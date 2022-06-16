@@ -1795,6 +1795,7 @@ namespace Gekko
                 {
                     this.isClosing = true;
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+                    throw e;
                 }
             }
         }

@@ -134,6 +134,8 @@
     <Compile Include="Cmd2Parser.cs" />
     <Compile Include="Cmd3Lexer.cs" />
     <Compile Include="Cmd3Parser.cs" />
+    <Compile Include="Cmd4Lexer.cs" />
+    <Compile Include="Cmd4Parser.cs" />
     <Compile Include="GAMSLexer.cs" />
     <Compile Include="GAMSParser.cs" />
     <Compile Include="ModelLexer.cs" />

@@ -1701,7 +1701,19 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
+            {
+                DateTime t0 = DateTime.Now;
+                new Writeln("Start");
+                double x = 0;
+                for (double i = 1; i <= 1e10; i++ )
+                {
+                    x += i;
+                }
+                new Writeln("" + x + "   " + G.Seconds(t0));
+            }
+
+            if (false && Globals.runningOnTTComputer)
             {
                 G.Writeln("");
                 G.Writeln("==========================================================================================");
@@ -1719,13 +1731,13 @@ namespace Gekko
                 G.Writeln("------------------------------------------------------------------------------------------");
                 G.Writeln(@"Work:e!a");
                 G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"read bank1; --- "); G.Write(@"bank: c:\Gekko\bank1 06-06-2022 9:45:24 --- trace: "); G.WriteLink("Work:e!a", ""); G.Writeln();
+                G.Write(@"read bank1; --- "); G.Write(@"bank: c:\Gekko\bank1.gbk 06-06-2022 9:45:24 --- trace: "); G.WriteLink("Work:e!a", ""); G.Writeln();
                 G.Writeln("------------------------------------------------------------------------------------------");
                 G.Writeln();
                 G.Writeln("------------------------------------------------------------------------------------------");
                 G.Writeln(@"Work:e!a --> Work:e!a");
                 G.Writeln("------------------------------------------------------------------------------------------");
-                G.Write(@"2021-2023: copy d to e; --- copied Work:e!a from Work:d!a --- trace: "); G.WriteLink("Work:d!a", ""); G.Writeln();
+                G.Write(@"copy d to e; --- copied Work:e!a from Work:d!a --- trace: "); G.WriteLink("Work:d!a", ""); G.Writeln();
                 G.Writeln(@"2024-2025: e <2024 2025> = 22, 23;");
                 G.Writeln("------------------------------------------------------------------------------------------");                
                 G.Writeln();
@@ -1887,7 +1899,7 @@ namespace Gekko
                 }
             }
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
 
                 //maybe buffer not larger then 1 mio.
@@ -1902,7 +1914,8 @@ namespace Gekko
                 else if (text.Contains("i7")) i = 7;
                 else if (text.Contains("i8")) i = 8;
 
-                string file = @"c:\Tools\Nibbler\sletmig.zip";
+                //string file = @"c:\Tools\test\makro.zip";
+                string file = @"c:\Tools\test\makro0.gdx";
                 DateTime dt0 = DateTime.Now;
 
                 //int buf = 4096;
@@ -1910,8 +1923,22 @@ namespace Gekko
 
                 if (true)
                 {
+
+                    //   debug rel64     on c:\Tools\test\makro.zip, a zip with 102 mb, inside is about 230 mb.
+                    //-------------------------------------------------------------------------------
+                    //i1  1500  1200     normal sha
+                    //i2  1300   980     sha with 1.2 mb chunks
+                    //i3  1250   980     sha with 1.2 mb chunks and read access
+                    //i4  2450  2400     md5 on text
+                    //i5  7500  7000     md5 on text utf8
+                    //i6    75    80     file copy
+                    //i7  3700  3150     zip extraction
+                    //i8  1100   990     sha with optimal mb chunks and read access
+                    //-------------------------------------------------------------------------------
+
                     if (i == 1)
                     {
+                        //almost as fast as 3 (fastest)
                         using (FileStream stream = File.OpenRead(file))
                         {
                             SHA256Managed sha = new SHA256Managed();
@@ -1921,6 +1948,7 @@ namespace Gekko
                     }
                     else if (i == 2)
                     {
+                        //almost as fast as 3 (fastest)
                         using (var stream = new BufferedStream(File.OpenRead(file), 1200000))
                         {
                             SHA256Managed sha = new SHA256Managed();
@@ -1950,6 +1978,7 @@ namespace Gekko
                     }
                     else if (i == 6)
                     {
+                        //really fast
                         WaitForFileCopy(file, "c:\\tools\\slet\\sletmig.data");
                     }
                     else if (i == 7)
@@ -1967,7 +1996,7 @@ namespace Gekko
                     }
                     else if (i == 8)
                     {
-                        using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                        using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //50000
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
@@ -3398,8 +3427,134 @@ namespace Gekko
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
+            //file is the "real" filepath and filename.
 
             Databank databankTemp = new Databank("temporary"); //doing it like this, merging is much easier
+
+            //first we (may) look in the protobuffer cache, to see if there is a hit.
+
+            if (true)
+            {
+                ////Similar code regarding LIBRARY caching (for instance large library zip files). See #k50dfi4lkdf098.
+
+                //DateTime dt0 = DateTime.Now;
+                //string type = "[unknown]";  //file | cache | ram                
+                //string fileName2 = file;
+                //string libraryName = Path.GetFileNameWithoutExtension(fileName2);
+                //string fileNameWithPath = file;
+                //if (fileNameWithPath == null)
+                //{
+                //    new Error("Could not find databank: " + fileName2);
+                //}                
+
+                //DateTime stamp = File.GetLastWriteTime(fileNameWithPath);
+
+                ////Regarding libraries, there is a ram cache too. This is not done for databanks, because these are often large,
+                ////and we do not want to use up RAM (for libraries, opening and closing libraries fast can be good, when you
+                ////are trying to make sure where a function f() comes from).
+                
+                
+                //{
+                //    //Not found in RAM cache.
+                //    //Now we try the disk cache.                    
+                //    //We only allow a match if it is BOTH the same bytes in the file, AND the filepath + alias is the same.
+                //    //This makes file references easier, less to think about. So two identical libs may be parsed two times if the are in two different file locations (or a different alias is used)
+
+                //    //TODO: This may be slow: first the network file is read and UTF-converted, then MD5.
+                //    //      Maybe faster to do local copy of whole file first (if copylocal?...), and then find some
+                //    //      fast MD5 (and salt with filename etc.).
+
+                //    string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
+                //    string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
+                //    string libHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
+                //    libHash = libHash.Trim();  //probably not necessary
+                //    string libFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
+                //    bool loadedFromProtobuf = false;
+                //    if (Program.options.library_cache == true)
+                //    {
+                //        if (File.Exists(libFileNameAndPath))
+                //        {
+                //            try
+                //            {
+                //                using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
+                //                {
+                //                    library = Serializer.Deserialize<Library>(fs);
+                //                    loadedFromProtobuf = true;
+                //                }
+                //            }
+                //            catch (Exception e)
+                //            {
+                //                if (G.IsUnitTesting())
+                //                {
+                //                    throw;
+                //                }
+                //                else
+                //                {
+                //                    //do nothing, we then have to parse the file
+                //                    loadedFromProtobuf = false;
+                //                }
+                //            }
+                //            type = "cache";
+                //        }
+                //    }
+                //    else
+                //    {
+                //        loadedFromProtobuf = false;
+                //    }
+
+                //    if (loadedFromProtobuf)
+                //    {
+                //        //do nothing, also no writing of .lib file of course
+                //    }
+                //    else
+                //    {
+                //        //We have to parse it
+                //        library = new Library(libraryName, fileNameWithPath, stamp);
+                //        library.LibraryExtractor(fileNameWithPath);
+
+                //        try //not the end of world if it fails
+                //        {
+                //            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                //            RuntimeTypeModel serializer = TypeModel.Create();
+                //            serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                //            // ----- SERIALIZE                    
+                //            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
+                //            string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                //            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                //            {
+                //                serializer.Serialize(fs, library);
+                //            }
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            //do nothing, not the end of the world if it fails
+                //        }
+                //        type = "file";
+                //    }
+
+                //    //all files loaded from .zip end up here, and the cache only grows (cannot shrink).
+                //    this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+                //}
+
+                //this.libraries.Add(library);
+                //List<string> functions, procedures, files;
+                //QHelper(library, out functions, out procedures, out files);
+
+                //string more = null;
+                //if (functions.Count + procedures.Count + files.Count > 0)
+                //{
+                //    more = " (" + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, QHelperActions(library, functions, procedures, files))) + ")";
+                //}
+
+                //using (Writeln txt = new Writeln())
+                //{
+                //    txt.MainAdd("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more + ".");
+                //    txt.MainNewLineTight();
+                //    txt.MainAdd("Library path: " + fileNameWithPath + ", ");
+                //    txt.MainAdd("loaded from " + type + " in: " + G.SecondsFormat((DateTime.Now - dt0).TotalMilliseconds) + ".");
+                //}
+
+            }
 
             if (oRead.Type == EDataFormat.Pcim)
             {
@@ -11124,10 +11279,55 @@ namespace Gekko
                         Globals.printAST = true;
                         G.Writeln("AST tree will be printed...");
                     }
-                    break;
+                    break;                
                 case "--testram":
                     {
                         Program.TestRam(false);
+                    }
+                    break;
+                case "--antlr":
+                    {
+                        //
+                        //rem without Xconversiontimeout it will only compile 10 % of the times. 120000 probably means 120 sec.
+                        //rem Takes about 1 minute 15 s, june 2019.The 1.5 GB setting makes compilation possible, and does not cost extra time.                        
+                        string antlrFile = "c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g";
+                        string antlrFile4 = antlrFile.Replace("Cmd3.g", "Cmd4.g");
+                        string javaPath = "c:\\Thomas\\Software\\Java\\jre6\\bin\\java.exe";
+                        string classPath = "c:\\Thomas\\Software\\ANTLR\\antlr-3.1.3.jar";
+                        string s = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 120000 -traceParser " + antlrFile;
+                        new Writeln("Start Cmd3.g");
+                        Program.ExecuteShellCommand(s, false);
+                        new Writeln("End Cmd3.g");
+                        string txt2 = GetTextFromFileWithWait(antlrFile, false);  //keep ansi
+                        List<string> txt3 = Stringlist.ExtractLinesFromText(txt2);
+                        List<string> txt4 = new List<string>();
+                        int hit = 0;
+                        foreach (string s7 in txt3)
+                        {
+                            if (s7.Contains("//[[Cmd4.g -- do not touch]]")) continue;
+                            string s8 = s7;
+                            if (s8.Contains("grammar Cmd3;"))
+                            {
+                                s8 = s8.Replace("grammar Cmd3;", "grammar Cmd4;");
+                                hit++;
+                            }
+                            txt4.Add(s8);
+                        }
+                        if (txt3.Count - txt4.Count != 4) new Error("Expected 4 lines difference between Cmd3.g and Cmd4g, got: " + (txt3.Count - txt4.Count));
+                        if (hit != 1) new Error("Expected 1 'grammar Cmd3;'");
+                        using (FileStream fs = WaitForFileStream(antlrFile4, null, GekkoFileReadOrWrite.Write))
+                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                        {
+                            foreach (string s2 in txt4)
+                            {
+                                sw.WriteLine(s2);
+                            }
+                            sw.Flush();
+                        }
+                        string s4 = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 120000 -traceParser " + antlrFile4;
+                        new Writeln("Start Cmd4.g");
+                        Program.ExecuteShellCommand(s4, false);
+                        new Writeln("End Cmd4.g");
                     }
                     break;
                 case "--gray":
@@ -17152,8 +17352,8 @@ namespace Gekko
         /// <summary>
         /// SYS command: execute from Windows shell
         /// </summary>
-        /// <param name="_CommandLine">Command line parameters to pass</param>        
-        public static void ExecuteShellCommand(string _CommandLine, bool mute)
+        /// <param name="commandLine">Command line parameters to pass</param>        
+        public static void ExecuteShellCommand(string commandLine, bool mute)
         {
             //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
 
@@ -17175,9 +17375,9 @@ namespace Gekko
                 //string _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _FileToExecute });
                 string _Arguments = "";
                 // pass any command line parameters for execution
-                if (_CommandLine != null && _CommandLine.Length > 0)
+                if (commandLine != null && commandLine.Length > 0)
                 {
-                    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _CommandLine, System.Globalization.CultureInfo.InvariantCulture });
+                    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
                 }
                 // sets a value indicating not to start the process in a new window.
                 process.StartInfo.CreateNoWindow = true;
@@ -17255,7 +17455,7 @@ namespace Gekko
                     int exitCode = process.ExitCode;
                     if (exitCode != 0)
                     {
-                        new Warning("System call exited with code: " + exitCode + ". System command: " + _CommandLine);
+                        new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
                         //fail = true;
                     }
                 }

@@ -44,7 +44,7 @@ namespace Gekko
         public static bool HANDLE_LIBRARY = false;
         public const string tempFileStart = "tempfile";
         public const string tempFileEnd = ".tmp";
-        public const string zip = ".zip";
+        public const string zip = ".zip";        
         
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
@@ -333,6 +333,7 @@ namespace Gekko
         
         //Seems this is used
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
+        //public static Parser.Gek.ParserGekCreateAST.EParserType syntaxType = Parser.Gek.ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;  //used in Cmd3.g        
 
         public const string firstCheatString = "[FIRST]";
 

@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Cmd3.g 2022-06-01 12:21:04
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2022-06-16 11:58:47
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -2076,7 +2076,7 @@ public partial class Cmd3Lexer : Lexer {
     
     override public string GrammarFileName
     {
-    	get { return "Cmd3.g";} 
+    	get { return "c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g";} 
     }
 
     // $ANTLR start "MAXLAG"
@@ -2086,8 +2086,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAXLAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:623:8: ( 'MAXLAG' )
-            // Cmd3.g:623:10: 'MAXLAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:623:8: ( 'MAXLAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:623:10: 'MAXLAG'
             {
             	Match("MAXLAG"); 
 
@@ -2110,8 +2110,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DFMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:624:7: ( 'DFMIN' )
-            // Cmd3.g:624:9: 'DFMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:624:7: ( 'DFMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:624:9: 'DFMIN'
             {
             	Match("DFMIN"); 
 
@@ -2134,8 +2134,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:625:6: ( 'LEAD' )
-            // Cmd3.g:625:8: 'LEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:625:6: ( 'LEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:625:8: 'LEAD'
             {
             	Match("LEAD"); 
 
@@ -2158,8 +2158,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REKUR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:626:7: ( 'REKUR' )
-            // Cmd3.g:626:9: 'REKUR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:626:7: ( 'REKUR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:626:9: 'REKUR'
             {
             	Match("REKUR"); 
 
@@ -2182,8 +2182,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAXLEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:627:9: ( 'MAXLEAD' )
-            // Cmd3.g:627:11: 'MAXLEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:627:9: ( 'MAXLEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:627:11: 'MAXLEAD'
             {
             	Match("MAXLEAD"); 
 
@@ -2206,8 +2206,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:628:5: ( 'FIT' )
-            // Cmd3.g:628:7: 'FIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:628:5: ( 'FIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:628:7: 'FIT'
             {
             	Match("FIT"); 
 
@@ -2230,8 +2230,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:629:5: ( 'GMS' )
-            // Cmd3.g:629:7: 'GMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:629:5: ( 'GMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:629:7: 'GMS'
             {
             	Match("GMS"); 
 
@@ -2254,8 +2254,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ELEMENTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:630:10: ( 'ELEMENTS' )
-            // Cmd3.g:630:12: 'ELEMENTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:630:10: ( 'ELEMENTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:630:12: 'ELEMENTS'
             {
             	Match("ELEMENTS"); 
 
@@ -2278,8 +2278,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:631:7: ( 'NOMAX' )
-            // Cmd3.g:631:9: 'NOMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:631:7: ( 'NOMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:631:9: 'NOMAX'
             {
             	Match("NOMAX"); 
 
@@ -2302,8 +2302,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RETURN2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:632:9: ( 'RETURN' )
-            // Cmd3.g:632:11: 'RETURN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:632:9: ( 'RETURN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:632:11: 'RETURN'
             {
             	Match("RETURN"); 
 
@@ -2326,8 +2326,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:633:4: ( 'IN' )
-            // Cmd3.g:633:6: 'IN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:633:4: ( 'IN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:633:6: 'IN'
             {
             	Match("IN"); 
 
@@ -2350,8 +2350,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:634:5: ( 'MAP' )
-            // Cmd3.g:634:7: 'MAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:634:5: ( 'MAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:634:7: 'MAP'
             {
             	Match("MAP"); 
 
@@ -2374,8 +2374,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STRING2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:635:9: ( 'STRING' )
-            // Cmd3.g:635:11: 'STRING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:635:9: ( 'STRING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:635:11: 'STRING'
             {
             	Match("STRING"); 
 
@@ -2398,8 +2398,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REMOTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:636:8: ( 'REMOTE' )
-            // Cmd3.g:636:10: 'REMOTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:636:8: ( 'REMOTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:636:10: 'REMOTE'
             {
             	Match("REMOTE"); 
 
@@ -2422,8 +2422,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ALIAS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:637:7: ( 'ALIAS' )
-            // Cmd3.g:637:9: 'ALIAS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:637:7: ( 'ALIAS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:637:9: 'ALIAS'
             {
             	Match("ALIAS"); 
 
@@ -2446,8 +2446,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OFFSET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:638:8: ( 'OFFSET' )
-            // Cmd3.g:638:10: 'OFFSET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:638:8: ( 'OFFSET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:638:10: 'OFFSET'
             {
             	Match("OFFSET"); 
 
@@ -2470,8 +2470,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DETECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:639:8: ( 'DETECT' )
-            // Cmd3.g:639:10: 'DETECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:639:8: ( 'DETECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:639:10: 'DETECT'
             {
             	Match("DETECT"); 
 
@@ -2494,8 +2494,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GRIDSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:640:11: ( 'GRIDSTYLE' )
-            // Cmd3.g:640:13: 'GRIDSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:640:11: ( 'GRIDSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:640:13: 'GRIDSTYLE'
             {
             	Match("GRIDSTYLE"); 
 
@@ -2518,8 +2518,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:641:6: ( 'BOLD' )
-            // Cmd3.g:641:8: 'BOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:641:6: ( 'BOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:641:8: 'BOLD'
             {
             	Match("BOLD"); 
 
@@ -2542,8 +2542,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ITALIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:642:8: ( 'ITALIC' )
-            // Cmd3.g:642:10: 'ITALIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:642:8: ( 'ITALIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:642:10: 'ITALIC'
             {
             	Match("ITALIC"); 
 
@@ -2566,8 +2566,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ASER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:643:6: ( 'ASER' )
-            // Cmd3.g:643:8: 'ASER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:643:6: ( 'ASER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:643:8: 'ASER'
             {
             	Match("ASER"); 
 
@@ -2590,8 +2590,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ASERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:644:9: ( 'ASERIES' )
-            // Cmd3.g:644:11: 'ASERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:644:9: ( 'ASERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:644:11: 'ASERIES'
             {
             	Match("ASERIES"); 
 
@@ -2614,8 +2614,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:645:9: ( 'XLABELS' )
-            // Cmd3.g:645:11: 'XLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:645:9: ( 'XLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:645:11: 'XLABELS'
             {
             	Match("XLABELS"); 
 
@@ -2638,8 +2638,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:646:9: ( 'YLABELS' )
-            // Cmd3.g:646:11: 'YLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:646:9: ( 'YLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:646:11: 'YLABELS'
             {
             	Match("YLABELS"); 
 
@@ -2662,8 +2662,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:647:8: ( 'ANNUAL' )
-            // Cmd3.g:647:10: 'ANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:647:8: ( 'ANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:647:10: 'ANNUAL'
             {
             	Match("ANNUAL"); 
 
@@ -2686,8 +2686,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AT2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:648:5: ( 'AT' )
-            // Cmd3.g:648:7: 'AT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:648:5: ( 'AT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:648:7: 'AT'
             {
             	Match("AT"); 
 
@@ -2710,8 +2710,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BETWEEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:649:9: ( 'BETWEEN' )
-            // Cmd3.g:649:11: 'BETWEEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:649:9: ( 'BETWEEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:649:11: 'BETWEEN'
             {
             	Match("BETWEEN"); 
 
@@ -2734,8 +2734,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NONANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:650:11: ( 'NONANNUAL' )
-            // Cmd3.g:650:13: 'NONANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:650:11: ( 'NONANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:650:13: 'NONANNUAL'
             {
             	Match("NONANNUAL"); 
 
@@ -2758,8 +2758,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CURRENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:651:9: ( 'CURRENT' )
-            // Cmd3.g:651:11: 'CURRENT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:651:9: ( 'CURRENT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:651:11: 'CURRENT'
             {
             	Match("CURRENT"); 
 
@@ -2782,8 +2782,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIGITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:652:8: ( 'DIGITS' )
-            // Cmd3.g:652:10: 'DIGITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:652:8: ( 'DIGITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:652:10: 'DIGITS'
             {
             	Match("DIGITS"); 
 
@@ -2806,8 +2806,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GAMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:653:6: ( 'GAMS' )
-            // Cmd3.g:653:8: 'GAMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:653:6: ( 'GAMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:653:8: 'GAMS'
             {
             	Match("GAMS"); 
 
@@ -2830,8 +2830,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:654:5: ( 'GDX' )
-            // Cmd3.g:654:7: 'GDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:654:5: ( 'GDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:654:7: 'GDX'
             {
             	Match("GDX"); 
 
@@ -2854,8 +2854,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GDXOPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:655:8: ( 'GDXOPT' )
-            // Cmd3.g:655:10: 'GDXOPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:655:8: ( 'GDXOPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:655:10: 'GDXOPT'
             {
             	Match("GDXOPT"); 
 
@@ -2878,8 +2878,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LAGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:656:8: ( 'LAGFIX' )
-            // Cmd3.g:656:10: 'LAGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:656:8: ( 'LAGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:656:10: 'LAGFIX'
             {
             	Match("LAGFIX"); 
 
@@ -2902,8 +2902,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ADDBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:657:9: ( 'ADDBANK' )
-            // Cmd3.g:657:11: 'ADDBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:657:9: ( 'ADDBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:657:11: 'ADDBANK'
             {
             	Match("ADDBANK"); 
 
@@ -2926,8 +2926,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHOWBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:658:10: ( 'SHOWBANK' )
-            // Cmd3.g:658:12: 'SHOWBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:658:10: ( 'SHOWBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:658:12: 'SHOWBANK'
             {
             	Match("SHOWBANK"); 
 
@@ -2950,8 +2950,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHOWFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:659:10: ( 'SHOWFREQ' )
-            // Cmd3.g:659:12: 'SHOWFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:659:10: ( 'SHOWFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:659:12: 'SHOWFREQ'
             {
             	Match("SHOWFREQ"); 
 
@@ -2974,8 +2974,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REBASE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:660:8: ( 'REBASE' )
-            // Cmd3.g:660:10: 'REBASE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:660:8: ( 'REBASE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:660:10: 'REBASE'
             {
             	Match("REBASE"); 
 
@@ -2998,8 +2998,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINESPOINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:661:13: ( 'LINESPOINTS' )
-            // Cmd3.g:661:15: 'LINESPOINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:661:13: ( 'LINESPOINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:661:15: 'LINESPOINTS'
             {
             	Match("LINESPOINTS"); 
 
@@ -3022,8 +3022,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BOXES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:662:7: ( 'BOXES' )
-            // Cmd3.g:662:9: 'BOXES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:662:7: ( 'BOXES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:662:9: 'BOXES'
             {
             	Match("BOXES"); 
 
@@ -3046,8 +3046,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FILLEDCURVES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:663:14: ( 'FILLEDCURVES' )
-            // Cmd3.g:663:16: 'FILLEDCURVES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:663:14: ( 'FILLEDCURVES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:663:16: 'FILLEDCURVES'
             {
             	Match("FILLEDCURVES"); 
 
@@ -3070,8 +3070,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STEPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:664:7: ( 'STEPS' )
-            // Cmd3.g:664:9: 'STEPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:664:7: ( 'STEPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:664:9: 'STEPS'
             {
             	Match("STEPS"); 
 
@@ -3094,8 +3094,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:665:6: ( 'DOTS' )
-            // Cmd3.g:665:8: 'DOTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:665:6: ( 'DOTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:665:8: 'DOTS'
             {
             	Match("DOTS"); 
 
@@ -3118,8 +3118,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IMPULSES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:666:10: ( 'IMPULSES' )
-            // Cmd3.g:666:12: 'IMPULSES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:666:10: ( 'IMPULSES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:666:12: 'IMPULSES'
             {
             	Match("IMPULSES"); 
 
@@ -3142,8 +3142,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONTINUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:667:10: ( 'CONTINUE' )
-            // Cmd3.g:667:12: 'CONTINUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:667:10: ( 'CONTINUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:667:12: 'CONTINUE'
             {
             	Match("CONTINUE"); 
 
@@ -3166,8 +3166,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VOID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:668:6: ( 'VOID' )
-            // Cmd3.g:668:8: 'VOID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:668:6: ( 'VOID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:668:8: 'VOID'
             {
             	Match("VOID"); 
 
@@ -3190,8 +3190,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PROCEDURE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:669:11: ( 'PROCEDURE' )
-            // Cmd3.g:669:13: 'PROCEDURE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:669:11: ( 'PROCEDURE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:669:13: 'PROCEDURE'
             {
             	Match("PROCEDURE"); 
 
@@ -3214,8 +3214,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:670:6: ( 'SIZE' )
-            // Cmd3.g:670:8: 'SIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:670:6: ( 'SIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:670:8: 'SIZE'
             {
             	Match("SIZE"); 
 
@@ -3238,8 +3238,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SUBTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:671:10: ( 'SUBTITLE' )
-            // Cmd3.g:671:12: 'SUBTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:671:10: ( 'SUBTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:671:12: 'SUBTITLE'
             {
             	Match("SUBTITLE"); 
 
@@ -3262,8 +3262,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TICS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:672:6: ( 'TICS' )
-            // Cmd3.g:672:8: 'TICS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:672:6: ( 'TICS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:672:8: 'TICS'
             {
             	Match("TICS"); 
 
@@ -3286,8 +3286,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GRID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:673:6: ( 'GRID' )
-            // Cmd3.g:673:8: 'GRID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:673:6: ( 'GRID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:673:8: 'GRID'
             {
             	Match("GRID"); 
 
@@ -3310,8 +3310,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = KEY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:674:5: ( 'KEY' )
-            // Cmd3.g:674:7: 'KEY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:674:5: ( 'KEY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:674:7: 'KEY'
             {
             	Match("KEY"); 
 
@@ -3334,8 +3334,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PALETTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:675:9: ( 'PALETTE' )
-            // Cmd3.g:675:11: 'PALETTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:675:9: ( 'PALETTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:675:11: 'PALETTE'
             {
             	Match("PALETTE"); 
 
@@ -3358,8 +3358,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:676:7: ( 'STACK' )
-            // Cmd3.g:676:9: 'STACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:676:7: ( 'STACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:676:9: 'STACK'
             {
             	Match("STACK"); 
 
@@ -3382,8 +3382,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BOXWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:677:10: ( 'BOXWIDTH' )
-            // Cmd3.g:677:12: 'BOXWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:677:10: ( 'BOXWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:677:12: 'BOXWIDTH'
             {
             	Match("BOXWIDTH"); 
 
@@ -3406,8 +3406,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BOXGAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:678:8: ( 'BOXGAP' )
-            // Cmd3.g:678:10: 'BOXGAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:678:8: ( 'BOXGAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:678:10: 'BOXGAP'
             {
             	Match("BOXGAP"); 
 
@@ -3430,8 +3430,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SEPARATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:679:10: ( 'SEPARATE' )
-            // Cmd3.g:679:12: 'SEPARATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:679:10: ( 'SEPARATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:679:12: 'SEPARATE'
             {
             	Match("SEPARATE"); 
 
@@ -3454,8 +3454,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:680:7: ( 'XLINE' )
-            // Cmd3.g:680:9: 'XLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:680:7: ( 'XLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:680:9: 'XLINE'
             {
             	Match("XLINE"); 
 
@@ -3478,8 +3478,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLINEBEFORE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:681:13: ( 'XLINEBEFORE' )
-            // Cmd3.g:681:15: 'XLINEBEFORE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:681:13: ( 'XLINEBEFORE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:681:15: 'XLINEBEFORE'
             {
             	Match("XLINEBEFORE"); 
 
@@ -3502,8 +3502,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLINEAFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:682:12: ( 'XLINEAFTER' )
-            // Cmd3.g:682:14: 'XLINEAFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:682:12: ( 'XLINEAFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:682:14: 'XLINEAFTER'
             {
             	Match("XLINEAFTER"); 
 
@@ -3526,8 +3526,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMIRROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:683:9: ( 'YMIRROR' )
-            // Cmd3.g:683:11: 'YMIRROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:683:9: ( 'YMIRROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:683:11: 'YMIRROR'
             {
             	Match("YMIRROR"); 
 
@@ -3550,8 +3550,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:684:8: ( 'YTITLE' )
-            // Cmd3.g:684:10: 'YTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:684:8: ( 'YTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:684:10: 'YTITLE'
             {
             	Match("YTITLE"); 
 
@@ -3574,8 +3574,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:685:7: ( 'YLINE' )
-            // Cmd3.g:685:9: 'YLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:685:7: ( 'YLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:685:9: 'YLINE'
             {
             	Match("YLINE"); 
 
@@ -3598,8 +3598,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:686:10: ( 'YMAXHARD' )
-            // Cmd3.g:686:12: 'YMAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:686:10: ( 'YMAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:686:12: 'YMAXHARD'
             {
             	Match("YMAXHARD"); 
 
@@ -3622,8 +3622,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:687:10: ( 'YMAXSOFT' )
-            // Cmd3.g:687:12: 'YMAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:687:10: ( 'YMAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:687:12: 'YMAXSOFT'
             {
             	Match("YMAXSOFT"); 
 
@@ -3646,8 +3646,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:688:10: ( 'YMINHARD' )
-            // Cmd3.g:688:12: 'YMINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:688:10: ( 'YMINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:688:12: 'YMINHARD'
             {
             	Match("YMINHARD"); 
 
@@ -3670,8 +3670,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:689:10: ( 'YMINSOFT' )
-            // Cmd3.g:689:12: 'YMINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:689:10: ( 'YMINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:689:12: 'YMINSOFT'
             {
             	Match("YMINSOFT"); 
 
@@ -3694,8 +3694,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:690:11: ( 'XZEROAXIS' )
-            // Cmd3.g:690:13: 'XZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:690:11: ( 'XZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:690:13: 'XZEROAXIS'
             {
             	Match("XZEROAXIS"); 
 
@@ -3718,8 +3718,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:691:9: ( 'Y2TITLE' )
-            // Cmd3.g:691:11: 'Y2TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:691:9: ( 'Y2TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:691:11: 'Y2TITLE'
             {
             	Match("Y2TITLE"); 
 
@@ -3742,8 +3742,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2LINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:692:8: ( 'Y2LINE' )
-            // Cmd3.g:692:10: 'Y2LINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:692:8: ( 'Y2LINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:692:10: 'Y2LINE'
             {
             	Match("Y2LINE"); 
 
@@ -3766,8 +3766,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:693:11: ( 'Y2MAXHARD' )
-            // Cmd3.g:693:13: 'Y2MAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:693:11: ( 'Y2MAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:693:13: 'Y2MAXHARD'
             {
             	Match("Y2MAXHARD"); 
 
@@ -3790,8 +3790,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:694:11: ( 'Y2MAXSOFT' )
-            // Cmd3.g:694:13: 'Y2MAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:694:11: ( 'Y2MAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:694:13: 'Y2MAXSOFT'
             {
             	Match("Y2MAXSOFT"); 
 
@@ -3814,8 +3814,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:695:11: ( 'Y2MINHARD' )
-            // Cmd3.g:695:13: 'Y2MINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:695:11: ( 'Y2MINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:695:13: 'Y2MINHARD'
             {
             	Match("Y2MINHARD"); 
 
@@ -3838,8 +3838,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:696:11: ( 'Y2MINSOFT' )
-            // Cmd3.g:696:13: 'Y2MINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:696:11: ( 'Y2MINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:696:13: 'Y2MINSOFT'
             {
             	Match("Y2MINSOFT"); 
 
@@ -3862,8 +3862,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = X2ZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:697:12: ( 'X2ZEROAXIS' )
-            // Cmd3.g:697:14: 'X2ZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:697:12: ( 'X2ZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:697:14: 'X2ZEROAXIS'
             {
             	Match("X2ZEROAXIS"); 
 
@@ -3886,8 +3886,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ARROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:698:7: ( 'ARROW' )
-            // Cmd3.g:698:9: 'ARROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:698:7: ( 'ARROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:698:9: 'ARROW'
             {
             	Match("ARROW"); 
 
@@ -3910,8 +3910,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DASHTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:699:10: ( 'DASHTYPE' )
-            // Cmd3.g:699:12: 'DASHTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:699:10: ( 'DASHTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:699:12: 'DASHTYPE'
             {
             	Match("DASHTYPE"); 
 
@@ -3934,8 +3934,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:700:11: ( 'LINEWIDTH' )
-            // Cmd3.g:700:13: 'LINEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:700:11: ( 'LINEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:700:13: 'LINEWIDTH'
             {
             	Match("LINEWIDTH"); 
 
@@ -3958,8 +3958,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINECOLOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:701:11: ( 'LINECOLOR' )
-            // Cmd3.g:701:13: 'LINECOLOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:701:11: ( 'LINECOLOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:701:13: 'LINECOLOR'
             {
             	Match("LINECOLOR"); 
 
@@ -3982,8 +3982,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = POINTTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:702:11: ( 'POINTTYPE' )
-            // Cmd3.g:702:13: 'POINTTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:702:11: ( 'POINTTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:702:13: 'POINTTYPE'
             {
             	Match("POINTTYPE"); 
 
@@ -4006,8 +4006,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = POINTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:703:11: ( 'POINTSIZE' )
-            // Cmd3.g:703:13: 'POINTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:703:11: ( 'POINTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:703:13: 'POINTSIZE'
             {
             	Match("POINTSIZE"); 
 
@@ -4030,8 +4030,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FILLSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:704:11: ( 'FILLSTYLE' )
-            // Cmd3.g:704:13: 'FILLSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:704:11: ( 'FILLSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:704:13: 'FILLSTYLE'
             {
             	Match("FILLSTYLE"); 
 
@@ -4054,8 +4054,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LABEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:705:7: ( 'LABEL' )
-            // Cmd3.g:705:9: 'LABEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:705:7: ( 'LABEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:705:9: 'LABEL'
             {
             	Match("LABEL"); 
 
@@ -4078,8 +4078,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:706:4: ( 'Y2' )
-            // Cmd3.g:706:6: 'Y2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:706:4: ( 'Y2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:706:6: 'Y2'
             {
             	Match("Y2"); 
 
@@ -4102,8 +4102,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = X;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:707:3: ( 'X' )
-            // Cmd3.g:707:5: 'X'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:707:3: ( 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:707:5: 'X'
             {
             	Match('X'); 
 
@@ -4125,8 +4125,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:708:3: ( 'Y' )
-            // Cmd3.g:708:5: 'Y'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:708:3: ( 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:708:5: 'Y'
             {
             	Match('Y'); 
 
@@ -4148,8 +4148,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MDATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:709:13: ( 'MDATEFORMAT' )
-            // Cmd3.g:709:15: 'MDATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:709:13: ( 'MDATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:709:15: 'MDATEFORMAT'
             {
             	Match("MDATEFORMAT"); 
 
@@ -4172,8 +4172,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = THOUSANDSSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:710:20: ( 'THOUSANDSSEPARATOR' )
-            // Cmd3.g:710:22: 'THOUSANDSSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:710:20: ( 'THOUSANDSSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:710:22: 'THOUSANDSSEPARATOR'
             {
             	Match("THOUSANDSSEPARATOR"); 
 
@@ -4196,8 +4196,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XEDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:711:7: ( 'XEDIT' )
-            // Cmd3.g:711:9: 'XEDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:711:7: ( 'XEDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:711:9: 'XEDIT'
             {
             	Match("XEDIT"); 
 
@@ -4220,8 +4220,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IMPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:712:8: ( 'IMPOSE' )
-            // Cmd3.g:712:10: 'IMPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:712:8: ( 'IMPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:712:10: 'IMPOSE'
             {
             	Match("IMPOSE"); 
 
@@ -4244,8 +4244,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONSTANT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:713:10: ( 'CONSTANT' )
-            // Cmd3.g:713:12: 'CONSTANT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:713:10: ( 'CONSTANT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:713:12: 'CONSTANT'
             {
             	Match("CONSTANT"); 
 
@@ -4268,8 +4268,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INTERPOLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:714:13: ( 'INTERPOLATE' )
-            // Cmd3.g:714:15: 'INTERPOLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:714:13: ( 'INTERPOLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:714:15: 'INTERPOLATE'
             {
             	Match("INTERPOLATE"); 
 
@@ -4292,8 +4292,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRORATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:715:9: ( 'PRORATE' )
-            // Cmd3.g:715:11: 'PRORATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:715:9: ( 'PRORATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:715:11: 'PRORATE'
             {
             	Match("PRORATE"); 
 
@@ -4316,8 +4316,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:716:6: ( 'TRIM' )
-            // Cmd3.g:716:8: 'TRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:716:6: ( 'TRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:716:8: 'TRIM'
             {
             	Match("TRIM"); 
 
@@ -4340,8 +4340,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = USING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:717:7: ( 'USING' )
-            // Cmd3.g:717:9: 'USING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:717:7: ( 'USING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:717:9: 'USING'
             {
             	Match("USING"); 
 
@@ -4364,8 +4364,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:718:3: ( 'A' )
-            // Cmd3.g:718:5: 'A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:718:3: ( 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:718:5: 'A'
             {
             	Match('A'); 
 
@@ -4387,8 +4387,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DEFAULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:719:9: ( 'DEFAULT' )
-            // Cmd3.g:719:11: 'DEFAULT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:719:9: ( 'DEFAULT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:719:11: 'DEFAULT'
             {
             	Match("DEFAULT"); 
 
@@ -4411,8 +4411,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LOGIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:720:7: ( 'LOGIC' )
-            // Cmd3.g:720:9: 'LOGIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:720:7: ( 'LOGIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:720:9: 'LOGIC'
             {
             	Match("LOGIC"); 
 
@@ -4435,8 +4435,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:721:5: ( 'ABS' )
-            // Cmd3.g:721:7: 'ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:721:5: ( 'ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:721:7: 'ABS'
             {
             	Match("ABS"); 
 
@@ -4459,8 +4459,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ABSOLUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:722:10: ( 'absolute' )
-            // Cmd3.g:722:12: 'absolute'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:722:10: ( 'absolute' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:722:12: 'absolute'
             {
             	Match("absolute"); 
 
@@ -4483,8 +4483,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ACCEPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:723:8: ( 'ACCEPT' )
-            // Cmd3.g:723:10: 'ACCEPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:723:8: ( 'ACCEPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:723:10: 'ACCEPT'
             {
             	Match("ACCEPT"); 
 
@@ -4507,8 +4507,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ADD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:724:5: ( 'ADD' )
-            // Cmd3.g:724:7: 'ADD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:724:5: ( 'ADD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:724:7: 'ADD'
             {
             	Match("ADD"); 
 
@@ -4531,8 +4531,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:725:7: ( 'AFTER' )
-            // Cmd3.g:725:9: 'AFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:725:7: ( 'AFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:725:9: 'AFTER'
             {
             	Match("AFTER"); 
 
@@ -4555,8 +4555,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AFTER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:726:8: ( 'AFTER2' )
-            // Cmd3.g:726:10: 'AFTER2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:726:8: ( 'AFTER2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:726:10: 'AFTER2'
             {
             	Match("AFTER2"); 
 
@@ -4579,8 +4579,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ALIGNCENTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:727:13: ( 'ALIGNCENTER' )
-            // Cmd3.g:727:15: 'ALIGNCENTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:727:13: ( 'ALIGNCENTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:727:15: 'ALIGNCENTER'
             {
             	Match("ALIGNCENTER"); 
 
@@ -4603,8 +4603,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ALIGNLEFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:728:11: ( 'ALIGNLEFT' )
-            // Cmd3.g:728:13: 'ALIGNLEFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:728:11: ( 'ALIGNLEFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:728:13: 'ALIGNLEFT'
             {
             	Match("ALIGNLEFT"); 
 
@@ -4627,8 +4627,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ALIGNRIGHT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:729:12: ( 'ALIGNRIGHT' )
-            // Cmd3.g:729:14: 'ALIGNRIGHT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:729:12: ( 'ALIGNRIGHT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:729:14: 'ALIGNRIGHT'
             {
             	Match("ALIGNRIGHT"); 
 
@@ -4651,8 +4651,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:730:5: ( 'ALL' )
-            // Cmd3.g:730:7: 'ALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:730:5: ( 'ALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:730:7: 'ALL'
             {
             	Match("ALL"); 
 
@@ -4675,8 +4675,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ANALYZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:731:9: ( 'ANALYZE' )
-            // Cmd3.g:731:11: 'ANALYZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:731:9: ( 'ANALYZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:731:11: 'ANALYZE'
             {
             	Match("ANALYZE"); 
 
@@ -4699,8 +4699,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:732:5: ( 'AND' )
-            // Cmd3.g:732:7: 'AND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:732:5: ( 'AND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:732:7: 'AND'
             {
             	Match("AND"); 
 
@@ -4723,8 +4723,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = APPEND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:733:8: ( 'APPEND' )
-            // Cmd3.g:733:10: 'APPEND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:733:8: ( 'APPEND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:733:10: 'APPEND'
             {
             	Match("APPEND"); 
 
@@ -4747,8 +4747,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AREMOS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:734:8: ( 'AREMOS' )
-            // Cmd3.g:734:10: 'AREMOS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:734:8: ( 'AREMOS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:734:10: 'AREMOS'
             {
             	Match("AREMOS"); 
 
@@ -4771,8 +4771,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:735:4: ( 'OP' )
-            // Cmd3.g:735:6: 'OP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:735:4: ( 'OP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:735:6: 'OP'
             {
             	Match("OP"); 
 
@@ -4795,8 +4795,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:736:4: ( 'AS' )
-            // Cmd3.g:736:6: 'AS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:736:4: ( 'AS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:736:6: 'AS'
             {
             	Match("AS"); 
 
@@ -4819,8 +4819,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AUTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:737:6: ( 'AUTO' )
-            // Cmd3.g:737:8: 'AUTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:737:6: ( 'AUTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:737:8: 'AUTO'
             {
             	Match("AUTO"); 
 
@@ -4843,8 +4843,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AVG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:738:5: ( 'AVG' )
-            // Cmd3.g:738:7: 'AVG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:738:5: ( 'AVG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:738:7: 'AVG'
             {
             	Match("AVG"); 
 
@@ -4867,8 +4867,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BACKTRACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:739:11: ( 'BACKTRACK' )
-            // Cmd3.g:739:13: 'BACKTRACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:739:11: ( 'BACKTRACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:739:13: 'BACKTRACK'
             {
             	Match("BACKTRACK"); 
 
@@ -4891,8 +4891,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:740:6: ( 'BANK' )
-            // Cmd3.g:740:8: 'BANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:740:6: ( 'BANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:740:8: 'BANK'
             {
             	Match("BANK"); 
 
@@ -4915,8 +4915,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BANK1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:741:7: ( 'BANK1' )
-            // Cmd3.g:741:9: 'BANK1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:741:7: ( 'BANK1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:741:9: 'BANK1'
             {
             	Match("BANK1"); 
 
@@ -4939,8 +4939,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BANK2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:742:7: ( 'BANK2' )
-            // Cmd3.g:742:9: 'BANK2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:742:7: ( 'BANK2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:742:9: 'BANK2'
             {
             	Match("BANK2"); 
 
@@ -4963,8 +4963,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BOWL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:743:6: ( 'BOWL' )
-            // Cmd3.g:743:8: 'BOWL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:743:6: ( 'BOWL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:743:8: 'BOWL'
             {
             	Match("BOWL"); 
 
@@ -4987,8 +4987,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:744:4: ( 'BY' )
-            // Cmd3.g:744:6: 'BY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:744:4: ( 'BY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:744:6: 'BY'
             {
             	Match("BY"); 
 
@@ -5011,8 +5011,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CACHE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:745:7: ( 'CACHE' )
-            // Cmd3.g:745:9: 'CACHE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:745:7: ( 'CACHE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:745:9: 'CACHE'
             {
             	Match("CACHE"); 
 
@@ -5035,8 +5035,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CALC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:746:6: ( 'CALC' )
-            // Cmd3.g:746:8: 'CALC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:746:6: ( 'CALC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:746:8: 'CALC'
             {
             	Match("CALC"); 
 
@@ -5059,8 +5059,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CAPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:747:6: ( 'CAPS' )
-            // Cmd3.g:747:8: 'CAPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:747:6: ( 'CAPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:747:8: 'CAPS'
             {
             	Match("CAPS"); 
 
@@ -5083,8 +5083,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:748:6: ( 'CELL' )
-            // Cmd3.g:748:8: 'CELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:748:6: ( 'CELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:748:8: 'CELL'
             {
             	Match("CELL"); 
 
@@ -5107,8 +5107,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CHANGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:749:8: ( 'CHANGE' )
-            // Cmd3.g:749:10: 'CHANGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:749:8: ( 'CHANGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:749:10: 'CHANGE'
             {
             	Match("CHANGE"); 
 
@@ -5131,8 +5131,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CHECKOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:750:10: ( 'CHECKOFF' )
-            // Cmd3.g:750:12: 'CHECKOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:750:10: ( 'CHECKOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:750:12: 'CHECKOFF'
             {
             	Match("CHECKOFF"); 
 
@@ -5155,8 +5155,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:751:7: ( 'CLEAR' )
-            // Cmd3.g:751:9: 'CLEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:751:7: ( 'CLEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:751:9: 'CLEAR'
             {
             	Match("CLEAR"); 
 
@@ -5179,8 +5179,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLEAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:752:8: ( 'CLEAR2' )
-            // Cmd3.g:752:10: 'CLEAR2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:752:8: ( 'CLEAR2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:752:10: 'CLEAR2'
             {
             	Match("CLEAR2"); 
 
@@ -5203,8 +5203,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:753:6: ( 'CLIP' )
-            // Cmd3.g:753:8: 'CLIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:753:6: ( 'CLIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:753:8: 'CLIP'
             {
             	Match("CLIP"); 
 
@@ -5227,8 +5227,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLIPBOARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:754:11: ( 'CLIPBOARD' )
-            // Cmd3.g:754:13: 'CLIPBOARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:754:11: ( 'CLIPBOARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:754:13: 'CLIPBOARD'
             {
             	Match("CLIPBOARD"); 
 
@@ -5251,8 +5251,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:755:7: ( 'CLONE' )
-            // Cmd3.g:755:9: 'CLONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:755:7: ( 'CLONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:755:9: 'CLONE'
             {
             	Match("CLONE"); 
 
@@ -5275,8 +5275,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:756:6: ( 'MOVE' )
-            // Cmd3.g:756:8: 'MOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:756:6: ( 'MOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:756:8: 'MOVE'
             {
             	Match("MOVE"); 
 
@@ -5299,8 +5299,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REMOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:757:8: ( 'REMOVE' )
-            // Cmd3.g:757:10: 'REMOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:757:8: ( 'REMOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:757:10: 'REMOVE'
             {
             	Match("REMOVE"); 
 
@@ -5323,8 +5323,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:758:7: ( 'CLOSE' )
-            // Cmd3.g:758:9: 'CLOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:758:7: ( 'CLOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:758:9: 'CLOSE'
             {
             	Match("CLOSE"); 
 
@@ -5347,8 +5347,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLOSEALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:759:10: ( 'CLOSEALL' )
-            // Cmd3.g:759:12: 'CLOSEALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:759:10: ( 'CLOSEALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:759:12: 'CLOSEALL'
             {
             	Match("CLOSEALL"); 
 
@@ -5371,8 +5371,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLOSEBANKS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:760:12: ( 'CLOSEBANKS' )
-            // Cmd3.g:760:14: 'CLOSEBANKS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:760:12: ( 'CLOSEBANKS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:760:14: 'CLOSEBANKS'
             {
             	Match("CLOSEBANKS"); 
 
@@ -5395,8 +5395,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:761:5: ( 'CLS' )
-            // Cmd3.g:761:7: 'CLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:761:5: ( 'CLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:761:7: 'CLS'
             {
             	Match("CLS"); 
 
@@ -5419,8 +5419,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:762:6: ( 'CODE' )
-            // Cmd3.g:762:8: 'CODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:762:6: ( 'CODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:762:8: 'CODE'
             {
             	Match("CODE"); 
 
@@ -5443,8 +5443,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLLAPSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:763:10: ( 'COLLAPSE' )
-            // Cmd3.g:763:12: 'COLLAPSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:763:10: ( 'COLLAPSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:763:12: 'COLLAPSE'
             {
             	Match("COLLAPSE"); 
 
@@ -5467,8 +5467,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XTREND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:764:8: ( 'XTREND' )
-            // Cmd3.g:764:10: 'XTREND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:764:8: ( 'XTREND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:764:10: 'XTREND'
             {
             	Match("XTREND"); 
 
@@ -5491,8 +5491,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XFLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:765:7: ( 'XFLAT' )
-            // Cmd3.g:765:9: 'XFLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:765:7: ( 'XFLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:765:9: 'XFLAT'
             {
             	Match("XFLAT"); 
 
@@ -5515,8 +5515,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:766:4: ( 'PX' )
-            // Cmd3.g:766:6: 'PX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:766:4: ( 'PX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:766:6: 'PX'
             {
             	Match("PX"); 
 
@@ -5539,8 +5539,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ARRAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:767:7: ( 'ARRAY' )
-            // Cmd3.g:767:9: 'ARRAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:767:7: ( 'ARRAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:767:9: 'ARRAY'
             {
             	Match("ARRAY"); 
 
@@ -5563,8 +5563,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BUGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:768:8: ( 'BUGFIX' )
-            // Cmd3.g:768:10: 'BUGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:768:8: ( 'BUGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:768:10: 'BUGFIX'
             {
             	Match("BUGFIX"); 
 
@@ -5587,8 +5587,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GCM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:769:5: ( 'GCM' )
-            // Cmd3.g:769:7: 'GCM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:769:5: ( 'GCM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:769:7: 'GCM'
             {
             	Match("GCM"); 
 
@@ -5611,8 +5611,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:770:8: ( 'COLORS' )
-            // Cmd3.g:770:10: 'COLORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:770:8: ( 'COLORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:770:10: 'COLORS'
             {
             	Match("COLORS"); 
 
@@ -5635,8 +5635,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:771:6: ( 'COLS' )
-            // Cmd3.g:771:8: 'COLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:771:6: ( 'COLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:771:8: 'COLS'
             {
             	Match("COLS"); 
 
@@ -5659,8 +5659,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DELIMITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:772:11: ( 'DELIMITER' )
-            // Cmd3.g:772:13: 'DELIMITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:772:11: ( 'DELIMITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:772:13: 'DELIMITER'
             {
             	Match("DELIMITER"); 
 
@@ -5683,8 +5683,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:773:12: ( 'DATEFORMAT' )
-            // Cmd3.g:773:14: 'DATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:773:12: ( 'DATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:773:14: 'DATEFORMAT'
             {
             	Match("DATEFORMAT"); 
 
@@ -5707,8 +5707,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATETYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:774:10: ( 'DATETYPE' )
-            // Cmd3.g:774:12: 'DATETYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:774:10: ( 'DATETYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:774:12: 'DATETYPE'
             {
             	Match("DATETYPE"); 
 
@@ -5731,8 +5731,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:775:7: ( 'COMMA' )
-            // Cmd3.g:775:9: 'COMMA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:775:7: ( 'COMMA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:775:9: 'COMMA'
             {
             	Match("COMMA"); 
 
@@ -5755,8 +5755,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:776:9: ( 'COMMAND' )
-            // Cmd3.g:776:11: 'COMMAND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:776:9: ( 'COMMAND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:776:11: 'COMMAND'
             {
             	Match("COMMAND"); 
 
@@ -5779,8 +5779,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMAND1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:777:10: ( 'COMMAND1' )
-            // Cmd3.g:777:12: 'COMMAND1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:777:10: ( 'COMMAND1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:777:12: 'COMMAND1'
             {
             	Match("COMMAND1"); 
 
@@ -5803,8 +5803,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMAND2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:778:10: ( 'COMMAND2' )
-            // Cmd3.g:778:12: 'COMMAND2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:778:10: ( 'COMMAND2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:778:12: 'COMMAND2'
             {
             	Match("COMMAND2"); 
 
@@ -5827,8 +5827,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMPARE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:779:9: ( 'COMPARE' )
-            // Cmd3.g:779:11: 'COMPARE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:779:9: ( 'COMPARE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:779:11: 'COMPARE'
             {
             	Match("COMPARE"); 
 
@@ -5851,8 +5851,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMPRESS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:780:10: ( 'COMPRESS' )
-            // Cmd3.g:780:12: 'COMPRESS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:780:10: ( 'COMPRESS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:780:12: 'COMPRESS'
             {
             	Match("COMPRESS"); 
 
@@ -5875,8 +5875,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:781:7: ( 'CONST' )
-            // Cmd3.g:781:9: 'CONST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:781:7: ( 'CONST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:781:9: 'CONST'
             {
             	Match("CONST"); 
 
@@ -5899,8 +5899,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:782:6: ( 'CONV' )
-            // Cmd3.g:782:8: 'CONV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:782:6: ( 'CONV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:782:8: 'CONV'
             {
             	Match("CONV"); 
 
@@ -5923,8 +5923,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONV1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:783:7: ( 'CONV1' )
-            // Cmd3.g:783:9: 'CONV1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:783:7: ( 'CONV1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:783:9: 'CONV1'
             {
             	Match("CONV1"); 
 
@@ -5947,8 +5947,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CONV2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:784:7: ( 'CONV2' )
-            // Cmd3.g:784:9: 'CONV2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:784:7: ( 'CONV2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:784:9: 'CONV2'
             {
             	Match("CONV2"); 
 
@@ -5971,8 +5971,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COPY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:785:6: ( 'COPY' )
-            // Cmd3.g:785:8: 'COPY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:785:6: ( 'COPY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:785:8: 'COPY'
             {
             	Match("COPY"); 
 
@@ -5995,8 +5995,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COPYLOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:786:11: ( 'COPYLOCAL' )
-            // Cmd3.g:786:13: 'COPYLOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:786:11: ( 'COPYLOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:786:13: 'COPYLOCAL'
             {
             	Match("COPYLOCAL"); 
 
@@ -6019,8 +6019,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:787:7: ( 'LOCAL' )
-            // Cmd3.g:787:9: 'LOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:787:7: ( 'LOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:787:9: 'LOCAL'
             {
             	Match("LOCAL"); 
 
@@ -6043,8 +6043,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLOBAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:788:8: ( 'GLOBAL' )
-            // Cmd3.g:788:10: 'GLOBAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:788:8: ( 'GLOBAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:788:10: 'GLOBAL'
             {
             	Match("GLOBAL"); 
 
@@ -6067,8 +6067,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COUNT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:789:7: ( 'COUNT' )
-            // Cmd3.g:789:9: 'COUNT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:789:7: ( 'COUNT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:789:9: 'COUNT'
             {
             	Match("COUNT"); 
 
@@ -6091,8 +6091,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:790:7: ( 'CPLOT' )
-            // Cmd3.g:790:9: 'CPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:790:7: ( 'CPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:790:9: 'CPLOT'
             {
             	Match("CPLOT"); 
 
@@ -6115,8 +6115,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CREATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:791:8: ( 'CREATE' )
-            // Cmd3.g:791:10: 'CREATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:791:8: ( 'CREATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:791:10: 'CREATE'
             {
             	Match("CREATE"); 
 
@@ -6139,8 +6139,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CREATEVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:792:12: ( 'CREATEVARS' )
-            // Cmd3.g:792:14: 'CREATEVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:792:12: ( 'CREATEVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:792:14: 'CREATEVARS'
             {
             	Match("CREATEVARS"); 
 
@@ -6163,8 +6163,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CSV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:793:5: ( 'CSV' )
-            // Cmd3.g:793:7: 'CSV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:793:5: ( 'CSV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:793:7: 'CSV'
             {
             	Match("CSV"); 
 
@@ -6187,8 +6187,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CURROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:794:8: ( 'CURROW' )
-            // Cmd3.g:794:10: 'CURROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:794:8: ( 'CURROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:794:10: 'CURROW'
             {
             	Match("CURROW"); 
 
@@ -6211,8 +6211,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = D;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:795:3: ( 'D' )
-            // Cmd3.g:795:5: 'D'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:795:3: ( 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:795:5: 'D'
             {
             	Match('D'); 
 
@@ -6234,8 +6234,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:796:6: ( 'DAMP' )
-            // Cmd3.g:796:8: 'DAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:796:6: ( 'DAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:796:8: 'DAMP'
             {
             	Match("DAMP"); 
 
@@ -6258,8 +6258,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DANISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:797:8: ( 'DANISH' )
-            // Cmd3.g:797:10: 'DANISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:797:8: ( 'DANISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:797:10: 'DANISH'
             {
             	Match("DANISH"); 
 
@@ -6282,8 +6282,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:798:6: ( 'DATA' )
-            // Cmd3.g:798:8: 'DATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:798:6: ( 'DATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:798:8: 'DATA'
             {
             	Match("DATA"); 
 
@@ -6306,8 +6306,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATABANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:799:10: ( 'DATABANK' )
-            // Cmd3.g:799:12: 'DATABANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:799:10: ( 'DATABANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:799:12: 'DATABANK'
             {
             	Match("DATABANK"); 
 
@@ -6330,8 +6330,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATAWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:800:11: ( 'DATAWIDTH' )
-            // Cmd3.g:800:13: 'DATAWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:800:11: ( 'DATAWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:800:13: 'DATAWIDTH'
             {
             	Match("DATAWIDTH"); 
 
@@ -6354,8 +6354,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:801:6: ( 'DATE' )
-            // Cmd3.g:801:8: 'DATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:801:6: ( 'DATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:801:8: 'DATE'
             {
             	Match("DATE"); 
 
@@ -6378,8 +6378,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:802:7: ( 'DATES' )
-            // Cmd3.g:802:9: 'DATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:802:7: ( 'DATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:802:9: 'DATES'
             {
             	Match("DATES"); 
 
@@ -6402,8 +6402,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DEBUG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:803:7: ( 'DEBUG' )
-            // Cmd3.g:803:9: 'DEBUG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:803:7: ( 'DEBUG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:803:9: 'DEBUG'
             {
             	Match("DEBUG"); 
 
@@ -6426,8 +6426,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:804:5: ( 'DEC' )
-            // Cmd3.g:804:7: 'DEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:804:5: ( 'DEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:804:7: 'DEC'
             {
             	Match("DEC"); 
 
@@ -6450,8 +6450,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DECIMALSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:805:18: ( 'DECIMALSEPARATOR' )
-            // Cmd3.g:805:20: 'DECIMALSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:805:18: ( 'DECIMALSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:805:20: 'DECIMALSEPARATOR'
             {
             	Match("DECIMALSEPARATOR"); 
 
@@ -6474,8 +6474,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DECOMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:806:8: ( 'DECOMP' )
-            // Cmd3.g:806:10: 'DECOMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:806:8: ( 'DECOMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:806:10: 'DECOMP'
             {
             	Match("DECOMP"); 
 
@@ -6498,8 +6498,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DECOMP2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:807:9: ( 'DECOMP2' )
-            // Cmd3.g:807:11: 'DECOMP2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:807:9: ( 'DECOMP2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:807:11: 'DECOMP2'
             {
             	Match("DECOMP2"); 
 
@@ -6522,8 +6522,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DECOMP3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:808:9: ( 'DECOMP3' )
-            // Cmd3.g:808:11: 'DECOMP3'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:808:9: ( 'DECOMP3' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:808:11: 'DECOMP3'
             {
             	Match("DECOMP3"); 
 
@@ -6546,8 +6546,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EVAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:809:6: ( 'EVAL' )
-            // Cmd3.g:809:8: 'EVAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:809:6: ( 'EVAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:809:8: 'EVAL'
             {
             	Match("EVAL"); 
 
@@ -6570,8 +6570,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DELETE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:810:8: ( 'DELETE' )
-            // Cmd3.g:810:10: 'DELETE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:810:8: ( 'DELETE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:810:10: 'DELETE'
             {
             	Match("DELETE"); 
 
@@ -6594,8 +6594,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DETAILS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:811:9: ( 'DETAILS' )
-            // Cmd3.g:811:11: 'DETAILS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:811:9: ( 'DETAILS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:811:11: 'DETAILS'
             {
             	Match("DETAILS"); 
 
@@ -6618,8 +6618,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIALOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:812:8: ( 'DIALOG' )
-            // Cmd3.g:812:10: 'DIALOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:812:8: ( 'DIALOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:812:10: 'DIALOG'
             {
             	Match("DIALOG"); 
 
@@ -6642,8 +6642,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:813:5: ( 'DIF' )
-            // Cmd3.g:813:7: 'DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:813:5: ( 'DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:813:7: 'DIF'
             {
             	Match("DIF"); 
 
@@ -6666,8 +6666,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:814:6: ( 'DIFF' )
-            // Cmd3.g:814:8: 'DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:814:6: ( 'DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:814:8: 'DIFF'
             {
             	Match("DIFF"); 
 
@@ -6690,8 +6690,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:815:8: ( 'DIFPRT' )
-            // Cmd3.g:815:10: 'DIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:815:8: ( 'DIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:815:10: 'DIFPRT'
             {
             	Match("DIFPRT"); 
 
@@ -6714,8 +6714,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:816:6: ( 'DING' )
-            // Cmd3.g:816:8: 'DING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:816:6: ( 'DING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:816:8: 'DING'
             {
             	Match("DING"); 
 
@@ -6738,8 +6738,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DYN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:817:5: ( 'DYN' )
-            // Cmd3.g:817:7: 'DYN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:817:5: ( 'DYN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:817:7: 'DYN'
             {
             	Match("DYN"); 
 
@@ -6762,8 +6762,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIRECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:818:8: ( 'DIRECT' )
-            // Cmd3.g:818:10: 'DIRECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:818:8: ( 'DIRECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:818:10: 'DIRECT'
             {
             	Match("DIRECT"); 
 
@@ -6786,8 +6786,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DISP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:819:6: ( 'DISP' )
-            // Cmd3.g:819:8: 'DISP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:819:6: ( 'DISP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:819:8: 'DISP'
             {
             	Match("DISP"); 
 
@@ -6810,8 +6810,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DISPLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:820:9: ( 'DISPLAY' )
-            // Cmd3.g:820:11: 'DISPLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:820:9: ( 'DISPLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:820:11: 'DISPLAY'
             {
             	Match("DISPLAY"); 
 
@@ -6834,8 +6834,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:821:5: ( 'DOC' )
-            // Cmd3.g:821:7: 'DOC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:821:5: ( 'DOC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:821:7: 'DOC'
             {
             	Match("DOC"); 
 
@@ -6858,8 +6858,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOWNLOAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:822:10: ( 'DOWNLOAD' )
-            // Cmd3.g:822:12: 'DOWNLOAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:822:10: ( 'DOWNLOAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:822:12: 'DOWNLOAD'
             {
             	Match("DOWNLOAD"); 
 
@@ -6882,8 +6882,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:823:4: ( 'DP' )
-            // Cmd3.g:823:6: 'DP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:823:4: ( 'DP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:823:6: 'DP'
             {
             	Match("DP"); 
 
@@ -6906,8 +6906,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DUMOF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:824:7: ( 'DUMOF' )
-            // Cmd3.g:824:9: 'DUMOF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:824:7: ( 'DUMOF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:824:9: 'DUMOF'
             {
             	Match("DUMOF"); 
 
@@ -6930,8 +6930,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DUMOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:825:8: ( 'DUMOFF' )
-            // Cmd3.g:825:10: 'DUMOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:825:8: ( 'DUMOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:825:10: 'DUMOFF'
             {
             	Match("DUMOFF"); 
 
@@ -6954,8 +6954,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DUMON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:826:7: ( 'DUMON' )
-            // Cmd3.g:826:9: 'DUMON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:826:7: ( 'DUMON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:826:9: 'DUMON'
             {
             	Match("DUMON"); 
 
@@ -6978,8 +6978,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DUMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:827:6: ( 'DUMP' )
-            // Cmd3.g:827:8: 'DUMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:827:6: ( 'DUMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:827:8: 'DUMP'
             {
             	Match("DUMP"); 
 
@@ -7002,8 +7002,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DUMPOPTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:828:13: ( 'DUMPOPTIONS' )
-            // Cmd3.g:828:15: 'DUMPOPTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:828:13: ( 'DUMPOPTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:828:15: 'DUMPOPTIONS'
             {
             	Match("DUMPOPTIONS"); 
 
@@ -7026,8 +7026,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:829:6: ( 'EDIT' )
-            // Cmd3.g:829:8: 'EDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:829:6: ( 'EDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:829:8: 'EDIT'
             {
             	Match("EDIT"); 
 
@@ -7050,8 +7050,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:830:7: ( 'EFTER' )
-            // Cmd3.g:830:9: 'EFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:830:7: ( 'EFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:830:9: 'EFTER'
             {
             	Match("EFTER"); 
 
@@ -7074,8 +7074,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ELSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:831:6: ( 'ELSE' )
-            // Cmd3.g:831:8: 'ELSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:831:6: ( 'ELSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:831:8: 'ELSE'
             {
             	Match("ELSE"); 
 
@@ -7098,8 +7098,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = END;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:832:5: ( 'END' )
-            // Cmd3.g:832:7: 'END'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:832:5: ( 'END' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:832:7: 'END'
             {
             	Match("END"); 
 
@@ -7122,8 +7122,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ENDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:833:6: ( 'ENDO' )
-            // Cmd3.g:833:8: 'ENDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:833:6: ( 'ENDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:833:8: 'ENDO'
             {
             	Match("ENDO"); 
 
@@ -7146,8 +7146,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ENGLISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:834:9: ( 'ENGLISH' )
-            // Cmd3.g:834:11: 'ENGLISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:834:9: ( 'ENGLISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:834:11: 'ENGLISH'
             {
             	Match("ENGLISH"); 
 
@@ -7170,8 +7170,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ERROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:835:7: ( 'ERROR' )
-            // Cmd3.g:835:9: 'ERROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:835:7: ( 'ERROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:835:9: 'ERROR'
             {
             	Match("ERROR"); 
 
@@ -7194,8 +7194,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXCEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:836:7: ( 'EXCEL' )
-            // Cmd3.g:836:9: 'EXCEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:836:7: ( 'EXCEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:836:9: 'EXCEL'
             {
             	Match("EXCEL"); 
 
@@ -7218,8 +7218,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:837:5: ( 'EXE' )
-            // Cmd3.g:837:7: 'EXE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:837:5: ( 'EXE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:837:7: 'EXE'
             {
             	Match("EXE"); 
 
@@ -7242,8 +7242,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:838:6: ( 'EXIT' )
-            // Cmd3.g:838:8: 'EXIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:838:6: ( 'EXIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:838:8: 'EXIT'
             {
             	Match("EXIT"); 
 
@@ -7266,8 +7266,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:839:5: ( 'EXO' )
-            // Cmd3.g:839:7: 'EXO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:839:5: ( 'EXO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:839:7: 'EXO'
             {
             	Match("EXO"); 
 
@@ -7290,8 +7290,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:840:5: ( 'EXP' )
-            // Cmd3.g:840:7: 'EXP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:840:5: ( 'EXP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:840:7: 'EXP'
             {
             	Match("EXP"); 
 
@@ -7314,8 +7314,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:841:8: ( 'EXPORT' )
-            // Cmd3.g:841:10: 'EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:841:8: ( 'EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:841:10: 'EXPORT'
             {
             	Match("EXPORT"); 
 
@@ -7338,8 +7338,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:842:10: ( 'EXTERNAL' )
-            // Cmd3.g:842:12: 'EXTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:842:10: ( 'EXTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:842:12: 'EXTERNAL'
             {
             	Match("EXTERNAL"); 
 
@@ -7362,8 +7362,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FAILSAFE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:843:10: ( 'FAILSAFE' )
-            // Cmd3.g:843:12: 'FAILSAFE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:843:10: ( 'FAILSAFE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:843:12: 'FAILSAFE'
             {
             	Match("FAILSAFE"); 
 
@@ -7386,8 +7386,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:844:6: ( 'FAIR' )
-            // Cmd3.g:844:8: 'FAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:844:6: ( 'FAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:844:8: 'FAIR'
             {
             	Match("FAIR"); 
 
@@ -7410,8 +7410,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FALSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:845:7: ( 'false' )
-            // Cmd3.g:845:9: 'false'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:845:7: ( 'false' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:845:9: 'false'
             {
             	Match("false"); 
 
@@ -7434,8 +7434,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:846:6: ( 'FAST' )
-            // Cmd3.g:846:8: 'FAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:846:6: ( 'FAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:846:8: 'FAST'
             {
             	Match("FAST"); 
 
@@ -7458,8 +7458,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FEED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:847:6: ( 'FEED' )
-            // Cmd3.g:847:8: 'FEED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:847:6: ( 'FEED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:847:8: 'FEED'
             {
             	Match("FEED"); 
 
@@ -7482,8 +7482,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FEEDBACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:848:10: ( 'FEEDBACK' )
-            // Cmd3.g:848:12: 'FEEDBACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:848:10: ( 'FEEDBACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:848:12: 'FEEDBACK'
             {
             	Match("FEEDBACK"); 
 
@@ -7506,8 +7506,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIELDS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:849:8: ( 'FIELDS' )
-            // Cmd3.g:849:10: 'FIELDS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:849:8: ( 'FIELDS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:849:10: 'FIELDS'
             {
             	Match("FIELDS"); 
 
@@ -7530,8 +7530,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:850:6: ( 'FILE' )
-            // Cmd3.g:850:8: 'FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:850:6: ( 'FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:850:8: 'FILE'
             {
             	Match("FILE"); 
 
@@ -7554,8 +7554,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FILEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:851:11: ( 'FILEWIDTH' )
-            // Cmd3.g:851:13: 'FILEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:851:11: ( 'FILEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:851:13: 'FILEWIDTH'
             {
             	Match("FILEWIDTH"); 
 
@@ -7578,8 +7578,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:852:8: ( 'FILTER' )
-            // Cmd3.g:852:10: 'FILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:852:8: ( 'FILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:852:10: 'FILTER'
             {
             	Match("FILTER"); 
 
@@ -7602,8 +7602,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FINDMISSINGDATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:853:17: ( 'FINDMISSINGDATA' )
-            // Cmd3.g:853:19: 'FINDMISSINGDATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:853:17: ( 'FINDMISSINGDATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:853:19: 'FINDMISSINGDATA'
             {
             	Match("FINDMISSINGDATA"); 
 
@@ -7626,8 +7626,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = KEEPTYPES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:854:11: ( 'KEEPTYPES' )
-            // Cmd3.g:854:13: 'KEEPTYPES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:854:11: ( 'KEEPTYPES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:854:13: 'KEEPTYPES'
             {
             	Match("KEEPTYPES"); 
 
@@ -7650,8 +7650,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PREDICT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:855:9: ( 'PREDICT' )
-            // Cmd3.g:855:11: 'PREDICT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:855:9: ( 'PREDICT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:855:11: 'PREDICT'
             {
             	Match("PREDICT"); 
 
@@ -7674,8 +7674,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:856:6: ( 'FIND' )
-            // Cmd3.g:856:8: 'FIND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:856:6: ( 'FIND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:856:8: 'FIND'
             {
             	Match("FIND"); 
 
@@ -7698,8 +7698,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PYTHON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:857:8: ( 'PYTHON' )
-            // Cmd3.g:857:10: 'PYTHON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:857:8: ( 'PYTHON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:857:10: 'PYTHON'
             {
             	Match("PYTHON"); 
 
@@ -7722,8 +7722,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:858:5: ( 'DEP' )
-            // Cmd3.g:858:7: 'DEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:858:5: ( 'DEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:858:7: 'DEP'
             {
             	Match("DEP"); 
 
@@ -7746,8 +7746,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BROWSER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:859:9: ( 'BROWSER' )
-            // Cmd3.g:859:11: 'BROWSER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:859:9: ( 'BROWSER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:859:11: 'BROWSER'
             {
             	Match("BROWSER"); 
 
@@ -7770,8 +7770,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIRST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:860:7: ( 'FIRST' )
-            // Cmd3.g:860:9: 'FIRST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:860:7: ( 'FIRST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:860:9: 'FIRST'
             {
             	Match("FIRST"); 
 
@@ -7794,8 +7794,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIRSTCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:861:15: ( 'FIRSTCOLWIDTH' )
-            // Cmd3.g:861:17: 'FIRSTCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:861:15: ( 'FIRSTCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:861:17: 'FIRSTCOLWIDTH'
             {
             	Match("FIRSTCOLWIDTH"); 
 
@@ -7818,8 +7818,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:862:5: ( 'FIX' )
-            // Cmd3.g:862:7: 'FIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:862:5: ( 'FIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:862:7: 'FIX'
             {
             	Match("FIX"); 
 
@@ -7842,8 +7842,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:863:6: ( 'FLAT' )
-            // Cmd3.g:863:8: 'FLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:863:6: ( 'FLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:863:8: 'FLAT'
             {
             	Match("FLAT"); 
 
@@ -7866,8 +7866,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DATECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:864:10: ( 'DATECELL' )
-            // Cmd3.g:864:12: 'DATECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:864:10: ( 'DATECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:864:12: 'DATECELL'
             {
             	Match("DATECELL"); 
 
@@ -7890,8 +7890,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NAMECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:865:10: ( 'NAMECELL' )
-            // Cmd3.g:865:12: 'NAMECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:865:10: ( 'NAMECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:865:12: 'NAMECELL'
             {
             	Match("NAMECELL"); 
 
@@ -7914,8 +7914,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FOLDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:866:8: ( 'FOLDER' )
-            // Cmd3.g:866:10: 'FOLDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:866:8: ( 'FOLDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:866:10: 'FOLDER'
             {
             	Match("FOLDER"); 
 
@@ -7938,8 +7938,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FONT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:867:6: ( 'FONT' )
-            // Cmd3.g:867:8: 'FONT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:867:6: ( 'FONT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:867:8: 'FONT'
             {
             	Match("FONT"); 
 
@@ -7962,8 +7962,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FONTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:868:10: ( 'FONTSIZE' )
-            // Cmd3.g:868:12: 'FONTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:868:10: ( 'FONTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:868:12: 'FONTSIZE'
             {
             	Match("FONTSIZE"); 
 
@@ -7986,8 +7986,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:869:5: ( 'FOR' )
-            // Cmd3.g:869:7: 'FOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:869:5: ( 'FOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:869:7: 'FOR'
             {
             	Match("FOR"); 
 
@@ -8010,8 +8010,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:870:8: ( 'FORMAT' )
-            // Cmd3.g:870:10: 'FORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:870:8: ( 'FORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:870:10: 'FORMAT'
             {
             	Match("FORMAT"); 
 
@@ -8034,8 +8034,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FORWARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:871:9: ( 'FORWARD' )
-            // Cmd3.g:871:11: 'FORWARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:871:9: ( 'FORWARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:871:11: 'FORWARD'
             {
             	Match("FORWARD"); 
 
@@ -8058,8 +8058,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:872:6: ( 'FREQ' )
-            // Cmd3.g:872:8: 'FREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:872:6: ( 'FREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:872:8: 'FREQ'
             {
             	Match("FREQ"); 
 
@@ -8082,8 +8082,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FRML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:873:6: ( 'FRML' )
-            // Cmd3.g:873:8: 'FRML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:873:6: ( 'FRML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:873:8: 'FRML'
             {
             	Match("FRML"); 
 
@@ -8106,8 +8106,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FROM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:874:6: ( 'FROM' )
-            // Cmd3.g:874:8: 'FROM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:874:6: ( 'FROM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:874:8: 'FROM'
             {
             	Match("FROM"); 
 
@@ -8130,8 +8130,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FUNCTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:875:10: ( 'FUNCTION' )
-            // Cmd3.g:875:12: 'FUNCTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:875:10: ( 'FUNCTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:875:12: 'FUNCTION'
             {
             	Match("FUNCTION"); 
 
@@ -8154,8 +8154,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GAUSS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:876:7: ( 'GAUSS' )
-            // Cmd3.g:876:9: 'GAUSS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:876:7: ( 'GAUSS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:876:9: 'GAUSS'
             {
             	Match("GAUSS"); 
 
@@ -8178,8 +8178,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:877:5: ( 'GBK' )
-            // Cmd3.g:877:7: 'GBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:877:5: ( 'GBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:877:7: 'GBK'
             {
             	Match("GBK"); 
 
@@ -8202,8 +8202,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:878:6: ( 'GDIF' )
-            // Cmd3.g:878:8: 'GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:878:6: ( 'GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:878:8: 'GDIF'
             {
             	Match("GDIF"); 
 
@@ -8226,8 +8226,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:879:7: ( 'GDIFF' )
-            // Cmd3.g:879:9: 'GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:879:7: ( 'GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:879:9: 'GDIFF'
             {
             	Match("GDIFF"); 
 
@@ -8250,8 +8250,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GEKKO18;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:880:9: ( 'GEKKO18' )
-            // Cmd3.g:880:11: 'GEKKO18'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:880:9: ( 'GEKKO18' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:880:11: 'GEKKO18'
             {
             	Match("GEKKO18"); 
 
@@ -8274,8 +8274,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GEKKO20;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:881:9: ( 'GEKKO20' )
-            // Cmd3.g:881:11: 'GEKKO20'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:881:9: ( 'GEKKO20' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:881:11: 'GEKKO20'
             {
             	Match("GEKKO20"); 
 
@@ -8298,8 +8298,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GENR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:882:6: ( 'GENR' )
-            // Cmd3.g:882:8: 'GENR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:882:6: ( 'GENR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:882:8: 'GENR'
             {
             	Match("GENR"); 
 
@@ -8322,8 +8322,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GEOMETRIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:883:11: ( 'GEOMETRIC' )
-            // Cmd3.g:883:13: 'GEOMETRIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:883:11: ( 'GEOMETRIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:883:13: 'GEOMETRIC'
             {
             	Match("GEOMETRIC"); 
 
@@ -8346,8 +8346,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OVERLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:884:9: ( 'OVERLAY' )
-            // Cmd3.g:884:11: 'OVERLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:884:9: ( 'OVERLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:884:11: 'OVERLAY'
             {
             	Match("OVERLAY"); 
 
@@ -8370,8 +8370,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GMULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:885:9: ( 'GMULPRT' )
-            // Cmd3.g:885:11: 'GMULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:885:9: ( 'GMULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:885:11: 'GMULPRT'
             {
             	Match("GMULPRT"); 
 
@@ -8394,8 +8394,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GNUPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:886:9: ( 'GNUPLOT' )
-            // Cmd3.g:886:11: 'GNUPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:886:9: ( 'GNUPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:886:11: 'GNUPLOT'
             {
             	Match("GNUPLOT"); 
 
@@ -8418,8 +8418,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GOAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:887:6: ( 'GOAL' )
-            // Cmd3.g:887:8: 'GOAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:887:6: ( 'GOAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:887:8: 'GOAL'
             {
             	Match("GOAL"); 
 
@@ -8442,8 +8442,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GOTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:888:6: ( 'GOTO' )
-            // Cmd3.g:888:8: 'GOTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:888:6: ( 'GOTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:888:8: 'GOTO'
             {
             	Match("GOTO"); 
 
@@ -8466,8 +8466,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GRAPH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:889:7: ( 'GRAPH' )
-            // Cmd3.g:889:9: 'GRAPH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:889:7: ( 'GRAPH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:889:9: 'GRAPH'
             {
             	Match("GRAPH"); 
 
@@ -8490,8 +8490,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GROWTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:890:8: ( 'GROWTH' )
-            // Cmd3.g:890:10: 'GROWTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:890:8: ( 'GROWTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:890:10: 'GROWTH'
             {
             	Match("GROWTH"); 
 
@@ -8514,8 +8514,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HDG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:891:5: ( 'HDG' )
-            // Cmd3.g:891:7: 'HDG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:891:5: ( 'HDG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:891:7: 'HDG'
             {
             	Match("HDG"); 
 
@@ -8538,8 +8538,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HEADING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:892:9: ( 'HEADING' )
-            // Cmd3.g:892:11: 'HEADING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:892:9: ( 'HEADING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:892:11: 'HEADING'
             {
             	Match("HEADING"); 
 
@@ -8562,8 +8562,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HELP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:893:6: ( 'HELP' )
-            // Cmd3.g:893:8: 'HELP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:893:6: ( 'HELP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:893:8: 'HELP'
             {
             	Match("HELP"); 
 
@@ -8586,8 +8586,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HIDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:894:6: ( 'HIDE' )
-            // Cmd3.g:894:8: 'HIDE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:894:6: ( 'HIDE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:894:8: 'HIDE'
             {
             	Match("HIDE"); 
 
@@ -8610,8 +8610,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HIDELEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:895:16: ( 'HIDELEFTBORDER' )
-            // Cmd3.g:895:18: 'HIDELEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:895:16: ( 'HIDELEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:895:18: 'HIDELEFTBORDER'
             {
             	Match("HIDELEFTBORDER"); 
 
@@ -8634,8 +8634,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HIDERIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:896:17: ( 'HIDERIGHTBORDER' )
-            // Cmd3.g:896:19: 'HIDERIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:896:17: ( 'HIDERIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:896:19: 'HIDERIGHTBORDER'
             {
             	Match("HIDERIGHTBORDER"); 
 
@@ -8658,8 +8658,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HORIZON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:897:9: ( 'HORIZON' )
-            // Cmd3.g:897:11: 'HORIZON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:897:9: ( 'HORIZON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:897:11: 'HORIZON'
             {
             	Match("HORIZON"); 
 
@@ -8682,8 +8682,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HPFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:898:10: ( 'HPFILTER' )
-            // Cmd3.g:898:12: 'HPFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:898:10: ( 'HPFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:898:12: 'HPFILTER'
             {
             	Match("HPFILTER"); 
 
@@ -8706,8 +8706,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HTML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:899:6: ( 'HTML' )
-            // Cmd3.g:899:8: 'HTML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:899:6: ( 'HTML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:899:8: 'HTML'
             {
             	Match("HTML"); 
 
@@ -8730,8 +8730,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:900:4: ( 'IF' )
-            // Cmd3.g:900:6: 'IF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:900:4: ( 'IF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:900:6: 'IF'
             {
             	Match("IF"); 
 
@@ -8754,8 +8754,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IF_OLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:901:8: ( 'IF_OLD' )
-            // Cmd3.g:901:10: 'IF_OLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:901:8: ( 'IF_OLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:901:10: 'IF_OLD'
             {
             	Match("IF_OLD"); 
 
@@ -8778,8 +8778,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ASBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:902:8: ( 'ASBANK' )
-            // Cmd3.g:902:10: 'ASBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:902:8: ( 'ASBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:902:10: 'ASBANK'
             {
             	Match("ASBANK"); 
 
@@ -8802,8 +8802,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TOBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:903:8: ( 'TOBANK' )
-            // Cmd3.g:903:10: 'TOBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:903:8: ( 'TOBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:903:10: 'TOBANK'
             {
             	Match("TOBANK"); 
 
@@ -8826,8 +8826,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = FROMBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:904:10: ( 'FROMBANK' )
-            // Cmd3.g:904:12: 'FROMBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:904:10: ( 'FROMBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:904:12: 'FROMBANK'
             {
             	Match("FROMBANK"); 
 
@@ -8850,8 +8850,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IGNOREMISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:905:15: ( 'IGNOREMISSING' )
-            // Cmd3.g:905:17: 'IGNOREMISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:905:15: ( 'IGNOREMISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:905:17: 'IGNOREMISSING'
             {
             	Match("IGNOREMISSING"); 
 
@@ -8874,8 +8874,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IGNOREMISSINGVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:906:19: ( 'IGNOREMISSINGVARS' )
-            // Cmd3.g:906:21: 'IGNOREMISSINGVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:906:19: ( 'IGNOREMISSINGVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:906:21: 'IGNOREMISSINGVARS'
             {
             	Match("IGNOREMISSINGVARS"); 
 
@@ -8898,8 +8898,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IGNOREVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:907:12: ( 'IGNOREVARS' )
-            // Cmd3.g:907:14: 'IGNOREVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:907:12: ( 'IGNOREVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:907:14: 'IGNOREVARS'
             {
             	Match("IGNOREVARS"); 
 
@@ -8922,8 +8922,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IMPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:908:8: ( 'IMPORT' )
-            // Cmd3.g:908:10: 'IMPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:908:8: ( 'IMPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:908:10: 'IMPORT'
             {
             	Match("IMPORT"); 
 
@@ -8946,8 +8946,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INDEX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:909:7: ( 'INDEX' )
-            // Cmd3.g:909:9: 'INDEX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:909:7: ( 'INDEX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:909:9: 'INDEX'
             {
             	Match("INDEX"); 
 
@@ -8970,8 +8970,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INFO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:910:6: ( 'INFO' )
-            // Cmd3.g:910:8: 'INFO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:910:6: ( 'INFO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:910:8: 'INFO'
             {
             	Match("INFO"); 
 
@@ -8994,8 +8994,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INFOFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:911:10: ( 'INFOFILE' )
-            // Cmd3.g:911:12: 'INFOFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:911:10: ( 'INFOFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:911:12: 'INFOFILE'
             {
             	Match("INFOFILE"); 
 
@@ -9018,8 +9018,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:912:5: ( 'INI' )
-            // Cmd3.g:912:7: 'INI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:912:5: ( 'INI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:912:7: 'INI'
             {
             	Match("INI"); 
 
@@ -9042,8 +9042,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:913:6: ( 'INIT' )
-            // Cmd3.g:913:8: 'INIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:913:6: ( 'INIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:913:8: 'INIT'
             {
             	Match("INIT"); 
 
@@ -9066,8 +9066,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INTERFACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:914:11: ( 'INTERFACE' )
-            // Cmd3.g:914:13: 'INTERFACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:914:11: ( 'INTERFACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:914:13: 'INTERFACE'
             {
             	Match("INTERFACE"); 
 
@@ -9090,8 +9090,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:915:10: ( 'INTERNAL' )
-            // Cmd3.g:915:12: 'INTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:915:10: ( 'INTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:915:12: 'INTERNAL'
             {
             	Match("INTERNAL"); 
 
@@ -9114,8 +9114,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = INVERT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:916:8: ( 'INVERT' )
-            // Cmd3.g:916:10: 'INVERT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:916:8: ( 'INVERT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:916:10: 'INVERT'
             {
             	Match("INVERT"); 
 
@@ -9138,8 +9138,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ROBUST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:917:8: ( 'ROBUST' )
-            // Cmd3.g:917:10: 'ROBUST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:917:8: ( 'ROBUST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:917:10: 'ROBUST'
             {
             	Match("ROBUST"); 
 
@@ -9162,8 +9162,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:918:6: ( 'ITER' )
-            // Cmd3.g:918:8: 'ITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:918:6: ( 'ITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:918:8: 'ITER'
             {
             	Match("ITER"); 
 
@@ -9186,8 +9186,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ITERMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:919:9: ( 'ITERMAX' )
-            // Cmd3.g:919:11: 'ITERMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:919:9: ( 'ITERMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:919:11: 'ITERMAX'
             {
             	Match("ITERMAX"); 
 
@@ -9210,8 +9210,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ITERMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:920:9: ( 'ITERMIN' )
-            // Cmd3.g:920:11: 'ITERMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:920:9: ( 'ITERMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:920:11: 'ITERMIN'
             {
             	Match("ITERMIN"); 
 
@@ -9234,8 +9234,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ITERSHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:921:10: ( 'ITERSHOW' )
-            // Cmd3.g:921:12: 'ITERSHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:921:10: ( 'ITERSHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:921:12: 'ITERSHOW'
             {
             	Match("ITERSHOW"); 
 
@@ -9258,8 +9258,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = KEEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:922:6: ( 'KEEP' )
-            // Cmd3.g:922:8: 'KEEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:922:6: ( 'KEEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:922:8: 'KEEP'
             {
             	Match("KEEP"); 
 
@@ -9282,8 +9282,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:923:8: ( 'LABELS' )
-            // Cmd3.g:923:10: 'LABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:923:8: ( 'LABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:923:10: 'LABELS'
             {
             	Match("LABELS"); 
 
@@ -9306,8 +9306,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:924:5: ( 'LAG' )
-            // Cmd3.g:924:7: 'LAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:924:5: ( 'LAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:924:7: 'LAG'
             {
             	Match("LAG"); 
 
@@ -9330,8 +9330,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LANGUAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:925:10: ( 'LANGUAGE' )
-            // Cmd3.g:925:12: 'LANGUAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:925:10: ( 'LANGUAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:925:12: 'LANGUAGE'
             {
             	Match("LANGUAGE"); 
 
@@ -9354,8 +9354,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:926:6: ( 'LAST' )
-            // Cmd3.g:926:8: 'LAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:926:6: ( 'LAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:926:8: 'LAST'
             {
             	Match("LAST"); 
 
@@ -9378,8 +9378,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:927:5: ( 'LEV' )
-            // Cmd3.g:927:7: 'LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:927:5: ( 'LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:927:7: 'LEV'
             {
             	Match("LEV"); 
 
@@ -9402,8 +9402,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:928:8: ( 'LINEAR' )
-            // Cmd3.g:928:10: 'LINEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:928:8: ( 'LINEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:928:10: 'LINEAR'
             {
             	Match("LINEAR"); 
 
@@ -9426,8 +9426,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:929:7: ( 'LINES' )
-            // Cmd3.g:929:9: 'LINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:929:7: ( 'LINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:929:9: 'LINES'
             {
             	Match("LINES"); 
 
@@ -9450,8 +9450,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LIST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:930:6: ( 'LIST' )
-            // Cmd3.g:930:8: 'LIST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:930:6: ( 'LIST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:930:8: 'LIST'
             {
             	Match("LIST"); 
 
@@ -9474,8 +9474,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LISTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:931:10: ( 'LISTFILE' )
-            // Cmd3.g:931:12: 'LISTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:931:10: ( 'LISTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:931:12: 'LISTFILE'
             {
             	Match("LISTFILE"); 
 
@@ -9498,8 +9498,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:932:5: ( 'LOG' )
-            // Cmd3.g:932:7: 'LOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:932:5: ( 'LOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:932:7: 'LOG'
             {
             	Match("LOG"); 
 
@@ -9522,8 +9522,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:933:7: ( 'LOCK' )
-            // Cmd3.g:933:9: 'LOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:933:7: ( 'LOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:933:9: 'LOCK'
             {
             	Match("LOCK"); 
 
@@ -9546,8 +9546,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UNLOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:934:9: ( 'UNLOCK' )
-            // Cmd3.g:934:11: 'UNLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:934:9: ( 'UNLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:934:11: 'UNLOCK'
             {
             	Match("UNLOCK"); 
 
@@ -9570,8 +9570,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:935:4: ( 'LU' )
-            // Cmd3.g:935:6: 'LU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:935:4: ( 'LU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:935:6: 'LU'
             {
             	Match("LU"); 
 
@@ -9594,8 +9594,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = M;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:936:3: ( 'M' )
-            // Cmd3.g:936:5: 'M'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:936:3: ( 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:936:5: 'M'
             {
             	Match('M'); 
 
@@ -9617,8 +9617,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MACRO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:937:8: ( 'MACRO2' )
-            // Cmd3.g:937:10: 'MACRO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:937:8: ( 'MACRO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:937:10: 'MACRO2'
             {
             	Match("MACRO2"); 
 
@@ -9641,8 +9641,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:938:6: ( 'MAIN' )
-            // Cmd3.g:938:8: 'MAIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:938:6: ( 'MAIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:938:8: 'MAIN'
             {
             	Match("MAIN"); 
 
@@ -9665,8 +9665,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:939:5: ( 'MAT' )
-            // Cmd3.g:939:7: 'MAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:939:5: ( 'MAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:939:7: 'MAT'
             {
             	Match("MAT"); 
 
@@ -9689,8 +9689,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MATRIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:940:8: ( 'MATRIX' )
-            // Cmd3.g:940:10: 'MATRIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:940:8: ( 'MATRIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:940:10: 'MATRIX'
             {
             	Match("MATRIX"); 
 
@@ -9713,8 +9713,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ROWNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:941:10: ( 'ROWNAMES' )
-            // Cmd3.g:941:12: 'ROWNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:941:10: ( 'ROWNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:941:12: 'ROWNAMES'
             {
             	Match("ROWNAMES"); 
 
@@ -9737,8 +9737,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:942:10: ( 'COLNAMES' )
-            // Cmd3.g:942:12: 'COLNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:942:10: ( 'COLNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:942:12: 'COLNAMES'
             {
             	Match("COLNAMES"); 
 
@@ -9761,8 +9761,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:943:5: ( 'MAX' )
-            // Cmd3.g:943:7: 'MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:943:5: ( 'MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:943:7: 'MAX'
             {
             	Match("MAX"); 
 
@@ -9785,8 +9785,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MAXLINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:944:10: ( 'MAXLINES' )
-            // Cmd3.g:944:12: 'MAXLINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:944:10: ( 'MAXLINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:944:12: 'MAXLINES'
             {
             	Match("MAXLINES"); 
 
@@ -9809,8 +9809,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:945:5: ( 'MEM' )
-            // Cmd3.g:945:7: 'MEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:945:5: ( 'MEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:945:7: 'MEM'
             {
             	Match("MEM"); 
 
@@ -9833,8 +9833,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MENU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:946:6: ( 'MENU' )
-            // Cmd3.g:946:8: 'MENU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:946:6: ( 'MENU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:946:8: 'MENU'
             {
             	Match("MENU"); 
 
@@ -9857,8 +9857,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MENUTABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:947:11: ( 'MENUTABLE' )
-            // Cmd3.g:947:13: 'MENUTABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:947:11: ( 'MENUTABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:947:13: 'MENUTABLE'
             {
             	Match("MENUTABLE"); 
 
@@ -9881,8 +9881,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MERGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:948:7: ( 'MERGE' )
-            // Cmd3.g:948:9: 'MERGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:948:7: ( 'MERGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:948:9: 'MERGE'
             {
             	Match("MERGE"); 
 
@@ -9905,8 +9905,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MERGECOLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:949:11: ( 'MERGECOLS' )
-            // Cmd3.g:949:13: 'MERGECOLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:949:11: ( 'MERGECOLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:949:13: 'MERGECOLS'
             {
             	Match("MERGECOLS"); 
 
@@ -9929,8 +9929,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MESSAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:950:9: ( 'MESSAGE' )
-            // Cmd3.g:950:11: 'MESSAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:950:9: ( 'MESSAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:950:11: 'MESSAGE'
             {
             	Match("MESSAGE"); 
 
@@ -9953,8 +9953,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = METHOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:951:8: ( 'METHOD' )
-            // Cmd3.g:951:10: 'METHOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:951:8: ( 'METHOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:951:10: 'METHOD'
             {
             	Match("METHOD"); 
 
@@ -9977,8 +9977,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:952:5: ( 'MIN' )
-            // Cmd3.g:952:7: 'MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:952:5: ( 'MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:952:7: 'MIN'
             {
             	Match("MIN"); 
 
@@ -10001,8 +10001,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MIXED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:953:7: ( 'MIXED' )
-            // Cmd3.g:953:9: 'MIXED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:953:7: ( 'MIXED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:953:9: 'MIXED'
             {
             	Match("MIXED"); 
 
@@ -10025,8 +10025,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:954:9: ( 'MISSING' )
-            // Cmd3.g:954:11: 'MISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:954:9: ( 'MISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:954:11: 'MISSING'
             {
             	Match("MISSING"); 
 
@@ -10049,8 +10049,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:955:6: ( 'MODE' )
-            // Cmd3.g:955:8: 'MODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:955:6: ( 'MODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:955:8: 'MODE'
             {
             	Match("MODE"); 
 
@@ -10073,8 +10073,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:956:7: ( 'MODEL' )
-            // Cmd3.g:956:9: 'MODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:956:7: ( 'MODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:956:9: 'MODEL'
             {
             	Match("MODEL"); 
 
@@ -10097,8 +10097,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MODERNLOOK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:957:12: ( 'MODERNLOOK' )
-            // Cmd3.g:957:14: 'MODERNLOOK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:957:12: ( 'MODERNLOOK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:957:14: 'MODERNLOOK'
             {
             	Match("MODERNLOOK"); 
 
@@ -10121,8 +10121,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:958:4: ( 'MP' )
-            // Cmd3.g:958:6: 'MP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:958:4: ( 'MP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:958:6: 'MP'
             {
             	Match("MP"); 
 
@@ -10145,8 +10145,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:959:4: ( 'DL' )
-            // Cmd3.g:959:6: 'DL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:959:4: ( 'DL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:959:6: 'DL'
             {
             	Match("DL"); 
 
@@ -10169,8 +10169,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = L;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:960:3: ( 'L' )
-            // Cmd3.g:960:5: 'L'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:960:3: ( 'L' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:960:5: 'L'
             {
             	Match('L'); 
 
@@ -10192,8 +10192,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RDL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:961:5: ( 'RDL' )
-            // Cmd3.g:961:7: 'RDL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:961:5: ( 'RDL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:961:7: 'RDL'
             {
             	Match("RDL"); 
 
@@ -10216,8 +10216,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:962:4: ( 'RL' )
-            // Cmd3.g:962:6: 'RL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:962:4: ( 'RL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:962:6: 'RL'
             {
             	Match("RL"); 
 
@@ -10240,8 +10240,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MULBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:963:7: ( 'MULBK' )
-            // Cmd3.g:963:9: 'MULBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:963:7: ( 'MULBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:963:9: 'MULBK'
             {
             	Match("MULBK"); 
 
@@ -10264,8 +10264,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MULPCT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:964:8: ( 'MULPCT' )
-            // Cmd3.g:964:10: 'MULPCT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:964:8: ( 'MULPCT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:964:10: 'MULPCT'
             {
             	Match("MULPCT"); 
 
@@ -10288,8 +10288,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:965:8: ( 'MULPRT' )
-            // Cmd3.g:965:10: 'MULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:965:8: ( 'MULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:965:10: 'MULPRT'
             {
             	Match("MULPRT"); 
 
@@ -10312,8 +10312,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:966:6: ( 'MUTE' )
-            // Cmd3.g:966:8: 'MUTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:966:6: ( 'MUTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:966:8: 'MUTE'
             {
             	Match("MUTE"); 
 
@@ -10336,8 +10336,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = N;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:967:3: ( 'N' )
-            // Cmd3.g:967:5: 'N'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:967:3: ( 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:967:5: 'N'
             {
             	Match('N'); 
 
@@ -10359,8 +10359,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:968:6: ( 'NAME' )
-            // Cmd3.g:968:8: 'NAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:968:6: ( 'NAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:968:8: 'NAME'
             {
             	Match("NAME"); 
 
@@ -10383,8 +10383,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:969:7: ( 'NAMES' )
-            // Cmd3.g:969:9: 'NAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:969:7: ( 'NAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:969:9: 'NAMES'
             {
             	Match("NAMES"); 
 
@@ -10407,8 +10407,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:970:6: ( 'NDEC' )
-            // Cmd3.g:970:8: 'NDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:970:6: ( 'NDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:970:8: 'NDEC'
             {
             	Match("NDEC"); 
 
@@ -10431,8 +10431,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NDIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:971:9: ( 'NDIFPRT' )
-            // Cmd3.g:971:11: 'NDIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:971:9: ( 'NDIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:971:11: 'NDIFPRT'
             {
             	Match("NDIFPRT"); 
 
@@ -10455,8 +10455,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NEW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:972:5: ( 'NEW' )
-            // Cmd3.g:972:7: 'NEW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:972:5: ( 'NEW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:972:7: 'NEW'
             {
             	Match("NEW"); 
 
@@ -10479,8 +10479,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NEWTON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:973:8: ( 'NEWTON' )
-            // Cmd3.g:973:10: 'NEWTON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:973:8: ( 'NEWTON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:973:10: 'NEWTON'
             {
             	Match("NEWTON"); 
 
@@ -10503,8 +10503,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:974:6: ( 'NEXT' )
-            // Cmd3.g:974:8: 'NEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:974:6: ( 'NEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:974:8: 'NEXT'
             {
             	Match("NEXT"); 
 
@@ -10527,8 +10527,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NFAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:975:7: ( 'NFAIR' )
-            // Cmd3.g:975:9: 'NFAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:975:7: ( 'NFAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:975:9: 'NFAIR'
             {
             	Match("NFAIR"); 
 
@@ -10551,8 +10551,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:976:4: ( 'no' )
-            // Cmd3.g:976:6: 'no'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:976:4: ( 'no' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:976:6: 'no'
             {
             	Match("no"); 
 
@@ -10575,8 +10575,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:977:7: ( 'NOABS' )
-            // Cmd3.g:977:9: 'NOABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:977:7: ( 'NOABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:977:9: 'NOABS'
             {
             	Match("NOABS"); 
 
@@ -10599,8 +10599,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOCR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:978:6: ( 'NOCR' )
-            // Cmd3.g:978:8: 'NOCR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:978:6: ( 'NOCR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:978:8: 'NOCR'
             {
             	Match("NOCR"); 
 
@@ -10623,8 +10623,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NODIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:979:7: ( 'NODIF' )
-            // Cmd3.g:979:9: 'NODIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:979:7: ( 'NODIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:979:9: 'NODIF'
             {
             	Match("NODIF"); 
 
@@ -10647,8 +10647,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NODIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:980:8: ( 'NODIFF' )
-            // Cmd3.g:980:10: 'NODIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:980:8: ( 'NODIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:980:10: 'NODIFF'
             {
             	Match("NODIFF"); 
 
@@ -10671,8 +10671,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:981:10: ( 'NOFILTER' )
-            // Cmd3.g:981:12: 'NOFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:981:10: ( 'NOFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:981:12: 'NOFILTER'
             {
             	Match("NOFILTER"); 
 
@@ -10695,8 +10695,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:982:8: ( 'NOGDIF' )
-            // Cmd3.g:982:10: 'NOGDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:982:8: ( 'NOGDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:982:10: 'NOGDIF'
             {
             	Match("NOGDIF"); 
 
@@ -10719,8 +10719,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:983:9: ( 'NOGDIFF' )
-            // Cmd3.g:983:11: 'NOGDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:983:9: ( 'NOGDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:983:11: 'NOGDIFF'
             {
             	Match("NOGDIFF"); 
 
@@ -10743,8 +10743,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOLEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:984:7: ( 'NOLEV' )
-            // Cmd3.g:984:9: 'NOLEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:984:7: ( 'NOLEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:984:9: 'NOLEV'
             {
             	Match("NOLEV"); 
 
@@ -10767,8 +10767,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:985:6: ( 'NONE' )
-            // Cmd3.g:985:8: 'NONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:985:6: ( 'NONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:985:8: 'NONE'
             {
             	Match("NONE"); 
 
@@ -10791,8 +10791,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NONMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:986:10: ( 'NONMODEL' )
-            // Cmd3.g:986:12: 'NONMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:986:10: ( 'NONMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:986:12: 'NONMODEL'
             {
             	Match("NONMODEL"); 
 
@@ -10815,8 +10815,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:987:7: ( 'NOPCH' )
-            // Cmd3.g:987:9: 'NOPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:987:7: ( 'NOPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:987:9: 'NOPCH'
             {
             	Match("NOPCH"); 
 
@@ -10839,8 +10839,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SAVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:988:6: ( 'SAVE' )
-            // Cmd3.g:988:8: 'SAVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:988:6: ( 'SAVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:988:8: 'SAVE'
             {
             	Match("SAVE"); 
 
@@ -10863,8 +10863,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:989:5: ( 'NOT' )
-            // Cmd3.g:989:7: 'NOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:989:5: ( 'NOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:989:7: 'NOT'
             {
             	Match("NOT"); 
 
@@ -10887,8 +10887,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOTIFY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:990:8: ( 'NOTIFY' )
-            // Cmd3.g:990:10: 'NOTIFY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:990:8: ( 'NOTIFY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:990:10: 'NOTIFY'
             {
             	Match("NOTIFY"); 
 
@@ -10911,8 +10911,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NOV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:991:5: ( 'NOV' )
-            // Cmd3.g:991:7: 'NOV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:991:5: ( 'NOV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:991:7: 'NOV'
             {
             	Match("NOV"); 
 
@@ -10935,8 +10935,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:992:8: ( 'NWIDTH' )
-            // Cmd3.g:992:10: 'NWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:992:8: ( 'NWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:992:10: 'NWIDTH'
             {
             	Match("NWIDTH"); 
 
@@ -10959,8 +10959,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NYTVINDU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:993:10: ( 'NYTVINDU' )
-            // Cmd3.g:993:12: 'NYTVINDU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:993:10: ( 'NYTVINDU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:993:12: 'NYTVINDU'
             {
             	Match("NYTVINDU"); 
 
@@ -10983,8 +10983,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:994:5: ( 'OLS' )
-            // Cmd3.g:994:7: 'OLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:994:5: ( 'OLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:994:7: 'OLS'
             {
             	Match("OLS"); 
 
@@ -11007,8 +11007,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OPEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:995:6: ( 'OPEN' )
-            // Cmd3.g:995:8: 'OPEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:995:6: ( 'OPEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:995:8: 'OPEN'
             {
             	Match("OPEN"); 
 
@@ -11031,8 +11031,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OPTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:996:8: ( 'OPTION' )
-            // Cmd3.g:996:10: 'OPTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:996:8: ( 'OPTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:996:10: 'OPTION'
             {
             	Match("OPTION"); 
 
@@ -11055,8 +11055,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:997:4: ( 'OR' )
-            // Cmd3.g:997:6: 'OR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:997:4: ( 'OR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:997:6: 'OR'
             {
             	Match("OR"); 
 
@@ -11079,8 +11079,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = P;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:998:3: ( 'P' )
-            // Cmd3.g:998:5: 'P'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:998:3: ( 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:998:5: 'P'
             {
             	Match('P'); 
 
@@ -11102,8 +11102,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PARAM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:999:7: ( 'PARAM' )
-            // Cmd3.g:999:9: 'PARAM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:999:7: ( 'PARAM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:999:9: 'PARAM'
             {
             	Match("PARAM"); 
 
@@ -11126,8 +11126,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PATCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1000:7: ( 'PATCH' )
-            // Cmd3.g:1000:9: 'PATCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1000:7: ( 'PATCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1000:9: 'PATCH'
             {
             	Match("PATCH"); 
 
@@ -11150,8 +11150,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PATH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1001:6: ( 'PATH' )
-            // Cmd3.g:1001:8: 'PATH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1001:6: ( 'PATH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1001:8: 'PATH'
             {
             	Match("PATH"); 
 
@@ -11174,8 +11174,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PAUSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1002:7: ( 'PAUSE' )
-            // Cmd3.g:1002:9: 'PAUSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1002:7: ( 'PAUSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1002:9: 'PAUSE'
             {
             	Match("PAUSE"); 
 
@@ -11198,8 +11198,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1003:5: ( 'PCH' )
-            // Cmd3.g:1003:7: 'PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1003:5: ( 'PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1003:7: 'PCH'
             {
             	Match("PCH"); 
 
@@ -11222,8 +11222,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PCIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1004:6: ( 'PCIM' )
-            // Cmd3.g:1004:8: 'PCIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1004:6: ( 'PCIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1004:8: 'PCIM'
             {
             	Match("PCIM"); 
 
@@ -11246,8 +11246,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PCIMSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1005:11: ( 'PCIMSTYLE' )
-            // Cmd3.g:1005:13: 'PCIMSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1005:11: ( 'PCIMSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1005:13: 'PCIMSTYLE'
             {
             	Match("PCIMSTYLE"); 
 
@@ -11270,8 +11270,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1006:7: ( 'STYLE' )
-            // Cmd3.g:1006:9: 'STYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1006:7: ( 'STYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1006:9: 'STYLE'
             {
             	Match("STYLE"); 
 
@@ -11294,8 +11294,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PCTPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1007:8: ( 'PCTPRT' )
-            // Cmd3.g:1007:10: 'PCTPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1007:8: ( 'PCTPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1007:10: 'PCTPRT'
             {
             	Match("PCTPRT"); 
 
@@ -11318,8 +11318,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1008:6: ( 'PDEC' )
-            // Cmd3.g:1008:8: 'PDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1008:6: ( 'PDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1008:8: 'PDEC'
             {
             	Match("PDEC"); 
 
@@ -11342,8 +11342,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PERIOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1009:8: ( 'PERIOD' )
-            // Cmd3.g:1009:10: 'PERIOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1009:8: ( 'PERIOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1009:10: 'PERIOD'
             {
             	Match("PERIOD"); 
 
@@ -11366,8 +11366,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PIPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1010:6: ( 'PIPE' )
-            // Cmd3.g:1010:8: 'PIPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1010:6: ( 'PIPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1010:8: 'PIPE'
             {
             	Match("PIPE"); 
 
@@ -11390,8 +11390,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1011:6: ( 'PLOT' )
-            // Cmd3.g:1011:8: 'PLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1011:6: ( 'PLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1011:8: 'PLOT'
             {
             	Match("PLOT"); 
 
@@ -11414,8 +11414,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PLOTCODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1012:10: ( 'PLOTCODE' )
-            // Cmd3.g:1012:12: 'PLOTCODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1012:10: ( 'PLOTCODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1012:12: 'PLOTCODE'
             {
             	Match("PLOTCODE"); 
 
@@ -11438,8 +11438,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CUT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1013:5: ( 'CUT' )
-            // Cmd3.g:1013:7: 'CUT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1013:5: ( 'CUT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1013:7: 'CUT'
             {
             	Match("CUT"); 
 
@@ -11462,8 +11462,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = POINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1014:8: ( 'POINTS' )
-            // Cmd3.g:1014:10: 'POINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1014:8: ( 'POINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1014:10: 'POINTS'
             {
             	Match("POINTS"); 
 
@@ -11486,8 +11486,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = POS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1015:5: ( 'POS' )
-            // Cmd3.g:1015:7: 'POS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1015:5: ( 'POS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1015:7: 'POS'
             {
             	Match("POS"); 
 
@@ -11510,8 +11510,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PREFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1016:8: ( 'PREFIX' )
-            // Cmd3.g:1016:10: 'PREFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1016:8: ( 'PREFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1016:10: 'PREFIX'
             {
             	Match("PREFIX"); 
 
@@ -11534,8 +11534,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRETTY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1017:8: ( 'PRETTY' )
-            // Cmd3.g:1017:10: 'PRETTY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1017:8: ( 'PRETTY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1017:10: 'PRETTY'
             {
             	Match("PRETTY"); 
 
@@ -11558,8 +11558,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1018:5: ( 'PRI' )
-            // Cmd3.g:1018:7: 'PRI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1018:5: ( 'PRI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1018:7: 'PRI'
             {
             	Match("PRI"); 
 
@@ -11582,8 +11582,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1019:6: ( 'PRIM' )
-            // Cmd3.g:1019:8: 'PRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1019:6: ( 'PRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1019:8: 'PRIM'
             {
             	Match("PRIM"); 
 
@@ -11606,8 +11606,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRINT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1020:7: ( 'PRINT' )
-            // Cmd3.g:1020:9: 'PRINT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1020:7: ( 'PRINT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1020:9: 'PRINT'
             {
             	Match("PRINT"); 
 
@@ -11630,8 +11630,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = OPERATORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1021:11: ( 'OPERATORS' )
-            // Cmd3.g:1021:13: 'OPERATORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1021:11: ( 'OPERATORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1021:13: 'OPERATORS'
             {
             	Match("OPERATORS"); 
 
@@ -11654,8 +11654,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1022:5: ( 'PRN' )
-            // Cmd3.g:1022:7: 'PRN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1022:5: ( 'PRN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1022:7: 'PRN'
             {
             	Match("PRN"); 
 
@@ -11678,8 +11678,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PROT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1023:6: ( 'PROT' )
-            // Cmd3.g:1023:8: 'PROT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1023:6: ( 'PROT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1023:8: 'PROT'
             {
             	Match("PROT"); 
 
@@ -11702,8 +11702,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1024:5: ( 'PRT' )
-            // Cmd3.g:1024:7: 'PRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1024:5: ( 'PRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1024:7: 'PRT'
             {
             	Match("PRT"); 
 
@@ -11726,8 +11726,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PRTX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1025:6: ( 'PRTX' )
-            // Cmd3.g:1025:8: 'PRTX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1025:6: ( 'PRTX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1025:8: 'PRTX'
             {
             	Match("PRTX"); 
 
@@ -11750,8 +11750,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1026:9: ( 'PUDVALG' )
-            // Cmd3.g:1026:11: 'PUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1026:9: ( 'PUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1026:11: 'PUDVALG'
             {
             	Match("PUDVALG"); 
 
@@ -11774,8 +11774,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1027:8: ( 'PWIDTH' )
-            // Cmd3.g:1027:10: 'PWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1027:8: ( 'PWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1027:10: 'PWIDTH'
             {
             	Match("PWIDTH"); 
 
@@ -11798,8 +11798,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Q;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1028:3: ( 'Q' )
-            // Cmd3.g:1028:5: 'Q'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1028:3: ( 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1028:5: 'Q'
             {
             	Match('Q'); 
 
@@ -11821,8 +11821,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = R;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1029:3: ( 'R' )
-            // Cmd3.g:1029:5: 'R'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1029:3: ( 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1029:5: 'R'
             {
             	Match('R'); 
 
@@ -11844,8 +11844,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = R_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1030:10: ( 'R_EXPORT' )
-            // Cmd3.g:1030:12: 'R_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1030:10: ( 'R_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1030:12: 'R_EXPORT'
             {
             	Match("R_EXPORT"); 
 
@@ -11868,8 +11868,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = R_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1031:8: ( 'R_FILE' )
-            // Cmd3.g:1031:10: 'R_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1031:8: ( 'R_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1031:10: 'R_FILE'
             {
             	Match("R_FILE"); 
 
@@ -11892,8 +11892,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = R_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1032:7: ( 'R_RUN' )
-            // Cmd3.g:1032:9: 'R_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1032:7: ( 'R_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1032:9: 'R_RUN'
             {
             	Match("R_RUN"); 
 
@@ -11916,8 +11916,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PYTHON_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1033:15: ( 'PYTHON_EXPORT' )
-            // Cmd3.g:1033:17: 'PYTHON_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1033:15: ( 'PYTHON_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1033:17: 'PYTHON_EXPORT'
             {
             	Match("PYTHON_EXPORT"); 
 
@@ -11940,8 +11940,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PYTHON_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1034:13: ( 'PYTHON_FILE' )
-            // Cmd3.g:1034:15: 'PYTHON_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1034:13: ( 'PYTHON_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1034:15: 'PYTHON_FILE'
             {
             	Match("PYTHON_FILE"); 
 
@@ -11964,8 +11964,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PYTHON_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1035:12: ( 'PYTHON_RUN' )
-            // Cmd3.g:1035:14: 'PYTHON_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1035:12: ( 'PYTHON_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1035:14: 'PYTHON_RUN'
             {
             	Match("PYTHON_RUN"); 
 
@@ -11988,8 +11988,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1036:4: ( 'RD' )
-            // Cmd3.g:1036:6: 'RD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1036:4: ( 'RD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1036:6: 'RD'
             {
             	Match("RD"); 
 
@@ -12012,8 +12012,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RDP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1037:5: ( 'RDP' )
-            // Cmd3.g:1037:7: 'RDP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1037:5: ( 'RDP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1037:7: 'RDP'
             {
             	Match("RDP"); 
 
@@ -12036,8 +12036,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = READ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1038:6: ( 'READ' )
-            // Cmd3.g:1038:8: 'READ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1038:6: ( 'READ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1038:8: 'READ'
             {
             	Match("READ"); 
 
@@ -12060,8 +12060,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1039:5: ( 'REF' )
-            // Cmd3.g:1039:7: 'REF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1039:5: ( 'REF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1039:7: 'REF'
             {
             	Match("REF"); 
 
@@ -12084,8 +12084,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1040:5: ( 'REL' )
-            // Cmd3.g:1040:7: 'REL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1040:5: ( 'REL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1040:7: 'REL'
             {
             	Match("REL"); 
 
@@ -12108,8 +12108,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RENAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1041:8: ( 'RENAME' )
-            // Cmd3.g:1041:10: 'RENAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1041:8: ( 'RENAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1041:10: 'RENAME'
             {
             	Match("RENAME"); 
 
@@ -12132,8 +12132,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1042:9: ( 'REORDER' )
-            // Cmd3.g:1042:11: 'REORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1042:9: ( 'REORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1042:11: 'REORDER'
             {
             	Match("REORDER"); 
 
@@ -12156,8 +12156,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1043:5: ( 'REP' )
-            // Cmd3.g:1043:7: 'REP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1043:5: ( 'REP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1043:7: 'REP'
             {
             	Match("REP"); 
 
@@ -12180,8 +12180,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REPEAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1044:8: ( 'REPEAT' )
-            // Cmd3.g:1044:10: 'REPEAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1044:8: ( 'REPEAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1044:10: 'REPEAT'
             {
             	Match("REPEAT"); 
 
@@ -12204,8 +12204,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = REPLACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1045:9: ( 'REPLACE' )
-            // Cmd3.g:1045:11: 'REPLACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1045:9: ( 'REPLACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1045:11: 'REPLACE'
             {
             	Match("REPLACE"); 
 
@@ -12228,8 +12228,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1046:5: ( 'RES' )
-            // Cmd3.g:1046:7: 'RES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1046:5: ( 'RES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1046:7: 'RES'
             {
             	Match("RES"); 
 
@@ -12252,8 +12252,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RESET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1047:7: ( 'RESET' )
-            // Cmd3.g:1047:9: 'RESET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1047:7: ( 'RESET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1047:9: 'RESET'
             {
             	Match("RESET"); 
 
@@ -12276,8 +12276,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BLOCK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1048:7: ( 'BLOCK' )
-            // Cmd3.g:1048:9: 'BLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1048:7: ( 'BLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1048:9: 'BLOCK'
             {
             	Match("BLOCK"); 
 
@@ -12300,8 +12300,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RESPECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1049:9: ( 'RESPECT' )
-            // Cmd3.g:1049:11: 'RESPECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1049:9: ( 'RESPECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1049:11: 'RESPECT'
             {
             	Match("RESPECT"); 
 
@@ -12324,8 +12324,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RESTART;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1050:9: ( 'RESTART' )
-            // Cmd3.g:1050:11: 'RESTART'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1050:9: ( 'RESTART' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1050:11: 'RESTART'
             {
             	Match("RESTART"); 
 
@@ -12348,8 +12348,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1051:6: ( 'RING' )
-            // Cmd3.g:1051:8: 'RING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1051:6: ( 'RING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1051:8: 'RING'
             {
             	Match("RING"); 
 
@@ -12372,8 +12372,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1052:4: ( 'RN' )
-            // Cmd3.g:1052:6: 'RN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1052:4: ( 'RN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1052:6: 'RN'
             {
             	Match("RN"); 
 
@@ -12396,8 +12396,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ROWS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1053:6: ( 'ROWS' )
-            // Cmd3.g:1053:8: 'ROWS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1053:6: ( 'ROWS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1053:8: 'ROWS'
             {
             	Match("ROWS"); 
 
@@ -12420,8 +12420,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GROUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1054:7: ( 'GROUP' )
-            // Cmd3.g:1054:9: 'GROUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1054:7: ( 'GROUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1054:9: 'GROUP'
             {
             	Match("GROUP"); 
 
@@ -12444,8 +12444,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEVEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1055:7: ( 'LEVEL' )
-            // Cmd3.g:1055:9: 'LEVEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1055:7: ( 'LEVEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1055:9: 'LEVEL'
             {
             	Match("LEVEL"); 
 
@@ -12468,8 +12468,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LINK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1056:6: ( 'LINK' )
-            // Cmd3.g:1056:8: 'LINK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1056:6: ( 'LINK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1056:8: 'LINK'
             {
             	Match("LINK"); 
 
@@ -12492,8 +12492,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WHERE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1057:7: ( 'WHERE' )
-            // Cmd3.g:1057:9: 'WHERE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1057:7: ( 'WHERE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1057:9: 'WHERE'
             {
             	Match("WHERE"); 
 
@@ -12516,8 +12516,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1058:4: ( 'RP' )
-            // Cmd3.g:1058:6: 'RP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1058:4: ( 'RP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1058:6: 'RP'
             {
             	Match("RP"); 
 
@@ -12540,8 +12540,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1059:5: ( 'RUN' )
-            // Cmd3.g:1059:7: 'RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1059:5: ( 'RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1059:7: 'RUN'
             {
             	Match("RUN"); 
 
@@ -12564,8 +12564,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LIBRARY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1060:9: ( 'LIBRARY' )
-            // Cmd3.g:1060:11: 'LIBRARY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1060:9: ( 'LIBRARY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1060:11: 'LIBRARY'
             {
             	Match("LIBRARY"); 
 
@@ -12588,8 +12588,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SEARCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1061:8: ( 'SEARCH' )
-            // Cmd3.g:1061:10: 'SEARCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1061:8: ( 'SEARCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1061:10: 'SEARCH'
             {
             	Match("SEARCH"); 
 
@@ -12612,8 +12612,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1062:5: ( 'SEC' )
-            // Cmd3.g:1062:7: 'SEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1062:5: ( 'SEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1062:7: 'SEC'
             {
             	Match("SEC"); 
 
@@ -12636,8 +12636,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SECONDCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1063:16: ( 'SECONDCOLWIDTH' )
-            // Cmd3.g:1063:18: 'SECONDCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1063:16: ( 'SECONDCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1063:18: 'SECONDCOLWIDTH'
             {
             	Match("SECONDCOLWIDTH"); 
 
@@ -12660,8 +12660,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1064:6: ( 'S___ER' )
-            // Cmd3.g:1064:8: 'S___ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1064:6: ( 'S___ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1064:8: 'S___ER'
             {
             	Match("S___ER"); 
 
@@ -12684,8 +12684,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SER3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1065:6: ( 'S____ER' )
-            // Cmd3.g:1065:8: 'S____ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1065:6: ( 'S____ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1065:8: 'S____ER'
             {
             	Match("S____ER"); 
 
@@ -12708,8 +12708,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1066:5: ( 'SER' )
-            // Cmd3.g:1066:7: 'SER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1066:5: ( 'SER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1066:7: 'SER'
             {
             	Match("SER"); 
 
@@ -12732,8 +12732,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SERIES2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1067:9: ( 'S___ERIES' )
-            // Cmd3.g:1067:11: 'S___ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1067:9: ( 'S___ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1067:11: 'S___ERIES'
             {
             	Match("S___ERIES"); 
 
@@ -12756,8 +12756,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SERIES3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1068:9: ( 'S____ERIES' )
-            // Cmd3.g:1068:11: 'S____ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1068:9: ( 'S____ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1068:11: 'S____ERIES'
             {
             	Match("S____ERIES"); 
 
@@ -12780,8 +12780,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1069:8: ( 'SERIES' )
-            // Cmd3.g:1069:10: 'SERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1069:8: ( 'SERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1069:10: 'SERIES'
             {
             	Match("SERIES"); 
 
@@ -12804,8 +12804,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1070:5: ( 'SET' )
-            // Cmd3.g:1070:7: 'SET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1070:5: ( 'SET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1070:7: 'SET'
             {
             	Match("SET"); 
 
@@ -12828,8 +12828,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1071:11: ( 'SETBORDER' )
-            // Cmd3.g:1071:13: 'SETBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1071:11: ( 'SETBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1071:13: 'SETBORDER'
             {
             	Match("SETBORDER"); 
 
@@ -12852,8 +12852,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETBOTTOMBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1072:17: ( 'SETBOTTOMBORDER' )
-            // Cmd3.g:1072:19: 'SETBOTTOMBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1072:17: ( 'SETBOTTOMBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1072:19: 'SETBOTTOMBORDER'
             {
             	Match("SETBOTTOMBORDER"); 
 
@@ -12876,8 +12876,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETDATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1073:10: ( 'SETDATES' )
-            // Cmd3.g:1073:12: 'SETDATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1073:10: ( 'SETDATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1073:12: 'SETDATES'
             {
             	Match("SETDATES"); 
 
@@ -12900,8 +12900,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETLEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1074:15: ( 'SETLEFTBORDER' )
-            // Cmd3.g:1074:17: 'SETLEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1074:15: ( 'SETLEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1074:17: 'SETLEFTBORDER'
             {
             	Match("SETLEFTBORDER"); 
 
@@ -12924,8 +12924,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETRIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1075:16: ( 'SETRIGHTBORDER' )
-            // Cmd3.g:1075:18: 'SETRIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1075:16: ( 'SETRIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1075:18: 'SETRIGHTBORDER'
             {
             	Match("SETRIGHTBORDER"); 
 
@@ -12948,8 +12948,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETTEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1076:9: ( 'SETTEXT' )
-            // Cmd3.g:1076:11: 'SETTEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1076:9: ( 'SETTEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1076:11: 'SETTEXT'
             {
             	Match("SETTEXT"); 
 
@@ -12972,8 +12972,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETTOPBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1077:14: ( 'SETTOPBORDER' )
-            // Cmd3.g:1077:16: 'SETTOPBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1077:14: ( 'SETTOPBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1077:16: 'SETTOPBORDER'
             {
             	Match("SETTOPBORDER"); 
 
@@ -12996,8 +12996,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SETVALUES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1078:11: ( 'SETVALUES' )
-            // Cmd3.g:1078:13: 'SETVALUES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1078:11: ( 'SETVALUES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1078:13: 'SETVALUES'
             {
             	Match("SETVALUES"); 
 
@@ -13020,8 +13020,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHEET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1079:7: ( 'SHEET' )
-            // Cmd3.g:1079:9: 'SHEET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1079:7: ( 'SHEET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1079:9: 'SHEET'
             {
             	Match("SHEET"); 
 
@@ -13044,8 +13044,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1080:6: ( 'SHOW' )
-            // Cmd3.g:1080:8: 'SHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1080:6: ( 'SHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1080:8: 'SHOW'
             {
             	Match("SHOW"); 
 
@@ -13068,8 +13068,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHOWBORDERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1081:13: ( 'SHOWBORDERS' )
-            // Cmd3.g:1081:15: 'SHOWBORDERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1081:13: ( 'SHOWBORDERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1081:15: 'SHOWBORDERS'
             {
             	Match("SHOWBORDERS"); 
 
@@ -13092,8 +13092,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SHOWPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1082:9: ( 'SHOWPCH' )
-            // Cmd3.g:1082:11: 'SHOWPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1082:9: ( 'SHOWPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1082:11: 'SHOWPCH'
             {
             	Match("SHOWPCH"); 
 
@@ -13116,8 +13116,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SIGN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1083:6: ( 'SIGN' )
-            // Cmd3.g:1083:8: 'SIGN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1083:6: ( 'SIGN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1083:8: 'SIGN'
             {
             	Match("SIGN"); 
 
@@ -13140,8 +13140,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1084:5: ( 'SIM' )
-            // Cmd3.g:1084:7: 'SIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1084:5: ( 'SIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1084:7: 'SIM'
             {
             	Match("SIM"); 
 
@@ -13164,8 +13164,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1085:8: ( 'SIMPLE' )
-            // Cmd3.g:1085:10: 'SIMPLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1085:8: ( 'SIMPLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1085:10: 'SIMPLE'
             {
             	Match("SIMPLE"); 
 
@@ -13188,8 +13188,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SKIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1086:6: ( 'SKIP' )
-            // Cmd3.g:1086:8: 'SKIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1086:6: ( 'SKIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1086:8: 'SKIP'
             {
             	Match("SKIP"); 
 
@@ -13212,8 +13212,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1087:5: ( 'NAN' )
-            // Cmd3.g:1087:7: 'NAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1087:5: ( 'NAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1087:7: 'NAN'
             {
             	Match("NAN"); 
 
@@ -13236,8 +13236,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ENGINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1088:8: ( 'ENGINE' )
-            // Cmd3.g:1088:10: 'ENGINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1088:8: ( 'ENGINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1088:10: 'ENGINE'
             {
             	Match("ENGINE"); 
 
@@ -13260,8 +13260,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = NORMAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1089:8: ( 'NORMAL' )
-            // Cmd3.g:1089:10: 'NORMAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1089:8: ( 'NORMAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1089:10: 'NORMAL'
             {
             	Match("NORMAL"); 
 
@@ -13284,8 +13284,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SMOOTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1090:8: ( 'SMOOTH' )
-            // Cmd3.g:1090:10: 'SMOOTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1090:8: ( 'SMOOTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1090:10: 'SMOOTH'
             {
             	Match("SMOOTH"); 
 
@@ -13308,8 +13308,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SOLVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1091:7: ( 'SOLVE' )
-            // Cmd3.g:1091:9: 'SOLVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1091:7: ( 'SOLVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1091:9: 'SOLVE'
             {
             	Match("SOLVE"); 
 
@@ -13332,8 +13332,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SOME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1092:6: ( 'SOME' )
-            // Cmd3.g:1092:8: 'SOME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1092:6: ( 'SOME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1092:8: 'SOME'
             {
             	Match("SOME"); 
 
@@ -13356,8 +13356,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1093:6: ( 'SORT' )
-            // Cmd3.g:1093:8: 'SORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1093:6: ( 'SORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1093:8: 'SORT'
             {
             	Match("SORT"); 
 
@@ -13380,8 +13380,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SOUND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1094:7: ( 'SOUND' )
-            // Cmd3.g:1094:9: 'SOUND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1094:7: ( 'SOUND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1094:9: 'SOUND'
             {
             	Match("SOUND"); 
 
@@ -13404,8 +13404,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SOURCE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1095:8: ( 'SOURCE' )
-            // Cmd3.g:1095:10: 'SOURCE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1095:8: ( 'SOURCE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1095:10: 'SOURCE'
             {
             	Match("SOURCE"); 
 
@@ -13428,8 +13428,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SPECIALMINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1096:14: ( 'SPECIALMINUS' )
-            // Cmd3.g:1096:16: 'SPECIALMINUS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1096:14: ( 'SPECIALMINUS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1096:16: 'SPECIALMINUS'
             {
             	Match("SPECIALMINUS"); 
 
@@ -13452,8 +13452,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SPLICE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1097:8: ( 'SPLICE' )
-            // Cmd3.g:1097:10: 'SPLICE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1097:8: ( 'SPLICE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1097:10: 'SPLICE'
             {
             	Match("SPLICE"); 
 
@@ -13476,8 +13476,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SPLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1098:8: ( 'SPLINE' )
-            // Cmd3.g:1098:10: 'SPLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1098:8: ( 'SPLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1098:10: 'SPLINE'
             {
             	Match("SPLINE"); 
 
@@ -13500,8 +13500,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SPLIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1099:7: ( 'SPLIT' )
-            // Cmd3.g:1099:9: 'SPLIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1099:7: ( 'SPLIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1099:9: 'SPLIT'
             {
             	Match("SPLIT"); 
 
@@ -13524,8 +13524,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STACKED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1100:9: ( 'STACKED' )
-            // Cmd3.g:1100:11: 'STACKED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1100:9: ( 'STACKED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1100:11: 'STACKED'
             {
             	Match("STACKED"); 
 
@@ -13548,8 +13548,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1101:7: ( 'STAMP' )
-            // Cmd3.g:1101:9: 'STAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1101:7: ( 'STAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1101:9: 'STAMP'
             {
             	Match("STAMP"); 
 
@@ -13572,8 +13572,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STARTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1102:11: ( 'STARTFILE' )
-            // Cmd3.g:1102:13: 'STARTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1102:11: ( 'STARTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1102:13: 'STARTFILE'
             {
             	Match("STARTFILE"); 
 
@@ -13596,8 +13596,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STATIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1103:8: ( 'STATIC' )
-            // Cmd3.g:1103:10: 'STATIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1103:8: ( 'STATIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1103:10: 'STATIC'
             {
             	Match("STATIC"); 
 
@@ -13620,8 +13620,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = CHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1104:7: ( 'CHECK' )
-            // Cmd3.g:1104:9: 'CHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1104:7: ( 'CHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1104:9: 'CHECK'
             {
             	Match("CHECK"); 
 
@@ -13644,8 +13644,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1105:6: ( 'STEP' )
-            // Cmd3.g:1105:8: 'STEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1105:6: ( 'STEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1105:8: 'STEP'
             {
             	Match("STEP"); 
 
@@ -13668,8 +13668,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STOP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1106:6: ( 'STOP' )
-            // Cmd3.g:1106:8: 'STOP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1106:6: ( 'STOP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1106:8: 'STOP'
             {
             	Match("STOP"); 
 
@@ -13692,8 +13692,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STRIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1107:7: ( 'STRIP' )
-            // Cmd3.g:1107:9: 'STRIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1107:7: ( 'STRIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1107:9: 'STRIP'
             {
             	Match("STRIP"); 
 
@@ -13716,8 +13716,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SUFFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1108:8: ( 'SUFFIX' )
-            // Cmd3.g:1108:10: 'SUFFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1108:8: ( 'SUFFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1108:10: 'SUFFIX'
             {
             	Match("SUFFIX"); 
 
@@ -13740,8 +13740,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SUGGESTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1109:13: ( 'SUGGESTIONS' )
-            // Cmd3.g:1109:15: 'SUGGESTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1109:13: ( 'SUGGESTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1109:15: 'SUGGESTIONS'
             {
             	Match("SUGGESTIONS"); 
 
@@ -13764,8 +13764,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1110:6: ( 'SWAP' )
-            // Cmd3.g:1110:8: 'SWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1110:6: ( 'SWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1110:8: 'SWAP'
             {
             	Match("SWAP"); 
 
@@ -13788,8 +13788,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SYS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1111:5: ( 'SYS' )
-            // Cmd3.g:1111:7: 'SYS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1111:5: ( 'SYS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1111:7: 'SYS'
             {
             	Match("SYS"); 
 
@@ -13812,8 +13812,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SYSTEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1112:8: ( 'SYSTEM' )
-            // Cmd3.g:1112:10: 'SYSTEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1112:8: ( 'SYSTEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1112:10: 'SYSTEM'
             {
             	Match("SYSTEM"); 
 
@@ -13836,8 +13836,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1113:7: ( 'TABLE' )
-            // Cmd3.g:1113:9: 'TABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1113:7: ( 'TABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1113:9: 'TABLE'
             {
             	Match("TABLE"); 
 
@@ -13860,8 +13860,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TABLE1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1114:8: ( 'TABLE1' )
-            // Cmd3.g:1114:10: 'TABLE1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1114:8: ( 'TABLE1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1114:10: 'TABLE1'
             {
             	Match("TABLE1"); 
 
@@ -13884,8 +13884,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TABLE2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1115:8: ( 'TABLE2' )
-            // Cmd3.g:1115:10: 'TABLE2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1115:8: ( 'TABLE2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1115:10: 'TABLE2'
             {
             	Match("TABLE2"); 
 
@@ -13908,8 +13908,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TABLEOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1116:10: ( 'TABLEOLD' )
-            // Cmd3.g:1116:12: 'TABLEOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1116:10: ( 'TABLEOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1116:12: 'TABLEOLD'
             {
             	Match("TABLEOLD"); 
 
@@ -13932,8 +13932,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1117:6: ( 'TABS' )
-            // Cmd3.g:1117:8: 'TABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1117:6: ( 'TABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1117:8: 'TABS'
             {
             	Match("TABS"); 
 
@@ -13956,8 +13956,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TARGET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1118:8: ( 'TARGET' )
-            // Cmd3.g:1118:10: 'TARGET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1118:8: ( 'TARGET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1118:10: 'TARGET'
             {
             	Match("TARGET"); 
 
@@ -13980,8 +13980,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1119:6: ( 'TELL' )
-            // Cmd3.g:1119:8: 'TELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1119:6: ( 'TELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1119:8: 'TELL'
             {
             	Match("TELL"); 
 
@@ -14004,8 +14004,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TEMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1120:6: ( 'TEMP' )
-            // Cmd3.g:1120:8: 'TEMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1120:6: ( 'TEMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1120:8: 'TEMP'
             {
             	Match("TEMP"); 
 
@@ -14028,8 +14028,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TERMINAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1121:10: ( 'TERMINAL' )
-            // Cmd3.g:1121:12: 'TERMINAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1121:10: ( 'TERMINAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1121:12: 'TERMINAL'
             {
             	Match("TERMINAL"); 
 
@@ -14052,8 +14052,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TEST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1122:6: ( 'TEST' )
-            // Cmd3.g:1122:8: 'TEST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1122:6: ( 'TEST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1122:8: 'TEST'
             {
             	Match("TEST"); 
 
@@ -14076,8 +14076,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1123:17: ( 'TESTRANDOMMODEL' )
-            // Cmd3.g:1123:19: 'TESTRANDOMMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1123:17: ( 'TESTRANDOMMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1123:19: 'TESTRANDOMMODEL'
             {
             	Match("TESTRANDOMMODEL"); 
 
@@ -14100,8 +14100,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODELCHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1124:22: ( 'TESTRANDOMMODELCHECK' )
-            // Cmd3.g:1124:24: 'TESTRANDOMMODELCHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1124:22: ( 'TESTRANDOMMODELCHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1124:24: 'TESTRANDOMMODELCHECK'
             {
             	Match("TESTRANDOMMODELCHECK"); 
 
@@ -14124,8 +14124,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TESTSIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1125:9: ( 'TESTSIM' )
-            // Cmd3.g:1125:11: 'TESTSIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1125:9: ( 'TESTSIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1125:11: 'TESTSIM'
             {
             	Match("TESTSIM"); 
 
@@ -14148,8 +14148,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TIME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1126:6: ( 'TIME' )
-            // Cmd3.g:1126:8: 'TIME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1126:6: ( 'TIME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1126:8: 'TIME'
             {
             	Match("TIME"); 
 
@@ -14172,8 +14172,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TIMEFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1127:12: ( 'TIMEFILTER' )
-            // Cmd3.g:1127:14: 'TIMEFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1127:12: ( 'TIMEFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1127:14: 'TIMEFILTER'
             {
             	Match("TIMEFILTER"); 
 
@@ -14196,8 +14196,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UNITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1128:7: ( 'UNITS' )
-            // Cmd3.g:1128:9: 'UNITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1128:7: ( 'UNITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1128:9: 'UNITS'
             {
             	Match("UNITS"); 
 
@@ -14220,8 +14220,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TIMESPAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1129:10: ( 'TIMESPAN' )
-            // Cmd3.g:1129:12: 'TIMESPAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1129:10: ( 'TIMESPAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1129:12: 'TIMESPAN'
             {
             	Match("TIMESPAN"); 
 
@@ -14244,8 +14244,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1130:7: ( 'TITLE' )
-            // Cmd3.g:1130:9: 'TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1130:7: ( 'TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1130:9: 'TITLE'
             {
             	Match("TITLE"); 
 
@@ -14268,8 +14268,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1131:4: ( 'TO' )
-            // Cmd3.g:1131:6: 'TO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1131:4: ( 'TO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1131:6: 'TO'
             {
             	Match("TO"); 
 
@@ -14292,8 +14292,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TOTAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1132:7: ( 'TOTAL' )
-            // Cmd3.g:1132:9: 'TOTAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1132:7: ( 'TOTAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1132:9: 'TOTAL'
             {
             	Match("TOTAL"); 
 
@@ -14316,8 +14316,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRANSLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1133:11: ( 'TRANSLATE' )
-            // Cmd3.g:1133:13: 'TRANSLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1133:11: ( 'TRANSLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1133:13: 'TRANSLATE'
             {
             	Match("TRANSLATE"); 
 
@@ -14340,8 +14340,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRANSPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1134:11: ( 'TRANSPOSE' )
-            // Cmd3.g:1134:13: 'TRANSPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1134:11: ( 'TRANSPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1134:13: 'TRANSPOSE'
             {
             	Match("TRANSPOSE"); 
 
@@ -14364,8 +14364,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TREL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1135:6: ( 'TREL' )
-            // Cmd3.g:1135:8: 'TREL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1135:6: ( 'TREL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1135:8: 'TREL'
             {
             	Match("TREL"); 
 
@@ -14388,8 +14388,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1136:6: ( 'true' )
-            // Cmd3.g:1136:8: 'true'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1136:6: ( 'true' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1136:8: 'true'
             {
             	Match("true"); 
 
@@ -14412,8 +14412,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRUNCATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1137:10: ( 'TRUNCATE' )
-            // Cmd3.g:1137:12: 'TRUNCATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1137:10: ( 'TRUNCATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1137:12: 'TRUNCATE'
             {
             	Match("TRUNCATE"); 
 
@@ -14436,8 +14436,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TSD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1138:5: ( 'TSD' )
-            // Cmd3.g:1138:7: 'TSD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1138:5: ( 'TSD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1138:7: 'TSD'
             {
             	Match("TSD"); 
 
@@ -14460,8 +14460,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TSDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1139:6: ( 'TSDX' )
-            // Cmd3.g:1139:8: 'TSDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1139:6: ( 'TSDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1139:8: 'TSDX'
             {
             	Match("TSDX"); 
 
@@ -14484,8 +14484,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TSP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1140:5: ( 'TSP' )
-            // Cmd3.g:1140:7: 'TSP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1140:5: ( 'TSP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1140:7: 'TSP'
             {
             	Match("TSP"); 
 
@@ -14508,8 +14508,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1141:5: ( 'TXT' )
-            // Cmd3.g:1141:7: 'TXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1141:5: ( 'TXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1141:7: 'TXT'
             {
             	Match("TXT"); 
 
@@ -14532,8 +14532,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1142:6: ( 'TYPE' )
-            // Cmd3.g:1142:8: 'TYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1142:6: ( 'TYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1142:8: 'TYPE'
             {
             	Match("TYPE"); 
 
@@ -14556,8 +14556,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = U;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1143:3: ( 'U' )
-            // Cmd3.g:1143:5: 'U'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1143:3: ( 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1143:5: 'U'
             {
             	Match('U'); 
 
@@ -14579,8 +14579,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1144:6: ( '_ABS' )
-            // Cmd3.g:1144:8: '_ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1144:6: ( '_ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1144:8: '_ABS'
             {
             	Match("_ABS"); 
 
@@ -14603,8 +14603,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1145:6: ( '_DIF' )
-            // Cmd3.g:1145:8: '_DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1145:6: ( '_DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1145:8: '_DIF'
             {
             	Match("_DIF"); 
 
@@ -14627,8 +14627,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1146:7: ( '_DIFF' )
-            // Cmd3.g:1146:9: '_DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1146:7: ( '_DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1146:9: '_DIFF'
             {
             	Match("_DIFF"); 
 
@@ -14651,8 +14651,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1147:8: ( 'UDVALG' )
-            // Cmd3.g:1147:10: 'UDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1147:8: ( 'UDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1147:10: 'UDVALG'
             {
             	Match("UDVALG"); 
 
@@ -14675,8 +14675,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1148:7: ( '_GDIF' )
-            // Cmd3.g:1148:9: '_GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1148:7: ( '_GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1148:9: '_GDIF'
             {
             	Match("_GDIF"); 
 
@@ -14699,8 +14699,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1149:8: ( '_GDIFF' )
-            // Cmd3.g:1149:10: '_GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1149:8: ( '_GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1149:10: '_GDIFF'
             {
             	Match("_GDIFF"); 
 
@@ -14723,8 +14723,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ULEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1150:6: ( '_LEV' )
-            // Cmd3.g:1150:8: '_LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1150:6: ( '_LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1150:8: '_LEV'
             {
             	Match("_LEV"); 
 
@@ -14747,8 +14747,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UNDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1151:6: ( 'UNDO' )
-            // Cmd3.g:1151:8: 'UNDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1151:6: ( 'UNDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1151:8: 'UNDO'
             {
             	Match("UNDO"); 
 
@@ -14771,8 +14771,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UNFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1152:7: ( 'UNFIX' )
-            // Cmd3.g:1152:9: 'UNFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1152:7: ( 'UNFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1152:9: 'UNFIX'
             {
             	Match("UNFIX"); 
 
@@ -14795,8 +14795,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SPEEDUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1153:9: ( 'SPEEDUP' )
-            // Cmd3.g:1153:11: 'SPEEDUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1153:9: ( 'SPEEDUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1153:11: 'SPEEDUP'
             {
             	Match("SPEEDUP"); 
 
@@ -14819,8 +14819,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UNSWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1154:8: ( 'UNSWAP' )
-            // Cmd3.g:1154:10: 'UNSWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1154:8: ( 'UNSWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1154:10: 'UNSWAP'
             {
             	Match("UNSWAP"); 
 
@@ -14843,8 +14843,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1155:6: ( '_PCH' )
-            // Cmd3.g:1155:8: '_PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1155:6: ( '_PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1155:8: '_PCH'
             {
             	Match("_PCH"); 
 
@@ -14867,8 +14867,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UPDATEFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1156:12: ( 'UPDATEFREQ' )
-            // Cmd3.g:1156:14: 'UPDATEFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1156:12: ( 'UPDATEFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1156:14: 'UPDATEFREQ'
             {
             	Match("UPDATEFREQ"); 
 
@@ -14891,8 +14891,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = UPDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1157:6: ( 'UPDX' )
-            // Cmd3.g:1157:8: 'UPDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1157:6: ( 'UPDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1157:8: 'UPDX'
             {
             	Match("UPDX"); 
 
@@ -14915,8 +14915,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = V;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1158:3: ( 'V' )
-            // Cmd3.g:1158:5: 'V'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1158:3: ( 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1158:5: 'V'
             {
             	Match('V'); 
 
@@ -14938,8 +14938,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1159:5: ( 'VAL' )
-            // Cmd3.g:1159:7: 'VAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1159:5: ( 'VAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1159:7: 'VAL'
             {
             	Match("VAL"); 
 
@@ -14962,8 +14962,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1160:5: ( 'VAR' )
-            // Cmd3.g:1160:7: 'VAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1160:5: ( 'VAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1160:7: 'VAR'
             {
             	Match("VAR"); 
 
@@ -14986,8 +14986,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VAR_KDUSJFLQO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1161:16: ( 'VAR_KDUSJFLQO2' )
-            // Cmd3.g:1161:18: 'VAR_KDUSJFLQO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1161:16: ( 'VAR_KDUSJFLQO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1161:18: 'VAR_KDUSJFLQO2'
             {
             	Match("VAR_KDUSJFLQO2"); 
 
@@ -15010,8 +15010,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VALUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1162:7: ( 'VALUE' )
-            // Cmd3.g:1162:9: 'VALUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1162:7: ( 'VALUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1162:9: 'VALUE'
             {
             	Match("VALUE"); 
 
@@ -15034,8 +15034,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1163:6: ( 'VERS' )
-            // Cmd3.g:1163:8: 'VERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1163:6: ( 'VERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1163:8: 'VERS'
             {
             	Match("VERS"); 
 
@@ -15058,8 +15058,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VERSION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1164:9: ( 'VERSION' )
-            // Cmd3.g:1164:11: 'VERSION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1164:9: ( 'VERSION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1164:11: 'VERSION'
             {
             	Match("VERSION"); 
 
@@ -15082,8 +15082,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1165:6: ( 'VPRT' )
-            // Cmd3.g:1165:8: 'VPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1165:6: ( 'VPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1165:8: 'VPRT'
             {
             	Match("VPRT"); 
 
@@ -15106,8 +15106,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WAIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1166:6: ( 'WAIT' )
-            // Cmd3.g:1166:8: 'WAIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1166:6: ( 'WAIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1166:8: 'WAIT'
             {
             	Match("WAIT"); 
 
@@ -15130,8 +15130,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1167:7: ( 'WIDTH' )
-            // Cmd3.g:1167:9: 'WIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1167:7: ( 'WIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1167:9: 'WIDTH'
             {
             	Match("WIDTH"); 
 
@@ -15154,8 +15154,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WINDOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1168:8: ( 'WINDOW' )
-            // Cmd3.g:1168:10: 'WINDOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1168:8: ( 'WINDOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1168:10: 'WINDOW'
             {
             	Match("WINDOW"); 
 
@@ -15178,8 +15178,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WORKING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1169:9: ( 'WORKING' )
-            // Cmd3.g:1169:11: 'WORKING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1169:9: ( 'WORKING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1169:11: 'WORKING'
             {
             	Match("WORKING"); 
 
@@ -15202,8 +15202,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1170:7: ( 'WPLOT' )
-            // Cmd3.g:1170:9: 'WPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1170:7: ( 'WPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1170:9: 'WPLOT'
             {
             	Match("WPLOT"); 
 
@@ -15226,8 +15226,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WRITE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1171:7: ( 'WRITE' )
-            // Cmd3.g:1171:9: 'WRITE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1171:7: ( 'WRITE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1171:9: 'WRITE'
             {
             	Match("WRITE"); 
 
@@ -15250,8 +15250,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1172:9: ( 'WUDVALG' )
-            // Cmd3.g:1172:11: 'WUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1172:9: ( 'WUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1172:11: 'WUDVALG'
             {
             	Match("WUDVALG"); 
 
@@ -15274,8 +15274,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = X12A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1173:6: ( 'X12A' )
-            // Cmd3.g:1173:8: 'X12A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1173:6: ( 'X12A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1173:8: 'X12A'
             {
             	Match("X12A"); 
 
@@ -15298,8 +15298,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1174:5: ( 'XLS' )
-            // Cmd3.g:1174:7: 'XLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1174:5: ( 'XLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1174:7: 'XLS'
             {
             	Match("XLS"); 
 
@@ -15322,8 +15322,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = XLSX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1175:6: ( 'XLSX' )
-            // Cmd3.g:1175:8: 'XLSX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1175:6: ( 'XLSX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1175:8: 'XLSX'
             {
             	Match("XLSX"); 
 
@@ -15346,8 +15346,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1176:5: ( 'yes' )
-            // Cmd3.g:1176:7: 'yes'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1176:5: ( 'yes' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1176:7: 'yes'
             {
             	Match("yes"); 
 
@@ -15370,8 +15370,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1177:6: ( 'YMAX' )
-            // Cmd3.g:1177:8: 'YMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1177:6: ( 'YMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1177:8: 'YMAX'
             {
             	Match("YMAX"); 
 
@@ -15394,8 +15394,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = YMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1178:6: ( 'YMIN' )
-            // Cmd3.g:1178:8: 'YMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1178:6: ( 'YMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1178:8: 'YMIN'
             {
             	Match("YMIN"); 
 
@@ -15418,8 +15418,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1179:7: ( 'Y2MAX' )
-            // Cmd3.g:1179:9: 'Y2MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1179:7: ( 'Y2MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1179:9: 'Y2MAX'
             {
             	Match("Y2MAX"); 
 
@@ -15442,8 +15442,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Y2MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1180:7: ( 'Y2MIN' )
-            // Cmd3.g:1180:9: 'Y2MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1180:7: ( 'Y2MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1180:9: 'Y2MIN'
             {
             	Match("Y2MIN"); 
 
@@ -15466,8 +15466,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ZERO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1181:6: ( 'ZERO' )
-            // Cmd3.g:1181:8: 'ZERO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1181:6: ( 'ZERO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1181:8: 'ZERO'
             {
             	Match("ZERO"); 
 
@@ -15490,8 +15490,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ZOOM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1182:6: ( 'ZOOM' )
-            // Cmd3.g:1182:8: 'ZOOM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1182:6: ( 'ZOOM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1182:8: 'ZOOM'
             {
             	Match("ZOOM"); 
 
@@ -15514,8 +15514,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ZVAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:1183:6: ( 'ZVAR' )
-            // Cmd3.g:1183:8: 'ZVAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1183:6: ( 'ZVAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1183:8: 'ZVAR'
             {
             	Match("ZVAR"); 
 
@@ -15536,8 +15536,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5207:18: ( '\\n' )
-            // Cmd3.g:5207:29: '\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5225:18: ( '\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5225:29: '\\n'
             {
             	Match('\n'); 
 
@@ -15555,8 +15555,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5208:18: ( '\\r\\n' )
-            // Cmd3.g:5208:29: '\\r\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5226:18: ( '\\r\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5226:29: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -15575,8 +15575,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5209:15: ( '0' .. '9' )
-            // Cmd3.g:5209:29: '0' .. '9'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5227:15: ( '0' .. '9' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5227:29: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -15594,8 +15594,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5210:16: ( 'a' .. 'z' | 'A' .. 'Z' )
-            // Cmd3.g:
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5228:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -15625,16 +15625,16 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HTTP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5212:5: ( H_ T_ T_ P_ ':' ( '//' ) )
-            // Cmd3.g:5212:29: H_ T_ T_ P_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5230:5: ( H_ T_ T_ P_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5230:29: H_ T_ T_ P_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
             	mT_(); 
             	mP_(); 
             	Match(':'); 
-            	// Cmd3.g:5212:46: ( '//' )
-            	// Cmd3.g:5212:47: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5230:46: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5230:47: '//'
             	{
             		Match("//"); 
 
@@ -15660,8 +15660,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HTTPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5213:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
-            // Cmd3.g:5213:29: H_ T_ T_ P_ S_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5231:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5231:29: H_ T_ T_ P_ S_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
@@ -15669,8 +15669,8 @@ public partial class Cmd3Lexer : Lexer {
             	mP_(); 
             	mS_(); 
             	Match(':'); 
-            	// Cmd3.g:5213:49: ( '//' )
-            	// Cmd3.g:5213:50: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5231:49: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5231:50: '//'
             	{
             		Match("//"); 
 
@@ -15696,10 +15696,10 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5215:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
-            // Cmd3.g:5215:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             {
-            	// Cmd3.g:5215:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             	int cnt1 = 0;
             	do 
             	{
@@ -15737,35 +15737,35 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // Cmd3.g:5215:31: '\\t'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:31: '\\t'
             			    {
             			    	Match('\t'); 
 
             			    }
             			    break;
             			case 2 :
-            			    // Cmd3.g:5215:38: ' '
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:38: ' '
             			    {
             			    	Match(' '); 
 
             			    }
             			    break;
             			case 3 :
-            			    // Cmd3.g:5215:44: '\\u000C'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:44: '\\u000C'
             			    {
             			    	Match('\f'); 
 
             			    }
             			    break;
             			case 4 :
-            			    // Cmd3.g:5215:54: NEWLINE2
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:54: NEWLINE2
             			    {
             			    	mNEWLINE2(); 
 
             			    }
             			    break;
             			case 5 :
-            			    // Cmd3.g:5215:65: NEWLINE3
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5233:65: NEWLINE3
             			    {
             			    	mNEWLINE3(); 
 
@@ -15804,18 +15804,18 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5217:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // Cmd3.g:5217:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// Cmd3.g:5217:29: ( '//' )
-            	// Cmd3.g:5217:30: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:29: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:30: '//'
             	{
             		Match("//"); 
 
 
             	}
 
-            	// Cmd3.g:5217:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
             	    int alt2 = 2;
@@ -15830,7 +15830,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt2) 
             		{
             			case 1 :
-            			    // Cmd3.g:5217:37: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5235:37: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -15875,12 +15875,12 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMENT_MULTILINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5218:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
-            // Cmd3.g:5218:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5236:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5236:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
             {
             	Match("/*"); 
 
-            	// Cmd3.g:5218:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5236:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
             	do 
             	{
             	    int alt3 = 3;
@@ -15925,14 +15925,14 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt3) 
             		{
             			case 1 :
-            			    // Cmd3.g:5218:60: COMMENT_MULTILINE
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5236:60: COMMENT_MULTILINE
             			    {
             			    	mCOMMENT_MULTILINE(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // Cmd3.g:5218:80: .
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5236:80: .
             			    {
             			    	MatchAny(); 
 
@@ -15969,8 +15969,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5221:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // Cmd3.g:5221:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5239:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5239:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -15983,7 +15983,7 @@ public partial class Cmd3Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Cmd3.g:5221:42: ( DIGIT | LETTER | '_' )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5239:42: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt4 = 2;
@@ -15998,7 +15998,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt4) 
             		{
             			case 1 :
-            			    // Cmd3.g:
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             			    {
             			    	if ( (input.LA(1) >= '0' && input.LA(1) <= '9') || (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             			    	{
@@ -16043,10 +16043,10 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5223:8: ( ( DIGIT )+ )
-            // Cmd3.g:5223:29: ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5241:8: ( ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5241:29: ( DIGIT )+
             {
-            	// Cmd3.g:5223:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5241:29: ( DIGIT )+
             	int cnt5 = 0;
             	do 
             	{
@@ -16062,7 +16062,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // Cmd3.g:5223:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5241:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16100,10 +16100,10 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DigitsEDigits;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5225:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
-            // Cmd3.g:5225:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
             {
-            	// Cmd3.g:5225:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:29: ( DIGIT )+
             	int cnt6 = 0;
             	do 
             	{
@@ -16119,7 +16119,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt6) 
             		{
             			case 1 :
-            			    // Cmd3.g:5225:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16138,14 +16138,14 @@ public partial class Cmd3Lexer : Lexer {
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
-            	// Cmd3.g:5225:37: ( E_ )
-            	// Cmd3.g:5225:39: E_
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:37: ( E_ )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:39: E_
             	{
             		mE_(); 
 
             	}
 
-            	// Cmd3.g:5225:45: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:45: ( DIGIT )+
             	int cnt7 = 0;
             	do 
             	{
@@ -16161,7 +16161,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt7) 
             		{
             			case 1 :
-            			    // Cmd3.g:5225:45: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5243:45: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16199,15 +16199,15 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DateDef;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5231:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
             int alt14 = 3;
             alt14 = dfa14.Predict(input);
             switch (alt14) 
             {
                 case 1 :
-                    // Cmd3.g:5231:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
                     {
-                    	// Cmd3.g:5231:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:14: ( DIGIT )+
                     	int cnt8 = 0;
                     	do 
                     	{
@@ -16223,7 +16223,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt8) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5231:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16243,7 +16243,7 @@ public partial class Cmd3Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop8' has no statements
 
                     	mM_(); 
-                    	// Cmd3.g:5231:24: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:24: ( DIGIT )+
                     	int cnt9 = 0;
                     	do 
                     	{
@@ -16259,7 +16259,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt9) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5231:24: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:24: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16279,7 +16279,7 @@ public partial class Cmd3Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop9' has no statements
 
                     	mD_(); 
-                    	// Cmd3.g:5231:34: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:34: ( DIGIT )+
                     	int cnt10 = 0;
                     	do 
                     	{
@@ -16295,7 +16295,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt10) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5231:34: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5249:34: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16318,9 +16318,9 @@ public partial class Cmd3Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // Cmd3.g:5232:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5250:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
                     {
-                    	// Cmd3.g:5232:11: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5250:11: ( DIGIT )+
                     	int cnt11 = 0;
                     	do 
                     	{
@@ -16336,7 +16336,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt11) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5232:11: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5250:11: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16366,7 +16366,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    Recover(mse);
                     	    throw mse;}
 
-                    	// Cmd3.g:5232:45: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5250:45: ( DIGIT )+
                     	int cnt12 = 0;
                     	do 
                     	{
@@ -16382,7 +16382,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt12) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5232:45: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5250:45: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16405,9 +16405,9 @@ public partial class Cmd3Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // Cmd3.g:5233:14: ( DIGIT )+ ( A_ | U_ )
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5251:14: ( DIGIT )+ ( A_ | U_ )
                     {
-                    	// Cmd3.g:5233:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5251:14: ( DIGIT )+
                     	int cnt13 = 0;
                     	do 
                     	{
@@ -16423,7 +16423,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt13) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5233:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5251:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16474,10 +16474,10 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = IdentStartingWithInt;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5236:21: ( ( DIGIT | LETTER | '_' )+ )
-            // Cmd3.g:5236:29: ( DIGIT | LETTER | '_' )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5254:21: ( ( DIGIT | LETTER | '_' )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5254:29: ( DIGIT | LETTER | '_' )+
             {
-            	// Cmd3.g:5236:29: ( DIGIT | LETTER | '_' )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5254:29: ( DIGIT | LETTER | '_' )+
             	int cnt15 = 0;
             	do 
             	{
@@ -16493,7 +16493,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt15) 
             		{
             			case 1 :
-            			    // Cmd3.g:
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             			    {
             			    	if ( (input.LA(1) >= '0' && input.LA(1) <= '9') || (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             			    	{
@@ -16541,15 +16541,15 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5241:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
             int alt22 = 3;
             alt22 = dfa22.Predict(input);
             switch (alt22) 
             {
                 case 1 :
-                    // Cmd3.g:5241:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
                     {
-                    	// Cmd3.g:5241:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:29: ( DIGIT )+
                     	int cnt16 = 0;
                     	do 
                     	{
@@ -16565,7 +16565,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt16) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5241:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16586,7 +16586,7 @@ public partial class Cmd3Lexer : Lexer {
 
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// Cmd3.g:5241:54: ( DIGIT )*
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:54: ( DIGIT )*
                     	do 
                     	{
                     	    int alt17 = 2;
@@ -16601,7 +16601,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt17) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5241:54: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:54: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16616,7 +16616,7 @@ public partial class Cmd3Lexer : Lexer {
                     	loop17:
                     		;	// Stops C# compiler whining that label 'loop17' has no statements
 
-                    	// Cmd3.g:5241:61: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:61: ( Exponent )?
                     	int alt18 = 2;
                     	int LA18_0 = input.LA(1);
 
@@ -16627,7 +16627,7 @@ public partial class Cmd3Lexer : Lexer {
                     	switch (alt18) 
                     	{
                     	    case 1 :
-                    	        // Cmd3.g:5241:61: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5259:61: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -16640,9 +16640,9 @@ public partial class Cmd3Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // Cmd3.g:5242:29: ( DIGIT )+ Exponent
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5260:29: ( DIGIT )+ Exponent
                     {
-                    	// Cmd3.g:5242:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5260:29: ( DIGIT )+
                     	int cnt19 = 0;
                     	do 
                     	{
@@ -16658,7 +16658,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt19) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5242:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5260:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16682,11 +16682,11 @@ public partial class Cmd3Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // Cmd3.g:5243:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5261:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
                     {
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// Cmd3.g:5243:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5261:29: ( DIGIT )+
                     	int cnt20 = 0;
                     	do 
                     	{
@@ -16702,7 +16702,7 @@ public partial class Cmd3Lexer : Lexer {
                     	    switch (alt20) 
                     		{
                     			case 1 :
-                    			    // Cmd3.g:5243:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5261:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16721,7 +16721,7 @@ public partial class Cmd3Lexer : Lexer {
                     	loop20:
                     		;	// Stops C# compiler whining that label 'loop20' has no statements
 
-                    	// Cmd3.g:5243:36: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5261:36: ( Exponent )?
                     	int alt21 = 2;
                     	int LA21_0 = input.LA(1);
 
@@ -16732,7 +16732,7 @@ public partial class Cmd3Lexer : Lexer {
                     	switch (alt21) 
                     	{
                     	    case 1 :
-                    	        // Cmd3.g:5243:36: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5261:36: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -16760,11 +16760,11 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5246:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
-            // Cmd3.g:5246:29: E_ ( '+' | '-' )? ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5264:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5264:29: E_ ( '+' | '-' )? ( DIGIT )+
             {
             	mE_(); 
-            	// Cmd3.g:5246:32: ( '+' | '-' )?
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5264:32: ( '+' | '-' )?
             	int alt23 = 2;
             	int LA23_0 = input.LA(1);
 
@@ -16775,7 +16775,7 @@ public partial class Cmd3Lexer : Lexer {
             	switch (alt23) 
             	{
             	    case 1 :
-            	        // Cmd3.g:
+            	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             	        {
             	        	if ( input.LA(1) == '+' || input.LA(1) == '-' ) 
             	        	{
@@ -16794,7 +16794,7 @@ public partial class Cmd3Lexer : Lexer {
 
             	}
 
-            	// Cmd3.g:5246:47: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5264:47: ( DIGIT )+
             	int cnt24 = 0;
             	do 
             	{
@@ -16810,7 +16810,7 @@ public partial class Cmd3Lexer : Lexer {
             	    switch (alt24) 
             		{
             			case 1 :
-            			    // Cmd3.g:5246:47: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5264:47: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16846,14 +16846,14 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = StringInQuotes;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5266:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
-            // Cmd3.g:5266:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
             {
-            	// Cmd3.g:5266:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
-            	// Cmd3.g:5266:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
             	{
             		Match('\''); 
-            		// Cmd3.g:5266:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
             		do 
             		{
             		    int alt25 = 4;
@@ -16898,7 +16898,7 @@ public partial class Cmd3Lexer : Lexer {
             		    switch (alt25) 
             			{
             				case 1 :
-            				    // Cmd3.g:5266:36: '~\\''
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:36: '~\\''
             				    {
             				    	Match("~'"); 
 
@@ -16906,7 +16906,7 @@ public partial class Cmd3Lexer : Lexer {
             				    }
             				    break;
             				case 2 :
-            				    // Cmd3.g:5266:44: '~{'
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:44: '~{'
             				    {
             				    	Match("~{"); 
 
@@ -16914,7 +16914,7 @@ public partial class Cmd3Lexer : Lexer {
             				    }
             				    break;
             				case 3 :
-            				    // Cmd3.g:5266:51: ~ ( '\\'' | '{' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5284:51: ~ ( '\\'' | '{' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -16962,18 +16962,18 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = StringInQuotes1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5267:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
-            // Cmd3.g:5267:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 0 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes1", " stringCounter == 0 ");
             	}
-            	// Cmd3.g:5267:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
-            	// Cmd3.g:5267:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('\''); 
-            		// Cmd3.g:5267:61: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:61: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt26 = 2;
@@ -16988,7 +16988,7 @@ public partial class Cmd3Lexer : Lexer {
             		    switch (alt26) 
             			{
             				case 1 :
-            				    // Cmd3.g:5267:62: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5285:62: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17037,18 +17037,18 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = StringInQuotes2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5268:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
-            // Cmd3.g:5268:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes2", " stringCounter == 1 ");
             	}
-            	// Cmd3.g:5268:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
-            	// Cmd3.g:5268:56: '}' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:56: '}' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('}'); 
-            		// Cmd3.g:5268:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt27 = 2;
@@ -17063,7 +17063,7 @@ public partial class Cmd3Lexer : Lexer {
             		    switch (alt27) 
             			{
             				case 1 :
-            				    // Cmd3.g:5268:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5286:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17111,18 +17111,18 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = StringInQuotes3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5269:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
-            // Cmd3.g:5269:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes3", " stringCounter == 1 ");
             	}
-            	// Cmd3.g:5269:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
-            	// Cmd3.g:5269:56: '}' (~ ( '{' | '\\'' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:56: '}' (~ ( '{' | '\\'' ) )* '\\''
             	{
             		Match('}'); 
-            		// Cmd3.g:5269:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt28 = 2;
@@ -17137,7 +17137,7 @@ public partial class Cmd3Lexer : Lexer {
             		    switch (alt28) 
             			{
             				case 1 :
-            				    // Cmd3.g:5269:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5287:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17186,8 +17186,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PLUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5272:10: ( '+=' )
-            // Cmd3.g:5272:29: '+='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5290:10: ( '+=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5290:29: '+='
             {
             	Match("+="); 
 
@@ -17210,8 +17210,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STAREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5273:10: ( '*=' )
-            // Cmd3.g:5273:29: '*='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5291:10: ( '*=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5291:29: '*='
             {
             	Match("*="); 
 
@@ -17234,8 +17234,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PERCENTEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5275:13: ( '%=' )
-            // Cmd3.g:5275:29: '%='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5293:13: ( '%=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5293:29: '%='
             {
             	Match("%="); 
 
@@ -17258,8 +17258,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HASHEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5277:10: ( '#=' )
-            // Cmd3.g:5277:29: '#='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5295:10: ( '#=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5295:29: '#='
             {
             	Match("#="); 
 
@@ -17282,8 +17282,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HATEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5278:9: ( '^=' )
-            // Cmd3.g:5278:29: '^='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5296:9: ( '^=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5296:29: '^='
             {
             	Match("^="); 
 
@@ -17306,8 +17306,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5281:5: ( '¨' )
-            // Cmd3.g:5281:29: '¨'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5299:5: ( '¨' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5299:29: '¨'
             {
             	Match('\u00A8'); 
 
@@ -17329,8 +17329,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLUEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5282:8: ( '£' )
-            // Cmd3.g:5282:29: '£'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5300:8: ( '£' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5300:29: '£'
             {
             	Match('\u00A3'); 
 
@@ -17352,8 +17352,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLUEDOTNUMBER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5283:14: ( '§' )
-            // Cmd3.g:5283:29: '§'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5301:14: ( '§' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5301:29: '§'
             {
             	Match('\u00A7'); 
 
@@ -17375,8 +17375,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLUESTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5284:9: ( '½' )
-            // Cmd3.g:5284:29: '½'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5302:9: ( '½' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5302:29: '½'
             {
             	Match('\u00BD'); 
 
@@ -17398,8 +17398,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTANGLESPECIAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5285:17: ( '<=<' )
-            // Cmd3.g:5285:29: '<=<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5303:17: ( '<=<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5303:29: '<=<'
             {
             	Match("<=<"); 
 
@@ -17422,8 +17422,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = GLUEBACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5288:14: ( '¨\\\\' )
-            // Cmd3.g:5288:29: '¨\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5306:14: ( '¨\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5306:29: '¨\\\\'
             {
             	Match("¨\\"); 
 
@@ -17446,8 +17446,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ISEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5293:8: ( '==' )
-            // Cmd3.g:5293:29: '=='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5311:8: ( '==' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5311:29: '=='
             {
             	Match("=="); 
 
@@ -17470,8 +17470,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ISNOTQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5294:10: ( '<>' )
-            // Cmd3.g:5294:29: '<>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5312:10: ( '<>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5312:29: '<>'
             {
             	Match("<>"); 
 
@@ -17494,8 +17494,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ISLARGEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5295:16: ( '>=' )
-            // Cmd3.g:5295:20: '>='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5313:16: ( '>=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5313:20: '>='
             {
             	Match(">="); 
 
@@ -17518,8 +17518,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = ISSMALLEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5296:17: ( '<=' )
-            // Cmd3.g:5296:29: '<='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5314:17: ( '<=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5314:29: '<='
             {
             	Match("<="); 
 
@@ -17542,8 +17542,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EXCLAMATION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5298:12: ( '!' )
-            // Cmd3.g:5298:29: '!'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5316:12: ( '!' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5316:29: '!'
             {
             	Match('!'); 
 
@@ -17565,8 +17565,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TILDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5299:6: ( '~' )
-            // Cmd3.g:5299:16: '~'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5317:6: ( '~' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5317:16: '~'
             {
             	Match('~'); 
 
@@ -17588,8 +17588,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = AT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5300:3: ( '@' )
-            // Cmd3.g:5300:29: '@'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5318:3: ( '@' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5318:29: '@'
             {
             	Match('@'); 
 
@@ -17611,8 +17611,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5301:4: ( '^' )
-            // Cmd3.g:5301:29: '^'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5319:4: ( '^' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5319:29: '^'
             {
             	Match('^'); 
 
@@ -17634,8 +17634,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = SEMICOLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5302:10: ( ';' )
-            // Cmd3.g:5302:29: ';'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5320:10: ( ';' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5320:29: ';'
             {
             	Match(';'); 
 
@@ -17657,8 +17657,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLONGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5303:10: ( ':|' )
-            // Cmd3.g:5303:29: ':|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5321:10: ( ':|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5321:29: ':|'
             {
             	Match(":|"); 
 
@@ -17681,8 +17681,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5304:6: ( ':' )
-            // Cmd3.g:5304:29: ':'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5322:6: ( ':' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5322:29: ':'
             {
             	Match(':'); 
 
@@ -17704,8 +17704,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = COMMA2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5305:7: ( ',' )
-            // Cmd3.g:5305:29: ','
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5323:7: ( ',' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5323:29: ','
             {
             	Match(','); 
 
@@ -17727,8 +17727,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5306:4: ( '.' )
-            // Cmd3.g:5306:29: '.'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5324:4: ( '.' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5324:29: '.'
             {
             	Match('.'); 
 
@@ -17750,8 +17750,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = HASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5307:5: ( '#' )
-            // Cmd3.g:5307:29: '#'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5325:5: ( '#' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5325:29: '#'
             {
             	Match('#'); 
 
@@ -17773,8 +17773,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PERCENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5308:8: ( '%' )
-            // Cmd3.g:5308:29: '%'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5326:8: ( '%' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5326:29: '%'
             {
             	Match('%'); 
 
@@ -17796,8 +17796,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5309:7: ( '$' )
-            // Cmd3.g:5309:29: '$'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5327:7: ( '$' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5327:29: '$'
             {
             	Match('$'); 
 
@@ -17819,8 +17819,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5310:10: ( '{' )
-            // Cmd3.g:5310:29: '{'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5328:10: ( '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5328:29: '{'
             {
             	Match('{'); 
 
@@ -17842,8 +17842,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RIGHTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5311:11: ( '}' )
-            // Cmd3.g:5311:29: '}'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5329:11: ( '}' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5329:29: '}'
             {
             	Match('}'); 
 
@@ -17865,8 +17865,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5312:10: ( '(' )
-            // Cmd3.g:5312:29: '('
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5330:10: ( '(' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5330:29: '('
             {
             	Match('('); 
 
@@ -17888,8 +17888,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RIGHTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5313:11: ( ')' )
-            // Cmd3.g:5313:29: ')'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5331:11: ( ')' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5331:29: ')'
             {
             	Match(')'); 
 
@@ -17911,8 +17911,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTBRACKETGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5314:16: ( '[_[' )
-            // Cmd3.g:5314:29: '[_['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5332:16: ( '[_[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5332:29: '[_['
             {
             	Match("[_["); 
 
@@ -17935,8 +17935,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5316:12: ( '[' )
-            // Cmd3.g:5316:29: '['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5334:12: ( '[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5334:29: '['
             {
             	Match('['); 
 
@@ -17958,8 +17958,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RIGHTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5317:13: ( ']' )
-            // Cmd3.g:5317:29: ']'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5335:13: ( ']' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5335:29: ']'
             {
             	Match(']'); 
 
@@ -17981,8 +17981,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = LEFTANGLESIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5320:16: ( '<' )
-            // Cmd3.g:5320:29: '<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5338:16: ( '<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5338:29: '<'
             {
             	Match('<'); 
 
@@ -18004,8 +18004,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = RIGHTANGLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5321:11: ( '>' )
-            // Cmd3.g:5321:29: '>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5339:11: ( '>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5339:29: '>'
             {
             	Match('>'); 
 
@@ -18027,8 +18027,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5322:5: ( '*' )
-            // Cmd3.g:5322:29: '*'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5340:5: ( '*' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5340:29: '*'
             {
             	Match('*'); 
 
@@ -18050,8 +18050,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5323:19: ( '||' )
-            // Cmd3.g:5323:29: '||'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5341:19: ( '||' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5341:29: '||'
             {
             	Match("||"); 
 
@@ -18074,8 +18074,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOUBLEAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5324:10: ( '&&' )
-            // Cmd3.g:5324:29: '&&'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5342:10: ( '&&' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5342:29: '&&'
             {
             	Match("&&"); 
 
@@ -18098,8 +18098,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5325:19: ( '|¨|' )
-            // Cmd3.g:5325:29: '|¨|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5343:19: ( '|¨|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5343:29: '|¨|'
             {
             	Match("|¨|"); 
 
@@ -18122,8 +18122,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = VERTICALBAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5327:12: ( '|' )
-            // Cmd3.g:5327:29: '|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5345:12: ( '|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5345:29: '|'
             {
             	Match('|'); 
 
@@ -18145,8 +18145,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5328:5: ( '+' )
-            // Cmd3.g:5328:29: '+'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5346:5: ( '+' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5346:29: '+'
             {
             	Match('+'); 
 
@@ -18168,8 +18168,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5329:6: ( '-' )
-            // Cmd3.g:5329:29: '-'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5347:6: ( '-' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5347:29: '-'
             {
             	Match('-'); 
 
@@ -18191,8 +18191,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5330:4: ( '/' )
-            // Cmd3.g:5330:29: '/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5348:4: ( '/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5348:29: '/'
             {
             	Match('/'); 
 
@@ -18214,8 +18214,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = TRIPLESTARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5331:12: ( '***' )
-            // Cmd3.g:5331:29: '***'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5349:12: ( '***' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5349:29: '***'
             {
             	Match("***"); 
 
@@ -18238,8 +18238,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5332:6: ( '**' )
-            // Cmd3.g:5332:29: '**'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5350:6: ( '**' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5350:29: '**'
             {
             	Match("**"); 
 
@@ -18262,8 +18262,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = EQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5334:6: ( '=' )
-            // Cmd3.g:5334:29: '='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5352:6: ( '=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5352:29: '='
             {
             	Match('='); 
 
@@ -18285,8 +18285,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = MINUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5335:11: ( '-=' )
-            // Cmd3.g:5335:29: '-='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5353:11: ( '-=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5353:29: '-='
             {
             	Match("-="); 
 
@@ -18309,8 +18309,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = DIVEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5336:9: ( '/=' )
-            // Cmd3.g:5336:29: '/='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5354:9: ( '/=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5354:29: '/='
             {
             	Match("/="); 
 
@@ -18333,8 +18333,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = BACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5338:10: ( '\\\\' )
-            // Cmd3.g:5338:29: '\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5356:10: ( '\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5356:29: '\\\\'
             {
             	Match('\\'); 
 
@@ -18356,8 +18356,8 @@ public partial class Cmd3Lexer : Lexer {
     		{
             int _type = QUESTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd3.g:5339:9: ( '?' )
-            // Cmd3.g:5339:29: '?'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5357:9: ( '?' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5357:29: '?'
             {
             	Match('?'); 
 
@@ -18377,8 +18377,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5341:12: ( ( 'a' | 'A' ) )
-            // Cmd3.g:5341:13: ( 'a' | 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5359:12: ( ( 'a' | 'A' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5359:13: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -18406,8 +18406,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5342:12: ( ( 'b' | 'B' ) )
-            // Cmd3.g:5342:13: ( 'b' | 'B' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5360:12: ( ( 'b' | 'B' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5360:13: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -18435,8 +18435,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5343:12: ( ( 'c' | 'C' ) )
-            // Cmd3.g:5343:13: ( 'c' | 'C' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5361:12: ( ( 'c' | 'C' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5361:13: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -18464,8 +18464,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5344:12: ( ( 'd' | 'D' ) )
-            // Cmd3.g:5344:13: ( 'd' | 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5362:12: ( ( 'd' | 'D' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5362:13: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -18493,8 +18493,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5345:12: ( ( 'e' | 'E' ) )
-            // Cmd3.g:5345:13: ( 'e' | 'E' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5363:12: ( ( 'e' | 'E' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5363:13: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -18522,8 +18522,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5346:12: ( ( 'f' | 'F' ) )
-            // Cmd3.g:5346:13: ( 'f' | 'F' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5364:12: ( ( 'f' | 'F' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5364:13: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -18551,8 +18551,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5347:12: ( ( 'g' | 'G' ) )
-            // Cmd3.g:5347:13: ( 'g' | 'G' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5365:12: ( ( 'g' | 'G' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5365:13: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -18580,8 +18580,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5348:12: ( ( 'h' | 'H' ) )
-            // Cmd3.g:5348:13: ( 'h' | 'H' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5366:12: ( ( 'h' | 'H' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5366:13: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -18609,8 +18609,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5349:12: ( ( 'i' | 'I' ) )
-            // Cmd3.g:5349:13: ( 'i' | 'I' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5367:12: ( ( 'i' | 'I' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5367:13: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -18638,8 +18638,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5350:12: ( ( 'j' | 'J' ) )
-            // Cmd3.g:5350:13: ( 'j' | 'J' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5368:12: ( ( 'j' | 'J' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5368:13: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -18667,8 +18667,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5351:12: ( ( 'k' | 'K' ) )
-            // Cmd3.g:5351:13: ( 'k' | 'K' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5369:12: ( ( 'k' | 'K' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5369:13: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -18696,8 +18696,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5353:12: ( ( 'm' | 'M' ) )
-            // Cmd3.g:5353:13: ( 'm' | 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5371:12: ( ( 'm' | 'M' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5371:13: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -18725,8 +18725,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5354:12: ( ( 'n' | 'N' ) )
-            // Cmd3.g:5354:13: ( 'n' | 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5372:12: ( ( 'n' | 'N' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5372:13: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -18754,8 +18754,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5355:12: ( ( 'o' | 'O' ) )
-            // Cmd3.g:5355:13: ( 'o' | 'O' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5373:12: ( ( 'o' | 'O' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5373:13: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -18783,8 +18783,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5356:12: ( ( 'p' | 'P' ) )
-            // Cmd3.g:5356:13: ( 'p' | 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5374:12: ( ( 'p' | 'P' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5374:13: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -18812,8 +18812,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5357:12: ( ( 'q' | 'Q' ) )
-            // Cmd3.g:5357:13: ( 'q' | 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5375:12: ( ( 'q' | 'Q' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5375:13: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -18841,8 +18841,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5358:12: ( ( 'r' | 'R' ) )
-            // Cmd3.g:5358:13: ( 'r' | 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5376:12: ( ( 'r' | 'R' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5376:13: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -18870,8 +18870,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5359:12: ( ( 's' | 'S' ) )
-            // Cmd3.g:5359:13: ( 's' | 'S' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5377:12: ( ( 's' | 'S' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5377:13: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -18899,8 +18899,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5360:12: ( ( 't' | 'T' ) )
-            // Cmd3.g:5360:13: ( 't' | 'T' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5378:12: ( ( 't' | 'T' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5378:13: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -18928,8 +18928,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5361:12: ( ( 'u' | 'U' ) )
-            // Cmd3.g:5361:13: ( 'u' | 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5379:12: ( ( 'u' | 'U' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5379:13: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -18957,8 +18957,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5362:12: ( ( 'v' | 'V' ) )
-            // Cmd3.g:5362:13: ( 'v' | 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5380:12: ( ( 'v' | 'V' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5380:13: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -18986,8 +18986,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5363:12: ( ( 'w' | 'W' ) )
-            // Cmd3.g:5363:13: ( 'w' | 'W' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5381:12: ( ( 'w' | 'W' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5381:13: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -19015,8 +19015,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5364:12: ( ( 'x' | 'X' ) )
-            // Cmd3.g:5364:13: ( 'x' | 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5382:12: ( ( 'x' | 'X' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5382:13: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -19044,8 +19044,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5365:12: ( ( 'y' | 'Y' ) )
-            // Cmd3.g:5365:13: ( 'y' | 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5383:12: ( ( 'y' | 'Y' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5383:13: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -19073,8 +19073,8 @@ public partial class Cmd3Lexer : Lexer {
     {
     		try
     		{
-            // Cmd3.g:5366:12: ( ( 'z' | 'Z' ) )
-            // Cmd3.g:5366:13: ( 'z' | 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5384:12: ( ( 'z' | 'Z' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5384:13: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -19099,4395 +19099,4395 @@ public partial class Cmd3Lexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // Cmd3.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
         int alt29 = 627;
         alt29 = dfa29.Predict(input);
         switch (alt29) 
         {
             case 1 :
-                // Cmd3.g:1:10: MAXLAG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:10: MAXLAG
                 {
                 	mMAXLAG(); 
 
                 }
                 break;
             case 2 :
-                // Cmd3.g:1:17: DFMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:17: DFMIN
                 {
                 	mDFMIN(); 
 
                 }
                 break;
             case 3 :
-                // Cmd3.g:1:23: LEAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:23: LEAD
                 {
                 	mLEAD(); 
 
                 }
                 break;
             case 4 :
-                // Cmd3.g:1:28: REKUR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:28: REKUR
                 {
                 	mREKUR(); 
 
                 }
                 break;
             case 5 :
-                // Cmd3.g:1:34: MAXLEAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:34: MAXLEAD
                 {
                 	mMAXLEAD(); 
 
                 }
                 break;
             case 6 :
-                // Cmd3.g:1:42: FIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:42: FIT
                 {
                 	mFIT(); 
 
                 }
                 break;
             case 7 :
-                // Cmd3.g:1:46: GMS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:46: GMS
                 {
                 	mGMS(); 
 
                 }
                 break;
             case 8 :
-                // Cmd3.g:1:50: ELEMENTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:50: ELEMENTS
                 {
                 	mELEMENTS(); 
 
                 }
                 break;
             case 9 :
-                // Cmd3.g:1:59: NOMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:59: NOMAX
                 {
                 	mNOMAX(); 
 
                 }
                 break;
             case 10 :
-                // Cmd3.g:1:65: RETURN2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:65: RETURN2
                 {
                 	mRETURN2(); 
 
                 }
                 break;
             case 11 :
-                // Cmd3.g:1:73: IN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:73: IN
                 {
                 	mIN(); 
 
                 }
                 break;
             case 12 :
-                // Cmd3.g:1:76: MAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:76: MAP
                 {
                 	mMAP(); 
 
                 }
                 break;
             case 13 :
-                // Cmd3.g:1:80: STRING2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:80: STRING2
                 {
                 	mSTRING2(); 
 
                 }
                 break;
             case 14 :
-                // Cmd3.g:1:88: REMOTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:88: REMOTE
                 {
                 	mREMOTE(); 
 
                 }
                 break;
             case 15 :
-                // Cmd3.g:1:95: ALIAS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:95: ALIAS
                 {
                 	mALIAS(); 
 
                 }
                 break;
             case 16 :
-                // Cmd3.g:1:101: OFFSET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:101: OFFSET
                 {
                 	mOFFSET(); 
 
                 }
                 break;
             case 17 :
-                // Cmd3.g:1:108: DETECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:108: DETECT
                 {
                 	mDETECT(); 
 
                 }
                 break;
             case 18 :
-                // Cmd3.g:1:115: GRIDSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:115: GRIDSTYLE
                 {
                 	mGRIDSTYLE(); 
 
                 }
                 break;
             case 19 :
-                // Cmd3.g:1:125: BOLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:125: BOLD
                 {
                 	mBOLD(); 
 
                 }
                 break;
             case 20 :
-                // Cmd3.g:1:130: ITALIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:130: ITALIC
                 {
                 	mITALIC(); 
 
                 }
                 break;
             case 21 :
-                // Cmd3.g:1:137: ASER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:137: ASER
                 {
                 	mASER(); 
 
                 }
                 break;
             case 22 :
-                // Cmd3.g:1:142: ASERIES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:142: ASERIES
                 {
                 	mASERIES(); 
 
                 }
                 break;
             case 23 :
-                // Cmd3.g:1:150: XLABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:150: XLABELS
                 {
                 	mXLABELS(); 
 
                 }
                 break;
             case 24 :
-                // Cmd3.g:1:158: YLABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:158: YLABELS
                 {
                 	mYLABELS(); 
 
                 }
                 break;
             case 25 :
-                // Cmd3.g:1:166: ANNUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:166: ANNUAL
                 {
                 	mANNUAL(); 
 
                 }
                 break;
             case 26 :
-                // Cmd3.g:1:173: AT2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:173: AT2
                 {
                 	mAT2(); 
 
                 }
                 break;
             case 27 :
-                // Cmd3.g:1:177: BETWEEN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:177: BETWEEN
                 {
                 	mBETWEEN(); 
 
                 }
                 break;
             case 28 :
-                // Cmd3.g:1:185: NONANNUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:185: NONANNUAL
                 {
                 	mNONANNUAL(); 
 
                 }
                 break;
             case 29 :
-                // Cmd3.g:1:195: CURRENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:195: CURRENT
                 {
                 	mCURRENT(); 
 
                 }
                 break;
             case 30 :
-                // Cmd3.g:1:203: DIGITS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:203: DIGITS
                 {
                 	mDIGITS(); 
 
                 }
                 break;
             case 31 :
-                // Cmd3.g:1:210: GAMS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:210: GAMS
                 {
                 	mGAMS(); 
 
                 }
                 break;
             case 32 :
-                // Cmd3.g:1:215: GDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:215: GDX
                 {
                 	mGDX(); 
 
                 }
                 break;
             case 33 :
-                // Cmd3.g:1:219: GDXOPT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:219: GDXOPT
                 {
                 	mGDXOPT(); 
 
                 }
                 break;
             case 34 :
-                // Cmd3.g:1:226: LAGFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:226: LAGFIX
                 {
                 	mLAGFIX(); 
 
                 }
                 break;
             case 35 :
-                // Cmd3.g:1:233: ADDBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:233: ADDBANK
                 {
                 	mADDBANK(); 
 
                 }
                 break;
             case 36 :
-                // Cmd3.g:1:241: SHOWBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:241: SHOWBANK
                 {
                 	mSHOWBANK(); 
 
                 }
                 break;
             case 37 :
-                // Cmd3.g:1:250: SHOWFREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:250: SHOWFREQ
                 {
                 	mSHOWFREQ(); 
 
                 }
                 break;
             case 38 :
-                // Cmd3.g:1:259: REBASE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:259: REBASE
                 {
                 	mREBASE(); 
 
                 }
                 break;
             case 39 :
-                // Cmd3.g:1:266: LINESPOINTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:266: LINESPOINTS
                 {
                 	mLINESPOINTS(); 
 
                 }
                 break;
             case 40 :
-                // Cmd3.g:1:278: BOXES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:278: BOXES
                 {
                 	mBOXES(); 
 
                 }
                 break;
             case 41 :
-                // Cmd3.g:1:284: FILLEDCURVES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:284: FILLEDCURVES
                 {
                 	mFILLEDCURVES(); 
 
                 }
                 break;
             case 42 :
-                // Cmd3.g:1:297: STEPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:297: STEPS
                 {
                 	mSTEPS(); 
 
                 }
                 break;
             case 43 :
-                // Cmd3.g:1:303: DOTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:303: DOTS
                 {
                 	mDOTS(); 
 
                 }
                 break;
             case 44 :
-                // Cmd3.g:1:308: IMPULSES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:308: IMPULSES
                 {
                 	mIMPULSES(); 
 
                 }
                 break;
             case 45 :
-                // Cmd3.g:1:317: CONTINUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:317: CONTINUE
                 {
                 	mCONTINUE(); 
 
                 }
                 break;
             case 46 :
-                // Cmd3.g:1:326: VOID
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:326: VOID
                 {
                 	mVOID(); 
 
                 }
                 break;
             case 47 :
-                // Cmd3.g:1:331: PROCEDURE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:331: PROCEDURE
                 {
                 	mPROCEDURE(); 
 
                 }
                 break;
             case 48 :
-                // Cmd3.g:1:341: SIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:341: SIZE
                 {
                 	mSIZE(); 
 
                 }
                 break;
             case 49 :
-                // Cmd3.g:1:346: SUBTITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:346: SUBTITLE
                 {
                 	mSUBTITLE(); 
 
                 }
                 break;
             case 50 :
-                // Cmd3.g:1:355: TICS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:355: TICS
                 {
                 	mTICS(); 
 
                 }
                 break;
             case 51 :
-                // Cmd3.g:1:360: GRID
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:360: GRID
                 {
                 	mGRID(); 
 
                 }
                 break;
             case 52 :
-                // Cmd3.g:1:365: KEY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:365: KEY
                 {
                 	mKEY(); 
 
                 }
                 break;
             case 53 :
-                // Cmd3.g:1:369: PALETTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:369: PALETTE
                 {
                 	mPALETTE(); 
 
                 }
                 break;
             case 54 :
-                // Cmd3.g:1:377: STACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:377: STACK
                 {
                 	mSTACK(); 
 
                 }
                 break;
             case 55 :
-                // Cmd3.g:1:383: BOXWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:383: BOXWIDTH
                 {
                 	mBOXWIDTH(); 
 
                 }
                 break;
             case 56 :
-                // Cmd3.g:1:392: BOXGAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:392: BOXGAP
                 {
                 	mBOXGAP(); 
 
                 }
                 break;
             case 57 :
-                // Cmd3.g:1:399: SEPARATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:399: SEPARATE
                 {
                 	mSEPARATE(); 
 
                 }
                 break;
             case 58 :
-                // Cmd3.g:1:408: XLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:408: XLINE
                 {
                 	mXLINE(); 
 
                 }
                 break;
             case 59 :
-                // Cmd3.g:1:414: XLINEBEFORE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:414: XLINEBEFORE
                 {
                 	mXLINEBEFORE(); 
 
                 }
                 break;
             case 60 :
-                // Cmd3.g:1:426: XLINEAFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:426: XLINEAFTER
                 {
                 	mXLINEAFTER(); 
 
                 }
                 break;
             case 61 :
-                // Cmd3.g:1:437: YMIRROR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:437: YMIRROR
                 {
                 	mYMIRROR(); 
 
                 }
                 break;
             case 62 :
-                // Cmd3.g:1:445: YTITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:445: YTITLE
                 {
                 	mYTITLE(); 
 
                 }
                 break;
             case 63 :
-                // Cmd3.g:1:452: YLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:452: YLINE
                 {
                 	mYLINE(); 
 
                 }
                 break;
             case 64 :
-                // Cmd3.g:1:458: YMAXHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:458: YMAXHARD
                 {
                 	mYMAXHARD(); 
 
                 }
                 break;
             case 65 :
-                // Cmd3.g:1:467: YMAXSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:467: YMAXSOFT
                 {
                 	mYMAXSOFT(); 
 
                 }
                 break;
             case 66 :
-                // Cmd3.g:1:476: YMINHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:476: YMINHARD
                 {
                 	mYMINHARD(); 
 
                 }
                 break;
             case 67 :
-                // Cmd3.g:1:485: YMINSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:485: YMINSOFT
                 {
                 	mYMINSOFT(); 
 
                 }
                 break;
             case 68 :
-                // Cmd3.g:1:494: XZEROAXIS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:494: XZEROAXIS
                 {
                 	mXZEROAXIS(); 
 
                 }
                 break;
             case 69 :
-                // Cmd3.g:1:504: Y2TITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:504: Y2TITLE
                 {
                 	mY2TITLE(); 
 
                 }
                 break;
             case 70 :
-                // Cmd3.g:1:512: Y2LINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:512: Y2LINE
                 {
                 	mY2LINE(); 
 
                 }
                 break;
             case 71 :
-                // Cmd3.g:1:519: Y2MAXHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:519: Y2MAXHARD
                 {
                 	mY2MAXHARD(); 
 
                 }
                 break;
             case 72 :
-                // Cmd3.g:1:529: Y2MAXSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:529: Y2MAXSOFT
                 {
                 	mY2MAXSOFT(); 
 
                 }
                 break;
             case 73 :
-                // Cmd3.g:1:539: Y2MINHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:539: Y2MINHARD
                 {
                 	mY2MINHARD(); 
 
                 }
                 break;
             case 74 :
-                // Cmd3.g:1:549: Y2MINSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:549: Y2MINSOFT
                 {
                 	mY2MINSOFT(); 
 
                 }
                 break;
             case 75 :
-                // Cmd3.g:1:559: X2ZEROAXIS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:559: X2ZEROAXIS
                 {
                 	mX2ZEROAXIS(); 
 
                 }
                 break;
             case 76 :
-                // Cmd3.g:1:570: ARROW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:570: ARROW
                 {
                 	mARROW(); 
 
                 }
                 break;
             case 77 :
-                // Cmd3.g:1:576: DASHTYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:576: DASHTYPE
                 {
                 	mDASHTYPE(); 
 
                 }
                 break;
             case 78 :
-                // Cmd3.g:1:585: LINEWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:585: LINEWIDTH
                 {
                 	mLINEWIDTH(); 
 
                 }
                 break;
             case 79 :
-                // Cmd3.g:1:595: LINECOLOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:595: LINECOLOR
                 {
                 	mLINECOLOR(); 
 
                 }
                 break;
             case 80 :
-                // Cmd3.g:1:605: POINTTYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:605: POINTTYPE
                 {
                 	mPOINTTYPE(); 
 
                 }
                 break;
             case 81 :
-                // Cmd3.g:1:615: POINTSIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:615: POINTSIZE
                 {
                 	mPOINTSIZE(); 
 
                 }
                 break;
             case 82 :
-                // Cmd3.g:1:625: FILLSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:625: FILLSTYLE
                 {
                 	mFILLSTYLE(); 
 
                 }
                 break;
             case 83 :
-                // Cmd3.g:1:635: LABEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:635: LABEL
                 {
                 	mLABEL(); 
 
                 }
                 break;
             case 84 :
-                // Cmd3.g:1:641: Y2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:641: Y2
                 {
                 	mY2(); 
 
                 }
                 break;
             case 85 :
-                // Cmd3.g:1:644: X
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:644: X
                 {
                 	mX(); 
 
                 }
                 break;
             case 86 :
-                // Cmd3.g:1:646: Y
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:646: Y
                 {
                 	mY(); 
 
                 }
                 break;
             case 87 :
-                // Cmd3.g:1:648: MDATEFORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:648: MDATEFORMAT
                 {
                 	mMDATEFORMAT(); 
 
                 }
                 break;
             case 88 :
-                // Cmd3.g:1:660: THOUSANDSSEPARATOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:660: THOUSANDSSEPARATOR
                 {
                 	mTHOUSANDSSEPARATOR(); 
 
                 }
                 break;
             case 89 :
-                // Cmd3.g:1:679: XEDIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:679: XEDIT
                 {
                 	mXEDIT(); 
 
                 }
                 break;
             case 90 :
-                // Cmd3.g:1:685: IMPOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:685: IMPOSE
                 {
                 	mIMPOSE(); 
 
                 }
                 break;
             case 91 :
-                // Cmd3.g:1:692: CONSTANT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:692: CONSTANT
                 {
                 	mCONSTANT(); 
 
                 }
                 break;
             case 92 :
-                // Cmd3.g:1:701: INTERPOLATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:701: INTERPOLATE
                 {
                 	mINTERPOLATE(); 
 
                 }
                 break;
             case 93 :
-                // Cmd3.g:1:713: PRORATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:713: PRORATE
                 {
                 	mPRORATE(); 
 
                 }
                 break;
             case 94 :
-                // Cmd3.g:1:721: TRIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:721: TRIM
                 {
                 	mTRIM(); 
 
                 }
                 break;
             case 95 :
-                // Cmd3.g:1:726: USING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:726: USING
                 {
                 	mUSING(); 
 
                 }
                 break;
             case 96 :
-                // Cmd3.g:1:732: A
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:732: A
                 {
                 	mA(); 
 
                 }
                 break;
             case 97 :
-                // Cmd3.g:1:734: DEFAULT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:734: DEFAULT
                 {
                 	mDEFAULT(); 
 
                 }
                 break;
             case 98 :
-                // Cmd3.g:1:742: LOGIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:742: LOGIC
                 {
                 	mLOGIC(); 
 
                 }
                 break;
             case 99 :
-                // Cmd3.g:1:748: ABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:748: ABS
                 {
                 	mABS(); 
 
                 }
                 break;
             case 100 :
-                // Cmd3.g:1:752: ABSOLUTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:752: ABSOLUTE
                 {
                 	mABSOLUTE(); 
 
                 }
                 break;
             case 101 :
-                // Cmd3.g:1:761: ACCEPT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:761: ACCEPT
                 {
                 	mACCEPT(); 
 
                 }
                 break;
             case 102 :
-                // Cmd3.g:1:768: ADD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:768: ADD
                 {
                 	mADD(); 
 
                 }
                 break;
             case 103 :
-                // Cmd3.g:1:772: AFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:772: AFTER
                 {
                 	mAFTER(); 
 
                 }
                 break;
             case 104 :
-                // Cmd3.g:1:778: AFTER2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:778: AFTER2
                 {
                 	mAFTER2(); 
 
                 }
                 break;
             case 105 :
-                // Cmd3.g:1:785: ALIGNCENTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:785: ALIGNCENTER
                 {
                 	mALIGNCENTER(); 
 
                 }
                 break;
             case 106 :
-                // Cmd3.g:1:797: ALIGNLEFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:797: ALIGNLEFT
                 {
                 	mALIGNLEFT(); 
 
                 }
                 break;
             case 107 :
-                // Cmd3.g:1:807: ALIGNRIGHT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:807: ALIGNRIGHT
                 {
                 	mALIGNRIGHT(); 
 
                 }
                 break;
             case 108 :
-                // Cmd3.g:1:818: ALL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:818: ALL
                 {
                 	mALL(); 
 
                 }
                 break;
             case 109 :
-                // Cmd3.g:1:822: ANALYZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:822: ANALYZE
                 {
                 	mANALYZE(); 
 
                 }
                 break;
             case 110 :
-                // Cmd3.g:1:830: AND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:830: AND
                 {
                 	mAND(); 
 
                 }
                 break;
             case 111 :
-                // Cmd3.g:1:834: APPEND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:834: APPEND
                 {
                 	mAPPEND(); 
 
                 }
                 break;
             case 112 :
-                // Cmd3.g:1:841: AREMOS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:841: AREMOS
                 {
                 	mAREMOS(); 
 
                 }
                 break;
             case 113 :
-                // Cmd3.g:1:848: OP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:848: OP
                 {
                 	mOP(); 
 
                 }
                 break;
             case 114 :
-                // Cmd3.g:1:851: AS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:851: AS
                 {
                 	mAS(); 
 
                 }
                 break;
             case 115 :
-                // Cmd3.g:1:854: AUTO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:854: AUTO
                 {
                 	mAUTO(); 
 
                 }
                 break;
             case 116 :
-                // Cmd3.g:1:859: AVG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:859: AVG
                 {
                 	mAVG(); 
 
                 }
                 break;
             case 117 :
-                // Cmd3.g:1:863: BACKTRACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:863: BACKTRACK
                 {
                 	mBACKTRACK(); 
 
                 }
                 break;
             case 118 :
-                // Cmd3.g:1:873: BANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:873: BANK
                 {
                 	mBANK(); 
 
                 }
                 break;
             case 119 :
-                // Cmd3.g:1:878: BANK1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:878: BANK1
                 {
                 	mBANK1(); 
 
                 }
                 break;
             case 120 :
-                // Cmd3.g:1:884: BANK2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:884: BANK2
                 {
                 	mBANK2(); 
 
                 }
                 break;
             case 121 :
-                // Cmd3.g:1:890: BOWL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:890: BOWL
                 {
                 	mBOWL(); 
 
                 }
                 break;
             case 122 :
-                // Cmd3.g:1:895: BY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:895: BY
                 {
                 	mBY(); 
 
                 }
                 break;
             case 123 :
-                // Cmd3.g:1:898: CACHE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:898: CACHE
                 {
                 	mCACHE(); 
 
                 }
                 break;
             case 124 :
-                // Cmd3.g:1:904: CALC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:904: CALC
                 {
                 	mCALC(); 
 
                 }
                 break;
             case 125 :
-                // Cmd3.g:1:909: CAPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:909: CAPS
                 {
                 	mCAPS(); 
 
                 }
                 break;
             case 126 :
-                // Cmd3.g:1:914: CELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:914: CELL
                 {
                 	mCELL(); 
 
                 }
                 break;
             case 127 :
-                // Cmd3.g:1:919: CHANGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:919: CHANGE
                 {
                 	mCHANGE(); 
 
                 }
                 break;
             case 128 :
-                // Cmd3.g:1:926: CHECKOFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:926: CHECKOFF
                 {
                 	mCHECKOFF(); 
 
                 }
                 break;
             case 129 :
-                // Cmd3.g:1:935: CLEAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:935: CLEAR
                 {
                 	mCLEAR(); 
 
                 }
                 break;
             case 130 :
-                // Cmd3.g:1:941: CLEAR2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:941: CLEAR2
                 {
                 	mCLEAR2(); 
 
                 }
                 break;
             case 131 :
-                // Cmd3.g:1:948: CLIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:948: CLIP
                 {
                 	mCLIP(); 
 
                 }
                 break;
             case 132 :
-                // Cmd3.g:1:953: CLIPBOARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:953: CLIPBOARD
                 {
                 	mCLIPBOARD(); 
 
                 }
                 break;
             case 133 :
-                // Cmd3.g:1:963: CLONE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:963: CLONE
                 {
                 	mCLONE(); 
 
                 }
                 break;
             case 134 :
-                // Cmd3.g:1:969: MOVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:969: MOVE
                 {
                 	mMOVE(); 
 
                 }
                 break;
             case 135 :
-                // Cmd3.g:1:974: REMOVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:974: REMOVE
                 {
                 	mREMOVE(); 
 
                 }
                 break;
             case 136 :
-                // Cmd3.g:1:981: CLOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:981: CLOSE
                 {
                 	mCLOSE(); 
 
                 }
                 break;
             case 137 :
-                // Cmd3.g:1:987: CLOSEALL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:987: CLOSEALL
                 {
                 	mCLOSEALL(); 
 
                 }
                 break;
             case 138 :
-                // Cmd3.g:1:996: CLOSEBANKS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:996: CLOSEBANKS
                 {
                 	mCLOSEBANKS(); 
 
                 }
                 break;
             case 139 :
-                // Cmd3.g:1:1007: CLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1007: CLS
                 {
                 	mCLS(); 
 
                 }
                 break;
             case 140 :
-                // Cmd3.g:1:1011: CODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1011: CODE
                 {
                 	mCODE(); 
 
                 }
                 break;
             case 141 :
-                // Cmd3.g:1:1016: COLLAPSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1016: COLLAPSE
                 {
                 	mCOLLAPSE(); 
 
                 }
                 break;
             case 142 :
-                // Cmd3.g:1:1025: XTREND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1025: XTREND
                 {
                 	mXTREND(); 
 
                 }
                 break;
             case 143 :
-                // Cmd3.g:1:1032: XFLAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1032: XFLAT
                 {
                 	mXFLAT(); 
 
                 }
                 break;
             case 144 :
-                // Cmd3.g:1:1038: PX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1038: PX
                 {
                 	mPX(); 
 
                 }
                 break;
             case 145 :
-                // Cmd3.g:1:1041: ARRAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1041: ARRAY
                 {
                 	mARRAY(); 
 
                 }
                 break;
             case 146 :
-                // Cmd3.g:1:1047: BUGFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1047: BUGFIX
                 {
                 	mBUGFIX(); 
 
                 }
                 break;
             case 147 :
-                // Cmd3.g:1:1054: GCM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1054: GCM
                 {
                 	mGCM(); 
 
                 }
                 break;
             case 148 :
-                // Cmd3.g:1:1058: COLORS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1058: COLORS
                 {
                 	mCOLORS(); 
 
                 }
                 break;
             case 149 :
-                // Cmd3.g:1:1065: COLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1065: COLS
                 {
                 	mCOLS(); 
 
                 }
                 break;
             case 150 :
-                // Cmd3.g:1:1070: DELIMITER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1070: DELIMITER
                 {
                 	mDELIMITER(); 
 
                 }
                 break;
             case 151 :
-                // Cmd3.g:1:1080: DATEFORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1080: DATEFORMAT
                 {
                 	mDATEFORMAT(); 
 
                 }
                 break;
             case 152 :
-                // Cmd3.g:1:1091: DATETYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1091: DATETYPE
                 {
                 	mDATETYPE(); 
 
                 }
                 break;
             case 153 :
-                // Cmd3.g:1:1100: COMMA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1100: COMMA
                 {
                 	mCOMMA(); 
 
                 }
                 break;
             case 154 :
-                // Cmd3.g:1:1106: COMMAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1106: COMMAND
                 {
                 	mCOMMAND(); 
 
                 }
                 break;
             case 155 :
-                // Cmd3.g:1:1114: COMMAND1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1114: COMMAND1
                 {
                 	mCOMMAND1(); 
 
                 }
                 break;
             case 156 :
-                // Cmd3.g:1:1123: COMMAND2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1123: COMMAND2
                 {
                 	mCOMMAND2(); 
 
                 }
                 break;
             case 157 :
-                // Cmd3.g:1:1132: COMPARE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1132: COMPARE
                 {
                 	mCOMPARE(); 
 
                 }
                 break;
             case 158 :
-                // Cmd3.g:1:1140: COMPRESS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1140: COMPRESS
                 {
                 	mCOMPRESS(); 
 
                 }
                 break;
             case 159 :
-                // Cmd3.g:1:1149: CONST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1149: CONST
                 {
                 	mCONST(); 
 
                 }
                 break;
             case 160 :
-                // Cmd3.g:1:1155: CONV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1155: CONV
                 {
                 	mCONV(); 
 
                 }
                 break;
             case 161 :
-                // Cmd3.g:1:1160: CONV1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1160: CONV1
                 {
                 	mCONV1(); 
 
                 }
                 break;
             case 162 :
-                // Cmd3.g:1:1166: CONV2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1166: CONV2
                 {
                 	mCONV2(); 
 
                 }
                 break;
             case 163 :
-                // Cmd3.g:1:1172: COPY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1172: COPY
                 {
                 	mCOPY(); 
 
                 }
                 break;
             case 164 :
-                // Cmd3.g:1:1177: COPYLOCAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1177: COPYLOCAL
                 {
                 	mCOPYLOCAL(); 
 
                 }
                 break;
             case 165 :
-                // Cmd3.g:1:1187: LOCAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1187: LOCAL
                 {
                 	mLOCAL(); 
 
                 }
                 break;
             case 166 :
-                // Cmd3.g:1:1193: GLOBAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1193: GLOBAL
                 {
                 	mGLOBAL(); 
 
                 }
                 break;
             case 167 :
-                // Cmd3.g:1:1200: COUNT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1200: COUNT
                 {
                 	mCOUNT(); 
 
                 }
                 break;
             case 168 :
-                // Cmd3.g:1:1206: CPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1206: CPLOT
                 {
                 	mCPLOT(); 
 
                 }
                 break;
             case 169 :
-                // Cmd3.g:1:1212: CREATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1212: CREATE
                 {
                 	mCREATE(); 
 
                 }
                 break;
             case 170 :
-                // Cmd3.g:1:1219: CREATEVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1219: CREATEVARS
                 {
                 	mCREATEVARS(); 
 
                 }
                 break;
             case 171 :
-                // Cmd3.g:1:1230: CSV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1230: CSV
                 {
                 	mCSV(); 
 
                 }
                 break;
             case 172 :
-                // Cmd3.g:1:1234: CURROW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1234: CURROW
                 {
                 	mCURROW(); 
 
                 }
                 break;
             case 173 :
-                // Cmd3.g:1:1241: D
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1241: D
                 {
                 	mD(); 
 
                 }
                 break;
             case 174 :
-                // Cmd3.g:1:1243: DAMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1243: DAMP
                 {
                 	mDAMP(); 
 
                 }
                 break;
             case 175 :
-                // Cmd3.g:1:1248: DANISH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1248: DANISH
                 {
                 	mDANISH(); 
 
                 }
                 break;
             case 176 :
-                // Cmd3.g:1:1255: DATA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1255: DATA
                 {
                 	mDATA(); 
 
                 }
                 break;
             case 177 :
-                // Cmd3.g:1:1260: DATABANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1260: DATABANK
                 {
                 	mDATABANK(); 
 
                 }
                 break;
             case 178 :
-                // Cmd3.g:1:1269: DATAWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1269: DATAWIDTH
                 {
                 	mDATAWIDTH(); 
 
                 }
                 break;
             case 179 :
-                // Cmd3.g:1:1279: DATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1279: DATE
                 {
                 	mDATE(); 
 
                 }
                 break;
             case 180 :
-                // Cmd3.g:1:1284: DATES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1284: DATES
                 {
                 	mDATES(); 
 
                 }
                 break;
             case 181 :
-                // Cmd3.g:1:1290: DEBUG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1290: DEBUG
                 {
                 	mDEBUG(); 
 
                 }
                 break;
             case 182 :
-                // Cmd3.g:1:1296: DEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1296: DEC
                 {
                 	mDEC(); 
 
                 }
                 break;
             case 183 :
-                // Cmd3.g:1:1300: DECIMALSEPARATOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1300: DECIMALSEPARATOR
                 {
                 	mDECIMALSEPARATOR(); 
 
                 }
                 break;
             case 184 :
-                // Cmd3.g:1:1317: DECOMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1317: DECOMP
                 {
                 	mDECOMP(); 
 
                 }
                 break;
             case 185 :
-                // Cmd3.g:1:1324: DECOMP2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1324: DECOMP2
                 {
                 	mDECOMP2(); 
 
                 }
                 break;
             case 186 :
-                // Cmd3.g:1:1332: DECOMP3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1332: DECOMP3
                 {
                 	mDECOMP3(); 
 
                 }
                 break;
             case 187 :
-                // Cmd3.g:1:1340: EVAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1340: EVAL
                 {
                 	mEVAL(); 
 
                 }
                 break;
             case 188 :
-                // Cmd3.g:1:1345: DELETE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1345: DELETE
                 {
                 	mDELETE(); 
 
                 }
                 break;
             case 189 :
-                // Cmd3.g:1:1352: DETAILS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1352: DETAILS
                 {
                 	mDETAILS(); 
 
                 }
                 break;
             case 190 :
-                // Cmd3.g:1:1360: DIALOG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1360: DIALOG
                 {
                 	mDIALOG(); 
 
                 }
                 break;
             case 191 :
-                // Cmd3.g:1:1367: DIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1367: DIF
                 {
                 	mDIF(); 
 
                 }
                 break;
             case 192 :
-                // Cmd3.g:1:1371: DIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1371: DIFF
                 {
                 	mDIFF(); 
 
                 }
                 break;
             case 193 :
-                // Cmd3.g:1:1376: DIFPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1376: DIFPRT
                 {
                 	mDIFPRT(); 
 
                 }
                 break;
             case 194 :
-                // Cmd3.g:1:1383: DING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1383: DING
                 {
                 	mDING(); 
 
                 }
                 break;
             case 195 :
-                // Cmd3.g:1:1388: DYN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1388: DYN
                 {
                 	mDYN(); 
 
                 }
                 break;
             case 196 :
-                // Cmd3.g:1:1392: DIRECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1392: DIRECT
                 {
                 	mDIRECT(); 
 
                 }
                 break;
             case 197 :
-                // Cmd3.g:1:1399: DISP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1399: DISP
                 {
                 	mDISP(); 
 
                 }
                 break;
             case 198 :
-                // Cmd3.g:1:1404: DISPLAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1404: DISPLAY
                 {
                 	mDISPLAY(); 
 
                 }
                 break;
             case 199 :
-                // Cmd3.g:1:1412: DOC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1412: DOC
                 {
                 	mDOC(); 
 
                 }
                 break;
             case 200 :
-                // Cmd3.g:1:1416: DOWNLOAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1416: DOWNLOAD
                 {
                 	mDOWNLOAD(); 
 
                 }
                 break;
             case 201 :
-                // Cmd3.g:1:1425: DP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1425: DP
                 {
                 	mDP(); 
 
                 }
                 break;
             case 202 :
-                // Cmd3.g:1:1428: DUMOF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1428: DUMOF
                 {
                 	mDUMOF(); 
 
                 }
                 break;
             case 203 :
-                // Cmd3.g:1:1434: DUMOFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1434: DUMOFF
                 {
                 	mDUMOFF(); 
 
                 }
                 break;
             case 204 :
-                // Cmd3.g:1:1441: DUMON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1441: DUMON
                 {
                 	mDUMON(); 
 
                 }
                 break;
             case 205 :
-                // Cmd3.g:1:1447: DUMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1447: DUMP
                 {
                 	mDUMP(); 
 
                 }
                 break;
             case 206 :
-                // Cmd3.g:1:1452: DUMPOPTIONS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1452: DUMPOPTIONS
                 {
                 	mDUMPOPTIONS(); 
 
                 }
                 break;
             case 207 :
-                // Cmd3.g:1:1464: EDIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1464: EDIT
                 {
                 	mEDIT(); 
 
                 }
                 break;
             case 208 :
-                // Cmd3.g:1:1469: EFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1469: EFTER
                 {
                 	mEFTER(); 
 
                 }
                 break;
             case 209 :
-                // Cmd3.g:1:1475: ELSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1475: ELSE
                 {
                 	mELSE(); 
 
                 }
                 break;
             case 210 :
-                // Cmd3.g:1:1480: END
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1480: END
                 {
                 	mEND(); 
 
                 }
                 break;
             case 211 :
-                // Cmd3.g:1:1484: ENDO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1484: ENDO
                 {
                 	mENDO(); 
 
                 }
                 break;
             case 212 :
-                // Cmd3.g:1:1489: ENGLISH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1489: ENGLISH
                 {
                 	mENGLISH(); 
 
                 }
                 break;
             case 213 :
-                // Cmd3.g:1:1497: ERROR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1497: ERROR
                 {
                 	mERROR(); 
 
                 }
                 break;
             case 214 :
-                // Cmd3.g:1:1503: EXCEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1503: EXCEL
                 {
                 	mEXCEL(); 
 
                 }
                 break;
             case 215 :
-                // Cmd3.g:1:1509: EXE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1509: EXE
                 {
                 	mEXE(); 
 
                 }
                 break;
             case 216 :
-                // Cmd3.g:1:1513: EXIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1513: EXIT
                 {
                 	mEXIT(); 
 
                 }
                 break;
             case 217 :
-                // Cmd3.g:1:1518: EXO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1518: EXO
                 {
                 	mEXO(); 
 
                 }
                 break;
             case 218 :
-                // Cmd3.g:1:1522: EXP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1522: EXP
                 {
                 	mEXP(); 
 
                 }
                 break;
             case 219 :
-                // Cmd3.g:1:1526: EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1526: EXPORT
                 {
                 	mEXPORT(); 
 
                 }
                 break;
             case 220 :
-                // Cmd3.g:1:1533: EXTERNAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1533: EXTERNAL
                 {
                 	mEXTERNAL(); 
 
                 }
                 break;
             case 221 :
-                // Cmd3.g:1:1542: FAILSAFE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1542: FAILSAFE
                 {
                 	mFAILSAFE(); 
 
                 }
                 break;
             case 222 :
-                // Cmd3.g:1:1551: FAIR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1551: FAIR
                 {
                 	mFAIR(); 
 
                 }
                 break;
             case 223 :
-                // Cmd3.g:1:1556: FALSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1556: FALSE
                 {
                 	mFALSE(); 
 
                 }
                 break;
             case 224 :
-                // Cmd3.g:1:1562: FAST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1562: FAST
                 {
                 	mFAST(); 
 
                 }
                 break;
             case 225 :
-                // Cmd3.g:1:1567: FEED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1567: FEED
                 {
                 	mFEED(); 
 
                 }
                 break;
             case 226 :
-                // Cmd3.g:1:1572: FEEDBACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1572: FEEDBACK
                 {
                 	mFEEDBACK(); 
 
                 }
                 break;
             case 227 :
-                // Cmd3.g:1:1581: FIELDS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1581: FIELDS
                 {
                 	mFIELDS(); 
 
                 }
                 break;
             case 228 :
-                // Cmd3.g:1:1588: FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1588: FILE
                 {
                 	mFILE(); 
 
                 }
                 break;
             case 229 :
-                // Cmd3.g:1:1593: FILEWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1593: FILEWIDTH
                 {
                 	mFILEWIDTH(); 
 
                 }
                 break;
             case 230 :
-                // Cmd3.g:1:1603: FILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1603: FILTER
                 {
                 	mFILTER(); 
 
                 }
                 break;
             case 231 :
-                // Cmd3.g:1:1610: FINDMISSINGDATA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1610: FINDMISSINGDATA
                 {
                 	mFINDMISSINGDATA(); 
 
                 }
                 break;
             case 232 :
-                // Cmd3.g:1:1626: KEEPTYPES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1626: KEEPTYPES
                 {
                 	mKEEPTYPES(); 
 
                 }
                 break;
             case 233 :
-                // Cmd3.g:1:1636: PREDICT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1636: PREDICT
                 {
                 	mPREDICT(); 
 
                 }
                 break;
             case 234 :
-                // Cmd3.g:1:1644: FIND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1644: FIND
                 {
                 	mFIND(); 
 
                 }
                 break;
             case 235 :
-                // Cmd3.g:1:1649: PYTHON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1649: PYTHON
                 {
                 	mPYTHON(); 
 
                 }
                 break;
             case 236 :
-                // Cmd3.g:1:1656: DEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1656: DEP
                 {
                 	mDEP(); 
 
                 }
                 break;
             case 237 :
-                // Cmd3.g:1:1660: BROWSER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1660: BROWSER
                 {
                 	mBROWSER(); 
 
                 }
                 break;
             case 238 :
-                // Cmd3.g:1:1668: FIRST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1668: FIRST
                 {
                 	mFIRST(); 
 
                 }
                 break;
             case 239 :
-                // Cmd3.g:1:1674: FIRSTCOLWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1674: FIRSTCOLWIDTH
                 {
                 	mFIRSTCOLWIDTH(); 
 
                 }
                 break;
             case 240 :
-                // Cmd3.g:1:1688: FIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1688: FIX
                 {
                 	mFIX(); 
 
                 }
                 break;
             case 241 :
-                // Cmd3.g:1:1692: FLAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1692: FLAT
                 {
                 	mFLAT(); 
 
                 }
                 break;
             case 242 :
-                // Cmd3.g:1:1697: DATECELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1697: DATECELL
                 {
                 	mDATECELL(); 
 
                 }
                 break;
             case 243 :
-                // Cmd3.g:1:1706: NAMECELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1706: NAMECELL
                 {
                 	mNAMECELL(); 
 
                 }
                 break;
             case 244 :
-                // Cmd3.g:1:1715: FOLDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1715: FOLDER
                 {
                 	mFOLDER(); 
 
                 }
                 break;
             case 245 :
-                // Cmd3.g:1:1722: FONT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1722: FONT
                 {
                 	mFONT(); 
 
                 }
                 break;
             case 246 :
-                // Cmd3.g:1:1727: FONTSIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1727: FONTSIZE
                 {
                 	mFONTSIZE(); 
 
                 }
                 break;
             case 247 :
-                // Cmd3.g:1:1736: FOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1736: FOR
                 {
                 	mFOR(); 
 
                 }
                 break;
             case 248 :
-                // Cmd3.g:1:1740: FORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1740: FORMAT
                 {
                 	mFORMAT(); 
 
                 }
                 break;
             case 249 :
-                // Cmd3.g:1:1747: FORWARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1747: FORWARD
                 {
                 	mFORWARD(); 
 
                 }
                 break;
             case 250 :
-                // Cmd3.g:1:1755: FREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1755: FREQ
                 {
                 	mFREQ(); 
 
                 }
                 break;
             case 251 :
-                // Cmd3.g:1:1760: FRML
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1760: FRML
                 {
                 	mFRML(); 
 
                 }
                 break;
             case 252 :
-                // Cmd3.g:1:1765: FROM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1765: FROM
                 {
                 	mFROM(); 
 
                 }
                 break;
             case 253 :
-                // Cmd3.g:1:1770: FUNCTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1770: FUNCTION
                 {
                 	mFUNCTION(); 
 
                 }
                 break;
             case 254 :
-                // Cmd3.g:1:1779: GAUSS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1779: GAUSS
                 {
                 	mGAUSS(); 
 
                 }
                 break;
             case 255 :
-                // Cmd3.g:1:1785: GBK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1785: GBK
                 {
                 	mGBK(); 
 
                 }
                 break;
             case 256 :
-                // Cmd3.g:1:1789: GDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1789: GDIF
                 {
                 	mGDIF(); 
 
                 }
                 break;
             case 257 :
-                // Cmd3.g:1:1794: GDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1794: GDIFF
                 {
                 	mGDIFF(); 
 
                 }
                 break;
             case 258 :
-                // Cmd3.g:1:1800: GEKKO18
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1800: GEKKO18
                 {
                 	mGEKKO18(); 
 
                 }
                 break;
             case 259 :
-                // Cmd3.g:1:1808: GEKKO20
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1808: GEKKO20
                 {
                 	mGEKKO20(); 
 
                 }
                 break;
             case 260 :
-                // Cmd3.g:1:1816: GENR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1816: GENR
                 {
                 	mGENR(); 
 
                 }
                 break;
             case 261 :
-                // Cmd3.g:1:1821: GEOMETRIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1821: GEOMETRIC
                 {
                 	mGEOMETRIC(); 
 
                 }
                 break;
             case 262 :
-                // Cmd3.g:1:1831: OVERLAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1831: OVERLAY
                 {
                 	mOVERLAY(); 
 
                 }
                 break;
             case 263 :
-                // Cmd3.g:1:1839: GMULPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1839: GMULPRT
                 {
                 	mGMULPRT(); 
 
                 }
                 break;
             case 264 :
-                // Cmd3.g:1:1847: GNUPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1847: GNUPLOT
                 {
                 	mGNUPLOT(); 
 
                 }
                 break;
             case 265 :
-                // Cmd3.g:1:1855: GOAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1855: GOAL
                 {
                 	mGOAL(); 
 
                 }
                 break;
             case 266 :
-                // Cmd3.g:1:1860: GOTO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1860: GOTO
                 {
                 	mGOTO(); 
 
                 }
                 break;
             case 267 :
-                // Cmd3.g:1:1865: GRAPH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1865: GRAPH
                 {
                 	mGRAPH(); 
 
                 }
                 break;
             case 268 :
-                // Cmd3.g:1:1871: GROWTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1871: GROWTH
                 {
                 	mGROWTH(); 
 
                 }
                 break;
             case 269 :
-                // Cmd3.g:1:1878: HDG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1878: HDG
                 {
                 	mHDG(); 
 
                 }
                 break;
             case 270 :
-                // Cmd3.g:1:1882: HEADING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1882: HEADING
                 {
                 	mHEADING(); 
 
                 }
                 break;
             case 271 :
-                // Cmd3.g:1:1890: HELP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1890: HELP
                 {
                 	mHELP(); 
 
                 }
                 break;
             case 272 :
-                // Cmd3.g:1:1895: HIDE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1895: HIDE
                 {
                 	mHIDE(); 
 
                 }
                 break;
             case 273 :
-                // Cmd3.g:1:1900: HIDELEFTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1900: HIDELEFTBORDER
                 {
                 	mHIDELEFTBORDER(); 
 
                 }
                 break;
             case 274 :
-                // Cmd3.g:1:1915: HIDERIGHTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1915: HIDERIGHTBORDER
                 {
                 	mHIDERIGHTBORDER(); 
 
                 }
                 break;
             case 275 :
-                // Cmd3.g:1:1931: HORIZON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1931: HORIZON
                 {
                 	mHORIZON(); 
 
                 }
                 break;
             case 276 :
-                // Cmd3.g:1:1939: HPFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1939: HPFILTER
                 {
                 	mHPFILTER(); 
 
                 }
                 break;
             case 277 :
-                // Cmd3.g:1:1948: HTML
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1948: HTML
                 {
                 	mHTML(); 
 
                 }
                 break;
             case 278 :
-                // Cmd3.g:1:1953: IF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1953: IF
                 {
                 	mIF(); 
 
                 }
                 break;
             case 279 :
-                // Cmd3.g:1:1956: IF_OLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1956: IF_OLD
                 {
                 	mIF_OLD(); 
 
                 }
                 break;
             case 280 :
-                // Cmd3.g:1:1963: ASBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1963: ASBANK
                 {
                 	mASBANK(); 
 
                 }
                 break;
             case 281 :
-                // Cmd3.g:1:1970: TOBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1970: TOBANK
                 {
                 	mTOBANK(); 
 
                 }
                 break;
             case 282 :
-                // Cmd3.g:1:1977: FROMBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1977: FROMBANK
                 {
                 	mFROMBANK(); 
 
                 }
                 break;
             case 283 :
-                // Cmd3.g:1:1986: IGNOREMISSING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:1986: IGNOREMISSING
                 {
                 	mIGNOREMISSING(); 
 
                 }
                 break;
             case 284 :
-                // Cmd3.g:1:2000: IGNOREMISSINGVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2000: IGNOREMISSINGVARS
                 {
                 	mIGNOREMISSINGVARS(); 
 
                 }
                 break;
             case 285 :
-                // Cmd3.g:1:2018: IGNOREVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2018: IGNOREVARS
                 {
                 	mIGNOREVARS(); 
 
                 }
                 break;
             case 286 :
-                // Cmd3.g:1:2029: IMPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2029: IMPORT
                 {
                 	mIMPORT(); 
 
                 }
                 break;
             case 287 :
-                // Cmd3.g:1:2036: INDEX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2036: INDEX
                 {
                 	mINDEX(); 
 
                 }
                 break;
             case 288 :
-                // Cmd3.g:1:2042: INFO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2042: INFO
                 {
                 	mINFO(); 
 
                 }
                 break;
             case 289 :
-                // Cmd3.g:1:2047: INFOFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2047: INFOFILE
                 {
                 	mINFOFILE(); 
 
                 }
                 break;
             case 290 :
-                // Cmd3.g:1:2056: INI
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2056: INI
                 {
                 	mINI(); 
 
                 }
                 break;
             case 291 :
-                // Cmd3.g:1:2060: INIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2060: INIT
                 {
                 	mINIT(); 
 
                 }
                 break;
             case 292 :
-                // Cmd3.g:1:2065: INTERFACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2065: INTERFACE
                 {
                 	mINTERFACE(); 
 
                 }
                 break;
             case 293 :
-                // Cmd3.g:1:2075: INTERNAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2075: INTERNAL
                 {
                 	mINTERNAL(); 
 
                 }
                 break;
             case 294 :
-                // Cmd3.g:1:2084: INVERT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2084: INVERT
                 {
                 	mINVERT(); 
 
                 }
                 break;
             case 295 :
-                // Cmd3.g:1:2091: ROBUST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2091: ROBUST
                 {
                 	mROBUST(); 
 
                 }
                 break;
             case 296 :
-                // Cmd3.g:1:2098: ITER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2098: ITER
                 {
                 	mITER(); 
 
                 }
                 break;
             case 297 :
-                // Cmd3.g:1:2103: ITERMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2103: ITERMAX
                 {
                 	mITERMAX(); 
 
                 }
                 break;
             case 298 :
-                // Cmd3.g:1:2111: ITERMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2111: ITERMIN
                 {
                 	mITERMIN(); 
 
                 }
                 break;
             case 299 :
-                // Cmd3.g:1:2119: ITERSHOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2119: ITERSHOW
                 {
                 	mITERSHOW(); 
 
                 }
                 break;
             case 300 :
-                // Cmd3.g:1:2128: KEEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2128: KEEP
                 {
                 	mKEEP(); 
 
                 }
                 break;
             case 301 :
-                // Cmd3.g:1:2133: LABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2133: LABELS
                 {
                 	mLABELS(); 
 
                 }
                 break;
             case 302 :
-                // Cmd3.g:1:2140: LAG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2140: LAG
                 {
                 	mLAG(); 
 
                 }
                 break;
             case 303 :
-                // Cmd3.g:1:2144: LANGUAGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2144: LANGUAGE
                 {
                 	mLANGUAGE(); 
 
                 }
                 break;
             case 304 :
-                // Cmd3.g:1:2153: LAST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2153: LAST
                 {
                 	mLAST(); 
 
                 }
                 break;
             case 305 :
-                // Cmd3.g:1:2158: LEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2158: LEV
                 {
                 	mLEV(); 
 
                 }
                 break;
             case 306 :
-                // Cmd3.g:1:2162: LINEAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2162: LINEAR
                 {
                 	mLINEAR(); 
 
                 }
                 break;
             case 307 :
-                // Cmd3.g:1:2169: LINES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2169: LINES
                 {
                 	mLINES(); 
 
                 }
                 break;
             case 308 :
-                // Cmd3.g:1:2175: LIST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2175: LIST
                 {
                 	mLIST(); 
 
                 }
                 break;
             case 309 :
-                // Cmd3.g:1:2180: LISTFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2180: LISTFILE
                 {
                 	mLISTFILE(); 
 
                 }
                 break;
             case 310 :
-                // Cmd3.g:1:2189: LOG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2189: LOG
                 {
                 	mLOG(); 
 
                 }
                 break;
             case 311 :
-                // Cmd3.g:1:2193: LOCK_
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2193: LOCK_
                 {
                 	mLOCK_(); 
 
                 }
                 break;
             case 312 :
-                // Cmd3.g:1:2199: UNLOCK_
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2199: UNLOCK_
                 {
                 	mUNLOCK_(); 
 
                 }
                 break;
             case 313 :
-                // Cmd3.g:1:2207: LU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2207: LU
                 {
                 	mLU(); 
 
                 }
                 break;
             case 314 :
-                // Cmd3.g:1:2210: M
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2210: M
                 {
                 	mM(); 
 
                 }
                 break;
             case 315 :
-                // Cmd3.g:1:2212: MACRO2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2212: MACRO2
                 {
                 	mMACRO2(); 
 
                 }
                 break;
             case 316 :
-                // Cmd3.g:1:2219: MAIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2219: MAIN
                 {
                 	mMAIN(); 
 
                 }
                 break;
             case 317 :
-                // Cmd3.g:1:2224: MAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2224: MAT
                 {
                 	mMAT(); 
 
                 }
                 break;
             case 318 :
-                // Cmd3.g:1:2228: MATRIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2228: MATRIX
                 {
                 	mMATRIX(); 
 
                 }
                 break;
             case 319 :
-                // Cmd3.g:1:2235: ROWNAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2235: ROWNAMES
                 {
                 	mROWNAMES(); 
 
                 }
                 break;
             case 320 :
-                // Cmd3.g:1:2244: COLNAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2244: COLNAMES
                 {
                 	mCOLNAMES(); 
 
                 }
                 break;
             case 321 :
-                // Cmd3.g:1:2253: MAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2253: MAX
                 {
                 	mMAX(); 
 
                 }
                 break;
             case 322 :
-                // Cmd3.g:1:2257: MAXLINES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2257: MAXLINES
                 {
                 	mMAXLINES(); 
 
                 }
                 break;
             case 323 :
-                // Cmd3.g:1:2266: MEM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2266: MEM
                 {
                 	mMEM(); 
 
                 }
                 break;
             case 324 :
-                // Cmd3.g:1:2270: MENU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2270: MENU
                 {
                 	mMENU(); 
 
                 }
                 break;
             case 325 :
-                // Cmd3.g:1:2275: MENUTABLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2275: MENUTABLE
                 {
                 	mMENUTABLE(); 
 
                 }
                 break;
             case 326 :
-                // Cmd3.g:1:2285: MERGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2285: MERGE
                 {
                 	mMERGE(); 
 
                 }
                 break;
             case 327 :
-                // Cmd3.g:1:2291: MERGECOLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2291: MERGECOLS
                 {
                 	mMERGECOLS(); 
 
                 }
                 break;
             case 328 :
-                // Cmd3.g:1:2301: MESSAGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2301: MESSAGE
                 {
                 	mMESSAGE(); 
 
                 }
                 break;
             case 329 :
-                // Cmd3.g:1:2309: METHOD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2309: METHOD
                 {
                 	mMETHOD(); 
 
                 }
                 break;
             case 330 :
-                // Cmd3.g:1:2316: MIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2316: MIN
                 {
                 	mMIN(); 
 
                 }
                 break;
             case 331 :
-                // Cmd3.g:1:2320: MIXED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2320: MIXED
                 {
                 	mMIXED(); 
 
                 }
                 break;
             case 332 :
-                // Cmd3.g:1:2326: MISSING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2326: MISSING
                 {
                 	mMISSING(); 
 
                 }
                 break;
             case 333 :
-                // Cmd3.g:1:2334: MODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2334: MODE
                 {
                 	mMODE(); 
 
                 }
                 break;
             case 334 :
-                // Cmd3.g:1:2339: MODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2339: MODEL
                 {
                 	mMODEL(); 
 
                 }
                 break;
             case 335 :
-                // Cmd3.g:1:2345: MODERNLOOK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2345: MODERNLOOK
                 {
                 	mMODERNLOOK(); 
 
                 }
                 break;
             case 336 :
-                // Cmd3.g:1:2356: MP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2356: MP
                 {
                 	mMP(); 
 
                 }
                 break;
             case 337 :
-                // Cmd3.g:1:2359: DL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2359: DL
                 {
                 	mDL(); 
 
                 }
                 break;
             case 338 :
-                // Cmd3.g:1:2362: L
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2362: L
                 {
                 	mL(); 
 
                 }
                 break;
             case 339 :
-                // Cmd3.g:1:2364: RDL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2364: RDL
                 {
                 	mRDL(); 
 
                 }
                 break;
             case 340 :
-                // Cmd3.g:1:2368: RL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2368: RL
                 {
                 	mRL(); 
 
                 }
                 break;
             case 341 :
-                // Cmd3.g:1:2371: MULBK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2371: MULBK
                 {
                 	mMULBK(); 
 
                 }
                 break;
             case 342 :
-                // Cmd3.g:1:2377: MULPCT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2377: MULPCT
                 {
                 	mMULPCT(); 
 
                 }
                 break;
             case 343 :
-                // Cmd3.g:1:2384: MULPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2384: MULPRT
                 {
                 	mMULPRT(); 
 
                 }
                 break;
             case 344 :
-                // Cmd3.g:1:2391: MUTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2391: MUTE
                 {
                 	mMUTE(); 
 
                 }
                 break;
             case 345 :
-                // Cmd3.g:1:2396: N
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2396: N
                 {
                 	mN(); 
 
                 }
                 break;
             case 346 :
-                // Cmd3.g:1:2398: NAME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2398: NAME
                 {
                 	mNAME(); 
 
                 }
                 break;
             case 347 :
-                // Cmd3.g:1:2403: NAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2403: NAMES
                 {
                 	mNAMES(); 
 
                 }
                 break;
             case 348 :
-                // Cmd3.g:1:2409: NDEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2409: NDEC
                 {
                 	mNDEC(); 
 
                 }
                 break;
             case 349 :
-                // Cmd3.g:1:2414: NDIFPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2414: NDIFPRT
                 {
                 	mNDIFPRT(); 
 
                 }
                 break;
             case 350 :
-                // Cmd3.g:1:2422: NEW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2422: NEW
                 {
                 	mNEW(); 
 
                 }
                 break;
             case 351 :
-                // Cmd3.g:1:2426: NEWTON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2426: NEWTON
                 {
                 	mNEWTON(); 
 
                 }
                 break;
             case 352 :
-                // Cmd3.g:1:2433: NEXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2433: NEXT
                 {
                 	mNEXT(); 
 
                 }
                 break;
             case 353 :
-                // Cmd3.g:1:2438: NFAIR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2438: NFAIR
                 {
                 	mNFAIR(); 
 
                 }
                 break;
             case 354 :
-                // Cmd3.g:1:2444: NO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2444: NO
                 {
                 	mNO(); 
 
                 }
                 break;
             case 355 :
-                // Cmd3.g:1:2447: NOABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2447: NOABS
                 {
                 	mNOABS(); 
 
                 }
                 break;
             case 356 :
-                // Cmd3.g:1:2453: NOCR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2453: NOCR
                 {
                 	mNOCR(); 
 
                 }
                 break;
             case 357 :
-                // Cmd3.g:1:2458: NODIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2458: NODIF
                 {
                 	mNODIF(); 
 
                 }
                 break;
             case 358 :
-                // Cmd3.g:1:2464: NODIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2464: NODIFF
                 {
                 	mNODIFF(); 
 
                 }
                 break;
             case 359 :
-                // Cmd3.g:1:2471: NOFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2471: NOFILTER
                 {
                 	mNOFILTER(); 
 
                 }
                 break;
             case 360 :
-                // Cmd3.g:1:2480: NOGDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2480: NOGDIF
                 {
                 	mNOGDIF(); 
 
                 }
                 break;
             case 361 :
-                // Cmd3.g:1:2487: NOGDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2487: NOGDIFF
                 {
                 	mNOGDIFF(); 
 
                 }
                 break;
             case 362 :
-                // Cmd3.g:1:2495: NOLEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2495: NOLEV
                 {
                 	mNOLEV(); 
 
                 }
                 break;
             case 363 :
-                // Cmd3.g:1:2501: NONE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2501: NONE
                 {
                 	mNONE(); 
 
                 }
                 break;
             case 364 :
-                // Cmd3.g:1:2506: NONMODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2506: NONMODEL
                 {
                 	mNONMODEL(); 
 
                 }
                 break;
             case 365 :
-                // Cmd3.g:1:2515: NOPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2515: NOPCH
                 {
                 	mNOPCH(); 
 
                 }
                 break;
             case 366 :
-                // Cmd3.g:1:2521: SAVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2521: SAVE
                 {
                 	mSAVE(); 
 
                 }
                 break;
             case 367 :
-                // Cmd3.g:1:2526: NOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2526: NOT
                 {
                 	mNOT(); 
 
                 }
                 break;
             case 368 :
-                // Cmd3.g:1:2530: NOTIFY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2530: NOTIFY
                 {
                 	mNOTIFY(); 
 
                 }
                 break;
             case 369 :
-                // Cmd3.g:1:2537: NOV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2537: NOV
                 {
                 	mNOV(); 
 
                 }
                 break;
             case 370 :
-                // Cmd3.g:1:2541: NWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2541: NWIDTH
                 {
                 	mNWIDTH(); 
 
                 }
                 break;
             case 371 :
-                // Cmd3.g:1:2548: NYTVINDU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2548: NYTVINDU
                 {
                 	mNYTVINDU(); 
 
                 }
                 break;
             case 372 :
-                // Cmd3.g:1:2557: OLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2557: OLS
                 {
                 	mOLS(); 
 
                 }
                 break;
             case 373 :
-                // Cmd3.g:1:2561: OPEN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2561: OPEN
                 {
                 	mOPEN(); 
 
                 }
                 break;
             case 374 :
-                // Cmd3.g:1:2566: OPTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2566: OPTION
                 {
                 	mOPTION(); 
 
                 }
                 break;
             case 375 :
-                // Cmd3.g:1:2573: OR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2573: OR
                 {
                 	mOR(); 
 
                 }
                 break;
             case 376 :
-                // Cmd3.g:1:2576: P
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2576: P
                 {
                 	mP(); 
 
                 }
                 break;
             case 377 :
-                // Cmd3.g:1:2578: PARAM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2578: PARAM
                 {
                 	mPARAM(); 
 
                 }
                 break;
             case 378 :
-                // Cmd3.g:1:2584: PATCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2584: PATCH
                 {
                 	mPATCH(); 
 
                 }
                 break;
             case 379 :
-                // Cmd3.g:1:2590: PATH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2590: PATH
                 {
                 	mPATH(); 
 
                 }
                 break;
             case 380 :
-                // Cmd3.g:1:2595: PAUSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2595: PAUSE
                 {
                 	mPAUSE(); 
 
                 }
                 break;
             case 381 :
-                // Cmd3.g:1:2601: PCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2601: PCH
                 {
                 	mPCH(); 
 
                 }
                 break;
             case 382 :
-                // Cmd3.g:1:2605: PCIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2605: PCIM
                 {
                 	mPCIM(); 
 
                 }
                 break;
             case 383 :
-                // Cmd3.g:1:2610: PCIMSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2610: PCIMSTYLE
                 {
                 	mPCIMSTYLE(); 
 
                 }
                 break;
             case 384 :
-                // Cmd3.g:1:2620: STYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2620: STYLE
                 {
                 	mSTYLE(); 
 
                 }
                 break;
             case 385 :
-                // Cmd3.g:1:2626: PCTPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2626: PCTPRT
                 {
                 	mPCTPRT(); 
 
                 }
                 break;
             case 386 :
-                // Cmd3.g:1:2633: PDEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2633: PDEC
                 {
                 	mPDEC(); 
 
                 }
                 break;
             case 387 :
-                // Cmd3.g:1:2638: PERIOD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2638: PERIOD
                 {
                 	mPERIOD(); 
 
                 }
                 break;
             case 388 :
-                // Cmd3.g:1:2645: PIPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2645: PIPE
                 {
                 	mPIPE(); 
 
                 }
                 break;
             case 389 :
-                // Cmd3.g:1:2650: PLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2650: PLOT
                 {
                 	mPLOT(); 
 
                 }
                 break;
             case 390 :
-                // Cmd3.g:1:2655: PLOTCODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2655: PLOTCODE
                 {
                 	mPLOTCODE(); 
 
                 }
                 break;
             case 391 :
-                // Cmd3.g:1:2664: CUT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2664: CUT
                 {
                 	mCUT(); 
 
                 }
                 break;
             case 392 :
-                // Cmd3.g:1:2668: POINTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2668: POINTS
                 {
                 	mPOINTS(); 
 
                 }
                 break;
             case 393 :
-                // Cmd3.g:1:2675: POS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2675: POS
                 {
                 	mPOS(); 
 
                 }
                 break;
             case 394 :
-                // Cmd3.g:1:2679: PREFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2679: PREFIX
                 {
                 	mPREFIX(); 
 
                 }
                 break;
             case 395 :
-                // Cmd3.g:1:2686: PRETTY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2686: PRETTY
                 {
                 	mPRETTY(); 
 
                 }
                 break;
             case 396 :
-                // Cmd3.g:1:2693: PRI
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2693: PRI
                 {
                 	mPRI(); 
 
                 }
                 break;
             case 397 :
-                // Cmd3.g:1:2697: PRIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2697: PRIM
                 {
                 	mPRIM(); 
 
                 }
                 break;
             case 398 :
-                // Cmd3.g:1:2702: PRINT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2702: PRINT
                 {
                 	mPRINT(); 
 
                 }
                 break;
             case 399 :
-                // Cmd3.g:1:2708: OPERATORS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2708: OPERATORS
                 {
                 	mOPERATORS(); 
 
                 }
                 break;
             case 400 :
-                // Cmd3.g:1:2718: PRN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2718: PRN
                 {
                 	mPRN(); 
 
                 }
                 break;
             case 401 :
-                // Cmd3.g:1:2722: PROT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2722: PROT
                 {
                 	mPROT(); 
 
                 }
                 break;
             case 402 :
-                // Cmd3.g:1:2727: PRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2727: PRT
                 {
                 	mPRT(); 
 
                 }
                 break;
             case 403 :
-                // Cmd3.g:1:2731: PRTX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2731: PRTX
                 {
                 	mPRTX(); 
 
                 }
                 break;
             case 404 :
-                // Cmd3.g:1:2736: PUDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2736: PUDVALG
                 {
                 	mPUDVALG(); 
 
                 }
                 break;
             case 405 :
-                // Cmd3.g:1:2744: PWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2744: PWIDTH
                 {
                 	mPWIDTH(); 
 
                 }
                 break;
             case 406 :
-                // Cmd3.g:1:2751: Q
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2751: Q
                 {
                 	mQ(); 
 
                 }
                 break;
             case 407 :
-                // Cmd3.g:1:2753: R
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2753: R
                 {
                 	mR(); 
 
                 }
                 break;
             case 408 :
-                // Cmd3.g:1:2755: R_EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2755: R_EXPORT
                 {
                 	mR_EXPORT(); 
 
                 }
                 break;
             case 409 :
-                // Cmd3.g:1:2764: R_FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2764: R_FILE
                 {
                 	mR_FILE(); 
 
                 }
                 break;
             case 410 :
-                // Cmd3.g:1:2771: R_RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2771: R_RUN
                 {
                 	mR_RUN(); 
 
                 }
                 break;
             case 411 :
-                // Cmd3.g:1:2777: PYTHON_EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2777: PYTHON_EXPORT
                 {
                 	mPYTHON_EXPORT(); 
 
                 }
                 break;
             case 412 :
-                // Cmd3.g:1:2791: PYTHON_FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2791: PYTHON_FILE
                 {
                 	mPYTHON_FILE(); 
 
                 }
                 break;
             case 413 :
-                // Cmd3.g:1:2803: PYTHON_RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2803: PYTHON_RUN
                 {
                 	mPYTHON_RUN(); 
 
                 }
                 break;
             case 414 :
-                // Cmd3.g:1:2814: RD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2814: RD
                 {
                 	mRD(); 
 
                 }
                 break;
             case 415 :
-                // Cmd3.g:1:2817: RDP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2817: RDP
                 {
                 	mRDP(); 
 
                 }
                 break;
             case 416 :
-                // Cmd3.g:1:2821: READ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2821: READ
                 {
                 	mREAD(); 
 
                 }
                 break;
             case 417 :
-                // Cmd3.g:1:2826: REF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2826: REF
                 {
                 	mREF(); 
 
                 }
                 break;
             case 418 :
-                // Cmd3.g:1:2830: REL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2830: REL
                 {
                 	mREL(); 
 
                 }
                 break;
             case 419 :
-                // Cmd3.g:1:2834: RENAME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2834: RENAME
                 {
                 	mRENAME(); 
 
                 }
                 break;
             case 420 :
-                // Cmd3.g:1:2841: REORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2841: REORDER
                 {
                 	mREORDER(); 
 
                 }
                 break;
             case 421 :
-                // Cmd3.g:1:2849: REP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2849: REP
                 {
                 	mREP(); 
 
                 }
                 break;
             case 422 :
-                // Cmd3.g:1:2853: REPEAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2853: REPEAT
                 {
                 	mREPEAT(); 
 
                 }
                 break;
             case 423 :
-                // Cmd3.g:1:2860: REPLACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2860: REPLACE
                 {
                 	mREPLACE(); 
 
                 }
                 break;
             case 424 :
-                // Cmd3.g:1:2868: RES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2868: RES
                 {
                 	mRES(); 
 
                 }
                 break;
             case 425 :
-                // Cmd3.g:1:2872: RESET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2872: RESET
                 {
                 	mRESET(); 
 
                 }
                 break;
             case 426 :
-                // Cmd3.g:1:2878: BLOCK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2878: BLOCK
                 {
                 	mBLOCK(); 
 
                 }
                 break;
             case 427 :
-                // Cmd3.g:1:2884: RESPECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2884: RESPECT
                 {
                 	mRESPECT(); 
 
                 }
                 break;
             case 428 :
-                // Cmd3.g:1:2892: RESTART
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2892: RESTART
                 {
                 	mRESTART(); 
 
                 }
                 break;
             case 429 :
-                // Cmd3.g:1:2900: RING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2900: RING
                 {
                 	mRING(); 
 
                 }
                 break;
             case 430 :
-                // Cmd3.g:1:2905: RN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2905: RN
                 {
                 	mRN(); 
 
                 }
                 break;
             case 431 :
-                // Cmd3.g:1:2908: ROWS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2908: ROWS
                 {
                 	mROWS(); 
 
                 }
                 break;
             case 432 :
-                // Cmd3.g:1:2913: GROUP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2913: GROUP
                 {
                 	mGROUP(); 
 
                 }
                 break;
             case 433 :
-                // Cmd3.g:1:2919: LEVEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2919: LEVEL
                 {
                 	mLEVEL(); 
 
                 }
                 break;
             case 434 :
-                // Cmd3.g:1:2925: LINK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2925: LINK
                 {
                 	mLINK(); 
 
                 }
                 break;
             case 435 :
-                // Cmd3.g:1:2930: WHERE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2930: WHERE
                 {
                 	mWHERE(); 
 
                 }
                 break;
             case 436 :
-                // Cmd3.g:1:2936: RP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2936: RP
                 {
                 	mRP(); 
 
                 }
                 break;
             case 437 :
-                // Cmd3.g:1:2939: RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2939: RUN
                 {
                 	mRUN(); 
 
                 }
                 break;
             case 438 :
-                // Cmd3.g:1:2943: LIBRARY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2943: LIBRARY
                 {
                 	mLIBRARY(); 
 
                 }
                 break;
             case 439 :
-                // Cmd3.g:1:2951: SEARCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2951: SEARCH
                 {
                 	mSEARCH(); 
 
                 }
                 break;
             case 440 :
-                // Cmd3.g:1:2958: SEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2958: SEC
                 {
                 	mSEC(); 
 
                 }
                 break;
             case 441 :
-                // Cmd3.g:1:2962: SECONDCOLWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2962: SECONDCOLWIDTH
                 {
                 	mSECONDCOLWIDTH(); 
 
                 }
                 break;
             case 442 :
-                // Cmd3.g:1:2977: SER2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2977: SER2
                 {
                 	mSER2(); 
 
                 }
                 break;
             case 443 :
-                // Cmd3.g:1:2982: SER3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2982: SER3
                 {
                 	mSER3(); 
 
                 }
                 break;
             case 444 :
-                // Cmd3.g:1:2987: SER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2987: SER
                 {
                 	mSER(); 
 
                 }
                 break;
             case 445 :
-                // Cmd3.g:1:2991: SERIES2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2991: SERIES2
                 {
                 	mSERIES2(); 
 
                 }
                 break;
             case 446 :
-                // Cmd3.g:1:2999: SERIES3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:2999: SERIES3
                 {
                 	mSERIES3(); 
 
                 }
                 break;
             case 447 :
-                // Cmd3.g:1:3007: SERIES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3007: SERIES
                 {
                 	mSERIES(); 
 
                 }
                 break;
             case 448 :
-                // Cmd3.g:1:3014: SET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3014: SET
                 {
                 	mSET(); 
 
                 }
                 break;
             case 449 :
-                // Cmd3.g:1:3018: SETBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3018: SETBORDER
                 {
                 	mSETBORDER(); 
 
                 }
                 break;
             case 450 :
-                // Cmd3.g:1:3028: SETBOTTOMBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3028: SETBOTTOMBORDER
                 {
                 	mSETBOTTOMBORDER(); 
 
                 }
                 break;
             case 451 :
-                // Cmd3.g:1:3044: SETDATES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3044: SETDATES
                 {
                 	mSETDATES(); 
 
                 }
                 break;
             case 452 :
-                // Cmd3.g:1:3053: SETLEFTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3053: SETLEFTBORDER
                 {
                 	mSETLEFTBORDER(); 
 
                 }
                 break;
             case 453 :
-                // Cmd3.g:1:3067: SETRIGHTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3067: SETRIGHTBORDER
                 {
                 	mSETRIGHTBORDER(); 
 
                 }
                 break;
             case 454 :
-                // Cmd3.g:1:3082: SETTEXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3082: SETTEXT
                 {
                 	mSETTEXT(); 
 
                 }
                 break;
             case 455 :
-                // Cmd3.g:1:3090: SETTOPBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3090: SETTOPBORDER
                 {
                 	mSETTOPBORDER(); 
 
                 }
                 break;
             case 456 :
-                // Cmd3.g:1:3103: SETVALUES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3103: SETVALUES
                 {
                 	mSETVALUES(); 
 
                 }
                 break;
             case 457 :
-                // Cmd3.g:1:3113: SHEET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3113: SHEET
                 {
                 	mSHEET(); 
 
                 }
                 break;
             case 458 :
-                // Cmd3.g:1:3119: SHOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3119: SHOW
                 {
                 	mSHOW(); 
 
                 }
                 break;
             case 459 :
-                // Cmd3.g:1:3124: SHOWBORDERS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3124: SHOWBORDERS
                 {
                 	mSHOWBORDERS(); 
 
                 }
                 break;
             case 460 :
-                // Cmd3.g:1:3136: SHOWPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3136: SHOWPCH
                 {
                 	mSHOWPCH(); 
 
                 }
                 break;
             case 461 :
-                // Cmd3.g:1:3144: SIGN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3144: SIGN
                 {
                 	mSIGN(); 
 
                 }
                 break;
             case 462 :
-                // Cmd3.g:1:3149: SIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3149: SIM
                 {
                 	mSIM(); 
 
                 }
                 break;
             case 463 :
-                // Cmd3.g:1:3153: SIMPLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3153: SIMPLE
                 {
                 	mSIMPLE(); 
 
                 }
                 break;
             case 464 :
-                // Cmd3.g:1:3160: SKIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3160: SKIP
                 {
                 	mSKIP(); 
 
                 }
                 break;
             case 465 :
-                // Cmd3.g:1:3165: NAN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3165: NAN
                 {
                 	mNAN(); 
 
                 }
                 break;
             case 466 :
-                // Cmd3.g:1:3169: ENGINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3169: ENGINE
                 {
                 	mENGINE(); 
 
                 }
                 break;
             case 467 :
-                // Cmd3.g:1:3176: NORMAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3176: NORMAL
                 {
                 	mNORMAL(); 
 
                 }
                 break;
             case 468 :
-                // Cmd3.g:1:3183: SMOOTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3183: SMOOTH
                 {
                 	mSMOOTH(); 
 
                 }
                 break;
             case 469 :
-                // Cmd3.g:1:3190: SOLVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3190: SOLVE
                 {
                 	mSOLVE(); 
 
                 }
                 break;
             case 470 :
-                // Cmd3.g:1:3196: SOME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3196: SOME
                 {
                 	mSOME(); 
 
                 }
                 break;
             case 471 :
-                // Cmd3.g:1:3201: SORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3201: SORT
                 {
                 	mSORT(); 
 
                 }
                 break;
             case 472 :
-                // Cmd3.g:1:3206: SOUND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3206: SOUND
                 {
                 	mSOUND(); 
 
                 }
                 break;
             case 473 :
-                // Cmd3.g:1:3212: SOURCE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3212: SOURCE
                 {
                 	mSOURCE(); 
 
                 }
                 break;
             case 474 :
-                // Cmd3.g:1:3219: SPECIALMINUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3219: SPECIALMINUS
                 {
                 	mSPECIALMINUS(); 
 
                 }
                 break;
             case 475 :
-                // Cmd3.g:1:3232: SPLICE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3232: SPLICE
                 {
                 	mSPLICE(); 
 
                 }
                 break;
             case 476 :
-                // Cmd3.g:1:3239: SPLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3239: SPLINE
                 {
                 	mSPLINE(); 
 
                 }
                 break;
             case 477 :
-                // Cmd3.g:1:3246: SPLIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3246: SPLIT
                 {
                 	mSPLIT(); 
 
                 }
                 break;
             case 478 :
-                // Cmd3.g:1:3252: STACKED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3252: STACKED
                 {
                 	mSTACKED(); 
 
                 }
                 break;
             case 479 :
-                // Cmd3.g:1:3260: STAMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3260: STAMP
                 {
                 	mSTAMP(); 
 
                 }
                 break;
             case 480 :
-                // Cmd3.g:1:3266: STARTFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3266: STARTFILE
                 {
                 	mSTARTFILE(); 
 
                 }
                 break;
             case 481 :
-                // Cmd3.g:1:3276: STATIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3276: STATIC
                 {
                 	mSTATIC(); 
 
                 }
                 break;
             case 482 :
-                // Cmd3.g:1:3283: CHECK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3283: CHECK
                 {
                 	mCHECK(); 
 
                 }
                 break;
             case 483 :
-                // Cmd3.g:1:3289: STEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3289: STEP
                 {
                 	mSTEP(); 
 
                 }
                 break;
             case 484 :
-                // Cmd3.g:1:3294: STOP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3294: STOP
                 {
                 	mSTOP(); 
 
                 }
                 break;
             case 485 :
-                // Cmd3.g:1:3299: STRIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3299: STRIP
                 {
                 	mSTRIP(); 
 
                 }
                 break;
             case 486 :
-                // Cmd3.g:1:3305: SUFFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3305: SUFFIX
                 {
                 	mSUFFIX(); 
 
                 }
                 break;
             case 487 :
-                // Cmd3.g:1:3312: SUGGESTIONS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3312: SUGGESTIONS
                 {
                 	mSUGGESTIONS(); 
 
                 }
                 break;
             case 488 :
-                // Cmd3.g:1:3324: SWAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3324: SWAP
                 {
                 	mSWAP(); 
 
                 }
                 break;
             case 489 :
-                // Cmd3.g:1:3329: SYS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3329: SYS
                 {
                 	mSYS(); 
 
                 }
                 break;
             case 490 :
-                // Cmd3.g:1:3333: SYSTEM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3333: SYSTEM
                 {
                 	mSYSTEM(); 
 
                 }
                 break;
             case 491 :
-                // Cmd3.g:1:3340: TABLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3340: TABLE
                 {
                 	mTABLE(); 
 
                 }
                 break;
             case 492 :
-                // Cmd3.g:1:3346: TABLE1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3346: TABLE1
                 {
                 	mTABLE1(); 
 
                 }
                 break;
             case 493 :
-                // Cmd3.g:1:3353: TABLE2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3353: TABLE2
                 {
                 	mTABLE2(); 
 
                 }
                 break;
             case 494 :
-                // Cmd3.g:1:3360: TABLEOLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3360: TABLEOLD
                 {
                 	mTABLEOLD(); 
 
                 }
                 break;
             case 495 :
-                // Cmd3.g:1:3369: TABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3369: TABS
                 {
                 	mTABS(); 
 
                 }
                 break;
             case 496 :
-                // Cmd3.g:1:3374: TARGET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3374: TARGET
                 {
                 	mTARGET(); 
 
                 }
                 break;
             case 497 :
-                // Cmd3.g:1:3381: TELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3381: TELL
                 {
                 	mTELL(); 
 
                 }
                 break;
             case 498 :
-                // Cmd3.g:1:3386: TEMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3386: TEMP
                 {
                 	mTEMP(); 
 
                 }
                 break;
             case 499 :
-                // Cmd3.g:1:3391: TERMINAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3391: TERMINAL
                 {
                 	mTERMINAL(); 
 
                 }
                 break;
             case 500 :
-                // Cmd3.g:1:3400: TEST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3400: TEST
                 {
                 	mTEST(); 
 
                 }
                 break;
             case 501 :
-                // Cmd3.g:1:3405: TESTRANDOMMODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3405: TESTRANDOMMODEL
                 {
                 	mTESTRANDOMMODEL(); 
 
                 }
                 break;
             case 502 :
-                // Cmd3.g:1:3421: TESTRANDOMMODELCHECK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3421: TESTRANDOMMODELCHECK
                 {
                 	mTESTRANDOMMODELCHECK(); 
 
                 }
                 break;
             case 503 :
-                // Cmd3.g:1:3442: TESTSIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3442: TESTSIM
                 {
                 	mTESTSIM(); 
 
                 }
                 break;
             case 504 :
-                // Cmd3.g:1:3450: TIME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3450: TIME
                 {
                 	mTIME(); 
 
                 }
                 break;
             case 505 :
-                // Cmd3.g:1:3455: TIMEFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3455: TIMEFILTER
                 {
                 	mTIMEFILTER(); 
 
                 }
                 break;
             case 506 :
-                // Cmd3.g:1:3466: UNITS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3466: UNITS
                 {
                 	mUNITS(); 
 
                 }
                 break;
             case 507 :
-                // Cmd3.g:1:3472: TIMESPAN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3472: TIMESPAN
                 {
                 	mTIMESPAN(); 
 
                 }
                 break;
             case 508 :
-                // Cmd3.g:1:3481: TITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3481: TITLE
                 {
                 	mTITLE(); 
 
                 }
                 break;
             case 509 :
-                // Cmd3.g:1:3487: TO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3487: TO
                 {
                 	mTO(); 
 
                 }
                 break;
             case 510 :
-                // Cmd3.g:1:3490: TOTAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3490: TOTAL
                 {
                 	mTOTAL(); 
 
                 }
                 break;
             case 511 :
-                // Cmd3.g:1:3496: TRANSLATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3496: TRANSLATE
                 {
                 	mTRANSLATE(); 
 
                 }
                 break;
             case 512 :
-                // Cmd3.g:1:3506: TRANSPOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3506: TRANSPOSE
                 {
                 	mTRANSPOSE(); 
 
                 }
                 break;
             case 513 :
-                // Cmd3.g:1:3516: TREL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3516: TREL
                 {
                 	mTREL(); 
 
                 }
                 break;
             case 514 :
-                // Cmd3.g:1:3521: TRUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3521: TRUE
                 {
                 	mTRUE(); 
 
                 }
                 break;
             case 515 :
-                // Cmd3.g:1:3526: TRUNCATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3526: TRUNCATE
                 {
                 	mTRUNCATE(); 
 
                 }
                 break;
             case 516 :
-                // Cmd3.g:1:3535: TSD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3535: TSD
                 {
                 	mTSD(); 
 
                 }
                 break;
             case 517 :
-                // Cmd3.g:1:3539: TSDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3539: TSDX
                 {
                 	mTSDX(); 
 
                 }
                 break;
             case 518 :
-                // Cmd3.g:1:3544: TSP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3544: TSP
                 {
                 	mTSP(); 
 
                 }
                 break;
             case 519 :
-                // Cmd3.g:1:3548: TXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3548: TXT
                 {
                 	mTXT(); 
 
                 }
                 break;
             case 520 :
-                // Cmd3.g:1:3552: TYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3552: TYPE
                 {
                 	mTYPE(); 
 
                 }
                 break;
             case 521 :
-                // Cmd3.g:1:3557: U
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3557: U
                 {
                 	mU(); 
 
                 }
                 break;
             case 522 :
-                // Cmd3.g:1:3559: UABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3559: UABS
                 {
                 	mUABS(); 
 
                 }
                 break;
             case 523 :
-                // Cmd3.g:1:3564: UDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3564: UDIF
                 {
                 	mUDIF(); 
 
                 }
                 break;
             case 524 :
-                // Cmd3.g:1:3569: UDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3569: UDIFF
                 {
                 	mUDIFF(); 
 
                 }
                 break;
             case 525 :
-                // Cmd3.g:1:3575: UDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3575: UDVALG
                 {
                 	mUDVALG(); 
 
                 }
                 break;
             case 526 :
-                // Cmd3.g:1:3582: UGDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3582: UGDIF
                 {
                 	mUGDIF(); 
 
                 }
                 break;
             case 527 :
-                // Cmd3.g:1:3588: UGDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3588: UGDIFF
                 {
                 	mUGDIFF(); 
 
                 }
                 break;
             case 528 :
-                // Cmd3.g:1:3595: ULEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3595: ULEV
                 {
                 	mULEV(); 
 
                 }
                 break;
             case 529 :
-                // Cmd3.g:1:3600: UNDO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3600: UNDO
                 {
                 	mUNDO(); 
 
                 }
                 break;
             case 530 :
-                // Cmd3.g:1:3605: UNFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3605: UNFIX
                 {
                 	mUNFIX(); 
 
                 }
                 break;
             case 531 :
-                // Cmd3.g:1:3611: SPEEDUP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3611: SPEEDUP
                 {
                 	mSPEEDUP(); 
 
                 }
                 break;
             case 532 :
-                // Cmd3.g:1:3619: UNSWAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3619: UNSWAP
                 {
                 	mUNSWAP(); 
 
                 }
                 break;
             case 533 :
-                // Cmd3.g:1:3626: UPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3626: UPCH
                 {
                 	mUPCH(); 
 
                 }
                 break;
             case 534 :
-                // Cmd3.g:1:3631: UPDATEFREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3631: UPDATEFREQ
                 {
                 	mUPDATEFREQ(); 
 
                 }
                 break;
             case 535 :
-                // Cmd3.g:1:3642: UPDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3642: UPDX
                 {
                 	mUPDX(); 
 
                 }
                 break;
             case 536 :
-                // Cmd3.g:1:3647: V
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3647: V
                 {
                 	mV(); 
 
                 }
                 break;
             case 537 :
-                // Cmd3.g:1:3649: VAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3649: VAL
                 {
                 	mVAL(); 
 
                 }
                 break;
             case 538 :
-                // Cmd3.g:1:3653: VAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3653: VAR
                 {
                 	mVAR(); 
 
                 }
                 break;
             case 539 :
-                // Cmd3.g:1:3657: VAR_KDUSJFLQO2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3657: VAR_KDUSJFLQO2
                 {
                 	mVAR_KDUSJFLQO2(); 
 
                 }
                 break;
             case 540 :
-                // Cmd3.g:1:3672: VALUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3672: VALUE
                 {
                 	mVALUE(); 
 
                 }
                 break;
             case 541 :
-                // Cmd3.g:1:3678: VERS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3678: VERS
                 {
                 	mVERS(); 
 
                 }
                 break;
             case 542 :
-                // Cmd3.g:1:3683: VERSION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3683: VERSION
                 {
                 	mVERSION(); 
 
                 }
                 break;
             case 543 :
-                // Cmd3.g:1:3691: VPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3691: VPRT
                 {
                 	mVPRT(); 
 
                 }
                 break;
             case 544 :
-                // Cmd3.g:1:3696: WAIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3696: WAIT
                 {
                 	mWAIT(); 
 
                 }
                 break;
             case 545 :
-                // Cmd3.g:1:3701: WIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3701: WIDTH
                 {
                 	mWIDTH(); 
 
                 }
                 break;
             case 546 :
-                // Cmd3.g:1:3707: WINDOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3707: WINDOW
                 {
                 	mWINDOW(); 
 
                 }
                 break;
             case 547 :
-                // Cmd3.g:1:3714: WORKING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3714: WORKING
                 {
                 	mWORKING(); 
 
                 }
                 break;
             case 548 :
-                // Cmd3.g:1:3722: WPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3722: WPLOT
                 {
                 	mWPLOT(); 
 
                 }
                 break;
             case 549 :
-                // Cmd3.g:1:3728: WRITE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3728: WRITE
                 {
                 	mWRITE(); 
 
                 }
                 break;
             case 550 :
-                // Cmd3.g:1:3734: WUDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3734: WUDVALG
                 {
                 	mWUDVALG(); 
 
                 }
                 break;
             case 551 :
-                // Cmd3.g:1:3742: X12A
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3742: X12A
                 {
                 	mX12A(); 
 
                 }
                 break;
             case 552 :
-                // Cmd3.g:1:3747: XLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3747: XLS
                 {
                 	mXLS(); 
 
                 }
                 break;
             case 553 :
-                // Cmd3.g:1:3751: XLSX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3751: XLSX
                 {
                 	mXLSX(); 
 
                 }
                 break;
             case 554 :
-                // Cmd3.g:1:3756: YES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3756: YES
                 {
                 	mYES(); 
 
                 }
                 break;
             case 555 :
-                // Cmd3.g:1:3760: YMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3760: YMAX
                 {
                 	mYMAX(); 
 
                 }
                 break;
             case 556 :
-                // Cmd3.g:1:3765: YMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3765: YMIN
                 {
                 	mYMIN(); 
 
                 }
                 break;
             case 557 :
-                // Cmd3.g:1:3770: Y2MAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3770: Y2MAX
                 {
                 	mY2MAX(); 
 
                 }
                 break;
             case 558 :
-                // Cmd3.g:1:3776: Y2MIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3776: Y2MIN
                 {
                 	mY2MIN(); 
 
                 }
                 break;
             case 559 :
-                // Cmd3.g:1:3782: ZERO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3782: ZERO
                 {
                 	mZERO(); 
 
                 }
                 break;
             case 560 :
-                // Cmd3.g:1:3787: ZOOM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3787: ZOOM
                 {
                 	mZOOM(); 
 
                 }
                 break;
             case 561 :
-                // Cmd3.g:1:3792: ZVAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3792: ZVAR
                 {
                 	mZVAR(); 
 
                 }
                 break;
             case 562 :
-                // Cmd3.g:1:3797: HTTP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3797: HTTP
                 {
                 	mHTTP(); 
 
                 }
                 break;
             case 563 :
-                // Cmd3.g:1:3802: HTTPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3802: HTTPS
                 {
                 	mHTTPS(); 
 
                 }
                 break;
             case 564 :
-                // Cmd3.g:1:3808: WHITESPACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3808: WHITESPACE
                 {
                 	mWHITESPACE(); 
 
                 }
                 break;
             case 565 :
-                // Cmd3.g:1:3819: COMMENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3819: COMMENT
                 {
                 	mCOMMENT(); 
 
                 }
                 break;
             case 566 :
-                // Cmd3.g:1:3827: COMMENT_MULTILINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3827: COMMENT_MULTILINE
                 {
                 	mCOMMENT_MULTILINE(); 
 
                 }
                 break;
             case 567 :
-                // Cmd3.g:1:3845: Ident
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3845: Ident
                 {
                 	mIdent(); 
 
                 }
                 break;
             case 568 :
-                // Cmd3.g:1:3851: Integer
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3851: Integer
                 {
                 	mInteger(); 
 
                 }
                 break;
             case 569 :
-                // Cmd3.g:1:3859: DigitsEDigits
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3859: DigitsEDigits
                 {
                 	mDigitsEDigits(); 
 
                 }
                 break;
             case 570 :
-                // Cmd3.g:1:3873: DateDef
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3873: DateDef
                 {
                 	mDateDef(); 
 
                 }
                 break;
             case 571 :
-                // Cmd3.g:1:3881: IdentStartingWithInt
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3881: IdentStartingWithInt
                 {
                 	mIdentStartingWithInt(); 
 
                 }
                 break;
             case 572 :
-                // Cmd3.g:1:3902: Double
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3902: Double
                 {
                 	mDouble(); 
 
                 }
                 break;
             case 573 :
-                // Cmd3.g:1:3909: StringInQuotes
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3909: StringInQuotes
                 {
                 	mStringInQuotes(); 
 
                 }
                 break;
             case 574 :
-                // Cmd3.g:1:3924: StringInQuotes1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3924: StringInQuotes1
                 {
                 	mStringInQuotes1(); 
 
                 }
                 break;
             case 575 :
-                // Cmd3.g:1:3940: StringInQuotes2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3940: StringInQuotes2
                 {
                 	mStringInQuotes2(); 
 
                 }
                 break;
             case 576 :
-                // Cmd3.g:1:3956: StringInQuotes3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3956: StringInQuotes3
                 {
                 	mStringInQuotes3(); 
 
                 }
                 break;
             case 577 :
-                // Cmd3.g:1:3972: PLUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3972: PLUSEQUAL
                 {
                 	mPLUSEQUAL(); 
 
                 }
                 break;
             case 578 :
-                // Cmd3.g:1:3982: STAREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3982: STAREQUAL
                 {
                 	mSTAREQUAL(); 
 
                 }
                 break;
             case 579 :
-                // Cmd3.g:1:3992: PERCENTEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3992: PERCENTEQUAL
                 {
                 	mPERCENTEQUAL(); 
 
                 }
                 break;
             case 580 :
-                // Cmd3.g:1:4005: HASHEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4005: HASHEQUAL
                 {
                 	mHASHEQUAL(); 
 
                 }
                 break;
             case 581 :
-                // Cmd3.g:1:4015: HATEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4015: HATEQUAL
                 {
                 	mHATEQUAL(); 
 
                 }
                 break;
             case 582 :
-                // Cmd3.g:1:4024: GLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4024: GLUE
                 {
                 	mGLUE(); 
 
                 }
                 break;
             case 583 :
-                // Cmd3.g:1:4029: GLUEDOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4029: GLUEDOT
                 {
                 	mGLUEDOT(); 
 
                 }
                 break;
             case 584 :
-                // Cmd3.g:1:4037: GLUEDOTNUMBER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4037: GLUEDOTNUMBER
                 {
                 	mGLUEDOTNUMBER(); 
 
                 }
                 break;
             case 585 :
-                // Cmd3.g:1:4051: GLUESTAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4051: GLUESTAR
                 {
                 	mGLUESTAR(); 
 
                 }
                 break;
             case 586 :
-                // Cmd3.g:1:4060: LEFTANGLESPECIAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4060: LEFTANGLESPECIAL
                 {
                 	mLEFTANGLESPECIAL(); 
 
                 }
                 break;
             case 587 :
-                // Cmd3.g:1:4077: GLUEBACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4077: GLUEBACKSLASH
                 {
                 	mGLUEBACKSLASH(); 
 
                 }
                 break;
             case 588 :
-                // Cmd3.g:1:4091: ISEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4091: ISEQUAL
                 {
                 	mISEQUAL(); 
 
                 }
                 break;
             case 589 :
-                // Cmd3.g:1:4099: ISNOTQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4099: ISNOTQUAL
                 {
                 	mISNOTQUAL(); 
 
                 }
                 break;
             case 590 :
-                // Cmd3.g:1:4109: ISLARGEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4109: ISLARGEROREQUAL
                 {
                 	mISLARGEROREQUAL(); 
 
                 }
                 break;
             case 591 :
-                // Cmd3.g:1:4125: ISSMALLEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4125: ISSMALLEROREQUAL
                 {
                 	mISSMALLEROREQUAL(); 
 
                 }
                 break;
             case 592 :
-                // Cmd3.g:1:4142: EXCLAMATION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4142: EXCLAMATION
                 {
                 	mEXCLAMATION(); 
 
                 }
                 break;
             case 593 :
-                // Cmd3.g:1:4154: TILDE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4154: TILDE
                 {
                 	mTILDE(); 
 
                 }
                 break;
             case 594 :
-                // Cmd3.g:1:4160: AT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4160: AT
                 {
                 	mAT(); 
 
                 }
                 break;
             case 595 :
-                // Cmd3.g:1:4163: HAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4163: HAT
                 {
                 	mHAT(); 
 
                 }
                 break;
             case 596 :
-                // Cmd3.g:1:4167: SEMICOLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4167: SEMICOLON
                 {
                 	mSEMICOLON(); 
 
                 }
                 break;
             case 597 :
-                // Cmd3.g:1:4177: COLONGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4177: COLONGLUE
                 {
                 	mCOLONGLUE(); 
 
                 }
                 break;
             case 598 :
-                // Cmd3.g:1:4187: COLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4187: COLON
                 {
                 	mCOLON(); 
 
                 }
                 break;
             case 599 :
-                // Cmd3.g:1:4193: COMMA2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4193: COMMA2
                 {
                 	mCOMMA2(); 
 
                 }
                 break;
             case 600 :
-                // Cmd3.g:1:4200: DOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4200: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
             case 601 :
-                // Cmd3.g:1:4204: HASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4204: HASH
                 {
                 	mHASH(); 
 
                 }
                 break;
             case 602 :
-                // Cmd3.g:1:4209: PERCENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4209: PERCENT
                 {
                 	mPERCENT(); 
 
                 }
                 break;
             case 603 :
-                // Cmd3.g:1:4217: DOLLAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4217: DOLLAR
                 {
                 	mDOLLAR(); 
 
                 }
                 break;
             case 604 :
-                // Cmd3.g:1:4224: LEFTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4224: LEFTCURLY
                 {
                 	mLEFTCURLY(); 
 
                 }
                 break;
             case 605 :
-                // Cmd3.g:1:4234: RIGHTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4234: RIGHTCURLY
                 {
                 	mRIGHTCURLY(); 
 
                 }
                 break;
             case 606 :
-                // Cmd3.g:1:4245: LEFTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4245: LEFTPAREN
                 {
                 	mLEFTPAREN(); 
 
                 }
                 break;
             case 607 :
-                // Cmd3.g:1:4255: RIGHTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4255: RIGHTPAREN
                 {
                 	mRIGHTPAREN(); 
 
                 }
                 break;
             case 608 :
-                // Cmd3.g:1:4266: LEFTBRACKETGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4266: LEFTBRACKETGLUE
                 {
                 	mLEFTBRACKETGLUE(); 
 
                 }
                 break;
             case 609 :
-                // Cmd3.g:1:4282: LEFTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4282: LEFTBRACKET
                 {
                 	mLEFTBRACKET(); 
 
                 }
                 break;
             case 610 :
-                // Cmd3.g:1:4294: RIGHTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4294: RIGHTBRACKET
                 {
                 	mRIGHTBRACKET(); 
 
                 }
                 break;
             case 611 :
-                // Cmd3.g:1:4307: LEFTANGLESIMPLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4307: LEFTANGLESIMPLE
                 {
                 	mLEFTANGLESIMPLE(); 
 
                 }
                 break;
             case 612 :
-                // Cmd3.g:1:4323: RIGHTANGLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4323: RIGHTANGLE
                 {
                 	mRIGHTANGLE(); 
 
                 }
                 break;
             case 613 :
-                // Cmd3.g:1:4334: STAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4334: STAR
                 {
                 	mSTAR(); 
 
                 }
                 break;
             case 614 :
-                // Cmd3.g:1:4339: DOUBLEVERTICALBAR1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4339: DOUBLEVERTICALBAR1
                 {
                 	mDOUBLEVERTICALBAR1(); 
 
                 }
                 break;
             case 615 :
-                // Cmd3.g:1:4358: DOUBLEAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4358: DOUBLEAND
                 {
                 	mDOUBLEAND(); 
 
                 }
                 break;
             case 616 :
-                // Cmd3.g:1:4368: DOUBLEVERTICALBAR2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4368: DOUBLEVERTICALBAR2
                 {
                 	mDOUBLEVERTICALBAR2(); 
 
                 }
                 break;
             case 617 :
-                // Cmd3.g:1:4387: VERTICALBAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4387: VERTICALBAR
                 {
                 	mVERTICALBAR(); 
 
                 }
                 break;
             case 618 :
-                // Cmd3.g:1:4399: PLUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4399: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
             case 619 :
-                // Cmd3.g:1:4404: MINUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4404: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
             case 620 :
-                // Cmd3.g:1:4410: DIV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4410: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
             case 621 :
-                // Cmd3.g:1:4414: TRIPLESTARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4414: TRIPLESTARS
                 {
                 	mTRIPLESTARS(); 
 
                 }
                 break;
             case 622 :
-                // Cmd3.g:1:4426: STARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4426: STARS
                 {
                 	mSTARS(); 
 
                 }
                 break;
             case 623 :
-                // Cmd3.g:1:4432: EQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4432: EQUAL
                 {
                 	mEQUAL(); 
 
                 }
                 break;
             case 624 :
-                // Cmd3.g:1:4438: MINUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4438: MINUSEQUAL
                 {
                 	mMINUSEQUAL(); 
 
                 }
                 break;
             case 625 :
-                // Cmd3.g:1:4449: DIVEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4449: DIVEQUAL
                 {
                 	mDIVEQUAL(); 
 
                 }
                 break;
             case 626 :
-                // Cmd3.g:1:4458: BACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4458: BACKSLASH
                 {
                 	mBACKSLASH(); 
 
                 }
                 break;
             case 627 :
-                // Cmd3.g:1:4468: QUESTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4468: QUESTION
                 {
                 	mQUESTION(); 
 
@@ -23564,7 +23564,7 @@ public partial class Cmd3Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5231:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
+            get { return "5249:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
         }
 
     }
@@ -23616,7 +23616,7 @@ public partial class Cmd3Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5241:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+            get { return "5259:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
         }
 
     }

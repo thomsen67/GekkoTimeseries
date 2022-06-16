@@ -1112,14 +1112,39 @@ namespace Gekko
 
             double[,] mEndo = null;
             double[,] mExo = null;
+            List<string> eqNames = new List<string>();
 
             //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
             //because the size of exo is used the second time.
             //Maybe a bit inefficient?
             for (int k = 0; k < 2; k++)  //k=0 just counts endo/exo
             {
-                if (k != 0)
+                if (k == 0)
                 {
+                    //do nothing                    
+                }
+                else
+                {
+                    if (endo.Count != eqNames.Count)
+                    {
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("The numbers of total equations (" + eqNames.Count + ") and the number of endogenous variables (" + endo.Count + ") do not match");
+                            List<string> temp2 = eqNames;
+                            temp2.Sort(G.CompareNaturalIgnoreCase);
+                            txt.MoreAdd("There are the following " + eqNames.Count + " equations given:");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
+                            txt.MoreNewLine();
+                            List<string>temp1 = endo.Keys.ToList();
+                            for (int i = 0; i < temp1.Count; i++) { temp1[i] = temp1[i].Replace("¤", ""); }
+                            temp1.Sort(G.CompareNaturalIgnoreCase);
+                            txt.MoreAdd("There are the following " + endo.Count + " endo variables given:");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd(Stringlist.GetListWithCommas(temp1));
+                        }
+                    }
+
                     mEndo = new double[endo.Count, endo.Count];
                     mExo = new double[endo.Count, exo.Count];
                 }
@@ -1139,9 +1164,9 @@ namespace Gekko
                             row++;
 
                             //see also #as7f3læaf9
-                            string name1 = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
-                            string name2 = dsh.name + "[" + t.ToString() + "]";
-                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[name1];
+                            string eqName = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+                            if (k == 0) eqNames.Add(eqName);
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[eqName];                            
 
                             //foreach precedent variable
                             for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
@@ -1181,7 +1206,10 @@ namespace Gekko
                                     if (endo.ContainsKey(x1))
                                     {
                                         int col = endo[x1];
-                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1))) new Error("DECOMP matrix invert problem");
+                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
+                                        {
+                                            new Error("DECOMP matrix invert problem");
+                                        }
                                         Series ts = dd.storage[x2];
                                         double d = ts.GetDataSimple(t);
                                         mEndo[row, col] = d;
@@ -1189,7 +1217,10 @@ namespace Gekko
                                     else if (exo.ContainsKey(x1))
                                     {
                                         int col = exo[x1];
-                                        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1))) new Error("DECOMP matrix invert problem");
+                                        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
+                                        {
+                                            new Error("DECOMP matrix invert problem");
+                                        }                                            
                                         Series ts = dd.storage[x2];
                                         double d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;

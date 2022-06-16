@@ -12,13 +12,20 @@ namespace Gekko.Parser
 {
     public class ParserCommon
     {
-        public static void DebugTokens(Cmd3Lexer lexer3)
+        /// <summary>
+        /// Show info on individual tokens. If lexer3==null, it takes lexer4.
+        /// </summary>
+        /// <param name="lexer3"></param>
+        /// <param name="lexer4"></param>
+        public static void DebugTokens(Cmd3Lexer lexer3, Cmd4Lexer lexer4)
         {
             G.Writeln("Debugging tokens (Globals.debugTokens)", Color.Orange);
             IToken token;
             for (int i = 0; i < 100; i++)
             {
-                token = lexer3.NextToken();
+                token = null;
+                if (lexer3 != null) token = lexer3.NextToken();
+                else token = lexer4.NextToken();
                 string s1 = token.Text;
                 if (s1 == "{") s1 = "[leftcurly]";
                 if (s1 == "}") s1 = "[rightcurly]";

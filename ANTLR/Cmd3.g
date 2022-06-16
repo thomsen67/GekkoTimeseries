@@ -2534,12 +2534,30 @@ ifOperator:		            ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
  * PARSER RULES
  *------------------------------------------------------------------*/
 
+startB:                     statementsB EOF;  //EOF is necessary in order to force the whole file to be parsed
+statementsB:                statements2B*;
+statements2B:               SEMICOLON -> //stray semicolon is ok, nothing is written                     
+						  | assignment2          SEMICOLON!   //[simple]
+						    ;
+
+// ===================================================================================================
+
+startC:                     statementsC EOF;  //EOF is necessary in order to force the whole file to be parsed
+statementsC:                statements2C*;
+statements2C:               SEMICOLON -> //stray semicolon is ok, nothing is written                     
+						  | functionNaked        SEMICOLON!   //[simple] f(x);
+						  | objectFunctionNaked  SEMICOLON!   //[simple] x.f();
+						  | procedure            SEMICOLON!   //[simple] f x;
+							;
+
+// ===================================================================================================
+
 start:                      statements EOF;  //EOF is necessary in order to force the whole file to be parsed
 
 statements:                 statements2*;
 
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written                     
-						  | assignment2          SEMICOLON!
+						  | assignment2          SEMICOLON!          //[[Cmd4.g -- do not touch]]
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
 						  | block                
@@ -2623,10 +2641,10 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | unfix                SEMICOLON!
 						  | write                SEMICOLON!	
 						  | x12a                 SEMICOLON!
-						  | xedit                SEMICOLON!					  
-						  | functionNaked        SEMICOLON!   //naked function outside expression
-						  | objectFunctionNaked  SEMICOLON!   //naked object function outside expression
-						  | procedure            SEMICOLON!   //procedure call
+						  | xedit                SEMICOLON!
+					  	  | functionNaked        SEMICOLON!   //f(x);         //[[Cmd4.g -- do not touch]]
+						  | objectFunctionNaked  SEMICOLON!   //x.f();        //[[Cmd4.g -- do not touch]]
+						  | procedure            SEMICOLON!   //f x;          //[[Cmd4.g -- do not touch]]
 						    ;
 
 //procedure: ident expression* -> ^(ASTPROCEDURE expression*);

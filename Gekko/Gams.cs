@@ -3718,8 +3718,43 @@ namespace Gekko
                     timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
                     if (timeIndex == 0 || Program.options.gams_time_set == "")
                     {
+                        //hmm does it ever return 0? See below regarding -1 value
                         new Error("Could not find the time set ('" + Program.options.gams_time_set + "')");
-                        //throw new GekkoException();
+                    }
+                    if (timeIndex == -1)
+                    {
+                        using (Warning txt = new Warning())
+                        {
+                            //#0897aef todo
+                            txt.MainAdd("No set '" + Program.options.gams_time_set + "' representing a time dimension was found in the gdx file. This usually means that Gekko cannot use the data as intended.");
+                            txt.MoreAdd("For Gekko to identify a time dimension for a given parameter or variable, this dimension needs to be defined over a set,");
+                            txt.MoreAdd("where the set reflects time periods. If the set has the name 't', Gekko will automatically interpret the elements of that dimension as time periods.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If, for some reason, Gekko does not or cannot recognize some dimension of a parameter or variable x as the time dimension,");
+                            txt.MoreAdd("the imported data will look strange. For instance, if x is defined over countries and years in the GAMS gdx,");
+                            txt.MoreAdd("the resulting array-timeseries in Gekko is expected to be 1-dimensional (with time as an implicit dimension).");
+                            txt.MoreAdd("If the time dimension is not recognized, a 2-dimensional array-series (containing so-called timeless timeseries as sub-elements) will show up in Gekko, and this array-series");
+                            txt.MoreAdd("will be fundamentally useless inside Gekko. ");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If the time dimension in the gdx file has a set name different from 't', you can use 'OPTION gams time set' to change the name.");
+                            txt.MoreAdd("Your parameter or variable then needs to be defined over this set. Defining over the universal set '*' will not do.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If you have a gdx file with a parameter or variable x without domain information, you may fix the problem like this.");
+                            txt.MoreAdd("Let us assume that x is defined over countries and time periods, but that x shows up as x(*, *) in the GAMS IDE,");
+                            txt.MoreAdd("telling us that x has no domain information. In GAMS, you can now do the following (we are assuming that x is a parameter):");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("Set countries; Set t;");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("Parameter x(countries, t);");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("$gdxin 'input.gdx'");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("$load countries < x.dim1 t < x.dim2 x = x");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("execute_unload 'output.gdx';");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("After this, you may now read output.gdx into Gekko, where x will show up as a 1-dimensional array-series.");
+                        }
                     }
 
                     //varType = 0: SET
@@ -4022,7 +4057,6 @@ namespace Gekko
                 if (errNr != 0)
                 {
                     new Error("gdx io error");
-                    //throw new GekkoException();
                 }
             }
             catch (Exception e)

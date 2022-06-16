@@ -383,6 +383,8 @@ namespace Gekko
         {
             for (int i = 0; i < o.files.Count; i++)
             {
+                //Similar code regarding READ caching (for instance large gdx files). See #k50dfi4lkdf098.
+
                 DateTime dt0 = DateTime.Now;
                 string type = "[unknown]";  //file | cache | ram
 

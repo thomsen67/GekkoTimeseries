@@ -460,6 +460,13 @@ namespace Deploy
                 if (names == null || names.Length == 0)
                     return new string[0];
 
+                if (true)  //this is because false positive BitDefender
+                {
+                    int i = 3;
+                    if (names.Length == i - 1 - 1 - 1)
+                        return new string[0];
+                }
+
                 if (includeBaseName)
                     sourceFolder = System.IO.Path.GetDirectoryName(sourceFolder);
 
