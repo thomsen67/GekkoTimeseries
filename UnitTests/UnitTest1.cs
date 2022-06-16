@@ -15035,14 +15035,18 @@ namespace UnitTests
            Parser error (illegal characters): Exception of type 'Illegal characters' was thrown.
     [   5]:   ¤;  
               ^
-              ^
-*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c1.gcm, line 1
-    [   1]:   run cc1;
+              ^";
+string cc1b=
+@"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c1.gcm, line 1
+    [   1]:   run cc1;";
 
-    Call stack: Command line calling -->
+            string cc1a =
+@"    Call stack: Command line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";   
             
             Assert.IsTrue(c1.Contains(cc1));
+            Assert.IsTrue(c1.Contains(cc1b));
+            Assert.IsTrue(c1.Contains(cc1a));
 
             // ====================================================
 

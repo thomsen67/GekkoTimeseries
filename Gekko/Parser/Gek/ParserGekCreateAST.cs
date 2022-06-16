@@ -1546,8 +1546,7 @@ namespace Gekko.Parser.Gek
                     G.Writeln(line2, Color.Blue);
 
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-
+                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);                    
                 }
 
                 if (paranthesesError != "") G.Writeln(paranthesesError);
@@ -1559,7 +1558,16 @@ namespace Gekko.Parser.Gek
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
-            
+
+            using (Note txt = new Note())
+            {
+                txt.MainAdd("Illegal chars/symbols encountered, beware of non-matching quotes.");
+                txt.MoreAdd("Quotes like ' or \" can trigger these kinds of errors. But they may also");
+                txt.MoreAdd("stem from 'funny' characters/symbols, like '€' or '½' etc.");
+                txt.MoreAdd("The hardest cases are characters that show up as blanks, but are in reality some other code. This mostly happens while copy-pasting code.");
+                txt.MoreNewLine();
+                txt.MoreAdd("The best thing to do is to start checking if quotes ' and \" match up. If so, you can perhaps run the commands line by line to find the offending character/symbol.");
+            }
         }
 
         /// <summary>
