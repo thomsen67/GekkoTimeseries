@@ -14,6 +14,12 @@ using System.Reflection.Emit;
 
 namespace Gekko.Parser.Gek
 {
+    public class LexerAndParserErrors
+    {
+        public List<string> lexerErrors = null;
+        public List<string> parserErrors = null;
+    }
+
     /// <summary>
     /// This class is used to parse commands and create an ASTtree, and walk it.There is a similar class for model files.
     /// </summary>
@@ -31,14 +37,26 @@ namespace Gekko.Parser.Gek
 
         public static ConvertHelper ParseAndCallWalkAndEmit(ParseHelper ph, P p)
         {            
-            ph.isNotDebugMode = true;
+            ph.isDebugMode = false;
             ph.syntaxType = EParserType.Normal;
             ph.nicerErrors = true;
 
             ConvertHelper parseOutput;
             string textWithExtraLines;
             CommonTree t;
-            ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
+            LexerAndParserErrors lexerAndParserErrors = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
+
+            if (lexerAndParserErrors.lexerErrors != null)
+            {
+                string input2 = ph.commandsText + "\r\n";
+                HandleCommandLexerErrors(lexerAndParserErrors.lexerErrors, Stringlist.CreateListOfStringsFromFile(input2), ph);
+                throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+            }
+            else if (lexerAndParserErrors.parserErrors != null)
+            {
+                HandleCommandParserErrors(lexerAndParserErrors.parserErrors, Stringlist.CreateListOfStringsFromFile(ph.commandsText), ph);                
+                throw new GekkoException();
+            }
 
             if (Globals.printAST)
             {
@@ -137,8 +155,9 @@ namespace Gekko.Parser.Gek
             return parseOutput;
         }
 
-        private static void ParseAndSyntaxErrors(out ConvertHelper ch2, out string textInput, out CommonTree t, ParseHelper ph)
+        private static LexerAndParserErrors ParseAndSyntaxErrors(out ConvertHelper ch2, out string textInput, out CommonTree t, ParseHelper ph)
         {
+            LexerAndParserErrors lexerAndParserErrors = new LexerAndParserErrors();
             ch2 = new ConvertHelper();
             textInput = ph.commandsText + "\r\n" + "\r\n";
             ANTLRStringStream input = new ANTLRStringStream(textInput);
@@ -150,12 +169,12 @@ namespace Gekko.Parser.Gek
             Cmd4Parser parser4 = null;
             Cmd4Lexer lexer4 = null;
 
-            if (ph.isNotDebugMode) lexer3 = new Cmd3Lexer(input);
+            if (!ph.isDebugMode) lexer3 = new Cmd3Lexer(input);
             else lexer4 = new Cmd4Lexer(input);
-
-            //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
+            
             if (Globals.runningOnTTComputer && Globals.debugTokens)
             {
+                //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
                 ParserCommon.DebugTokens(lexer3, lexer4);
             }
 
@@ -168,7 +187,7 @@ namespace Gekko.Parser.Gek
             Cmd4Parser.startB_return r4B = null;
             Cmd4Parser.startC_return r4C = null;
 
-            if (ph.isNotDebugMode)
+            if (!ph.isDebugMode)
             {
                 tokens3 = new CommonTokenStream(lexer3);
                 parser3 = new Cmd3Parser(tokens3);
@@ -183,17 +202,17 @@ namespace Gekko.Parser.Gek
             {
                 if (ph.syntaxType == EParserType.Normal)
                 {
-                    if (ph.isNotDebugMode) r3 = parser3.start();
+                    if (!ph.isDebugMode) r3 = parser3.start();
                     else r4 = parser4.start();
                 }
                 else if (ph.syntaxType == EParserType.OnlyAssignment)
                 {
-                    if (ph.isNotDebugMode) r3B = parser3.startB();
+                    if (!ph.isDebugMode) r3B = parser3.startB();
                     else r4B = parser4.startB();
                 }
                 else if (ph.syntaxType == EParserType.OnlyProcedureCallEtc)
                 {
-                    if (ph.isNotDebugMode) r3C = parser3.startC();
+                    if (!ph.isDebugMode) r3C = parser3.startC();
                     else r4C = parser4.startC();
                 }
                 else new Error("Parser types");
@@ -202,36 +221,38 @@ namespace Gekko.Parser.Gek
             {
                 List<string> temp = new List<string>();
                 temp.Add(e.Message);
-                string input2 = textInput + "\r\n";
-                HandleCommandLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
-                throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+                lexerAndParserErrors.lexerErrors = temp;
+                return lexerAndParserErrors;
             }
 
             List<string> parserErrors = null;
-            if (ph.isNotDebugMode) parserErrors = parser3.GetErrors();
+            if (!ph.isDebugMode) parserErrors = parser3.GetErrors();
             else parserErrors = parser4.GetErrors();
+
             if (parserErrors.Count > 0)
             {
-                HandleCommandParserErrors(parserErrors, Stringlist.CreateListOfStringsFromFile(textInput), ph);
-                throw new GekkoException();
+                lexerAndParserErrors.parserErrors = parserErrors;
+                return lexerAndParserErrors;
             }
 
             if (ph.syntaxType == EParserType.Normal)
             {
-                if (ph.isNotDebugMode) t = (CommonTree)r3.Tree;
+                if (!ph.isDebugMode) t = (CommonTree)r3.Tree;
                 else t = (CommonTree)r4.Tree;
             }
             else if (ph.syntaxType == EParserType.OnlyAssignment)
             {
-                if (ph.isNotDebugMode) t = (CommonTree)r3B.Tree;
+                if (!ph.isDebugMode) t = (CommonTree)r3B.Tree;
                 else t = (CommonTree)r4B.Tree;
             }
             else if (ph.syntaxType == EParserType.OnlyProcedureCallEtc)
             {
-                if (ph.isNotDebugMode) t = (CommonTree)r3C.Tree;
+                if (!ph.isDebugMode) t = (CommonTree)r3C.Tree;
                 else t = (CommonTree)r4C.Tree;
             }
             else new Error("Parser types");
+
+            return lexerAndParserErrors;
         }
 
         /// <summary>
