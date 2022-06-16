@@ -87,6 +87,7 @@ namespace Gekko
         public int interface_csv_pdec = 100;        
         public string interface_debug = "dialog";  //or "none"  
         public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
+        public string interface_errors = "normal";  // old | normal
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;        
@@ -344,7 +345,8 @@ namespace Gekko
             Add("INTERFACE CSV PDEC", Globals.xint);
             Add("INTERFACE DEBUG", Globals.xnameOrString, "none", "dialog");
             Add("INTERFACE EDIT STYLE", Globals.xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");
-            Add("INTERFACE EXCEL LANGUAGE", Globals.xnameOrString, "danish", "english");
+            Add("INTERFACE ERRORS", Globals.xnameOrString, "old", "normal");
+            Add("INTERFACE EXCEL LANGUAGE", Globals.xnameOrString, "danish", "english");            
             Add("INTERFACE EXCEL MODERNLOOK", Globals.xbool);
             Add("INTERFACE HELP COPYLOCAL", Globals.xbool);
             Add("INTERFACE MODE", Globals.xnameOrString, "mixed", "sim", "data");

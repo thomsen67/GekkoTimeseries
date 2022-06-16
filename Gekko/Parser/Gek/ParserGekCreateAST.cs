@@ -45,7 +45,8 @@ namespace Gekko.Parser.Gek
         {            
             ph.isDebugMode = false;
             ph.syntaxType = EParserType.Normal;
-            ph.nicerErrors = true;
+            ph.nicerErrors = false;
+            if (G.Equal(Program.options.interface_errors, "normal")) ph.nicerErrors = true;
 
             ConvertHelper parseOutput; string textWithExtraLines; CommonTree t;
             LexerAndParserErrors lexerAndParserErrors = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
@@ -107,6 +108,8 @@ namespace Gekko.Parser.Gek
                         bool startFor = false;
                         bool startIf = false;
                         ParseHelper ph7 = ph.Clone();
+                        ph7.isDebugMode = true;
+
                         string s7 = sta7.text.Trim();
                         string s7a = s7;
 
