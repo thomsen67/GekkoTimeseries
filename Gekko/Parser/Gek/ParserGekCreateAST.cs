@@ -60,6 +60,11 @@ namespace Gekko.Parser.Gek
             {
                 if (ph.nicerErrors)
                 {
+                    //TODO
+                    //TODO
+                    //TODO
+                    //TODO
+                    //TODO
 
                     string txt = ph.commandsText;
                     var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
@@ -98,16 +103,44 @@ namespace Gekko.Parser.Gek
                     statements2.Add(sta);
                     
                     foreach (Statement sta7 in statements2)
-                    {
+                    {                        
+                        bool startFor = false;
+                        bool startIf = false;
                         ParseHelper ph7 = ph.Clone();
-                        ph7.commandsText = sta7.text;
+                        string s7 = sta7.text.Trim();
+                        string s7a = s7;
+
+                        TokenHelper firstWord = null;
+                        foreach (TokenHelper th in sta7.tokens)
+                        {
+                            if (th.type == ETokenType.Word)
+                            {
+                                firstWord = th;
+                                break;
+                            }
+                        }
+
+                        TokenHelper next = firstWord.SiblingAfter(1, true);
+                        if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
+
+                        if (G.Equal(firstWord.s, "for"))
+                        {
+                            startFor = true;
+                            s7 += "end;";
+                        }
+                        else if (G.Equal(firstWord.s, "if"))
+                        {
+                            startIf = true;
+                            s7 += "end;";
+                        }
+                        ph7.commandsText = s7;
                         ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
-                        LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
+                        LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);                        
                         if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                         {
-                            foreach (string s7 in lexerAndParserErrors7.parserErrors)
+                            foreach (string ss7 in lexerAndParserErrors7.parserErrors)
                             {
-                                new Writeln(sta7.text + " --> " + s7);
+                                new Writeln(s7a + " --> " + ss7);
                             }                            
                         }
                     }

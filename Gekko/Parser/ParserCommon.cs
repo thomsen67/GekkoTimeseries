@@ -47,7 +47,7 @@ namespace Gekko.Parser
         public string libraryName = null;
         public bool isDebugMode = true;
         public Gek.ParserGekCreateAST.EParserType syntaxType = Gek.ParserGekCreateAST.EParserType.Normal;
-        public bool nicerErrors = true;
+        public bool nicerErrors = false;
         public ParseHelper Clone()
         {
             ParseHelper ph = new ParseHelper();
