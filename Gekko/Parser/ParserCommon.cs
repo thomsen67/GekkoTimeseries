@@ -48,6 +48,19 @@ namespace Gekko.Parser
         public bool isDebugMode = true;
         public Gek.ParserGekCreateAST.EParserType syntaxType = Gek.ParserGekCreateAST.EParserType.Normal;
         public bool nicerErrors = true;
+        public ParseHelper Clone()
+        {
+            ParseHelper ph = new ParseHelper();
+            ph.isOneLinerFromGui = this.isOneLinerFromGui;
+            ph.commandsText = this.commandsText;
+            ph.fileName = this.fileName;
+            ph.isModel = this.isModel;
+            ph.libraryName = this.libraryName;
+            ph.isDebugMode = this.isDebugMode;
+            ph.syntaxType = this.syntaxType;
+            ph.nicerErrors = this.nicerErrors;
+            return ph;
+        }
     }
 
     public class ConvertHelper

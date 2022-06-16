@@ -14,6 +14,12 @@ using System.Reflection.Emit;
 
 namespace Gekko.Parser.Gek
 {
+    public class Statement
+    {
+        public List<TokenHelper> tokens = null;
+        public string text = null;
+    }
+
     public class LexerAndParserErrors
     {
         public List<string> lexerErrors = null;
@@ -41,9 +47,7 @@ namespace Gekko.Parser.Gek
             ph.syntaxType = EParserType.Normal;
             ph.nicerErrors = true;
 
-            ConvertHelper parseOutput;
-            string textWithExtraLines;
-            CommonTree t;
+            ConvertHelper parseOutput; string textWithExtraLines; CommonTree t;
             LexerAndParserErrors lexerAndParserErrors = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
 
             if (lexerAndParserErrors.lexerErrors != null)
@@ -54,7 +58,64 @@ namespace Gekko.Parser.Gek
             }
             else if (lexerAndParserErrors.parserErrors != null)
             {
-                HandleCommandParserErrors(lexerAndParserErrors.parserErrors, Stringlist.CreateListOfStringsFromFile(ph.commandsText), ph);                
+                if (ph.nicerErrors)
+                {
+
+                    string txt = ph.commandsText;
+                    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                    var tags2 = new List<string>() { "//" };
+                    TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);                    
+                    StringBuilder rv = new StringBuilder();
+                    List<Statement> statements2 = new List<Statement>();
+                    List<TokenHelper> statement = new List<TokenHelper>();
+                    int n_paren = 0; int n_bracket = 0; int n_curly = 0;
+                    List<string> comments = new List<string>();
+                    Statement sta = null;
+                    foreach (TokenHelper tok in tokens2.subnodes.storage)
+                    {
+                        if (tok.s == "(") n_paren++;
+                        else if (tok.s == ")") n_paren--;
+                        else if (tok.s == "[") n_bracket++;
+                        else if (tok.s == "]") n_bracket--;
+                        else if (tok.s == "{") n_curly++;
+                        else if (tok.s == "}") n_curly--;
+                        if (n_paren < 0) comments.Add(tok.LineAndPosText() + ": superfluous ')' encountered ");
+                        if (n_bracket < 0) comments.Add(tok.LineAndPosText() + ": superfluous ']' encountered ");
+                        if (n_curly < 0) comments.Add(tok.LineAndPosText() + ": superfluous '}' encountered ");
+
+                        statement.Add(tok);
+                        if (tok.s == ";")  // && (n_paren == 0 && n_bracket == 0 && n_curly == 0))
+                        {
+                            //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.
+                            sta = new Statement();
+                            sta.tokens = statement;
+                            sta.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement, true);
+                            statements2.Add(sta);
+                            statement = new List<TokenHelper>();
+                            n_paren = 0; n_bracket = 0; n_curly = 0;  //reset
+                        }
+                    }
+                    statements2.Add(sta);
+                    
+                    foreach (Statement sta7 in statements2)
+                    {
+                        ParseHelper ph7 = ph.Clone();
+                        ph7.commandsText = sta7.text;
+                        ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
+                        LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
+                        if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
+                        {
+                            foreach (string s7 in lexerAndParserErrors7.parserErrors)
+                            {
+                                new Writeln(sta7.text + " --> " + s7);
+                            }                            
+                        }
+                    }
+                }
+                else
+                {
+                    HandleCommandParserErrors(lexerAndParserErrors.parserErrors, Stringlist.CreateListOfStringsFromFile(ph.commandsText), ph);
+                }
                 throw new GekkoException();
             }
 
