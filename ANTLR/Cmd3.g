@@ -2122,7 +2122,7 @@ d.Add("Y" ,Y);
 
                                 public override void ReportError(RecognitionException e) {
                                   string hdr = GetErrorHeader(e);
-                                  string msg = "Cmd lexer error: " + e.Message;
+                                  string msg = "Parser error (illegal characters): " + e.Message;
                                   throw new Exception(e.Line + "¤" + e.CharPositionInLine + "¤" + hdr + "¤" + msg);
                                 }
 

@@ -15032,7 +15032,7 @@ namespace UnitTests
             //-------------------------------------------------------------------------------
             string cc1 =
 @"*** ERROR: Parsing file: c:\Thomas\Gekko\regres\StackTrace\cc1.gcm line 5 pos 1
-           Cmd lexer error: Exception of type 'Antlr.Runtime.NoViableAltException' was thrown.
+           Parser error (illegal characters): Exception of type 'Illegal characters' was thrown.
     [   5]:   ¤;  
               ^
               ^

@@ -30,120 +30,20 @@ namespace Gekko.Parser.Gek
         }
 
         public static ConvertHelper ParseAndCallWalkAndEmit(ParseHelper ph, P p)
-        {
-            //standard
-            bool parserCmd3 = true;
-            EParserType syntaxType = EParserType.Normal;
+        {            
+            ph.isNotDebugMode = true;
+            ph.syntaxType = EParserType.Normal;
+            ph.nicerErrors = true;
 
-            if (false)
-            {
-                //used for nested loops etc, but does not cover assignments and nakes funcs/procedures
-                parserCmd3 = false;
-                syntaxType = EParserType.Normal;
-            }
-
-            ConvertHelper ch2 = new ConvertHelper();
-
-            string textInput = ph.commandsText + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
-            
-            ANTLRStringStream input = new ANTLRStringStream(textInput);
-
-            List<string> errors = null;
-            CommonTree t = null;
-
-            if (Globals.printAST) G.Writeln2(ph.commandsText, Color.Green);
-            Cmd3Parser parser3 = null;
-            Cmd3Lexer lexer3 = null;
-            Cmd4Parser parser4 = null;
-            Cmd4Lexer lexer4 = null;
-
-            if (parserCmd3) lexer3 = new Cmd3Lexer(input);
-            else lexer4 = new Cmd4Lexer(input);
-
-            //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
-            if (Globals.runningOnTTComputer && Globals.debugTokens)
-            {
-                ParserCommon.DebugTokens(lexer3, lexer4);
-            }
-
-            CommonTokenStream tokens3 = null;
-            CommonTokenStream tokens4 = null;
-            Cmd3Parser.start_return r3 = null;
-            Cmd3Parser.startB_return r3B = null;
-            Cmd3Parser.startC_return r3C = null;
-            Cmd4Parser.start_return r4 = null;
-            Cmd4Parser.startB_return r4B = null;
-            Cmd4Parser.startC_return r4C = null;
-
-            if (parserCmd3)
-            {
-                tokens3 = new CommonTokenStream(lexer3);
-                parser3 = new Cmd3Parser(tokens3);
-            }
-            else
-            {
-                tokens4 = new CommonTokenStream(lexer4);
-                parser4 = new Cmd4Parser(tokens4);
-            }            
-
-            try
-            {
-                if (syntaxType == EParserType.Normal)
-                {
-                    if (parserCmd3) r3 = parser3.start();
-                    else r4 = parser4.start();
-                }
-                else if (syntaxType == EParserType.OnlyAssignment)
-                {
-                    if (parserCmd3) r3B = parser3.startB();
-                    else r4B = parser4.startB();
-                }
-                else if (syntaxType == EParserType.OnlyProcedureCallEtc)
-                {
-                    if (parserCmd3) r3C = parser3.startC();
-                    else r4C = parser4.startC();
-                }
-                else new Error("Parser types");
-            }
-            catch (Exception e)
-            {                
-                List<string> temp = new List<string>();
-                temp.Add(e.Message);
-                string input2 = textInput + "\r\n";
-                HandleCommandLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
-                throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
-            }
-
-            List<string> lexerErrors = null;
-            if (parserCmd3) lexerErrors = parser3.GetErrors();
-            else lexerErrors = parser4.GetErrors();
-            if (lexerErrors.Count > 0)
-            {
-                HandleCommandParserErrors(lexerErrors, Stringlist.CreateListOfStringsFromFile(textInput), ph);
-                throw new GekkoException();
-            }
-
-            if (syntaxType == EParserType.Normal)
-            {
-                if(parserCmd3) t = (CommonTree)r3.Tree;
-                else t = (CommonTree)r4.Tree;
-            }
-            else if (syntaxType == EParserType.OnlyAssignment)
-            {
-                if (parserCmd3) t = (CommonTree)r3B.Tree;
-                else t = (CommonTree)r4B.Tree;
-            }
-            else if (syntaxType == EParserType.OnlyProcedureCallEtc)
-            {
-                if (parserCmd3) t = (CommonTree)r3C.Tree;
-                else t = (CommonTree)r4C.Tree;
-            }
-            else new Error("Parser types");
+            ConvertHelper parseOutput;
+            string textWithExtraLines;
+            CommonTree t;
+            ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph);
 
             if (Globals.printAST)
             {
                 PrintAST(t, 0);
-            }                      
+            }
 
             GekkoStringBuilder s = new GekkoStringBuilder();
             W wh2 = new W();
@@ -164,10 +64,10 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-            
+
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root, 0);                        
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root, 0);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textWithExtraLines, wh2, p);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
             //PrintAST2(root, 0);
@@ -203,7 +103,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
             s2.AppendLine("namespace Gekko");
             s2.AppendLine("{");
-            
+
             s2.AppendLine("public class TranslatedCode");
             s2.AppendLine("{");
 
@@ -220,21 +120,118 @@ namespace Gekko.Parser.Gek
             s2.AppendLine(Globals.gekkoSmplInit);
             //The generated code, but much of it may be in codeCi
             s2.AppendLine(csCode);
-            
+
             s2.AppendLine("}");  //method CodeLines()
             s2.AppendLine("}");  //class TranslatedCode
             s2.AppendLine("}");  //namespace Gekko            
 
-            ch2.code = s2.ToString().Replace("`", Globals.QT).Replace(Globals.smpl, "smpl");
+            parseOutput.code = s2.ToString().Replace("`", Globals.QT).Replace(Globals.smpl, "smpl");
 
-            ch2.errors = errors;  //not used?
-            
+            //parseOutput.errors = errors;  //not used?
+
             if (Globals.printAST)
-            {                
-                G.Writeln(ch2.code);
+            {
+                G.Writeln(parseOutput.code);
             }
 
-            return ch2;
+            return parseOutput;
+        }
+
+        private static void ParseAndSyntaxErrors(out ConvertHelper ch2, out string textInput, out CommonTree t, ParseHelper ph)
+        {
+            ch2 = new ConvertHelper();
+            textInput = ph.commandsText + "\r\n" + "\r\n";
+            ANTLRStringStream input = new ANTLRStringStream(textInput);
+            
+            t = null;
+            if (Globals.printAST) G.Writeln2(ph.commandsText, Color.Green);
+            Cmd3Parser parser3 = null;
+            Cmd3Lexer lexer3 = null;
+            Cmd4Parser parser4 = null;
+            Cmd4Lexer lexer4 = null;
+
+            if (ph.isNotDebugMode) lexer3 = new Cmd3Lexer(input);
+            else lexer4 = new Cmd4Lexer(input);
+
+            //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
+            if (Globals.runningOnTTComputer && Globals.debugTokens)
+            {
+                ParserCommon.DebugTokens(lexer3, lexer4);
+            }
+
+            CommonTokenStream tokens3 = null;
+            CommonTokenStream tokens4 = null;
+            Cmd3Parser.start_return r3 = null;
+            Cmd3Parser.startB_return r3B = null;
+            Cmd3Parser.startC_return r3C = null;
+            Cmd4Parser.start_return r4 = null;
+            Cmd4Parser.startB_return r4B = null;
+            Cmd4Parser.startC_return r4C = null;
+
+            if (ph.isNotDebugMode)
+            {
+                tokens3 = new CommonTokenStream(lexer3);
+                parser3 = new Cmd3Parser(tokens3);
+            }
+            else
+            {
+                tokens4 = new CommonTokenStream(lexer4);
+                parser4 = new Cmd4Parser(tokens4);
+            }
+
+            try
+            {
+                if (ph.syntaxType == EParserType.Normal)
+                {
+                    if (ph.isNotDebugMode) r3 = parser3.start();
+                    else r4 = parser4.start();
+                }
+                else if (ph.syntaxType == EParserType.OnlyAssignment)
+                {
+                    if (ph.isNotDebugMode) r3B = parser3.startB();
+                    else r4B = parser4.startB();
+                }
+                else if (ph.syntaxType == EParserType.OnlyProcedureCallEtc)
+                {
+                    if (ph.isNotDebugMode) r3C = parser3.startC();
+                    else r4C = parser4.startC();
+                }
+                else new Error("Parser types");
+            }
+            catch (Exception e)
+            {
+                List<string> temp = new List<string>();
+                temp.Add(e.Message);
+                string input2 = textInput + "\r\n";
+                HandleCommandLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
+                throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+            }
+
+            List<string> parserErrors = null;
+            if (ph.isNotDebugMode) parserErrors = parser3.GetErrors();
+            else parserErrors = parser4.GetErrors();
+            if (parserErrors.Count > 0)
+            {
+                HandleCommandParserErrors(parserErrors, Stringlist.CreateListOfStringsFromFile(textInput), ph);
+                throw new GekkoException();
+            }
+
+            if (ph.syntaxType == EParserType.Normal)
+            {
+                if (ph.isNotDebugMode) t = (CommonTree)r3.Tree;
+                else t = (CommonTree)r4.Tree;
+            }
+            else if (ph.syntaxType == EParserType.OnlyAssignment)
+            {
+                if (ph.isNotDebugMode) t = (CommonTree)r3B.Tree;
+                else t = (CommonTree)r4B.Tree;
+            }
+            else if (ph.syntaxType == EParserType.OnlyProcedureCallEtc)
+            {
+                if (ph.isNotDebugMode) t = (CommonTree)r3C.Tree;
+                else t = (CommonTree)r4C.Tree;
+            }
+            else new Error("Parser types");
         }
 
         /// <summary>
@@ -1442,7 +1439,6 @@ namespace Gekko.Parser.Gek
                 catch (Exception e)
                 {
                     new Error("The parser stumbled unexpectedly with the message: " + s);
-                    //throw new GekkoException();
                 }
                 int lineNo = lineNumber + 1;  //1-based
                 int positionNo = -12345;
@@ -1453,19 +1449,18 @@ namespace Gekko.Parser.Gek
                 catch (Exception e)
                 {
                     new Error("The parser stumbled unexpectedly with the message: " + s);
-                    //throw new GekkoException();
                 }
 
                 string errorMessage = ss[3];
 
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
+                errorMessage = errorMessage.Replace("Antlr.Runtime.NoViableAltException", "Illegal characters"); //easier to understand
 
                 if (lineNo > inputFileLines.Count)
                 {
                     {
                         new Error(errorMessage, false);
                     }
-
                     continue;  //doesn't give meaning
                 }
                 string line = inputFileLines[lineNo - 1];
@@ -1543,7 +1538,7 @@ namespace Gekko.Parser.Gek
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
-
+            
         }
 
         /// <summary>

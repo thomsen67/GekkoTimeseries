@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2022-06-16 11:58:47
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2022-06-16 14:50:15
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -2041,7 +2041,7 @@ public partial class Cmd3Lexer : Lexer {
 
                                     public override void ReportError(RecognitionException e) {
                                       string hdr = GetErrorHeader(e);
-                                      string msg = "Cmd lexer error: " + e.Message;
+                                      string msg = "Parser error (illegal characters): " + e.Message;
                                       throw new Exception(e.Line + "¤" + e.CharPositionInLine + "¤" + hdr + "¤" + msg);
                                     }
 

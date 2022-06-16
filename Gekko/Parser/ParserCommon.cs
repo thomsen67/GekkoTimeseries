@@ -45,13 +45,15 @@ namespace Gekko.Parser
         public string fileName = null;
         public bool isModel = false;
         public string libraryName = null;
+        public bool isNotDebugMode = true;
+        public Gek.ParserGekCreateAST.EParserType syntaxType = Gek.ParserGekCreateAST.EParserType.Normal;
+        public bool nicerErrors = true;
     }
 
     public class ConvertHelper
     {
         public string code;
-        public List<string> errors;
+        //public List<string> errors;
         public string commandsText;
-        //public string codeUFunctions;        
     }
 }
