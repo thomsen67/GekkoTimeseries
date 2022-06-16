@@ -18,6 +18,7 @@ namespace Gekko.Parser.Gek
     {
         public List<TokenHelper> tokens = null;
         public string text = null;
+        public int type = 2;  //0 normal 1 series 2 naked func procedure. Set to 2 to start out because it is hardest to determine (we test for 0 or 1)
     }
 
     public class LexerAndParserErrors
@@ -70,21 +71,38 @@ namespace Gekko.Parser.Gek
                     string txt = ph.commandsText;
                     var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
                     var tags2 = new List<string>() { "//" };
-                    TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);                    
+                    //TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);                    
+                    TokenList tokens2 = StringTokenizer.GetTokensWithLeftBlanks(txt, 0, tags1, tags2, null, null);
                     StringBuilder rv = new StringBuilder();
                     List<Statement> statements2 = new List<Statement>();
                     List<TokenHelper> statement = new List<TokenHelper>();
                     int n_paren = 0; int n_bracket = 0; int n_curly = 0;
                     List<string> comments = new List<string>();
                     Statement sta = null;
-                    foreach (TokenHelper tok in tokens2.subnodes.storage)
+                    int type = 2;
+                    int i = -1;
+                    bool isInsideOptionField = false;
+                    foreach (TokenHelper tok in tokens2.storage)
                     {
+                        i++;                        
                         if (tok.s == "(") n_paren++;
                         else if (tok.s == ")") n_paren--;
                         else if (tok.s == "[") n_bracket++;
                         else if (tok.s == "]") n_bracket--;
                         else if (tok.s == "{") n_curly++;
                         else if (tok.s == "}") n_curly--;
+                        else if (tok.s == "<")
+                        {
+                            if (i == 1) isInsideOptionField = true;
+                        }
+                        else if (tok.s == ">")
+                        {
+                            isInsideOptionField = false;
+                        }
+                        else if (tok.s == "=" && tok.SiblingAfter(1, true) != null && tok.SiblingAfter(1, true).s != "=")
+                        {
+                            if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) type = 1;
+                        }
                         if (n_paren < 0) comments.Add(tok.LineAndPosText() + ": superfluous ')' encountered ");
                         if (n_bracket < 0) comments.Add(tok.LineAndPosText() + ": superfluous ']' encountered ");
                         if (n_curly < 0) comments.Add(tok.LineAndPosText() + ": superfluous '}' encountered ");
@@ -94,6 +112,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.
                             sta = new Statement();
+                            sta.type = type;
                             sta.tokens = statement;
                             sta.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement, true);
                             statements2.Add(sta);
@@ -101,7 +120,7 @@ namespace Gekko.Parser.Gek
                             n_paren = 0; n_bracket = 0; n_curly = 0;  //reset
                         }
                     }
-                    statements2.Add(sta);
+                    //statements2.Add(sta);
                     
                     foreach (Statement sta7 in statements2)
                     {                        
@@ -123,6 +142,8 @@ namespace Gekko.Parser.Gek
                             }
                         }
 
+                        if (Globals.commandNames.Contains(firstWord.s.ToUpper())) sta7.type = 0;
+
                         TokenHelper next = firstWord.SiblingAfter(1, true);
                         if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
 
@@ -137,13 +158,23 @@ namespace Gekko.Parser.Gek
                             s7 += "end;";
                         }
                         ph7.commandsText = s7;
+                        ph7.syntaxType = EParserType.Normal;
+                        if (sta7.type == 1) ph7.syntaxType = EParserType.OnlyAssignment;
+                        else if (sta7.type == 2) ph7.syntaxType = EParserType.OnlyProcedureCallEtc;
                         ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
                         LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);                        
                         if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                         {
                             foreach (string ss7 in lexerAndParserErrors7.parserErrors)
                             {
-                                new Writeln(s7a + " --> " + ss7);
+                                int lineNumber, positionNumber;
+                                string errorMessage, fileName;
+                                ExtractParserErrorLineAndPos(ss7, ph7.fileName, out lineNumber, out positionNumber, out errorMessage, out fileName);
+                                new Writeln(s7a + " --> type " + ph7.syntaxType + " fn " + fileName + " line " + lineNumber + " pos " + positionNumber + " error: " + errorMessage);
+                                foreach (string comment in comments)
+                                {
+                                    new Writeln(comment);
+                                }
                             }                            
                         }
                     }
@@ -1688,30 +1719,12 @@ namespace Gekko.Parser.Gek
                 {
                     if (number == 1) G.Writeln();
                     G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
-                    //G.Writeln();
                 }
                 else G.Writeln();
-
-                string[] ss = s.Split(Globals.parserErrorSeparator);
-                int lineNumberTemp = 0;
-                int lineNumber = 0;
-                int positionNo = 0;
-                string errorMessage = "General error";
-                string fileName = null;
-
-                try
-                {
-                    lineNumberTemp = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
-                    lineNumber = lineNumberTemp + 1;  //1-based
-                    positionNo = int.Parse(ss[1]) + 1;  //1-based                               
-                    errorMessage = ss[3];
-                    fileName = ph.fileName;
-                    Program.CorrectLineNumber(ref fileName, ref lineNumber);
-                }
-                catch
-                {
-
-                }
+                
+                int lineNumber, positionNumber;
+                string errorMessage, fileName;
+                ExtractParserErrorLineAndPos(s, ph.fileName, out lineNumber, out positionNumber, out errorMessage, out fileName);
 
                 errorMessage = G.ReplaceGlueSymbols(errorMessage);
 
@@ -1758,7 +1771,7 @@ namespace Gekko.Parser.Gek
                         errorMessage += G.NL + "  For each FOR or IF, an";
                         errorMessage += G.NL + "  END is expected.";
                     }
-                    
+
                 }
 
 
@@ -1781,7 +1794,7 @@ namespace Gekko.Parser.Gek
 
                 if (true)
                 {
-                    if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
+                    if (positionNumber == firstWordPosInLine && errorMessage.Contains("no viable"))
                     {
                         //get preceding line (or really: statement) -- most probably the culprit.
                         previousLineProbablyCulprit = true;
@@ -1799,9 +1812,9 @@ namespace Gekko.Parser.Gek
                         {
                             string fn = fileName;
                             string extra = "";
-                            if (lineNumber >= 1 && positionNo > 0)
+                            if (lineNumber >= 1 && positionNumber > 0)
                             {
-                                extra = " line " + lineNumber + " pos " + positionNo;
+                                extra = " line " + lineNumber + " pos " + positionNumber;
                             }
 
                             if (fn == null || fn == "")
@@ -1816,15 +1829,15 @@ namespace Gekko.Parser.Gek
                         }
                         else
                         {
-                            if (positionNo > 0)
+                            if (positionNumber > 0)
                             {
-                                G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
+                                G.Writeln("*** ERROR: Parsing pos " + positionNumber + ":  " + errorMessage);
                             }
                             else G.Writeln("*** ERROR: " + errorMessage);
                         }
                         line = line + "  ";  //hack to avoid ending problems.....
 
-                        if (positionNo - 1 >= 0)
+                        if (positionNumber - 1 >= 0)
                         {
                             string lineTemp = line;
                             if (lineTemp != null && lineTemp != "")
@@ -1839,9 +1852,9 @@ namespace Gekko.Parser.Gek
                             string line0 = "";
                             string line1 = "";
                             string line2 = "";
-                            try { line0 = lineTemp.Substring(0, positionNo - 1); } catch { };
-                            try { line1 = lineTemp.Substring(positionNo - 1, 1); } catch { };
-                            try { line2 = lineTemp.Substring(positionNo - 1 + 1); } catch { };
+                            try { line0 = lineTemp.Substring(0, positionNumber - 1); } catch { };
+                            try { line1 = lineTemp.Substring(positionNumber - 1, 1); } catch { };
+                            try { line2 = lineTemp.Substring(positionNumber - 1 + 1); } catch { };
 
                             if (previousLineProbablyCulprit && lineNumber > 1)
                             {
@@ -1854,8 +1867,8 @@ namespace Gekko.Parser.Gek
                             G.Write(line1, Color.Red);
                             G.Writeln(line2, Color.Blue);
 
-                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                            G.Writeln(G.Blanks(positionNumber - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                            G.Writeln(G.Blanks(positionNumber - 1 + 4 + 5 + 5) + "^", Color.Blue);
 
                             CheckForBadDouble(lineTemp);
                         }
@@ -1871,7 +1884,30 @@ namespace Gekko.Parser.Gek
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
 
         }
-        
+
+        private static void ExtractParserErrorLineAndPos(string s, string fileName2, out int lineNumber, out int positionNo, out string errorMessage, out string fileName)
+        {
+            string[] ss = s.Split(Globals.parserErrorSeparator);
+            int lineNumberTemp = 0;
+            lineNumber = 0;
+            positionNo = 0;
+            errorMessage = "General error";
+            fileName = null;
+            try
+            {
+                lineNumberTemp = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
+                lineNumber = lineNumberTemp + 1;  //1-based
+                positionNo = int.Parse(ss[1]) + 1;  //1-based                               
+                errorMessage = ss[3];
+                fileName = fileName2;
+                Program.CorrectLineNumber(ref fileName, ref lineNumber);
+            }
+            catch
+            {
+
+            }
+        }
+
         private static void CheckForBadDouble(string lineTemp)
         {
             string xx = G.ReplaceGlueSymbols(lineTemp.Trim());
