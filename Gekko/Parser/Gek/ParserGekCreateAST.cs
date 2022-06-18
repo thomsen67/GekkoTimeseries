@@ -17,7 +17,10 @@ namespace Gekko.Parser.Gek
     
     public class Statement
     {
-        public List<TokenHelper> tokens = null;
+        public List<TokenHelper> tokens = new List<TokenHelper>();
+        public List<int?> paren_parentheses = new List<int?>();
+        public List<int?> paren_brackets = new List<int?>();
+        public List<int?> paren_curlies = new List<int?>();
         public string text = null;
         public int type = 2;  //0 normal 1 series 2 naked func procedure. Set to 2 to start out because it is hardest to determine (we test for 0 or 1)
     }
@@ -69,74 +72,117 @@ namespace Gekko.Parser.Gek
                     //TODO
                     //TODO
 
-                    string txt = ph.commandsText;
-                    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-                    var tags2 = new List<string>() { "//" };
-                    //TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);                    
-                    TokenList tokens2 = StringTokenizer.GetTokensWithLeftBlanks(txt, 0, tags1, tags2, null, null);
-                    StringBuilder rv = new StringBuilder();
-                    List<Statement> statements2 = new List<Statement>();
-                    List<TokenHelper> statement = new List<TokenHelper>();
-                    int n_paren = 0; int n_bracket = 0; int n_curly = 0;
-                    List<string> comments = new List<string>();
-                    Statement sta = null;
-                    int type = 2;
-                    int i = -1;
-                    bool isInsideOptionField = false;
-                    foreach (TokenHelper tok in tokens2.storage)
-                    {
-                        i++;                        
-                        if (tok.s == "(") n_paren++;
-                        else if (tok.s == ")") n_paren--;
-                        else if (tok.s == "[") n_bracket++;
-                        else if (tok.s == "]") n_bracket--;
-                        else if (tok.s == "{") n_curly++;
-                        else if (tok.s == "}") n_curly--;
-                        else if (tok.s == "<")
-                        {
-                            if (i == 1) isInsideOptionField = true;
-                        }
-                        else if (tok.s == ">")
-                        {
-                            isInsideOptionField = false;
-                        }
-                        else if (tok.s == "=" && tok.SiblingAfter(1, true) != null && tok.SiblingAfter(1, true).s != "=")
-                        {
-                            if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) type = 1;
-                        }
-                        if (n_paren < 0) comments.Add(tok.LineAndPosText() + ": superfluous ')' encountered ");
-                        if (n_bracket < 0) comments.Add(tok.LineAndPosText() + ": superfluous ']' encountered ");
-                        if (n_curly < 0) comments.Add(tok.LineAndPosText() + ": superfluous '}' encountered ");
+                    List<Statement> statements = new List<Statement>();
 
-                        statement.Add(tok);
-                        if (tok.s == ";")  // && (n_paren == 0 && n_bracket == 0 && n_curly == 0))
+                    if (true)
+                    {
+                        string txt = ph.commandsText;
+                        var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                        var tags2 = new List<string>() { "//" };
+                        //TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);                    
+                        TokenList tokens2 = StringTokenizer.GetTokensWithLeftBlanks(txt, 0, tags1, tags2, null, null);
+                        StringBuilder rv = new StringBuilder();
+                        
+                        int n_paren = 0; int n_bracket = 0; int n_curly = 0;
+                        List<string> comments = new List<string>();
+                        Statement statement = new Statement();
+
+                        statement.type = 2;
+                        int i = -1;
+                        bool isInsideOptionField = false;
+                        foreach (TokenHelper tok in tokens2.storage)
                         {
-                            //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.
-                            sta = new Statement();
-                            sta.type = type;
-                            sta.tokens = statement;
-                            sta.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement, true);
-                            statements2.Add(sta);
-                            statement = new List<TokenHelper>();
-                            n_paren = 0; n_bracket = 0; n_curly = 0;  //reset
+                            i++;
+                            if (tok.s == "(")
+                            {
+                                n_paren++;
+                                statement.paren_parentheses.Add(n_paren);
+                            }
+                            else if (tok.s == ")")
+                            {
+                                n_paren--;
+                                statement.paren_parentheses.Add(n_paren);
+                            }
+                            else
+                            {
+                                statement.paren_parentheses.Add(null);
+                            }
+
+                            if (tok.s == "[")
+                            {
+                                n_bracket++;
+                                statement.paren_brackets.Add(n_bracket);
+                            }
+                            else if (tok.s == "]")
+                            {
+                                n_bracket--;
+                                statement.paren_brackets.Add(n_bracket);
+                            }
+                            else
+                            {
+                                statement.paren_brackets.Add(null);
+                            }
+
+                            if (tok.s == "{")
+                            {
+                                n_curly++;
+                                statement.paren_curlies.Add(n_curly);
+                            }
+                            else if (tok.s == "}")
+                            {
+                                n_curly--;
+                                statement.paren_curlies.Add(n_curly);
+                            }
+                            else
+                            {
+                                statement.paren_curlies.Add(null);
+                            }
+
+                            if (tok.s == "<")
+                            {
+                                if (i == 1) isInsideOptionField = true;
+                            }
+                            else if (tok.s == ">")
+                            {
+                                //will not handle a logical < or > inside an option field, but these do not exist anyway
+                                isInsideOptionField = false;
+                            }
+
+                            if (tok.s == "=" && tok.SiblingAfter(1, true) != null && tok.SiblingAfter(1, true).s != "=")
+                            {
+                                if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) statement.type = 1;
+                            }
+
+                            statement.tokens.Add(tok);
+
+                            if (tok.s == ";")  // && (n_paren == 0 && n_bracket == 0 && n_curly == 0))
+                            {
+                                //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.                                                        
+                                statement.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement.tokens, true);
+                                statements.Add(statement);
+                                //
+                                //reset
+                                //
+                                n_paren = 0; n_bracket = 0; n_curly = 0;  //reset                            
+                                statement = new Statement();  //ready for the next
+                            }
                         }
                     }
-                    //statements2.Add(sta);
 
-                    for (int ii = 0; ii < statements2.Count; ii++)
+                    for (int ii = 0; ii < statements.Count; ii++)
                     {
-                        Statement sta7 = statements2[ii];
+                        Statement statement = statements[ii];
                         bool startFor = false;
                         bool startIf = false;
                         ParseHelper ph7 = ph.Clone();
                         ph7.isDebugMode = true;
 
-                        string s7 = sta7.text.Trim();
+                        string s7 = statement.text.Trim();
                         string s7a = s7;
 
                         TokenHelper firstWord = null;
                         TokenHelper next = null;
-                        foreach (TokenHelper th in sta7.tokens)
+                        foreach (TokenHelper th in statement.tokens)
                         {
                             if (firstWord != null && next == null && (th.type != ETokenType.Comment))
                             {
@@ -149,7 +195,7 @@ namespace Gekko.Parser.Gek
                             }
                         }
 
-                        if (Globals.commandNames.Contains(firstWord.s.ToUpper())) sta7.type = 0;
+                        if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = 0;
 
                         if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
 
@@ -165,12 +211,48 @@ namespace Gekko.Parser.Gek
                         }
                         ph7.commandsText = s7;
                         ph7.syntaxType = EParserType.Normal;
-                        if (sta7.type == 1) ph7.syntaxType = EParserType.OnlyAssignment;
-                        else if (sta7.type == 2) ph7.syntaxType = EParserType.OnlyProcedureCallEtc;
+                        if (statement.type == 1) ph7.syntaxType = EParserType.OnlyAssignment;
+                        else if (statement.type == 2) ph7.syntaxType = EParserType.OnlyProcedureCallEtc;
+
                         ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
                         LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);
+
                         if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
-                        {                            
+                        {
+                            List<string> pErrors = new List<string>();
+                            int last_parenthesis = 0;
+                            int last_bracket = 0;
+                            int last_curly = 0;
+                            for (int i7 = 0; i7 < statement.tokens.Count; i7++)
+                            {
+                                if (statement.paren_parentheses[i7] != null) last_parenthesis = (int)statement.paren_parentheses[i7];
+                                if (statement.paren_brackets[i7] != null) last_bracket = (int)statement.paren_brackets[i7];
+                                if (statement.paren_curlies[i7] != null) last_curly = (int)statement.paren_curlies[i7];
+
+                                if (statement.paren_parentheses[i7] != null && statement.paren_parentheses[i7] < 0)
+                                {
+                                    pErrors.Add("Extraneous ')' at line " + statement.tokens[i7].line + " pos " + statement.tokens[i7].column);
+                                }
+
+                                if (statement.paren_brackets[i7] != null && statement.paren_brackets[i7] < 0)
+                                {
+                                    pErrors.Add("Extraneous ']' at line " + statement.tokens[i7].line + " pos " + statement.tokens[i7].column);
+                                }
+
+                                if (statement.paren_curlies[i7] != null && statement.paren_curlies[i7] < 0)
+                                {
+                                    pErrors.Add("Extraneous '}' at line " + statement.tokens[i7].line + " pos " + statement.tokens[i7].column);
+                                }                                
+                            }
+                            if (last_parenthesis > 0) pErrors.Add("Missing " + last_parenthesis + " ')' in statement");
+                            if (last_bracket > 0) pErrors.Add("Missing " + last_bracket + " ']' in statement");
+                            if (last_curly > 0) pErrors.Add("Missing " + last_curly + " '}' in statement");
+
+                            foreach (string ss7 in pErrors)
+                            {
+                                G.Writeln("--- " + ss7, Color.Red);
+                            }
+
                             foreach (string ss7 in lexerAndParserErrors7.parserErrors)
                             {
                                 int lineNumber, positionNumber;
@@ -178,7 +260,7 @@ namespace Gekko.Parser.Gek
                                 ExtractParserErrorLineAndPos(ss7, ph7.fileName, out lineNumber, out positionNumber, out errorMessage, out fileName);
                                 
                                 List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
-                                int line7 = sta7.tokens[0].line + lineNumber - 1;
+                                int line7 = statement.tokens[0].line + lineNumber - 1;
                                 if (ph.isOneLinerFromGui) line7--;
                                 string lineText = text[line7];
                                 string lineString = "[" + line7.ToString() + "]: ";
@@ -190,10 +272,6 @@ namespace Gekko.Parser.Gek
 
                                 //new Writeln(s7a + " --> type " + ph7.syntaxType + " fn " + fileName + " line " + lineNumber + " pos " + positionNumber + " error: " + errorMessage);
 
-                                foreach (string comment in comments)
-                                {
-                                    new Writeln(comment);
-                                }
                             }
                         }
                     }
