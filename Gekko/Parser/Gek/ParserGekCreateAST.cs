@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 
 namespace Gekko.Parser.Gek
 {
+    
     public class Statement
     {
         public List<TokenHelper> tokens = null;
@@ -121,9 +122,10 @@ namespace Gekko.Parser.Gek
                         }
                     }
                     //statements2.Add(sta);
-                    
-                    foreach (Statement sta7 in statements2)
-                    {                        
+
+                    for (int ii = 0; ii < statements2.Count; ii++)
+                    {
+                        Statement sta7 = statements2[ii];
                         bool startFor = false;
                         bool startIf = false;
                         ParseHelper ph7 = ph.Clone();
@@ -133,18 +135,22 @@ namespace Gekko.Parser.Gek
                         string s7a = s7;
 
                         TokenHelper firstWord = null;
+                        TokenHelper next = null;
                         foreach (TokenHelper th in sta7.tokens)
                         {
-                            if (th.type == ETokenType.Word)
+                            if (firstWord != null && next == null && (th.type != ETokenType.Comment))
+                            {
+                                next = th;
+                                break;
+                            }
+                            if (firstWord == null && th.type == ETokenType.Word)
                             {
                                 firstWord = th;
-                                break;
                             }
                         }
 
                         if (Globals.commandNames.Contains(firstWord.s.ToUpper())) sta7.type = 0;
 
-                        TokenHelper next = firstWord.SiblingAfter(1, true);
                         if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
 
                         if (G.Equal(firstWord.s, "for"))
@@ -162,20 +168,33 @@ namespace Gekko.Parser.Gek
                         if (sta7.type == 1) ph7.syntaxType = EParserType.OnlyAssignment;
                         else if (sta7.type == 2) ph7.syntaxType = EParserType.OnlyProcedureCallEtc;
                         ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
-                        LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);                        
+                        LexerAndParserErrors lexerAndParserErrors7 = ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);
                         if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
-                        {
+                        {                            
                             foreach (string ss7 in lexerAndParserErrors7.parserErrors)
                             {
                                 int lineNumber, positionNumber;
                                 string errorMessage, fileName;
                                 ExtractParserErrorLineAndPos(ss7, ph7.fileName, out lineNumber, out positionNumber, out errorMessage, out fileName);
-                                new Writeln(s7a + " --> type " + ph7.syntaxType + " fn " + fileName + " line " + lineNumber + " pos " + positionNumber + " error: " + errorMessage);
+                                
+                                List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
+                                int line7 = sta7.tokens[0].line + lineNumber - 1;
+                                if (ph.isOneLinerFromGui) line7--;
+                                string lineText = text[line7];
+                                string lineString = "[" + line7.ToString() + "]: ";
+
+                                G.Writeln("");
+                                G.Writeln(errorMessage, Color.Red, true);                                
+                                G.Writeln(lineString + lineText, Color.Red, true);                                
+                                G.Writeln(G.Blanks(lineString.Length) + G.Blanks(positionNumber - 1) + "^", Color.Red, true);
+
+                                //new Writeln(s7a + " --> type " + ph7.syntaxType + " fn " + fileName + " line " + lineNumber + " pos " + positionNumber + " error: " + errorMessage);
+
                                 foreach (string comment in comments)
                                 {
                                     new Writeln(comment);
                                 }
-                            }                            
+                            }
                         }
                     }
                 }
