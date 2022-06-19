@@ -18,6 +18,13 @@ namespace Gekko.Parser.Gek
         public List<string> parserErrors = null;
     }
 
+    public class ErrorHelper
+    {
+        public List<string> errors = null;
+        public string oneLineOfText = null;
+        //public string start = null;        
+    }
+
     /// <summary>
     /// Gathers error info on 1 Gekko statement
     /// </summary>
@@ -31,7 +38,7 @@ namespace Gekko.Parser.Gek
         public List<string> parenthesisErrors2 = new List<string>();             //assigned to statement
         public string text = null;
         public int type = 2;  //0 normal 1 series 2 naked func procedure. Set to 2 to start out because it is hardest to determine (we test for 0 or 1)
-        public SortedDictionary<long, List<string>> errors = null;
+        public SortedDictionary<long, ErrorHelper> errors = null;
     }
 
     /// <summary>
@@ -51,6 +58,8 @@ namespace Gekko.Parser.Gek
         public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements)
         {
             int numberOfErroneousStatementsShownInDetail = 100;
+
+            List<string> originalText = Stringlist.ExtractLinesFromText(ph.commandsText);
 
             List<Statement> statements = GetStatements(ph);
 
@@ -100,7 +109,7 @@ namespace Gekko.Parser.Gek
 
                 if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                 {
-                    statement.errors = ErrorsFromOneStatement(ph, errorStatements, statement, ph7, lexerAndParserErrors7);                    
+                    statement.errors = GetErrorsFromOneStatement(ph, errorStatements, statement, ph7, lexerAndParserErrors7);                    
                 }
             } //end loop over statements
 
@@ -118,7 +127,7 @@ namespace Gekko.Parser.Gek
                     counter++;
                     if (counter > numberOfErroneousStatementsShownInDetail) break;
                     SortedDictionary<int, string> split = new SortedDictionary<int, string>();  //relevant lines for multi-line errors
-                    foreach (KeyValuePair<long, List<string>> kvp in statement.errors)
+                    foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                     {
                         int line = (int)(kvp.Key / (long)1e9);
                         if (!split.ContainsKey(line)) split.Add(line, null);
@@ -126,23 +135,31 @@ namespace Gekko.Parser.Gek
 
                     foreach (int line2 in split.Keys)
                     {
-                        string start = "[" + line2 + "]: ";
+                        int line = 0;
+                        string text = null;
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
+                        {
+                            text = kvp.Value.oneLineOfText;
+                            line = (int)(kvp.Key / (long)1e9);
+                            break;
+                        }
+                        string start = "[" + line + "]: ";                        
                         string start2 = G.Blanks(start.Length);
-                        G.Writeln(start + statement.text, Color.Red);
+                        G.Writeln(start + originalText[line2 - 1], Color.Red);
                         int used = 0; int errorCounter = 0;
-                        foreach (KeyValuePair<long, List<string>> kvp in statement.errors)
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
                             errorCounter++;
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
-                            if (errorCounter == 1) G.Write(start2);
+                            if (errorCounter == 1) G.Write(start2);                            
                             G.Write(G.Blanks(col - 1 - used) + "|", Color.Red);
                             used = col - 1 - 1;
                         }
                         G.Writeln("", Color.Red, true);
                         used = 0; errorCounter = 0;
-                        foreach (KeyValuePair<long, List<string>> kvp in statement.errors)
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
                             errorCounter++;
                             int ln = (int)(kvp.Key / (long)1e9);
@@ -155,13 +172,13 @@ namespace Gekko.Parser.Gek
                         }
                         G.Writeln("", Color.Red, true);
                         errorCounter = 0;
-                        foreach (KeyValuePair<long, List<string>> kvp in statement.errors)
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
                             errorCounter++;
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
-                            foreach (string s in kvp.Value)
+                            foreach (string s in kvp.Value.errors)
                             {
                                 char letter = (char)(65 + errorCounter - 1);
                                 G.Write(letter + " --> ");
@@ -170,14 +187,14 @@ namespace Gekko.Parser.Gek
                         }                        
                     }
 
-                    if (false)
+                    if (true)
                     {
                         G.Writeln();
-                        foreach (KeyValuePair<long, List<string>> kvp in statement.errors)
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
                             int line = (int)(kvp.Key / (long)1e9);
                             int pos = (int)(kvp.Key % (long)1e9);
-                            foreach (string s8 in kvp.Value)
+                            foreach (string s8 in kvp.Value.errors)
                             {
                                 G.Writeln("ln " + line + " col " + pos + ": " + s8);
                             }
@@ -192,14 +209,16 @@ namespace Gekko.Parser.Gek
         }
 
         /// <summary>
-        /// Assembles error messages from 1 Gekko statement with syntax errors (statement may run several lines)
+        /// Assembles error messages from 1 Gekko statement with syntax errors (statement may run over several lines).
+        /// It returns a dictionary where the keys point to the exact position, and the values are a list of errors
+        /// for that exact position (coordinate). After each error, with a "¤", the statement is glued on, too.
         /// </summary>
         /// <param name="ph"></param>
         /// <param name="errorStatements"></param>
         /// <param name="statement"></param>
         /// <param name="ph7"></param>
         /// <param name="lexerAndParserErrors7"></param>
-        private static SortedDictionary<long, List<string>> ErrorsFromOneStatement(ParseHelper ph, int errorStatements, Statement statement, ParseHelper ph7, LexerAndParserErrors lexerAndParserErrors7)
+        private static SortedDictionary<long, ErrorHelper> GetErrorsFromOneStatement(ParseHelper ph, int errorStatements, Statement statement, ParseHelper ph7, LexerAndParserErrors lexerAndParserErrors7)
         {
             int last_parenthesis = 0;
             int last_bracket = 0;
@@ -235,16 +254,28 @@ namespace Gekko.Parser.Gek
             if (last_bracket > 0) statement.parenthesisErrors2.Add("missing " + last_bracket + " ']' in statement");
             if (last_curly > 0) statement.parenthesisErrors2.Add("missing " + last_curly + " '}' in statement");
 
-            SortedDictionary<long, List<string>> errors = new SortedDictionary<long, List<string>>();
+            SortedDictionary<long, ErrorHelper> errors = new SortedDictionary<long, ErrorHelper>();
 
             for (int i7 = 0; i7 < statement.tokens.Count; i7++)
             {
                 if (statement.parenthesisErrors[i7].Count > 0)
                 {
+                    int ln; string lineText;
+                    AdjustLine(ph, 1, statement.tokens[i7].line, out ln, out lineText);
+
                     long n = (long)1e9 * statement.tokens[i7].line + statement.tokens[i7].column;
-                    List<string> errorsn = null; errors.TryGetValue(n, out errorsn);
-                    if (errorsn != null) errorsn.AddRange(statement.parenthesisErrors[i7]);
-                    else errors.Add(n, statement.parenthesisErrors[i7]);
+                    ErrorHelper errorsn = null; errors.TryGetValue(n, out errorsn);
+                    if (errorsn != null)
+                    {
+                        errorsn.errors.AddRange(statement.parenthesisErrors[i7]);
+                    }
+                    else
+                    {
+                        ErrorHelper e = new ErrorHelper();
+                        e.errors = statement.parenthesisErrors[i7];
+                        e.oneLineOfText = lineText;
+                        errors.Add(n, e);
+                    }
                 }
             }
 
@@ -254,26 +285,37 @@ namespace Gekko.Parser.Gek
                 string errorMessage, fileName;
                 ParserGekCreateAST.ExtractParserErrorLineAndPos(ss7, ph7.fileName, out lineNumber, out col, out errorMessage, out fileName);
 
-                List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
-                int ln = statement.tokens[0].line + lineNumber - 1 + 1;
-                if (ph.isOneLinerFromGui) ln += -1;
-                string lineText = text[ln - 1];
-                string lineString = "[" + ln.ToString() + "]: ";
+                int ln; string lineText;
+                AdjustLine(ph, statement.tokens[0].line, lineNumber, out ln, out lineText);                
 
                 bool show = false;
                 if (errorStatements == int.MaxValue) show = true;
 
                 long n = (long)1e9 * ln + col;
-                List<string> errorsn = null; errors.TryGetValue(n, out errorsn);
-                if (errorsn != null) errorsn.Add(errorMessage);
-                else errors.Add(n, new List<string>() { errorMessage });
-
-                //new Writeln(s7a + " --> type " + ph7.syntaxType + " fn " + fileName + " line " + lineNumber + " pos " + positionNumber + " error: " + errorMessage);
-
+                ErrorHelper errorsn = null; errors.TryGetValue(n, out errorsn);
+                if (errorsn != null)
+                {
+                    errorsn.errors.Add(errorMessage);
+                }
+                else
+                {
+                    ErrorHelper e = new ErrorHelper();
+                    e.errors = new List<string>() { errorMessage };
+                    e.oneLineOfText = lineText;
+                    errors.Add(n, e);
+                }
             }
 
             return errors;
             
+        }
+
+        private static void AdjustLine(ParseHelper ph, int line0, int lineNumber, out int ln, out string lineText)
+        {
+            List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
+            ln = line0 + lineNumber - 1;
+            if (ph.isOneLinerFromGui) ln += -1;
+            lineText = "[" + ln.ToString() + "]: " + text[ln - 1];
         }
 
         private static List<Statement> GetStatements(ParseHelper ph)
