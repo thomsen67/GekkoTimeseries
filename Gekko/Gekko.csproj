@@ -386,6 +386,7 @@
     <Compile Include="Parser\Gek\ParserGekCommon.cs" />
     <Compile Include="Parser\Gek\ParserGekCompileAndRunAST.cs" />
     <Compile Include="Parser\Gek\ParserGekCreateAST.cs" />
+    <Compile Include="Parser\Gek\ParserGekErrors.cs" />
     <Compile Include="Parser\Gek\ParserGekWalkASTAndEmit.cs" />
     <Compile Include="Parser\ParserCommon.cs" />
     <Compile Include="Plot.cs" />
