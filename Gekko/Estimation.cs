@@ -74,7 +74,6 @@ namespace Gekko
             if (lhs_series == null)
             {
                 new Error("Left-hand side should be a SERIES");
-                //throw new GekkoException();
             }
 
             //bool useScale = false; //usually true
@@ -130,7 +129,6 @@ namespace Gekko
                 if (cols != m + 1)
                 {
                     new Error("The impose matrix has " + cols + " cols, expected " + (m + 1));
-                    //throw new GekkoException();
                 }
 
                 restrict_input = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling

@@ -55,10 +55,9 @@ namespace Gekko.Parser.Gek
         /// <param name="textWithExtraLines"></param>
         /// <param name="t"></param>
         /// <param name="errorStatements"></param>
-        public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements)
-        {
-            int numberOfErroneousStatementsShownInDetail = 100;
-            bool showLetters = true;
+        public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements, int numberOfErroneousStatementsShownInDetail)
+        {            
+            bool showLetters = false;
             bool condense = true;
             if (!showLetters) condense = true;
 
@@ -117,7 +116,7 @@ namespace Gekko.Parser.Gek
 
             //TODO infinite line length + show both on screen and in pipe
             //TODO infinite line length + show both on screen and in pipe
-            //TODO infinite line length + show both on screen and in pipe
+            //TODO infinite line length + show both on screen and in pipe, and fix problem with glue chars.
             //TODO infinite line length + show both on screen and in pipe
             //TODO infinite line length + show both on screen and in pipe
             G.Writeln2("*** ERROR: Syntax errors encountered in file '" + ph.fileName + "'");
@@ -135,10 +134,11 @@ namespace Gekko.Parser.Gek
                         if (!split.ContainsKey(line)) split.Add(line, null);
                     }
 
+                    string start2 = null;
                     foreach (int line2 in split.Keys)
                     {                        
                         string start = "[" + line2 + "]: ";
-                        string start2 = G.Blanks(start.Length);
+                        start2 = G.Blanks(start.Length);
                         G.Writeln();
                         G.Writeln(start + originalText[line2 - 1]);
                         int cOld = 0; int errorCounter = 0;
@@ -158,7 +158,7 @@ namespace Gekko.Parser.Gek
                         }
                         G.Writeln(s1, Color.Red);
                         if (showLetters) G.Writeln(s2, Color.Red);
-                        G.Writeln();
+                        //G.Writeln();
                         errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {                            
@@ -177,7 +177,11 @@ namespace Gekko.Parser.Gek
                                 }
                                 error = error.Substring(0, error.Length - ". ".Length);
                                 if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(error);
-                                else s3 = "(^): " + G.FirstCharToUpper(error);
+                                else
+                                {
+                                    s3 = start2 + G.FirstCharToUpper(error);
+                                    //s3 = "(^): " + G.FirstCharToUpper(error);
+                                }
                                 if (!s3.EndsWith(".")) s3 = s3 + ".";
                                 G.Writeln(s3, Color.Red);
                             }
@@ -187,19 +191,31 @@ namespace Gekko.Parser.Gek
                                 {                                    
                                     string s3 = null;
                                     if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(s);
-                                    else s3 = "(^): " + G.FirstCharToUpper(s);
+                                    else
+                                    {
+                                        s3 = start2 + G.FirstCharToUpper(s);
+                                        //s3 = "(^): " + G.FirstCharToUpper(s);
+                                    }
                                     if (!s3.EndsWith(".")) s3 = s3 + ".";
                                     G.Writeln(s3, Color.Red);
                                 }
                             }
                         }                        
                     }
+                    string extra = null;
                     foreach (string s8 in statement.parenthesisErrors2)
                     {
-                        G.Writeln("(*): " + s8, Color.Red);
+                        extra += G.FirstCharToUpper(s8) + ". ";
+                        //G.Writeln("(*): General note: " + s8, Color.Red);
+                    }
+                    if (extra != null)
+                    {
+                        extra = extra.Substring(0, extra.Length - ". ".Length);
+                        if (!extra.EndsWith(".")) extra = extra + ".";
+                        G.Writeln(start2 + "[General note]: " + extra + ")", Color.Red);
                     }
 
-                    if (true)
+                    if (false)
                     {
                         G.Writeln();
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
@@ -217,6 +233,15 @@ namespace Gekko.Parser.Gek
                         }
                     }
                 }
+                if (numberOfErroneousStatementsShownInDetail == 1) break;
+            }
+            if (numberOfErroneousStatementsShownInDetail == 1 && statements.Count > 1)
+            {
+                Action<GAO> a = (gao) =>
+                {                    
+                    G.Writeln("HEJ");
+                };
+                G.Writeln2("There were " + (statements.Count - 1) + " more statements with errors " + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "  ");
             }
         }
 

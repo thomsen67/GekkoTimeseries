@@ -52,7 +52,7 @@ namespace Gekko.Parser.Gek
                 int errorStatements = 1;  //0 or 1 or max
                 if (ph.nicerErrors)
                 {
-                    ParserGekErrors.ErrorMessages(ph, ref parseOutput, ref textWithExtraLines, ref t, errorStatements);
+                    ParserGekErrors.ErrorMessages(ph, ref parseOutput, ref textWithExtraLines, ref t, errorStatements, 1);
                 }
                 else
                 {
