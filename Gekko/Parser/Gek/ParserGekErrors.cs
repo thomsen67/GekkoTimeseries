@@ -70,7 +70,7 @@ namespace Gekko.Parser.Gek
                 ParseHelper ph7 = ph.Clone();
                 ph7.isDebugMode = true;
 
-                string s7 = statement.text.Trim();
+                string s7 = statement.text;
                 string s7a = s7;
 
                 TokenHelper firstWord = null;
@@ -139,12 +139,16 @@ namespace Gekko.Parser.Gek
                         string text = null;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
+                            int ln = (int)(kvp.Key / (long)1e9);
+                            int col = (int)(kvp.Key % (long)1e9);
+                            if (ln != line2) continue;
                             text = kvp.Value.oneLineOfText;
                             line = (int)(kvp.Key / (long)1e9);
                             break;
                         }
                         string start = "[" + line + "]: ";                        
                         string start2 = G.Blanks(start.Length);
+                        G.Writeln();
                         G.Writeln(start + originalText[line2 - 1], Color.Red);
                         int used = 0; int errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
@@ -153,11 +157,12 @@ namespace Gekko.Parser.Gek
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
-                            if (errorCounter == 1) G.Write(start2);                            
-                            G.Write(G.Blanks(col - 1 - used) + "|", Color.Red);
-                            used = col - 1 - 1;
+                            if (errorCounter == 1) G.Write(start2);
+                            int c = col - 1 - used;
+                            G.Write(G.Blanks(c) + "^", Color.Red);
+                            used = c + 1;
                         }
-                        G.Writeln("", Color.Red, true);
+                        G.Writeln("");
                         used = 0; errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
@@ -166,11 +171,13 @@ namespace Gekko.Parser.Gek
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
                             if (errorCounter == 1) G.Write(start2);
-                            char letter = (char)(65 + errorCounter - 1);
+                            char letter = (char)(97 + errorCounter - 1);
+                            int c = col - 1 - used;
                             G.Write(G.Blanks(col - 1 - used) + letter, Color.Red);
-                            used = col - 1 - 1;
+                            used = c + 1;
                         }
-                        G.Writeln("", Color.Red, true);
+                        G.Writeln();
+                        G.Writeln();
                         errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {
@@ -180,9 +187,9 @@ namespace Gekko.Parser.Gek
                             if (ln != line2) continue;
                             foreach (string s in kvp.Value.errors)
                             {
-                                char letter = (char)(65 + errorCounter - 1);
-                                G.Write(letter + " --> ");
-                                G.Writeln(s);
+                                char letter = (char)(97 + errorCounter - 1);
+                                G.Write(letter + " -> ", Color.Red);
+                                G.Writeln(s, Color.Red);
                             }
                         }                        
                     }
@@ -315,7 +322,8 @@ namespace Gekko.Parser.Gek
             List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
             ln = line0 + lineNumber - 1;
             if (ph.isOneLinerFromGui) ln += -1;
-            lineText = "[" + ln.ToString() + "]: " + text[ln - 1];
+            //lineText = "[" + ln.ToString() + "]: " + text[ln - 1];
+            lineText = text[ln - 1];
         }
 
         private static List<Statement> GetStatements(ParseHelper ph)
