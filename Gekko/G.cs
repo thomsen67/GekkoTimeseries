@@ -3931,6 +3931,22 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Transforms for instance "the car is red" into "The car is red".
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string FirstCharToUpper(string input)
+        {
+            switch (input)
+            {
+                case null: new Error("Null string for FirstCharToUpper()"); break;
+                case "": new Error("Empty string for FirstCharToUpper()"); break;
+                default: return input[0].ToString().ToUpper() + input.Substring(1);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Converts e.g. "fxo" to "fXo" is a model is loaded (using casing of model)
         /// </summary>
         /// <param name="var">Input string</param>

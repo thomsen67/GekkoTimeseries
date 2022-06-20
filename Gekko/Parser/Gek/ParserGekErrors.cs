@@ -58,7 +58,9 @@ namespace Gekko.Parser.Gek
         public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements)
         {
             int numberOfErroneousStatementsShownInDetail = 100;
-            bool showLetters = false;
+            bool showLetters = true;
+            bool condense = true;
+            if (!showLetters) condense = true;
 
             List<string> originalText = Stringlist.ExtractLinesFromText(ph.commandsText);
 
@@ -72,7 +74,6 @@ namespace Gekko.Parser.Gek
                 ph7.isDebugMode = true;
 
                 string s7 = statement.text;
-                string s7a = s7;
 
                 TokenHelper firstWord = null;
                 TokenHelper next = null;
@@ -119,7 +120,7 @@ namespace Gekko.Parser.Gek
             //TODO infinite line length + show both on screen and in pipe
             //TODO infinite line length + show both on screen and in pipe
             //TODO infinite line length + show both on screen and in pipe
-
+            G.Writeln2("*** ERROR: Syntax errors encountered in file '" + ph.fileName + "'");
             int counter = 0;
             foreach (Statement statement in statements)
             {                          
@@ -135,49 +136,28 @@ namespace Gekko.Parser.Gek
                     }
 
                     foreach (int line2 in split.Keys)
-                    {
-                        //int ln = 0;
-                        //string text = null;
-                        //foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        //{
-                        //    ln = (int)(kvp.Key / (long)1e9);
-                        //    //int col = (int)(kvp.Key % (long)1e9);
-                        //    if (ln != line2) continue;
-                        //    text = kvp.Value.oneLineOfText;
-                        //    //line = (int)(kvp.Key / (long)1e9);
-                        //    break;
-                        //}
+                    {                        
                         string start = "[" + line2 + "]: ";
                         string start2 = G.Blanks(start.Length);
                         G.Writeln();
-                        G.Writeln(start + originalText[line2 - 1], Color.Red);
+                        G.Writeln(start + originalText[line2 - 1]);
                         int cOld = 0; int errorCounter = 0;
-                        G.Write(start2);
+                        string s1 = start2;
+                        string s2 = start2;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
                         {                            
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
                             errorCounter++;
-                            int c = col - 1 - cOld;
-                            G.Write(G.Blanks(c) + "^", Color.Red);
-                            cOld = col;
-                        }
-                        G.Writeln("");
-                        cOld = 0; errorCounter = 0;
-                        G.Write(start2);
-                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {                            
-                            int ln = (int)(kvp.Key / (long)1e9);
-                            int col = (int)(kvp.Key % (long)1e9);
-                            if (ln != line2) continue;
-                            errorCounter++;
-                            int c = col - 1 - cOld;
                             char letter = (char)(97 + errorCounter - 1);
-                            G.Write(G.Blanks(col - 1 - cOld) + letter, Color.Red);
+                            int c = col - 1 - cOld;                            
+                            s1 += G.Blanks(c) + "^";
+                            s2 += G.Blanks(c) + letter;
                             cOld = col;
                         }
-                        G.Writeln();
+                        G.Writeln(s1, Color.Red);
+                        if (showLetters) G.Writeln(s2, Color.Red);
                         G.Writeln();
                         errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
@@ -186,13 +166,37 @@ namespace Gekko.Parser.Gek
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
                             errorCounter++;
-                            foreach (string s in kvp.Value.errors)
+                            char letter = (char)(97 + errorCounter - 1);
+                            if (condense)
                             {
-                                char letter = (char)(97 + errorCounter - 1);
-                                G.Write(letter + " -> ", Color.Red);
-                                G.Writeln(s, Color.Red);
+                                string s3 = null;
+                                string error = null;
+                                foreach (string s in kvp.Value.errors)
+                                {
+                                    error += G.FirstCharToUpper(s) + ". ";
+                                }
+                                error = error.Substring(0, error.Length - ". ".Length);
+                                if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(error);
+                                else s3 = "(^): " + G.FirstCharToUpper(error);
+                                if (!s3.EndsWith(".")) s3 = s3 + ".";
+                                G.Writeln(s3, Color.Red);
+                            }
+                            else
+                            {
+                                foreach (string s in kvp.Value.errors)
+                                {                                    
+                                    string s3 = null;
+                                    if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(s);
+                                    else s3 = "(^): " + G.FirstCharToUpper(s);
+                                    if (!s3.EndsWith(".")) s3 = s3 + ".";
+                                    G.Writeln(s3, Color.Red);
+                                }
                             }
                         }                        
+                    }
+                    foreach (string s8 in statement.parenthesisErrors2)
+                    {
+                        G.Writeln("(*): " + s8, Color.Red);
                     }
 
                     if (true)
