@@ -21,7 +21,7 @@ namespace Gekko.Parser.Gek
     public class ErrorHelper
     {
         public List<string> errors = null;
-        public string oneLineOfText = null;
+        //public string oneLineOfText = null;
         //public string start = null;        
     }
 
@@ -58,6 +58,7 @@ namespace Gekko.Parser.Gek
         public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements)
         {
             int numberOfErroneousStatementsShownInDetail = 100;
+            bool showLetters = false;
 
             List<string> originalText = Stringlist.ExtractLinesFromText(ph.commandsText);
 
@@ -135,56 +136,56 @@ namespace Gekko.Parser.Gek
 
                     foreach (int line2 in split.Keys)
                     {
-                        int line = 0;
-                        string text = null;
-                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {
-                            int ln = (int)(kvp.Key / (long)1e9);
-                            int col = (int)(kvp.Key % (long)1e9);
-                            if (ln != line2) continue;
-                            text = kvp.Value.oneLineOfText;
-                            line = (int)(kvp.Key / (long)1e9);
-                            break;
-                        }
-                        string start = "[" + line + "]: ";                        
+                        //int ln = 0;
+                        //string text = null;
+                        //foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
+                        //{
+                        //    ln = (int)(kvp.Key / (long)1e9);
+                        //    //int col = (int)(kvp.Key % (long)1e9);
+                        //    if (ln != line2) continue;
+                        //    text = kvp.Value.oneLineOfText;
+                        //    //line = (int)(kvp.Key / (long)1e9);
+                        //    break;
+                        //}
+                        string start = "[" + line2 + "]: ";
                         string start2 = G.Blanks(start.Length);
                         G.Writeln();
                         G.Writeln(start + originalText[line2 - 1], Color.Red);
-                        int used = 0; int errorCounter = 0;
+                        int cOld = 0; int errorCounter = 0;
+                        G.Write(start2);
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {
-                            errorCounter++;
+                        {                            
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
-                            if (errorCounter == 1) G.Write(start2);
-                            int c = col - 1 - used;
+                            errorCounter++;
+                            int c = col - 1 - cOld;
                             G.Write(G.Blanks(c) + "^", Color.Red);
-                            used = c + 1;
+                            cOld = col;
                         }
                         G.Writeln("");
-                        used = 0; errorCounter = 0;
+                        cOld = 0; errorCounter = 0;
+                        G.Write(start2);
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {
-                            errorCounter++;
+                        {                            
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
-                            if (errorCounter == 1) G.Write(start2);
+                            errorCounter++;
+                            int c = col - 1 - cOld;
                             char letter = (char)(97 + errorCounter - 1);
-                            int c = col - 1 - used;
-                            G.Write(G.Blanks(col - 1 - used) + letter, Color.Red);
-                            used = c + 1;
+                            G.Write(G.Blanks(col - 1 - cOld) + letter, Color.Red);
+                            cOld = col;
                         }
                         G.Writeln();
                         G.Writeln();
                         errorCounter = 0;
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {
-                            errorCounter++;
+                        {                            
                             int ln = (int)(kvp.Key / (long)1e9);
                             int col = (int)(kvp.Key % (long)1e9);
                             if (ln != line2) continue;
+                            errorCounter++;
                             foreach (string s in kvp.Value.errors)
                             {
                                 char letter = (char)(97 + errorCounter - 1);
@@ -280,7 +281,7 @@ namespace Gekko.Parser.Gek
                     {
                         ErrorHelper e = new ErrorHelper();
                         e.errors = statement.parenthesisErrors[i7];
-                        e.oneLineOfText = lineText;
+                        //e.oneLineOfText = lineText;
                         errors.Add(n, e);
                     }
                 }
@@ -308,7 +309,7 @@ namespace Gekko.Parser.Gek
                 {
                     ErrorHelper e = new ErrorHelper();
                     e.errors = new List<string>() { errorMessage };
-                    e.oneLineOfText = lineText;
+                    //e.oneLineOfText = lineText;
                     errors.Add(n, e);
                 }
             }
