@@ -1594,7 +1594,7 @@ namespace Gekko
                     //throw new GekkoException();
                 }
             }
-            catch
+            catch (Exception e2)
             {
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
                 new Error("Problem with link", false);

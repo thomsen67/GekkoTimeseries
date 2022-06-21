@@ -54,15 +54,20 @@ namespace Gekko.Parser.Gek
                 throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
             }
             else if (lexerAndParserErrors.parserErrors != null)
-            {
-                int errorStatements = 1;  //0 or 1 or max
+            {                
                 if (ph.nicerErrors)
                 {
                     ErrorMessagesHelper helper = new ErrorMessagesHelper();
                     helper.parseOutput = parseOutput;
                     helper.textWithExtraLines = textWithExtraLines;
                     helper.t = t;
-                    ParserGekErrors.ErrorMessages(helper, ph, errorStatements);
+                    int nMax = 10;  //can be int.MaxValue
+                    bool fail = ParserGekErrors.ErrorMessages(helper, ph, nMax);
+                    if (fail)
+                    {
+                        //use old
+                        HandleCommandParserErrors(lexerAndParserErrors.parserErrors, Stringlist.CreateListOfStringsFromFile(ph.commandsText), ph);
+                    }
                 }
                 else
                 {
