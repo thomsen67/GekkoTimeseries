@@ -3603,16 +3603,13 @@ namespace Gekko
         /// <returns></returns>
         public static string ReplaceGlueSymbols(string s)
         {
-            //int length = s.Length;
-            //TODO:
-            //what about error position if glue stuff is removed?? Do some logic...
+            //See replacement in new errors: #9j5n34jererjn
             if (s == null) return s;
             s = s.Replace(Globals.symbolGlueChar2, "");
             s = s.Replace(Globals.symbolGlueChar3, "");
             s = s.Replace(Globals.symbolGlueChar4, "");
             s = s.Replace(Globals.symbolGlueChar5, "<");  //--> fixme, this is a workaround
-            s = s.Replace(Globals.symbolGlueChar6, "[");  //--> fixme, this is a workaround, #098523
-            s = s.Replace(Globals.symbolGlueChar6a, "["); //--> is this necessary?
+            s = s.Replace(Globals.symbolGlueChar6, "[");  //--> fixme, this is a workaround, #098523            
             s = s.Replace(Globals.symbolGlueChar7, "[");
             s = s.Replace(Globals.symbolGlueChar1.ToString(), "");  //must be after symbolGlueChar7
             

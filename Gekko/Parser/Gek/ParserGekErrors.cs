@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Antlr.Runtime;
 using Antlr.Runtime.Tree;
 using System.Drawing;
+using System.IO;
 
 namespace Gekko.Parser.Gek
 {
@@ -20,9 +21,7 @@ namespace Gekko.Parser.Gek
 
     public class ErrorHelper
     {
-        public List<string> errors = null;
-        //public string oneLineOfText = null;
-        //public string start = null;        
+        public List<string> errors = null;   
     }
 
     /// <summary>
@@ -38,7 +37,7 @@ namespace Gekko.Parser.Gek
         public List<string> parenthesisErrors2 = new List<string>();             //assigned to statement
         public string text = null;
         public int type = 2;  //0 normal 1 series 2 naked func procedure. Set to 2 to start out because it is hardest to determine (we test for 0 or 1)
-        public SortedDictionary<long, ErrorHelper> errors = null;
+        public SortedDictionary<long, ErrorHelper> errorDictionary = null;
     }
 
     /// <summary>
@@ -55,8 +54,8 @@ namespace Gekko.Parser.Gek
         /// <param name="textWithExtraLines"></param>
         /// <param name="t"></param>
         /// <param name="errorStatements"></param>
-        public static void ErrorMessages(ParseHelper ph, ref ConvertHelper parseOutput, ref string textWithExtraLines, ref CommonTree t, int errorStatements, int numberOfErroneousStatementsShownInDetail)
-        {            
+        public static void ErrorMessages(ErrorMessagesHelper helper, ParseHelper ph, int numberOfErroneousStatementsShownInDetail)
+        {
             bool showLetters = false;
             bool condense = true;
             if (!showLetters) condense = true;
@@ -66,7 +65,7 @@ namespace Gekko.Parser.Gek
             List<Statement> statements = GetStatements(ph);
 
             foreach (Statement statement in statements)
-            {                
+            {
                 bool startFor = false;
                 bool startIf = false;
                 ParseHelper ph7 = ph.Clone();
@@ -106,11 +105,11 @@ namespace Gekko.Parser.Gek
                 else if (statement.type == 2) ph7.syntaxType = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
 
                 ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
-                LexerAndParserErrors lexerAndParserErrors7 = ParserGekCreateAST.ParseAndSyntaxErrors(out parseOutput, out textWithExtraLines, out t, ph7);
+                LexerAndParserErrors lexerAndParserErrors7 = ParserGekCreateAST.ParseAndSyntaxErrors(out parseOutput7, out textWithExtraLines7, out t7, ph7);
 
                 if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                 {
-                    statement.errors = GetErrorsFromOneStatement(ph, errorStatements, statement, ph7, lexerAndParserErrors7);                    
+                    statement.errorDictionary = GetErrorsFromOneStatement(ph, numberOfErroneousStatementsShownInDetail, statement, ph7, lexerAndParserErrors7);
                 }
             } //end loop over statements
 
@@ -119,130 +118,259 @@ namespace Gekko.Parser.Gek
             //TODO infinite line length + show both on screen and in pipe, and fix problem with glue chars.
             //TODO infinite line length + show both on screen and in pipe
             //TODO infinite line length + show both on screen and in pipe
-            G.Writeln2("*** ERROR: Syntax errors encountered in file '" + ph.fileName + "'");
-            int counter = 0;
+
+            WritelnError("");
+
+            int n = 0;
             foreach (Statement statement in statements)
-            {                          
-                if (statement.errors != null)
+            {
+                if (statement.errorDictionary != null)
                 {
-                    counter++;
-                    if (counter > numberOfErroneousStatementsShownInDetail) break;
-                    SortedDictionary<int, string> split = new SortedDictionary<int, string>();  //relevant lines for multi-line errors
-                    foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                    {
-                        int line = (int)(kvp.Key / (long)1e9);
-                        if (!split.ContainsKey(line)) split.Add(line, null);
-                    }
+                    n++;
+                }
+            }
 
-                    string start2 = null;
-                    foreach (int line2 in split.Keys)
-                    {                        
-                        string start = "[" + line2 + "]: ";
-                        start2 = G.Blanks(start.Length);
-                        G.Writeln();
-                        G.Writeln(start + originalText[line2 - 1]);
-                        int cOld = 0; int errorCounter = 0;
-                        string s1 = start2;
-                        string s2 = start2;
-                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {                            
-                            int ln = (int)(kvp.Key / (long)1e9);
-                            int col = (int)(kvp.Key % (long)1e9);
-                            if (ln != line2) continue;
-                            errorCounter++;
-                            char letter = (char)(97 + errorCounter - 1);
-                            int c = col - 1 - cOld;                            
-                            s1 += G.Blanks(c) + "^";
-                            s2 += G.Blanks(c) + letter;
-                            cOld = col;
-                        }
-                        G.Writeln(s1, Color.Red);
-                        if (showLetters) G.Writeln(s2, Color.Red);
-                        //G.Writeln();
-                        errorCounter = 0;
-                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
-                        {                            
-                            int ln = (int)(kvp.Key / (long)1e9);
-                            int col = (int)(kvp.Key % (long)1e9);
-                            if (ln != line2) continue;
-                            errorCounter++;
-                            char letter = (char)(97 + errorCounter - 1);
-                            if (condense)
-                            {
-                                string s3 = null;
-                                string error = null;
-                                foreach (string s in kvp.Value.errors)
-                                {
-                                    error += G.FirstCharToUpper(s) + ". ";
-                                }
-                                error = error.Substring(0, error.Length - ". ".Length);
-                                if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(error);
-                                else
-                                {
-                                    s3 = start2 + G.FirstCharToUpper(error);
-                                    //s3 = "(^): " + G.FirstCharToUpper(error);
-                                }
-                                if (!s3.EndsWith(".")) s3 = s3 + ".";
-                                G.Writeln(s3, Color.Red);
-                            }
-                            else
-                            {
-                                foreach (string s in kvp.Value.errors)
-                                {                                    
-                                    string s3 = null;
-                                    if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(s);
-                                    else
-                                    {
-                                        s3 = start2 + G.FirstCharToUpper(s);
-                                        //s3 = "(^): " + G.FirstCharToUpper(s);
-                                    }
-                                    if (!s3.EndsWith(".")) s3 = s3 + ".";
-                                    G.Writeln(s3, Color.Red);
-                                }
-                            }
-                        }                        
-                    }
-                    string extra = null;
-                    foreach (string s8 in statement.parenthesisErrors2)
-                    {
-                        extra += G.FirstCharToUpper(s8) + ". ";
-                        //G.Writeln("(*): General note: " + s8, Color.Red);
-                    }
-                    if (extra != null)
-                    {
-                        extra = extra.Substring(0, extra.Length - ". ".Length);
-                        if (!extra.EndsWith(".")) extra = extra + ".";
-                        G.Writeln(start2 + "[General note]: " + extra + ")", Color.Red);
-                    }
+            if (numberOfErroneousStatementsShownInDetail == 1)
+            {
+                using (Error txt = new Error())
+                {
+                    string fileNameWithoutPath = "";
+                    fileNameWithoutPath = "'" + Path.GetFileName(ph.fileName) + "'";
+                    if (fileNameWithoutPath == "''") fileNameWithoutPath = "[screen input]";
 
-                    if (false)
+                    txt.ThrowNoException();
+
+                    if (n <= 1)
                     {
-                        G.Writeln();
-                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errors)
+                        txt.MainAdd("Showing syntax errors from 1 erroneous statement in " + fileNameWithoutPath + "");
+                    }
+                    else
+                    {
+                        Action<GAO> a = (gao) =>
                         {
-                            int line = (int)(kvp.Key / (long)1e9);
-                            int pos = (int)(kvp.Key % (long)1e9);
-                            foreach (string s8 in kvp.Value.errors)
-                            {
-                                G.Writeln("ln " + line + " col " + pos + ": " + s8);
-                            }
-                        }
-                        foreach (string s8 in statement.parenthesisErrors2)
-                        {
-                            G.Writeln(s8);
-                        }
+                            ErrorMessages(helper, ph, int.MaxValue);
+                        };
+
+                        txt.MainAdd("Showing syntax errors from 1 of " + n + " erroneous statements in " + fileNameWithoutPath + " (" + G.GetLinkAction("show all", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+
                     }
                 }
-                if (numberOfErroneousStatementsShownInDetail == 1) break;
             }
-            if (numberOfErroneousStatementsShownInDetail == 1 && statements.Count > 1)
+
+            int widthRemember = Program.options.print_width;  //reset width afterwards (in finally {})
+            Program.options.print_width = int.MaxValue;
+
+            try
             {
-                Action<GAO> a = (gao) =>
-                {                    
-                    G.Writeln("HEJ");
-                };
-                G.Writeln2("There were " + (statements.Count - 1) + " more statements with errors " + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "  ");
+                int counter = 0;
+                foreach (Statement statement in statements)
+                {
+                    if (statement.errorDictionary != null)
+                    {
+                        counter++;
+                        if (counter > numberOfErroneousStatementsShownInDetail) break;
+                        SortedDictionary<int, string> split = new SortedDictionary<int, string>();  //relevant lines for multi-line errors
+                        foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+                        {
+                            int line = (int)(kvp.Key / (long)1e9);
+                            if (!split.ContainsKey(line)) split.Add(line, null);
+                        }
+
+                        string start2 = null;
+                        foreach (int line2 in split.Keys)
+                        {
+                            //
+                            // ---------- print a line from the statement
+                            //
+
+                            //Also see replacement: #9j5n34jererjn
+                            string start = "[" + line2 + "]: ";
+                            start2 = G.Blanks(start.Length);
+                            WritelnError("");
+                            string statementLine = originalText[line2 - 1];
+                            string statementLine2 = statementLine + "   ";  //easier
+                            StringBuilder statementLine3 = new StringBuilder();
+                            
+                            //
+                            // handle glue symbols
+                            //
+
+                            List<string> glues1 = new List<string>() { "£", "§", "½", "<=<", "[_[", "[¨[", "¨" };
+                            List<string> glues2 = new List<string>() { "", "", "", "<", "[", "[", "" };
+                            int[] glue = new int[statementLine.Length];  //1 means it is being removed
+                            int collapse = 0;
+                            for (int i = 0; i < statementLine.Length; i++)
+                            {
+                                bool hit = false;
+                                foreach (string g in glues1)
+                                {
+                                    if (statementLine2.Substring(i, g.Length) == g)
+                                    {
+                                        //we put '£' symbols in
+
+                                        hit = true;
+                                        bool big = false;
+                                        if (g.Length > 1) big = true;
+                                        
+                                        if (big)
+                                        {
+                                            statementLine3.Append('£');
+                                            statementLine3.Append('£');
+                                            statementLine3.Append(statementLine2[i + 2]);  //only the third
+                                            i += 2;
+                                        }
+                                        else
+                                        {
+                                            statementLine3.Append('£');
+                                        }
+                                        break;
+                                    }
+                                }
+                                if (!hit)
+                                {
+                                    statementLine3.Append(statementLine2[i]);
+                                }
+                            }
+                            statementLine = statementLine3.ToString();
+
+                            WritelnError(start + statementLine);
+                            int cOld = 0; int errorCounter = 0;
+                            string s1 = start2;
+                            string s2 = start2;
+                            foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+                            {
+                                int ln = (int)(kvp.Key / (long)1e9);
+                                int col = (int)(kvp.Key % (long)1e9);
+                                if (ln != line2) continue;
+                                errorCounter++;
+                                char letter = (char)(97 + errorCounter - 1);
+                                int c = col - 1 - cOld;
+                                s1 += G.Blanks(c) + "^";
+                                s2 += G.Blanks(c) + letter;
+                                cOld = col;
+                            }
+
+                            //
+                            // ---------- print ^ pointers below the statement line
+                            //
+
+                            WritelnError(s1);
+                            if (showLetters) WritelnError(s2);
+
+                            //The list of errors line by line
+
+                            string indent = start2;
+                            indent = "";
+
+                            //
+                            // ---------- print the detailed info on each ^ as lines below
+                            //
+
+                            errorCounter = 0;
+                            foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+                            {
+                                int ln = (int)(kvp.Key / (long)1e9);
+                                int col = (int)(kvp.Key % (long)1e9);
+                                if (ln != line2) continue;
+                                errorCounter++;
+                                char letter = (char)(97 + errorCounter - 1);
+                                if (condense)
+                                {
+                                    string s3 = null;
+                                    string error = null;
+                                    foreach (string s in kvp.Value.errors)
+                                    {
+                                        error += G.FirstCharToUpper(s) + ". ";
+                                    }
+                                    error = error.Substring(0, error.Length - ". ".Length);
+                                    if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(error);
+                                    else
+                                    {
+                                        s3 = indent + G.FirstCharToUpper(error);
+                                        //s3 = "(^): " + G.FirstCharToUpper(error);
+                                    }
+                                    if (!s3.EndsWith(".")) s3 = s3 + ".";
+                                    WritelnError(s3);
+                                }
+                                else
+                                {
+                                    foreach (string s in kvp.Value.errors)
+                                    {
+                                        string s3 = null;
+                                        if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(s);
+                                        else
+                                        {
+                                            s3 = indent + G.FirstCharToUpper(s);
+                                            //s3 = "(^): " + G.FirstCharToUpper(s);
+                                        }
+                                        if (!s3.EndsWith(".")) s3 = s3 + ".";
+                                        WritelnError(s3);
+                                    }
+                                }
+                            }
+                        }
+                        string extra = null;
+                        foreach (string s8 in statement.parenthesisErrors2)
+                        {
+                            extra += G.FirstCharToUpper(s8) + ". ";
+                        }
+                        if (extra != null)
+                        {
+                            extra = extra.Substring(0, extra.Length - ". ".Length);
+                            if (!extra.EndsWith(".")) extra = extra + ".";
+
+                            string indent = start2;
+                            indent = "";
+                            
+                            using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
+                            {
+                                txt.MainAdd("Statement note: " + extra);
+                            }
+                        }
+
+                        if (true)
+                        {
+                            G.Writeln();
+                            foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+                            {
+                                int line = (int)(kvp.Key / (long)1e9);
+                                int pos = (int)(kvp.Key % (long)1e9);
+                                foreach (string s8 in kvp.Value.errors)
+                                {
+                                    G.Writeln("ln " + line + " col " + pos + ": " + s8);
+                                }
+                            }
+                            foreach (string s8 in statement.parenthesisErrors2)
+                            {
+                                G.Writeln(s8);
+                            }
+                        }
+                    }
+                    if (numberOfErroneousStatementsShownInDetail == 1) break;
+                }
             }
+            finally
+            {
+                Program.options.print_width = widthRemember;
+            }
+        }
+
+        private static SortedDictionary<long, ErrorHelper> CloneErrorDictionary(SortedDictionary<long, ErrorHelper> errorsX)
+        {
+            SortedDictionary<long, ErrorHelper> errors2 = new SortedDictionary<long, ErrorHelper>();
+            foreach (KeyValuePair<long, ErrorHelper> kvp in errorsX)
+            {
+                ErrorHelper eh = new ErrorHelper();
+                eh.errors = new List<string>();
+                eh.errors.AddRange(kvp.Value.errors);
+                errors2.Add(kvp.Key, kvp.Value);
+            }
+            return errors2;
+        }
+
+        private static void WritelnError(string s)
+        {
+            G.Writeln(s, Color.Red, true);
         }
 
         /// <summary>
@@ -301,18 +429,7 @@ namespace Gekko.Parser.Gek
                     AdjustLine(ph, 1, statement.tokens[i7].line, out ln, out lineText);
 
                     long n = (long)1e9 * statement.tokens[i7].line + statement.tokens[i7].column;
-                    ErrorHelper errorsn = null; errors.TryGetValue(n, out errorsn);
-                    if (errorsn != null)
-                    {
-                        errorsn.errors.AddRange(statement.parenthesisErrors[i7]);
-                    }
-                    else
-                    {
-                        ErrorHelper e = new ErrorHelper();
-                        e.errors = statement.parenthesisErrors[i7];
-                        //e.oneLineOfText = lineText;
-                        errors.Add(n, e);
-                    }
+                    ErrorsAddOrMerge(errors, n, statement.parenthesisErrors[i7]);
                 }
             }
 
@@ -347,11 +464,31 @@ namespace Gekko.Parser.Gek
             
         }
 
+        private static void ErrorsAddOrMerge(SortedDictionary<long, ErrorHelper> errors, long n, List<string> extra)
+        {
+            ErrorHelper errorsn = null; errors.TryGetValue(n, out errorsn);
+            if (errorsn != null)
+            {
+                errorsn.errors.AddRange(extra);
+            }
+            else
+            {
+                ErrorHelper e = new ErrorHelper();
+                e.errors = new List<string>();
+                e.errors.AddRange(extra);
+                errors.Add(n, e);
+            }
+        }
+
         private static void AdjustLine(ParseHelper ph, int line0, int lineNumber, out int ln, out string lineText)
         {
             List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
             ln = line0 + lineNumber - 1;
-            if (ph.isOneLinerFromGui) ln += -1;
+            if (false)
+            {
+                //this is not good here. Probably something from the old error messages.
+                if (ph.isOneLinerFromGui) ln += -1;
+            }
             //lineText = "[" + ln.ToString() + "]: " + text[ln - 1];
             lineText = text[ln - 1];
         }

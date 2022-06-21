@@ -15,6 +15,12 @@ using System.Reflection.Emit;
 namespace Gekko.Parser.Gek
 {
     
+    public class ErrorMessagesHelper
+    {
+        public ConvertHelper parseOutput;
+        public string textWithExtraLines;
+        public CommonTree t;
+    }
     
     /// <summary>
     /// This class is used to parse commands and create an ASTtree, and walk it.There is a similar class for model files.
@@ -52,7 +58,11 @@ namespace Gekko.Parser.Gek
                 int errorStatements = 1;  //0 or 1 or max
                 if (ph.nicerErrors)
                 {
-                    ParserGekErrors.ErrorMessages(ph, ref parseOutput, ref textWithExtraLines, ref t, errorStatements, 1);
+                    ErrorMessagesHelper helper = new ErrorMessagesHelper();
+                    helper.parseOutput = parseOutput;
+                    helper.textWithExtraLines = textWithExtraLines;
+                    helper.t = t;
+                    ParserGekErrors.ErrorMessages(helper, ph, errorStatements);
                 }
                 else
                 {
