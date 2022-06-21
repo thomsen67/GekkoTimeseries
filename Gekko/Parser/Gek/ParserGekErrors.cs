@@ -57,7 +57,7 @@ namespace Gekko.Parser.Gek
         /// <param name="textWithExtraLines"></param>
         /// <param name="t"></param>
         /// <param name="errorStatements"></param>
-        public static bool ErrorMessages(ErrorMessagesHelper helper, ParseHelper ph, int numberOfErroneousStatementsShownInDetail)
+        public static bool ErrorMessages(ErrorMessagesHelper helper, ParseHelper ph, int maxCalc, int maxShow)
         {
             bool showLetters = false;
             bool condense = true;
@@ -66,8 +66,6 @@ namespace Gekko.Parser.Gek
             List<string> originalText = Stringlist.ExtractLinesFromText(ph.commandsText);
 
             List<Statement> statements = GetStatements(ph);
-
-            G.Writeln2("START LOOP");
 
             int linesWithErrors = 0;
             foreach (Statement statement in statements)
@@ -110,33 +108,32 @@ namespace Gekko.Parser.Gek
                 if (statement.type == 1) ph7.syntaxType = ParserGekCreateAST.EParserType.OnlyAssignment;
                 else if (statement.type == 2) ph7.syntaxType = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
 
+                // ========================================
+                // calling parser
+                // ========================================
                 ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
                 LexerAndParserErrors lexerAndParserErrors7 = ParserGekCreateAST.ParseAndSyntaxErrors(out parseOutput7, out textWithExtraLines7, out t7, ph7);
 
                 if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                 {
-                    statement.errorDictionary = GetErrorsFromOneStatement(ph, numberOfErroneousStatementsShownInDetail, statement, ph7, lexerAndParserErrors7);
+                    statement.errorDictionary = GetErrorsFromOneStatement(ph, maxCalc, statement, ph7, lexerAndParserErrors7);
                 }
 
                 if (statement.errorDictionary != null) linesWithErrors++;                
-                if (linesWithErrors >= numberOfErroneousStatementsShownInDetail) break;  //no need to carry on
+                if (linesWithErrors >= maxCalc) break;  //no need to carry on
 
-            } //end loop over statements
+            } //end loop over statements and calling the parser
 
             if (linesWithErrors == 0) return true;  //signals a problem, and we revert to "old" error messages.            
+            
+            WritelnError("", true);
 
-            //TODO infinite line length + show both on screen and in pipe
-            //TODO infinite line length + show both on screen and in pipe
-            //TODO infinite line length + show both on screen and in pipe, and fix problem with glue chars.
-            //TODO infinite line length + show both on screen and in pipe
-            //TODO infinite line length + show both on screen and in pipe
-
-            WritelnError("");            
-
-            if (numberOfErroneousStatementsShownInDetail == 1)
+            if (true)
             {
                 using (Error txt = new Error())
                 {
+                    //will be shown even if piping or muting
+
                     string fileNameWithoutPath = "";
                     fileNameWithoutPath = "'" + Path.GetFileName(ph.fileName) + "'";
                     string part = "in " + fileNameWithoutPath;
@@ -144,19 +141,24 @@ namespace Gekko.Parser.Gek
 
                     txt.ThrowNoException();
 
-                    if (linesWithErrors <= 1)
+                    if (true)
                     {
-                        txt.MainAdd("Showing syntax errors from 1 erroneous statement " + part);
-                    }
-                    else
-                    {
+                        string plus = null;
+                        if (linesWithErrors >= maxCalc) plus = "+";
+
                         Action<GAO> a = (gao) =>
                         {
-                            ErrorMessages(helper, ph, int.MaxValue);
+                            ErrorMessages(helper, ph, maxCalc, maxCalc - 1);
                         };
 
-                        txt.MainAdd("Showing syntax errors from 1 of " + linesWithErrors + " erroneous statements " + part + " (" + G.GetLinkAction("show all", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                        int number = linesWithErrors;
+                        if (plus != null) number--;
 
+                        string link = null;
+                        string x = null;
+                        if (number > 1 && maxShow == 1) link = " (" + G.GetLinkAction("show " + number + "", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                        if (maxShow == 1) x = " 1 of " + number;
+                        txt.MainAdd("Showing syntax errors from" + x + plus + " erroneous statements " + part + link);
                     }
                 }
             }
@@ -172,8 +174,8 @@ namespace Gekko.Parser.Gek
                     if (statement.errorDictionary != null)
                     {
                         SortedDictionary<long, ErrorHelper> originalErrors = CloneErrorDictionary(statement.errorDictionary);
-                        counter++;
-                        if (counter > numberOfErroneousStatementsShownInDetail) break;
+                        counter++;                        
+
                         SortedDictionary<int, string> split = new SortedDictionary<int, string>();  //relevant lines for multi-line errors
                         foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
                         {
@@ -191,7 +193,7 @@ namespace Gekko.Parser.Gek
                             //Also see replacement: #9j5n34jererjn
                             string start = "[" + line2 + "]: ";
                             start2 = G.Blanks(start.Length);
-                            WritelnError("");
+                            WritelnError("", true);
                             string statementLine = originalText[line2 - 1];
                             string statementLine2 = statementLine + "   ";  //easier
                             StringBuilder statementLine3 = new StringBuilder();
@@ -206,7 +208,7 @@ namespace Gekko.Parser.Gek
                             // print statement
                             //
 
-                            WritelnError(start + statementLine);
+                            WritelnError(start + statementLine, false);
 
                             //
                             // make ^ visual pointers
@@ -233,8 +235,8 @@ namespace Gekko.Parser.Gek
                             // ---------- print ^ pointers below the statement line
                             //
 
-                            WritelnError(s1);
-                            if (showLetters) WritelnError(s2);
+                            WritelnError(s1, true);
+                            if (showLetters) WritelnError(s2, true);
 
                             //The list of errors line by line
 
@@ -271,7 +273,7 @@ namespace Gekko.Parser.Gek
                                     }
                                     if (!s3.EndsWith(".")) s3 = s3 + ".";
                                     s3 += " [" + ln + ":" + (col + kvp.Value.offset) + "]";
-                                    WritelnError(s3);
+                                    WritelnError(s3, true);
                                 }
                                 else
                                 {
@@ -287,7 +289,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         if (!s3.EndsWith(".")) s3 = s3 + ".";
                                         s3 += " [" + ln + ":" + (col + kvp.Value.offset) + "]";
-                                        WritelnError(s3);
+                                        WritelnError(s3, true);
                                     }
                                 }
                             }
@@ -334,13 +336,14 @@ namespace Gekko.Parser.Gek
                             }
                         }
                     }
-                    if (numberOfErroneousStatementsShownInDetail == 1) break;
+                    if (counter >= maxShow) break;
                 }
             }
             finally
             {
                 Program.options.print_width = widthRemember;
             }
+            G.Write("");  //removes marking
             return false;
         }
 
@@ -472,9 +475,11 @@ namespace Gekko.Parser.Gek
             return errors2;
         }
 
-        private static void WritelnError(string s)
+        private static void WritelnError(string s, bool red)
         {
-            G.Writeln(s, Color.Red, true);
+            Color c = Color.Black;
+            if (red) c = Color.Red;
+            G.Writeln(s, c, true);
         }
 
         /// <summary>

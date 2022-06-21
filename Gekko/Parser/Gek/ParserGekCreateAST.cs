@@ -62,7 +62,7 @@ namespace Gekko.Parser.Gek
                     helper.textWithExtraLines = textWithExtraLines;
                     helper.t = t;
                     int nMax = 10;  //can be int.MaxValue
-                    bool fail = ParserGekErrors.ErrorMessages(helper, ph, nMax);
+                    bool fail = ParserGekErrors.ErrorMessages(helper, ph, 11, 1);
                     if (fail)
                     {
                         //use old
