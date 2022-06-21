@@ -598,6 +598,14 @@ namespace Gekko
         
         public static string helpStartPage = "introduction";
 
+        public static List<string> leftSideFunctions = new List<string>() {
+            "log",
+            "dlog",
+            "pch",
+            "dif",
+            "diff"
+        };
+
         public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko commands" in the help files
             //done January 2021, see also Globals.extraNames and Globals.commandNames
             "ACCEPT",

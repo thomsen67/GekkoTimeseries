@@ -653,6 +653,55 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Finds real (non-comment etc.) token on the right. May return null. Can be 0 or positive.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <param name="offset"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
+        public static string OffsetTokensRightReal(List<TokenHelper> line, int i, int offset, out int j)
+        {
+            if (offset < 0) new Error("Offset");
+            string rv = null;
+            j = -12345;
+            int n = 0;
+            for (int ii = i + 1; ii < line.Count; ii++)
+            {
+                if (line[ii].type == ETokenType.Number || line[ii].type == ETokenType.QuotedString || line[ii].type == ETokenType.Symbol || line[ii].type == ETokenType.Word)
+                {
+                    n++;
+                    if (n >= offset)
+                    {
+                        j = ii;
+                        break;
+                    }
+                }
+            }
+
+            if (j == -12345) return null;
+
+            return line[j].s;
+        }
+
+        public static string GetFirstTokenReal(List<TokenHelper> line, out int j)
+        {            
+            string rv = null;
+            j = -12345;
+            int n = 0;
+            for (int ii = 0; ii < line.Count; ii++)
+            {
+                if (line[ii].type == ETokenType.Number || line[ii].type == ETokenType.QuotedString || line[ii].type == ETokenType.Symbol || line[ii].type == ETokenType.Word)
+                {
+                    j = ii;
+                    break;
+                }
+            }
+            if (j == -12345) return null;
+            return line[j].s;
+        }
+
+        /// <summary>
         /// Get number of leftblanks at position i. Returns 0 if out of range.
         /// </summary>
         /// <param name="line"></param>

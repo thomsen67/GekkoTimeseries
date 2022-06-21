@@ -37,7 +37,7 @@ namespace Gekko.Parser.Gek
         public List<List<string>> parenthesisErrors = new List<List<string>>();  //assigned to tokens
         public List<string> parenthesisErrors2 = new List<string>();             //assigned to statement
         public string text = null;
-        public ParserGekCreateAST.EParserType type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;  //Set to OnlyProcedureCallEtc to start out because it is hardest to determine (we test for 0 or 1)
+        public ParserGekCreateAST.EParserType type = ParserGekCreateAST.EParserType.OnlyAssignment;  //Set to OnlyAssignment to start out because it is hardest to determine
         public SortedDictionary<long, ErrorHelper> errorDictionary = null;
     }
 
@@ -622,15 +622,16 @@ namespace Gekko.Parser.Gek
 
             int n_paren = 0; int n_bracket = 0; int n_curly = 0;
             List<string> comments = new List<string>();
-            Statement statement = new Statement();
-                        
-            int i = -1;
+            Statement statement = new Statement();                       
+            
             bool isInsideOptionField = false;
             int iFirstWord = -12345;
 
-            foreach (TokenHelper tok in tokens2.storage)
+            //foreach (TokenHelper tok in tokens2.storage)
+            for(int i = 0;i<tokens2.storage.Count;i++)
             {
-                i++;
+                TokenHelper tok = tokens2.storage[i];
+            
                 if (iFirstWord == -12345 && tok.type == ETokenType.Word) iFirstWord = i;
                 if (tok.s == "(")
                 {
@@ -685,12 +686,7 @@ namespace Gekko.Parser.Gek
                 {
                     //will not handle a logical < or > inside an option field, but these do not exist anyway
                     isInsideOptionField = false;
-                }
-
-                if (tok.s == "=" && tok.SiblingAfter(1, true) != null && tok.SiblingAfter(1, true).s != "=")
-                {
-                    if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) statement.type = ParserGekCreateAST.EParserType.OnlyAssignment;
-                }
+                }                
 
                 statement.tokens.Add(tok);
 
@@ -699,6 +695,44 @@ namespace Gekko.Parser.Gek
                     //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.                                                        
                     statement.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement.tokens, true);
                     if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field");
+
+                    if (true)
+                    {                        
+                        int j1; string s1 = StringTokenizer.GetFirstTokenReal(statement.tokens, out j1);
+                        int j2; string s2 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
+                        int j3; string s3 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
+                        int j4; string s4 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j3, 1, out j4);
+                        int j5; string s5 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
+
+                        bool flag = false;
+
+                        if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j3].s == "(")
+                        {
+                            //f¨(
+                            //must not be log/pch..., and must not contain =
+                            if (!Globals.leftParenthesisIndicator.Contains(s1.ToLower())) flag = true;
+                        }
+                        else if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word && statement.tokens[j4].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j5].s == "(")
+                        {
+                            //b:f¨(
+                            //must not be log/pch..., and must not contain =
+                            flag = true;
+                        }
+                        else if (statement.tokens[j1].type == ETokenType.Word)
+                        {
+                            //f 
+                            //must not be command, and must not contain =
+                            if (!Globals.commandNames.Contains(s1.ToUpper())) flag = true;
+                        }
+                        else if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word)
+                        {
+                            //b:f                            
+                            flag = true;
+                        }
+
+                        if (flag) statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+                    }
+
                     statements.Add(statement);
                     //
                     //reset
