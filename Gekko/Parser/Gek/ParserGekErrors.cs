@@ -37,7 +37,7 @@ namespace Gekko.Parser.Gek
         public List<List<string>> parenthesisErrors = new List<List<string>>();  //assigned to tokens
         public List<string> parenthesisErrors2 = new List<string>();             //assigned to statement
         public string text = null;
-        public int type = 2;  //0 normal 1 series 2 naked func procedure. Set to 2 to start out because it is hardest to determine (we test for 0 or 1)
+        public ParserGekCreateAST.EParserType type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;  //Set to OnlyProcedureCallEtc to start out because it is hardest to determine (we test for 0 or 1)
         public SortedDictionary<long, ErrorHelper> errorDictionary = null;
     }
 
@@ -95,7 +95,7 @@ namespace Gekko.Parser.Gek
                     }
                 }
 
-                if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = 0;
+                if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
 
                 if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
 
@@ -104,9 +104,7 @@ namespace Gekko.Parser.Gek
                     s7 += "end;";
                 }
                 ph7.commandsText = s7;
-                ph7.syntaxType = ParserGekCreateAST.EParserType.Normal;
-                if (statement.type == 1) ph7.syntaxType = ParserGekCreateAST.EParserType.OnlyAssignment;
-                else if (statement.type == 2) ph7.syntaxType = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+                ph7.syntaxType = statement.type;
 
                 // ========================================
                 // calling parser
@@ -300,7 +298,9 @@ namespace Gekko.Parser.Gek
                             extra += G.FirstCharToUpper(s8) + ". ";
                         }
 
-                        string help = ParserGekCreateAST.GetLinkToHelpFile2(statement.text.Trim());
+                        string h = statement.text.Trim();
+                        
+                        string help = ParserGekCreateAST.GetLinkToHelpFile2(h);
 
                         if (extra != null || help != null)
                         {
@@ -323,6 +323,8 @@ namespace Gekko.Parser.Gek
                         {
                             if (Globals.runningOnTTComputer) new Error("Dict mismatch");
                         }
+
+                        if (ph.isOneLinerFromGui) WritelnError("", true);
 
                         if (false)
                         {
@@ -530,9 +532,9 @@ namespace Gekko.Parser.Gek
                     statement.parenthesisErrors[i7].Add("extraneous '}'");
                 }
             }
-            if (last_parenthesis > 0) statement.parenthesisErrors2.Add("missing " + last_parenthesis + " ')' in statement");
-            if (last_bracket > 0) statement.parenthesisErrors2.Add("missing " + last_bracket + " ']' in statement");
-            if (last_curly > 0) statement.parenthesisErrors2.Add("missing " + last_curly + " '}' in statement");
+            if (last_parenthesis > 0) statement.parenthesisErrors2.Add("Too many '(' in statement");
+            if (last_bracket > 0) statement.parenthesisErrors2.Add("Too many '[' in statement");
+            if (last_curly > 0) statement.parenthesisErrors2.Add("Too many '{' in statement");
 
             SortedDictionary<long, ErrorHelper> errors = new SortedDictionary<long, ErrorHelper>();
 
@@ -621,8 +623,7 @@ namespace Gekko.Parser.Gek
             int n_paren = 0; int n_bracket = 0; int n_curly = 0;
             List<string> comments = new List<string>();
             Statement statement = new Statement();
-
-            statement.type = 2;
+                        
             int i = -1;
             bool isInsideOptionField = false;
             int iFirstWord = -12345;
@@ -688,7 +689,7 @@ namespace Gekko.Parser.Gek
 
                 if (tok.s == "=" && tok.SiblingAfter(1, true) != null && tok.SiblingAfter(1, true).s != "=")
                 {
-                    if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) statement.type = 1;
+                    if (n_paren == 0 && n_bracket == 0 && n_curly == 0 && !isInsideOptionField) statement.type = ParserGekCreateAST.EParserType.OnlyAssignment;
                 }
 
                 statement.tokens.Add(tok);
