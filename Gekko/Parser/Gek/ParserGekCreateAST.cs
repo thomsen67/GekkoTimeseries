@@ -1622,49 +1622,77 @@ namespace Gekko.Parser.Gek
                 if (true)
                 {
                     errorMessage = errorMessage.Replace(" AT", " '@'");
-                    errorMessage = errorMessage.Replace(" HAT", " '^'");
-                    errorMessage = errorMessage.Replace(" SEMICOLON", " ';'");
+                    errorMessage = errorMessage.Replace(" BACKSLASH", " ' \\'");
                     errorMessage = errorMessage.Replace(" COLON", " ':'");
+                    errorMessage = errorMessage.Replace(" COLONGLUE", " ':'");
                     errorMessage = errorMessage.Replace(" COMMA2", " ','");
-                    errorMessage = errorMessage.Replace(" DOT", " '.'");
-                    errorMessage = errorMessage.Replace(" HASH", " '#'");
-                    errorMessage = errorMessage.Replace(" PERCENT", " '%'");
-                    errorMessage = errorMessage.Replace(" LEFTCURLY", " '{'");
-                    errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
-                    errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
-                    errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
-                    errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
-                    errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
-                    errorMessage = errorMessage.Replace(" RIGHTANGLE", " '>'");
-                    errorMessage = errorMessage.Replace(" STAR", " '*'");
-                    errorMessage = errorMessage.Replace(" VERTICALBAR", " '|'");
-                    errorMessage = errorMessage.Replace(" PLUS", " '+'");
-                    errorMessage = errorMessage.Replace(" MINUS", " '-'");
+                    errorMessage = errorMessage.Replace(" DateDef", " date");
+                    errorMessage = errorMessage.Replace(" DigitsEDigits", " digits");
                     errorMessage = errorMessage.Replace(" DIV", " '/'");
-                    errorMessage = errorMessage.Replace(" STARS", " '**'");
-                    errorMessage = errorMessage.Replace(" EQUAL", " '='");
-                    errorMessage = errorMessage.Replace(" BACKSLASH", " '\\'");
+                    errorMessage = errorMessage.Replace(" DIVEQUAL", " '/='");
                     errorMessage = errorMessage.Replace(" DOLLAR", " '$'");
+                    errorMessage = errorMessage.Replace(" DOT", " '.'");
+                    errorMessage = errorMessage.Replace(" Double", " floating value");
+                    errorMessage = errorMessage.Replace(" DOUBLEAND", " '&&'");
+                    errorMessage = errorMessage.Replace(" DOUBLEVERTICALBAR1", " '||'");
+                    errorMessage = errorMessage.Replace(" DOUBLEVERTICALBAR2", " '||'");    
+                    errorMessage = errorMessage.Replace(" EQUAL", " '='");
+                    errorMessage = errorMessage.Replace(" EXCLAMATION", " '!'");
+                    errorMessage = errorMessage.Replace(" GLUE", " no blank");
+                    errorMessage = errorMessage.Replace(" GLUEBACKSLASH", " ¨\\'");
+                    errorMessage = errorMessage.Replace(" GLUEDOT", " '.'");
+                    errorMessage = errorMessage.Replace(" GLUEDOTNUMBER:", " '.'");
+                    errorMessage = errorMessage.Replace(" GLUESTAR", " '*'");
+                    errorMessage = errorMessage.Replace(" HASH", " '#'");
+                    errorMessage = errorMessage.Replace(" HASHEQUAL", " '#='");
+                    errorMessage = errorMessage.Replace(" HAT", " '^'");
+                    errorMessage = errorMessage.Replace(" HATEQUAL", " '^='");
+                    errorMessage = errorMessage.Replace(" Ident", " letters");
+                    errorMessage = errorMessage.Replace(" IdentStartingWithInt", " digits+letters");
+                    errorMessage = errorMessage.Replace(" Integer", " integer");
+                    errorMessage = errorMessage.Replace(" ISEQUAL", " '=='");
+                    errorMessage = errorMessage.Replace(" ISLARGEROREQUAL", " '>='");
+                    errorMessage = errorMessage.Replace(" ISNOTQUAL", " '<>'");
+                    errorMessage = errorMessage.Replace(" ISSMALLEROREQUAL", " '<='");
+                    errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
+                    errorMessage = errorMessage.Replace(" LEFTANGLESPECIAL", " '<'");
+                    errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
+                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
+                    errorMessage = errorMessage.Replace(" LEFTCURLY", " '{'");
+                    errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
+                    errorMessage = errorMessage.Replace(" MINUS", " '-'");
+                    errorMessage = errorMessage.Replace(" MINUSEQUAL", " '-='");
+                    errorMessage = errorMessage.Replace(" PERCENT", " '%'");
+                    errorMessage = errorMessage.Replace(" PERCENTEQUAL", " '%='");
+                    errorMessage = errorMessage.Replace(" PLUS", " '+'");
+                    errorMessage = errorMessage.Replace(" PLUSEQUAL", " '+='");
                     errorMessage = errorMessage.Replace(" QUESTION", " '?'");
-
+                    errorMessage = errorMessage.Replace(" RIGHTANGLE", " '>'");
+                    errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
+                    errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
+                    errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
+                    errorMessage = errorMessage.Replace(" SEMICOLON", " ';'");
+                    errorMessage = errorMessage.Replace(" STAR", " '*'");
+                    errorMessage = errorMessage.Replace(" STAREQUAL", " ' *='");
+                    errorMessage = errorMessage.Replace(" STARS", " '**'");
+                    errorMessage = errorMessage.Replace(" VERTICALBAR", " '|'");
+                    errorMessage = errorMessage.Replace(" StringInQuotes1", " string");
+                    errorMessage = errorMessage.Replace(" StringInQuotes2", " string");
+                    errorMessage = errorMessage.Replace(" StringInQuotes", " string");
+                    errorMessage = errorMessage.Replace(" TILDE", " '~'");
+                    errorMessage = errorMessage.Replace(" TRIPLESTARS", " '***'");
+                    errorMessage = errorMessage.Replace(" VERTICALBAR:", " '|'");
                     errorMessage = errorMessage.Replace("EOF", "[End of input]");
-                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
                     errorMessage = errorMessage.Replace("expecting set", "");  //not meningful                
                     errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
                     errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
+                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
 
                     if (errorMessage.Contains("'<[End of input]>' expecting END"))
                     {
-                        errorMessage += G.NL + "  Check your loop structures";
-                        errorMessage += G.NL + "  (FOR) and conditionals (IF).";
-                        errorMessage += G.NL + "  For each FOR or IF, an";
-                        errorMessage += G.NL + "  END is expected.";
+                        errorMessage += G.NL + "  Check your loop structures (FOR) and conditionals (IF). For each FOR or IF, an END is expected.";
                     }
-
                 }
-
 
                 if (lineNumber > inputFileLines.Count)
                 {
@@ -1905,7 +1933,7 @@ namespace Gekko.Parser.Gek
             }
             if (flag)
             {
-                return "See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} in help system."; 
+                return "See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} command."; 
             }
             return null;
         }
