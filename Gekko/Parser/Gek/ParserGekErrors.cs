@@ -21,7 +21,8 @@ namespace Gekko.Parser.Gek
 
     public class ErrorHelper
     {
-        public List<string> errors = null;   
+        public List<string> errors = null;
+        public int offset = 0;
     }
 
     /// <summary>
@@ -194,46 +195,19 @@ namespace Gekko.Parser.Gek
                             //
                             // handle glue symbols
                             //
+                            
+                            statementLine = HandleGlueSymbols(statement, statementLine, statementLine2, statementLine3);                            
 
-                            List<string> glues1 = new List<string>() { "£", "§", "½", "<=<", "[_[", "[¨[", "¨" };
-                            List<string> glues2 = new List<string>() { "", "", "", "<", "[", "[", "" };
-                            int[] glue = new int[statementLine.Length];  //1 means it is being removed
-                            int collapse = 0;
-                            for (int i = 0; i < statementLine.Length; i++)
-                            {
-                                bool hit = false;
-                                foreach (string g in glues1)
-                                {
-                                    if (statementLine2.Substring(i, g.Length) == g)
-                                    {
-                                        //we put '£' symbols in
-
-                                        hit = true;
-                                        bool big = false;
-                                        if (g.Length > 1) big = true;
-                                        
-                                        if (big)
-                                        {
-                                            statementLine3.Append('£');
-                                            statementLine3.Append('£');
-                                            statementLine3.Append(statementLine2[i + 2]);  //only the third
-                                            i += 2;
-                                        }
-                                        else
-                                        {
-                                            statementLine3.Append('£');
-                                        }
-                                        break;
-                                    }
-                                }
-                                if (!hit)
-                                {
-                                    statementLine3.Append(statementLine2[i]);
-                                }
-                            }
-                            statementLine = statementLine3.ToString();
+                            //
+                            // print statement
+                            //
 
                             WritelnError(start + statementLine);
+
+                            //
+                            // make ^ visual pointers
+                            //
+
                             int cOld = 0; int errorCounter = 0;
                             string s1 = start2;
                             string s2 = start2;
@@ -241,6 +215,7 @@ namespace Gekko.Parser.Gek
                             {
                                 int ln = (int)(kvp.Key / (long)1e9);
                                 int col = (int)(kvp.Key % (long)1e9);
+                                col += kvp.Value.offset;  //kind of like cheating, but much easier because keys of a dict cannot be changed
                                 if (ln != line2) continue;
                                 errorCounter++;
                                 char letter = (char)(97 + errorCounter - 1);
@@ -260,7 +235,7 @@ namespace Gekko.Parser.Gek
                             //The list of errors line by line
 
                             string indent = start2;
-                            indent = "";
+                            indent = "  - ";
 
                             //
                             // ---------- print the detailed info on each ^ as lines below
@@ -290,6 +265,7 @@ namespace Gekko.Parser.Gek
                                         //s3 = "(^): " + G.FirstCharToUpper(error);
                                     }
                                     if (!s3.EndsWith(".")) s3 = s3 + ".";
+                                    s3 += " (" + ln + ":" + (col + kvp.Value.offset) + ")";
                                     WritelnError(s3);
                                 }
                                 else
@@ -353,6 +329,119 @@ namespace Gekko.Parser.Gek
             {
                 Program.options.print_width = widthRemember;
             }
+        }
+
+        private static string HandleGlueSymbols(Statement statement, string statementLine, string statementLine2, StringBuilder statementLine3)
+        {
+            List<string> glues1 = new List<string>() { "£", "§", "½", "<=<", "[_[", "[¨[", "¨" };
+            List<string> glues2 = new List<string>() { "", "", "", "<", "[", "[", "" };
+            int[] glue = new int[statementLine.Length];  //1 means it is being removed
+            int collapse = 0;
+            for (int i = 0; i < statementLine.Length; i++)
+            {
+                bool hit = false;
+                foreach (string g in glues1)
+                {
+                    if (statementLine2.Substring(i, g.Length) == g)
+                    {
+                        //we put '£' symbols in
+
+                        hit = true;
+                        bool big = false;
+                        if (g.Length > 1) big = true;
+
+                        if (big)
+                        {
+                            statementLine3.Append('£');
+                            statementLine3.Append('£');
+                            statementLine3.Append(statementLine2[i + 2]);  //only the third
+                            i += 2;
+                        }
+                        else
+                        {
+                            statementLine3.Append('£');
+                        }
+                        break;
+                    }
+                }
+                if (!hit)
+                {
+                    statementLine3.Append(statementLine2[i]);
+                }
+            }
+
+            statementLine = statementLine3.ToString();
+            StringBuilder statementLine4 = new StringBuilder();
+
+            //we move all pointers away from glue
+
+            SortedDictionary<long, ErrorHelper> errorDict2 = new SortedDictionary<long, ErrorHelper>();
+            for (int i = 0; i < statementLine.Length; i++)
+            {
+                int col2 = i + 1;
+                int col3 = col2;
+                if (statementLine[i] == '£')
+                {
+                    for (int j = i; j < statementLine.Length; j++)
+                    {
+                        if (statementLine[j] != '£')
+                        {
+                            col3 = j + 1;
+                            break;
+                        }
+                    }
+                }
+
+                //move to safety
+                foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+                {
+                    int ln = (int)(kvp.Key / (long)1e9);
+                    int col = (int)(kvp.Key % (long)1e9);
+                    if (col != col2) continue;
+                    col = col3;
+                    ErrorsAddOrMerge(errorDict2, (long)1e9 * ln + col, kvp.Value.errors);
+                }
+            }
+
+            if (CountErrors(statement.errorDictionary) != CountErrors(errorDict2)) new Error("Hov");
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < statementLine.Length; i++)
+            {
+                int col2 = i + 1;
+                if (statementLine[i] == '£')
+                {
+                    //move pointers 1 pos to the left
+                    foreach (KeyValuePair<long, ErrorHelper> kvp in errorDict2)
+                    {
+                        int ln = (int)(kvp.Key / (long)1e9);
+                        int col = (int)(kvp.Key % (long)1e9);
+                        if (col < col2) continue;  //only move after '£'
+                        kvp.Value.offset -= 1;
+                    }
+                }
+                else
+                {
+                    sb.Append(statementLine[i]);
+                }
+            }
+
+            if (CountErrors(statement.errorDictionary) != CountErrors(errorDict2)) new Error("Hov");
+
+            statement.errorDictionary = errorDict2;
+            statementLine = sb.ToString();
+            statement.text = statementLine;
+            return statementLine;
+        }
+
+        private static int CountErrors(SortedDictionary<long, ErrorHelper> errorDictionary)
+        {
+            int n1 = 0;
+            foreach (KeyValuePair<long, ErrorHelper> kvp in errorDictionary)
+            {
+                n1 += kvp.Value.errors.Count;
+            }
+            return n1;
         }
 
         private static SortedDictionary<long, ErrorHelper> CloneErrorDictionary(SortedDictionary<long, ErrorHelper> errorsX)
