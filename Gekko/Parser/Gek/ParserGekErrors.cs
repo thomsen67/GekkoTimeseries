@@ -299,17 +299,23 @@ namespace Gekko.Parser.Gek
                         {
                             extra += G.FirstCharToUpper(s8) + ". ";
                         }
-                        if (extra != null)
+
+                        string help = ParserGekCreateAST.GetLinkToHelpFile2(statement.text.Trim());
+
+                        if (extra != null || help != null)
                         {
-                            extra = extra.Substring(0, extra.Length - ". ".Length);
-                            if (!extra.EndsWith(".")) extra = extra + ".";
+                            if (extra != null)
+                            {
+                                extra = extra.Substring(0, extra.Length - ". ".Length);
+                                if (!extra.EndsWith(".")) extra = extra + ". ";
+                            }
 
                             string indent = start2;
-                            indent = "";
-                            
+                            indent = "";                            
+
                             using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
                             {
-                                txt.MainAdd("Statement note: " + extra);
+                                txt.MainAdd("Statement note: " + extra + help);
                             }
                         }
 

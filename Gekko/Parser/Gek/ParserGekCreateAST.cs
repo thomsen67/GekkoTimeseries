@@ -1571,7 +1571,8 @@ namespace Gekko.Parser.Gek
 
                 if (ph.isModel == false && previousLineProbablyCulprit == false)
                 {
-                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    string s5 = GetLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    if (s5 != null) new Writeln(s5);
                     if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
                 }
             }
@@ -1767,7 +1768,8 @@ namespace Gekko.Parser.Gek
 
                 if (ph.isModel == false)
                 {
-                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    string s5 = GetLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    if (s5 != null) new Writeln(s5);
                     if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
                 }
             }
@@ -1872,27 +1874,26 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void WriteLinkToHelpFile2(string line)
+        public static string GetLinkToHelpFile2(string line)
         {
+            //probably reasonably ok, no need to tokenize
             char[] splits = new char[] { ' ', '<' };  //"<" catches option field
             string line10 = line.Trim();
             string[] line11 = line10.Split(splits);
             string firstWord = line11[0].ToLower();
-            string firstWordUpper = firstWord.ToUpper();
-            string indent = "    ";
-            WriteLinkToHelpFile(firstWord, indent);
+            string firstWordUpper = firstWord.ToUpper();            
+            string s = GetLinkToHelpFile(firstWord);
+            return s;
         }
 
-        private static void WriteLinkToHelpFile(string firstWord, string indent)
+        private static string GetLinkToHelpFile(string firstWord)
         {
-            if (firstWord == null || firstWord == "") return;
-
+            if (firstWord == null || firstWord == "") return null;
             if (G.Equal(firstWord, "p")) firstWord = "prt";  //synonym
             if (G.Equal(firstWord, "pri")) firstWord = "prt";  //synonym
             if (G.Equal(firstWord, "print")) firstWord = "prt";  //synonym            
             if (G.Equal(firstWord, "ser")) firstWord = "series";  //synonym   
             //TODO: should check keyword list
-
             bool flag = false;
             foreach (string s in Globals.helpTopics)
             {
@@ -1904,8 +1905,9 @@ namespace Gekko.Parser.Gek
             }
             if (flag)
             {
-                new Writeln("See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} in help system.");               
+                return "See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} in help system."; 
             }
+            return null;
         }
 
         private static void ExtraErrorMessages(string line)
