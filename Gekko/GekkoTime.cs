@@ -808,7 +808,7 @@ namespace Gekko
 
             if (t1.freq != t2.freq)
             {
-                new Error("Frequency mismatch: " + t1.freq.Pretty() + " vs. " + t2.freq.Pretty());                
+                new Error("Frequency mismatch in observations(): " + t1.freq.Pretty() + " vs. " + t2.freq.Pretty());                
             }
 
             if ((t1.IsNull() && !t2.IsNull()) || ((!t1.IsNull() && t2.IsNull())))

@@ -662,6 +662,7 @@ namespace Gekko
         /// <returns></returns>
         public static string OffsetTokensRightReal(List<TokenHelper> line, int i, int offset, out int j)
         {
+            if (i < 0) new Error("Offset");
             if (offset < 0) new Error("Offset");
             string rv = null;
             j = -12345;
@@ -736,7 +737,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Search for a string
+        /// Search for string, returning the index. Returns -12345 if not found.
         /// </summary>
         /// <param name="line"></param>
         /// <param name="s"></param>
@@ -747,7 +748,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Search for a string
+        /// Search for string, returning the index. Returns -12345 if not found.
         /// </summary>
         /// <param name="line"></param>
         /// <param name="start"></param>
@@ -759,7 +760,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Search for strings
+        /// Search for strings, returning the index. Returns -12345 if not found.
         /// </summary>
         /// <param name="line"></param>
         /// <param name="start"></param>

@@ -1335,9 +1335,7 @@ namespace Gekko
                                                                                                                                         //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
-                                                    new Error("Frequency mismatch. Left-hand series is " + lhs_series.freq.Pretty() + ", whereas right-hand series is " + lhs_series.freq.Pretty());
-
-                                                    //throw new GekkoException();
+                                                    new Error("Frequency mismatch. Left-hand series is " + lhs_series.freq.Pretty() + ", whereas right-hand series is " + rhs_series_beware.freq.Pretty());
                                                 }
 
                                                 if (rhs_series_beware.type == ESeriesType.Light)
@@ -1838,9 +1836,30 @@ namespace Gekko
             string s = null;
             if (extra == 1)
             {
-                s+= Globals.stringConversionNote;
+                s += Globals.stringConversionNote + ".";
             }
-            new Error("" + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side. " + s);
+            
+            string vtype = "The variable type is not indicated, ";
+            if (type.ToString().ToLower() != "var") vtype = "The variable type is set to " + type.ToString().ToLower() + ", ";
+
+            using (Error txt = new Error())
+            {
+
+                string sigil = G.Chop_GetSigil(varnameWithFreq);
+                if (sigil == null)
+                {
+                    txt.MainAdd(vtype + "the variable name '" + varnameWithFreq + "' indicates a time-series, and the right-hand side is of type " + rhs.Type().ToString().ToLower() + ". ");
+                }
+                else if (sigil == "%")
+                {
+                    txt.MainAdd(vtype + "the variable name '" + varnameWithFreq + "' indicates a scalar (val/date/string), and the right-hand side is of type " + rhs.Type().ToString().ToLower() + ". ");
+                }
+                else if (sigil == "#")
+                {
+                    txt.MainAdd(vtype + "the variable name '" + varnameWithFreq + "' indicates a collection (list/matrix/map), and the right-hand side is of type " + rhs.Type().ToString().ToLower() + ". ");
+                }
+                txt.MainAdd("This fails: you may read more about assignment rules {a{here¤appendix_assignments.htm}a}. " + s);
+            }
         }
 
         private static bool IsAllSpecialDatabank(string dbName)

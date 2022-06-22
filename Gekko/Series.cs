@@ -585,7 +585,7 @@ namespace Gekko
 
         private void FreqError(GekkoTime t)
         {
-            new Error("Frequency mismatch: " + this.freq.Pretty() + " versus " + t.freq.Pretty());
+            new Error("Frequency mismatch: it seems a "+ t.freq.Pretty() + " time period is used on a series with " + this.freq.Pretty() + " frequency");
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
@@ -1192,7 +1192,7 @@ namespace Gekko
 
             if (gt.freq != anchorPeriod.freq)
             {
-                new Error("Frequency mismatch");
+                new Error("Frequency mismatch, " + gt.freq.Pretty() + " versus " + anchorPeriod.freq.Pretty());
             }
             //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
             //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   

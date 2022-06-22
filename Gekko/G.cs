@@ -1083,11 +1083,28 @@ namespace Gekko
             if (varname2 == null || varname2.Length == 0)
             {
                 new Error("Variable name with zero length");
-                //throw new GekkoException();
             }
             bool hasSigil = false;
             if (varname2[0] == Globals.symbolScalar || varname2[0] == Globals.symbolCollection) hasSigil = true;
             return hasSigil;
+        }
+
+        /// <summary>
+        /// Returns null or '%' or '#' depending on varname. Null for series.
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <returns></returns>
+        public static string Chop_GetSigil(string varname)
+        {
+            if (Program.IsListfileArtificialName(varname)) return Globals.symbolCollection.ToString();  //otherwise Chop_GetName gets it wrong below
+            string varname2 = Chop_GetName(varname);
+            if (varname2 == null || varname2.Length == 0)
+            {
+                new Error("Variable name with zero length");
+            }
+            if (varname2[0] == Globals.symbolScalar) return Globals.symbolScalar.ToString();
+            else if (varname2[0] == Globals.symbolCollection) return Globals.symbolCollection.ToString();
+            else return null;
         }
 
 

@@ -259,7 +259,8 @@ namespace Gekko.Parser.Gek
                                     string error = null;
                                     foreach (string s9 in kvp.Value.errors)
                                     {
-                                        string s = G.ReplaceGlueSymbols(s9);
+                                        string s = G.ReplaceGlueSymbols(s9);                                        
+                                        s = ParserGekCreateAST.ReplaceTokenNamesWithMeaningfulStrings(s);
                                         error += G.FirstCharToUpper(s) + ". ";
                                     }
                                     error = error.Substring(0, error.Length - ". ".Length);
@@ -278,6 +279,7 @@ namespace Gekko.Parser.Gek
                                     foreach (string s9 in kvp.Value.errors)
                                     {
                                         string s = G.ReplaceGlueSymbols(s9);
+                                        s = ParserGekCreateAST.ReplaceTokenNamesWithMeaningfulStrings(s);
                                         string s3 = null;
                                         if (showLetters) s3 = "(" + letter + "): " + G.FirstCharToUpper(s);
                                         else
@@ -299,7 +301,16 @@ namespace Gekko.Parser.Gek
                         }
 
                         string h = statement.text.Trim();
-                        
+
+                        if (statement.type == ParserGekCreateAST.EParserType.OnlyAssignment)
+                        {
+                            h = "var";
+                        }
+                        if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc)
+                        {
+                            h = "";  //could point to help file regarding procedure or function, but typically it is just a question of parentheses etc. that do not match
+                        }
+
                         string help = ParserGekCreateAST.GetLinkToHelpFile2(h);
 
                         if (extra != null || help != null)
@@ -697,40 +708,42 @@ namespace Gekko.Parser.Gek
                     if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field");
 
                     if (true)
-                    {                        
-                        int j1; string s1 = StringTokenizer.GetFirstTokenReal(statement.tokens, out j1);
-                        int j2; string s2 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
-                        int j3; string s3 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
-                        int j4; string s4 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j3, 1, out j4);
-                        int j5; string s5 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
+                    {
+
+                        int j1 = -12345; string s1 = StringTokenizer.GetFirstTokenReal(statement.tokens, out j1);
+                        int j2 = -12345; string s2 = null; if (s1 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
+                        int j3 = -12345; string s3 = null; if (s2 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
+                        int j4 = -12345; string s4 = null; if (s3 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j3, 1, out j4);
+                        int j5 = -12345; string s5 = null; if (s4 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
 
                         bool flag = false;
 
-                        if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j3].s == "(")
+                        if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j3].s == "(")
                         {
                             //f¨(
-                            //must not be log/pch..., and must not contain =
-                            if (!Globals.leftParenthesisIndicator.Contains(s1.ToLower())) flag = true;
+                            if (!Globals.leftSideFunctions.Contains(s1.ToLower())) flag = true;
                         }
-                        else if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word && statement.tokens[j4].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j5].s == "(")
+                        else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && j4 != -12345 && j5 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word && statement.tokens[j4].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j5].s == "(")
                         {
                             //b:f¨(
-                            //must not be log/pch..., and must not contain =
                             flag = true;
                         }
-                        else if (statement.tokens[j1].type == ETokenType.Word)
+                        else if (j1 != -12345 && statement.tokens[j1].type == ETokenType.Word)
                         {
-                            //f 
-                            //must not be command, and must not contain =
+                            //f
                             if (!Globals.commandNames.Contains(s1.ToUpper())) flag = true;
                         }
-                        else if (statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word)
+                        else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word)
                         {
                             //b:f                            
                             flag = true;
                         }
 
-                        if (flag) statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+                        int eq = StringTokenizer.FindS(statement.tokens, "=");
+
+                        if (flag && eq == -12345) statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+
+                        if (Globals.runningOnTTComputer) new Writeln("TYPE: " + statement.type);
                     }
 
                     statements.Add(statement);

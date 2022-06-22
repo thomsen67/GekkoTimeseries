@@ -1617,82 +1617,8 @@ namespace Gekko.Parser.Gek
                 string errorMessage, fileName;
                 ExtractParserErrorLineAndPos(s, ph.fileName, out lineNumber, out positionNumber, out errorMessage, out fileName);
 
-                errorMessage = G.ReplaceGlueSymbols(errorMessage);
-
-                if (true)
-                {
-                    errorMessage = errorMessage.Replace(" AT", " '@'");
-                    errorMessage = errorMessage.Replace(" BACKSLASH", " ' \\'");
-                    errorMessage = errorMessage.Replace(" COLON", " ':'");
-                    errorMessage = errorMessage.Replace(" COLONGLUE", " ':'");
-                    errorMessage = errorMessage.Replace(" COMMA2", " ','");
-                    errorMessage = errorMessage.Replace(" DateDef", " date");
-                    errorMessage = errorMessage.Replace(" DigitsEDigits", " digits");
-                    errorMessage = errorMessage.Replace(" DIV", " '/'");
-                    errorMessage = errorMessage.Replace(" DIVEQUAL", " '/='");
-                    errorMessage = errorMessage.Replace(" DOLLAR", " '$'");
-                    errorMessage = errorMessage.Replace(" DOT", " '.'");
-                    errorMessage = errorMessage.Replace(" Double", " floating value");
-                    errorMessage = errorMessage.Replace(" DOUBLEAND", " '&&'");
-                    errorMessage = errorMessage.Replace(" DOUBLEVERTICALBAR1", " '||'");
-                    errorMessage = errorMessage.Replace(" DOUBLEVERTICALBAR2", " '||'");    
-                    errorMessage = errorMessage.Replace(" EQUAL", " '='");
-                    errorMessage = errorMessage.Replace(" EXCLAMATION", " '!'");
-                    errorMessage = errorMessage.Replace(" GLUE", " no blank");
-                    errorMessage = errorMessage.Replace(" GLUEBACKSLASH", " ¨\\'");
-                    errorMessage = errorMessage.Replace(" GLUEDOT", " '.'");
-                    errorMessage = errorMessage.Replace(" GLUEDOTNUMBER:", " '.'");
-                    errorMessage = errorMessage.Replace(" GLUESTAR", " '*'");
-                    errorMessage = errorMessage.Replace(" HASH", " '#'");
-                    errorMessage = errorMessage.Replace(" HASHEQUAL", " '#='");
-                    errorMessage = errorMessage.Replace(" HAT", " '^'");
-                    errorMessage = errorMessage.Replace(" HATEQUAL", " '^='");
-                    errorMessage = errorMessage.Replace(" Ident", " letters");
-                    errorMessage = errorMessage.Replace(" IdentStartingWithInt", " digits+letters");
-                    errorMessage = errorMessage.Replace(" Integer", " integer");
-                    errorMessage = errorMessage.Replace(" ISEQUAL", " '=='");
-                    errorMessage = errorMessage.Replace(" ISLARGEROREQUAL", " '>='");
-                    errorMessage = errorMessage.Replace(" ISNOTQUAL", " '<>'");
-                    errorMessage = errorMessage.Replace(" ISSMALLEROREQUAL", " '<='");
-                    errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
-                    errorMessage = errorMessage.Replace(" LEFTANGLESPECIAL", " '<'");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
-                    errorMessage = errorMessage.Replace(" LEFTCURLY", " '{'");
-                    errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
-                    errorMessage = errorMessage.Replace(" MINUS", " '-'");
-                    errorMessage = errorMessage.Replace(" MINUSEQUAL", " '-='");
-                    errorMessage = errorMessage.Replace(" PERCENT", " '%'");
-                    errorMessage = errorMessage.Replace(" PERCENTEQUAL", " '%='");
-                    errorMessage = errorMessage.Replace(" PLUS", " '+'");
-                    errorMessage = errorMessage.Replace(" PLUSEQUAL", " '+='");
-                    errorMessage = errorMessage.Replace(" QUESTION", " '?'");
-                    errorMessage = errorMessage.Replace(" RIGHTANGLE", " '>'");
-                    errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
-                    errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
-                    errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
-                    errorMessage = errorMessage.Replace(" SEMICOLON", " ';'");
-                    errorMessage = errorMessage.Replace(" STAR", " '*'");
-                    errorMessage = errorMessage.Replace(" STAREQUAL", " ' *='");
-                    errorMessage = errorMessage.Replace(" STARS", " '**'");
-                    errorMessage = errorMessage.Replace(" VERTICALBAR", " '|'");
-                    errorMessage = errorMessage.Replace(" StringInQuotes1", " string");
-                    errorMessage = errorMessage.Replace(" StringInQuotes2", " string");
-                    errorMessage = errorMessage.Replace(" StringInQuotes", " string");
-                    errorMessage = errorMessage.Replace(" TILDE", " '~'");
-                    errorMessage = errorMessage.Replace(" TRIPLESTARS", " '***'");
-                    errorMessage = errorMessage.Replace(" VERTICALBAR:", " '|'");
-                    errorMessage = errorMessage.Replace("EOF", "[End of input]");
-                    errorMessage = errorMessage.Replace("expecting set", "");  //not meningful                
-                    errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
-                    errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
-                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
-
-                    if (errorMessage.Contains("'<[End of input]>' expecting END"))
-                    {
-                        errorMessage += G.NL + "  Check your loop structures (FOR) and conditionals (IF). For each FOR or IF, an END is expected.";
-                    }
-                }
+                errorMessage = G.ReplaceGlueSymbols(errorMessage);                
+                errorMessage = ReplaceTokenNamesWithMeaningfulStrings(errorMessage);                
 
                 if (lineNumber > inputFileLines.Count)
                 {
@@ -1803,6 +1729,83 @@ namespace Gekko.Parser.Gek
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
 
+        }
+
+        public static string ReplaceTokenNamesWithMeaningfulStrings(string s)
+        {
+            s = s.Replace(" AT", " '@'");
+            s = s.Replace(" BACKSLASH", " ' \\'");
+            s = s.Replace(" COLON", " ':'");
+            s = s.Replace(" COLONGLUE", " ':'");
+            s = s.Replace(" COMMA2", " ','");
+            s = s.Replace(" DateDef", " date");
+            s = s.Replace(" DigitsEDigits", " digits");
+            s = s.Replace(" DIV", " '/'");
+            s = s.Replace(" DIVEQUAL", " '/='");
+            s = s.Replace(" DOLLAR", " '$'");
+            s = s.Replace(" DOT", " '.'");
+            s = s.Replace(" Double", " floating value");
+            s = s.Replace(" DOUBLEAND", " '&&'");
+            s = s.Replace(" DOUBLEVERTICALBAR1", " '||'");
+            s = s.Replace(" DOUBLEVERTICALBAR2", " '||'");
+            s = s.Replace(" EQUAL", " '='");
+            s = s.Replace(" EXCLAMATION", " '!'");
+            s = s.Replace(" GLUE", " alternative");
+            s = s.Replace(" GLUEBACKSLASH", " '\\'");
+            s = s.Replace(" GLUEDOT", " '.'");
+            s = s.Replace(" GLUEDOTNUMBER:", " '.'");
+            s = s.Replace(" GLUESTAR", " '*'");
+            s = s.Replace(" HASH", " '#'");
+            s = s.Replace(" HASHEQUAL", " '#='");
+            s = s.Replace(" HAT", " '^'");
+            s = s.Replace(" HATEQUAL", " '^='");
+            s = s.Replace(" Ident", " letters");
+            s = s.Replace(" IdentStartingWithInt", " digits/letters");
+            s = s.Replace(" Integer", " integer");
+            s = s.Replace(" ISEQUAL", " '=='");
+            s = s.Replace(" ISLARGEROREQUAL", " '>='");
+            s = s.Replace(" ISNOTQUAL", " '<>'");
+            s = s.Replace(" ISSMALLEROREQUAL", " '<='");
+            s = s.Replace(" LEFTANGLESIMPLE", " '<'");
+            s = s.Replace(" LEFTANGLESPECIAL", " '<'");
+            s = s.Replace(" LEFTBRACKET", " '['");
+            s = s.Replace(" LEFTBRACKETGLUE", " '['");
+            s = s.Replace(" LEFTCURLY", " '{'");
+            s = s.Replace(" LEFTPAREN", " '('");
+            s = s.Replace(" MINUS", " '-'");
+            s = s.Replace(" MINUSEQUAL", " '-='");
+            s = s.Replace(" PERCENT", " '%'");
+            s = s.Replace(" PERCENTEQUAL", " '%='");
+            s = s.Replace(" PLUS", " '+'");
+            s = s.Replace(" PLUSEQUAL", " '+='");
+            s = s.Replace(" QUESTION", " '?'");
+            s = s.Replace(" RIGHTANGLE", " '>'");
+            s = s.Replace(" RIGHTBRACKET", " ']'");
+            s = s.Replace(" RIGHTCURLY", " '}'");
+            s = s.Replace(" RIGHTPAREN", " ')'");
+            s = s.Replace(" SEMICOLON", " ';'");
+            s = s.Replace(" STAR", " '*'");
+            s = s.Replace(" STAREQUAL", " ' *='");
+            s = s.Replace(" STARS", " '**'");
+            s = s.Replace(" VERTICALBAR", " '|'");
+            s = s.Replace(" StringInQuotes1", " string");
+            s = s.Replace(" StringInQuotes2", " string");
+            s = s.Replace(" StringInQuotes", " string");
+            s = s.Replace(" TILDE", " '~'");
+            s = s.Replace(" TRIPLESTARS", " '***'");
+            s = s.Replace(" VERTICALBAR:", " '|'");
+            s = s.Replace("EOF", "[End of input]");
+            s = s.Replace("expecting set", "");  //not meningful                
+            s = s.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
+            s = s.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
+            s = s.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
+
+            if (s.Contains("'<[End of input]>' expecting END"))
+            {
+                s += G.NL + "  Check your loop structures (FOR) and conditionals (IF). For each FOR or IF, an END is expected.";
+            }
+
+            return s;
         }
 
         public static void ExtractParserErrorLineAndPos(string s, string fileName2, out int lineNumber, out int positionNo, out string errorMessage, out string fileName)
@@ -1933,7 +1936,7 @@ namespace Gekko.Parser.Gek
             }
             if (flag)
             {
-                return "See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} command."; 
+                return "See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a}."; 
             }
             return null;
         }
