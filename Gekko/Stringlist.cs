@@ -334,8 +334,5 @@ namespace Gekko
                 keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
             }
         }
-
-
-
     }
 }

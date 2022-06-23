@@ -3764,7 +3764,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Converts a double into nearest int. Expects the input value to be very neaar to an integer, tolerance 0.000001 absolute.
+        /// Converts a double into nearest int. Expects the input value to be very near to an integer, tolerance 0.000001 absolute.
         /// Will handle negative values ok.
         /// </summary>
         /// <param name="rounded"></param>
@@ -3772,8 +3772,16 @@ namespace Gekko
         /// <returns></returns>
         public static bool ConvertToInt(out int rounded, double value)
         {            
-            bool flag = true;
-            rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
+            bool flag = true;            
+            try
+            {
+                rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
+            }
+            catch
+            {
+                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                throw;  //will not happen
+            }
             double decimals = value - rounded;            
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
@@ -3783,7 +3791,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Converts a double into nearest int. Expects the input value to be very neaar to an integer, tolerance 0.000001 absolute.
+        /// Converts a double into nearest int. Expects the input value to be very near to an integer, tolerance 0.000001 absolute.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -3791,7 +3799,16 @@ namespace Gekko
         {
             //simpler method
             bool flag = false;
-            int rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
+            int rounded;
+            try
+            {
+                rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
+            }
+            catch
+            {
+                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                throw;  //will not happen
+            }
             double decimals = value - rounded;
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
