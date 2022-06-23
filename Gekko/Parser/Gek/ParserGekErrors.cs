@@ -342,22 +342,23 @@ namespace Gekko.Parser.Gek
                             {
                                 using (Note txt = new Note())
                                 {
-                                    txt.MainAdd("The statement is valid Gekko 2.x syntax, but not valid Gekko 3.x syntax.");
+                                    txt.MainAdd("The statement is valid Gekko 2.x syntax, and Gekko has translated it: see the link.");
                                     if (is3_0)
                                     {
-                                        txt.MainNewLineTight();
-                                        txt.MainAdd("Gekko has {a{translated¤translate.htm}a} it into the following valid Gekko 3.x statement:");
-                                        txt.MainNewLineTight();
-                                        txt.MainAdd(translated);
-                                    }
-                                    else
-                                    {
-                                        txt.MainNewLineTight();
-                                        txt.MainAdd("The in-built {a{translator¤translate.htm}a} tried to translate it, but could not produce valid 3.x syntax. ");                                        
-                                        txt.MoreAdd("The following translation from Gekko 2.x to 3.x is not valid 3.x syntax, but may still provide some hints:");
+                                        txt.MoreAdd("Gekko has {a{translated¤translate.htm}a} the statement into the following valid Gekko 3.x code:");
                                         txt.MoreNewLine();
                                         txt.MoreAdd(translated);
                                     }
+                                    else
+                                    {                                        
+                                        txt.MoreAdd("The in-built {a{translator¤translate.htm}a} tried to translate the statement, but could not produce valid 3.x code.");
+                                        txt.MoreNewLine();
+                                        txt.MoreAdd("The translated code is the following (the code is invalid but may provide some hints):");
+                                        txt.MoreNewLine();
+                                        txt.MoreAdd(translated);
+                                    }
+                                    txt.MoreNewLine();
+                                    txt.MoreAdd("Note that automatically translated code is not guaranteed to replicate the original code.");
                                 }
                             }
                         }
