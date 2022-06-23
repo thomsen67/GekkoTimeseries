@@ -6548,7 +6548,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Conversion.
+        /// Conversion. May return int.MaxValue if error.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="reportError"></param>
@@ -6556,14 +6556,12 @@ namespace Gekko
         public static int ConvertToInt(IVariable a, bool reportError)
         {
             bool problem = false;
-            //GetInt() is really just GetVal() converted to int afterwards.
+            //ConvertToInt() is really just GetVal() converted to int afterwards.
             if (a.Type() == EVariableType.Series)
             {
                 if (reportError)
                 {
-                    new Error("Using GetInt() on timeseries. Did you forget []-brackets to pick out an observation, for instance x[2020]?");
-
-                    //throw new GekkoException();
+                    new Error("Using ConvertToInt() on timeseries. Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 }
                 problem = true;
             }
@@ -6574,14 +6572,45 @@ namespace Gekko
                 if (reportError)
                 {
                     new Error("Could not convert value '" + d + "' into integer");
-                    //throw new GekkoException();
                 }
                 problem = true;
             }
             if (!reportError && problem) intValue = int.MaxValue;  //signals a problem with the conversion
             return intValue;
         }
-        
+
+        /// <summary>
+        /// Conversion. May return long.MaxValue if error.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
+        public static long ConvertToLong(IVariable a, bool reportError)
+        {
+            bool problem = false;
+            //ConvertToLong() is really just GetVal() converted to int afterwards.
+            if (a.Type() == EVariableType.Series)
+            {
+                if (reportError)
+                {
+                    new Error("Using ConvertToLong() on timeseries. Did you forget []-brackets to pick out an observation, for instance x[2020]?");
+                }
+                problem = true;
+            }
+            double d = ConvertToVal(a);
+            long longValue = -12345;
+            if (!G.ConvertToLong(out longValue, d))
+            {
+                if (reportError)
+                {
+                    new Error("Could not convert value '" + d + "' into 64-bit integer");
+                }
+                problem = true;
+            }
+            if (!reportError && problem) longValue = long.MaxValue;  //signals a problem with the conversion
+            return longValue;
+        }
+
         //Common methods end
         //Common methods end
         //Common methods end

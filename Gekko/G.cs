@@ -3779,7 +3779,7 @@ namespace Gekko
             }
             catch
             {
-                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                new Error("Could not convert the value '" + value + "' into an integer (32-bit integer at most)");
                 throw;  //will not happen
             }
             double decimals = value - rounded;            
@@ -3806,7 +3806,7 @@ namespace Gekko
             }
             catch
             {
-                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                new Error("Could not convert the value '" + value + "' into an integer (32-bit integer at most)");
                 throw;  //will not happen
             }
             double decimals = value - rounded;
@@ -3817,6 +3817,62 @@ namespace Gekko
             }
             return rounded;
         }
+
+        /// <summary>
+        /// Converts a double into nearest long. Expects the input value to be very near to a long, tolerance 0.000001 absolute.
+        /// Will handle negative values ok.
+        /// </summary>
+        /// <param name="rounded"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool ConvertToLong(out long rounded, double value)
+        {
+            bool flag = true;
+            try
+            {
+                rounded = Convert.ToInt64(value);  //this function rounds to nearest int, so -12.98 --> -13
+            }
+            catch
+            {
+                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                throw;  //will not happen
+            }
+            double decimals = value - rounded;
+            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            {
+                flag = false;
+            }
+            return flag;
+        }
+
+        /// <summary>
+        /// Converts a double into nearest long. Expects the input value to be very near to a long, tolerance 0.000001 absolute.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static long ConvertToLong(double value)
+        {
+            //simpler method
+            bool flag = false;
+            long rounded;
+            try
+            {
+                rounded = Convert.ToInt64(value);  //this function rounds to nearest int, so -12.98 --> -13
+            }
+            catch
+            {
+                new Error("Could not convert the value '" + value + "' into an integer (64-bit integer at most)");
+                throw;  //will not happen
+            }
+            double decimals = value - rounded;
+            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            {
+                new Error("Could not convert " + value + " into 64-bit integer");
+                //throw new GekkoException();
+            }
+            return rounded;
+        }
+
 
         /// <summary>
         /// Converts a string into an integer. Returns int.MaxValue if fail.

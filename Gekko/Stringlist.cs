@@ -152,8 +152,8 @@ namespace Gekko
 
         /// <summary>
         /// Tries to convert a list of IVariables into a C# list of strings. The elements of the list are
-        /// typically strings or values (integers). But an element may also be a 1-element sub-list,
-        /// where this one element is of string or integer type. The integers may contain leading zeroes.
+        /// typically strings or values (integers up to 64-bit integer). But an element may also be a 1-element sub-list,
+        /// where this one element is of string or integer type. The integers may contain leading zeroes (these zeroes are stored in the ScalarVal variables).
         /// More complicated nested lists are probably not supported.
         /// How does this relate to GetListOfStringsFromList()?
         /// </summary>
@@ -177,8 +177,8 @@ namespace Gekko
                 else if (iv.Type() == EVariableType.Val)  //will handle 007 in x[a, 007], will become x['a', '007']
                 {
                     //note: see same kind of code just below, //#98073245243875
-                    int ii = O.ConvertToInt(iv, false);
-                    if (ii != int.MaxValue)
+                    long ii = O.ConvertToLong(iv, false);
+                    if (ii != long.MaxValue)
                     {
                         stringCount++;
                         byte b = (iv as ScalarVal).numberOfLeadingZeroes;
@@ -202,8 +202,8 @@ namespace Gekko
                         else if (singleton.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
                         {
                             //note: see same kind of code just above, //#98073245243875
-                            int ii = O.ConvertToInt(singleton, false);
-                            if (ii != int.MaxValue)
+                            long ii = O.ConvertToLong(singleton, false);
+                            if (ii != long.MaxValue)
                             {
                                 stringCount++;
                                 keys[i] = ii.ToString();
@@ -334,5 +334,31 @@ namespace Gekko
                 keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
             }
         }
+
+        /// <summary>
+        /// Overload for 64-bit ii. See same method for int 32-bit ii.
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <param name="i"></param>
+        /// <param name="b"></param>
+        /// <param name="ii"></param>
+        private static void HandleLeadingZeroes(string[] keys, int i, byte b, long ii)
+        {
+            string z = null;
+            if (b > 0)
+            {
+                z = new string('0', b);
+            }
+            if (ii < 0)
+            {                
+                keys[i] = "-" + z + (-ii).ToString(); //b = 3, ii = -7 --> "-0007"
+            }
+            else
+            {
+                keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
+            }
+        }
     }
+
+
 }
