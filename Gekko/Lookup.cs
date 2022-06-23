@@ -1293,20 +1293,20 @@ namespace Gekko
                                                 int obs = smpl.Observations12();
                                                 if (obs > 1)
                                                 {
-                                                    G.Writeln2("*** ERROR: It seems the left-hand side variable appears with a lag on the right-hand side.");
-                                                    G.Writeln("           When 'OPTION series dyn check = yes' (default), in such dynamic statements you", Color.Red);
-                                                    G.Writeln("           must use <dyn> or <dyn = no> tags, or put the expression inside a", Color.Red);
-                                                    G.Writeln("           'BLOCK series dyn = yes|no'.", Color.Red);
-                                                    G.Writeln();
-                                                    Action<GAO> a = (gao) =>
+                                                    using (Error txt = new Error())
                                                     {
-                                                        O.Help("i_dynamic_statements");
-                                                    };
-                                                    G.Writeln("           Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.7 to a", Color.Red);
-                                                    G.Writeln("           Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the", Color.Red);
-                                                    G.Writeln("           'Backwards incompatibility, or how to ignore' section in the above link.", Color.Red);
-                                                    G.Writeln();
-                                                    throw new GekkoException();
+                                                        txt.MainAdd("It seems the left-hand side variable appears with a lag on the right-hand side.");
+                                                        txt.MainAdd("When 'OPTION series dyn check = yes' (default), in such dynamic statements you");
+                                                        txt.MainAdd("must use <dyn> or <dyn = no> tags, or put the expression inside a");
+                                                        txt.MainAdd("'BLOCK series dyn = yes|no'.");
+                                                        Action<GAO> a = (gao) =>
+                                                        {
+                                                            O.Help("i_dynamic_statements");
+                                                        };
+                                                        txt.MoreAdd("Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.7 to a");
+                                                        txt.MoreAdd("Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the");
+                                                        txt.MoreAdd("'Backwards incompatibility, or how to ignore' section in the above link.");
+                                                    }                                                    
                                                 }
                                             }
                                         }

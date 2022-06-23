@@ -306,12 +306,12 @@ namespace Gekko.Parser.Gek
                         {
                             h = "var";
                         }
-                        if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc)
+                        else if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc)
                         {
                             h = "";  //could point to help file regarding procedure or function, but typically it is just a question of parentheses etc. that do not match
                         }
 
-                        string help = ParserGekCreateAST.GetLinkToHelpFile2(h);
+                        string help = ParserGekCreateAST.GetLinkToHelpFile2(h);                        
 
                         if (extra != null || help != null)
                         {
@@ -329,6 +329,41 @@ namespace Gekko.Parser.Gek
                                 txt.MainAdd("Statement note: " + extra + help);
                             }
                         }
+
+                        string gekko2_4 = null;
+                        try
+                        {
+                            string code = statement.text;
+                            bool is2_4 = ParserGekCreateAST.IsValid2_4Syntax(code);
+                            Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
+                            string translated = Translate_2_4_to_3_0.Translate(code, info);
+                            bool is3_0 = ParserGekCreateAST.IsValid3_0Syntax(translated);
+                            if (is2_4)
+                            {
+                                using (Note txt = new Note())
+                                {
+                                    txt.MainAdd("The statement is valid Gekko 2.x syntax, but not valid Gekko 3.x syntax.");
+                                    if (is3_0)
+                                    {
+                                        txt.MainNewLineTight();
+                                        txt.MainAdd("Gekko has {a{translated¤translate.htm}a} it into the following valid Gekko 3.x statement:");
+                                        txt.MainNewLineTight();
+                                        txt.MainAdd(translated);
+                                    }
+                                    else
+                                    {
+                                        txt.MainNewLineTight();
+                                        txt.MainAdd("The in-built {a{translator¤translate.htm}a} tried to translate it, but could not produce valid 3.x syntax. ");                                        
+                                        txt.MoreAdd("The following translation from Gekko 2.x to 3.x is not valid 3.x syntax, but may still provide some hints:");
+                                        txt.MoreNewLine();
+                                        txt.MoreAdd(translated);
+                                    }
+                                }
+                            }
+                        }
+                        catch { };
+
+                        if (Globals.runningOnTTComputer) new Writeln("--> TYPE: " + statement.type);
 
                         if (CountErrors(statement.errorDictionary) != CountErrors(originalErrors))
                         {
@@ -742,8 +777,7 @@ namespace Gekko.Parser.Gek
                         int eq = StringTokenizer.FindS(statement.tokens, "=");
 
                         if (flag && eq == -12345) statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
-
-                        if (Globals.runningOnTTComputer) new Writeln("TYPE: " + statement.type);
+                                                
                     }
 
                     statements.Add(statement);

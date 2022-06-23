@@ -1750,7 +1750,7 @@ namespace Gekko.Parser.Gek
             s = s.Replace(" DOUBLEVERTICALBAR2", " '||'");
             s = s.Replace(" EQUAL", " '='");
             s = s.Replace(" EXCLAMATION", " '!'");
-            s = s.Replace(" GLUE", " alternative");
+            s = s.Replace(" GLUE", " something else");
             s = s.Replace(" GLUEBACKSLASH", " '\\'");
             s = s.Replace(" GLUEDOT", " '.'");
             s = s.Replace(" GLUEDOTNUMBER:", " '.'");
