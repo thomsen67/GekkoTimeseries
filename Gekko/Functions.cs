@@ -2105,15 +2105,29 @@ namespace Gekko
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
                 new Error("setdomains(): Expected array-series");
-                //throw new GekkoException();
             }
             List m_list = m as List;
             if (m_list == null)
             {
                 new Error("setdomains(): Expected list of strings");
-                //throw new GekkoException();
             }
             string[] ss = Stringlist.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
+            if (ss == null)
+            {
+                new Error("setdomains(): Error regarding the list elements. These should be strings.");
+            }
+            if (x_series.dimensions != ss.Length)
+            {
+                new Error("setdomains(): The array-timeseries has " + x_series.dimensions + ", whereas the provided list of domain names has " + ss.Length + " dimensions.");
+            }
+            foreach (string s in ss)
+            {
+                if (s.StartsWith(Globals.symbolCollection.ToString()) || s == "*")
+                {
+                    //good
+                }
+                else new Error("setdomains(): Problem in domain name '" + s + "'. Only the string '*' or strings starting with '#' are allowed.");
+            }
             x_series.meta.domains = ss;
         }
 

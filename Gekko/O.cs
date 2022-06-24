@@ -8915,7 +8915,17 @@ namespace Gekko
                 }
             }
 
-
+            /// <summary>
+            /// Seems to be used for printing
+            /// </summary>
+            /// <param name="tsFirst"></param>
+            /// <param name="check"></param>
+            /// <param name="label2"></param>
+            /// <param name="recordedPieces"></param>
+            /// <param name="firstVariableFoundInFirstOrRef"></param>
+            /// <param name="bankNumber"></param>
+            /// <param name="unfold"></param>
+            /// <param name="labels"></param>
             private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
             {
 

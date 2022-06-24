@@ -4256,24 +4256,42 @@ namespace Gekko
                                 //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
                             }
 
+                            string[] gekkoDomains = ts?.meta.domains;
+
+
                             string[] domains = new string[ts.dimensions + timeDimension];
-                            for (int i = 0; i < domains.Length; i++) domains[i] = "*";
+                            for (int i = 0; i < domains.Length; i++) domains[i] = "*";  //default
+
+                            if (gekkoDomains != null)
+                            {
+                                for (int i = 0; i < domains.Length; i++)
+                                {
+                                    try
+                                    {
+                                        domains[i] = gekkoDomains[i].Substring(1);  //removes starting '#'
+                                    }
+                                    catch
+                                    {
+                                        //if something is wrong here regarding indexes and their length, the whole thing does not crash (and worst case, domains[i] just has a '*')
+                                        //also guards agains tricky stuff if it is timeless series.
+                                    }
+                                }
+                            }
+
                             if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;  //we alway put the t domain last
 
                             //counter++;
 
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, gamsglobals.dt_var, 0) == 0)
                             {
-                                //ReportGDXError();
-                                throw new GekkoException();
+                                new Error("Internal GAMS/gdx problem (gdxDataWriteStrStart)");
                             }
 
                             gdx.gdxSystemInfo(ref syCnt, ref uelCnt);
 
                             if (gdx.gdxSymbolSetDomainX(syCnt, domains) == 0)
                             {
-                                new Error("Could not write domain names");
-                                //throw new GekkoException();
+                                new Error("Could not write domain names (gdxSymbolSetDomainX)");
                             }
 
                             if (ts.type == ESeriesType.ArraySuper)
@@ -4418,8 +4436,6 @@ namespace Gekko
                     if (ntimeless > 0 && nnontimeless > 0)
                     {
                         new Error("The array-timeseries " + ts.name + " has subseries that are both timeless and non-timeless --> cannot write to GDX.");
-
-                        //throw new GekkoException();
                     }
                     if (ntimeless > 0) timeDimension = 0;
                     //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
