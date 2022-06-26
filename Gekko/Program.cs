@@ -3490,53 +3490,55 @@ namespace Gekko
             //file is the "real" system filepath and filename.
             //When we get here, the file is typically already copied (copylocal option)
 
+            //
+            //
+            // !!!!!!!!!!! what about the xml file inside a gbk??
+            // !!!!!!!!!!! maybe store it separately in cache as a normal file
+            //
+            //
+
             Databank databankTemp = new Databank("temporary"); //doing it like this, merging is much easier
 
             //first we (may) look in the protobuffer cache, to see if there is a hit.
 
-            
-
-            string libHash = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-            string libFileNameAndPath = file;
-            bool loadedFromProtobuf = false;            
-
+            bool cache_loadedFromProtobuf = false;
+            string cache_hash = null;
+            string cache_fileNameAndPath = null;
             if (MayUseDatabankCache(oRead))
             {
-                string hash = GetMD5Hash(null, file);
-
-                if (Program.options.library_cache == true)
+                DateTime t0 = DateTime.Now;
+                cache_hash = GetMD5Hash(null, file);
+                if (Globals.runningOnTTComputer) new Writeln("TTH md5 --> " + G.Seconds(t0));
+                cache_fileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + cache_hash + Globals.cacheExtension;
+                
+                if (File.Exists(cache_fileNameAndPath))
                 {
-                    if (File.Exists(libFileNameAndPath))
+                    try
                     {
-                        try
+                        using (FileStream fs = Program.WaitForFileStream(cache_fileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
                         {
-                            using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                            {
-                                databankTemp = Serializer.Deserialize<Databank>(fs);
-                                loadedFromProtobuf = true;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            if (G.IsUnitTesting())
-                            {
-                                throw;
-                            }
-                            else
-                            {
-                                //do nothing, we then have to parse the file
-                                loadedFromProtobuf = false;
-                            }
+                            DateTime t1 = DateTime.Now;
+                            databankTemp = Serializer.Deserialize<Databank>(fs);
+                            if (Globals.runningOnTTComputer) new Writeln("TTH deserialize --> " + G.Seconds(t1));
+                            cache_loadedFromProtobuf = true;
                         }
                     }
-                }
-                else
-                {
-                    loadedFromProtobuf = false;
-                }
+                    catch (Exception e)
+                    {
+                        if (G.IsUnitTesting())
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            //do nothing, we then have to parse the file
+                            cache_loadedFromProtobuf = false;
+                        }
+                    }
+                }                
             }
 
-            if (loadedFromProtobuf)
+            if (cache_loadedFromProtobuf)
             {
                 //do nothing, also no writing of cache file of course
             }
@@ -3594,13 +3596,12 @@ namespace Gekko
                         //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                         RuntimeTypeModel serializer = TypeModel.Create();
                         serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                                                                     // ----- SERIALIZE                    
-                        string protobufFileName = Globals.gekkoVersion + "_" + "data" + "_" + libHash + Globals.cacheExtension;
-                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                        using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                        DateTime t2 = DateTime.Now;
+                        using (FileStream fs = Program.WaitForFileStream(cache_fileNameAndPath, null, Program.GekkoFileReadOrWrite.Write))
                         {
                             serializer.Serialize(fs, databankTemp);
                         }
+                        if (Globals.runningOnTTComputer) new Writeln("TTH serialize --> " + G.Seconds(t2));
                     }
                     catch (Exception e)
                     {

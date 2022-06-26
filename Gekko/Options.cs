@@ -42,7 +42,7 @@ namespace Gekko
         public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---        
         public bool databank_create_auto = true;
-        public string databank_file_cache = "nongbk"; //[all | nonbgk | none] --> will cache non-gbk databank files for faster (re)read.
+        public string databank_file_cache = "none"; //[all | nonbgk | none] --> will cache non-gbk databank files for faster (re)read.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  

@@ -3663,8 +3663,7 @@ namespace Gekko
             }
             try
             {
-                bool useFasterArrays = false;
-
+                
                 string msg = string.Empty;
                 string producer = string.Empty;
                 int errNr = 0;
