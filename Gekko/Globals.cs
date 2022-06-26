@@ -75,6 +75,9 @@ namespace Gekko
 
         public const bool fixFor3_2 = false;
 
+        public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)
+        public const string cacheExtensionModel = ".mdl";  //used for models
+
         public const string globalLibraryString = "Global";
         public const string localLibraryString = "Local";  //--> maybe used later
         public const string gekkoLibraryString = "Gekko";  //--> maybe used later

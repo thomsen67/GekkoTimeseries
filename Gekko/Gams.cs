@@ -1573,7 +1573,7 @@ namespace Gekko
             string dependentsHash = tup.Item2.ToString();
             string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
 
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
             {
@@ -1628,7 +1628,7 @@ namespace Gekko
                     serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
 
                     // ----- SERIALIZE
-                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                     using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                     {
@@ -1669,7 +1669,7 @@ namespace Gekko
             Program.model = new Model();
             Program.model.modelGamsScalar = new ModelGamsScalar();
             
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
             {
@@ -1782,7 +1782,7 @@ namespace Gekko
                     serializer2.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
 
                     // ----- SERIALIZE
-                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                     using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                     {
@@ -3555,7 +3555,7 @@ namespace Gekko
 
         private static string GetModelHashGams(List<string> lines)
         {
-            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString()); //Pretty unlikely that two different gams files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString(), null); //Pretty unlikely that two different gams files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             return trueHash;
         }
@@ -3632,7 +3632,7 @@ namespace Gekko
             {
                 new Error("The slow gdx reader is not maintained, try the faster GDX reader with: OPTION gams fast = yes;");
             }
-            G.Writeln2("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");
+            G.Writeln("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");
             if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
 
             readInfo.startPerInFile = yearMin;
@@ -3663,6 +3663,8 @@ namespace Gekko
             }
             try
             {
+                bool useFasterArrays = false;
+
                 string msg = string.Empty;
                 string producer = string.Empty;
                 int errNr = 0;
@@ -3679,7 +3681,9 @@ namespace Gekko
                 string varName = string.Empty;
                 int varType = 0;
                 int d;
-                if (gamsDir == null) gamsDir = "";
+                if (gamsDir == null) gamsDir = "";                
+                List<string> paramsWithoutTimeDimensionCounter = new List<string>();
+                List<string> varsWithoutTimeDimensionCounter = new List<string>();
 
                 gdxcs gdx = new gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                 if (msg != string.Empty)
@@ -3716,45 +3720,12 @@ namespace Gekko
                     }
 
                     timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
+
                     if (timeIndex == 0 || Program.options.gams_time_set == "")
                     {
+                        //this will never be true --> remove it??
                         //hmm does it ever return 0? See below regarding -1 value
                         new Error("Could not find the time set ('" + Program.options.gams_time_set + "')");
-                    }
-                    if (timeIndex == -1)
-                    {
-                        using (Warning txt = new Warning())
-                        {
-                            //#0897aef todo
-                            txt.MainAdd("No set '" + Program.options.gams_time_set + "' representing a time dimension was found in the gdx file. This usually means that Gekko cannot use the data as intended.");
-                            txt.MoreAdd("For Gekko to identify a time dimension for a given parameter or variable, this dimension needs to be defined over a set,");
-                            txt.MoreAdd("where the set reflects time periods. If the set has the name 't', Gekko will automatically interpret the elements of that dimension as time periods.");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("If, for some reason, Gekko does not or cannot recognize some dimension of a parameter or variable x as the time dimension,");
-                            txt.MoreAdd("the imported data will look strange. For instance, if x is defined over countries and years in the GAMS gdx,");
-                            txt.MoreAdd("the resulting array-timeseries in Gekko is expected to be 1-dimensional (with time as an implicit dimension).");
-                            txt.MoreAdd("If the time dimension is not recognized, a 2-dimensional array-series (containing so-called timeless timeseries as sub-elements) will show up in Gekko, and this array-series");
-                            txt.MoreAdd("will be fundamentally useless inside Gekko. ");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("If the time dimension in the gdx file has a set name different from 't', you can use 'OPTION gams time set' to change the name.");
-                            txt.MoreAdd("Your parameter or variable then needs to be defined over this set. Defining over the universal set '*' will not do.");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("If you have a gdx file with a parameter or variable x without domain information, you may fix the problem like this.");
-                            txt.MoreAdd("Let us assume that x is defined over countries and time periods, but that x shows up as x(*, *) in the GAMS IDE,");
-                            txt.MoreAdd("telling us that x has no domain information. In GAMS, you can now do the following (we are assuming that x is a parameter):");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("Set countries; Set t;");
-                            txt.MoreNewLineTight();
-                            txt.MoreAdd("Parameter x(countries, t);");
-                            txt.MoreNewLineTight();
-                            txt.MoreAdd("$gdxin 'input.gdx'");
-                            txt.MoreNewLineTight();
-                            txt.MoreAdd("$load countries < x.dim1 t < x.dim2 x = x");
-                            txt.MoreNewLineTight();
-                            txt.MoreAdd("execute_unload 'output.gdx';");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("After this, you may now read output.gdx into Gekko, where x will show up as a 1-dimensional array-series.");
-                        }
                     }
 
                     //varType = 0: SET
@@ -3826,6 +3797,12 @@ namespace Gekko
                             //always fetched, since we use it for domains
                             gdx.gdxSymbolGetDomainX(i, ref domainStrings);
                             int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, domainStrings, gdxDimensions, gdx, timeIndex, i);
+
+                            if (timeDimNr == -12345)
+                            {
+                                if (varType == 1) paramsWithoutTimeDimensionCounter.Add(varName);
+                                if (varType == 2) varsWithoutTimeDimensionCounter.Add(varName);
+                            }
 
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
@@ -4050,6 +4027,67 @@ namespace Gekko
                         else
                         {
                             //do nothing, skip this symbol
+                        }
+                    }
+                    
+                    if (paramsWithoutTimeDimensionCounter.Count() > 0 || varsWithoutTimeDimensionCounter.Count() > 0)
+                    {
+                        int temp1 = counterParameters;
+                        int temp2 = counterVariables;
+                        Action<GAO> a = (gao) =>
+                        {
+                            Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                            O.Cls("output");
+                            if (paramsWithoutTimeDimensionCounter.Count() > 0)
+                            {
+                                G.Writeln("There were " + paramsWithoutTimeDimensionCounter.Count() + " out of " + temp1 + " parameters without time dimension '" + Program.options.gams_time_set + "' indicated:", ETabs.Output);
+                                G.Writeln("", ETabs.Output);
+                                G.Writeln(Stringlist.GetListWithCommas(paramsWithoutTimeDimensionCounter.OrderBy(q => q).ToList()), ETabs.Output);
+                                G.Writeln("", ETabs.Output);
+                            }
+
+                            if (varsWithoutTimeDimensionCounter.Count() > 0)
+                            {
+                                G.Writeln("There were " + varsWithoutTimeDimensionCounter.Count() + " out of " + temp2 + " variables without time dimension '" + Program.options.gams_time_set + "' indicated:", ETabs.Output);
+                                G.Writeln("", ETabs.Output);
+                                G.Writeln(Stringlist.GetListWithCommas(varsWithoutTimeDimensionCounter.OrderBy(q => q).ToList()), ETabs.Output);
+                                G.Writeln("", ETabs.Output);
+                            }
+                        };
+                        
+                        using (Warning txt = new Warning())
+                        {
+                            //#0897aef todo
+                            txt.MainAdd("There were " + paramsWithoutTimeDimensionCounter.Count() + " parameters and " + varsWithoutTimeDimensionCounter.Count() + " variables without a time dimension set '" + Program.options.gams_time_set + "' assigned as domain (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
+                            txt.MainAdd("This is ok if the GAMS variables/parameters are really timeless, but if not, there is a problem.");
+                            txt.MoreAdd("For Gekko to identify a time dimension for a given parameter or variable, the dimension needs to be defined over this time domain. For instance, if in GAMS IDE or GAMS Studio a variable x is shown as x[*, *], ");
+                            txt.MoreAdd("this means the no domains (sets) are assigned to the dimensions. In contrast, if it is for instance shown as x[i, t] in GAMS, this means that the first dimension is assigned to the set i (#i in Gekko),");
+                            txt.MoreAdd("whereas Gekko uses the second dimension as time dimension. In Gekko, a GAMS variable x[i, t] will show up as the 1-dimensional x[#i], because the time dimension is implicit.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If, for some reason, Gekko does not or cannot recognize some dimension of a parameter or variable x as the time dimension,");
+                            txt.MoreAdd("the imported data will look strange. For instance, if x is defined over countries and years in the GAMS gdx,");
+                            txt.MoreAdd("the resulting array-timeseries in Gekko is expected to be 1-dimensional (with time as an implicit dimension).");
+                            txt.MoreAdd("If the time dimension is not recognized, a 2-dimensional array-series (containing so-called timeless timeseries as sub-elements) will show up in Gekko, and this array-series");
+                            txt.MoreAdd("will be fundamentally useless inside Gekko. ");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If the time dimension in the gdx file has assigned a set name different from 't', you can use 'OPTION gams time set' to change the name.");
+                            txt.MoreAdd("Your parameter or variable then needs to be defined over this set. Defining over the universal set '*' will not do.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If you have a gdx file with a parameter or variable x without domain information, you may fix the problem like this.");
+                            txt.MoreAdd("Let us assume that x is defined over countries and time periods, but that x shows up as x[*, *] in GAMS IDE or GAMS Studio,");
+                            txt.MoreAdd("telling us that x has no domain information. In GAMS, you can now do the following (we are assuming that x is a parameter):");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("Set countries; Set t;");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("Parameter x(countries, t);");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("$gdxin 'input.gdx'");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("$load countries < x.dim1 t < x.dim2 x = x");
+                            txt.MoreNewLineTight();
+                            txt.MoreAdd("execute_unload 'output.gdx';");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("After this, you may now read output.gdx into Gekko, where x will show up as a 1-dimensional array-series.");
                         }
                     }
                 }
@@ -4661,6 +4699,18 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Tries to find the dimension number of a possible time index. Will try to do it fast with int[] domainSyNrs, else it reverts to a
+        /// string compare on a string[] domainStrings. It seems that if the set t (or other name) is actually present in the gdx
+        /// this runs faster. If not, we probably revert to string matching "t" of domain names.
+        /// </summary>
+        /// <param name="domainSyNrs"></param>
+        /// <param name="domainStrings"></param>
+        /// <param name="dimensions"></param>
+        /// <param name="gdx"></param>
+        /// <param name="timeIndex"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, string[] domainStrings, int dimensions, gdxcs gdx, int timeIndex, int i)
         {
             int timeDimNr = -12345;
@@ -4680,6 +4730,10 @@ namespace Gekko
             {
                 for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
                 {
+                    //
+                    // Note: this probably demands that the set t (or other name) is actually present in the gdx
+                    // file. If not, we probably revert to string matching "t".
+                    //
                     if (domainSyNrs[d2] == timeIndex)
                     {
                         timeDimNr = d2;

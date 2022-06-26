@@ -39,8 +39,7 @@ namespace Gekko
         /// Active libraries (excluding the Glbobal library). There are also non-active libraries in .libraryCache.
         /// </summary>        
         private List<Library> libraries = new List<Library>();        
-        private Library localLibrary = new Library(Globals.localLibraryString, null, new DateTime(0l));
-        public const string libCacheExtension = ".cache";
+        private Library localLibrary = new Library(Globals.localLibraryString, null, new DateTime(0l));        
 
         /// <summary>
         /// All historically loaded libraries. Active (non-Global) libraries are in .libraries.
@@ -489,9 +488,9 @@ namespace Gekko
 
                     string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
                     string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
-                    string libHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
+                    string libHash = Program.GetMD5Hash(ss, null); //Pretty unlikely that two different libs could produce the same hash.
                     libHash = libHash.Trim();  //probably not necessary
-                    string libFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
+                    string libFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Globals.cacheExtension;
                     bool loadedFromProtobuf = false;
                     if (Program.options.library_cache == true)
                     {
@@ -541,7 +540,7 @@ namespace Gekko
                             RuntimeTypeModel serializer = TypeModel.Create();
                             serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                             // ----- SERIALIZE                    
-                            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
+                            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Globals.cacheExtension;
                             string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                             {

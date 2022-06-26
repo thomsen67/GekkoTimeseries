@@ -1905,17 +1905,31 @@ namespace Gekko
                 //maybe buffer not larger then 1 mio.
 
                 int i = 0;
-                if (text.Contains("i1")) i = 1;
-                else if (text.Contains("i2")) i = 2;
-                else if (text.Contains("i3")) i = 3;
-                else if (text.Contains("i4")) i = 4;
-                else if (text.Contains("i5")) i = 5;
-                else if (text.Contains("i6")) i = 6;
-                else if (text.Contains("i7")) i = 7;
-                else if (text.Contains("i8")) i = 8;
+                
+                if (text.EndsWith("i1")) i = 1;
+                else if (text.EndsWith("i2")) i = 2;
+                else if (text.EndsWith("i3")) i = 3;
+                else if (text.EndsWith("i4")) i = 4;
+                else if (text.EndsWith("i5")) i = 5;
+                else if (text.EndsWith("i6")) i = 6;
+                else if (text.EndsWith("i7")) i = 7;
+                else if (text.EndsWith("i8")) i = 8;
+                else if (text.EndsWith("i9")) i = 9;
+                else if (text.EndsWith("i10")) i = 10;
+                else if (text.EndsWith("i11")) i = 11;
+                else if (text.EndsWith("i12")) i = 12;
+                else if (text.EndsWith("i13")) i = 13;
+                else if (text.EndsWith("i14")) i = 14;
+                else if (text.EndsWith("i15")) i = 15;
+                else if (text.EndsWith("i16")) i = 16;
 
-                //string file = @"c:\Tools\test\makro.zip";
-                string file = @"c:\Tools\test\makro0.gdx";
+                string file1 = @"c:\Tools\test\makro0.gdx";
+                string file2 = @"c:\Tools\test\makro0.zip";
+                string file2a = @"c:\Tools\test\makro0a.zip";  //uncompressed
+                string file3 = @"c:\Tools\test\makro0.gbk";    //gbk version
+                string file4 = @"c:\Tools\test\makro0a.gbk";    //gbk version uncompressed
+                string file5 = @"c:\Tools\test\makro0.data";   //data protobuf file
+                string fileFolder = @"c:\Tools\test\file";   
                 DateTime dt0 = DateTime.Now;
 
                 //int buf = 4096;
@@ -1924,22 +1938,34 @@ namespace Gekko
                 if (true)
                 {
 
-                    //   debug rel64     on c:\Tools\test\makro.zip, a zip with 102 mb, inside is about 230 mb.
+                    //   debug rel64      gdx is 127 mb, zipped 27 mb with compression. 
                     //-------------------------------------------------------------------------------
-                    //i1  1500  1200     normal sha
-                    //i2  1300   980     sha with 1.2 mb chunks
-                    //i3  1250   980     sha with 1.2 mb chunks and read access
-                    //i4  2450  2400     md5 on text
-                    //i5  7500  7000     md5 on text utf8
-                    //i6    75    80     file copy
-                    //i7  3700  3150     zip extraction
-                    //i8  1100   990     sha with optimal mb chunks and read access
+                    //i1   1800           normal sha
+                    //i2   1450           sha with 1.2 mb chunks
+                    //i3   1650           sha with 1.2 mb chunks and read access
+                    //i4   2900           md5 on text
+                    //i5   9000           md5 on text utf8
+                    //i6    200           file copy
+                    //i7
+                    //i8   1750           sha with optimal mb chunks and read access
+                    //i9   4600           zip with normal compression
+                    //i10  1000           zip with zero compression
+                    //i11  1100           unzip with normal compression
+                    //i12   300           unzip with zero compression
+                    //i13  2500           read<first> gbk with normal compression
+                    //i14  2200           read<first> gbk with zero compression
+                    //i15  1400           deflate directly from protobuf 
+                    //i16 11000           read<first> gdx
+                    //
+                    // So read <gdx> is 11.000 whereas file copy + sha + deflate is
+                    // about 3.000. So around 25-30% time.
+
                     //-------------------------------------------------------------------------------
 
                     if (i == 1)
                     {
                         //almost as fast as 3 (fastest)
-                        using (FileStream stream = File.OpenRead(file))
+                        using (FileStream stream = File.OpenRead(file1))
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
@@ -1949,7 +1975,7 @@ namespace Gekko
                     else if (i == 2)
                     {
                         //almost as fast as 3 (fastest)
-                        using (var stream = new BufferedStream(File.OpenRead(file), 1200000))
+                        using (var stream = new BufferedStream(File.OpenRead(file1), 1200000))
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
@@ -1959,7 +1985,7 @@ namespace Gekko
                     else if (i == 3)
                     {
                         //seems fastest, but i ==1 and i == 2 are almost as fast
-                        using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
+                        using (var stream = new FileStream(file1, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
@@ -1969,44 +1995,77 @@ namespace Gekko
                     else if (i == 4)
                     {
                         //2.5 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, false));
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, false), null);
                     }
                     else if (i == 5)
                     {
                         //7 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, true));
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, true), null);
                     }
                     else if (i == 6)
                     {
                         //really fast
-                        WaitForFileCopy(file, "c:\\tools\\slet\\sletmig.data");
+                        WaitForFileCopy(file1, "c:\\tools\\slet\\sletmig.data");
                     }
                     else if (i == 7)
                     {
-                        string folder = CreateTempFolderPath("temptsdxfolder");
-                        if (!Directory.Exists(folder))  //should almost never exist, since name is random
-                        {
-                            Directory.CreateDirectory(folder);
-                        }
-                        else
-                        {
-                            //in the very rare case, any files here will be overwritten
-                        }
-                        ZipFile.ExtractToDirectory(file, folder);
+                        string s = Program.GetMD5Hash(null, file1);
                     }
                     else if (i == 8)
                     {
-                        using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //50000
+                        using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //50000
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
                             string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
                         }
-                    }                    
+                    }
+                    else if (i == 9)
+                    {
+                        File.Delete(file2);
+                        ZipFile.CreateFromDirectory(fileFolder, file2);
+                    }
+                    else if (i == 10)
+                    {
+                        File.Delete(file2a);
+                        ZipFile.CreateFromDirectory(fileFolder, file2a, System.IO.Compression.CompressionLevel.NoCompression, false);
+                    }
+                    else if (i == 11)
+                    {
+                        string folder = CreateTempFolderPath("temptsdxfolder");
+                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                        ZipFile.ExtractToDirectory(file2, folder);
+                    }
+                    else if (i == 12)
+                    {
+                        string folder = CreateTempFolderPath("temptsdxfolder");
+                        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                        ZipFile.ExtractToDirectory(file2a, folder);
+                    }
+                    else if (i == 13)
+                    {
+                        Program.RunGekkoCommands("read <first> " + file3 + ";", "", 0, new P());
+                    }
+                    else if (i == 14)
+                    {
+                        Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
+                    }
+                    else if (i == 15)
+                    {                         
+                        using (FileStream fs = WaitForFileStream(file5, null, GekkoFileReadOrWrite.Read))
+                        {
+                            RuntimeTypeModel serializer = TypeModel.Create();
+                            Databank deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
+                        }
+                    }
+                    else if (i == 16)
+                    {
+                        Program.RunGekkoCommands("read <first gdx> " + file1 + ";", "", 0, new P());
+                    }
                 }
                 else
                 {
-                    using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                    using (var stream = Program.WaitForFileStream(file1, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
                     {
                         SHA256Managed sha = new SHA256Managed();
                         byte[] checksum = sha.ComputeHash(stream);
@@ -3091,7 +3150,7 @@ namespace Gekko
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
                         {
-                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file));
+                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null);
                         }
                     }
                 }
@@ -3401,7 +3460,7 @@ namespace Gekko
                         if (category2_fileExists && !category1_alreadyOpen)
                         {
                             if (hash != null) databank.fileHash = hash; //typically the MD5 has already been done on the copylocal temp file
-                            else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));
+                            else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath), null);
                         }
                     }
                 }
@@ -3416,8 +3475,9 @@ namespace Gekko
         /// <param name="offset"></param>
         /// <param name="oRead"></param>
         /// <param name="readInfo"></param>
-        /// <param name="file"></param>
-        /// <param name="originalFilePath"></param>
+        /// <param name="file">The "real" system path and filename</param>
+        /// <param name="originalFilePath">Often "funny", if the file is fetched inside a zip file. Do not use.</param>
+        /// <param name="originalFilePathPretty">This is the file name used for reporting to the user</param>
         /// <param name="dateformat"></param>
         /// <param name="datetype"></param>
         /// <param name="tsdxFile"></param>
@@ -3427,177 +3487,139 @@ namespace Gekko
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
-            //file is the "real" filepath and filename.
+            //file is the "real" system filepath and filename.
+            //When we get here, the file is typically already copied (copylocal option)
 
             Databank databankTemp = new Databank("temporary"); //doing it like this, merging is much easier
 
             //first we (may) look in the protobuffer cache, to see if there is a hit.
 
-            if (true)
+            
+
+            string libHash = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+            string libFileNameAndPath = file;
+            bool loadedFromProtobuf = false;            
+
+            if (MayUseDatabankCache(oRead))
             {
-                ////Similar code regarding LIBRARY caching (for instance large library zip files). See #k50dfi4lkdf098.
+                string hash = GetMD5Hash(null, file);
 
-                //DateTime dt0 = DateTime.Now;
-                //string type = "[unknown]";  //file | cache | ram                
-                //string fileName2 = file;
-                //string libraryName = Path.GetFileNameWithoutExtension(fileName2);
-                //string fileNameWithPath = file;
-                //if (fileNameWithPath == null)
-                //{
-                //    new Error("Could not find databank: " + fileName2);
-                //}                
-
-                //DateTime stamp = File.GetLastWriteTime(fileNameWithPath);
-
-                ////Regarding libraries, there is a ram cache too. This is not done for databanks, because these are often large,
-                ////and we do not want to use up RAM (for libraries, opening and closing libraries fast can be good, when you
-                ////are trying to make sure where a function f() comes from).
-                
-                
-                //{
-                //    //Not found in RAM cache.
-                //    //Now we try the disk cache.                    
-                //    //We only allow a match if it is BOTH the same bytes in the file, AND the filepath + alias is the same.
-                //    //This makes file references easier, less to think about. So two identical libs may be parsed two times if the are in two different file locations (or a different alias is used)
-
-                //    //TODO: This may be slow: first the network file is read and UTF-converted, then MD5.
-                //    //      Maybe faster to do local copy of whole file first (if copylocal?...), and then find some
-                //    //      fast MD5 (and salt with filename etc.).
-
-                //    string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
-                //    string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
-                //    string libHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
-                //    libHash = libHash.Trim();  //probably not necessary
-                //    string libFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
-                //    bool loadedFromProtobuf = false;
-                //    if (Program.options.library_cache == true)
-                //    {
-                //        if (File.Exists(libFileNameAndPath))
-                //        {
-                //            try
-                //            {
-                //                using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                //                {
-                //                    library = Serializer.Deserialize<Library>(fs);
-                //                    loadedFromProtobuf = true;
-                //                }
-                //            }
-                //            catch (Exception e)
-                //            {
-                //                if (G.IsUnitTesting())
-                //                {
-                //                    throw;
-                //                }
-                //                else
-                //                {
-                //                    //do nothing, we then have to parse the file
-                //                    loadedFromProtobuf = false;
-                //                }
-                //            }
-                //            type = "cache";
-                //        }
-                //    }
-                //    else
-                //    {
-                //        loadedFromProtobuf = false;
-                //    }
-
-                //    if (loadedFromProtobuf)
-                //    {
-                //        //do nothing, also no writing of .lib file of course
-                //    }
-                //    else
-                //    {
-                //        //We have to parse it
-                //        library = new Library(libraryName, fileNameWithPath, stamp);
-                //        library.LibraryExtractor(fileNameWithPath);
-
-                //        try //not the end of world if it fails
-                //        {
-                //            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                //            RuntimeTypeModel serializer = TypeModel.Create();
-                //            serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                //            // ----- SERIALIZE                    
-                //            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
-                //            string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                //            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-                //            {
-                //                serializer.Serialize(fs, library);
-                //            }
-                //        }
-                //        catch (Exception e)
-                //        {
-                //            //do nothing, not the end of the world if it fails
-                //        }
-                //        type = "file";
-                //    }
-
-                //    //all files loaded from .zip end up here, and the cache only grows (cannot shrink).
-                //    this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
-                //}
-
-                //this.libraries.Add(library);
-                //List<string> functions, procedures, files;
-                //QHelper(library, out functions, out procedures, out files);
-
-                //string more = null;
-                //if (functions.Count + procedures.Count + files.Count > 0)
-                //{
-                //    more = " (" + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, QHelperActions(library, functions, procedures, files))) + ")";
-                //}
-
-                //using (Writeln txt = new Writeln())
-                //{
-                //    txt.MainAdd("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more + ".");
-                //    txt.MainNewLineTight();
-                //    txt.MainAdd("Library path: " + fileNameWithPath + ", ");
-                //    txt.MainAdd("loaded from " + type + " in: " + G.SecondsFormat((DateTime.Now - dt0).TotalMilliseconds) + ".");
-                //}
-
+                if (Program.options.library_cache == true)
+                {
+                    if (File.Exists(libFileNameAndPath))
+                    {
+                        try
+                        {
+                            using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
+                            {
+                                databankTemp = Serializer.Deserialize<Databank>(fs);
+                                loadedFromProtobuf = true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            if (G.IsUnitTesting())
+                            {
+                                throw;
+                            }
+                            else
+                            {
+                                //do nothing, we then have to parse the file
+                                loadedFromProtobuf = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    loadedFromProtobuf = false;
+                }
             }
 
-            if (oRead.Type == EDataFormat.Pcim)
+            if (loadedFromProtobuf)
             {
-                Program.ReadPCIM(databankTemp, readInfo, file);
-            }
-            else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
-            {
-                Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, originalFilePathPretty, dateformat, datetype);
-            }
-            else if (oRead.Type == EDataFormat.Tsd)
-            {
-                ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref NaNCounter);
-            }
-            else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
-            {
-                ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath);
-            }
-            else if (oRead.Type == EDataFormat.Tsp)
-            {
-                TspUtilities.tspDataUtility(file, databankTemp, oRead, readInfo);
-            }
-            else if (oRead.Type == EDataFormat.Gdx)
-            {
-                GamsData.ReadGdx(databankTemp, readInfo, file);
-            }
-            else if (oRead.Type == EDataFormat.Px)
-            {
-                Program.ReadPxHelper(databankTemp, oRead, readInfo, file);
-            }
-            else if (oRead.Type == EDataFormat.Flat)
-            {
-                Program.ReadFlat(databankTemp, readInfo, file);
-            }
-            else if (oRead.Type == EDataFormat.Aremos)
-            {
-                Program.ReadAremos(databankTemp, readInfo, file);
+                //do nothing, also no writing of cache file of course
             }
             else
             {
-                new Error("#78632432");
-            }
+                if (true)  //read it the hard way
+                {
+                    if (oRead.Type == EDataFormat.Pcim)
+                    {
+                        Program.ReadPCIM(databankTemp, readInfo, file);
+                    }
+                    else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
+                    {
+                        Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, originalFilePathPretty, dateformat, datetype);
+                    }
+                    else if (oRead.Type == EDataFormat.Tsd)
+                    {
+                        ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref NaNCounter);
+                    }
+                    else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
+                    {
+                        ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath);
+                    }
+                    else if (oRead.Type == EDataFormat.Tsp)
+                    {
+                        TspUtilities.tspDataUtility(file, databankTemp, oRead, readInfo);
+                    }
+                    else if (oRead.Type == EDataFormat.Gdx)
+                    {
+                        GamsData.ReadGdx(databankTemp, readInfo, file);
+                    }
+                    else if (oRead.Type == EDataFormat.Px)
+                    {
+                        Program.ReadPxHelper(databankTemp, oRead, readInfo, file);
+                    }
+                    else if (oRead.Type == EDataFormat.Flat)
+                    {
+                        Program.ReadFlat(databankTemp, readInfo, file);
+                    }
+                    else if (oRead.Type == EDataFormat.Aremos)
+                    {
+                        Program.ReadAremos(databankTemp, readInfo, file);
+                    }
+                    else
+                    {
+                        new Error("#78632432");
+                    }
+                }
 
+                if (MayUseDatabankCache(oRead))
+                {
+
+                    try //not the end of world if it fails
+                    {
+                        //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                        RuntimeTypeModel serializer = TypeModel.Create();
+                        serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                                                                     // ----- SERIALIZE                    
+                        string protobufFileName = Globals.gekkoVersion + "_" + "data" + "_" + libHash + Globals.cacheExtension;
+                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                        using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                        {
+                            serializer.Serialize(fs, databankTemp);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        //do nothing, not the end of the world if it fails
+                    }
+                }
+            }
+                                                                    
             return databankTemp;
+        }
+
+        /// <summary>
+        /// True if options.databank_file_cache == "all", or if file type is != gbk and options.databank_file_cache == "nongbk"
+        /// </summary>
+        /// <param name="oRead"></param>
+        /// <returns></returns>
+        private static bool MayUseDatabankCache(ReadOpenMulbkHelper oRead)
+        {
+            return Program.options.databank_file_cache == "all" || (Program.options.databank_file_cache == "nongbk" && oRead.Type != EDataFormat.Gbk);
         }
 
         /// <summary>
@@ -10960,7 +10982,7 @@ namespace Gekko
             //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
             sb.AppendLine("SubPeriods: " + O.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.modelGekko.subPeriods
 
-            string trueHash = Program.GetMD5Hash(sb.ToString());  //Pretty unlikely that two different .frm files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(sb.ToString(), null);  //Pretty unlikely that two different .frm files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             G.WritelnGray("HASH: " + trueHash);
 
@@ -12602,24 +12624,50 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Obtains MD5 hash code from a string input. Some symbols in the returned hash are replaced, so MD5 here is not completely standard.
+        /// Obtains MD5 hash code from (a) string input or (b) a file. 
+        /// Re (a): Symbols '=', '+' and '/' in the MD5 are replaced, so MD5 here is not completely standard.
+        /// Re (b): Symbol '-' in the MD5 is removed.
+        /// Note that (b) is much faster on a file than first getting the file as a string.
+        /// The two versions are kept in 1 method to keep them together. Probably the internals are identical?
+        /// Look at this for Gekko 4.0.
         /// See also GetShaHash().
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string GetMD5Hash(string input)
-        {
-            // step 1, calculate MD5 hash from input
-            MD5 md5 = System.Security.Cryptography.MD5.Create();
-            byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);  //UTF8 seems best choice
-            byte[] hash = md5.ComputeHash(inputBytes);
-            // step 2, convert byte array to hex string
-            StringBuilder sb = new StringBuilder();
-            string s = Convert.ToBase64String(hash).Replace("=", "").Replace("+", "a").Replace("/", "b");
-            //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
-            //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
-            //This is a little better than hex (32 symbols).
-            return s;
+        public static string GetMD5Hash(string input, string fileNameWithPath)
+        {            
+            if (input != null && fileNameWithPath != null) new Error("Wrong call"); //one of them must be null
+
+            string hash = null;
+
+            if (input != null)
+            {
+                // step 1, calculate MD5 hash from input
+                MD5 md5 = MD5.Create();
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);  //UTF8 seems best choice
+                byte[] hash2 = md5.ComputeHash(inputBytes);
+                // step 2, convert byte array to hex string
+                StringBuilder sb = new StringBuilder();
+                hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
+                //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
+                //This is a little better than hex (32 symbols).
+            }
+            else if (fileNameWithPath != null)
+            {
+                using (var md5Instance = MD5.Create())
+                {
+                    using (var stream = File.OpenRead(fileNameWithPath))
+                    {
+                        byte[] hash2 = md5Instance.ComputeHash(stream);
+                        //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
+                        //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
+                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");                        
+                    }
+                }
+            }
+            else new Error("Wrong call");
+            return hash;
         }
 
         /// <summary>
@@ -15661,7 +15709,7 @@ namespace Gekko
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
             {
@@ -18811,13 +18859,12 @@ namespace Gekko
 
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
 
+            bool compress = true;
+            if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false) compress = false;
+
             if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
             try
-            {
-                if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
-                {
-                    new Error("'OPTION databank file gbk compress = yes' is deprecated in Gekko 3.1.9 and onwards.");
-                }
+            {                
                 if (!System.IO.Directory.Exists(folderInfo.FullName))
                 {
                     new Warning("Zip file could not be created");  //should not be possible                        
@@ -18833,7 +18880,14 @@ namespace Gekko
 
                 File.Delete(zipFileName);
                 Thread.Sleep(sleepMs);  //give some time after file is deleted
-                ZipFile.CreateFromDirectory(folder, zipFileName);
+                if (compress)
+                {
+                    ZipFile.CreateFromDirectory(folder, zipFileName);
+                }
+                else
+                {
+                    ZipFile.CreateFromDirectory(folder, zipFileName, System.IO.Compression.CompressionLevel.NoCompression, false);
+                }
             }
             catch (Exception e)
             {
@@ -19795,16 +19849,6 @@ namespace Gekko
 
         public static void MaybeWriteOpenDatabank(Databank removed)
         {
-            //if (Globals.runningOnTTComputer)
-            //{
-            //    // #matisk
-            //    if (removed.storage.ContainsKey("kcf!q"))
-            //    {
-            //        Series xx = removed.storage["kcf!q"] as Series;
-            //        MessageBox.Show("WRITING databank dirty " + Program.IsDatabankDirty(removed) + " --> " + removed.name + " --- " + xx.meta.label + " --- " + xx.meta.source);
-            //    }
-            //}
-
             if (Program.IsDatabankDirty(removed))
             {
                 if (removed.save == false)
@@ -19813,8 +19857,7 @@ namespace Gekko
                 }
                 else if (!removed.editable)
                 {
-                    new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter.");
-                    //throw new GekkoException();
+                    new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter.");                    
                 }
                 else
                 {
@@ -20138,7 +20181,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath));
+                    string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath), null);
                     if (!(trueFileHash == removed.fileHash))
                     {
                         MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' seems to have changed since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");

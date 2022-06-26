@@ -845,6 +845,8 @@ namespace Gekko
                 //fail silently
             }
 
+            // Will the below ever be used, isn't everything deleted above??
+
             try
             {
                 long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
@@ -857,7 +859,7 @@ namespace Gekko
                 List<DateTimeHelper> ddd = new List<DateTimeHelper>();
                 foreach (FileInfo file in files)
                 {
-                    if (G.Equal(file.Extension, ".mdl")  || G.Equal(file.Extension, Libraries.libCacheExtension))
+                    if (G.Equal(file.Extension, Globals.cacheExtensionModel)  || G.Equal(file.Extension, Globals.cacheExtension))
                     {
                         sum += file.Length;
                         ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });

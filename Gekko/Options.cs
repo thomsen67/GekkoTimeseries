@@ -40,8 +40,9 @@ namespace Gekko
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
         public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
-        // ---
-        public bool databank_create_auto = true;             
+        // ---        
+        public bool databank_create_auto = true;
+        public string databank_file_cache = "nongbk"; //[all | nonbgk | none] --> will cache non-gbk databank files for faster (re)read.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
@@ -300,6 +301,7 @@ namespace Gekko
             Add("BUGFIX MISSING", Globals.xbool);
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
+            Add("DATABANK FILE CACHE", Globals.xnameOrString, "all", "nongbk", "none");
             Add("DATABANK CREATE AUTO", Globals.xbool);
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);

@@ -91,7 +91,7 @@ namespace Gekko.Parser.Frm
                 //string outputPath = Globals.localTempFilesLocation;
                 //DeleteFolder(outputPath);
                 //Directory.CreateDirectory(outputPath);
-                string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + ".mdl";
+                string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + Globals.cacheExtensionModel;
                 string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                 using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                 {
