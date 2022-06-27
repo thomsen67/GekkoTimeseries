@@ -128,6 +128,7 @@ namespace Gekko
 
                     using (Writeln w = new Writeln("", -12345, System.Drawing.Color.Empty, false, ETabs.Output))
                     {
+                        w.lineWidth = int.MaxValue;
                         foreach (GekkoFunctionCode gfc in f.overloads)
                         {
                             List<string> xx = Stringlist.ExtractLinesFromText(gfc.code);
@@ -179,30 +180,30 @@ namespace Gekko
                 {
                     files_string += s + ", ";
                 }
-                using (Writeln writeln2 = new Writeln())
+                using (Writeln txt = new Writeln())
                 {
-                    writeln2.MainAdd("---------------------------------------------------------------");
-                    writeln2.MainNewLineTight();
-                    writeln2.MainAdd("Library '" + library.GetName() + "':");
-                    writeln2.MainNewLineTight();
-                    writeln2.MainAdd("---------------------------------------------------------------");
-                    writeln2.MainNewLineTight();
+                    txt.MainAdd("---------------------------------------------------------------");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("Library '" + library.GetName() + "':");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("---------------------------------------------------------------");
+                    txt.MainNewLineTight();
                     if (functions.Count > 0)
                     {
-                        writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + functions_string.Substring(0, functions_string.Length - ", ".Length));
-                        writeln2.MainNewLineTight();
+                        txt.MainAdd(G.AddS(functions.Count, "function") + ": " + functions_string.Substring(0, functions_string.Length - ", ".Length));
+                        txt.MainNewLineTight();
                     }
                     if (procedures.Count > 0)
                     {
-                        writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + procedures_string.Substring(0, procedures_string.Length - ", ".Length));
-                        writeln2.MainNewLineTight();
+                        txt.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + procedures_string.Substring(0, procedures_string.Length - ", ".Length));
+                        txt.MainNewLineTight();
                     }
                     if (files.Count > 0)
                     {
-                        writeln2.MainAdd(G.AddS(files.Count, "file") + ": " + files_string.Substring(0, files_string.Length - ", ".Length));
-                        writeln2.MainNewLineTight();
+                        txt.MainAdd(G.AddS(files.Count, "file") + ": " + files_string.Substring(0, files_string.Length - ", ".Length));
+                        txt.MainNewLineTight();
                     }
-                    writeln2.MainAdd("---------------------------------------------------------------");
+                    txt.MainAdd("---------------------------------------------------------------");
                 }
             };
             return a;
