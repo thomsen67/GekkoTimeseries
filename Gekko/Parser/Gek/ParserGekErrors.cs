@@ -695,7 +695,15 @@ namespace Gekko.Parser.Gek
                     statement.paren_parentheses.Add(null);
                 }
 
-                if (tok.s == "[")
+                string x1 = null; string x2 = null;
+                try
+                {
+                    x1 = tokens2.storage[i - 1].s;
+                    x2 = tokens2.storage[i - 2].s;
+                }
+                catch { };
+
+                if (tok.s == "[" && !((x1 == "_" || x1 == "¨") && x2 == "["))  //do not count the second bracket in a "[_[" or a "[¨[".
                 {
                     n_bracket++;
                     statement.paren_brackets.Add(n_bracket);
@@ -725,7 +733,7 @@ namespace Gekko.Parser.Gek
                     statement.paren_curlies.Add(null);
                 }
 
-                if (tok.s == "<")
+                if (tok.s == "<")  //if we have "<=<" glue symbols, with tokens "<", "=", "<", the second "<" cannot turn on isInsideOptionField (and even if it did: ok)
                 {
                     if (i == iFirstWord + 1) isInsideOptionField = true;  //will not handle /* ... */ in between
                 }

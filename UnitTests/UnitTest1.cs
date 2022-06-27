@@ -13696,7 +13696,7 @@ namespace UnitTests
 
                 //something fishy about local period in functions, and LHS local period.
                 //probably ok for procedure calls, but else...?
-                //Assert.Fail();
+                Assert.Fail();
 
 
             }
