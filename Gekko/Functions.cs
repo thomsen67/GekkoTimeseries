@@ -2106,29 +2106,18 @@ namespace Gekko
             {
                 new Error("setdomains(): Expected array-series");
             }
-            List m_list = m as List;
-            if (m_list == null)
+        }
+
+        public static IVariable isarrayseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            IVariable rv = Globals.scalarVal0;
+            Series x_series = x as Series;
+            if (x_series == null) return Globals.scalarVal0;
+            if (x_series.type == ESeriesType.ArraySuper)
             {
-                new Error("setdomains(): Expected list of strings");
+                return Globals.scalarVal1;
             }
-            string[] ss = Stringlist.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
-            if (ss == null)
-            {
-                new Error("setdomains(): Error regarding the list elements. These should be strings.");
-            }
-            if (x_series.dimensions != ss.Length)
-            {
-                new Error("setdomains(): The array-timeseries has " + x_series.dimensions + ", whereas the provided list of domain names has " + ss.Length + " dimensions.");
-            }
-            foreach (string s in ss)
-            {
-                if (s.StartsWith(Globals.symbolCollection.ToString()) || s == "*")
-                {
-                    //good
-                }
-                else new Error("setdomains(): Problem in domain name '" + s + "'. Only the string '*' or strings starting with '#' are allowed.");
-            }
-            x_series.meta.domains = ss;
+            return Globals.scalarVal0;
         }
 
         /// <summary>
@@ -2167,7 +2156,6 @@ namespace Gekko
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
                 new Error("getelements(): Expected array-series");
-                //throw new GekkoException();
             }
 
             double dimCount2 = 1d;

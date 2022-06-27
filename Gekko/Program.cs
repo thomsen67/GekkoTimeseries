@@ -59,6 +59,12 @@ using System.Linq;
 using OfficeOpenXml;
 using System.Data;
 using System.IO.Compression;
+//for Parallel.ForEach(...)
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gekko
 {
@@ -2051,7 +2057,7 @@ namespace Gekko
                         Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
                     }
                     else if (i == 15)
-                    {                         
+                    {
                         using (FileStream fs = WaitForFileStream(file5, null, GekkoFileReadOrWrite.Read))
                         {
                             RuntimeTypeModel serializer = TypeModel.Create();
@@ -2061,6 +2067,17 @@ namespace Gekko
                     else if (i == 16)
                     {
                         Program.RunGekkoCommands("read <first gdx> " + file1 + ";", "", 0, new P());
+                    }
+                    else if (i == 17)
+                    {
+                        //This probably needs protobuf.NET >= 3.0
+                        //var list = new List<byte[]>();
+                        //var output = new Databank[list.Count];
+                        //Parallel.ForEach(list, () => 0, (x, pls, index, s) =>
+                        //{
+                        //    output[(int)index] = Serializer.Deserialize<Databank>(x);
+                        //    return 0;
+                        //}, _ => { });
                     }
                 }
                 else
