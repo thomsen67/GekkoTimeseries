@@ -13603,6 +13603,12 @@ namespace UnitTests
             _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
             _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
 
+            //
+            //
+            // HMMMM fishy that z <1981 1981> can assign some
+            //
+            //
+
             //1 + 2 + 3 + a
             I("RESET;");
             I("function series f(<date %t1, date %t2>); block time %t1 %t2; y = 100; end; return y; end;");
@@ -13611,6 +13617,96 @@ namespace UnitTests
             _AssertSeries(First(), "z!a", 1990, double.NaN, sharedDelta);
             _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
             _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
+
+            if (true)
+            {
+                //test interaction with optional parameters   
+
+                //NO TIME
+                //NO TIME
+                //NO TIME
+
+                I("RESET;");
+                I("function val f(val %x1, val %x2, val %x3); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4, 7, 100);");                
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(val %x1, val %x2, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4, 7);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(val %x1 'Tast' = 4, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f();");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                //OPTIONAL TIME, AND CALLED
+                //OPTIONAL TIME, AND CALLED
+                //OPTIONAL TIME, AND CALLED
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2, val %x3); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(<2001 2003>, 4, 7, 100);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(<2001 2003>, 4, 7);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(<2001 2003>, 4);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1 'Tast' = 4, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(<2001 2003>);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                //OPTIONAL TIME, BUT NOT CALLED
+                //OPTIONAL TIME, BUT NOT CALLED
+                //OPTIONAL TIME, BUT NOT CALLED
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2, val %x3); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4, 7, 100);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4, 7);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f(4);");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                I("RESET;");
+                I("function val f(<date %t1, date %t2>, val %x1 'Tast' = 4, val %x2 'Tast' = 7, val %x3 'Tast' = 100); return %x1 + %x2 + %x3; end;");
+                I("%sum = f();");
+                _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
+
+                
+
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+                //Make same test for procedures
+
+            }
 
             // ========== PROCEDURE =====================
 
