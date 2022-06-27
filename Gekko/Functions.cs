@@ -2251,6 +2251,11 @@ namespace Gekko
                 ok = true;
                 mm = new ScalarVal(keys.Count);
             }
+            else if (G.Equal(s, "dimensions"))
+            {
+                ok = true;
+                mm = new ScalarVal(x_series.dimensions);
+            }
             else
             {
 
