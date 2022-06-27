@@ -20449,8 +20449,24 @@ namespace Gekko
 
         public static void GetErrorLineAndText(P p, int i, out int lineNumber2, out string lineText, out List<string> commandLines)
         {
+            //if it is a procedure, command will be something like: "procedure 'test', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
+            //if it is a procedure, command will be something like: "function 'test()', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
+            //if it is a gcm, command will be something like: "C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤12"
+            //
+            //The start 'procedure ' and 'function' is stable, not likely to be changed. So we can use it to determine if we are inside a procedure/function call
+
             string command = p.GetStack(i);
-            string fileText = p.GetStackCommandFileText(i - 1);
+            int ii = i - 1;
+            if (command.StartsWith("procedure ", StringComparison.OrdinalIgnoreCase) || command.StartsWith("function ", StringComparison.OrdinalIgnoreCase))
+            {
+                ii--;
+            }
+            string fileText = "";
+            try
+            {
+                fileText = p.GetStackCommandFileText(ii);
+            }
+            catch { };
             if (command == null)
             {
                 lineText = "[?]";
