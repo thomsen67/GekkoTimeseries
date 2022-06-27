@@ -13694,17 +13694,10 @@ namespace UnitTests
                 I("%sum = f();");
                 _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
 
-                
+                //something fishy about local period in functions, and LHS local period.
+                //probably ok for procedure calls, but else...?
+                //Assert.Fail();
 
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
-                //Make same test for procedures
 
             }
 
@@ -13746,8 +13739,24 @@ namespace UnitTests
             _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
             _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
 
+            if (true)
+            {
+                //test interaction with optional parameters   
+                
+                //OPTIONAL TIME, AND CALLED
+                //OPTIONAL TIME, AND CALLED
+                //OPTIONAL TIME, AND CALLED                
 
-
+                I("RESET;");
+                I("procedure f <date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100; %z = %x1 + %x2 + %x3; end;");
+                I("f <2001 2003> 4;");
+                _AssertScalarVal(First(), "%z", 111d, sharedDelta);                
+                
+                I("RESET;");
+                I("procedure f <date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100; %z = %x1 + %x2 + %x3; end;");
+                I("f 4;");
+                _AssertScalarVal(First(), "%z", 111d, sharedDelta);
+            }
         }
 
         [TestMethod]

@@ -766,7 +766,7 @@ namespace Gekko.Parser.Gek
                         string returnType = node[0].Text;
                         string functionName = GetFunctionName2(node);  //node[1]
 
-                        if (node[2][0] != null && node[2][0].Text == "ASTSPECIALARGSDEF")  //f(<date %t1, date %t2>)
+                        if (IsFunctionDefOptionalTimeParams(node[2][0]))  //f(<date %t1, date %t2>)
                         {
                             foreach (ASTNode child in node[2][0].ChildrenIterator())
                             {
@@ -782,7 +782,7 @@ namespace Gekko.Parser.Gek
 
                         foreach (ASTNode child in node[2].ChildrenIterator())
                         {
-                            if (child.Text == "ASTSPECIALARGSDEF")
+                            if (IsFunctionDefOptionalTimeParams(child))
                             {
                                 continue;  //<date %t1, date %t2> has been done above
                             }
@@ -828,6 +828,12 @@ namespace Gekko.Parser.Gek
                     }
                     break;
             }
+        }
+
+        private static bool IsFunctionDefOptionalTimeParams(ASTNode node)
+        {
+            if (node == null) return false;
+            return node.Text == "ASTSPECIALARGSDEF";
         }
 
         private static void WalkASTAndEmitAfter(ASTNode node, W w)
@@ -2139,8 +2145,11 @@ namespace Gekko.Parser.Gek
                         sb.AppendLine(internalName + "();" + G.NL);
 
                         string typeChecks = null;
-
+                        
                         int numberOfOptionalParameters = 0;
+                        int adjust = 0;
+                        if (IsFunctionDefOptionalTimeParams(node[2][0])) adjust = 1; //f(<date %t1, date %t2>)
+
                         if (node.functionDef == null)
                         {
                             //do nothing
@@ -2149,8 +2158,8 @@ namespace Gekko.Parser.Gek
                         {
                             for (int i = 2; i < numberOfParameters; i++)
                             {
-                                if (node[2]?[i - numberOfDates_constant]?[2]?[0] != null) node.functionDef[i].labelCode = node[2][i - numberOfDates_constant][2][0].Code.ToString();
-                                if (node[2]?[i - numberOfDates_constant]?[3]?[0] != null) node.functionDef[i].defaultValueCode = node[2][i - numberOfDates_constant][3][0].Code.ToString();
+                                if (node[2]?[i - numberOfDates_constant + adjust]?[2]?[0] != null) node.functionDef[i].labelCode = node[2][i - numberOfDates_constant + adjust][2][0].Code.ToString();
+                                if (node[2]?[i - numberOfDates_constant + adjust]?[3]?[0] != null) node.functionDef[i].defaultValueCode = node[2][i - numberOfDates_constant + adjust][3][0].Code.ToString();
                             }
 
                             for (int i = numberOfDates_constant; i < numberOfParameters; i++)
