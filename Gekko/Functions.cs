@@ -2206,6 +2206,54 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Info on GAMS gdx type: is it variable or parameter?
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static IVariable getfixtype(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            Series x_series = x as Series;
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                new Error("getFixType(): Expected array-series");
+            }
+            if (x_series.meta != null && x_series.meta.fix == EFixedType.Parameter) return new ScalarString("parameter");
+            return new ScalarString("variable");
+        }
+
+        /// <summary>
+        /// Sets GAMS gdx type (parameter or variable)
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static void setfixtype(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable type)
+        {
+            Series x_series = x as Series;
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                new Error("setFixType(): Expected array-series");
+            }
+            string type_string = O.ConvertToString(type);
+            if (G.Equal(type_string, "parameter"))
+            {
+                x_series.meta.fix = EFixedType.Parameter;
+            }
+            else if (G.Equal(type_string, "variable"))
+            {
+                x_series.meta.fix = EFixedType.Normal;  //what about timeless?? Timeless vars are probably almost always parameters, since we do not solve for them.
+            }
+            else new Error("setFixType() expects argument 'parameter' or 'variable'");
+        }
+
+        /// <summary>
         /// Gets info on subseries inside an array-series:
         /// - len/length: the number of subseries
         /// - names: 'x[a, b]', x[a, c]'
@@ -2223,7 +2271,6 @@ namespace Gekko
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
                 new Error("subseries(): Expected array-series");
-                //throw new GekkoException();
             }
 
             ScalarString ss = option as ScalarString;
