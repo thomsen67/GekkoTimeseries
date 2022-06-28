@@ -28231,7 +28231,13 @@ namespace Gekko
 
             int pcounter = 0;
             string fullPathAndFileName = path;
-            using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, null, GekkoFileReadOrWrite.Write))
+                        
+            //28/6 2022: the above regarding file names and parts were a complete mess.
+            //Tried to clean it up a bit, with the line below.
+            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(samFileName, null);
+
+            //using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, null, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
             {
 
