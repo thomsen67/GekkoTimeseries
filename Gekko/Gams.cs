@@ -4175,77 +4175,17 @@ namespace Gekko
                 //GdxFast gdx = new gdxcs(Sysdir, ref Msg);
                 if (Msg != string.Empty)
                 {
-                    Console.WriteLine("**** Could not load GDX library");
-                    Console.WriteLine("**** " + Msg);
-                    //return 1;
+                    if (false)
+                    {
+                        Console.WriteLine("**** Could not load GDX library");
+                        Console.WriteLine("**** " + Msg);
+                    }
                 }
                 gdx.gdxGetDLLVersion(ref Msg);
-                Console.WriteLine("Using GDX DLL version: " + Msg);
-
                 if (false)
                 {
-                    int n = 3000;
-
-                    DateTime tt = DateTime.Now;
-
-                    //write demand data
-                    gdx.gdxOpenWrite("demanddata.gdx", "Gekko", ref ErrNr);
-                    if (ErrNr != 0)
-                    {
-                        //xp_example1.ReportIOError(ErrNr);
-                        throw new GekkoException();
-                    }
-
-                    if (gdx.gdxDataWriteStrStart("x", "label", 2, gamsglobals.dt_var, 0) == 0)
-                    {
-                        //ReportGDXError();
-                        throw new GekkoException();
-                    }
-
-                    string[] Indx2 = new string[2];
-                    int[] index = new int[2];
-                    for (int i = 1; i < n + 1; i++)
-                    {
-                        for (int j = 1; j < n + 1; j++)
-                        {
-                            Values[gamsglobals.val_level] = (n * 1000) * i + j;
-
-                            if (true)
-                            {
-                                Indx2[0] = i.ToString();
-                                Indx2[1] = j.ToString();
-                                if (gdx.gdxDataWriteStr(Indx2, Values) == 0)
-                                {
-                                    G.Writeln2("OOPS");
-                                }
-                            }
-                            else
-                            {
-                                index[0] = i;
-                                index[1] = j;
-                                if (gdx.gdxDataWriteRaw(index, Values) == 0)
-                                {
-                                    G.Writeln2("OOPS");
-                                }
-                            }
-
-                            //gdx.gdxDataWriteRaw()
-                        }
-                    }
-
-                    if (gdx.gdxDataWriteDone() == 0)
-                    {
-                        //ReportGDXError();
-                        throw new GekkoException();
-                    }
-                    gdx.gdxClose();
-                    //Console.WriteLine("Demand data written by xp_example1");
-
-                    G.Writeln2("TIME: " + G.Seconds(tt));
-
-                    return;
-                }
-
+                    Console.WriteLine("Using GDX DLL version: " + Msg);
+                }                
 
                 if (true)
                 {
@@ -4295,7 +4235,6 @@ namespace Gekko
 
                             string[] gekkoDomains = ts?.meta.domains;
 
-
                             string[] domains = new string[ts.dimensions + timeDimension];
                             for (int i = 0; i < domains.Length; i++) domains[i] = "*";  //default
 
@@ -4319,7 +4258,10 @@ namespace Gekko
 
                             //counter++;
 
-                            if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, gamsglobals.dt_var, 0) == 0)
+                            //Choose if the (array)series is a variable or parameter (in GAMS sense).
+                            int dt_ = gamsglobals.dt_var;                            
+                            if (ts.meta != null && ts.meta.fix == EFixedType.Parameter) dt_ = gamsglobals.dt_par;                            
+                            if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, dt_, 0) == 0)
                             {
                                 new Error("Internal GAMS/gdx problem (gdxDataWriteStrStart)");
                             }
@@ -4346,8 +4288,7 @@ namespace Gekko
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
-                            {
-                                //ReportGDXError();
+                            {                                
                                 throw new GekkoException();
                             }
                             counterVariables++;
@@ -4355,8 +4296,7 @@ namespace Gekko
                         else if (iv.Type() == EVariableType.List)
                         {
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq.Replace(Globals.symbolCollection.ToString(), ""), "", 1, gamsglobals.dt_set, 0) == 0)
-                            {
-                                //ReportGDXError();
+                            {                                
                                 throw new GekkoException();
                             }
 
@@ -4366,40 +4306,29 @@ namespace Gekko
                             {
                                 if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
                                 {
-                                    new Error("Problem writing set for gdx");
-                                    //throw new GekkoException();
+                                    new Error("Problem writing set (list) for gdx");
                                 }
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
-                            {
-                                //ReportGDXError();
+                            {                                
                                 throw new GekkoException();
                             }
                             exportedSets++;
                         }
                         else continue;
-
-
                     }
-
                 }
-
 
                 ErrNr = gdx.gdxClose();
                 if (ErrNr != 0)
-                {
-                    //ReportIOError(ErrNr);
+                {                    
                     throw new GekkoException();
                 }
 
                 G.Writeln2("Wrote " + counterVariables + " variables and " + exportedSets + " sets to " + pathAndFilename + " (" + G.Seconds(t) + ")");
                 if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
-
-
             }
-
-
         }
 
         public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
