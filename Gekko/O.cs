@@ -2091,7 +2091,7 @@ namespace Gekko
         }
 
         public static void Tell(string text, bool nocr)
-        {
+        {            
             Program.Tell(text, nocr);
         }
 
