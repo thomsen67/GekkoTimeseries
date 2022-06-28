@@ -2837,7 +2837,7 @@ collapseOpt1h:				MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 // COMPARE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, input.LT(1).Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER fileName?));
+compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, input.LT(1).Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTHANDLEFILENAME fileName?));
 compareOpt1:			    ISNOTQUAL
 						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
 						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
@@ -3547,15 +3547,15 @@ v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 //deprecated
-r_file:   				        R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
+r_file:   				        R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileName?));
 
 //deprecated
 r_export:  				        R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
 r_exportOpt1:			        ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
 r_exportOpt1h:                  TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
-r_run:  				        R_RUN r_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTPLACEHOLDER fileName?))
-                              | R_RUN r_runOpt1? fileName? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
+r_run:  				        R_RUN r_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTHANDLEFILENAME fileName?))
+                              | R_RUN r_runOpt1? fileName? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ASTPLACEHOLDER ^(ASTHANDLEFILENAME fileName?))                              
 							    ;
 
 r_runOpt1:			            ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
@@ -3567,7 +3567,7 @@ r_runOpt1h:                     MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesN
 // PYTHON_FILE, PYTHON_EXPORT, PYTHON_RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-python_run:  				    PYTHON_RUN python_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTPLACEHOLDER fileName?))
+python_run:  				    PYTHON_RUN python_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTHANDLEFILENAME fileName?))
                               | PYTHON_RUN python_runOpt1? fileName? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
 							    ;
 
