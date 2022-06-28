@@ -3816,7 +3816,7 @@ namespace Gekko
 
                             //See also #asf87aufkdh where similar loading is done regarding data from GAMS scalar model
 
-                            Series ts = null;
+                            Series tsSuperseries = null;
                             if (isMultiDim)
                             {
                                 //Multi-dim timeseries
@@ -3830,13 +3830,13 @@ namespace Gekko
                                     counter++;
                                 }
                                 if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                ts = new Series(freq, varNameWithFreq);
-                                ts.meta.label = label;
-                                ts.meta.domains = domains;
-                                if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
-                                ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
-                                if (varType == 1) ts.meta.fix = EFixedType.Parameter;
-                                databank.AddIVariable(ts.name, ts);
+                                tsSuperseries = new Series(freq, varNameWithFreq);
+                                tsSuperseries.meta.label = label;
+                                tsSuperseries.meta.domains = domains;
+                                if (hasTimeDimension == 0) tsSuperseries.type = ESeriesType.Timeless;
+                                tsSuperseries.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
+                                if (varType == 1) tsSuperseries.meta.fix = EFixedType.Parameter;
+                                databank.AddIVariable(tsSuperseries.name, tsSuperseries);
                             }
                             else
                             {
@@ -3844,11 +3844,11 @@ namespace Gekko
                                 //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
                                 //in this case, we just construct a normal timeseries
                                 if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                ts = new Series(freq, varNameWithFreq);
-                                ts.meta.label = label;
-                                if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
-                                if (varType == 1) ts.meta.fix = EFixedType.Parameter;
-                                databank.AddIVariable(ts.name, ts);
+                                tsSuperseries = new Series(freq, varNameWithFreq);
+                                tsSuperseries.meta.label = label;
+                                if (hasTimeDimension == 0) tsSuperseries.type = ESeriesType.Timeless;
+                                if (varType == 1) tsSuperseries.meta.fix = EFixedType.Parameter;
+                                databank.AddIVariable(tsSuperseries.name, tsSuperseries);
                             }
 
                             if (varType == 1)
@@ -3862,7 +3862,7 @@ namespace Gekko
 
                             List<string> oldDims = new List<string>() { "     " }; //will not match anything
 
-                            Series ts2 = null;  //the subseries in one of the dimension coordinates
+                            Series tsSubseries = null;  //the subseries in one of the dimension coordinates
 
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                             {
@@ -3929,23 +3929,23 @@ namespace Gekko
                                     //create it
                                     if (isMultiDim)
                                     {
-                                        MultidimItem mmi = new MultidimItem(dims.ToArray(), ts);
-                                        IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                                        MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
+                                        IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                         if (iv == null)
                                         {
-                                            ts2 = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
-                                            if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
-                                            ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
+                                            tsSubseries = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
+                                            if (timeDimNr == -12345) tsSubseries.type = ESeriesType.Timeless;
+                                            tsSuperseries.dimensionsStorage.AddIVariableWithOverwrite(mmi, tsSubseries);
                                         }
                                         else
                                         {
-                                            ts2 = iv as Series;
+                                            tsSubseries = iv as Series;
                                         }
                                     }
                                     else
                                     {
                                         //zero-dimensional series
-                                        ts2 = ts;  //just use that for this purpose
+                                        tsSubseries = tsSuperseries;  //just use that for this purpose
                                     }
                                 }
 
@@ -3974,10 +3974,10 @@ namespace Gekko
 
                                 if (tt == -12345)
                                 {
-                                    ts2.SetTimelessData(value);
+                                    tsSubseries.SetTimelessData(value);
                                     if (GamsIsFixed(values, value))
                                     {
-                                        ts2.meta.fix = EFixedType.Timeless;
+                                        tsSubseries.meta.fix = EFixedType.Timeless;
                                     }
                                 }
                                 else
@@ -3989,29 +3989,29 @@ namespace Gekko
                                     //TODO
 
                                     GekkoTime gt = new GekkoTime(freq, tt, 1);
-                                    ts2.SetData(gt, value);
+                                    tsSubseries.SetData(gt, value);
                                     yearMax = Math.Max(tt, yearMax);
                                     yearMin = Math.Min(tt, yearMin);
 
                                     if (varType == 2 && GamsIsFixed(values, value))  //not for varType == 1 (parameter)
                                     {
-                                        ts2.meta.fix = EFixedType.Normal;  //will overwrite a lot, but never mind it is fast
-                                        if (ts2.meta.fixedNormal == null) ts2.meta.fixedNormal = new GekkoTimeSpans();
-                                        if (ts2.meta.fixedNormal.data.Count == 0)
+                                        tsSubseries.meta.fix = EFixedType.Normal;  //will overwrite a lot, but never mind it is fast
+                                        if (tsSubseries.meta.fixedNormal == null) tsSubseries.meta.fixedNormal = new GekkoTimeSpans();
+                                        if (tsSubseries.meta.fixedNormal.data.Count == 0)
                                         {
                                             //the very first
-                                            ts2.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
+                                            tsSubseries.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
                                         }
                                         else
                                         {
-                                            GekkoTimeSpan gts = ts2.meta.fixedNormal.data[ts2.meta.fixedNormal.data.Count - 1];
+                                            GekkoTimeSpan gts = tsSubseries.meta.fixedNormal.data[tsSubseries.meta.fixedNormal.data.Count - 1];
                                             if (gts.tEnd.EqualsGekkoTime(gt.Add(-1)))
                                             {
                                                 gts.tEnd = gt;
                                             }
                                             else
                                             {
-                                                ts2.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
+                                                tsSubseries.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
                                             }
                                         }
                                     }

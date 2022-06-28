@@ -13538,8 +13538,26 @@ namespace UnitTests
             // -----------------------
 
         }
-
-
+        
+        [TestMethod]
+        public void _Test_GAMSVariableParameterType()
+        {
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");            
+            I("v = series(1);");            
+            I("v.setGamsType('variable');");
+            I("v[a] = 2;");
+            I("p = series(1);");
+            I("p.setGamsType('parameter');");
+            I("p[a] = 3;");
+            I("write <gdx> temp;");
+            I("reset;");
+            I("read <gdx> temp;");
+            I("%v = v.getGamsType();");
+            I("%p = p.getGamsType();");
+            _AssertScalarString(First(), "%v", "variable");
+            _AssertScalarString(First(), "%p", "parameter");
+        }
 
         [TestMethod]
         public void _Test_FunctionLocalTime_AndSomeBlock()

@@ -134,7 +134,7 @@ namespace Gekko
         [ProtoMember(11)]
         //BEWARE: Be careful when using .dataOffsetLag! #772439872435
         private int dataOffsetLag = 0;  //Added in protobuf for ultra-safety, should not be necessary. Only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
-
+        
         public MultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
 
@@ -2851,7 +2851,7 @@ namespace Gekko
         public string[] domains = null;
 
         [ProtoMember(8)]
-        public EFixedType fix = EFixedType.None;
+        public EFixedType fix = EFixedType.None; //for an array-superseries, if this type is .Parameter, the corresponding GDX variable is "parameter". If not, the corresponding GDX variable is "variable". So this field is also used to store information on GAMS/GDX types.
         [ProtoMember(9)]
         public GekkoTimeSpans fixedNormal = null;  //only for EFixedType.Normal, setting the periods
 
