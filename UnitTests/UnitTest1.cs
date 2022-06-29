@@ -13543,18 +13543,20 @@ namespace UnitTests
         public void _Test_GAMSVariableParameterType()
         {
             I("reset;");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");            
             I("v = series(1);");            
-            I("v.setGamsType('variable');");
+            I("v.setFixType('variable');");
             I("v[a] = 2;");
             I("p = series(1);");
-            I("p.setGamsType('parameter');");
+            I("p.setFixType('parameter');");
             I("p[a] = 3;");
             I("write <gdx> temp;");
             I("reset;");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("read <gdx> temp;");
-            I("%v = v.getGamsType();");
-            I("%p = p.getGamsType();");
+            I("%v = v.getFixType();");
+            I("%p = p.getFixType();");
             _AssertScalarString(First(), "%v", "variable");
             _AssertScalarString(First(), "%p", "parameter");
         }
