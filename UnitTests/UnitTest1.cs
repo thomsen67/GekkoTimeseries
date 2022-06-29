@@ -903,12 +903,12 @@ namespace UnitTests
             // ---------------------------------------
             // ---------------------------------------
 
-            //<type=hist>
-            I("compare < type = hist >;");
+            //<type=hist>            
+            I("reset;");
             I("time 2001 2003;");
             I("@x = 10, 20, 1;");
             I("x = 10, 20, 1.1;");
-            I("compare <pch = 9.90>;");
+            I("compare <pch = 9.99>;");
             I("%s = readfile('compare_databanks.txt');");
             string ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
@@ -920,13 +920,13 @@ namespace UnitTests
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
             Assert.IsTrue(!ss5.Contains("0.6897"));
 
-            I("compare <pch = 0.68 type=hist>;");
+            I("compare <pch = 0.68 type=hist>;");  // 0.1 / 14.5 * 100
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
             Assert.IsTrue(ss5.Contains("0.6897"));
 
-            I("compare <pch = 0.69 type=hist>;");
+            I("compare <pch = 0.69 type=hist>;");  // 0.1 / 14.5 * 100
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
