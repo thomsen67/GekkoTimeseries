@@ -544,6 +544,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Compare()
         {
+            
             I("reset;");
             I("time 2001 2002;");
             I("yy = series(1);");
@@ -895,6 +896,47 @@ namespace UnitTests
             I("compare <2001q1 2001q1 dump abs = 0.401 >;");  //all are filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 0);
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- <type=hist>
+            // ---------------------------------------
+            // ---------------------------------------
+
+            //<type=hist>
+            I("compare < type = hist >;");
+            I("time 2001 2003;");
+            I("@x = 10, 20, 1;");
+            I("x = 10, 20, 1.1;");
+            I("compare <pch = 9.90>;");
+            I("%s = readfile('compare_databanks.txt');");
+            string ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
+            Assert.IsTrue(!ss5.Contains("0.6897"));
+
+            I("compare <pch = 10.01>;");
+            I("%s = readfile('compare_databanks.txt');");
+            ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
+            Assert.IsTrue(!ss5.Contains("0.6897"));
+
+            I("compare <pch = 0.68 type=hist>;");
+            I("%s = readfile('compare_databanks.txt');");
+            ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
+            Assert.IsTrue(ss5.Contains("0.6897"));
+
+            I("compare <pch = 0.69 type=hist>;");
+            I("%s = readfile('compare_databanks.txt');");
+            ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
+            Assert.IsTrue(!ss5.Contains("0.6897"));
+
+
+
+
+
+
 
 
         }
