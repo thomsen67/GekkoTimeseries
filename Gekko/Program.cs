@@ -20674,7 +20674,9 @@ namespace Gekko
             //TODO TODO file should be path...
             //TODO TODO 
 
-            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel);
+            bool history = false;
+            if (G.Equal(o.opt_type, "hist")) history = true;
+            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel, history);
 
         }
 
@@ -27441,11 +27443,17 @@ namespace Gekko
             double v2 = ts.GetDataSimple(year0.Add(-1));
             double v1 = ts.GetDataSimple(year0);
 
-            double v = ((Math.Abs(v3) + Math.Abs(v2) + Math.Abs(v1)) / 3d);  //abs mean, not used it seems
+            double v = ((Math.Abs(v3) + Math.Abs(v2) + Math.Abs(v1)) / 3d);  //abs mean, not used
             double dLag = Math.Abs(v2 - v3);  //diff for x(-1)-x(-2)
             double dNonlag = Math.Abs(v1 - v2);  //diff for x-x(-1)
-            double d = (dLag + dNonlag) / 2d;  //mean diff
-            double rel = d / v;
+            double d = (dLag + dNonlag) / 2d;  //mean diff, ONLY THIS IS USED!
+            double rel = d / v;  //not used
+
+            //d resembles rss on differences, v resembles rss on levels.
+            //d and v measure mean distance from x axis.
+            //d = (abs(x - x[-1]) + abs(x[-1] - x[-2])) / 2
+            //v = (abs(x] + abs(x[-1]) + abs(x[-2])) / 3
+            //rel = d / v
 
             if (double.IsInfinity(d))
             {
@@ -27876,13 +27884,13 @@ namespace Gekko
             GekkoTime gt1 = new GekkoTime((Program.options.freq), t1, 1);
             GekkoTime gt2 = new GekkoTime((Program.options.freq), t2, 1);
 
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path, null, null, double.NaN, double.NaN);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN, false);
         }
 
         /// <summary>
@@ -28001,7 +28009,7 @@ namespace Gekko
         /// </summary>
         public static void Sam1()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false, false);
         }
 
         /// <summary>
@@ -28009,7 +28017,7 @@ namespace Gekko
         /// </summary>
         public static void Sam2()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true, false);
         }
 
         /// <summary>
@@ -28017,7 +28025,7 @@ namespace Gekko
         /// </summary>
         public static void Sam3()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true, false);
         }
 
         /// <summary>
@@ -28047,10 +28055,10 @@ namespace Gekko
         /// <summary>
         /// Databank compare helper (GUI method)
         /// </summary>
-        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order)
+        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order, bool history)
         {
             //Called in order to compare databanks, 5 last args inactive
-            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN);
+            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN, history);
         }
 
         /// <summary>
@@ -28071,7 +28079,7 @@ namespace Gekko
         /// <param name="dump"></param>
         /// <param name="crit_abs"></param>
         /// <param name="crit_rel"></param>
-        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel)
+        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel, bool history)
         {
             //TODO: could be more clearly coded, with 6 compareTypes (3 databank and 3 residuals), doing a 'variables == null' is not too pretty
             //TODO: error handling if var not found in one of the banks in residual check
@@ -28298,6 +28306,8 @@ namespace Gekko
 
                         double var1 = ts.GetDataSimple(t);
                         double var2 = tsGrund.GetDataSimple(t);
+                        double var2_lag1 = tsGrund.GetDataSimple(t.Add(-1));
+                        double var2_lag2 = tsGrund.GetDataSimple(t.Add(-2));
 
                         //we check first both 0, both M, one non-M && one M.
 
@@ -28318,14 +28328,14 @@ namespace Gekko
                             varPch = 1e+100d;
                             varDelta = 1e+100;
                         }
-                        else if (var2 == 0)
+                        else if (var2 == 0 && !history)
                         {
                             varPch = 1e+100d;
                             varDelta = var1 - var2;
                         }
                         else
                         {
-                            varPch = ((var1 / var2 - 1d) * 100d);
+                            varPch = ComparePch(history, var1, var2, var2_lag1, var2_lag2);
                             varDelta = var1 - var2;
                         }
 
@@ -28443,6 +28453,12 @@ namespace Gekko
                     {
                         samFile.Write(G.varFormat(name) + "   FRML       DATABANK              ABS DIFF      % DIFF");
                     }
+
+                    if (history)
+                    {
+                        samFile.Write("     % HIST");
+                    }
+
                     if (dlog)
                     {
                         samFile.Write("       DLOG");
@@ -28465,41 +28481,59 @@ namespace Gekko
                     }
 
                     samFile.Write("-------------------------------------------------------------------");
+                    if (history) samFile.WriteLine("------------");
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
 
                     foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
-                        double varLevel = 0;
-                        double varLevel2 = 0;
+                        double var1 = 0;
+                        double var2 = 0;
+                        double var2_lag1 = 0;
+                        double var2_lag2 = 0;
                         double varDelta = 0;
                         double varPch = 0;
                         double varDlog = double.NaN;
+                        double varRelHist = double.NaN;
                         samFile.Write(t + " ");
 
                         {
-                            varLevel = ts.GetDataSimple(t);
-                            varLevel2 = tsGrund.GetDataSimple(t);
+                            var1 = ts.GetDataSimple(t);
+                            var2 = tsGrund.GetDataSimple(t);
+                            var2_lag1 = tsGrund.GetDataSimple(t.Add(-1));
+                            var2_lag2 = tsGrund.GetDataSimple(t.Add(-2));
                             varDelta = ts.GetDataSimple(t) - tsGrund.GetDataSimple(t);
                             varPch = ((ts.GetDataSimple(t) / tsGrund.GetDataSimple(t) - 1d) * 100d);
+
                             if (dlog)
                             {
                                 varDlog = Math.Log(tsGrund.GetDataSimple(t) / ts.GetDataSimple(t));
                             }
 
-                            samFile.Write(G.levelFormatOld(varLevel));
+                            if (history)
+                            {
+                                varRelHist = ComparePch(history, var1, var2, var2_lag1, var2_lag2);
+                            }                            
+
+                            samFile.Write(G.levelFormatOld(var1));
                             samFile.Write(" ");
-                            samFile.Write(G.levelFormatOld(varLevel2));
+                            samFile.Write(G.levelFormatOld(var2));
                             samFile.Write("       ");
                             samFile.Write(G.levelFormatOld(varDelta));
                             samFile.Write("    ");
                             if (varDelta == 0d) varPch = 0d; //this way, two clean 0's get 0% difference
                             samFile.Write(G.pchFormatOld(varPch));
+                            if (history)
+                            {
+                                samFile.Write("    ");
+                                samFile.Write(G.levelFormatOld(varRelHist, 8));
+                            }
                             if (dlog)
                             {
                                 samFile.Write("    ");
                                 samFile.Write(G.levelFormatOld(varDlog, 8));
                             }
+
                         }
                         samFile.WriteLine();
                     }
@@ -28519,6 +28553,34 @@ namespace Gekko
             {
                 new Note(notFoundBoth2.Count + " series not found");
             }
+        }
+
+        /// <summary>
+        /// Relative difference, where a "standard deviation" of the ref values is used. Note: percent (multiplied by 100), not relative.
+        /// </summary>
+        /// <param name="history"></param>
+        /// <param name="var1"></param>
+        /// <param name="var2"></param>
+        /// <param name="var2_lag1"></param>
+        /// <param name="var2_lag2"></param>
+        /// <returns></returns>
+        private static double ComparePch(bool history, double var1, double var2, double var2_lag1, double var2_lag2)
+        {
+            double varPch;
+            if (history)
+            {
+                //This corresponds perfectly with the way convergence is checked in gauss-seidel SIM (per default)
+                double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;
+                if (G.isNumericalError(d)) d = 1e+100d;
+                varPch = Math.Abs(var1 - var2) / d * 100d;  //if d provides NaN, varPch = 0 almost, and only abs check is performed.
+                if (G.isNumericalError(varPch)) varPch = 1e+100d;
+            }
+            else
+            {
+                varPch = ((var1 / var2 - 1d) * 100d);
+            }
+
+            return varPch;
         }
 
         /// <summary>

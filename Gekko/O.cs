@@ -7812,6 +7812,7 @@ namespace Gekko
             public double opt_abs = 0d; //important that this i 0
             public double opt_rel = 0d; //important that this i 0
             public double opt_pch = 0d; //important that this i 0
+            public string opt_type = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

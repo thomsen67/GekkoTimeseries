@@ -2848,6 +2848,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 						  | REL EQUAL expression -> ^(ASTOPT_VAL_REL expression)
 						  | SORT EQUAL name -> ^(ASTOPT_STRING_SORT name?)  //alpha, rel, abs
 						  | PCH EQUAL expression -> ^(ASTOPT_VAL_PCH expression)
+						  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)  //normal | hist
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

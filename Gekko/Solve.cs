@@ -2008,7 +2008,6 @@ namespace Gekko
             if (histVar == -12345d)
             {
                 new Error("hist variance");
-                //throw new GekkoException();
             }
             if (histVar == double.NaN)
             {
