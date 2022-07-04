@@ -1951,20 +1951,24 @@ namespace Gekko
                     //i3   1650           sha with 1.2 mb chunks and read access
                     //i4   2900           md5 on text
                     //i5   9000           md5 on text utf8
-                    //i6    200           file copy
-                    //i7
-                    //i8   1750           sha with optimal mb chunks and read access
-                    //i9   4600           zip with normal compression
-                    //i10  1000           zip with zero compression
-                    //i11  1100           unzip with normal compression
-                    //i12   300           unzip with zero compression
-                    //i13  2500           read<first> gbk with normal compression
-                    //i14  2200           read<first> gbk with zero compression
-                    //i15  1400           deflate directly from protobuf 
-                    //i16 11000           read<first> gdx
-                    //
-                    // So read <gdx> is 11.000 whereas file copy + sha + deflate is
-                    // about 3.000. So around 25-30% time.
+                    //i6    200    180    file copy
+                    //i7           700    md5 directly on file
+                    //i8   1750   1600    sha with optimal mb chunks and read access
+                    //i9   4600   4450    zip with normal compression
+                    //i10  1000    900    zip with zero compression
+                    //i11  1100   1000    unzip with normal compression
+                    //i12   300    300    unzip with zero compression
+                    //i13  2500   2400    read<first> gbk with normal compression
+                    //i14  2200   2100    read<first> gbk with zero compression
+                    //i15  1400   1400    deflate directly from protobuf 
+                    //i16 11000   5600    read<first> gdx
+                    //-------------------------------------------------------------------------------
+                    //could be 10-20% faster if arrays used instead of ts.SetData().
+                    //caching would be around 180+700+1400 = 2500. 
+                    //  Faster if gdx is zipped and hash, maybe 1900 = 3 x faster.
+                    //  Then read<gdx> first time would go from 2400 to 3400 = 40% worse.
+                    //reading gbk directly would be 2400.
+
 
                     //-------------------------------------------------------------------------------
 
@@ -28088,6 +28092,11 @@ namespace Gekko
             if (compareType != null) compareType = compareType.ToLower();
             int seriesShown = 0;
 
+            long lagProblem = 0;
+            long lag1Problem = 0;
+            long lag2Problem = 0;
+            long lagCounter = 0;
+
             List<string> dif = new List<string>();
 
             // =======================================
@@ -28414,7 +28423,7 @@ namespace Gekko
                 if (ordered.Count == 0) samFile.WriteLine("[none]");
                 samFile.WriteLine();
 
-                int counter = 0;
+                long counter = 0;                
                 foreach (DictionaryEntry de in ordered)
                 {
                     counter++;
@@ -28484,9 +28493,10 @@ namespace Gekko
                     if (history) samFile.WriteLine("------------");
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
-
+                    int tCounter = -1;
                     foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
+                        tCounter++;
                         double var1 = 0;
                         double var2 = 0;
                         double var2_lag1 = 0;
@@ -28510,10 +28520,30 @@ namespace Gekko
                                 varDlog = Math.Log(tsGrund.GetDataSimple(t) / ts.GetDataSimple(t));
                             }
 
-                            if (history)
+                            if (history && tCounter == 0)
                             {
+                                if (G.isNumericalError(var2))
+                                {
+                                    //ok then
+                                }
+                                else
+                                {
+                                    if (G.isNumericalError(var2_lag1))
+                                    {                                     
+                                        lag1Problem++;
+                                    }
+                                    if (G.isNumericalError(var2_lag2))
+                                    {                                        
+                                        lag2Problem++;
+                                    }
+                                    if (G.isNumericalError(var2_lag1) || G.isNumericalError(var2_lag2))
+                                    {
+                                        lagProblem++;
+                                    }
+                                    lagCounter++;
+                                }
                                 varRelHist = ComparePch(history, var1, var2, var2_lag1, var2_lag2);
-                            }                            
+                            }
 
                             samFile.Write(G.levelFormatOld(var1));
                             samFile.Write(" ");
@@ -28526,7 +28556,7 @@ namespace Gekko
                             if (history)
                             {
                                 samFile.Write("    ");
-                                samFile.Write(G.levelFormatOld(varRelHist, 8));
+                                samFile.Write(G.pchFormatOld(varRelHist, 8));
                             }
                             if (dlog)
                             {
@@ -28553,6 +28583,19 @@ namespace Gekko
             {
                 new Note(notFoundBoth2.Count + " series not found");
             }
+            double l = (double)lagProblem / (double)lagCounter;
+            double l1 = (double)lag1Problem / (double)lagCounter;
+            double l2 = (double)lag2Problem / (double)lagCounter;
+            if (history && lagCounter > 0 && l > 0.8d)
+            {
+                using (Warning txt = new Warning())
+                {
+                    txt.MainAdd("There are many missing values when computing historical variability for " + tStart.ToString() + ".");
+                    txt.MoreAdd("For the period " + tStart.Add(-1).ToString() + ", " + Math.Round(l1 * 100, 0) + "% of reference databank values are missing values, ");
+                    txt.MoreAdd("and for the period " + tStart.Add(-2).ToString() + ", " + Math.Round(l2 * 100, 0) + "% of reference databank values are missing values.");
+                    txt.MoreAdd("Therefore, in " + tStart.ToString() + ", the relative check will be of limited value and will seldom make an impact (instead the absolute criterium will be dominant).");                    
+                }
+            }
         }
 
         /// <summary>
@@ -28571,7 +28614,7 @@ namespace Gekko
             {
                 //This corresponds perfectly with the way convergence is checked in gauss-seidel SIM (per default)
                 double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;
-                if (G.isNumericalError(d)) d = 1e+100d;
+                //if (G.isNumericalError(d)) d = 1e+100d;
                 varPch = Math.Abs(var1 - var2) / d * 100d;  //if d provides NaN, varPch = 0 almost, and only abs check is performed.
                 if (G.isNumericalError(varPch)) varPch = 1e+100d;
             }

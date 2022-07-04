@@ -908,37 +908,48 @@ namespace UnitTests
             I("time 2001 2003;");
             I("@x = 10, 20, 1;");
             I("x = 10, 20, 1.1;");
-            I("compare <pch = 9.99>;");
+            I("compare <2003 2003 pch = 9.99>;");
             I("%s = readfile('compare_databanks.txt');");
             string ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
-            Assert.IsTrue(!ss5.Contains("0.6897"));
+            Assert.IsTrue(!ss5.Contains("0.69"));
 
-            I("compare <pch = 10.01>;");
+            I("compare <2003 2003 pch = 10.01>;");
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
-            Assert.IsTrue(!ss5.Contains("0.6897"));
+            Assert.IsTrue(!ss5.Contains("0.69"));
 
-            I("compare <pch = 0.68 type=hist>;");  // 0.1 / 14.5 * 100
+            I("compare <2003 2003 pch = 0.68 type=hist>;");  // 0.1 / 14.5 * 100
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 1 of them"));
-            Assert.IsTrue(ss5.Contains("0.6897"));
+            Assert.IsTrue(ss5.Contains("0.69"));
 
-            I("compare <pch = 0.69 type=hist>;");  // 0.1 / 14.5 * 100
+            I("compare <2003 2003 pch = 0.69 type=hist>;");  // 0.1 / 14.5 * 100
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 1 common series, there are differences regarding 0 of them"));
-            Assert.IsTrue(!ss5.Contains("0.6897"));
+            Assert.IsTrue(!ss5.Contains("0.69"));
 
-
-
-
-
-
-
-
+            I("@y1 = 10, m(), 1;");
+            I("@y2 = 10, m(), 1;");
+            I("@y3 = m(), 20, 1;");
+            I("@y4 = m(), 20, 1;");
+            I("@y5 = m(), m(), 1;");
+            I("@y6 = m(), m(), 1;");
+            I("y1 = 10, m(), 1.1;");
+            I("y2 = 10, m(), 1.1;");
+            I("y3 = m(), 20, 1.1;");
+            I("y4 = m(), 20, 1.1;");
+            I("y5 = m(), m(), 1.1;");
+            I("y6 = m(), m(), 1.1;");
+            Globals.unitTestScreenOutput.Clear();
+            I("compare <2003 2003 pch = 0.68 type=hist>;");
+            I("%s = readfile('compare_databanks.txt');");
+            ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss5.Contains("Out of the 7 common series, there are differences regarding 7 of them"));            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There are many missing values"));
         }
 
         [TestMethod]
