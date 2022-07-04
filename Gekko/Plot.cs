@@ -167,7 +167,7 @@ namespace Gekko
             }
 
             string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
-            string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
+            string path = Globals.localTempFilesLocationGnuplot + "\\tempfiles";
             // Determine whether the directory exists.
             if (!Directory.Exists(path))
             {

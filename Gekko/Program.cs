@@ -20495,12 +20495,85 @@ namespace Gekko
 
         public static void Flush()
         {
-            //See also #8073589432059875
-            G.DeleteFolder(Globals.localTempFilesLocation, true);
-            Directory.CreateDirectory(Globals.localTempFilesLocation);
-            G.Writeln();
-            G.Writeln("Temporary folder was flushed:");
-            G.Writeln("  " + Globals.localTempFilesLocation);
+            new Writeln("Deleting/flushing temporary folders: " + System.Windows.Forms.Application.LocalUserAppDataPath);
+
+            try
+            {
+                Directory.Delete(Globals.localTempFilesLocation, true);
+            }
+            catch { };
+
+            try
+            {
+                Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+            }
+            catch { };
+
+            //This is necessary regarding the first, but in principle not regarding the two next.
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocation);
+            }
+            catch { };
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot);
+            }
+            catch { };
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot + "\\tempfiles");
+            }
+            catch { };            
+
+            if (false)
+            {
+                //If we need something like LRU cache, not deleting everything,
+                //the stuff below could be resurrected.
+
+                string path = "??";
+
+                try
+                {
+                    long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
+                                                     //1000 MB corresponds to > 120 different large models
+                    double fraction = 0.8d;
+                    long sum = 0L;
+
+                    FileInfo[] files = new DirectoryInfo(path).GetFiles();
+
+                    List<DateTimeHelper> ddd = new List<DateTimeHelper>();
+                    foreach (FileInfo file in files)
+                    {
+                        if (G.Equal(file.Extension, Globals.cacheExtensionModel) || G.Equal(file.Extension, Globals.cacheExtension))
+                        {
+                            sum += file.Length;
+                            ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
+                        }
+                    }
+
+                    if (sum > sumMax)
+                    {
+                        ddd.Sort((a, b) => a.dt.CompareTo(b.dt));
+                        double temp = (double)sumMax * fraction;  //we crop it some more, so we don't have to delete files for a while (= speedy startup)
+                        long tooMuch = sum - (long)(temp);
+                        long sum2 = 0L;
+                        foreach (DateTimeHelper d in ddd)
+                        {
+                            sum2 += d.size;
+                            File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)                        
+                            if (sum2 > tooMuch) break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    //fail silently, sometimes the files may be locked temporarily
+                }
+            }
         }
 
         public static List<string> GetDatabankInfo(StampTypes type)

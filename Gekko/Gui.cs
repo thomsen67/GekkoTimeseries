@@ -483,7 +483,7 @@ namespace Gekko
 
             if (track) MessageBox.Show("10");
 
-            //Clean up once every 7 days
+            //Clean up once every 14 days
             bool cleanup = false;
             bool makeNewFile = false;
             string file = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoTimeStamp.txt";
@@ -494,7 +494,7 @@ namespace Gekko
                     DirectoryInfo di = new DirectoryInfo(file);
                     DateTime dt = di.LastWriteTime;
                     double days = (DateTime.Now - dt).TotalDays;
-                    if (days < 0 || days > 7d)  //we get cleanup if invalid time, or > 7 days gone (or stamp file is missing)
+                    if (days < 0 || days > 14d)  //we get cleanup if invalid time, or > 14 days gone (or stamp file is missing)
                     {
                         cleanup = true;
                         makeNewFile = true;
@@ -518,29 +518,11 @@ namespace Gekko
                 //do nothing
             }
 
-            if (cleanup)  //This is only run if last Gekko start is more than 48 hours ago. To avoid superflous cleanup,
+            if (cleanup)  //This is only run if last Gekko start is more than 14 days ago. To avoid superflous cleanup,
             {             //that may take up to 0.1 sec if there are many .mdl files or other stuff to look through.
-                          //So we only get this short startup delay every 48 hours.
                 DateTime t1 = DateTime.Now;
-                try
-                {
-                    DeleteTemporaryGraphFilesFromLastSession();
-                }
-                catch (Exception e)
-                {
-                    //do nothing
-                }
-
-                try
-                {
-                    DeleteTemporaryFilesFromLastSession();  //also limits .mdl files here to 500 MB max = ca. 60 models.
-                }
-                catch (Exception e)
-                {
-                    //do nothing
-                }
-                G.Writeln();
-                G.Writeln("General cleanup of temporary Gekko files (" + G.Seconds(t1) + ") -- done occasionally");
+                Program.Flush();
+                new Writeln("General cleanup of temporary Gekko files (" + G.Seconds(t1) + ") -- done occasionally");
             }
 
             UserSettings us = null;
@@ -776,116 +758,7 @@ namespace Gekko
                 }
                 catch { };
             }
-        }
-
-        /// <summary>
-        /// Files of type temp*.emf/dat/gp in \gnuplot\tempfiles are deleted
-        /// each time the program starts up.
-        /// Cannot be deleted after each graph, because of file lock issues.
-        /// </summary>
-        private static void DeleteTemporaryGraphFilesFromLastSession()
-        {
-            try
-            {
-                //delete temporary graph files
-                //String path = Application.StartupPath + "\\gnuplot\\tempfiles";
-                String path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
-                if (!Directory.Exists(path)) return;
-
-                string[] imgList = Directory.GetFiles(path, "temp*.emf");
-                foreach (string img in imgList)
-                {
-                    FileInfo imgInfo = new FileInfo(img);
-                    imgInfo.Delete();
-                }
-                imgList = Directory.GetFiles(path, "temp*.dat");
-                foreach (string img in imgList)
-                {
-                    FileInfo imgInfo = new FileInfo(img);
-                    imgInfo.Delete();
-                }
-                imgList = Directory.GetFiles(path, "temp*.gp");
-                foreach (string img in imgList)
-                {
-                    FileInfo imgInfo = new FileInfo(img);
-                    imgInfo.Delete();
-                }
-            }
-            catch (Exception e)
-            {
-                //fail silently, sometimes the files may be locked temporarily
-            }
-
-        }
-
-        private static void DeleteTemporaryFilesFromLastSession()
-        {
-            //TODO: Do this same way as Flush(), cf. #8073589432059875
-
-            string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
-            try
-            {
-                if (!Directory.Exists(path)) return;
-                G.DeleteFolder(path, false);
-            }
-            catch (Exception e)
-            {
-                //fail silently, sometimes the files may be locked temporarily
-            }
-
-            try
-            {
-                foreach (DirectoryInfo dir in new DirectoryInfo(path).GetDirectories())
-                {
-                    dir.Delete();  //deletes only if it is empty
-                }
-            }
-            catch
-            {
-                //fail silently
-            }
-
-            // Will the below ever be used, isn't everything deleted above??
-
-            try
-            {
-                long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
-                                                 //1000 MB corresponds to > 120 different large models
-                double fraction = 0.8d;
-                long sum = 0L;
-
-                FileInfo[] files = new DirectoryInfo(path).GetFiles();
-
-                List<DateTimeHelper> ddd = new List<DateTimeHelper>();
-                foreach (FileInfo file in files)
-                {
-                    if (G.Equal(file.Extension, Globals.cacheExtensionModel)  || G.Equal(file.Extension, Globals.cacheExtension))
-                    {
-                        sum += file.Length;
-                        ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
-                    }
-                }
-
-                if (sum > sumMax)
-                {                    
-                    ddd.Sort((a, b) => a.dt.CompareTo(b.dt));                    
-                    double temp = (double)sumMax * fraction;  //we crop it some more, so we don't have to delete files for a while (= speedy startup)
-                    long tooMuch = sum - (long)(temp);
-                    long sum2 = 0L;
-                    foreach (DateTimeHelper d in ddd)
-                    {
-                        sum2 += d.size;                        
-                        File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)                        
-                        if (sum2 > tooMuch) break;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                //fail silently, sometimes the files may be locked temporarily
-            }
-
-        }
+        }                
 
         private static UserSettings LoadUserSettings()
         {
