@@ -1707,9 +1707,9 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
-                //Parallel();
+                Speed.Run();
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -2069,7 +2069,7 @@ namespace Gekko
                     {
                         using (FileStream fs = WaitForFileStream(file5, null, GekkoFileReadOrWrite.Read))
                         {
-                            RuntimeTypeModel serializer = TypeModel.Create();
+                            RuntimeTypeModel serializer = RuntimeTypeModel.Create();
                             Databank deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
                         }
                     }
@@ -3620,7 +3620,7 @@ namespace Gekko
                     try //not the end of world if it fails
                     {
                         //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                        RuntimeTypeModel serializer = TypeModel.Create();
+                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
                         serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                         DateTime t2 = DateTime.Now;
                         using (FileStream fs = Program.WaitForFileStream(cache_fileNameAndPath, null, Program.GekkoFileReadOrWrite.Write))
@@ -4252,7 +4252,7 @@ namespace Gekko
                     {
                         DateTime dt3 = DateTime.Now;
 
-                        RuntimeTypeModel serializer = TypeModel.Create();
+                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
 
                         deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
 
@@ -18558,7 +18558,7 @@ namespace Gekko
 
                     try
                     {
-                        RuntimeTypeModel serializer = TypeModel.Create();
+                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
                         serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                         serializer.Serialize(fs, databank);
                         count = databank.storage.Count;
@@ -30346,41 +30346,6 @@ namespace Gekko
         public GekkoTime t2;
     }
 
-
-    [Serializable]
-    [ProtoContract]
-    public class Proto
-    {
-        [ProtoMember(1)]
-        public int xx1;
-        int xx2;
-        private int xx3;
-        [ProtoMember(2)]
-        public List<int> yy1;
-        List<int> yy2;
-        private List<int> yy3;
-        [ProtoMember(3)]
-        public List<int> zz1;
-        [ProtoMember(4, AsReference = true)]
-        public ProtoHelper hh1;
-        [ProtoMember(5, AsReference = true)]
-        public ProtoHelper hh2;
-        public Proto()
-        {
-        }
-        public Proto(string input)
-        {
-            G.Writeln(input);
-        }
-    }
-
-    [ProtoContract]
-    public class ProtoHelper
-    {
-        [ProtoMember(1)]
-        public List<int> hh;
-    }
-
     public class PipeFileHelper
     {
         public string pipeFileFileWithPath = "";
@@ -30903,10 +30868,10 @@ namespace Gekko
     }
 
 
-    /*
+    
     public class Speed
     {
-        static void Run(string[] args)
+        public static void Run()
         {
             Serializer.PrepareSerializer<Test>();
             var list = new List<byte[]>();
@@ -30922,54 +30887,33 @@ namespace Gekko
             var watch = new Stopwatch();
 
             var output = new Test[list.Count];
-            int index = 0;
-            Console.Write("without AsParallel (Deserialize): ");
-            watch.Restart();
-            foreach (var x in list)
-            {
-                output[index++] = Deserialize<Test>(x);
-            }
-            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
 
-            Console.Write("   with AsParallel (Deserialize): ");
+            G.Writeln();                        
+            G.Write("   with Parallel.ForEach (Deserialize): ");
             watch.Restart();
-            list.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+            Parallel.ForEach(list, () => 0, (x, pls, index, s) =>
             {
-                output[i] = Deserialize<Test>(x);
-                return true;
-            }).All(_ => _);
-            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
-
-            Console.Write("   with Parallel.ForEach (Deserialize): ");
-            watch.Restart();
-            Parallel.ForEach(list, () => 0, (x, pls, index777, s) =>
-            {
-                output[(int)index777] = Deserialize<Test>(x);
+                //See https://github.com/protobuf-net/protobuf-net/issues/668
+                //About double speed on TT pc, compared to no parallel
+                output[(int)index] = Deserialize<Test>(x);
                 return 0;
             }, _ => { });
-            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+            G.Writeln(watch.ElapsedMilliseconds.ToString() + "ms");
 
-            Console.Write("without AsParallel (DummyWork): ");
-            watch.Restart();
-            list.Select((x, i) =>
-            {
-                output[i] = DummyWork<Test>(x);
-                return true;
-            }).All(_ => _);
-            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
-
-            Console.Write("   with AsParallel (DummyWork): ");
+            
+            G.Write("   with AsParallel (DummyWork): ");
             watch.Restart();
             list.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
                 output[i] = DummyWork<Test>(x);
                 return true;
             }).All(_ => _);
-            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+            G.Writeln(watch.ElapsedMilliseconds.ToString() + "ms");
         }
 
-        private static T Deserialize<T>(byte[] buffer)
-        {
+        private static T Deserialize<T>(ReadOnlyMemory<byte> buffer)
+        {            
+            //ReadOnlySpan<byte> xx = (ReadOnlySpan<byte>)buffer;  //Span is on the heap (not good), and is not faster when tested
             return Serializer.Deserialize<T>(buffer);
         }
 
@@ -30989,5 +30933,5 @@ namespace Gekko
             public string Value;
         }
     }
-    */
+    
 }

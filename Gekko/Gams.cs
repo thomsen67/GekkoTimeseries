@@ -1624,7 +1624,7 @@ namespace Gekko
                     DateTime dt1 = DateTime.Now;
 
                     //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer = TypeModel.Create();
+                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
                     serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
 
                     // ----- SERIALIZE
@@ -1778,7 +1778,7 @@ namespace Gekko
                     GAMSScalarModelHelper(false);                    
 
                     //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer2 = TypeModel.Create();
+                    RuntimeTypeModel serializer2 = RuntimeTypeModel.Create();
                     serializer2.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
 
                     // ----- SERIALIZE
