@@ -1707,9 +1707,84 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
+            }
+
+            if (true && Globals.runningOnTTComputer)
+            {
+                int n = 1;
+
+                DateTime t = DateTime.Now;
+
+                string hash = "abc123";
+                List<string> files = new List<string>();
+                List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+                for (int i = 0; i < n; i++)
+                {
+                    files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + n + "" + Globals.cacheExtension);
+                    lists.Add(new List<KeyValuePair<string, IVariable>>());
+                }
+                Databank source = Program.databanks.GetFirst();
+                int half = source.storage.Count / n + 1;
+
+                int counter = -1;
+                foreach (KeyValuePair<string, IVariable> kvp in source.storage)
+                {
+                    counter++;
+                    lists[counter / half].Add(kvp);
+                }
+
+                lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+                {
+                    using (FileStream fs = WaitForFileStream(files[i], null, GekkoFileReadOrWrite.Write))
+                    {
+                        try
+                        {
+                            RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                            serializer.Serialize(fs, x);
+                        }
+                        catch (Exception e)
+                        {
+                            new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                        }
+                    }
+                    return true;
+                }).All(_ => _);
+
+                new Writeln("Serialize: " + G.Seconds(t));
+                t = DateTime.Now;
+
+                for (int i = 0; i < lists.Count; i++)
+                {
+                    lists[i] = new List<KeyValuePair<string, IVariable>>();
+                }
+
+                Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+                {
+                    //See https://github.com/protobuf-net/protobuf-net/issues/668
+                    //About double speed on TT pc, compared to no parallel                    
+                    using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
+                    {
+                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                        //lists[(int)index] = serializer.Deserialize(fs, null, typeof(List<KeyValuePair<string, IVariable>>)) as List<KeyValuePair<string, IVariable>>;
+                        lists[(int)index] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+                    }
+                    return 0;
+                }, _ => { });
+
+                Databank db = new Databank("temp");
+                foreach (List<KeyValuePair<string, IVariable>> list in lists)
+                {
+                    foreach (KeyValuePair<string, IVariable> kvp in list)
+                    {
+                        db.storage.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                new Writeln("Deserialize: " + G.Seconds(t));
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -18555,7 +18630,6 @@ namespace Gekko
 
                 using (FileStream fs = WaitForFileStream(pathAndFilename2, null, GekkoFileReadOrWrite.Write))
                 {
-
                     try
                     {
                         RuntimeTypeModel serializer = RuntimeTypeModel.Create();
@@ -18566,8 +18640,6 @@ namespace Gekko
                     catch (Exception e)
                     {
                         new Error("Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers). Message: " + e.Message);
-
-                        //throw;
                     }
 
                 }
@@ -30866,8 +30938,6 @@ namespace Gekko
         //public int rep1 = 1;
         //public int rep2 = 1;
     }
-
-
     
     public class Speed
     {
@@ -30933,5 +31003,4 @@ namespace Gekko
             public string Value;
         }
     }
-    
 }

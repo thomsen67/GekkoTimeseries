@@ -3650,9 +3650,6 @@ namespace Gekko
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
-
-            //if (Globals.runningOnTTComputer) G.Writeln2("FIXED::: " + counterFixed);
-
         }
 
         private static void ReadGdxFast(Databank databank, string prefix, bool hasPrefix, string file, int offset, ref int skippedSets, ref int importedSets, ref int counterVariables, ref int counterParameters, ref int yearMax, ref int yearMin, EFreq freq, ref string gamsDir)

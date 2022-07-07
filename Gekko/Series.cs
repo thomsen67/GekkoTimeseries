@@ -2737,8 +2737,7 @@ namespace Gekko
             if (this.type == ESeriesType.ArraySuper)
             {                
                 foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
-                {
-                    //Globals.mem++;
+                {                    
                     kvp.Value.DeepTrim();
                 }
             }
