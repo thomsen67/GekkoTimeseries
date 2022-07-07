@@ -494,6 +494,7 @@ namespace Gekko
                     DirectoryInfo di = new DirectoryInfo(file);
                     DateTime dt = di.LastWriteTime;
                     double days = (DateTime.Now - dt).TotalDays;
+                    if (Globals.runningOnTTComputer) days = 1000d;  //triggers a flush
                     if (days < 0 || days > 14d)  //we get cleanup if invalid time, or > 14 days gone (or stamp file is missing)
                     {
                         cleanup = true;
