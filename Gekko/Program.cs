@@ -1709,6 +1709,11 @@ namespace Gekko
         {
             if (false && Globals.runningOnTTComputer)
             {
+                //Parallel();
+            }
+
+            if (false && Globals.runningOnTTComputer)
+            {
                 DateTime t0 = DateTime.Now;
                 new Writeln("Start");
                 double x = 0;
@@ -30896,4 +30901,93 @@ namespace Gekko
         //public int rep1 = 1;
         //public int rep2 = 1;
     }
+
+
+    /*
+    public class Speed
+    {
+        static void Run(string[] args)
+        {
+            Serializer.PrepareSerializer<Test>();
+            var list = new List<byte[]>();
+            for (int i = 0; i < 1000000; i++)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    Serializer.Serialize<Test>(ms, new Test() { Value = "some text " + i });
+                    list.Add(ms.ToArray());
+                }
+            }
+
+            var watch = new Stopwatch();
+
+            var output = new Test[list.Count];
+            int index = 0;
+            Console.Write("without AsParallel (Deserialize): ");
+            watch.Restart();
+            foreach (var x in list)
+            {
+                output[index++] = Deserialize<Test>(x);
+            }
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+
+            Console.Write("   with AsParallel (Deserialize): ");
+            watch.Restart();
+            list.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+            {
+                output[i] = Deserialize<Test>(x);
+                return true;
+            }).All(_ => _);
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+
+            Console.Write("   with Parallel.ForEach (Deserialize): ");
+            watch.Restart();
+            Parallel.ForEach(list, () => 0, (x, pls, index777, s) =>
+            {
+                output[(int)index777] = Deserialize<Test>(x);
+                return 0;
+            }, _ => { });
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+
+            Console.Write("without AsParallel (DummyWork): ");
+            watch.Restart();
+            list.Select((x, i) =>
+            {
+                output[i] = DummyWork<Test>(x);
+                return true;
+            }).All(_ => _);
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+
+            Console.Write("   with AsParallel (DummyWork): ");
+            watch.Restart();
+            list.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+            {
+                output[i] = DummyWork<Test>(x);
+                return true;
+            }).All(_ => _);
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString() + "ms");
+        }
+
+        private static T Deserialize<T>(byte[] buffer)
+        {
+            return Serializer.Deserialize<T>(buffer);
+        }
+
+        private static T DummyWork<T>(byte[] buffer)
+        {
+            using (var ms = new MemoryStream(buffer))
+            {
+                for (int i = 0; i < 10000; i++) { var x = 100 / 10; }
+                return default(T);
+            }
+        }
+
+        [ProtoContract]
+        public sealed class Test
+        {
+            [ProtoMember(1)]
+            public string Value;
+        }
+    }
+    */
 }
