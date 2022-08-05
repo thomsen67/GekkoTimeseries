@@ -500,14 +500,18 @@ namespace Gekko
                 bool isStamp = false; if (o != null && G.Equal(o.opt_stamp, "yes")) isStamp = true;
                 string title = o.opt_title;
 
-                Table tab2 = printTable.Transpose();
+                Table tab2 = null;
 
                 if (Globals.excelDna)
                 {
+                    //transposing is easier here for ExcelDna than for Epplus.
+                    if (G.Equal(o.opt_cols, "yes")) tab2 = printTable;
+                    else tab2 = printTable.Transpose();
                     Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title);
                 }
                 else
                 {
+                    tab2 = printTable.Transpose();
                     ExcelOptions eo = Program.PrepareDataForExcel(tab2);
                     Program.WriteExcel(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
                 }
@@ -529,11 +533,11 @@ namespace Gekko
             }
             else  //is .Print type
             {
-                if (rows) printTable = printTable.Transpose();
+                if (rows) printTable = printTable.Transpose();  //else we have series normally, <cols>
 
                 if (Globals.excelDna)
                 {
-                    Program.PrtToExcelDna(printTable, false, false, null); //isMulprt only relevant if there is a stamp, just set false here
+                    Program.PrtToExcelDna(printTable, false, false, null);
                 }
                 else
                 {

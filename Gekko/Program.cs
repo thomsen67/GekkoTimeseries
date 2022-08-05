@@ -23200,7 +23200,7 @@ namespace Gekko
         }
 
         public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title)
-        {
+        {            
             int extraRows = 0;
             if (isStamp) extraRows++;
             if (title != null) extraRows++;
