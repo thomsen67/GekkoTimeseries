@@ -266,7 +266,7 @@ namespace Gekko
                         int lines = -12345;
                         int widthHere = -12345;
 
-                        if (type == EPrintTypes.Plot || type == EPrintTypes.Sheet || rows)
+                        if (type == EPrintTypes.Plot || type == EPrintTypes.Sheet || type == EPrintTypes.Clip || rows)
                         {
                             lines = 1;
                             widthHere = int.MaxValue;
