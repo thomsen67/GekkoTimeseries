@@ -515,8 +515,16 @@ namespace Gekko
             }
             else if (type == EPrintTypes.Clip)
             {
-                //do not print anything, but put it on clipboard             
-                Table tab2 = printTable.Transpose();
+                //do not print anything, but put it on clipboard     
+                Table tab2 = null;
+                if (G.Equal(o.opt_cols, "yes"))
+                {
+                    tab2 = printTable;
+                }                
+                else
+                {
+                    tab2 = printTable.Transpose();
+                }
                 Program.PrtClipboard(tab2, false);
             }
             else  //is .Print type

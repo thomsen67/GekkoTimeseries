@@ -23155,7 +23155,6 @@ namespace Gekko
             if (table == null)
             {
                 new Error("No print or table recorded to put on clipboard");
-                //throw new GekkoException();
             }
             StringBuilder s = new StringBuilder();
 
