@@ -26332,13 +26332,23 @@ namespace Gekko
                     int dataCols = eo.excelData.GetLength(1);
 
                     int[,] excelColumnLabelsAnnual = new int[1, dataCols];
+                    bool allAnnual = false;
 
-                    if (!isMatrix && eo.excelColumnLabels != null && options.freq == EFreq.A)
+                    if (!isMatrix && eo.excelColumnLabels != null)
                     {
+                        allAnnual = true;  //start hypothesis, can be invalid for Q, M etc.
+                        //Look at the labels, and if all are integers, allAnnual will remain true (else false).
+                        //We cannot use current frequency, since we may be for instance printing x!q with frequncy set to annual.
                         for (int i = 0; i < eo.excelColumnLabels.Length; i++)
                         {
-                            //should never give an error
-                            excelColumnLabelsAnnual[0, i] = int.Parse(eo.excelColumnLabels[0, i]);
+                            int z = 0;
+                            bool ok = int.TryParse(eo.excelColumnLabels[0, i], out z);
+                            if (!ok)
+                            {
+                                allAnnual = false;
+                                break;
+                            }
+                            excelColumnLabelsAnnual[0, i] = z;
                         }
                     }
 
@@ -26428,7 +26438,7 @@ namespace Gekko
                             {
                                 //text based without format --> 2010, 2010q3, 2010m3
 
-                                if (!isMatrix && options.freq == EFreq.A)
+                                if (!isMatrix && allAnnual)
                                 {
                                     //else the cells are left-justified and with a green triangle (warning)
                                     int[,] datesData2 = null;

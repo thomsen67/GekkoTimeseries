@@ -386,8 +386,6 @@ namespace Gekko
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
                         new Error("PLOT had " + n + " elements, max is " + Program.options.plot_elements_max + ". You can use PLOT<nomax> or set OPTION plot elements max = ... ;");
-
-                        //throw new GekkoException();
                     }
                 }
             }
