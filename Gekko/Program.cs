@@ -1712,7 +1712,7 @@ namespace Gekko
                 Speed.Run();
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {                
                 ProtoSpeed(1);
                 ProtoSpeed(2);
