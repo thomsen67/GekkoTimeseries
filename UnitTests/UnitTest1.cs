@@ -10995,15 +10995,12 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
             //TODO: a_residual row 2 (residual)              
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC | [0]");
             Assert.AreEqual(table.Get(2, 2).number, 5.8800d, 0.0001);
             Assert.AreEqual(table.Get(2, 3).number, 9.3551d, 0.0001);
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv | [0]");
             Assert.AreEqual(table.Get(3, 2).number, -0.1684d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, -0.0797d, 0.0001);
-            Assert.AreEqual(table.Get(16, 1).CellText.TextData[0], "vtArv");
-            Assert.AreEqual(table.Get(16, 2).number, -0.4467d, 0.0001);
-            Assert.AreEqual(table.Get(16, 3).number, 0.4306d, 0.0001);
 
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -11031,13 +11028,13 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
             //TODO: a_residual row 2 (residual)              
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC | [0]");
             Assert.AreEqual(table.Get(2, 2).number, 5.8800d, 0.0001);
             Assert.AreEqual(table.Get(2, 3).number, 9.3551d, 0.0001);
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv | [0]");
             Assert.AreEqual(table.Get(3, 2).number, -0.1685d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, -0.0798d, 0.0001);
-            Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "vtArv");
+            Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "vtArv | [0]");
             Assert.AreEqual(table.Get(15, 2).number, -0.4469d, 0.0001);
             Assert.AreEqual(table.Get(15, 3).number, 0.4308d, 0.0001);
         }
@@ -11074,7 +11071,7 @@ namespace UnitTests
 
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                    // Globals.showDecompTable = true;  //will show the following decomp table and then abort
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -11731,7 +11728,7 @@ namespace UnitTests
             //
             // Decomp for 2028.
             //
-            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             //Does not work to use atot, must use tot.
             //I("decomp3 <2028 2028 m> vHhx[tot] from E_jvHhx_aTot endo vHhx[tot] rows vars, lags cols time;");
             //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        

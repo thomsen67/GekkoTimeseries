@@ -2426,6 +2426,8 @@ namespace Gekko
                     double lhsSum = 0d;
                     double rhsSum = 0d;
 
+                    //second time, no loop..........
+
                     foreach (string varname in GetDecompDatas(decompDatasSupremeClone[super], operatorOneOf3Types).storage.Keys)
                     {
                         i++;
