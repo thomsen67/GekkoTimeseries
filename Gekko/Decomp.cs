@@ -426,7 +426,7 @@ namespace Gekko
             }
 
             if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse (like pch or share showing)
-            {                
+            {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
@@ -440,6 +440,8 @@ namespace Gekko
                     decompOptions2.dataPattern.dataCellsGradRef = new Series(per1.freq, null);
                 }
                 RealExtraPeriods(per1, per2, decompOptions2.dataPattern, extraPattern);
+                                
+                if(!shouldMerge) ResetDecompDatas(decompOptions2, decompDatas);
 
                 List<string> expressionTexts = new List<string>();
                 int ii = -1;
@@ -468,10 +470,10 @@ namespace Gekko
                             DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
                         }
                     }
-                    if (!shouldMerge)
-                    {
-                        decompDatas.storage.Add(temp);
-                    }
+                    //if (!shouldMerge)
+                    //{
+                    //    decompDatas.storage.Add(temp);
+                    //}
                 }
                 if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
@@ -734,6 +736,35 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static void ResetDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas)
+        {
+            decompDatas.storage = new List<List<DecompData>>();
+            int ii = -1;
+            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+            {
+                ii++;
+                decompDatas.storage.Add(new List<DecompData>());
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                    {
+                        DecompData d = new DecompData();
+                        DecompInitDict(d);
+                        decompDatas.storage[ii].Add(d);                        
+                    }
+                }
+                else
+                {
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
+                    {
+                        DecompData d = new DecompData();
+                        DecompInitDict(d);
+                        decompDatas.storage[ii].Add(d);
+                    }
+                }
+            }
         }
 
         private static void PrepareEquations(GekkoTime per1, GekkoTime per2, string operator1, DecompOptions2 decompOptions2)
@@ -1372,8 +1403,11 @@ namespace Gekko
 
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, List<DecompData> temp, DecompData dd, EContribType operatorOneOf3Types, bool shouldMerge, int ii, int jj)
         {
-            if (shouldMerge)
+            if (true)
             {
+                decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
+                decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
+
                 if (operatorOneOf3Types == EContribType.D)
                 {
                     decompDatas.storage[ii][jj].cellsContribD = dd.cellsContribD;
@@ -1386,6 +1420,10 @@ namespace Gekko
                 {
                     decompDatas.storage[ii][jj].cellsContribM = dd.cellsContribM;
                 }
+
+                decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
+                decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
+
             }
             else
             {

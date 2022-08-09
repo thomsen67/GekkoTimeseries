@@ -1734,33 +1734,33 @@ namespace Gekko.Parser.Gek
         public static string ReplaceTokenNamesWithMeaningfulStrings(string s)
         {
             s = s.Replace(" AT", " '@'");
-            s = s.Replace(" BACKSLASH", " ' \\'");
-            s = s.Replace(" COLON", " ':'");
+            s = s.Replace(" BACKSLASH", " ' \\'");            
             s = s.Replace(" COLONGLUE", " ':'");
+            s = s.Replace(" COLON", " ':'");
             s = s.Replace(" COMMA2", " ','");
             s = s.Replace(" DateDef", " date");
-            s = s.Replace(" DigitsEDigits", " digits");
-            s = s.Replace(" DIV", " '/'");
+            s = s.Replace(" DigitsEDigits", " digits");            
             s = s.Replace(" DIVEQUAL", " '/='");
-            s = s.Replace(" DOLLAR", " '$'");
-            s = s.Replace(" DOT", " '.'");
-            s = s.Replace(" Double", " floating value");
+            s = s.Replace(" DIV", " '/'");
+            s = s.Replace(" DOLLAR", " '$'");                        
             s = s.Replace(" DOUBLEAND", " '&&'");
             s = s.Replace(" DOUBLEVERTICALBAR1", " '||'");
             s = s.Replace(" DOUBLEVERTICALBAR2", " '||'");
+            s = s.Replace(" Double", " floating value");
             s = s.Replace(" EQUAL", " '='");
             s = s.Replace(" EXCLAMATION", " '!'");
-            s = s.Replace(" GLUE", " some alternative");
-            s = s.Replace(" GLUEBACKSLASH", " '\\'");
-            s = s.Replace(" GLUEDOT", " '.'");
+            s = s.Replace(" GLUEDOT", " '.'");            
+            s = s.Replace(" GLUEBACKSLASH", " '\\'");            
             s = s.Replace(" GLUEDOTNUMBER:", " '.'");
             s = s.Replace(" GLUESTAR", " '*'");
-            s = s.Replace(" HASH", " '#'");
+            s = s.Replace(" GLUE", " some alternative");
+            s = s.Replace(" DOT", " '.'");
             s = s.Replace(" HASHEQUAL", " '#='");
+            s = s.Replace(" HASH", " '#'");
             s = s.Replace(" HAT", " '^'");
-            s = s.Replace(" HATEQUAL", " '^='");
-            s = s.Replace(" Ident", " letters");
+            s = s.Replace(" HATEQUAL", " '^='");            
             s = s.Replace(" IdentStartingWithInt", " digits/letters");
+            s = s.Replace(" Ident", " letters");
             s = s.Replace(" Integer", " integer");
             s = s.Replace(" ISEQUAL", " '=='");
             s = s.Replace(" ISLARGEROREQUAL", " '>='");
@@ -1771,22 +1771,22 @@ namespace Gekko.Parser.Gek
             s = s.Replace(" LEFTBRACKET", " '['");
             s = s.Replace(" LEFTBRACKETGLUE", " '['");
             s = s.Replace(" LEFTCURLY", " '{'");
-            s = s.Replace(" LEFTPAREN", " '('");
-            s = s.Replace(" MINUS", " '-'");
+            s = s.Replace(" LEFTPAREN", " '('");            
             s = s.Replace(" MINUSEQUAL", " '-='");
-            s = s.Replace(" PERCENT", " '%'");
+            s = s.Replace(" MINUS", " '-'");            
             s = s.Replace(" PERCENTEQUAL", " '%='");
-            s = s.Replace(" PLUS", " '+'");
+            s = s.Replace(" PERCENT", " '%'");            
             s = s.Replace(" PLUSEQUAL", " '+='");
+            s = s.Replace(" PLUS", " '+'");
             s = s.Replace(" QUESTION", " '?'");
             s = s.Replace(" RIGHTANGLE", " '>'");
             s = s.Replace(" RIGHTBRACKET", " ']'");
             s = s.Replace(" RIGHTCURLY", " '}'");
             s = s.Replace(" RIGHTPAREN", " ')'");
-            s = s.Replace(" SEMICOLON", " ';'");
-            s = s.Replace(" STAR", " '*'");
+            s = s.Replace(" SEMICOLON", " ';'");            
             s = s.Replace(" STAREQUAL", " ' *='");
             s = s.Replace(" STARS", " '**'");
+            s = s.Replace(" STAR", " '*'");            
             s = s.Replace(" VERTICALBAR", " '|'");
             s = s.Replace(" StringInQuotes1", " string");
             s = s.Replace(" StringInQuotes2", " string");
@@ -1794,7 +1794,7 @@ namespace Gekko.Parser.Gek
             s = s.Replace(" TILDE", " '~'");
             s = s.Replace(" TRIPLESTARS", " '***'");
             s = s.Replace(" VERTICALBAR:", " '|'");
-            s = s.Replace("EOF", "[End of input]");
+            s = s.Replace("EOF", "[End of input]");                        
             s = s.Replace("expecting set", "");  //not meningful                
             s = s.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
             s = s.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
