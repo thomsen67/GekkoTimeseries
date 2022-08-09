@@ -11071,7 +11071,7 @@ namespace UnitTests
 
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                    Globals.showDecompTable = true;  //will show the following decomp table and then abort
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -11347,7 +11347,7 @@ namespace UnitTests
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
 
-            Gekko.Table table = null;
+            Gekko.Table table = null;                       
 
             //ModelGamsScalar.FlushAAndRArrays();
             //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
@@ -11371,7 +11371,6 @@ namespace UnitTests
             //   y1    1.71            y[-1]    1.71
             //   y3    1.71            y[+2]    1.71
             //
-
             
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> y from e1, e2 endo y, c rows vars cols time;");
@@ -11383,7 +11382,6 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 20d / 0.7d, 0.0001);
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "y");  //really y{extra}
             Assert.AreEqual(table.Get(4, 2).number, 32d - 20d / 0.7d, 0.0001);
-
 
             // ----------------------------------------
             // 2001-2002, multiplier
