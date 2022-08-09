@@ -429,7 +429,8 @@ namespace Gekko
             {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
-                //bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
+                //MAYBE DO THIS BY LOOKING INSIDE DECOMPDATAS...
+                //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)
 
                 Data extraPattern = new Data();
                 extraPattern.type = DecompGetType(operator1);
@@ -1406,29 +1407,6 @@ namespace Gekko
             MergeDecompDict(dd.cellsGradRef, decompDatas.storage[ii][jj].cellsGradRef);
             MergeDecompDict(dd.cellsQuo, decompDatas.storage[ii][jj].cellsQuo);
             MergeDecompDict(dd.cellsRef, decompDatas.storage[ii][jj].cellsRef);
-
-            //if (true)
-            //{
-            //    decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
-            //    decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
-
-            //    if (operatorOneOf3Types == EContribType.D)
-            //    {
-            //        decompDatas.storage[ii][jj].cellsContribD = dd.cellsContribD;
-            //    }
-            //    else if (operatorOneOf3Types == EContribType.RD)
-            //    {
-            //        decompDatas.storage[ii][jj].cellsContribDRef = dd.cellsContribDRef;
-            //    }
-            //    else if (operatorOneOf3Types == EContribType.M)
-            //    {
-            //        decompDatas.storage[ii][jj].cellsContribM = dd.cellsContribM;
-            //    }
-
-            //    decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
-            //    decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
-
-            //}
         }
 
         private static void MergeDecompDict(DecompDict dNew, DecompDict dOld)
@@ -2287,13 +2265,44 @@ namespace Gekko
                         }
                         else if (extra.type == EDecompBanks.Ref)
                         {
-                            //ref difference like <rd>   
-                            MessageBox.Show("Not implemented yet...");
+                            //ref difference like <rd>
+                            y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                            d.cellsRef[residualName].SetData(t, y0);
+                            double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
+                            d.cellsRef[residualName].SetData(t.Add(1), y1);
+                            double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
+                            double x1 = Program.model.modelGamsScalar.GetData(dp.date + 1, dp.variable, true);
+
+                            try
+                            {
+                                double x0_after = x0_before + eps;
+                                Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
+                                double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                double grad = (y0_after - y0) / eps;
+
+                                //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //see also #sf94lkjsdjæ
+                                if (!G.isNumericalError(grad))
+                                {
+                                    int lag2 = dp.date - timeIndex;
+                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
+                                    d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
+                                    d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
+                                    if (!vars.ContainsKey(name))  //for decomp pivot
+                                    {
+                                        vars.Add(name, 0);
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
+                            }
                         }
                         else if (extra.type == EDecompBanks.Work)
                         {
                             //work difference like <d>
-                            //normal multiplier like <m>
                             y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
                             d.cellsQuo[residualName].SetData(t, y0);
                             double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
