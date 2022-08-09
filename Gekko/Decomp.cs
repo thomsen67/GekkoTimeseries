@@ -254,109 +254,7 @@ namespace Gekko
                         ModelGamsScalar.FlushAAndRArrays();
                         Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                         Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
-                    }
-
-                    GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in decompOptions2.new_from)
-                    {
-                        //For each equation stated
-
-                        string equationName = null;
-                        //GekkoTime time = GekkoTime.tNull;
-
-                        string resultingFullName = null;
-                        List<string> indexes = null;
-                        //Actually there is no time extracted below: the s string hos no time element
-                        GekkoTime trash = GekkoTime.tNull;
-                        GamsModel.ExtractTimeDimension(s, false, ref equationName, ref trash, ref resultingFullName, out indexes);
-                        
-                        Dictionary<MultidimItem, DecompStartHelper> elements = null;
-                        equations.TryGetValue(equationName, out elements);
-                        if (elements == null)
-                        {
-                            elements = new Dictionary<MultidimItem, DecompStartHelper>();
-                            equations.Add(equationName, elements);
-                        }
-
-                        MultidimItem mmi = new MultidimItem(indexes.ToArray());
-                        DecompStartHelper element = null;
-                        elements.TryGetValue(mmi, out element);
-                        if (element == null)
-                        {
-                            element = new DecompStartHelper();
-                            element.name = equationName;
-                            element.indexes = mmi;
-                            element.fullName = element.name + element.indexes.GetName();
-                            int periods = GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2);
-                            element.periods = new DecompStartHelperPeriod[periods];
-                            elements.Add(mmi, element);
-                        }
-
-                        EDecompBanks type = EDecompBanks.Unknown;
-                        if (true)
-                        {
-                            //This is a bit convoluted, and the type is determined again later on.
-                            //The type ought to be determined here 1 time, and reused later on.
-                            //But we are using some commmon methods, so it is not completely spaghetti code (just double work)
-                            string operator1 = o.opt_prtcode.ToLower();
-                            Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1);  //removes any prefix "s"
-                            type = DecompGetType(operator1);
-                        }
-
-                        int deduct = -1;
-                        if (type == EDecompBanks.Multiplier) deduct = 0;
-
-                        foreach (GekkoTime time in new GekkoTimeIterator(o.t1.Add(deduct), o.t2))
-                        {
-                            int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
-                            if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
-                            if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
-                            DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
-                            //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
-                            string s2 = AddTimeToIndexes(s, time);
-                            int eqNumber = -12345;
-                            bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
-                            if (!b)
-                            {
-                                new Error("Could not find the equation '" + s2 + "'");
-                            }
-                            //int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
-                            elementPeriod.eqNumber = eqNumber;
-                            elementPeriod.t = time;
-                            element.periods[i] = elementPeriod;
-                        }
-                    }
-
-                    int counter = -1;
-                    foreach (KeyValuePair<string, Dictionary<MultidimItem, DecompStartHelper>> kvp in equations)
-                    {
-                        //for each equation name
-                        counter++;
-                        Link link = new Link();
-                        link.GAMS_dsh = new List<DecompStartHelper>();
-                        foreach (KeyValuePair<MultidimItem, DecompStartHelper> kvp2 in kvp.Value)
-                        {
-                            //for each index combination
-                            link.GAMS_dsh.Add(kvp2.Value);
-                            link.GAMS_eqNumber = counter;
-                        }
-
-                        if (counter == 0)
-                        {
-                            link.endo = new List<string>();
-                            link.endo.AddRange(decompOptions2.new_endo);
-                            link.varnames = new List<string>();
-                            link.varnames.AddRange(decompOptions2.new_select);
-                        }
-                        else
-                        {
-                            //is this still necessary?
-                            link.varnames = new List<string>();
-                            link.varnames.Add("<not used>"); //strange but necessary further on
-                        }
-
-                        decompOptions2.link.Add(link);
-                    }
+                    }                    
                 }
                 else
                 {
@@ -397,6 +295,32 @@ namespace Gekko
                 {
                     break;
                 }
+            }
+        }
+
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, EDecompBanks type)
+        {
+            int deduct = -1;
+            if (type == EDecompBanks.Multiplier) deduct = 0;
+
+            foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
+            {
+                int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
+                if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
+                if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
+                DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
+                //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
+                string s2 = AddTimeToIndexes(s, time);
+                int eqNumber = -12345;
+                bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
+                if (!b)
+                {
+                    new Error("Could not find the equation '" + s2 + "'");
+                }
+                //int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
+                elementPeriod.eqNumber = eqNumber;
+                elementPeriod.t = time;
+                element.periods[i] = elementPeriod;
             }
         }
 
@@ -496,8 +420,13 @@ namespace Gekko
                 else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
             }
 
-            if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse
+            if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
+                PrepareEquations(per1, per2, operator1, decompOptions2);
+            }
+
+            if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse (like pch or share showing)
+            {                
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
@@ -714,15 +643,15 @@ namespace Gekko
                                     Series varParent = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName];  //will be created
                                     Series varChild = kvp.Value;
 
-                                    int counter = -1;
+                                    int counter2 = -1;
 
                                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                     {
-                                        counter++;
+                                        counter2++;
                                         double dVarParent = varParent.GetDataSimple(t);
                                         if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
                                         double dVarChild = varChild.GetDataSimple(t.Add(add));
-                                        double x = dVarParent + factors[counter] * dVarChild;
+                                        double x = dVarParent + factors[counter2] * dVarChild;
                                         GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName].SetData(t, x);
                                     }
                                 }
@@ -805,6 +734,88 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static void PrepareEquations(GekkoTime per1, GekkoTime per2, string operator1, DecompOptions2 decompOptions2)
+        {
+            decompOptions2.link = new List<Link>();
+            GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in decompOptions2.new_from)
+            {
+                //For each equation stated
+                string equationName = null;
+                string resultingFullName = null;
+                List<string> indexes = null;
+                //Actually there is no time extracted below: the s string hos no time element
+                GekkoTime trash = GekkoTime.tNull;
+                GamsModel.ExtractTimeDimension(s, false, ref equationName, ref trash, ref resultingFullName, out indexes);
+
+                Dictionary<MultidimItem, DecompStartHelper> elements = null;
+                equations.TryGetValue(equationName, out elements);
+                if (elements == null)
+                {
+                    elements = new Dictionary<MultidimItem, DecompStartHelper>();
+                    equations.Add(equationName, elements);
+                }
+
+                MultidimItem mmi = new MultidimItem(indexes.ToArray());
+                DecompStartHelper element = null;
+                elements.TryGetValue(mmi, out element);
+                if (element == null)
+                {
+                    element = new DecompStartHelper();
+                    element.name = equationName;
+                    element.indexes = mmi;
+                    element.fullName = element.name + element.indexes.GetName();
+                    int periods = GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2);
+                    element.periods = new DecompStartHelperPeriod[periods];
+                    elements.Add(mmi, element);
+                }
+
+                EDecompBanks type = EDecompBanks.Unknown;
+                if (true)
+                {
+                    //This is a bit convoluted, and the type is determined again later on.
+                    //The type ought to be determined here 1 time, and reused later on.
+                    //But we are using some commmon methods, so it is not completely spaghetti code (just double work)
+                    //string operator1a = o.opt_prtcode.ToLower();
+                    //Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1a);  //removes any prefix "s"
+                    type = DecompGetType(operator1);
+                }
+
+                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, type);
+            }
+
+            int counter = -1;
+            foreach (KeyValuePair<string, Dictionary<MultidimItem, DecompStartHelper>> kvp in equations)
+            {
+                //for each equation name
+                counter++;
+                Link link = new Link();
+                link.GAMS_dsh = new List<DecompStartHelper>();
+                foreach (KeyValuePair<MultidimItem, DecompStartHelper> kvp2 in kvp.Value)
+                {
+                    //for each index combination
+                    link.GAMS_dsh.Add(kvp2.Value);
+                    link.GAMS_eqNumber = counter;
+                }
+
+                if (counter == 0)
+                {
+                    link.endo = new List<string>();
+                    link.endo.AddRange(decompOptions2.new_endo);
+                    link.varnames = new List<string>();
+                    link.varnames.AddRange(decompOptions2.new_select);
+                }
+                else
+                {
+                    //is this still necessary?
+                    link.varnames = new List<string>();
+                    link.varnames.Add("<not used>"); //strange but necessary further on
+                }
+
+                decompOptions2.link.Add(link);
+            }
         }
 
         /// <summary>
