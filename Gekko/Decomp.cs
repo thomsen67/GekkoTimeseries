@@ -429,7 +429,7 @@ namespace Gekko
             {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
-                bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
+                //bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
 
                 Data extraPattern = new Data();
                 extraPattern.type = DecompGetType(operator1);
@@ -440,8 +440,8 @@ namespace Gekko
                     decompOptions2.dataPattern.dataCellsGradRef = new Series(per1.freq, null);
                 }
                 RealExtraPeriods(per1, per2, decompOptions2.dataPattern, extraPattern);
-                                
-                if(!shouldMerge) ResetDecompDatas(decompOptions2, decompDatas);
+
+                if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
 
                 List<string> expressionTexts = new List<string>();
                 int ii = -1;
@@ -449,7 +449,6 @@ namespace Gekko
                 {
                     ii++;
                     string residualName = Program.GetDecompResidualName(ii);
-                    List<DecompData> temp = new List<DecompData>();
 
                     int jj = -1;
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
@@ -458,7 +457,7 @@ namespace Gekko
                         {
                             jj++;  //will be = 0
                             DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, extraPattern, dsh, DecompBanks(operator1), residualName, ref funcCounter);
-                            DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
+                            DecompMainMergeOrAdd(decompDatas, dd, operatorOneOf3Types, ii, jj);
                         }
                     }
                     else
@@ -467,14 +466,11 @@ namespace Gekko
                         {
                             jj++;
                             DecompData dd = Decomp.DecompLowLevel(per1, per2, extraPattern, expression, DecompBanks(operator1), residualName, ref funcCounter);
-                            DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
+                            DecompMainMergeOrAdd(decompDatas, dd, operatorOneOf3Types, ii, jj);
                         }
                     }
-                    //if (!shouldMerge)
-                    //{
-                    //    decompDatas.storage.Add(temp);
-                    //}
                 }
+
                 if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
@@ -738,7 +734,7 @@ namespace Gekko
             return table;
         }
 
-        private static void ResetDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas)
+        private static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas)
         {
             decompDatas.storage = new List<List<DecompData>>();
             int ii = -1;
@@ -1401,33 +1397,56 @@ namespace Gekko
             return type;
         }
 
-        private static void DecompMainMergeOrAdd(DecompDatas decompDatas, List<DecompData> temp, DecompData dd, EContribType operatorOneOf3Types, bool shouldMerge, int ii, int jj)
+        private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, EContribType operatorOneOf3Types, int ii, int jj)
+        {            
+            MergeDecompDict(dd.cellsContribD, decompDatas.storage[ii][jj].cellsContribD);
+            MergeDecompDict(dd.cellsContribDRef, decompDatas.storage[ii][jj].cellsContribDRef);
+            MergeDecompDict(dd.cellsContribM, decompDatas.storage[ii][jj].cellsContribM);
+            MergeDecompDict(dd.cellsGradQuo, decompDatas.storage[ii][jj].cellsGradQuo);
+            MergeDecompDict(dd.cellsGradRef, decompDatas.storage[ii][jj].cellsGradRef);
+            MergeDecompDict(dd.cellsQuo, decompDatas.storage[ii][jj].cellsQuo);
+            MergeDecompDict(dd.cellsRef, decompDatas.storage[ii][jj].cellsRef);
+
+            //if (true)
+            //{
+            //    decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
+            //    decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
+
+            //    if (operatorOneOf3Types == EContribType.D)
+            //    {
+            //        decompDatas.storage[ii][jj].cellsContribD = dd.cellsContribD;
+            //    }
+            //    else if (operatorOneOf3Types == EContribType.RD)
+            //    {
+            //        decompDatas.storage[ii][jj].cellsContribDRef = dd.cellsContribDRef;
+            //    }
+            //    else if (operatorOneOf3Types == EContribType.M)
+            //    {
+            //        decompDatas.storage[ii][jj].cellsContribM = dd.cellsContribM;
+            //    }
+
+            //    decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
+            //    decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
+
+            //}
+        }
+
+        private static void MergeDecompDict(DecompDict dNew, DecompDict dOld)
         {
-            if (true)
+            foreach (KeyValuePair<string, Series> kvp in dNew.storage)
             {
-                decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
-                decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
-
-                if (operatorOneOf3Types == EContribType.D)
+                Series tsNew = kvp.Value;
+                Series tsOld = dOld[kvp.Key]; //may be created
+                GekkoTime t1 = tsNew.GetRealDataPeriodFirst();
+                GekkoTime t2 = tsNew.GetRealDataPeriodLast();
+                if (!t1.IsNull())
                 {
-                    decompDatas.storage[ii][jj].cellsContribD = dd.cellsContribD;
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        //the following if is probably not necessary
+                        if (G.isNumericalError(tsOld.GetDataSimple(t))) tsOld.SetData(t, tsNew.GetDataSimple(t));
+                    }
                 }
-                else if (operatorOneOf3Types == EContribType.RD)
-                {
-                    decompDatas.storage[ii][jj].cellsContribDRef = dd.cellsContribDRef;
-                }
-                else if (operatorOneOf3Types == EContribType.M)
-                {
-                    decompDatas.storage[ii][jj].cellsContribM = dd.cellsContribM;
-                }
-
-                decompDatas.storage[ii][jj].cellsQuo = dd.cellsQuo;
-                decompDatas.storage[ii][jj].cellsRef = dd.cellsRef;
-
-            }
-            else
-            {
-                temp.Add(dd);
             }
         }
 
