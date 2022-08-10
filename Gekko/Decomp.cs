@@ -386,6 +386,16 @@ namespace Gekko
             DateTime t0 = DateTime.Now;
 
             EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
+            bool rawDataQuo = false;
+            bool rawDataRef = false;
+            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp")
+            {
+                rawDataQuo = true;
+            }
+            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp")
+            {
+                rawDataRef = true;
+            }
 
             int perLag = -2;
             string lhsString = "Expression value";
@@ -547,7 +557,7 @@ namespace Gekko
                         if (decompOptions2.dyn)
                         {
                             //decomp over time, resolving lags/leads                            
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, rawDataQuo, rawDataRef);
                         }
                         else
                         {
@@ -555,7 +565,7 @@ namespace Gekko
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, rawDataQuo, rawDataRef);
                                 refreshObjects = false;
                             }
                         }
@@ -586,7 +596,7 @@ namespace Gekko
             List<DecompData> decompDataMAINClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDataMAINClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types, rawDataQuo, rawDataRef);
 
             if (false)
             {
@@ -1168,19 +1178,8 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <param name="operatorOneOf3Types"></param>
         /// <param name="parentI"></param>
-        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects)
+        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, bool rawDataQuo, bool rawDataRef)
         {
-            bool rawDataQuo = false;
-            bool rawDataRef = false;
-            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp")
-            {
-                rawDataQuo = true;
-            }
-            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp")
-            {
-                rawDataRef = true;
-            }
-
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
@@ -2519,7 +2518,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types, bool rawDataQuo, bool rawDataRef)
         {
             int parentI = 0;
 
@@ -2527,8 +2526,7 @@ namespace Gekko
             {
                 ENormalizeType normalize = ENormalizeType.Lags;
                 DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
-            }             
-            
+            }            
 
             if (!operator1.StartsWith("x"))
             {
@@ -2617,7 +2615,18 @@ namespace Gekko
 
                     //second time, no loop..........
 
-                    foreach (string varname in GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types).storage.Keys)
+                    DecompDict dd = null;
+                    if (IsRaw(rawDataQuo, rawDataRef))
+                    {
+                        if (rawDataQuo) dd = decompDataMAINClone[super].cellsQuo;
+                        else if (rawDataRef) dd = decompDataMAINClone[super].cellsRef;
+                    }                    
+                    else
+                    {
+                        dd = GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types);
+                    }
+
+                    foreach (string varname in dd.storage.Keys)
                     {
                         i++;
 
