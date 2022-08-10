@@ -428,6 +428,7 @@ namespace Gekko
             if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
             {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+                decompDatas.MAIN_data = null;
 
                 //MAYBE DO THIS BY LOOKING INSIDE DECOMPDATAS...
                 //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)
@@ -542,27 +543,20 @@ namespace Gekko
                 {
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        if (decompOptions2.prtOptionLower.StartsWith("x"))
+                        bool dyn = false;
+                        if (decompOptions2.dyn)
                         {
-                            //do nothing here
+                            //decomp over time, resolving lags/leads                            
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true);
                         }
                         else
                         {
-                            bool dyn = false;
-                            if (decompOptions2.dyn)
+                            //decomp period by period, showing lags/leads.
+                            bool refreshObjects = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                //decomp over time, resolving lags/leads                            
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true);
-                            }
-                            else
-                            {
-                                //decomp period by period, showing lags/leads.
-                                bool refreshObjects = true;
-                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                                {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects);
-                                    refreshObjects = false;
-                                }
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects);
+                                refreshObjects = false;
                             }
                         }
                     }
@@ -1176,6 +1170,12 @@ namespace Gekko
         /// <param name="parentI"></param>
         private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects)
         {
+            bool rawData = false;
+            if (!(operatorOneOf3Types == EContribType.D || operatorOneOf3Types == EContribType.RD || operatorOneOf3Types == EContribType.M))
+            {
+                rawData = true;
+            }
+
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
@@ -2206,18 +2206,7 @@ namespace Gekko
             // as x[-1] in the 2002-contribution of e5. So if we visualize rows with x[-1], x, x[+1], z, etc.
             // and cols with 2001, 2002, 2003, etc., each atomic lowest level equation is actually present
             // separately in these columns.
-            //
-            // NB: Perhaps use this when migrating "old" ADAM-like DECOMP for models
-            //     We can keep DecompLowLevel() for decomp of arbitrary Gekko expression like movavg(...) etc.
-            //     and sums over sets and the like.
-            //     Maybe simply generate an ADAM scalar model as C# Funcs, and use this interface. Makes a lot of stuff easier.
-            //       
-            // Performance: when looping over time, for <d> and <rd> types, there is some overlap 
-            //   regarding write of "raw" data, for instance (because of overlapping lags/leads)
-            //   d.cellsQuo[name].SetData(t, x0_before); d.cellsQuo[name].SetData(t.Add(1), x1);
-            //   The gradients are only calculated one, however, and this is probably a minor issue, since
-            //   there is no model calculation, but only data retrieving.
-
+            
             //See #kljaf89usafasdf for Gekko  model
             
             double eps = Globals.newtonSmallNumber;
@@ -2244,11 +2233,9 @@ namespace Gekko
                 {
                     if (double.IsNaN(pattern.GetDataSimple(t))) continue;
 
+                    int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
+
                     int eqNumber = -12345;
-                    //string s = dsh.name + "[" + t.ToString() + "]";
-                    //string temp = dsh.fullName;
-                    //temp = temp.Replace("[]", "");  //a hack, because a non-index eq name looks like E_xyz[].
-                    //string s = AddTimeToIndexes(temp, t);
 
                     string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
 
@@ -2257,6 +2244,9 @@ namespace Gekko
                     {
                         new Error("Could not find equation '" + s + "'");
                     }
+
+                    double y0 = double.NaN;
+                    double y1 = double.NaN;
 
                     //foreach precedent variable
                     for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
@@ -2267,11 +2257,7 @@ namespace Gekko
 
                         PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                         string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
-
-                        int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
-
-                        double y0 = double.NaN;
-
+                        
                         if (extra.type == EDecompBanks.Unknown)
                         {
                             //raw data.
@@ -2279,10 +2265,14 @@ namespace Gekko
                             //and both quo and ref are fetched.
                             //but it should be fast anyway
                             //normal multiplier like <m>
-                            y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                            d.cellsRef[residualName].SetData(t, y0);
-                            double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                            d.cellsQuo[residualName].SetData(t, y1);
+                            
+                            if (i == 0)
+                            {
+                                y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0);
+                                y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t, y1);
+                            }
                             double x0 = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
                             double x1 = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
                             int lag2 = dp.date - timeIndex;
@@ -2297,10 +2287,13 @@ namespace Gekko
                         else if (extra.type == EDecompBanks.Multiplier)
                         {
                             //normal multiplier like <m>
-                            y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                            d.cellsRef[residualName].SetData(t, y0);
-                            double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                            d.cellsQuo[residualName].SetData(t, y1);
+                            if (i == 0)
+                            {
+                                y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0);
+                                y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t, y1);
+                            }
                             double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
                             double x1 = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
 
@@ -2334,10 +2327,13 @@ namespace Gekko
                         else if (extra.type == EDecompBanks.Ref)
                         {
                             //ref difference like <rd>
-                            y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                            d.cellsRef[residualName].SetData(t, y0);
-                            double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
-                            d.cellsRef[residualName].SetData(t.Add(1), y1);
+                            if (i == 0)
+                            {
+                                y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0);
+                                y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t.Add(1), y1);
+                            }
                             double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
                             double x1 = Program.model.modelGamsScalar.GetData(dp.date + 1, dp.variable, true);
 
@@ -2371,10 +2367,13 @@ namespace Gekko
                         else if (extra.type == EDecompBanks.Work)
                         {
                             //work difference like <d>
-                            y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                            d.cellsQuo[residualName].SetData(t, y0);
-                            double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
-                            d.cellsQuo[residualName].SetData(t.Add(1), y1);
+                            if (i == 0)
+                            {
+                                y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t, y0);
+                                y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t.Add(1), y1);
+                            }
                             double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
                             double x1 = Program.model.modelGamsScalar.GetData(dp.date + 1, dp.variable, false);
 
@@ -3445,22 +3444,23 @@ namespace Gekko
             {
                 ect = EContribType.N;
             }
-            else if (op == "rn")
+            else if (op == "rn" || op == "r")
             {
                 ect = EContribType.RN;
             }
-            else if (op == "d" || op == "p" || op == "dp")
+            else if (op == "d" || op == "p")
             {
                 ect = EContribType.D;
             }
-            else if (op == "rd" || op == "rp" || op == "rdp")
+            else if (op == "rd" || op == "rp")
             {
                 ect = EContribType.RD;
             }
-            else if (op == "m" || op == "q" || op == "mp")
+            else if (op == "m" || op == "q")
             {
                 ect = EContribType.M;
             }
+            else new Error("Unknown operator '" + op + "' for DECOMP");
             return ect;
         }
 
