@@ -1415,22 +1415,15 @@ namespace Gekko
                     DecompDict dd = null;
                     if (IsRaw(rawDataQuo, rawDataRef))
                     {
-                        if (rawDataQuo)
+                        Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, xnewName);
+                        decompDatas.MAIN_data[ZERO].cellsQuo[xnewName].SetData(time, tup.Item1.GetDataSimple(time));
+                        decompDatas.MAIN_data[ZERO].cellsRef[xnewName].SetData(time, tup.Item2.GetDataSimple(time));
+                        if (col == 0)
                         {
-                            dd = decompDatas.MAIN_data[ZERO].cellsQuo;
-                            foreach (List<DecompData> dd1 in decompDatas.storage)
-                            {
-                                foreach (DecompData dd2 in dd1)
-                                {
-
-                                }
-                            }
+                            Tuple<Series, Series> tup2 = GetRealTimeseries(decompDatas, enewName);
+                            decompDatas.MAIN_data[ZERO].cellsQuo[enewName].SetData(time, tup2.Item1.GetDataSimple(time));
+                            decompDatas.MAIN_data[ZERO].cellsRef[enewName].SetData(time, tup2.Item2.GetDataSimple(time));
                         }
-                        else if (rawDataRef)
-                        {
-
-                        }
-                        else new Error();
                     }
                     else
                     {
@@ -3367,7 +3360,7 @@ namespace Gekko
 
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
                 //bool isResidualName = name == Globals.decompResidualName;
-                Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, d.lhs);
+                Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, d.lhs);
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
@@ -3423,37 +3416,32 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="tsQuo"></param>
         /// <param name="tsRef"></param>
-        private static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, EContribType operatorOneOf3Types, string s)
+        private static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, string s)
         {
             Series tsQuo = null;
-            Series tsRef = null;            
+            Series tsRef = null;
 
             //Find the real values of the series for normalization
-            if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
-            {
-                foreach (List<DecompData> temp in decompDatas.storage)
-                {
-                    foreach (DecompData decompData in temp)
-                    {
-                        decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
-                        if (tsQuo != null) goto Label1;
-                    }
-                }
-            Label1:;
-            }
 
-            if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+            foreach (List<DecompData> temp in decompDatas.storage)
             {
-                foreach (List<DecompData> temp in decompDatas.storage)
+                foreach (DecompData decompData in temp)
                 {
-                    foreach (DecompData decompData in temp)
-                    {
-                        decompData.cellsRef.storage.TryGetValue(s, out tsRef);
-                        if (tsRef != null) goto Label2;
-                    }
+                    decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
+                    if (tsQuo != null) goto Label1;
                 }
-            Label2:;
             }
+        Label1:;
+
+            foreach (List<DecompData> temp in decompDatas.storage)
+            {
+                foreach (DecompData decompData in temp)
+                {
+                    decompData.cellsRef.storage.TryGetValue(s, out tsRef);
+                    if (tsRef != null) goto Label2;
+                }
+            }
+        Label2:;
 
             Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
             return ts;
