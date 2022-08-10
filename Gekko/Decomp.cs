@@ -1170,10 +1170,15 @@ namespace Gekko
         /// <param name="parentI"></param>
         private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects)
         {
-            bool rawData = false;
-            if (!(operatorOneOf3Types == EContribType.D || operatorOneOf3Types == EContribType.RD || operatorOneOf3Types == EContribType.M))
+            bool rawDataQuo = false;
+            bool rawDataRef = false;
+            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp")
             {
-                rawData = true;
+                rawDataQuo = true;
+            }
+            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp")
+            {
+                rawDataRef = true;
             }
 
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1206,7 +1211,11 @@ namespace Gekko
             //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
             //because the size of exo is used the second time.
             //Maybe a bit inefficient?
-            for (int k = 0; k < 2; k++)  //k=0 just counts endo/exo sizes, so the arrays can be defined
+
+            int kMax = 2;
+            if (IsRaw(rawDataQuo, rawDataRef)) kMax = 1;
+
+            for (int k = 0; k < kMax; k++)  //k=0 just counts endo/exo sizes, so the arrays can be defined
             {
                 if (k == 0)
                 {
@@ -1246,7 +1255,8 @@ namespace Gekko
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;
-                        DecompDict dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
+                        DecompDict dd = null;
+                        if (!IsRaw(rawDataQuo, rawDataRef)) dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
 
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -1255,7 +1265,7 @@ namespace Gekko
                             //see also #as7f3læaf9
                             string eqName = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
                             if (k == 0) eqNames.Add(eqName);
-                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[eqName];                            
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[eqName];
 
                             //foreach precedent variable
                             for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
@@ -1309,7 +1319,7 @@ namespace Gekko
                                         if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
-                                        }                                            
+                                        }
                                         Series ts = dd.storage[x2];
                                         double d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;
@@ -1340,43 +1350,40 @@ namespace Gekko
             }
 
             double[,] inverse = null;
+            double[,] effect = null;
 
-            try
+            if (!IsRaw(rawDataQuo, rawDataRef))
             {
-                double[,] temp = (double[,])mEndo.Clone();
-                inverse = Program.InvertMatrix(temp);
-            }
-            catch (Exception e)
-            {
-                new Error("Matrix inversion for DECOMP failed", false);
-                bool nan = false;
-                foreach (double d in mEndo)
+
+
+
+                try
                 {
-                    if (G.isNumericalError(d))
+                    double[,] temp = (double[,])mEndo.Clone();
+                    inverse = Program.InvertMatrix(temp);
+                }
+                catch (Exception e)
+                {
+                    new Error("Matrix inversion for DECOMP failed", false);
+                    bool nan = false;
+                    foreach (double d in mEndo)
                     {
-                        nan = true;
-                        break;
+                        if (G.isNumericalError(d))
+                        {
+                            nan = true;
+                            break;
+                        }
                     }
+                    if (nan)
+                    {
+                        new Error("The matrix contains missing or infinite values", false);
+                    }
+                    throw new GekkoException();
                 }
-                if (nan)
-                {
-                    new Error("The matrix contains missing or infinite values", false);
-                }
-                throw new GekkoException();
+
+                effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
+                //the effect matrix is #endo x #exo    
             }
-
-            double[,] effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
-
-            //the effect matrix is #endo x #exo            
-
-            //List<string> selected = new List<string>();
-            //foreach (string s in decompOptions2.new_select)
-            //{
-            //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-            //    {                    
-            //        string s = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 0);
-            //    }
-            //}
 
             for (int row = 0; row < endo.Count; row++)
             {
@@ -1404,23 +1411,47 @@ namespace Gekko
                     GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
                     string xnewName = ConvertToTurtleName(xname, xlag);
 
-                    int NUL = 0;
-                    Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[xnewName];
-                    ts2.SetData(time, effect[row, col]);
-
-                    if (col == 0)
+                    int ZERO = 0;
+                    DecompDict dd = null;
+                    if (IsRaw(rawDataQuo, rawDataRef))
                     {
-                        //only do it once
-                        //!!!
-                        //!!! can't the be moved out of col loop, together with enewName etc.? Sems strange to require col == 0.
-                        //!!!
-                        Series ts3 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[enewName];
-                        ts3.SetData(time, 1d);
+                        if (rawDataQuo)
+                        {
+                            dd = decompDatas.MAIN_data[ZERO].cellsQuo;
+                            foreach (List<DecompData> dd1 in decompDatas.storage)
+                            {
+                                foreach (DecompData dd2 in dd1)
+                                {
+
+                                }
+                            }
+                        }
+                        else if (rawDataRef)
+                        {
+
+                        }
+                        else new Error();
+                    }
+                    else
+                    {
+                        dd = GetDecompDatas(decompDatas.MAIN_data[ZERO], operatorOneOf3Types);
+                        Series ts2 = dd[xnewName];
+                        ts2.SetData(time, effect[row, col]);
+                        if (col == 0)  //just once
+                        {                            
+                            Series ts3 = dd[enewName];
+                            ts3.SetData(time, 1d);
+                        }
                     }
                 }
             }
 
             DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+        }
+
+        private static bool IsRaw(bool rawDataQuo, bool rawDataRef)
+        {
+            return rawDataQuo || rawDataRef;
         }
 
         /// <summary>
@@ -1603,8 +1634,9 @@ namespace Gekko
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
             else
             {
+                //only relevant for _Test_DecompOperators, not for others. And that one is DECOMOP2 which will die.
                 return decompData.cellsContribD;  //just to get something going when doing for instance "xn" option
-            }
+            }            
         }
 
         private static bool IsAlmostZeroTimeseries(GekkoTime per1, GekkoTime per2, Series xx, double eps)
