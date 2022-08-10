@@ -408,24 +408,24 @@ namespace Gekko
             int funcCounter = 0;
             //G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
 
-            bool shouldRecalc = false;
-            if (decompDatas.storage == null)
-            {
-                shouldRecalc = true;
-            }
-            else
-            {
-                if (operatorOneOf3Types == EContribType.D && !decompDatas.hasD) shouldRecalc = true;
-                else if (operatorOneOf3Types == EContribType.RD && !decompDatas.hasRD) shouldRecalc = true;
-                else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
-            }
+            //bool shouldRecalc = false;
+            //if (decompDatas.storage == null)
+            //{
+            //    shouldRecalc = true;
+            //}
+            //else
+            //{
+            //    if (operatorOneOf3Types == EContribType.D && !decompDatas.hasD) shouldRecalc = true;
+            //    else if (operatorOneOf3Types == EContribType.RD && !decompDatas.hasRD) shouldRecalc = true;
+            //    else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
+            //}
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
                 PrepareEquations(per1, per2, operator1, decompOptions2);
             }
 
-            if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse (like pch or share showing)
+            if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
             {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
@@ -486,6 +486,42 @@ namespace Gekko
                 if (false)
                 {
                     DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                }
+
+                if (true)
+                {
+                    int i = -1;
+                    foreach (List<DecompData> x in decompDatas.storage)
+                    {
+                        i++;
+                        int j = -1;
+                        foreach (DecompData y in x)
+                        {
+                            j++;
+                            new Writeln("COMBINATION =====> " + i + " " + j);
+
+                            new Writeln("cellsQuo --------------------------------");
+                            PrintDecompDict(y.cellsQuo);
+
+                            new Writeln("cellsRef --------------------------------");
+                            PrintDecompDict(y.cellsRef);
+
+                            new Writeln("cellsGradQuo --------------------------------");
+                            PrintDecompDict(y.cellsGradQuo);
+
+                            new Writeln("cellsGradRef --------------------------------");
+                            PrintDecompDict(y.cellsGradRef);
+
+                            new Writeln("cellsContribD --------------------------------");
+                            PrintDecompDict(y.cellsContribD);
+
+                            new Writeln("cellsContribDRef --------------------------------");
+                            PrintDecompDict(y.cellsContribDRef);
+
+                            new Writeln("cellsContribM --------------------------------");
+                            PrintDecompDict(y.cellsContribM);
+                        }
+                    }
                 }
 
                 bool[] used = new bool[decompDatas.storage.Count];
@@ -1424,6 +1460,32 @@ namespace Gekko
                         //the following if is probably not necessary
                         if (G.isNumericalError(tsOld.GetDataSimple(t))) tsOld.SetData(t, tsNew.GetDataSimple(t));
                     }
+                }
+            }
+        }
+
+        private static void PrintDecompDict(DecompDict d)
+        {
+            foreach (KeyValuePair<string, Series> kvp in d.storage)
+            {
+                Series ts = kvp.Value;
+                GekkoTime t1 = ts.GetRealDataPeriodFirst();
+                GekkoTime t2 = ts.GetRealDataPeriodLast();
+                if (!t1.IsNull())
+                {
+                    int missings = 0;
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        //the following if is probably not necessary
+                        if (G.isNumericalError(ts.GetDataSimple(t))) missings++;
+                    }
+                    string m = null;
+                    if (missings > 0) m = ", !!!!! missings = " + missings;
+                    new Writeln(kvp.Key + " ---> data for " + t1.ToString() + "-" + t2.ToString() + m);
+                }
+                else
+                {
+                    new Writeln(kvp.Key + " ---> all missings");
                 }
             }
         }
