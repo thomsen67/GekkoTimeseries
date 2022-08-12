@@ -2700,29 +2700,37 @@ namespace Gekko
                             else
                             {
 
-                                if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
-                                {
-                                    Series tsFirst = null;
-                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
-                                    if (tsFirst == null)
-                                    {
-                                        new Error("Decomp #7093473984");
-                                    }
-                                    dLevel = tsFirst.GetDataSimple(t2);
-                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                }
+                                Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, varname);
+                                Series tsFirst = tup.Item1;
+                                Series tsRef = tup.Item2;
+                                dLevel = tsFirst.GetDataSimple(t2);
+                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                dLevelRef = tsRef.GetDataSimple(t2);
+                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
 
-                                if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
-                                {
-                                    Series tsRef = null;
-                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
-                                    if (tsRef == null)
-                                    {
-                                        new Error("Decomp #7093473985");
-                                    }
-                                    dLevelRef = tsRef.GetDataSimple(t2);
-                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                }
+                                //if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
+                                //{
+                                //    Series tsFirst = null;
+                                //    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                //    if (tsFirst == null)
+                                //    {
+                                //        new Error("Decomp #7093473984");
+                                //    }
+                                //    dLevel = tsFirst.GetDataSimple(t2);
+                                //    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                //}
+
+                                //if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+                                //{
+                                //    Series tsRef = null;
+                                //    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                                //    if (tsRef == null)
+                                //    {
+                                //        new Error("Decomp #7093473985");
+                                //    }
+                                //    dLevelRef = tsRef.GetDataSimple(t2);
+                                //    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                //}
                             }
                         }
 
