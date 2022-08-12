@@ -21029,7 +21029,7 @@ namespace Gekko
             }
 
             GekkoTime t1_highfreq = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries
-            if (t1_highfreq.IsNull()) new Error("It seems the input series has no data.");
+            if (t1_highfreq.IsNull()) new Error("It seems the input series " + ts_rhs.GetNameAndFreqPretty(true) + " has no data.");
             GekkoTime t2_highfreq = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
 
             if (freq_rhs == EFreq.Q && freq_lhs == EFreq.A)
@@ -21292,7 +21292,7 @@ namespace Gekko
             EFreq freq_rhs = ts_rhs.freq;
             EFreq freq_lhs = ts_lhs.freq;
             GekkoTime t1_rhs = ts_rhs.GetRealDataPeriodFirst(); //start of low-freq timeseries.
-            if (t1_rhs.IsNull()) new Error("It seems the input series has no data.");
+            if (t1_rhs.IsNull()) new Error("It seems the input series " + ts_rhs.GetNameAndFreqPretty(true) + " has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries
 
             if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))

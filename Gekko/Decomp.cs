@@ -3613,6 +3613,8 @@ namespace Gekko
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
         {
+            //THIS IS IT
+
             double d = double.NaN;
 
             if (code1 == "d" || code1 == "p")
