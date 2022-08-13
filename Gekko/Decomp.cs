@@ -901,59 +901,43 @@ namespace Gekko
         /// <param name="extraPattern"></param>
         private static void RealExtraPeriods(GekkoTime per1, GekkoTime per2, Data dataPattern, Data extraPattern)
         {
-            if (extraPattern.type == EDecompBanks.Unknown)
+
+            //if cellsQuo or cellsRef contain missing for the period that is part
+            //of decomposition, just try to fill these missings in again (may be missing again).
+
+            if (extraPattern.type == EDecompBanks.Multiplier)
             {
-                //HACK HACK HACK
-                //Unknown is non-decomp --> raw viewing
-                //here we just activate the whole period. This could be refined: data may already be
-                //present, but raw fetching is fast anyway.
-                extraPattern.dataCellsGradQuo = new Series(per1.freq, null);
                 extraPattern.dataCellsGradRef = new Series(per1.freq, null);
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
-                    extraPattern.dataCellsGradQuo.SetData(t, 1d);
-                    extraPattern.dataCellsGradRef.SetData(t, 1d);
+                    if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
+                    {
+                        dataPattern.dataCellsGradRef.SetData(t, 1d);
+                        extraPattern.dataCellsGradRef.SetData(t, 1d);
+                    }
                 }
             }
-            else
+            else if (extraPattern.type == EDecompBanks.Work)
             {
-                //if cellsQuo or cellsRef contain missing for the period that is part
-                //of decomposition, just try to fill these missings in again (may be missing again).
-
-                if (extraPattern.type == EDecompBanks.Multiplier)
+                extraPattern.dataCellsGradQuo = new Series(per1.freq, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                 {
-                    extraPattern.dataCellsGradRef = new Series(per1.freq, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    if (double.IsNaN(dataPattern.dataCellsGradQuo.GetDataSimple(t)))
                     {
-                        if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
-                        {
-                            dataPattern.dataCellsGradRef.SetData(t, 1d);
-                            extraPattern.dataCellsGradRef.SetData(t, 1d);
-                        }
+                        dataPattern.dataCellsGradQuo.SetData(t, 1d);
+                        extraPattern.dataCellsGradQuo.SetData(t, 1d);
                     }
                 }
-                else if (extraPattern.type == EDecompBanks.Work)
+            }
+            else if (extraPattern.type == EDecompBanks.Ref)
+            {
+                extraPattern.dataCellsGradRef = new Series(per1.freq, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                 {
-                    extraPattern.dataCellsGradQuo = new Series(per1.freq, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
+                    if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
                     {
-                        if (double.IsNaN(dataPattern.dataCellsGradQuo.GetDataSimple(t)))
-                        {
-                            dataPattern.dataCellsGradQuo.SetData(t, 1d);
-                            extraPattern.dataCellsGradQuo.SetData(t, 1d);
-                        }
-                    }
-                }
-                else if (extraPattern.type == EDecompBanks.Ref)
-                {
-                    extraPattern.dataCellsGradRef = new Series(per1.freq, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
-                    {
-                        if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
-                        {
-                            dataPattern.dataCellsGradRef.SetData(t, 1d);
-                            extraPattern.dataCellsGradRef.SetData(t, 1d);
-                        }
+                        dataPattern.dataCellsGradRef.SetData(t, 1d);
+                        extraPattern.dataCellsGradRef.SetData(t, 1d);
                     }
                 }
             }
@@ -2242,9 +2226,17 @@ namespace Gekko
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             
             Series pattern = extra.dataCellsGradRef;
-            if (extra.type == EDecompBanks.Work) pattern = extra.dataCellsGradQuo;
+            if (extra.type == EDecompBanks.Work) pattern = extra.dataCellsGradQuo;            
+            if (pattern == null)
+            {                
+                pattern = new Series(tt1.freq, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(tt1.Add(-1), tt2))  //-1 so <xd> works
+                {
+                    pattern.SetData(t, 1d);
+                }
+            }
             GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
-            GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
+            GekkoTime extrat2 = pattern.GetRealDataPeriodLast();            
 
             if (extrat1.IsNull())
             {
