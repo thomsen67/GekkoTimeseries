@@ -2570,7 +2570,7 @@ namespace Gekko
                             GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
                             string residualName = "residual___";
                             int funcCounter = 0;
-                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, null, expression, Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
 
                             List<string> m1 = new List<string>();
                             List<string> m2 = new List<string>();

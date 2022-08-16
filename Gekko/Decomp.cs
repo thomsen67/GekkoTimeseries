@@ -20,21 +20,21 @@ namespace Gekko
         public bool isShares = false;
         public bool usesQuo = false;
         public bool usesRef = false;
-        List<int> lagData = new List<int>() { 0, 0 };
-        List<int> lagGradient = new List<int>() { 0, 0 };        
+        public List<int> lagData = new List<int>() { 0, 0 };
+        public List<int> lagGradient = new List<int>() { 0, 0 };        
 
         public DecompOperator(string x)
         {
             bool good = false;
             if (x == "x" || x == "xn")
             {
-                isRaw = true;
-                usesQuo = true;
+                this.isRaw = true;
+                this.usesQuo = true;
             }
             else if (x == "xr" || x == "xrn")
             {
-                isRaw = true;
-                usesRef = true;
+                this.isRaw = true;
+                this.usesRef = true;
             }
 
             // ----------------------------------------------------
@@ -43,21 +43,21 @@ namespace Gekko
 
             else if (x == "xd")
             {
-                isRaw = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
+                this.isRaw = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xp")
             {
-                isRaw = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
+                this.isRaw = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xdp")
             {
-                isRaw = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -2, 0 };
+                this.isRaw = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -2, 0 };
             }
 
             // ----------------------------------------------------
@@ -66,21 +66,21 @@ namespace Gekko
                         
             else if (x == "d")
             {
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "p")
             {
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "dp")
             {
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -2, 0 };
-                List<int> lagGradient = new List<int>() { -2, -1 };
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -2, 0 };
+                this.lagGradient = new List<int>() { -2, -1 };
             }
 
             // ----------------------------------------------------
@@ -88,22 +88,22 @@ namespace Gekko
             // ----------------------------------------------------
             else if (x == "xm")
             {
-                usesQuo = true;
-                usesRef = true;
-                isRaw = true;
+                this.usesQuo = true;
+                this.usesRef = true;
+                this.isRaw = true;
             }
             else if (x == "xq")
             {
-                usesQuo = true;
-                usesRef = true;
-                isRaw = true;
+                this.usesQuo = true;
+                this.usesRef = true;
+                this.isRaw = true;
             }
             else if (x == "xmp")
             {
-                isRaw = true;
-                usesQuo = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
+                this.isRaw = true;
+                this.usesQuo = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
             }
 
             // ----------------------------------------------------
@@ -111,20 +111,20 @@ namespace Gekko
             // ----------------------------------------------------
             else if (x == "m")
             {
-                usesQuo = true;
-                usesRef = true;
+                this.usesQuo = true;
+                this.usesRef = true;
             }
             else if (x == "q")
             {
-                usesQuo = true;
-                usesRef = true;
+                this.usesQuo = true;
+                this.usesRef = true;
             }
             else if (x == "mp")
             {
-                usesQuo = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.usesQuo = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
 
 
@@ -134,21 +134,21 @@ namespace Gekko
 
             else if (x == "xrd")
             {                   
-                isRaw = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
+                this.isRaw = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xrp")
             {
-                isRaw = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
+                this.isRaw = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xrdp")
             {
-                isRaw = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -2, 0 };
+                this.isRaw = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -2, 0 };
             }
 
             // ----------------------------------------------------
@@ -157,21 +157,21 @@ namespace Gekko
 
             else if (x == "rd")
             {
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "rp")
             {
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "rdp")
             {
-                usesRef = true;
-                List<int> lagData = new List<int>() { -2, 0 };
-                List<int> lagGradient = new List<int>() { -2, -1 };
+                this.usesRef = true;
+                this.lagData = new List<int>() { -2, 0 };
+                this.lagGradient = new List<int>() { -2, -1 };
             }
 
             // ----------------------------------------------------
@@ -180,24 +180,24 @@ namespace Gekko
 
             else if (x == "sd")
             {
-                isShares = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.isShares = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "sp")
             {
-                isShares = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.isShares = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "sdp")
             {
-                isShares = true;
-                usesQuo = true;
-                List<int> lagData = new List<int>() { -2, 0 };
-                List<int> lagGradient = new List<int>() { -2, -1 };
+                this.isShares = true;
+                this.usesQuo = true;
+                this.lagData = new List<int>() { -2, 0 };
+                this.lagGradient = new List<int>() { -2, -1 };
             }
 
             // ----------------------------------------------------
@@ -205,23 +205,23 @@ namespace Gekko
             // ----------------------------------------------------
             else if (x == "sm")
             {
-                isShares = true;
-                usesQuo = true;
-                usesRef = true;
+                this.isShares = true;
+                this.usesQuo = true;
+                this.usesRef = true;
             }
             else if (x == "sq")
             {
-                isShares = true;
-                usesQuo = true;
-                usesRef = true;
+                this.isShares = true;
+                this.usesQuo = true;
+                this.usesRef = true;
             }
             else if (x == "smp")
             {
-                isShares = true;
-                usesQuo = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.isShares = true;
+                this.usesQuo = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
 
             // ----------------------------------------------------
@@ -230,24 +230,24 @@ namespace Gekko
 
             else if (x == "srd")
             {
-                isShares = true;
-                usesRef = true;                
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.isShares = true;
+                this.usesRef = true;                
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "srp")
             {
-                isShares = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -1, 0 };
-                List<int> lagGradient = new List<int>() { -1, -1 };
+                this.isShares = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -1, 0 };
+                this.lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "srdp")
             {
-                isShares = true;
-                usesRef = true;
-                List<int> lagData = new List<int>() { -2, 0 };
-                List<int> lagGradient = new List<int>() { -2, -1 };
+                this.isShares = true;
+                this.usesRef = true;
+                this.lagData = new List<int>() { -2, 0 };
+                this.lagGradient = new List<int>() { -2, -1 };
             }
             
             // -------------------------------
@@ -471,12 +471,10 @@ namespace Gekko
         /// <param name="element"></param>
         /// <param name="type"></param>
         /// <param name="doubleDif"></param>
-        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, EDecompBanks type, bool doubleDif)
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, DecompOperator op)
         {
-            int deduct = -1;
-            if (type == EDecompBanks.Multiplier) deduct = 0;
-            if (doubleDif) deduct = -2;
-
+            int deduct = op.lagGradient[0];
+            if(op.isRaw) deduct = op.lagData[0];
             foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
             {
                 int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
@@ -549,22 +547,7 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
 
-            EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
-            bool rawDataQuo = false;
-            bool rawDataRef = false;
-            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp" || decompOptions2.prtOptionLower == "xdp")
-            {
-                rawDataQuo = true;
-            }
-            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp" || decompOptions2.prtOptionLower == "xrdp")
-            {
-                rawDataRef = true;
-            }
-            else if (decompOptions2.prtOptionLower == "xm" || decompOptions2.prtOptionLower == "xq" || decompOptions2.prtOptionLower == "xmp")
-            {
-                rawDataQuo = true;
-                rawDataRef = true;
-            }
+            EContribType operatorOneOf3Types = DecompContribTypeHelper(op);           
 
             int perLag = -2;
             string lhsString = "Expression value";
@@ -586,19 +569,7 @@ namespace Gekko
 
             int funcCounter = 0;
             //G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
-
-            //bool shouldRecalc = false;
-            //if (decompDatas.storage == null)
-            //{
-            //    shouldRecalc = true;
-            //}
-            //else
-            //{
-            //    if (operatorOneOf3Types == EContribType.D && !decompDatas.hasD) shouldRecalc = true;
-            //    else if (operatorOneOf3Types == EContribType.RD && !decompDatas.hasRD) shouldRecalc = true;
-            //    else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
-            //}
-
+            
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
                 PrepareEquations(per1, per2, op, decompOptions2);
@@ -610,18 +581,7 @@ namespace Gekko
                 decompDatas.MAIN_data = null;
 
                 //MAYBE DO THIS BY LOOKING INSIDE DECOMPDATAS...
-                //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)
-
-                Data extraPattern = new Data();
-                extraPattern.type = DecompGetType(op);
-                if (decompOptions2.dataPattern == null)
-                {
-                    decompOptions2.dataPattern = new Data();
-                    decompOptions2.dataPattern.dataCellsGradQuo = new Series(per1.freq, null);
-                    decompOptions2.dataPattern.dataCellsGradRef = new Series(per1.freq, null);
-                }
-                bool doubleDif = IsDoubleDif(op);
-                RealExtraPeriods(per1, per2, doubleDif, decompOptions2.dataPattern, extraPattern);
+                //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)                
 
                 if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
 
@@ -638,7 +598,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, extraPattern, dsh, DecompBanks(op), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, dsh, op, residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -647,7 +607,7 @@ namespace Gekko
                         foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;
-                            DecompData dd = Decomp.DecompLowLevel(per1, per2, extraPattern, expression, DecompBanks(op), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(op), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -727,7 +687,7 @@ namespace Gekko
                         if (decompOptions2.dyn)
                         {
                             //decomp over time, resolving lags/leads                            
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, rawDataQuo, rawDataRef);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op);
                         }
                         else
                         {
@@ -735,7 +695,7 @@ namespace Gekko
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, rawDataQuo, rawDataRef);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op);
                                 refreshObjects = false;
                             }
                         }
@@ -1033,7 +993,7 @@ namespace Gekko
                 }
                 
                 bool doubleDif = IsDoubleDif(operator1);
-                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, type, doubleDif);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1);
             }
 
             int counter = -1;
@@ -1066,61 +1026,7 @@ namespace Gekko
 
                 decompOptions2.link.Add(link);
             }
-        }
-
-        /// <summary>
-        /// Helper, aids finding out which new gradients are really needed. This avoids recalculating 100 years of gradients, if 90 of these have already been done 
-        /// </summary>
-        /// <param name="per1"></param>
-        /// <param name="per2"></param>
-        /// <param name="decompOptions2"></param>
-        /// <param name="extraPattern"></param>
-        private static void RealExtraPeriods(GekkoTime per1, GekkoTime per2, bool doubleDif, Data dataPattern, Data extraPattern)
-        {
-
-            //if cellsQuo or cellsRef contain missing for the period that is part
-            //of decomposition, just try to fill these missings in again (may be missing again).
-
-            int minusA = -1;
-            int minusB = -1;
-            if (doubleDif) minusA = -2;  //not minusB
-            if (extraPattern.type == EDecompBanks.Multiplier)
-            {
-                extraPattern.dataCellsGradRef = new Series(per1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                {
-                    if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
-                    {
-                        dataPattern.dataCellsGradRef.SetData(t, 1d);
-                        extraPattern.dataCellsGradRef.SetData(t, 1d);
-                    }
-                }
-            }
-            else if (extraPattern.type == EDecompBanks.Work)
-            {
-                extraPattern.dataCellsGradQuo = new Series(per1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(minusA), per2.Add(minusB)))
-                {
-                    if (double.IsNaN(dataPattern.dataCellsGradQuo.GetDataSimple(t)))
-                    {
-                        dataPattern.dataCellsGradQuo.SetData(t, 1d);
-                        extraPattern.dataCellsGradQuo.SetData(t, 1d);
-                    }
-                }
-            }
-            else if (extraPattern.type == EDecompBanks.Ref)
-            {
-                extraPattern.dataCellsGradRef = new Series(per1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(minusA), per2.Add(minusB)))
-                {
-                    if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
-                    {
-                        dataPattern.dataCellsGradRef.SetData(t, 1d);
-                        extraPattern.dataCellsGradRef.SetData(t, 1d);
-                    }
-                }
-            }
-        }
+        }        
 
         private static void DecompMainHelperInvert(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
         {
@@ -1341,7 +1247,7 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <param name="operatorOneOf3Types"></param>
         /// <param name="parentI"></param>
-        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, bool rawDataQuo, bool rawDataRef)
+        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op)
         {
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1375,7 +1281,7 @@ namespace Gekko
             //Maybe a bit inefficient?
 
             int kMax = 2;
-            if (IsRaw(rawDataQuo, rawDataRef)) kMax = 1;
+            if (op.isRaw) kMax = 1;
 
             for (int k = 0; k < kMax; k++)  //k=0 just counts endo/exo sizes, so the arrays can be defined
             {
@@ -1418,7 +1324,7 @@ namespace Gekko
                     {
                         jj++;
                         DecompDict dd = null;
-                        if (!IsRaw(rawDataQuo, rawDataRef)) dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
+                        if (!op.isRaw) dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
 
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -1514,10 +1420,8 @@ namespace Gekko
             double[,] inverse = null;
             double[,] effect = null;
 
-            if (!IsRaw(rawDataQuo, rawDataRef))
+            if (!op.isRaw)
             {
-
-
 
                 try
                 {
@@ -1575,7 +1479,7 @@ namespace Gekko
 
                     int ZERO = 0;
                     DecompDict dd = null;
-                    if (IsRaw(rawDataQuo, rawDataRef))
+                    if (op.isRaw)
                     {
                         Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, xnewName);
                         decompDatas.MAIN_data[ZERO].cellsQuo[xnewName].SetData(time, tup.Item1.GetDataSimple(time));
@@ -1953,7 +1857,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Data extra, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for scalar model
             //
@@ -2384,7 +2288,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, int linkNumber, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter)
         {
             // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
             // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
@@ -2402,30 +2306,32 @@ namespace Gekko
             DecompInitDict(d);                                    
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            
-            Series pattern = extra.dataCellsGradRef;
-            if (extra.type == EDecompBanks.Work) pattern = extra.dataCellsGradQuo;            
-            if (pattern == null)
-            {                
-                pattern = new Series(tt1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(tt1.Add(-1), tt2))  //-1 so <xd> works
-                {
-                    pattern.SetData(t, 1d);
-                }
-            }
-            GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
-            GekkoTime extrat2 = pattern.GetRealDataPeriodLast();            
 
-            if (extrat1.IsNull())
+            GekkoTime gt1 = tt1;
+            GekkoTime gt2 = tt2;
+            if (op.isRaw)
             {
-                //do nothing, nothing to recalculate
+                gt1 = tt1.Add(op.lagData[0]);
+                gt2 = tt2.Add(op.lagData[1]);
             }
             else
             {
+                gt1 = tt1.Add(op.lagGradient[0]);
+                gt2 = tt2.Add(op.lagGradient[1]);
+            }
+
+            if (true)
+            {
                 //foreach time period
-                foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
+                foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
                 {
-                    if (double.IsNaN(pattern.GetDataSimple(t))) continue;
+                    // TODO TODO TODO
+                    // TODO TODO TODO
+                    // TODO TODO TODO
+                    // TODO TODO TODO skip via a dictionary if already done
+                    // TODO TODO TODO
+                    // TODO TODO TODO
+                    // TODO TODO TODO
 
                     int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
 
@@ -2452,7 +2358,7 @@ namespace Gekko
                         PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                         string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
                         
-                        if (extra.type == EDecompBanks.Unknown)
+                        if (op.isRaw)
                         {
                             //raw data.
                             //a bit of a hack here, since all data is fetched (extra will contain all periods),
@@ -2478,7 +2384,7 @@ namespace Gekko
                                 vars.Add(name, 0);
                             }
                         }
-                        else if (extra.type == EDecompBanks.Multiplier)
+                        else if (op.usesQuo && op.usesRef)
                         {
                             //normal multiplier like <m>
                             if (i == 0)
@@ -2518,7 +2424,7 @@ namespace Gekko
                                 Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
                             }
                         }
-                        else if (extra.type == EDecompBanks.Ref)
+                        else if (!op.usesQuo && op.usesRef)
                         {
                             //ref difference like <rd>
                             if (i == 0)
@@ -2558,7 +2464,7 @@ namespace Gekko
                                 Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
                             }
                         }
-                        else if (extra.type == EDecompBanks.Work)
+                        else if (op.usesQuo && !op.usesRef)
                         {
                             //work difference like <d>
                             if (i == 0)
@@ -2606,15 +2512,15 @@ namespace Gekko
                 //Grad tells us which lags are actually active.
                 //If we know that lags beforehand, we could limit the lag loop and save time here.
 
-                if (extra.type != EDecompBanks.Unknown)
+                if (!op.isRaw)
                 {
-                    foreach (GekkoTime t2 in new GekkoTimeIterator(extrat1, extrat2))
+                    foreach (GekkoTime t2 in new GekkoTimeIterator(gt1, gt2))
                     {
-                        int add = 1; if (extra.type == EDecompBanks.Multiplier) add = 0;
+                        int add = 1; if (op.usesQuo && op.usesRef) add = 0;
                         GekkoTime t = t2.Add(add);
                         foreach (string s in vars.Keys)
                         {
-                            if (extra.type == EDecompBanks.Work)
+                            if (op.usesQuo && !op.usesRef)
                             {
                                 double vQuo = d.cellsQuo[s].GetDataSimple(t);
                                 double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
@@ -2622,7 +2528,7 @@ namespace Gekko
                                 double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                                 d.cellsContribD[s].SetData(t, dContribD);
                             }
-                            else if (extra.type == EDecompBanks.Ref)
+                            else if (!op.usesQuo && op.usesRef)
                             {
                                 double vRef = d.cellsRef[s].GetDataSimple(t);
                                 double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
@@ -2630,7 +2536,7 @@ namespace Gekko
                                 double dContribDRef = vGradRefLag * (vRef - vRefLag);
                                 d.cellsContribDRef[s].SetData(t, dContribDRef);
                             }
-                            else if (extra.type == EDecompBanks.Multiplier)
+                            else if (op.usesQuo && op.usesRef)
                             {
                                 double vQuo = d.cellsQuo[s].GetDataSimple(t);
                                 double vRef = d.cellsRef[s].GetDataSimple(t);
@@ -2640,15 +2546,15 @@ namespace Gekko
                             }
                             else new Error("Decomp error");
                         }
-                        if (extra.type == EDecompBanks.Work)
+                        if (op.usesQuo && !op.usesRef)
                         {
                             d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
                         }
-                        else if (extra.type == EDecompBanks.Ref)
+                        else if (!op.usesQuo && op.usesRef)
                         {
                             d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
                         }
-                        else if (extra.type == EDecompBanks.Multiplier)
+                        else if (op.usesQuo && op.usesRef)
                         {
                             d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
                         }
