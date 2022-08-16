@@ -10,7 +10,219 @@ using MathNet.Numerics.LinearAlgebra.Sparse;
 using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
 
 namespace Gekko
-{
+{    
+
+    public class DecompOperator
+    {
+        public static List<string> possibleOperatorsDiff = new List<string>() { "d", "p", "dp" };
+        public static List<string> possibleOperatorsDiffRef = new List<string>() { "rd", "rp", "rdp" };
+        public static List<string> possibleOperatorsMul = new List<string>() { "m", "q", "mp"};
+
+        public string operatorLower = null;
+        public bool isRaw = false;
+        public bool isShares = false;
+        List<int> lagData = new List<int>() { 0, 0 };
+        List<int> lagGradient = new List<int>() { 0, 0 };        
+
+        public DecompOperator(string x)
+        {
+            bool good = false;
+            if (x == "x" || x == "xn")
+            {
+                isRaw = true;
+            }
+            else if (x == "xr" || x == "xrn")
+            {
+                isRaw = true;
+            }
+
+            // ----------------------------------------------------
+            //col 1
+            // ----------------------------------------------------
+
+            else if (x == "xd")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+            }
+            else if (x == "xp")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+            }
+            else if (x == "xdp")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -2, 0 };
+            }
+
+            // ----------------------------------------------------
+            //col 2
+            // ----------------------------------------------------
+                        
+            else if (x == "d")
+            {
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "p")
+            {
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "dp")
+            {
+                List<int> lagData = new List<int>() { -2, 0 };
+                List<int> lagGradient = new List<int>() { -2, -1 };
+            }
+
+            // ----------------------------------------------------
+            //col 3
+            // ----------------------------------------------------
+            else if (x == "xm")
+            {
+                isRaw = true;
+            }
+            else if (x == "xq")
+            {
+                isRaw = true;
+            }
+            else if (x == "xmp")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+            }
+
+            // ----------------------------------------------------
+            //col 4
+            // ----------------------------------------------------
+            else if (x == "m")
+            {
+            }
+            else if (x == "q")
+            {
+            }
+            else if (x == "mp")
+            {
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+
+
+            // ----------------------------------------------------
+            //ref col 1
+            // ----------------------------------------------------
+
+            else if (x == "xrd")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+            }
+            else if (x == "xrp")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+            }
+            else if (x == "xrdp")
+            {
+                isRaw = true;
+                List<int> lagData = new List<int>() { -2, 0 };
+            }
+
+            // ----------------------------------------------------
+            //ref col 2
+            // ----------------------------------------------------
+
+            else if (x == "rd")
+            {
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "rp")
+            {
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "rdp")
+            {
+                List<int> lagData = new List<int>() { -2, 0 };
+                List<int> lagGradient = new List<int>() { -2, -1 };
+            }
+
+            // ----------------------------------------------------
+            //shares col 2
+            // ----------------------------------------------------
+
+            else if (x == "sd")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "sp")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "sdp")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -2, 0 };
+                List<int> lagGradient = new List<int>() { -2, -1 };
+            }
+
+            // ----------------------------------------------------
+            //shares col 4
+            // ----------------------------------------------------
+            else if (x == "sm")
+            {
+                isShares = true;
+            }
+            else if (x == "sq")
+            {
+                isShares = true;
+            }
+            else if (x == "smp")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+
+            // ----------------------------------------------------
+            //ref shares col 2
+            // ----------------------------------------------------
+
+            else if (x == "srd")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "srp")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -1, 0 };
+                List<int> lagGradient = new List<int>() { -1, -1 };
+            }
+            else if (x == "srdp")
+            {
+                isShares = true;
+                List<int> lagData = new List<int>() { -2, 0 };
+                List<int> lagGradient = new List<int>() { -2, -1 };
+            }
+            
+            // -------------------------------
+
+            else
+            {
+                new Error("Illegal operator '" + x + "'");
+            }
+            this.operatorLower = x;
+        }
+    }
+
     class AggContainer
     {
         public double change;
@@ -85,85 +297,6 @@ namespace Gekko
 
             //See source code documentation
 
-            //
-            //CLICKING: Mouse_Down(), cf. #98732498724
-            //        
-            // Consider this: e1   y[#a] = x1[#a] + x2[#a] + z;    #9807532957234
-            //                e2   x1[#a] = b1 * u[#a];
-            //                e3   x2[#a] = b2 * u[#a-1];
-            //                e4   z = sum(#a, u[#a]):
-            //
-            //decomp <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;                
-            //
-            // with #a = 20, 21, we have:
-            //
-            //        e1a       y[20] = x1[20] + x2[20] + z; <----+----------+   z goes into both
-            //        e1b       y[21] = x1[21] + x2[21] + z; <----|----+-----+  
-            //        e2a       x1[20] = b1 * u[20]; ---->--------+    |     |
-            //        e2b       x1[21] = b1 * u[21]; ---->--------|----+     |
-            //        e3a       x2[20] = b2 * u[19]; ---->--------+    |     |
-            //        e3b       x2[21] = b2 * u[20]; ---->-------------+     |
-            //        e4        z = u[20] + u[21];   ---->-------------------+
-            //
-            //decomp <d> y[20],y[21] in e1 link x1[20],x1[21] in e2, x2[20],x2[21] in e3, z in e4;                
-
-            //In this: x[#a] = x1[#a] + x2[#a], #a = 20, 21, there is the uncontrolled set #a. We cannot be sure 
-            //that all indexes [20] is the first equation, since there may be lags #a-1, or even single equations like
-            //x1[20] = y[21]... . So in reality we have the equation x[20] = y[21] ... , and effects do not sum to
-            //zero over each age. We may also have x[#i, #j] = ... where #i and #j are uncontrolled, for instance producing
-            //the equations x[i1, j1], x[i1, j3], x[i2, j1], x[i2, j2]. So we could do "eq x[i1, j1]" to identify one of
-            //the equations. In a lot of cases, like x[#a] = b[#a]*u[#a], the equations would match a set, so that in the
-            //raw datatable, the column with eq and #a would correlate 100%. In that case, we could just eliminate the "eq...".
-            //Perhaps also "eq x[i1, j1]", ... would sometimes correlate 100% with #i and #j, and in that case we could eliminate
-            //the "eq..." too.
-            //                    eq              #i            #j
-            //                  -----------------------------------------
-            //              eq x[i1, j1]          i1            j1
-            //              eq x[i1, j2]          i1            j2
-            //              eq x[i2, j1]          i2            j1
-
-            //When linking, we do not link the sub-equations together, we only link into the primary equation
-            //one by one (so link order can be important). In the above example, if we only want to look at
-            //y[20], calculating e1b, e2b and e3b is a waste of time. If lazy eval was used, these would
-            //never be calculated, and can they be omitted? That is probably hard, for instance the e2a equation
-            //could depend on x2[21], and then we need the decomposed e3b equation. For instance this:
-            //
-            //                e1   y[#a] = x1[#a] + x2[#a];   links with x1[#a] and x2[#a]
-            //                e2   x1[#a] = b1 * x2[#a+1];
-            //                e3   x2[#a] = b2 * u[#a];       
-            //
-            //                e1a   y[20] = x1[20] + x2[20];
-            //                e1b   y[21] = x1[21] + x2[21];
-            //                e2a   x1[20] = b1 * x2[21]; -------- points to this one --------+
-            //                e2b   x1[21] = b1 * x2[22];                                     |
-            //                e3a   x2[20] = b2 * u[20];                                      |
-            //                e3b   x2[21] = b2 * u[21];  <-----------------------------------+
-            //
-            // When e1 is linked with e2, we get a #a-lead in e1, and therefore we need e3b in the 
-            // calculation. So it seems this problem is "hard", because we never really know the sets
-            // (could in principle depend on a function, like x1[#a] = b1 * x2[randomlead(#a)], so
-            // it seems a bit similar to the lag problem.
-            // Also, e2 might be x1[#a2] = b1 * x2[#a2], where #a2 is an unknown set. In that case, how
-            // to know which of the equations e2a or e2b is relevant, if #a2 = 21, 22...?
-            // If we are calculating everything (all 7 unfolded eqs in the original example), the good thing
-            // is that it will be switch between looking at e1a or e1b since everything is pre-calculated.
-            //
-
-            //if (G.GetModelType() == EModelType.GAMSScalar)
-            //{
-            //    ModelGamsScalar model = Program.model.modelGamsScalar;
-            //    if (model.a == null)
-            //    {
-            //        model.FromDatabankToA(Program.databanks.GetFirst(), false);
-            //        model.r = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
-            //    }
-            //    if (model.a_ref == null)
-            //    {
-            //        model.FromDatabankToA(Program.databanks.GetRef(), true);
-            //        model.r_ref = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
-            //    }
-            //}
-
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
@@ -226,23 +359,9 @@ namespace Gekko
             }
 
             if (decompOptions2.type == "ASTDECOMP3")
-            {
-                //newest decomp
-
-                //TODO
-                //TODO
-                //TODO
+            {                
                 //Here, for scalar we need to assemble the equations like this:
-                //
-                // e1[a, 2001]
-                // e1[a, 2001]
-                // e1[b, 2002]
-                // e1[b, 2002]
-                // e2[x, 2001]
-                // e2[x, 2001]
-                // e2[y, 2002]
-                // e2[y, 2002]
-                //
+                // e1[a, 2001], e1[a, 2001], e1[b, 2002], e1[b, 2002], e2[x, 2001], e2[x, 2001], e2[y, 2002], e2[y, 2002]
                 // Produces 2 Link objects, each consisting of a list of 2 sub-objects.
                 // These sub-objects should provide params that makes it possible to call
                 //       the for instance e1[a] by GekkoTime, so it can call
@@ -304,6 +423,17 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Hooks up to GAMS scalar model
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="s"></param>
+        /// <param name="equationName"></param>
+        /// <param name="mmi"></param>
+        /// <param name="element"></param>
+        /// <param name="type"></param>
+        /// <param name="doubleDif"></param>
         private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, EDecompBanks type, bool doubleDif)
         {
             int deduct = -1;
@@ -361,18 +491,6 @@ namespace Gekko
             return s2;
         }
 
-        public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
-        {
-            string isShares = null;
-            if (operator1.StartsWith("s"))
-            {
-                operator1 = operator1.Substring(1);
-                isShares = "s";
-            }
-
-            return isShares;
-        }
-
         /// <summary>
         /// Main entry to the math part of decomposition. Performs a lot of the hard stuff, including
         /// matrix inversion etc. Calls DecompLowLevel() a lot, where gradients etc. are calculated.
@@ -388,11 +506,13 @@ namespace Gekko
         /// <param name="refresh"></param>
         /// <param name="decompDatas"></param>
         /// <returns></returns>
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
         {
+            DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
+
             DateTime t0 = DateTime.Now;
 
-            EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
+            EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
             bool rawDataQuo = false;
             bool rawDataRef = false;
             if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp" || decompOptions2.prtOptionLower == "xdp")
@@ -444,7 +564,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                PrepareEquations(per1, per2, operator1, decompOptions2);
+                PrepareEquations(per1, per2, op, decompOptions2);
             }
 
             if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
@@ -456,14 +576,14 @@ namespace Gekko
                 //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)
 
                 Data extraPattern = new Data();
-                extraPattern.type = DecompGetType(operator1);
+                extraPattern.type = DecompGetType(op);
                 if (decompOptions2.dataPattern == null)
                 {
                     decompOptions2.dataPattern = new Data();
                     decompOptions2.dataPattern.dataCellsGradQuo = new Series(per1.freq, null);
                     decompOptions2.dataPattern.dataCellsGradRef = new Series(per1.freq, null);
                 }
-                bool doubleDif = IsDoubleDif(operator1);
+                bool doubleDif = IsDoubleDif(op);
                 RealExtraPeriods(per1, per2, doubleDif, decompOptions2.dataPattern, extraPattern);
 
                 if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
@@ -481,7 +601,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, extraPattern, dsh, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, extraPattern, dsh, DecompBanks(op), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -490,7 +610,7 @@ namespace Gekko
                         foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;
-                            DecompData dd = Decomp.DecompLowLevel(per1, per2, extraPattern, expression, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevel(per1, per2, extraPattern, expression, DecompBanks(op), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -609,7 +729,7 @@ namespace Gekko
             List<DecompData> decompDataMAINClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDataMAINClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types, rawDataQuo, rawDataRef);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types, rawDataQuo, rawDataRef);
 
             if (false)
             {
@@ -622,9 +742,9 @@ namespace Gekko
             return table;
         }
 
-        private static bool IsDoubleDif(string operator1)
+        private static bool IsDoubleDif(DecompOperator op)
         {
-            return operator1 == "dp" || operator1 == "rdp";
+            return op.operatorLower == "dp" || op.operatorLower == "rdp";
         }
 
         private static void OBSOLETE_decomp2_stuff(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool[] used)
@@ -828,7 +948,7 @@ namespace Gekko
             }
         }
 
-        private static void PrepareEquations(GekkoTime per1, GekkoTime per2, string operator1, DecompOptions2 decompOptions2)
+        private static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2)
         {
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
@@ -1458,9 +1578,9 @@ namespace Gekko
         /// </summary>
         /// <param name="operator1"></param>
         /// <returns></returns>
-        private static EDecompBanks DecompGetType(string operator1x)
+        private static EDecompBanks DecompGetType(DecompOperator operator1x)
         {
-            string operator1 = operator1x;
+            string operator1 = operator1x.operatorLower;
             EDecompBanks type = EDecompBanks.Unknown;
             if (operator1 == "m" || operator1 == "q" || operator1 == "mp") type = EDecompBanks.Multiplier;
             else if (operator1 == "d" || operator1 == "p" || operator1 == "dp") type = EDecompBanks.Work;
@@ -2531,7 +2651,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types, bool rawDataQuo, bool rawDataRef)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types, bool rawDataQuo, bool rawDataRef)
         {
             int parentI = 0;
 
@@ -2541,7 +2661,7 @@ namespace Gekko
                 DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
             }            
 
-            if (!operator1.StartsWith("x"))
+            if (!op.operatorLower.StartsWith("x"))
             {
                 if (decompOptions2.modelType != EModelType.GAMSScalar)                
                 {
@@ -2712,7 +2832,7 @@ namespace Gekko
                         double dLevelRefLag = double.NaN;
                         double dLevelRefLag2 = double.NaN;
 
-                        if (true || operator1.StartsWith("x"))
+                        if (true)
                         {
                             if (varname.Contains(Globals.decompResidualName))
                             {
@@ -2723,7 +2843,7 @@ namespace Gekko
 
                                 //MAybe turn this of for x-type...
 
-                                if (operator1.StartsWith("x"))
+                                if (op.operatorLower.StartsWith("x"))
                                 {
                                     Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, varname);
                                     Series tsFirst = tup.Item1;
@@ -2769,24 +2889,24 @@ namespace Gekko
 
                         double d = double.NaN;
                         double dAlternative = double.NaN;             
-                        if (operator1 == "dp")
+                        if (op.operatorLower == "dp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
-                        else if (operator1 == "rp")
+                        else if (op.operatorLower == "rp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
-                        else if (operator1 == "mp")
+                        else if (op.operatorLower == "mp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
                             dAlternative = double.NaN;
                         }
 
@@ -3137,72 +3257,72 @@ namespace Gekko
                         }
                         // ----- first end --------------------------------------------------
 
-                        if (operator1 == "n" || operator1 == "xn")
+                        if (op.operatorLower == "n" || op.operatorLower == "xn")
                         {
                             d = dLevel;
                         }
-                        else if (operator1 == "rn" || operator1 == "r" || operator1 == "xrn" || operator1 == "xr")
+                        else if (op.operatorLower == "rn" || op.operatorLower == "r" || op.operatorLower == "xrn" || op.operatorLower == "xr")
                         {
                             d = dLevelRef;
                         }
-                        else if (operator1 == "d")
+                        else if (op.operatorLower == "d")
                         {
                             d = td.change;
                         }
-                        else if (operator1 == "p")
+                        else if (op.operatorLower == "p")
                         {
                             d = td.change / dFirstLevelLag * 100d;
                         }
-                        else if (operator1 == "dp")
+                        else if (op.operatorLower == "dp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
                         }
-                        else if (operator1 == "m")
+                        else if (op.operatorLower == "m")
                         {
                             d = td.change;
                         }
-                        else if (operator1 == "q")
+                        else if (op.operatorLower == "q")
                         {
                             d = td.change / dFirstLevelRef * 100d;
                         }
-                        else if (operator1 == "mp")
+                        else if (op.operatorLower == "mp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
                         }
-                        else if (operator1 == "xd")
+                        else if (op.operatorLower == "xd")
                         {
                             d = dLevel - dLevelLag;
                         }
-                        else if (operator1 == "xp")
+                        else if (op.operatorLower == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
                         }
-                        else if (operator1 == "xm")
+                        else if (op.operatorLower == "xm")
                         {
                             d = dLevel - dLevelRef;
                         }
-                        else if (operator1 == "xq")
+                        else if (op.operatorLower == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
                         // -----------------
-                        else if (operator1 == "rd")
+                        else if (op.operatorLower == "rd")
                         {
                             d = td.change;
                         }
-                        else if (operator1 == "rp")
+                        else if (op.operatorLower == "rp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d;
                         }
-                        else if (operator1 == "rdp")
+                        else if (op.operatorLower == "rdp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
                         }
-                        else if (operator1 == "xrd")
+                        else if (op.operatorLower == "xrd")
                         {
                             d = dLevelRef - dLevelRefLag;
                         }
-                        else if (operator1 == "xrp")
+                        else if (op.operatorLower == "xrp")
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
@@ -3263,7 +3383,8 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         private static void DecompNormalizeOLD(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, EContribType operatorOneOf3Types)
         {
-            EDecompBanks edb = DecompBanks(decompOptions2.prtOptionLower);
+            DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
+            EDecompBanks edb = DecompBanks(op);
 
             bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
             //This normalizes the parent-link-variables so that they reflect their real values
@@ -3547,40 +3668,40 @@ namespace Gekko
             return ts;
         }
 
-        public static EContribType DecompContribTypeHelper(string prtOptionLower)
+        public static EContribType DecompContribTypeHelper(DecompOperator op)
         {
-            string op = prtOptionLower;
-            if (op.StartsWith("x")) op = op.Substring(1);
-            if (op.StartsWith("s")) op = op.Substring(1);
-            EContribType ect = DecompContribType(op);
+            DecompOperator op2 = new DecompOperator(op.operatorLower);
+            if (op2.operatorLower.StartsWith("x")) op2.operatorLower = op2.operatorLower.Substring(1);
+            if (op2.operatorLower.StartsWith("s")) op2.operatorLower = op2.operatorLower.Substring(1);
+            EContribType ect = DecompContribType(op2);
             return ect;
         }
 
-        public static EContribType DecompContribType(string op)
+        public static EContribType DecompContribType(DecompOperator op)
         {
             EContribType ect = EContribType.Unknown;
 
-            if (op == "n")
+            if (op.operatorLower == "n")
             {
                 ect = EContribType.N;
             }
-            else if (op == "rn" || op == "r")
+            else if (op.operatorLower == "rn" || op.operatorLower == "r")
             {
                 ect = EContribType.RN;
             }
-            else if (op == "d" || op == "p" || op == "dp")
+            else if (op.operatorLower == "d" || op.operatorLower == "p" || op.operatorLower == "dp")
             {
                 ect = EContribType.D;
             }
-            else if (op == "rd" || op == "rp" || op == "rdp")
+            else if (op.operatorLower == "rd" || op.operatorLower == "rp" || op.operatorLower == "rdp")
             {
                 ect = EContribType.RD;
             }
-            else if (op == "m" || op == "q" || op == "mp")
+            else if (op.operatorLower == "m" || op.operatorLower == "q" || op.operatorLower == "mp")
             {
                 ect = EContribType.M;
             }
-            else new Error("Unknown operator '" + op + "' for DECOMP");
+            else new Error("Unknown operator '" + op.operatorLower + "' for DECOMP");
             return ect;
         }
 
@@ -3702,21 +3823,21 @@ namespace Gekko
             //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
-        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
+        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, DecompOperator op, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
         {
             //THIS IS IT
 
             double d = double.NaN;
 
-            if (code1 == "d" || code1 == "p")
+            if (op.operatorLower == "d" || op.operatorLower == "p")
             {
                 d = decompTables.cellsContribD[colname].GetData(smpl, t2);
             }
-            else if (code1 == "rd" || code1 == "rp")
+            else if (op.operatorLower == "rd" || op.operatorLower == "rp")
             {
                 d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
             }
-            else if (code1 == "m" || code1 == "q")
+            else if (op.operatorLower == "m" || op.operatorLower == "q")
             {
                 d = decompTables.cellsContribM[colname].GetData(smpl, t2);
             }
@@ -3735,9 +3856,10 @@ namespace Gekko
             return d;
         }
 
-        public static EDecompBanks DecompBanks(string operator1)
+        public static EDecompBanks DecompBanks(DecompOperator op)
         {
             EDecompBanks banks = EDecompBanks.Work;
+            string operator1 = op.operatorLower;
             if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
             if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Multiplier;
             return banks;

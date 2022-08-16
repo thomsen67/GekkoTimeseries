@@ -154,8 +154,8 @@ namespace Gekko
             ModelGamsEquation equation = equations[0]; //always only 1
                         
             {
-
-                string op = "d";
+                                
+                DecompOperator op = new DecompOperator("d");
                 
                 string residualName = "residual___";
                 int funcCounter = 0;

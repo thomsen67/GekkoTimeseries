@@ -2565,7 +2565,7 @@ namespace Gekko
 
                         try
                         {
-                            string op = "d";
+                            DecompOperator op = new DecompOperator("d");
                             GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
                             GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
                             string residualName = "residual___";

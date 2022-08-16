@@ -1743,14 +1743,8 @@ namespace Gekko
 
                 _statusText.Text = "";
 
-                string operator1, isShares;
-                DecompIsSharesOrPercentageType(out operator1, out isShares);
-
                 GekkoTime per1 = this.decompOptions2.t1;
-                GekkoTime per2 = this.decompOptions2.t2;
-
-                bool isRaw = false;
-                if (this.decompOptions2.prtOptionLower.StartsWith("x")) isRaw = true;
+                GekkoTime per2 = this.decompOptions2.t2;                
 
                 GekkoSmpl smpl = new GekkoSmpl(per1, per2);
 
@@ -1758,7 +1752,7 @@ namespace Gekko
                 IVariable y0aRef = null;
 
                 frame = new FrameLight();
-                Table table = Decomp.DecompMain(smpl, per1, per2, operator1, isShares, this.decompOptions2, frame, refresh, ref this.decompDatas);
+                Table table = Decomp.DecompMain(smpl, per1, per2, this.decompOptions2, frame, refresh, ref this.decompDatas);
 
                 string s = FindEquationText2(this.decompOptions2);
                 equation.Text = s;
@@ -1798,18 +1792,7 @@ namespace Gekko
                     throw e;
                 }
             }
-        }
-         
-        public void DecompIsSharesOrPercentageType(out string operator1, out string isShares)
-        {
-            operator1 = this.decompOptions2.prtOptionLower;
-            isShares = Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1);
-            this.decompOptions2.decompTablesFormat.isPercentageType = false;
-            if (operator1.Contains("p") || operator1.Contains("q") || isShares == "s")
-            {
-                this.decompOptions2.decompTablesFormat.isPercentageType = true;
-            }
-        }        
+        }               
 
         private void SetRadioButtonsDefaults()
         {
