@@ -14,20 +14,26 @@ namespace Gekko
     class AggContainer
     {
         public double change;
+        public double changeAlternative;
         public double level;
         public double levelLag;
+        public double levelLag2;
         public double levelRef;
         public double levelRefLag;
+        public double levelRefLag2;
         public int n;
         public List<string> fullVariableNames;
 
-        public AggContainer(double change, double level, double levelLag, double levelRef, double levelRefLag, int n, List<string> fullVariableNames)
+        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames)
         {
             this.change = change;
+            this.changeAlternative = changeAlternative;
             this.level = level;
             this.levelLag = levelLag;
+            this.levelLag2 = levelLag2;
             this.levelRef = levelRef;
             this.levelRefLag = levelRefLag;
+            this.levelRefLag2 = levelRefLag2;
             this.n = n;
             this.fullVariableNames = fullVariableNames;
         }
@@ -2571,20 +2577,26 @@ namespace Gekko
             string col_lag = Globals.internalColumnIdentifyer + "lag";
             string col_universe = Globals.internalColumnIdentifyer + "universe";
             string col_value = Globals.internalColumnIdentifyer + "value";
+            string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
             string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
             string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
+            string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
             string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
             string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
+            string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
             string col_equ = Globals.internalColumnIdentifyer + "equ";
             string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
             string gekko_null = "null";            
 
             frame.AddColName(col_t);
             frame.AddColName(col_value);
+            frame.AddColName(col_valueAlternative);
             frame.AddColName(col_valueLevel);
             frame.AddColName(col_valueLevelLag);
+            frame.AddColName(col_valueLevelLag2);
             frame.AddColName(col_valueLevelRef);
             frame.AddColName(col_valueLevelRefLag);
+            frame.AddColName(col_valueLevelRefLag2);
             frame.AddColName(col_variable);
             frame.AddColName(col_lag);
             frame.AddColName(col_universe);
@@ -2684,8 +2696,10 @@ namespace Gekko
 
                         double dLevel = double.NaN;
                         double dLevelLag = double.NaN;
+                        double dLevelLag2 = double.NaN;
                         double dLevelRef = double.NaN;
                         double dLevelRefLag = double.NaN;
+                        double dLevelRefLag2 = double.NaN;
 
                         if (true || operator1.StartsWith("x"))
                         {
@@ -2705,8 +2719,10 @@ namespace Gekko
                                     Series tsRef = tup.Item2;
                                     dLevel = tsFirst.GetDataSimple(t2);
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
                                     dLevelRef = tsRef.GetDataSimple(t2);
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
                                 }
                                 else
                                 {
@@ -2721,6 +2737,7 @@ namespace Gekko
                                         }
                                         dLevel = tsFirst.GetDataSimple(t2);
                                         dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                        dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
                                     }
 
                                     if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
@@ -2733,12 +2750,15 @@ namespace Gekko
                                         }
                                         dLevelRef = tsRef.GetDataSimple(t2);
                                         dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                        dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
                                     }
                                 }
                             }
                         }
 
                         double d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                        int minus1 = -1;
+                        double dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2.Add(minus1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
 
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
@@ -2780,10 +2800,13 @@ namespace Gekko
                         }
 
                         dr.Set(frame, col_value, new CellLight(d));
+                        dr.Set(frame, col_valueAlternative, new CellLight(dAlternative));
                         dr.Set(frame, col_valueLevel, new CellLight(dLevel));
                         dr.Set(frame, col_valueLevelLag, new CellLight(dLevelLag));
+                        dr.Set(frame, col_valueLevelLag2, new CellLight(dLevelLag2));
                         dr.Set(frame, col_valueLevelRef, new CellLight(dLevelRef));
                         dr.Set(frame, col_valueLevelRefLag, new CellLight(dLevelRefLag));
+                        dr.Set(frame, col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
 
                         frame.rows.Add(dr);
                     }
@@ -2935,25 +2958,31 @@ namespace Gekko
                 if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
 
                 double d = row.Get(frame, col_value).data;
+                double dAlternative = row.Get(frame, col_valueAlternative).data;
                 double dLevel = row.Get(frame, col_valueLevel).data;
                 double dLevelLag = row.Get(frame, col_valueLevelLag).data;
+                double dLevelLag2 = row.Get(frame, col_valueLevelLag2).data;
                 double dLevelRef = row.Get(frame, col_valueLevelRef).data;
                 double dLevelRefLag = row.Get(frame, col_valueLevelRefLag).data;
+                double dLevelRefLag2 = row.Get(frame, col_valueLevelRefLag2).data;
                 string fullVariableName = row.Get(frame, col_fullVariableName).text;
 
                 AggContainer td = null;
                 agg.TryGetValue(key, out td);
                 if (td == null)
                 {
-                    agg.Add(key, new AggContainer(d, dLevel, dLevelLag, dLevelRef, dLevelRefLag, 1, new List<string>() { fullVariableName }));
+                    agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }));
                 }
                 else
                 {
                     td.change += d;
+                    td.changeAlternative = dAlternative;
                     td.level += dLevel;
                     td.levelLag += dLevelLag;
+                    td.levelLag2 += dLevelLag2;
                     td.levelRef += dLevelRef;
                     td.levelRefLag += dLevelRefLag;
+                    td.levelRefLag2 += dLevelRefLag2;
                     td.n += 1;
                     td.fullVariableNames.Add(fullVariableName);
                 }            
@@ -3030,28 +3059,34 @@ namespace Gekko
                     AggContainer td = null;
                     agg.TryGetValue(key, out td);
                     double d = 0d;
+                    double dAlternative = 0d;
                     double dLevel = 0d;
                     double dLevelLag = 0d;
+                    double dLevelLag2 = 0d;
                     double dLevelRef = 0d;
                     double dLevelRefLag = 0d;
+                    double dLevelRefLag2 = 0d;
                     int n = 0;
                     List<string> fullVariableNames = null;
 
                     if (td != null)
                     {
-
                         dLevel = td.level;
                         dLevelLag = td.levelLag;
+                        dLevelLag2 = td.levelLag2;
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
+                        dLevelRefLag2 = td.levelRefLag2;
                         n = td.n;
                         fullVariableNames = td.fullVariableNames;
 
                         // ----- first start -----------------------------------------------
                         double dFirstLevel = double.NaN;
                         double dFirstLevelLag = double.NaN;
+                        double dFirstLevelLag2 = double.NaN;
                         double dFirstLevelRef = double.NaN;
                         double dFirstLevelRefLag = double.NaN;
+                        double dFirstLevelRefLag2 = double.NaN;
                         int dFirstN = 0;
                         List<string> dFirstFullVariableNames = null;
                         string keyFirst = null;
@@ -3063,8 +3098,10 @@ namespace Gekko
                         {
                             dFirstLevel = tdFirst.level;
                             dFirstLevelLag = tdFirst.levelLag;
+                            dFirstLevelLag2 = tdFirst.levelLag2;
                             dFirstLevelRef = tdFirst.levelRef;
                             dFirstLevelRefLag = tdFirst.levelRefLag;
+                            dFirstLevelRefLag2 = tdFirst.levelRefLag2;
                             dFirstN = tdFirst.n;
                             dFirstFullVariableNames = tdFirst.fullVariableNames;
                         }
@@ -3086,6 +3123,10 @@ namespace Gekko
                         {
                             d = td.change / dFirstLevelLag * 100d;
                         }
+                        else if (operator1 == "dp")
+                        {
+                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
+                        }
                         else if (operator1 == "m")
                         {
                             d = td.change;
@@ -3093,6 +3134,10 @@ namespace Gekko
                         else if (operator1 == "q")
                         {
                             d = td.change / dFirstLevelRef * 100d;
+                        }
+                        else if (operator1 == "mp")
+                        {
+                            d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
                         }
                         else if (operator1 == "xd")
                         {
@@ -3118,6 +3163,10 @@ namespace Gekko
                         else if (operator1 == "rp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d;
+                        }
+                        else if (operator1 == "rdp")
+                        {
+                            d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
                         }
                         else if (operator1 == "xrd")
                         {
