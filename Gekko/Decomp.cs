@@ -14,13 +14,12 @@ namespace Gekko
 
     public class DecompOperator
     {
-        public static List<string> possibleOperatorsDiff = new List<string>() { "d", "p", "dp" };
-        public static List<string> possibleOperatorsDiffRef = new List<string>() { "rd", "rp", "rdp" };
-        public static List<string> possibleOperatorsMul = new List<string>() { "m", "q", "mp"};
-
+        
         public string operatorLower = null;
         public bool isRaw = false;
         public bool isShares = false;
+        public bool usesQuo = false;
+        public bool usesRef = false;
         List<int> lagData = new List<int>() { 0, 0 };
         List<int> lagGradient = new List<int>() { 0, 0 };        
 
@@ -30,10 +29,12 @@ namespace Gekko
             if (x == "x" || x == "xn")
             {
                 isRaw = true;
+                usesQuo = true;
             }
             else if (x == "xr" || x == "xrn")
             {
                 isRaw = true;
+                usesRef = true;
             }
 
             // ----------------------------------------------------
@@ -43,16 +44,19 @@ namespace Gekko
             else if (x == "xd")
             {
                 isRaw = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xp")
             {
                 isRaw = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xdp")
             {
                 isRaw = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -2, 0 };
             }
 
@@ -62,16 +66,19 @@ namespace Gekko
                         
             else if (x == "d")
             {
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "p")
             {
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "dp")
             {
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -2, 0 };
                 List<int> lagGradient = new List<int>() { -2, -1 };
             }
@@ -81,15 +88,21 @@ namespace Gekko
             // ----------------------------------------------------
             else if (x == "xm")
             {
+                usesQuo = true;
+                usesRef = true;
                 isRaw = true;
             }
             else if (x == "xq")
             {
+                usesQuo = true;
+                usesRef = true;
                 isRaw = true;
             }
             else if (x == "xmp")
             {
                 isRaw = true;
+                usesQuo = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
             }
 
@@ -98,12 +111,18 @@ namespace Gekko
             // ----------------------------------------------------
             else if (x == "m")
             {
+                usesQuo = true;
+                usesRef = true;
             }
             else if (x == "q")
             {
+                usesQuo = true;
+                usesRef = true;
             }
             else if (x == "mp")
             {
+                usesQuo = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
@@ -114,18 +133,21 @@ namespace Gekko
             // ----------------------------------------------------
 
             else if (x == "xrd")
-            {
+            {                   
                 isRaw = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xrp")
             {
                 isRaw = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xrdp")
             {
                 isRaw = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -2, 0 };
             }
 
@@ -135,16 +157,19 @@ namespace Gekko
 
             else if (x == "rd")
             {
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "rp")
             {
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "rdp")
             {
+                usesRef = true;
                 List<int> lagData = new List<int>() { -2, 0 };
                 List<int> lagGradient = new List<int>() { -2, -1 };
             }
@@ -156,18 +181,21 @@ namespace Gekko
             else if (x == "sd")
             {
                 isShares = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "sp")
             {
                 isShares = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "sdp")
             {
                 isShares = true;
+                usesQuo = true;
                 List<int> lagData = new List<int>() { -2, 0 };
                 List<int> lagGradient = new List<int>() { -2, -1 };
             }
@@ -178,14 +206,20 @@ namespace Gekko
             else if (x == "sm")
             {
                 isShares = true;
+                usesQuo = true;
+                usesRef = true;
             }
             else if (x == "sq")
             {
                 isShares = true;
+                usesQuo = true;
+                usesRef = true;
             }
             else if (x == "smp")
             {
                 isShares = true;
+                usesQuo = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
@@ -197,18 +231,21 @@ namespace Gekko
             else if (x == "srd")
             {
                 isShares = true;
+                usesRef = true;                
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "srp")
             {
                 isShares = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -1, 0 };
                 List<int> lagGradient = new List<int>() { -1, -1 };
             }
             else if (x == "srdp")
             {
                 isShares = true;
+                usesRef = true;
                 List<int> lagData = new List<int>() { -2, 0 };
                 List<int> lagGradient = new List<int>() { -2, -1 };
             }
@@ -729,7 +766,7 @@ namespace Gekko
             List<DecompData> decompDataMAINClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDataMAINClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types, rawDataQuo, rawDataRef);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
 
             if (false)
             {
@@ -2651,7 +2688,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types, bool rawDataQuo, bool rawDataRef)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
 
@@ -2755,10 +2792,13 @@ namespace Gekko
                     //second time, no loop..........
 
                     DecompDict dd = null;
-                    if (IsRaw(rawDataQuo, rawDataRef))
+                    if (op.isRaw)
                     {
-                        if (rawDataQuo) dd = decompDataMAINClone[super].cellsQuo;
-                        else if (rawDataRef) dd = decompDataMAINClone[super].cellsRef;
+                        //data is not used from here, it is just to get the list of
+                        //relevant variables. For multiplier type, both if's are true,
+                        //and in that case we just use the first.
+                        if (op.usesQuo) dd = decompDataMAINClone[super].cellsQuo;
+                        else if (op.usesRef) dd = decompDataMAINClone[super].cellsRef;
                     }                    
                     else
                     {
