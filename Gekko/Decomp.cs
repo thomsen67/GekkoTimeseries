@@ -304,10 +304,11 @@ namespace Gekko
             }
         }
 
-        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, EDecompBanks type)
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, EDecompBanks type, bool doubleDif)
         {
             int deduct = -1;
             if (type == EDecompBanks.Multiplier) deduct = 0;
+            if (doubleDif) deduct = -2;
 
             foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
             {
@@ -462,7 +463,8 @@ namespace Gekko
                     decompOptions2.dataPattern.dataCellsGradQuo = new Series(per1.freq, null);
                     decompOptions2.dataPattern.dataCellsGradRef = new Series(per1.freq, null);
                 }
-                RealExtraPeriods(per1, per2, decompOptions2.dataPattern, extraPattern);
+                bool doubleDif = IsDoubleDif(operator1);
+                RealExtraPeriods(per1, per2, doubleDif, decompOptions2.dataPattern, extraPattern);
 
                 if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
 
@@ -618,6 +620,11 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static bool IsDoubleDif(string operator1)
+        {
+            return operator1 == "dp" || operator1 == "rdp";
         }
 
         private static void OBSOLETE_decomp2_stuff(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool[] used)
@@ -867,8 +874,9 @@ namespace Gekko
                     //Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1a);  //removes any prefix "s"
                     type = DecompGetType(operator1);
                 }
-
-                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, type);
+                
+                bool doubleDif = IsDoubleDif(operator1);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, type, doubleDif);
             }
 
             int counter = -1;
@@ -910,12 +918,15 @@ namespace Gekko
         /// <param name="per2"></param>
         /// <param name="decompOptions2"></param>
         /// <param name="extraPattern"></param>
-        private static void RealExtraPeriods(GekkoTime per1, GekkoTime per2, Data dataPattern, Data extraPattern)
+        private static void RealExtraPeriods(GekkoTime per1, GekkoTime per2, bool doubleDif, Data dataPattern, Data extraPattern)
         {
 
             //if cellsQuo or cellsRef contain missing for the period that is part
             //of decomposition, just try to fill these missings in again (may be missing again).
 
+            int minusA = -1;
+            int minusB = -1;
+            if (doubleDif) minusA = -2;  //not minusB
             if (extraPattern.type == EDecompBanks.Multiplier)
             {
                 extraPattern.dataCellsGradRef = new Series(per1.freq, null);
@@ -931,7 +942,7 @@ namespace Gekko
             else if (extraPattern.type == EDecompBanks.Work)
             {
                 extraPattern.dataCellsGradQuo = new Series(per1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
+                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(minusA), per2.Add(minusB)))
                 {
                     if (double.IsNaN(dataPattern.dataCellsGradQuo.GetDataSimple(t)))
                     {
@@ -943,7 +954,7 @@ namespace Gekko
             else if (extraPattern.type == EDecompBanks.Ref)
             {
                 extraPattern.dataCellsGradRef = new Series(per1.freq, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
+                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(minusA), per2.Add(minusB)))
                 {
                     if (double.IsNaN(dataPattern.dataCellsGradRef.GetDataSimple(t)))
                     {
@@ -2756,9 +2767,28 @@ namespace Gekko
                             }
                         }
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                        int minus1 = -1;
-                        double dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2.Add(minus1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                        double d = double.NaN;
+                        double dAlternative = double.NaN;             
+                        if (operator1 == "dp")
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                        }
+                        else if (operator1 == "rp")
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                        }
+                        else if (operator1 == "mp")
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                        }
+                        else
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = double.NaN;
+                        }
 
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
