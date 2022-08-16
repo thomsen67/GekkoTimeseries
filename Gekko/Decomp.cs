@@ -21,7 +21,8 @@ namespace Gekko
         public bool usesQuo = false;
         public bool usesRef = false;
         public List<int> lagData = new List<int>() { 0, 0 };
-        public List<int> lagGradient = new List<int>() { 0, 0 };        
+        public List<int> lagGradient = new List<int>() { 0, 0 };
+        public Decomp.EContribType type = Decomp.EContribType.Unknown;
 
         public DecompOperator(string x)
         {
@@ -69,18 +70,21 @@ namespace Gekko
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.D;
             }
             else if (x == "p")
             {
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.D;
             }
             else if (x == "dp")
             {
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
+                this.type = Decomp.EContribType.D;
             }
 
             // ----------------------------------------------------
@@ -113,11 +117,13 @@ namespace Gekko
             {
                 this.usesQuo = true;
                 this.usesRef = true;
+                this.type = Decomp.EContribType.M;
             }
             else if (x == "q")
             {
                 this.usesQuo = true;
                 this.usesRef = true;
+                this.type = Decomp.EContribType.M;
             }
             else if (x == "mp")
             {
@@ -125,6 +131,7 @@ namespace Gekko
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.M;
             }
 
 
@@ -160,18 +167,21 @@ namespace Gekko
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.RD;
             }
             else if (x == "rp")
             {
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.RD;
             }
             else if (x == "rdp")
             {
                 this.usesRef = true;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
+                this.type = Decomp.EContribType.RD;
             }
 
             // ----------------------------------------------------
@@ -184,6 +194,7 @@ namespace Gekko
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.D;
             }
             else if (x == "sp")
             {
@@ -191,6 +202,7 @@ namespace Gekko
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.D;
             }
             else if (x == "sdp")
             {
@@ -198,6 +210,7 @@ namespace Gekko
                 this.usesQuo = true;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
+                this.type = Decomp.EContribType.D;
             }
 
             // ----------------------------------------------------
@@ -208,12 +221,14 @@ namespace Gekko
                 this.isShares = true;
                 this.usesQuo = true;
                 this.usesRef = true;
+                this.type = Decomp.EContribType.M;
             }
             else if (x == "sq")
             {
                 this.isShares = true;
                 this.usesQuo = true;
                 this.usesRef = true;
+                this.type = Decomp.EContribType.M;
             }
             else if (x == "smp")
             {
@@ -222,6 +237,7 @@ namespace Gekko
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.M;
             }
 
             // ----------------------------------------------------
@@ -234,6 +250,7 @@ namespace Gekko
                 this.usesRef = true;                
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.RD;
             }
             else if (x == "srp")
             {
@@ -241,6 +258,7 @@ namespace Gekko
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
+                this.type = Decomp.EContribType.RD;
             }
             else if (x == "srdp")
             {
@@ -248,6 +266,7 @@ namespace Gekko
                 this.usesRef = true;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
+                this.type = Decomp.EContribType.RD;
             }
             
             // -------------------------------
@@ -288,17 +307,17 @@ namespace Gekko
         }
     }
 
-    class Decomp
+    public class Decomp
     {
         public enum EContribType
         {
             Unknown,
-            N,
-            RN,
+            N,   //probably not used much
+            RN,  //probably not used much
             D,
             RD,
             M
-        }
+        }        
 
         /// <summary>
         /// Tells normalize method how to sum up
@@ -547,7 +566,8 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
 
-            EContribType operatorOneOf3Types = DecompContribTypeHelper(op);           
+            //EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
+            EContribType operatorOneOf3Types = op.type;
 
             int perLag = -2;
             string lhsString = "Expression value";
@@ -607,7 +627,7 @@ namespace Gekko
                         foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;
-                            DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(op), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -2563,7 +2583,7 @@ namespace Gekko
                 DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
             }            
 
-            if (!op.operatorLower.StartsWith("x"))
+            if (!op.isRaw)
             {
                 if (decompOptions2.modelType != EModelType.GAMSScalar)                
                 {
@@ -2796,18 +2816,43 @@ namespace Gekko
                         double dAlternative = double.NaN;             
                         if (op.operatorLower == "dp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            try
+                            {
+                                op.operatorLower = "d";
+                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            }
+                            finally
+                            {
+                                op.operatorLower = "dp";
+                            }
                         }
                         else if (op.operatorLower == "rp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            try
+                            {
+                                op.operatorLower = "rd";
+                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            }
+                            finally
+                            {
+                                op.operatorLower = "rp";
+                            }
                         }
                         else if (op.operatorLower == "mp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("d"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], new DecompOperator("rd"), smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            try
+                            {
+                                op.operatorLower = "d";
+                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                                op.operatorLower = "rd";
+                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            }
+                            finally
+                            {
+                                op.operatorLower = "mp";
+                            }
                         }
                         else
                         {
@@ -3289,7 +3334,7 @@ namespace Gekko
         private static void DecompNormalizeOLD(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, EContribType operatorOneOf3Types)
         {
             DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
-            EDecompBanks edb = DecompBanks(op);
+            EDecompBanks edb = DecompBanks_OLDREMOVESOON(op);
 
             bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
             //This normalizes the parent-link-variables so that they reflect their real values
@@ -3571,44 +3616,7 @@ namespace Gekko
 
             Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
             return ts;
-        }
-
-        public static EContribType DecompContribTypeHelper(DecompOperator op)
-        {
-            DecompOperator op2 = new DecompOperator(op.operatorLower);
-            if (op2.operatorLower.StartsWith("x")) op2.operatorLower = op2.operatorLower.Substring(1);
-            if (op2.operatorLower.StartsWith("s")) op2.operatorLower = op2.operatorLower.Substring(1);
-            EContribType ect = DecompContribType(op2);
-            return ect;
-        }
-
-        public static EContribType DecompContribType(DecompOperator op)
-        {
-            EContribType ect = EContribType.Unknown;
-
-            if (op.operatorLower == "n")
-            {
-                ect = EContribType.N;
-            }
-            else if (op.operatorLower == "rn" || op.operatorLower == "r")
-            {
-                ect = EContribType.RN;
-            }
-            else if (op.operatorLower == "d" || op.operatorLower == "p" || op.operatorLower == "dp")
-            {
-                ect = EContribType.D;
-            }
-            else if (op.operatorLower == "rd" || op.operatorLower == "rp" || op.operatorLower == "rdp")
-            {
-                ect = EContribType.RD;
-            }
-            else if (op.operatorLower == "m" || op.operatorLower == "q" || op.operatorLower == "mp")
-            {
-                ect = EContribType.M;
-            }
-            else new Error("Unknown operator '" + op.operatorLower + "' for DECOMP");
-            return ect;
-        }
+        }        
 
         private static bool DecompMatchWord(string colnames3, string varnames)
         {
@@ -3730,8 +3738,7 @@ namespace Gekko
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, DecompOperator op, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
         {
-            //THIS IS IT
-
+            
             double d = double.NaN;
 
             if (op.operatorLower == "d" || op.operatorLower == "p")
@@ -3761,7 +3768,7 @@ namespace Gekko
             return d;
         }
 
-        public static EDecompBanks DecompBanks(DecompOperator op)
+        public static EDecompBanks DecompBanks_OLDREMOVESOON(DecompOperator op)
         {
             EDecompBanks banks = EDecompBanks.Work;
             string operator1 = op.operatorLower;
