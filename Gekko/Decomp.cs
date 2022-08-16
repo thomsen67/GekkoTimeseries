@@ -737,12 +737,7 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
-        }
-
-        private static bool IsDoubleDif(DecompOperator op)
-        {
-            return op.operatorLower == "dp" || op.operatorLower == "rdp";
-        }
+        }        
 
         private static void OBSOLETE_decomp2_stuff(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool[] used)
         {
@@ -980,19 +975,7 @@ namespace Gekko
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
-
-                EDecompBanks type = EDecompBanks.Unknown;
-                if (true)
-                {
-                    //This is a bit convoluted, and the type is determined again later on.
-                    //The type ought to be determined here 1 time, and reused later on.
-                    //But we are using some commmon methods, so it is not completely spaghetti code (just double work)
-                    //string operator1a = o.opt_prtcode.ToLower();
-                    //Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1a);  //removes any prefix "s"
-                    type = DecompGetType(operator1);
-                }
                 
-                bool doubleDif = IsDoubleDif(operator1);
                 FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1);
             }
 
@@ -1508,27 +1491,6 @@ namespace Gekko
             DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
-        private static bool IsRaw(bool rawDataQuo, bool rawDataRef)
-        {
-            return rawDataQuo || rawDataRef;
-        }
-
-        /// <summary>
-        /// Get DECOMP type.
-        /// Handles types m, q, d, p, rd, rp, mp, rp, rdp. Also handles prefix "x".
-        /// </summary>
-        /// <param name="operator1"></param>
-        /// <returns></returns>
-        private static EDecompBanks DecompGetType(DecompOperator operator1x)
-        {
-            string operator1 = operator1x.operatorLower;
-            EDecompBanks type = EDecompBanks.Unknown;
-            if (operator1 == "m" || operator1 == "q" || operator1 == "mp") type = EDecompBanks.Multiplier;
-            else if (operator1 == "d" || operator1 == "p" || operator1 == "dp") type = EDecompBanks.Work;
-            else if (operator1 == "rd" || operator1 == "rp" || operator1 == "rdp") type = EDecompBanks.Ref;
-            return type;
-        }
-
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
         {            
             MergeDecompDict(dd.cellsContribD, decompDatas.storage[ii][jj].cellsContribD);
@@ -1690,11 +1652,8 @@ namespace Gekko
             if (operatorOneOf3Types == EContribType.D) return decompData.cellsContribD;
             else if (operatorOneOf3Types == EContribType.RD) return decompData.cellsContribDRef;
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
-            else
-            {
-                //only relevant for _Test_DecompOperators, not for others. And that one is DECOMOP2 which will die.
-                return decompData.cellsContribD;  //just to get something going when doing for instance "xn" option
-            }            
+            else new Error("Wrong type");            
+            return null;
         }
 
         private static bool IsAlmostZeroTimeseries(GekkoTime per1, GekkoTime per2, Series xx, double eps)
