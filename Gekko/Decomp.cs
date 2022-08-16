@@ -388,12 +388,17 @@ namespace Gekko
             EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
             bool rawDataQuo = false;
             bool rawDataRef = false;
-            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp")
+            if (decompOptions2.prtOptionLower == "xn" || decompOptions2.prtOptionLower == "xd" || decompOptions2.prtOptionLower == "xp" || decompOptions2.prtOptionLower == "xdp")
             {
                 rawDataQuo = true;
             }
-            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp")
+            else if (decompOptions2.prtOptionLower == "xr" || decompOptions2.prtOptionLower == "xrn" || decompOptions2.prtOptionLower == "xrd" || decompOptions2.prtOptionLower == "xrp" || decompOptions2.prtOptionLower == "xrdp")
             {
+                rawDataRef = true;
+            }
+            else if (decompOptions2.prtOptionLower == "xm" || decompOptions2.prtOptionLower == "xq" || decompOptions2.prtOptionLower == "xmp")
+            {
+                rawDataQuo = true;
                 rawDataRef = true;
             }
 
@@ -1431,19 +1436,18 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get DECOMP type. Not for stuff like dp or mp --
-        /// these return .Unknown. Handles types m, q, d, p, rd, rp. Also handles prefix "x".
+        /// Get DECOMP type.
+        /// Handles types m, q, d, p, rd, rp, mp, rp, rdp. Also handles prefix "x".
         /// </summary>
         /// <param name="operator1"></param>
         /// <returns></returns>
         private static EDecompBanks DecompGetType(string operator1x)
         {
             string operator1 = operator1x;
-            //if (operator1x.StartsWith("x")) operator1 = operator1x.Substring(1);
             EDecompBanks type = EDecompBanks.Unknown;
-            if (operator1 == "m" || operator1 == "q") type = EDecompBanks.Multiplier;
-            else if (operator1 == "d" || operator1 == "p") type = EDecompBanks.Work;
-            else if (operator1 == "rd" || operator1 == "rp") type = EDecompBanks.Ref;
+            if (operator1 == "m" || operator1 == "q" || operator1 == "mp") type = EDecompBanks.Multiplier;
+            else if (operator1 == "d" || operator1 == "p" || operator1 == "dp") type = EDecompBanks.Work;
+            else if (operator1 == "rd" || operator1 == "rp" || operator1 == "rdp") type = EDecompBanks.Ref;
             return type;
         }
 
@@ -3485,15 +3489,15 @@ namespace Gekko
             {
                 ect = EContribType.RN;
             }
-            else if (op == "d" || op == "p")
+            else if (op == "d" || op == "p" || op == "dp")
             {
                 ect = EContribType.D;
             }
-            else if (op == "rd" || op == "rp")
+            else if (op == "rd" || op == "rp" || op == "rdp")
             {
                 ect = EContribType.RD;
             }
-            else if (op == "m" || op == "q")
+            else if (op == "m" || op == "q" || op == "mp")
             {
                 ect = EContribType.M;
             }

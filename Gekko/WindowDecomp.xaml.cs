@@ -1907,7 +1907,7 @@ namespace Gekko
             {
                 checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
                 checkBox2.Opacity = 0.5;
-            }
+            }            
 
             if (true)
             {
@@ -1915,17 +1915,18 @@ namespace Gekko
                 //TODO TODO TODO TODO TODO TODO  TODO TODO
                 //TODO TODO TODO TODO TODO TODO  TODO TODO greyed out for now
                 //TODO TODO TODO TODO TODO TODO  TODO TODO
-                //TODO TODO TODO TODO TODO TODO  TODO TODO
-                radioButton9.IsEnabled = false;
-                radioButton9.Opacity = 0.5;
-                radioButton10.IsEnabled = false;
-                radioButton10.Opacity = 0.5;
-                radioButton29.IsEnabled = false;
-                radioButton29.Opacity = 0.5;
-                radioButton30.IsEnabled = false;
-                radioButton30.Opacity = 0.5;
+                //TODO TODO TODO TODO TODO TODO  TODO TODO                
                 checkBox1.IsEnabled = false;
                 checkBox1.Opacity = 0.5;
+
+                //radioButton9.IsEnabled = false;
+                //radioButton9.Opacity = 0.5;
+                //radioButton10.IsEnabled = false;
+                //radioButton10.Opacity = 0.5;
+                //radioButton29.IsEnabled = false;
+                //radioButton29.Opacity = 0.5;
+                //radioButton30.IsEnabled = false;
+                //radioButton30.Opacity = 0.5;
             }
         }
 
