@@ -708,16 +708,42 @@ namespace Gekko
                         if (decompOptions2.dyn)
                         {
                             //decomp over time, resolving lags/leads                            
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op);
+
+                            if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
+                            {
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op);
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op);  //Note: refreshObjects = false!
+                            }
+                            else
+                            {
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op);
+                            }
                         }
                         else
                         {
                             //decomp period by period, showing lags/leads.
-                            bool refreshObjects = true;
-                            foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+
+                            if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op);
-                                refreshObjects = false;
+                                bool refreshObjects = true;
+                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                                {
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op);
+                                    refreshObjects = false;
+                                }
+                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                                {
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op);                                    
+                                }
+                            }
+                            else
+                            {
+                                bool refreshObjects = true;
+                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                                {
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op);
+                                    refreshObjects = false;
+                                }
                             }
                         }
                     }
@@ -2605,7 +2631,15 @@ namespace Gekko
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
                 ENormalizeType normalize = ENormalizeType.Lags;
-                DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
+                if (op.lowLevel == ELowLevel.BothQuoAndRef)
+                {
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize);
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize);
+                }
+                else
+                {
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
+                }
             }            
 
             if (!op.isRaw)
@@ -2712,7 +2746,14 @@ namespace Gekko
                     }                    
                     else
                     {
-                        dd = GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types);
+                        if (op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            dd = GetDecompDatas(decompDataMAINClone[super], EContribType.D);  //could just as well be .RD, we are only using the keys
+                        }
+                        else
+                        {
+                            dd = GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types);
+                        }
                     }
 
                     foreach (string varname in dd.storage.Keys)
