@@ -2644,7 +2644,9 @@ namespace Gekko
                 }
                 else
                 {
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
+                    int deduct = 0;
+                    if (op.operatorLower == "dp" || op.operatorLower == "rdp") deduct = -1;
+                    DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
                 }
             }            
 
