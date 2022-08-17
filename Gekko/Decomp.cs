@@ -130,7 +130,7 @@ namespace Gekko
                 this.usesQuo = true;
                 this.usesRef = true;
                 this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
+                this.lagGradient = new List<int>() { -1, 0 };
                 this.type = Decomp.EContribType.M;
             }
 
@@ -2813,50 +2813,25 @@ namespace Gekko
                         }
 
                         double d = double.NaN;
-                        double dAlternative = double.NaN;             
+                        double dAlternative = double.NaN;
                         if (op.operatorLower == "dp")
                         {
-                            try
-                            {
-                                op.operatorLower = "d";
-                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            }
-                            finally
-                            {
-                                op.operatorLower = "dp";
-                            }
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
                         else if (op.operatorLower == "rp")
                         {
-                            try
-                            {
-                                op.operatorLower = "rd";
-                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            }
-                            finally
-                            {
-                                op.operatorLower = "rp";
-                            }
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
                         else if (op.operatorLower == "mp")
                         {
-                            try
-                            {
-                                op.operatorLower = "d";
-                                d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                                op.operatorLower = "rd";
-                                dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            }
-                            finally
-                            {
-                                op.operatorLower = "mp";
-                            }
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
                             dAlternative = double.NaN;
                         }
 
@@ -3748,20 +3723,20 @@ namespace Gekko
             //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
-        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, DecompOperator op, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
+        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
         {
             
             double d = double.NaN;
 
-            if (op.operatorLower == "d" || op.operatorLower == "p")
+            if (operatorLower == "d" || operatorLower == "p")
             {
                 d = decompTables.cellsContribD[colname].GetData(smpl, t2);
             }
-            else if (op.operatorLower == "rd" || op.operatorLower == "rp")
+            else if (operatorLower == "rd" || operatorLower == "rp")
             {
                 d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
             }
-            else if (op.operatorLower == "m" || op.operatorLower == "q")
+            else if (operatorLower == "m" || operatorLower == "q")
             {
                 d = decompTables.cellsContribM[colname].GetData(smpl, t2);
             }
