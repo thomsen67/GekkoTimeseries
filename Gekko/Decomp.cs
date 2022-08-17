@@ -564,6 +564,19 @@ namespace Gekko
         {
             DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
 
+            GekkoTime gt1 = per1;
+            GekkoTime gt2 = per2;
+            if (op.isRaw)
+            {
+                gt1 = per1.Add(op.lagData[0]);
+                gt2 = per2.Add(op.lagData[1]);
+            }
+            else
+            {
+                gt1 = per1.Add(op.lagGradient[0]);
+                gt2 = per2.Add(op.lagGradient[1]);
+            }
+
             DateTime t0 = DateTime.Now;
 
             //EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
@@ -618,7 +631,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, dsh, op, residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -1508,7 +1521,7 @@ namespace Gekko
                 }
             }
 
-            DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+            //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
@@ -2267,7 +2280,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter)
         {
             // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
             // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
@@ -2285,20 +2298,7 @@ namespace Gekko
             DecompInitDict(d);                                    
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            GekkoTime gt1 = tt1;
-            GekkoTime gt2 = tt2;
-            if (op.isRaw)
-            {
-                gt1 = tt1.Add(op.lagData[0]);
-                gt2 = tt2.Add(op.lagData[1]);
-            }
-            else
-            {
-                gt1 = tt1.Add(op.lagGradient[0]);
-                gt2 = tt2.Add(op.lagGradient[1]);
-            }
-
+            
             if (true)
             {
                 //foreach time period
@@ -3076,7 +3076,7 @@ namespace Gekko
                 else
                 {
                     td.change += d;
-                    td.changeAlternative = dAlternative;
+                    td.changeAlternative += dAlternative;
                     td.level += dLevel;
                     td.levelLag += dLevelLag;
                     td.levelLag2 += dLevelLag2;
@@ -3247,6 +3247,10 @@ namespace Gekko
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
                         }
+                        else if (op.operatorLower == "xdp")
+                        {
+                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
+                        }
                         else if (op.operatorLower == "xm")
                         {
                             d = dLevel - dLevelRef;
@@ -3254,6 +3258,10 @@ namespace Gekko
                         else if (op.operatorLower == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
+                        }
+                        else if (op.operatorLower == "xmp")
+                        {
+                            d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
                         // -----------------
                         else if (op.operatorLower == "rd")
@@ -3275,6 +3283,10 @@ namespace Gekko
                         else if (op.operatorLower == "xrp")
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                        }
+                        else if (op.operatorLower == "xrdp")
+                        {
+                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
                         }
                     }
 
