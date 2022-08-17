@@ -498,7 +498,10 @@ namespace Gekko
             foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
             {
                 int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
-                if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
+                if (i < 0 || i > element.periods.Length - 1)
+                {
+                    new Error("Period " + time.ToString() + " outside GAMS scalar model period (GAMS model runs over " + Program.model.modelGamsScalar.t0.ToString() + " to " + Program.model.modelGamsScalar.t2.ToString());
+                }
                 if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                 DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
                 //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
@@ -3816,7 +3819,7 @@ namespace Gekko
             // TODO TODO TODO is this a hack or not?
             // TODO TODO TODO
             // TODO TODO TODO
-            if (isScalarModel && G.isNumericalError(d)) d = 0d;
+            if (false && isScalarModel && G.isNumericalError(d)) d = 0d;
 
             return d;
         }
