@@ -8103,6 +8103,7 @@ namespace Gekko
             public string opt_prtcode = null;
             public string opt_dyn = null;  //yes|no
             public string opt_count = null;  //n | names
+            public string opt_missing = "m"; //m | zero
             public string variable = null;
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            

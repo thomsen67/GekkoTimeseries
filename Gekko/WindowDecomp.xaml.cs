@@ -2473,8 +2473,8 @@ namespace Gekko
     {
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
-
         public EModelType modelType = EModelType.Unknown;
+        public bool missingAsZero = false;
 
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
@@ -2570,6 +2570,7 @@ namespace Gekko
             d.prtOptionLower = this.prtOptionLower;
             d.dyn = this.dyn;
             d.count = this.count;
+            d.missingAsZero = this.missingAsZero;
 
             d.operatorHelper = new DecompOperatorHelper();
             d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;

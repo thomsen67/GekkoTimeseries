@@ -367,7 +367,7 @@ namespace Gekko
             decompOptions2.expression = o.expression;
             decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
             if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
-
+            if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
             if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
             else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
 
@@ -674,29 +674,7 @@ namespace Gekko
                 //linking
                 //linking
                 //linking
-
-                if (true)
-                {
-                    int i = -1;
-                    foreach (List<DecompData> x in decompDatas.storage)
-                    {
-                        i++;
-                        int j = -1;
-                        foreach (DecompData y in x)
-                        {
-                            j++;
-                            new Writeln("COMBINATION =====> " + i + " " + j);
-                            PrintDecompData(y);
-                        }
-                    }
-                    if (false)
-                    {
-                        new Writeln("...");
-                        new Writeln("...");
-                        new Writeln("MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN ");
-                        PrintDecompData(decompDatas.MAIN_data[0]);
-                    }
-                }
+                
 
                 //------------------------
                 //Example: e1: y = c + i + g  --> y - (c + i + g)
@@ -707,7 +685,6 @@ namespace Gekko
                 {
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        bool dyn = false;
                         if (decompOptions2.dyn)
                         {
                             //decomp over time, resolving lags/leads                            
@@ -725,7 +702,7 @@ namespace Gekko
                         else
                         {
                             //decomp period by period, showing lags/leads.
-
+                            
                             if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                             {
                                 bool refreshObjects = true;
@@ -741,8 +718,11 @@ namespace Gekko
                             }
                             else
                             {
+                                int deduct = 0;
+                                //why deduct not enough??
+                                if (op.operatorLower == "dp" || op.operatorLower == "rdp") deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
                                 bool refreshObjects = true;
-                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                                foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                                 {
                                     DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op);
                                     refreshObjects = false;
@@ -763,7 +743,30 @@ namespace Gekko
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.    
 
-                
+                if (true)
+                {
+                    int i = -1;
+                    foreach (List<DecompData> x in decompDatas.storage)
+                    {
+                        i++;
+                        int j = -1;
+                        foreach (DecompData y in x)
+                        {
+                            j++;
+                            new Writeln("COMBINATION =====> " + i + " " + j);
+                            PrintDecompData(y);
+                        }
+                    }
+                    if (true && decompDatas.MAIN_data != null && decompDatas.MAIN_data[0] != null)
+                    {
+                        new Writeln("...");
+                        new Writeln("...");
+                        new Writeln("MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN ");
+                        PrintDecompData(decompDatas.MAIN_data[0]);
+                    }
+                }
+
+
             }
 
             //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
@@ -2885,22 +2888,22 @@ namespace Gekko
                         double dAlternative = double.NaN;
                         if (op.operatorLower == "dp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.operatorLower == "rp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.operatorLower == "mp")
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = double.NaN;
                         }
 
@@ -3792,7 +3795,7 @@ namespace Gekko
             //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
-        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
+        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel, bool missingAsZero)
         {
             
             double d = double.NaN;
@@ -3812,14 +3815,9 @@ namespace Gekko
             else
             {
                 //do nothing
-            }
-
-            // TODO TODO TODO
-            // TODO TODO TODO
-            // TODO TODO TODO is this a hack or not?
-            // TODO TODO TODO
-            // TODO TODO TODO
-            if (false && isScalarModel && G.isNumericalError(d)) d = 0d;
+            }            
+            
+            if (missingAsZero && isScalarModel && G.isNumericalError(d)) d = 0d;
 
             return d;
         }

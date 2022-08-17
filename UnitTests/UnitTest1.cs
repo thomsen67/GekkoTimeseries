@@ -11388,7 +11388,7 @@ namespace UnitTests
             // ----------------------------------------
             
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 dyn m> y from e1, e2 endo y, c rows vars cols time;");
+            I("decomp3 <2001 2002 dyn m missing=zero> y from e1, e2 endo y, c rows vars cols time;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -11404,7 +11404,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 dyn m> y from e1, e2 endo y, c;");
+            I("decomp3 <2001 2002 dyn m missing=zero> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
             i = 0;
             i++;
@@ -11802,7 +11802,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 dyn m> x[y] from e1, e2 endo x[y], x[c] rows vars cols time;");
+            I("decomp3 <2001 2002 dyn m missing=zero> x[y] from e1, e2 endo x[y], x[c] rows vars cols time;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -11821,7 +11821,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 dyn m> x[y] from e1, e2 endo x[y], x[c] rows vars, #uni, lags cols time;");
+            I("decomp3 <2001 2002 dyn m missing=zero> x[y] from e1, e2 endo x[y], x[c] rows vars, #uni, lags cols time;");
             table = Globals.lastDecompTable;
             i = 0;
             i++;

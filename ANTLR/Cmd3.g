@@ -2941,6 +2941,7 @@ decompOpt1:					ISNOTQUAL
                             ;
 decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
                           | COUNT EQUAL name -> ^(ASTOPT_STRING_COUNT name)  //n | names
+						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)  //m | zero
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 
