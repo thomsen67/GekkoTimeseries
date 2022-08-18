@@ -18,8 +18,8 @@ namespace Gekko
         public string operatorLower = null;
         public bool isRaw = false;
         public bool isShares = false;
-        //public bool usesQuo = false;
-        //public bool usesRef = false;
+        public bool doubleDifQuo = false;  //only <dp> type
+        public bool doubleDifRef = false;  //only <rdp> type
         public Decomp.ELowLevel lowLevel = Decomp.ELowLevel.Unknown;
         public List<int> lagData = new List<int>() { 0, 0 };
         public List<int> lagGradient = new List<int>() { 0, 0 };
@@ -58,8 +58,9 @@ namespace Gekko
             else if (x == "xdp")
             {
                 this.isRaw = true;
+                this.doubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
-                this.lagData = new List<int>() { -2, 0 };
+                this.lagData = new List<int>() { -2, 0 };                
             }
 
             // ----------------------------------------------------
@@ -82,6 +83,7 @@ namespace Gekko
             }
             else if (x == "dp")
             {
+                this.doubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
@@ -149,6 +151,7 @@ namespace Gekko
             else if (x == "xrdp")
             {
                 this.isRaw = true;
+                this.doubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
             }
@@ -173,6 +176,7 @@ namespace Gekko
             }
             else if (x == "rdp")
             {
+                this.doubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
@@ -202,6 +206,7 @@ namespace Gekko
             else if (x == "sdp")
             {
                 this.isShares = true;
+                this.doubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
@@ -255,6 +260,7 @@ namespace Gekko
             else if (x == "srdp")
             {
                 this.isShares = true;
+                this.doubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
@@ -720,7 +726,7 @@ namespace Gekko
                             {
                                 int deduct = 0;
                                 //why deduct not enough??
-                                if (op.operatorLower == "dp" || op.operatorLower == "rdp") deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                                if (op.doubleDifQuo || op.doubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
                                 bool refreshObjects = true;
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                                 {
@@ -2645,7 +2651,7 @@ namespace Gekko
                 else
                 {
                     int deduct = 0;
-                    if (op.operatorLower == "dp" || op.operatorLower == "rdp") deduct = -1;
+                    if (op.doubleDifQuo || op.doubleDifRef) deduct = -1;
                     DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
                 }
             }            
@@ -2888,17 +2894,17 @@ namespace Gekko
 
                         double d = double.NaN;
                         double dAlternative = double.NaN;
-                        if (op.operatorLower == "dp")
+                        if (op.doubleDifQuo)  //dp
                         {
                             d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
-                        else if (op.operatorLower == "rp")
+                        else if (op.doubleDifRef) //rdp
                         {
                             d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
-                        else if (op.operatorLower == "mp")
+                        else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
                         {
                             d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
@@ -3264,27 +3270,27 @@ namespace Gekko
                         {
                             d = dLevelRef;
                         }
-                        else if (op.operatorLower == "d")
+                        else if (op.operatorLower == "d" || op.operatorLower == "sd")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "p")
+                        else if (op.operatorLower == "p" || op.operatorLower == "sp")
                         {
                             d = td.change / dFirstLevelLag * 100d;
                         }
-                        else if (op.operatorLower == "dp")
+                        else if (op.operatorLower == "dp" || op.operatorLower == "sdp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
                         }
-                        else if (op.operatorLower == "m")
+                        else if (op.operatorLower == "m" || op.operatorLower == "sm")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "q")
+                        else if (op.operatorLower == "q" || op.operatorLower == "sq")
                         {
                             d = td.change / dFirstLevelRef * 100d;
                         }
-                        else if (op.operatorLower == "mp")
+                        else if (op.operatorLower == "mp" || op.operatorLower == "smp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
                         }
@@ -3313,15 +3319,15 @@ namespace Gekko
                             d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
                         // -----------------
-                        else if (op.operatorLower == "rd")
+                        else if (op.operatorLower == "rd" || op.operatorLower == "srd")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "rp")
+                        else if (op.operatorLower == "rp" || op.operatorLower == "srp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d;
                         }
-                        else if (op.operatorLower == "rdp")
+                        else if (op.operatorLower == "rdp" || op.operatorLower == "srdp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
                         }
@@ -3802,15 +3808,15 @@ namespace Gekko
             
             double d = double.NaN;
 
-            if (operatorLower == "d" || operatorLower == "p")
+            if (operatorLower == "d" || operatorLower == "p" || operatorLower == "sd" || operatorLower == "sp")
             {
                 d = decompTables.cellsContribD[colname].GetData(smpl, t2);
             }
-            else if (operatorLower == "rd" || operatorLower == "rp")
+            else if (operatorLower == "rd" || operatorLower == "rp" || operatorLower == "srd" || operatorLower == "srp")
             {
                 d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
             }
-            else if (operatorLower == "m" || operatorLower == "q")
+            else if (operatorLower == "m" || operatorLower == "q" || operatorLower == "sm" || operatorLower == "sq")
             {
                 d = decompTables.cellsContribM[colname].GetData(smpl, t2);
             }
