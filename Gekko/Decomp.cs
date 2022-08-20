@@ -14,19 +14,23 @@ namespace Gekko
 
     public class DecompOperator
     {
-        
+        public bool isPercentageType = false; //for formatting
         public string operatorLower = null;
         public bool isRaw = false;
         public bool isShares = false;
-        public bool doubleDifQuo = false;  //only <dp> type
-        public bool doubleDifRef = false;  //only <rdp> type
-        public Decomp.ELowLevel lowLevel = Decomp.ELowLevel.Unknown;
+        public bool isDoubleDifQuo = false;  //codes that contain 'dp'
+        public bool isDoubleDifRef = false;  //codes that contain 'rdp'
+        public Decomp.ELowLevel lowLevel = Decomp.ELowLevel.Unknown; //.BothQuoAndRef --> <mp> or <xmp> type
         public List<int> lagData = new List<int>() { 0, 0 };
         public List<int> lagGradient = new List<int>() { 0, 0 };
         public Decomp.EContribType type = Decomp.EContribType.Unknown;
 
         public DecompOperator(string x)
         {
+            if (x == "n" || x == "r" || x == "rn")
+            {
+                new Error("Please use operator 'x" + x + "' instead of '" + x + "'.");
+            }
             bool good = false;
             if (x == "x" || x == "xn")
             {
@@ -54,40 +58,47 @@ namespace Gekko
                 this.isRaw = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -1, 0 };
+                this.isPercentageType = true;
             }
             else if (x == "xdp")
             {
                 this.isRaw = true;
-                this.doubleDifQuo = true;
+                this.isDoubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
-                this.lagData = new List<int>() { -2, 0 };                
+                this.lagData = new List<int>() { -2, 0 };
+                this.isPercentageType = true;
             }
 
             // ----------------------------------------------------
             //col 2
             // ----------------------------------------------------
                         
-            else if (x == "d")
+            else if (x == "d" || x == "sd")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.D;
+                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "p")
+            else if (x == "p" || x == "sp")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.D;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "dp")
+            else if (x == "dp" || x == "sdp")
             {
-                this.doubleDifQuo = true;
+                this.isDoubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
                 this.type = Decomp.EContribType.D;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
 
             // ----------------------------------------------------
@@ -102,33 +113,40 @@ namespace Gekko
             {
                 this.lowLevel = Decomp.ELowLevel.Multiplier;
                 this.isRaw = true;
+                this.isPercentageType = true;
             }
             else if (x == "xmp")
             {
                 this.isRaw = true;
                 this.lowLevel = Decomp.ELowLevel.BothQuoAndRef;
                 this.lagData = new List<int>() { -1, 0 };
+                this.isPercentageType = true;
             }
 
             // ----------------------------------------------------
             //col 4
             // ----------------------------------------------------
-            else if (x == "m")
+            else if (x == "m" || x == "sm")
             {
                 this.lowLevel = Decomp.ELowLevel.Multiplier;
                 this.type = Decomp.EContribType.M;
+                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "q")
+            else if (x == "q" || x == "sq")
             {
                 this.lowLevel = Decomp.ELowLevel.Multiplier;
                 this.type = Decomp.EContribType.M;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "mp")
+            else if (x == "mp" || x == "smp")
             {
                 this.lowLevel = Decomp.ELowLevel.BothQuoAndRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.M;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
 
 
@@ -147,124 +165,47 @@ namespace Gekko
                 this.isRaw = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
+                this.isPercentageType = true;
             }
             else if (x == "xrdp")
             {
                 this.isRaw = true;
-                this.doubleDifRef = true;
+                this.isDoubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
+                this.isPercentageType = true;
             }
 
             // ----------------------------------------------------
             //ref col 2
             // ----------------------------------------------------
 
-            else if (x == "rd")
+            else if (x == "rd" || x == "srd")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.RD;
+                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "rp")
+            else if (x == "rp" || x == "srp")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.RD;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "rdp")
+            else if (x == "rdp" || x == "srdp")
             {
-                this.doubleDifRef = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyRef;
-                this.lagData = new List<int>() { -2, 0 };
-                this.lagGradient = new List<int>() { -2, -1 };
-                this.type = Decomp.EContribType.RD;
-            }
-
-            // ----------------------------------------------------
-            //shares col 2
-            // ----------------------------------------------------
-
-            else if (x == "sd")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyQuo;
-                this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
-                this.type = Decomp.EContribType.D;
-            }
-            else if (x == "sp")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyQuo;
-                this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
-                this.type = Decomp.EContribType.D;
-            }
-            else if (x == "sdp")
-            {
-                this.isShares = true;
-                this.doubleDifQuo = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyQuo;
-                this.lagData = new List<int>() { -2, 0 };
-                this.lagGradient = new List<int>() { -2, -1 };
-                this.type = Decomp.EContribType.D;
-            }
-
-            // ----------------------------------------------------
-            //shares col 4
-            // ----------------------------------------------------
-            else if (x == "sm")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.Multiplier;
-                this.type = Decomp.EContribType.M;
-            }
-            else if (x == "sq")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.Multiplier;
-                this.type = Decomp.EContribType.M;
-            }
-            else if (x == "smp")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.BothQuoAndRef;
-                this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
-                this.type = Decomp.EContribType.M;
-            }
-
-            // ----------------------------------------------------
-            //ref shares col 2
-            // ----------------------------------------------------
-
-            else if (x == "srd")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyRef;
-                this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
-                this.type = Decomp.EContribType.RD;
-            }
-            else if (x == "srp")
-            {
-                this.isShares = true;
-                this.lowLevel = Decomp.ELowLevel.OnlyRef;
-                this.lagData = new List<int>() { -1, 0 };
-                this.lagGradient = new List<int>() { -1, -1 };
-                this.type = Decomp.EContribType.RD;
-            }
-            else if (x == "srdp")
-            {
-                this.isShares = true;
-                this.doubleDifRef = true;
+                this.isDoubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
                 this.lagGradient = new List<int>() { -2, -1 };
                 this.type = Decomp.EContribType.RD;
+                this.isPercentageType = true;
+                if (x.StartsWith("s")) isShares = true;
             }
             
             // -------------------------------
@@ -323,7 +264,7 @@ namespace Gekko
             OnlyQuo,
             OnlyRef,
             Multiplier,
-            BothQuoAndRef
+            BothQuoAndRef  //only for <mp> and <xmp> type
         }
 
         /// <summary>
@@ -573,6 +514,7 @@ namespace Gekko
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
         {
             DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
+            decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
 
             GekkoTime gt1 = per1;
             GekkoTime gt2 = per2;
@@ -726,7 +668,7 @@ namespace Gekko
                             {
                                 int deduct = 0;
                                 //why deduct not enough??
-                                if (op.doubleDifQuo || op.doubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                                if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
                                 bool refreshObjects = true;
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                                 {
@@ -749,7 +691,7 @@ namespace Gekko
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.    
 
-                if (true)
+                if (false)
                 {
                     int i = -1;
                     foreach (List<DecompData> x in decompDatas.storage)
@@ -1243,7 +1185,6 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
                     bool nan = false;
                     foreach (double d in mEndo)
                     {
@@ -1253,11 +1194,16 @@ namespace Gekko
                             break;
                         }
                     }
-                    if (nan)
+                    if (!nan)
                     {
-                        new Error("The matrix contains missing or infinite values", false);
+                        new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
+                        throw;
                     }
-                    throw new GekkoException();
+                    else
+                    {
+                        //We allow this, may just be some missing data
+                        inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
+                    }
                 }
 
                 double[,] effect = Program.MultiplyMatrices(inverse, mExo);
@@ -1498,7 +1444,6 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    new Error("Matrix inversion for DECOMP failed", false);
                     bool nan = false;
                     foreach (double d in mEndo)
                     {
@@ -1508,11 +1453,16 @@ namespace Gekko
                             break;
                         }
                     }
-                    if (nan)
+                    if (!nan)
                     {
-                        new Error("The matrix contains missing or infinite values", false);
+                        new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString(), false);
+                        throw;
                     }
-                    throw new GekkoException();
+                    else
+                    {
+                        //We allow this, may just be some missing data
+                        inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
+                    }
                 }
 
                 effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
@@ -1549,14 +1499,14 @@ namespace Gekko
                     DecompDict dd = null;
                     if (op.isRaw)
                     {
-                        Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, xnewName);
-                        decompDatas.MAIN_data[ZERO].cellsQuo[xnewName].SetData(time, tup.Item1.GetDataSimple(time));
-                        decompDatas.MAIN_data[ZERO].cellsRef[xnewName].SetData(time, tup.Item2.GetDataSimple(time));
+                        Tuple<Series, Series> tup1 = GetRealTimeseries(decompDatas, xnewName);
+                        if (tup1.Item1 != null) decompDatas.MAIN_data[ZERO].cellsQuo[xnewName].SetData(time, tup1.Item1.GetDataSimple(time));
+                        if (tup1.Item2 != null) decompDatas.MAIN_data[ZERO].cellsRef[xnewName].SetData(time, tup1.Item2.GetDataSimple(time));
                         if (col == 0)
                         {
                             Tuple<Series, Series> tup2 = GetRealTimeseries(decompDatas, enewName);
-                            decompDatas.MAIN_data[ZERO].cellsQuo[enewName].SetData(time, tup2.Item1.GetDataSimple(time));
-                            decompDatas.MAIN_data[ZERO].cellsRef[enewName].SetData(time, tup2.Item2.GetDataSimple(time));
+                            if (tup2.Item1 != null) decompDatas.MAIN_data[ZERO].cellsQuo[enewName].SetData(time, tup2.Item1.GetDataSimple(time));
+                            if (tup2.Item2 != null) decompDatas.MAIN_data[ZERO].cellsRef[enewName].SetData(time, tup2.Item2.GetDataSimple(time));
                         }
                     }
                     else
@@ -1737,7 +1687,8 @@ namespace Gekko
             if (operatorOneOf3Types == EContribType.D) return decompData.cellsContribD;
             else if (operatorOneOf3Types == EContribType.RD) return decompData.cellsContribDRef;
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
-            else new Error("Wrong type");            
+            else
+                new Error("Wrong type");            
             return null;
         }
 
@@ -2645,14 +2596,14 @@ namespace Gekko
                 ENormalizeType normalize = ENormalizeType.Lags;
                 if (op.lowLevel == ELowLevel.BothQuoAndRef)
                 {
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize);
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize);
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize, op);
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize, op);
                 }
                 else
                 {
                     int deduct = 0;
-                    if (op.doubleDifQuo || op.doubleDifRef) deduct = -1;
-                    DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize);
+                    if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;
+                    DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
                 }
             }            
 
@@ -2894,12 +2845,12 @@ namespace Gekko
 
                         double d = double.NaN;
                         double dAlternative = double.NaN;
-                        if (op.doubleDifQuo)  //dp
+                        if (op.isDoubleDifQuo)  //dp
                         {
                             d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
-                        else if (op.doubleDifRef) //rdp
+                        else if (op.isDoubleDifRef) //rdp
                         {
                             d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
@@ -3384,6 +3335,11 @@ namespace Gekko
                 tab.Set(1, j + 2, s);
             }
 
+            if (decompOptions2.decompTablesFormat.isPercentageType)
+            {
+                tab.Set(1, 1, "%" + "  ");
+            }
+
             return tab;
         }
 
@@ -3557,7 +3513,7 @@ namespace Gekko
         /// <param name="parentI"></param>
         /// <param name="decompDatasSupremeClone"></param>
         /// <param name="operatorOneOf3Types"></param>
-        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types, ENormalizeType normalize)
+        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types, ENormalizeType normalize, DecompOperator op)
         {
             // Decomp provides a linearization where the contributions sum to 0. Here we identify those
             // vars (contributions) that are moved to the LHS.
@@ -3619,7 +3575,25 @@ namespace Gekko
 
                     // ----------------------------------------------
 
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK this only solves shares for d, rd, m
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
+                    // HACK HACK HACK
                     double factor = d2 / d1;
+                    if (op.isShares)
+                    {
+                        factor = 100; //--> fixes d, rd, m
+                    }
 
                     bool found = false;
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)

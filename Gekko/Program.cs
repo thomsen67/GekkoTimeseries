@@ -25161,20 +25161,7 @@ namespace Gekko
             string format2 = "f16." + decimals.ToString();
             c.numberFormat = format2;
             tab.Set(new Coord(i + 1, j + 1), c);
-        }
-
-        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions2 decompOptions)
-        {
-            Cell c = new Cell();
-            c.number = d;
-            c.cellType = CellType.Number;
-            int decimals = 0;
-            if (decompOptions.decompTablesFormat.isPercentageType) decimals = decompOptions.decompTablesFormat.decimalsPch;
-            else decimals = decompOptions.decompTablesFormat.decimalsLevel;
-            string format = "f16." + decimals.ToString();
-            c.numberFormat = format;
-            tab.Set(new Coord(i + 1, j + 1), c);
-        }
+        }        
 
         public static double[,] PutJacobiIntoArray()
         {

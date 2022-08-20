@@ -1892,7 +1892,7 @@ namespace Gekko
                 checkBox2.Opacity = 0.5;
             }            
 
-            if (true)
+            if (false)
             {
                 //TODO TODO TODO TODO TODO TODO  TODO TODO
                 //TODO TODO TODO TODO TODO TODO  TODO TODO
@@ -1902,14 +1902,14 @@ namespace Gekko
                 checkBox1.IsEnabled = false;
                 checkBox1.Opacity = 0.5;
 
-                //radioButton9.IsEnabled = false;
-                //radioButton9.Opacity = 0.5;
-                //radioButton10.IsEnabled = false;
-                //radioButton10.Opacity = 0.5;
-                //radioButton29.IsEnabled = false;
-                //radioButton29.Opacity = 0.5;
-                //radioButton30.IsEnabled = false;
-                //radioButton30.Opacity = 0.5;
+                radioButton9.IsEnabled = false;
+                radioButton9.Opacity = 0.5;
+                radioButton10.IsEnabled = false;
+                radioButton10.Opacity = 0.5;
+                radioButton29.IsEnabled = false;
+                radioButton29.Opacity = 0.5;
+                radioButton30.IsEnabled = false;
+                radioButton30.Opacity = 0.5;
             }
         }
 

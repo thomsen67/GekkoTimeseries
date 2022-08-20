@@ -10532,7 +10532,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp()
+        public void _Test_Decomp_2xStyle()
         {
             Gekko.Table table = null;
 
@@ -10557,7 +10557,16 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
                 Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
             }
+        }
 
+
+        [TestMethod]
+        public void _Test_Decomp_OLD()
+        {
+            Gekko.Table table = null;
+
+            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
+            
             if (true)
             {
 
@@ -10964,44 +10973,7 @@ namespace UnitTests
             I("time 2015 2016;");
             //hmmm, qc_a[#a] er defineret over #a, mens npop[#a_] er defineret over #a_, dvs. har også a15t100 og tot.
             I("npop.setdomains(('#a',));");
-
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-            //2015    2016
-            //qC  5.88000887002727    9.35507860159851
-            //dArv - 0.168360969760489 - 0.0797363727806105
-            //EmrHhRente  0.222980194345246   0.120656066180453
-            //EpC - 2.42399221511223 - 2.96743364463208
-            //ErDisk  7.76079834577429    8.21492331748983
-            //ErOverlev   0.010490570877268   0.000278629455632681
-            //nPop    5.2486699737577 5.52628826893317
-            //pC  8.0292841739063 9.32769414117502
-            //qC_a - 0.615584918565111  0.0529402334943975
-            //qCxRef  2.30873367350501 - 5.70272233321886
-            //uUC 0   0
-            //vArv    2.13507950651876    0.284617948740825
-            //vHhTilBoern 0.14044182362823 - 0.562866143807517
-            //vPrimInd - 15.8713130277437 - 4.98015660375826
-            //vtArv - 0.44669281123282   0.430610285717499
-            I("decomp2 <d> qc[cikkebol] in E_qC_cNonHou link qc_a[#a18t100] in E_qC_a, qchtm[#a18t100] in E_qCHtM, qCr[#a19t100] in E_qCxRef, qCr[#a18t18] in E_qCxRef_a18, qCxRef[#a18t100] in E_mUC, mUC[#a18t100] in E_qCR, emUC[#a18t99] in E_Emuc, EmUC[#a100t100] in E_Emuc_aEnd;");
-            //                                           qCxRef[#a18t100] in E_mUC <lead>,
-            //                                           muc[#a18t100] in e_qCr <lead>,
-            //                                           emuc[#a18t99] in E_EmUC <lead>;
-            Gekko.Table table = Globals.lastDecompTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
-            //TODO: a_residual row 2 (residual)              
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC | [0]");
-            Assert.AreEqual(table.Get(2, 2).number, 5.8800d, 0.0001);
-            Assert.AreEqual(table.Get(2, 3).number, 9.3551d, 0.0001);
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv | [0]");
-            Assert.AreEqual(table.Get(3, 2).number, -0.1684d, 0.0001);
-            Assert.AreEqual(table.Get(3, 3).number, -0.0797d, 0.0001);
-
+            
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // Globals.showDecompTable = true;  //will show the following decomp table and then abort
@@ -11024,7 +10996,7 @@ namespace UnitTests
             //vPrimInd - 15.882724567599 - 4.98310555860543
             //vtArv - 0.446904847512389  0.43082959783288
             I("decomp3<d> qC[cikkebol] from E_qC_cNonHou, E_qC_a, E_qCHtM, E_qCxRef, E_qCxRef_a18, E_mUC, E_qCR, E_Emuc, E_Emuc_aEnd     endo qC[cikkebol], qc_a[#a18t100], qchtm[#a18t100], qCr[#a19t100], qCr[#a18t18], qCxRef[#a18t100], mUC[#a18t100], emUC[#a18t99], EmUC[#a100t100];");
-            table = Globals.lastDecompTable;
+            Gekko.Table table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
             //TODO: a_residual row 2 (residual)              
@@ -11929,7 +11901,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test_DecompAndArraySeries()
+        public void _Test_ArraySeriesAndDollar()
         {
             I("RESET; time 2000 2000;");
             I("#i = ('10', '11');");
@@ -12184,18 +12156,11 @@ namespace UnitTests
 
             Gekko.Table table = null;
 
-            for (int i = 0; i < 2; i++)
-            {
-                if (i == 0)
-                {                    
-                    I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo y[18], y[19], demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
-                }
-                else
-                {                    
-                    I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
-                }
-
-                int ii = -1 + i;
+            if (true)
+            {                
+                I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo y[18], y[19], demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
+             
+                int ii = -1 + 0;
 
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
@@ -12203,232 +12168,69 @@ namespace UnitTests
                 //TODO: a_residual row 2 (residual)              
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
                 Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
-                Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
-
-                if (i == 1)
-                {
-                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
-                    Assert.AreEqual(table.Get(3, 2).number, 0.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
-                }
-                
+                Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);                                
                 Assert.AreEqual(table.Get(4 + ii, 1).CellText.TextData[0], "g | 18 | [0]");
                 Assert.AreEqual(table.Get(4 + ii, 2).number, 3.3333d, 0.0001);
                 Assert.AreEqual(table.Get(4 + ii, 3).number, 6.6667d, 0.0001);
                 Assert.AreEqual(table.Get(5 + ii, 1).CellText.TextData[0], "y | 19 | [+1]");                
                 Assert.AreEqual(table.Get(5 + ii, 2).number, 5.5556d, 0.0001);                
                 Assert.AreEqual(table.Get(5 + ii, 3).number, 25.5555d, 0.0001);
-            }
-
-            if (true)
-            {
-
-                // Decomp over time example (#98750984325)
-                //
-                // eq1           2021       2022
-                // ---------------------------------
-                // y[18][0]     8.8889    32.2223
-                // residual     0          0
-                // g[18][0]     3.3333     6.6667
-                // y[19][+1]    5.5556    25.5555
-
-                // eq2           2021       2022
-                // ---------------------------------
-                // y[19][0]     3.33330    8.3333
-                // residual     0          0
-                // g[19][0]     3.333333   8.33333
-                // y[20][+1]    0          0
-
-                //in eq1, we want to substitute the 5.56 in the last row
-                //with eq2. So y[19][+1] in 2021 in eq1 is = y[19] in 2022 in eq2.
-                //So the 5.56 link up with the 8.33, and the effect is this for eq1:
-
-                // eq1           2021       2022
-                // ---------------------------------
-                // y[18][0]     8.8889    32.2223
-                // residual     0          0
-                // g[18][0]     3.3333     6.6667
-                // y[19][+1]    0         25.5555     <---- has 5.5556 removed in 2021
-                // g[19][+1]    5.5556     0          <---- has 5.5556 added in 2021
-                // y[20][+2]    0          0
-                //
-                // So for t = 2021 we take y[19][+1] in eq1, with value 5.5556. 
-                // Then we subtract 1 from lead --> y[19][0], and look that up,
-                // but for t+1 --> 8.3333. A factor is calculated, and the rows
-                // from eq2 in t+1 are put into eq1, where the names have 1 added
-                // to their leads (g[19][0] --> g[19][+1] and y[20][+1] --> y[20][+2].
-
-                //After initial DecompLowLevel():
-
-                // ------------------------------------------------------
-                // EQ e3: y(a, t) =E= c(a, t) + g(a, t)
-                // ------------------------------------------------------
-                //0 -- 0  name Work:c[18]¤[0] 2021 = -6.8889000000329         [LINK]
-                //0 -- 0  name Work:c[18]¤[0] 2022 = -28.2223000001347
-                //0 -- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
-                //0 -- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
-                //0 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
-                //0 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
-                //0 -- 0  name Work:a_residual__¤[0] 2021 = 0
-                //0 -- 0  name Work:a_residual__¤[0] 2022 = 0
-                // ------------------------------------------------------
-                //0 -- 1  name Work:c[19]¤[0] 2021 = -1.33330000000637
-                //0 -- 1  name Work:c[19]¤[0] 2022 = -3.3334000000159
-                //0 -- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
-                //0 -- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
-                //0 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
-                //0 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977
-                //0 -- 1  name Work:a_residual__¤[0] 2021 = 0
-                //0 -- 1  name Work:a_residual__¤[0] 2022 = 0
-                // ------------------------------------------------------
-                // EQ e2: c(a, t)    =E=  0.40 * (y(a, t) + y(a+1, t+1))
-                // ------------------------------------------------------
-                //1 -- 0  name Work:c[18]¤[0] 2021 = 6.8889000000329           [LINK]
-                //1 -- 0  name Work:c[18]¤[0] 2022 = 28.2223000001347
-                //1 -- 0  name Work:y[18]¤[0] 2021 = -3.55556000011804
-                //1 -- 0  name Work:y[18]¤[0] 2022 = -12.8889200004279
-                //1 -- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
-                //1 -- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
-                //1 -- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
-                //1 -- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
-                // ------------------------------------------------------
-                //1 -- 1  name Work:c[19]¤[0] 2021 = 1.33330000000637
-                //1 -- 1  name Work:c[19]¤[0] 2022 = 3.3334000000159
-                //1 -- 1  name Work:y[19]¤[0] 2021 = -1.33331999994953
-                //1 -- 1  name Work:y[19]¤[0] 2022 = -3.3333599998738
-                //1 -- 1  name Work:y[20]¤[+1] 2021 = 0
-                //1 -- 1  name Work:y[20]¤[+1] 2022 = 0
-                //1 -- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
-                //1 -- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
-                // ------------------------------------------------------
-                // EQ e4: y(a, t) =E= 1/0.60 * ( 0.40 * y(a+1, t+1) + g(a, t))
-                // ------------------------------------------------------
-                //2 -- 0  name Work:g[18]¤[0] 2021 = -3.33333333330188
-                //2 -- 0  name Work:g[18]¤[0] 2022 = -6.66666666671745
-                //2 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
-                //2 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
-                //2 -- 0  name Work:y[19]¤[+1] 2021 = -5.55559999982914
-                //2 -- 0  name Work:y[19]¤[+1] 2022 = -25.5555333330922
-                //2 -- 0  name Work:a_residual___link2¤[0] 2021 = 3.33333333060182E-05
-                //2 -- 0  name Work:a_residual___link2¤[0] 2022 = -9.99999999748979E-05
-                // ------------------------------------------------------
-                //2 -- 1  name Work:g[19]¤[0] 2021 = -3.33333333338715  
-                //2 -- 1  name Work:g[19]¤[0] 2022 = -8.33333333332575 <---- stored as g[19][+1], same with the others (lead)
-                //2 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
-                //2 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977  <--------------- y[19][0] linkChild, multiplied with 0.4 to give 3.3333
-                //2 -- 1  name Work:y[20]¤[+1] 2021 = 0
-                //2 -- 1  name Work:y[20]¤[+1] 2022 = 0
-                //2 -- 1  name Work:a_residual___link2¤[0] 2021 = 3.33333333344399E-05
-                //2 -- 1  name Work:a_residual___link2¤[0] 2022 = -6.66666666404581E-05
-
-                // ------------------------------------------------------
-                // MAIN_data: after the two first equations, just before the lead-equation
-                // ------------------------------------------------------
-                // 0-- 0  name Work:c[18]¤[0] 2021 = 0
-                // 0-- 0  name Work:c[18]¤[0] 2022 = 0
-                // 0-- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
-                // 0-- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
-                // 0-- 0  name Work:y[18]¤[0] 2021 = 5.33333999992441
-                // 0-- 0  name Work:y[18]¤[0] 2022 = 19.333379999726
-                // 0-- 0  name Work:a_residual__¤[0] 2021 = 0
-                // 0-- 0  name Work:a_residual__¤[0] 2022 = 0
-                // 0-- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
-                // 0-- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
-                // 0-- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
-                // 0-- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
-                // 0-- 1  name Work:c[19]¤[0] 2021 = 0
-                // 0-- 1  name Work:c[19]¤[0] 2022 = 0
-                // 0-- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
-                // 0-- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
-                // 0-- 1  name Work:y[19]¤[0] 2021 = 1.9999800000664
-                // 0-- 1  name Work:y[19]¤[0] 2022 = 5.00004000016597
-                // 0-- 1  name Work:a_residual__¤[0] 2021 = 0
-                // 0-- 1  name Work:a_residual__¤[0] 2022 = 0
-                // 0-- 1  name Work:y[20]¤[+1] 2021 = 0
-                // 0-- 1  name Work:y[20]¤[+1] 2022 = 0
-                // 0-- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
-                // 0-- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
-
-
-                // TOGETHER, 2021
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000
-                // name Work:y[19]¤[+1] 2021 = -3.3333     <---------------------linkParent in 2021
-
-                // LEAD EQUATION MULTIPLIED WITH 0.4 to give this:                
-                //2 -- 1  name Work:g[19]¤[0] 2022 = -3.3333
-                //2 -- 1  name Work:y[19]¤[0] 2022 = 3.3333 
-
-                // Changed lead and period:
-                //2 -- 1  name Work:g[19]¤[+1] 2021 = -3.3333
-                //2 -- 1  name Work:y[19]¤[+1] 2021 = 3.3333 
-
-                // NOW ADD TO "TOGETHER" ABOVE:
-
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000
-                // name Work:y[19]¤[+1] 2021 = -3.3333  
-                // name Work:g[19]¤[+1] 2021 = -3.3333
-                // name Work:y[19]¤[+1] 2021 = 3.3333 
-
-                // WHICH IS:
-
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000                
-                // name Work:g[19]¤[+1] 2021 = -3.3333
-
-                // AFTER NORMALIZATION:
-
-                // name Work:y[18]¤[0] 2021 = 8.8889
-                // name Work:g[18]¤[0] 2021 = 3.3333                
-                // name Work:g[19]¤[+1] 2021 = 5.5556
-
-                if (true)
-                {                    
-                    I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e4 <lead> where '0' in equ rows vars, #a, lags cols time;");
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                    //to residual rows
-                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g | 18 | [0]");
-                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "g | 19 | [+1]");
-                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "y | 20 | [+2]");
-                    Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
-                    //to residual rows
-                    Assert.AreEqual(table.Get(5, 2).number, 3.3333d, 0.0001);
-                    Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
-                    Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
-                }
-            }
+            }            
         }
 
         [TestMethod]
-        public void _Test_DecompOperators()
+        public void _Test_DecompOperators_OLD()
         {
             if (true)
-            {                
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                I("OPTION model type = gams;");
-                I("model <gms> agesimple;");
-                I("#a = seq(18, 20).strings();");
-                I("#a += tot,;");
-                I("c = series(1);");
-                I("c.setdomains(('#a',));");
-                I("time 2020 2021;");
-                //---
-                I("c[18] = 110, 114;");
-                I("c[19] = 120, 123;");
-                I("c[20] = 130, 128;");
-                I("ctot = c[18] + c[19] - c[20] + 1;");
+            {
+                if (false)
+                {
+                    I("RESET;");
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                    I("OPTION model type = gams;");
+                    I("model <gms> agesimple;");
+                    I("#a = seq(18, 20).strings();");
+                    I("#a += tot,;");
+                    I("c = series(1);");
+                    I("c.setdomains(('#a',));");
+                    I("time 2020 2021;");
+                    //---
+                    I("c[18] = 110, 114;");
+                    I("c[19] = 120, 123;");
+                    I("c[20] = 130, 128;");
+                    I("ctot = c[18] + c[19] - c[20] + 1;");
 
-                I("clone;");
+                    I("clone;");
 
-                I("c[18] = 113, 118;");
-                I("c[19] = 121, 125;");
-                I("c[20] = 136, 125;");
-                I("ctot = c[18] + c[19] - c[20] + 1;");
+                    I("c[18] = 113, 118;");
+                    I("c[19] = 121, 125;");
+                    I("c[20] = 136, 125;");
+                    I("ctot = c[18] + c[19] - c[20] + 1;");
+
+                }
+                else
+                {
+                    I("RESET;");
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                    I("model <gms> agesimple.zip;");
+                    I("#a = seq(18, 20).strings();");
+                    I("#a += tot,;");
+                    I("c = series(1);");
+                    I("c.setdomains(('#a',));");
+                    I("time 2020 2021;");
+                    //---
+                    I("c[18] = 110, 114;");
+                    I("c[19] = 120, 123;");
+                    I("c[20] = 130, 128;");
+                    I("ctot = c[18] + c[19] - c[20] + 1;");
+
+                    I("clone;");
+
+                    I("c[18] = 113, 118;");
+                    I("c[19] = 121, 125;");
+                    I("c[20] = 136, 125;");
+                    I("ctot = c[18] + c[19] - c[20] + 1;");
+                }
 
                 //ctot           Work         %            Ref        r%            <m>          m%
                 //2020        99.0000         M       101.0000         M        -2.0000       -1.98
@@ -12442,7 +12244,7 @@ namespace UnitTests
 
                 // ------------------------------------------------
                 // ------------------------------------------------
-                // (A) SHOWING ALL 3 AGED
+                // (A) SHOWING ALL 3 AGES
                 // ------------------------------------------------
                 // ------------------------------------------------
 
@@ -12450,7 +12252,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <n>
                 // -----------------------------------------------------------------------
-                I("decomp2 <n> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <n> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a cols time;");
                 Gekko.Table table = Globals.lastDecompTable;
                 int i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12475,7 +12278,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xd>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xd> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xd> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xd> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12500,7 +12304,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <d>
                 // -----------------------------------------------------------------------
-                I("decomp2 <d> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <d> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <d> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12525,7 +12330,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xp>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xp> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xp> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xp> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12550,7 +12356,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <p>
                 // -----------------------------------------------------------------------
-                I("decomp2 <p> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <p> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <p> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12579,7 +12386,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <r>
                 // -----------------------------------------------------------------------
-                I("decomp2 <rn> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <rn> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xrn> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12604,7 +12412,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xrd>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xrd> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xrd> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xrd> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12629,7 +12438,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <rd>
                 // -----------------------------------------------------------------------
-                I("decomp2 <rd> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <rd> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <rd> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12654,7 +12464,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xrp>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xrp> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xrp> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xrp> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12679,7 +12490,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <rp>
                 // -----------------------------------------------------------------------
-                I("decomp2 <rp> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <rp> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <rp> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12708,7 +12520,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xm>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xm> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xm> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xm> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12737,7 +12550,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <m>
                 // -----------------------------------------------------------------------
-                I("decomp2 <m> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <m> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <m> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12767,7 +12581,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <xq>
                 // -----------------------------------------------------------------------
-                I("decomp2 <xq> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <xq> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <xq> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
@@ -12797,7 +12612,8 @@ namespace UnitTests
                 // -----------------------------------------------------------------------
                 // <q>
                 // -----------------------------------------------------------------------
-                I("decomp2 <q> ctot in e_c rows vars, #a cols time;");
+                //I("decomp2 <q> ctot in e_c rows vars, #a cols time;");
+                I("decomp3 <q> ctot from e_c endo ctot rows vars, #a cols time;");
                 table = Globals.lastDecompTable;
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
