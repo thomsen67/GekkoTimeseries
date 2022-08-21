@@ -11477,7 +11477,6 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 2).number, 0.3d / 0.7d * 4d, 0.0001);
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | [-1]");
             Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);
-
         }
 
         [TestMethod]
@@ -12156,757 +12155,710 @@ namespace UnitTests
 
             Gekko.Table table = null;
 
-            if (true)
-            {                
-                I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo y[18], y[19], demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
-             
-                int ii = -1 + 0;
+            I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo y[18], y[19], demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");
 
-                table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
-                //TODO: a_residual row 2 (residual)              
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
-                Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);                                
-                Assert.AreEqual(table.Get(4 + ii, 1).CellText.TextData[0], "g | 18 | [0]");
-                Assert.AreEqual(table.Get(4 + ii, 2).number, 3.3333d, 0.0001);
-                Assert.AreEqual(table.Get(4 + ii, 3).number, 6.6667d, 0.0001);
-                Assert.AreEqual(table.Get(5 + ii, 1).CellText.TextData[0], "y | 19 | [+1]");                
-                Assert.AreEqual(table.Get(5 + ii, 2).number, 5.5556d, 0.0001);                
-                Assert.AreEqual(table.Get(5 + ii, 3).number, 25.5555d, 0.0001);
-            }            
+            int ii = -1 + 0;
+
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+            //TODO: a_residual row 2 (residual)              
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+            Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
+            Assert.AreEqual(table.Get(4 + ii, 1).CellText.TextData[0], "g | 18 | [0]");
+            Assert.AreEqual(table.Get(4 + ii, 2).number, 3.3333d, 0.0001);
+            Assert.AreEqual(table.Get(4 + ii, 3).number, 6.6667d, 0.0001);
+            Assert.AreEqual(table.Get(5 + ii, 1).CellText.TextData[0], "y | 19 | [+1]");
+            Assert.AreEqual(table.Get(5 + ii, 2).number, 5.5556d, 0.0001);
+            Assert.AreEqual(table.Get(5 + ii, 3).number, 25.5555d, 0.0001);
         }
 
         [TestMethod]
-        public void _Test_DecompOperators_OLD()
+        public void _Test_DecompOperators()
         {
-            if (true)
-            {
-                if (false)
-                {
-                    I("RESET;");
-                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                    I("OPTION model type = gams;");
-                    I("model <gms> agesimple;");
-                    I("#a = seq(18, 20).strings();");
-                    I("#a += tot,;");
-                    I("c = series(1);");
-                    I("c.setdomains(('#a',));");
-                    I("time 2020 2021;");
-                    //---
-                    I("c[18] = 110, 114;");
-                    I("c[19] = 120, 123;");
-                    I("c[20] = 130, 128;");
-                    I("ctot = c[18] + c[19] - c[20] + 1;");
+            // Note: <dp>, <rdp> and <mp> are not tested here
+            // But a good sanity test of all the others
 
-                    I("clone;");
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model <gms> agesimple.zip;");
+            I("#a = seq(18, 20).strings();");
+            I("#a += tot,;");
+            I("c = series(1);");
+            I("c.setdomains(('#a',));");
+            I("time 2019 2021;");
+            //---
+            I("c[18] = 112, 110, 114;");
+            I("c[19] = 119, 120, 123;");
+            I("c[20] = 125, 130, 128;");
+            I("ctot = c[18] + c[19] - c[20] + 1;");
 
-                    I("c[18] = 113, 118;");
-                    I("c[19] = 121, 125;");
-                    I("c[20] = 136, 125;");
-                    I("ctot = c[18] + c[19] - c[20] + 1;");
+            I("clone;");
 
-                }
-                else
-                {
-                    I("RESET;");
-                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                    I("model <gms> agesimple.zip;");
-                    I("#a = seq(18, 20).strings();");
-                    I("#a += tot,;");
-                    I("c = series(1);");
-                    I("c.setdomains(('#a',));");
-                    I("time 2020 2021;");
-                    //---
-                    I("c[18] = 110, 114;");
-                    I("c[19] = 120, 123;");
-                    I("c[20] = 130, 128;");
-                    I("ctot = c[18] + c[19] - c[20] + 1;");
-
-                    I("clone;");
-
-                    I("c[18] = 113, 118;");
-                    I("c[19] = 121, 125;");
-                    I("c[20] = 136, 125;");
-                    I("ctot = c[18] + c[19] - c[20] + 1;");
-                }
-
-                //ctot           Work         %            Ref        r%            <m>          m%
-                //2020        99.0000         M       101.0000         M        -2.0000       -1.98
-                //2021       119.0000     20.20       110.0000      8.91         9.0000        8.18
-
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                // ------------------------------------------------
-                // ------------------------------------------------
-                // (A) SHOWING ALL 3 AGES
-                // ------------------------------------------------
-                // ------------------------------------------------
-
-                
-                // -----------------------------------------------------------------------
-                // <n>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <n> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a cols time;");
-                Gekko.Table table = Globals.lastDecompTable;
-                int i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, 99d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 119d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 113d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 118d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 121d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 125d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, 136d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 125d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <xd>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xd> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xd> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 5d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, -11d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <d>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <d> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <d> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 5d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 11d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <xp>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xp> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xp> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (5d /113d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (4d /121d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, -(11d /136d) * 100d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <p>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <p> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <p> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (5d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (4d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (11d / 99d) * 100d, sharedTableDelta);
-
-                // =======
-                // =======
-                // =======
-
-                // -----------------------------------------------------------------------
-                // <r>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <rn> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xrn> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, 101d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 110d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 110d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 114d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 120d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 123d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, 130d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 128d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <xrd>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xrd> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xrd> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, -2d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <rd>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <rd> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <rd> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <xrp>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xrp> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xrp> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (4d / 110d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (3d / 120d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, -(2d / 130d) * 100d, sharedTableDelta);
-
-                // -----------------------------------------------------------------------
-                // <rp>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <rp> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <rp> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (4d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (3d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (2d / 101d) * 100d, sharedTableDelta);
-
-                // ==========
-                // ==========
-                // ==========
-
-                // -----------------------------------------------------------------------
-                // <xm>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xm> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xm> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 3d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 1d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, 6d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, -3d, sharedTableDelta);
-
-                // ==========
-                // ==========
-                // ==========
-
-                // -----------------------------------------------------------------------
-                // <m>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <m> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <m> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 3d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 1d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, -6d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
-
-                // ==========
-                // ==========
-                // ==========
+            I("c[18] = 110, 113, 118;");
+            I("c[19] = 117, 121, 125;");
+            I("c[20] = 133, 136, 125;");
+            I("ctot = c[18] + c[19] - c[20] + 1;");
+            I("time 2020 2021;");
 
 
-                // -----------------------------------------------------------------------
-                // <xq>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <xq> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <xq> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d/110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 3d/110d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d/114d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 1d/120d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 2d/123d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, 6d/130d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, -3d/128d * 100d, sharedTableDelta);
+            //ctot           Work         %            Ref        r%            <m>          m%
+            //2020        99.0000         M       101.0000         M        -2.0000       -1.98
+            //2021       119.0000     20.20       110.0000      8.91         9.0000        8.18
 
-                // ==========
-                // ==========
-                // ==========
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            // ------------------------------------------------
+            // ------------------------------------------------
+            // (A) SHOWING ALL 3 AGES
+            // ------------------------------------------------
+            // ------------------------------------------------
 
 
-                // -----------------------------------------------------------------------
-                // <q>
-                // -----------------------------------------------------------------------
-                //I("decomp2 <q> ctot in e_c rows vars, #a cols time;");
-                I("decomp3 <q> ctot from e_c endo ctot rows vars, #a cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
-                Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
-                Assert.AreEqual(table.Get(i, 2).number, 3d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d / 110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
-                Assert.AreEqual(table.Get(i, 2).number, 1d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 2d / 110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
-                Assert.AreEqual(table.Get(i, 2).number, -6d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 3d / 110d * 100d, sharedTableDelta);
+            // -----------------------------------------------------------------------
+            // <n>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <n> ctot in e_c rows vars, #a cols time;");
+            I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a cols time;");
+            Gekko.Table table = Globals.lastDecompTable;
+            int i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, 99d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 119d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 113d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 118d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 121d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 125d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, 136d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 125d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xd>
+            // -----------------------------------------------------------------------
+            I("decomp3 <xd> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, 5d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, -11d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <d>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <d> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, 5d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, 11d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xp>
+            // -----------------------------------------------------------------------                        
+            I("decomp3 <xp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, (5d / 113d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, (4d / 121d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, -(11d / 136d) * 100d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xdp> qwerty
+            // -----------------------------------------------------------------------                        
+            I("decomp3 <xdp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 1.6975d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <p>
+            // -----------------------------------------------------------------------                                                            
+            I("decomp3 <p> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, (5d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, (4d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, (11d / 99d) * 100d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <dp> qwerty
+            // -----------------------------------------------------------------------            
+            I("decomp3 <dp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 1.8926d, sharedTableDelta);
+
+            // =======
+            // =======
+            // =======
+
+            // -----------------------------------------------------------------------
+            // <r>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <rn> ctot in e_c rows vars, #a cols time;");
+            I("decomp3 <xrn> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, 101d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 110d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 110d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 114d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 120d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 123d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, 130d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 128d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xrd>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <xrd> ctot in e_c rows vars, #a cols time;");
+            I("decomp3 <xrd> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, -2d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <rd>
+            // -----------------------------------------------------------------------
+            I("decomp3 <rd> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xrp>
+            // -----------------------------------------------------------------------                        
+            I("decomp3 <xrp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, (4d / 110d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, (3d / 120d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, -(2d / 130d) * 100d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <xrdp> qwerty
+            // -----------------------------------------------------------------------            
+            I("decomp3 <xrdp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 5.4221d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <rp>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <rp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 3).number, (4d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 3).number, (3d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 3).number, (2d / 101d) * 100d, sharedTableDelta);
+
+            // -----------------------------------------------------------------------
+            // <rdp> qwerty
+            // -----------------------------------------------------------------------
+            I("decomp3 <rdp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 5.8296d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <xm>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <xm> ctot in e_c rows vars, #a cols time;");
+            I("decomp3 <xm> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 3d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 1d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, 6d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, -3d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <m>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <m> ctot in e_c rows vars, #a cols time;");
+            I("decomp3 <m> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 3d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 1d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 2d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, -6d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 3d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
 
 
-                // ------------------------------------------------
-                // ------------------------------------------------
-                // (B) AGGREGATED AGES
-                // ------------------------------------------------
-                // ------------------------------------------------
+            // -----------------------------------------------------------------------
+            // <xq>
+            // -----------------------------------------------------------------------
+            I("decomp3 <xq> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 3d / 110d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d / 114d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 1d / 120d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 2d / 123d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, 6d / 130d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, -3d / 128d * 100d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <n>
-                // -----------------------------------------------------------------------
-                I("decomp2 <n> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, 99d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 119d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, 370d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 368d, sharedTableDelta);
-                
-                // -----------------------------------------------------------------------
-                // <xd>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xd> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, -2d, sharedTableDelta);               
+            // -----------------------------------------------------------------------
+            // <xmp> qwerty
+            // -----------------------------------------------------------------------
+            I("decomp3 <xmp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 0.7884d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <d>
-                // -----------------------------------------------------------------------
-                I("decomp2 <d> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);                
+            // ==========
+            // ==========
+            // ==========
 
-                // -----------------------------------------------------------------------
-                // <xp>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xp> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, ((5d + 4d - 11d) / (113d + 121d + 136d)) * 100d, sharedTableDelta);
-                
+            // -----------------------------------------------------------------------
+            // <q>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <q> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
+            Assert.AreEqual(table.Get(i, 2).number, 3d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 19");
+            Assert.AreEqual(table.Get(i, 2).number, 1d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 2d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 20");
+            Assert.AreEqual(table.Get(i, 2).number, -6d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 3d / 110d * 100d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <p>
-                // -----------------------------------------------------------------------
-                I("decomp2 <p> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, ((5d + 4d + 11d) / 99d) * 100d, sharedTableDelta);
-                
-                // =======
-                // =======
-                // =======
+            // -----------------------------------------------------------------------
+            // <mp> qwerty
+            // -----------------------------------------------------------------------            
+            I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(3, 3).number, 1.09011d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <r>
-                // -----------------------------------------------------------------------
-                I("decomp2 <rn> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, 101d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 110d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, 110d + 120d + 130d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 114d + 123d + 128d, sharedTableDelta);
-                
-                // -----------------------------------------------------------------------
-                // <xrd>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xrd> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d + 3d - 2d, sharedTableDelta);
-                
+            // ------------------------------------------------
+            // ------------------------------------------------
+            // (B) AGGREGATED AGES
+            // ------------------------------------------------
+            // ------------------------------------------------
 
-                // -----------------------------------------------------------------------
-                // <rd>
-                // -----------------------------------------------------------------------
-                I("decomp2 <rd> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, 4d + 3d + 2d, sharedTableDelta);               
+            // -----------------------------------------------------------------------
+            // <n>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <xn> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, 99d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 119d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, 370d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 368d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <xrp>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xrp> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, ((4d + 3d - 2d) / (110d + 120d + 130d)) * 100d, sharedTableDelta);
-                
-                // -----------------------------------------------------------------------
-                // <rp>
-                // -----------------------------------------------------------------------
-                I("decomp2 <rp> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, double.NaN);
-                Assert.AreEqual(table.Get(i, 3).number, ((4d + 3d + 2d) / 101d) * 100d, sharedTableDelta);
-                
+            // -----------------------------------------------------------------------
+            // <xd>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <xd> ctot in e_c rows vars cols time;");
+            I("decomp3 <xd> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, -2d, sharedTableDelta);
 
-                // ==========
-                // ==========
-                // ==========
+            // -----------------------------------------------------------------------
+            // <d>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <d> ctot in e_c rows vars cols time;");
+            I("decomp3 <d> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <xm>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xm> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, 3d + 1d + 6d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d + 2d - 3d, sharedTableDelta);
-                
-                // ==========
-                // ==========
-                // ==========
+            // -----------------------------------------------------------------------
+            // <xp>
+            // -----------------------------------------------------------------------
+            I("decomp3 <xp> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, ((5d + 4d - 11d) / (113d + 121d + 136d)) * 100d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <m>
-                // -----------------------------------------------------------------------
-                I("decomp2 <m> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, 3d + 1d - 6d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 4d + 2d + 3d, sharedTableDelta);
-                
-                // ==========
-                // ==========
-                // ==========
-                
-                // -----------------------------------------------------------------------
-                // <xq>
-                // -----------------------------------------------------------------------
-                I("decomp2 <xq> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, (3d + 1d + 6d) / (110d + 120d + 130d) * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, (4d + 2d - 3d) / (114d + 123d + 128d) * 100d, sharedTableDelta);
-                
+            // -----------------------------------------------------------------------
+            // <p>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <p> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, ((5d + 4d + 11d) / 99d) * 100d, sharedTableDelta);
+                        
+            // =======
+            // =======
+            // =======
 
-                // ==========
-                // ==========
-                // ==========
+            // -----------------------------------------------------------------------
+            // <r>
+            // -----------------------------------------------------------------------
+            I("decomp3 <xrn> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, 101d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 110d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, 110d + 120d + 130d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 114d + 123d + 128d, sharedTableDelta);
 
+            // -----------------------------------------------------------------------
+            // <xrd>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <xrd> ctot in e_c rows vars cols time;");
+            I("decomp3 <xrd> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, 4d + 3d - 2d, sharedTableDelta);
+            
+            // -----------------------------------------------------------------------
+            // <rd>
+            // -----------------------------------------------------------------------
+            I("decomp3 <rd> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, 4d + 3d + 2d, sharedTableDelta);
 
-                // -----------------------------------------------------------------------
-                // <q>
-                // -----------------------------------------------------------------------
-                I("decomp2 <q> ctot in e_c rows vars cols time;");
-                table = Globals.lastDecompTable;
-                i = 1;
-                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
-                Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
-                Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, (3d + 1d - 6d) / 101d * 100d, sharedTableDelta);
-                Assert.AreEqual(table.Get(i, 3).number, (4d + 2d + 3d) / 110d * 100d, sharedTableDelta);
-                
+            // -----------------------------------------------------------------------
+            // <xrp>
+            // -----------------------------------------------------------------------
+            I("decomp3 <xrp> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, ((4d + 3d - 2d) / (110d + 120d + 130d)) * 100d, sharedTableDelta);
 
-            }
+            // -----------------------------------------------------------------------
+            // <rp>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <rp> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 3).number, ((4d + 3d + 2d) / 101d) * 100d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <xm>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <xm> ctot in e_c rows vars cols time;");
+            I("decomp3 <xm> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, 3d + 1d + 6d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d + 2d - 3d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <m>
+            // -----------------------------------------------------------------------
+            //I("decomp2 <m> ctot in e_c rows vars cols time;");
+            I("decomp3 <m> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, 3d + 1d - 6d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 4d + 2d + 3d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <xq>
+            // -----------------------------------------------------------------------            
+            I("decomp3 <xq> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, (3d + 1d + 6d) / (110d + 120d + 130d) * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, (4d + 2d - 3d) / (114d + 123d + 128d) * 100d, sharedTableDelta);
+
+            // ==========
+            // ==========
+            // ==========
+
+            // -----------------------------------------------------------------------
+            // <q>
+            // -----------------------------------------------------------------------
+            I("decomp3 <q> ctot from e_c endo ctot rows vars cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
+            Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot");
+            Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(i, 2).number, (3d + 1d - 6d) / 101d * 100d, sharedTableDelta);
+            Assert.AreEqual(table.Get(i, 3).number, (4d + 2d + 3d) / 110d * 100d, sharedTableDelta);
+            
         }
 
         [TestMethod]
