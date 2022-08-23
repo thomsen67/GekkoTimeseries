@@ -3996,94 +3996,27 @@ namespace Gekko
 
         public static string Find(O.Find o)
         {
+            if (!o.t1.Equals(o.t2)) new Error("FIND expects same start and end period");
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
+            int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t1);
+            string variableName2 = vars[0] + "[" + o.t1.ToString() + "]";
             string variableName = vars[0];
-
-            //for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
-            //{
-            //    //see also #as7f3læaf9
-            //    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
-            //    string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
-            //}
-
-
-            Globals.itemHandler = new ItemHandler();
-
-            string firstText = null;
-            List<string> firstList = new List<string>();
-            string firstEqName = null;
-
-            int lineCounter = 0;
-
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
+            int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
+            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+            List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
+            new Writeln("Variable " + variableName2 + ":");
+            foreach (int eq in eqNumbers)
             {
-                string eqName = kvp.Value[0].nameGams;  //has only 1
-
-                int counter = 0;
-                foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
-                {
-                    if (eqVarsGams == null) continue;
-                    counter++;
-                    {
-                        bool found = false;
-                        foreach (string ss in eqVarsGams.equationVariables) //foreach variable (first item is name)
-                        {
-                            string[] ss2 = ss.Split('¤');
-                            string ss3 = ss2[0];
-                            if (ss2.Length > 1 && ss2[1] == "[0]")
-                            {
-                                if (G.Equal(variableName, ss3))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (found)
-                        {
-                            //List<string> yy = m3;
-                            string xx = G.ReplaceTurtle(Stringlist.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
-
-                            string bool1 = "";
-                            string bool2 = "";
-                            string tt = "tx0";
-                            if (eqName == "E_qY_tot")
-                            {
-                                bool1 = Globals.protectSymbol;
-                                bool2 = Globals.protectSymbol;
-                            }
-                            else if (eqName == "E_vCalvo")
-                            {
-                                tt = "tx0e";
-                            }
-                            else if (eqName == "E_vCalvo_tEnd")
-                            {
-                                tt = "tend";
-                            }
-
-                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3));
-                            lineCounter++;
-
-                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-
-                            if (firstText == null)
-                            {
-                                firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                firstEqName = eqName;
-                                firstList.AddRange(eqVarsGams.equationVariables);
-                            }
-                        }
-                    }
-                }
+                string s = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[eq];
+                new Writeln("---> " + s);
             }
 
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser();
             eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+            //eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             //eb.EquationBrowserSetLabel(variableName);
-            eb._activeEquation = firstEqName;
+            //eb._activeEquation = firstEqName;
             eb._activeVariable = null;
             eb._t1 = o.t1;
             eb._t2 = o.t2;
@@ -4132,10 +4065,10 @@ namespace Gekko
         {
         }
 
-        public PeriodAndVariable(int date, int variable)
+        public PeriodAndVariable(int timeIndex, int aNumber)
         {
-            this.date = date;
-            this.variable = variable;
+            this.date = timeIndex;
+            this.variable = aNumber;
         }
 
         public override int GetHashCode()
