@@ -1159,7 +1159,7 @@ namespace Gekko
                             if (eqsHere.Contains(eqNumber))
                             {
                                 var xx = Program.model.modelGamsScalar.bb[eqNumber];
-                                //new Error("Strange!");
+                                new Error("Strange!");
                             }
                             eqsHere.Add(eqNumber);
                         }
@@ -1495,23 +1495,34 @@ namespace Gekko
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
                     List<string> notUsed = null;
-                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);
-                    //if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
-                    //if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
+                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);                    
                     int i1 = (GekkoTime.Observations(helper.t0, time) - 1);
                     int i2 = helper.dict_FromVarNameToANumber[resultingFullName];
-                    //if (helper.dictA.ContainsKey(resultingFullName))
-                    //{
-                    //    i2 = helper.dictA[resultingFullName];
-                    //}
-                    //else
-                    //{                        
-                    //    helper.dictA.Add(resultingFullName, i2);
-                    //}                                        
                     HandleEqLineAppend(helper, i, "a[b[" + helper.endo.Count + "]][b[" + (helper.endo.Count + 1) + "]]");
-                    helper.endo.Add(i1);
-                    helper.endo.Add(i2);
+                    bool good = true;
 
+                    bool useDict = true;
+                    if (true)
+                    {
+                        //tested that a dictionary<int, int> with (x-)number as key is not faster
+                        //maybe lookup is faster for long eqs, but an int has to be added to dict
+                        //each time. So for now, we just search the list.
+                        for (int ii = 0; ii < helper.endo.Count; ii += 2)
+                        {
+                            if (helper.endo[ii] == i1 && helper.endo[ii + 1] == i2)
+                            {
+                                good = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (good)
+                    {
+                        //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
+                        helper.endo.Add(i1);
+                        helper.endo.Add(i2);
+                    }
                 }
                 else
                 {
@@ -4909,7 +4920,7 @@ namespace Gekko
         public List<double> exoValues = new List<double>();
         public StringBuilder sb = new StringBuilder();
         public Dictionary<int, string> addBefore = new Dictionary<int, string>();  //inefficient?
-        public Dictionary<int, string> remove = new Dictionary<int, string>();     //inefficient?
+        public Dictionary<int, string> remove = new Dictionary<int, string>();     //inefficient?        
 
         public void Clear()
         {
