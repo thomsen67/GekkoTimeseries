@@ -1156,23 +1156,30 @@ namespace Gekko
                         }
                         else
                         {
-                            if (eqsHere.Contains(eqNumber)) new Error("Strange!");
+                            if (eqsHere.Contains(eqNumber))
+                            {
+                                var xx = Program.model.modelGamsScalar.bb[eqNumber];
+                                //new Error("Strange!");
+                            }
                             eqsHere.Add(eqNumber);
                         }
                     }
                 }
 
-                foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in Program.model.modelGamsScalar.precedents)
+                if (false && Globals.runningOnTTComputer)
                 {
-                    string varName = Program.model.modelGamsScalar.GetVarNameA(kvp.Key.variable);
-                    GekkoTime t = Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
-                    string s = varName + "[" + t.ToString() + "] = ";
-                    foreach (int i in kvp.Value)
+                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in Program.model.modelGamsScalar.precedents)
                     {
-                        string eqName = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
-                        s += eqName + ", ";
+                        string varName = Program.model.modelGamsScalar.GetVarNameA(kvp.Key.variable);
+                        GekkoTime t = Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
+                        string s = varName + "[" + t.ToString() + "] = ";
+                        foreach (int i in kvp.Value)
+                        {
+                            string eqName = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+                            s += eqName + ", ";
+                        }
+                        new Writeln(s);
                     }
-                    new Writeln(s);
                 }
 
                 if (Globals.runningOnTTComputer)

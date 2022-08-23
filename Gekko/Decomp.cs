@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using MathNet.Numerics.LinearAlgebra.Sparse.Linear;
 using MathNet.Numerics.LinearAlgebra.Sparse;
 using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
+using ProtoBuf;
 
 namespace Gekko
 {    
@@ -4118,10 +4119,18 @@ namespace Gekko
     /// <summary>
     /// Simple helper class
     /// </summary>
+    [ProtoContract]    
     public class PeriodAndVariable
     {
+        [ProtoMember(1)]
         public int date;
+
+        [ProtoMember(2)]
         public int variable;
+
+        public PeriodAndVariable() //for protobuf
+        {
+        }
 
         public PeriodAndVariable(int date, int variable)
         {
