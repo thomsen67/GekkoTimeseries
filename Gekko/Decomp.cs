@@ -4014,9 +4014,9 @@ namespace Gekko
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser();
             eb.Title = variableName + " - " + "Gekko equations";
-            //eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
-            //eb.EquationBrowserSetLabel(variableName);
-            //eb._activeEquation = firstEqName;
+            eb.EquationBrowserSetEquationButtons("firstEqName", "firstText", new List<string>() { "firstList1", "firstList2" });
+            eb.EquationBrowserSetLabel("variableName");
+            eb._activeEquation = "firstEqName";
             eb._activeVariable = null;
             eb._t1 = o.t1;
             eb._t2 = o.t2;
