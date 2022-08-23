@@ -467,12 +467,22 @@ namespace Gekko
         [ProtoMember(10)]
         public int unique = -12345;
 
+        /// <summary>
+        /// Gekko period corresponding to time index = 0 in GAMS (at the moment, t0 = t1).
+        /// Later on, t0 may become smaller than t1.
+        /// </summary>
         [ProtoMember(11)]
         public GekkoTime t0 = GekkoTime.tNull;
 
+        /// <summary>
+        /// First observed period in scalar model (at the moment equal to t0).
+        /// </summary>
         [ProtoMember(12)]
         public GekkoTime t1 = GekkoTime.tNull;
 
+        /// <summary>
+        /// Last observed period in scalar model (at the moment equal to t0).
+        /// </summary>
         [ProtoMember(13)]
         public GekkoTime t2 = GekkoTime.tNull;
 
@@ -516,6 +526,14 @@ namespace Gekko
 
         [ProtoMember(24)]
         public List<string> rawModel = null;  //in GAMS format
+
+        /// <summary>
+        /// Points a period-and-variable to the unfolded equations it is part of. This could
+        /// be a bit faster and use a bit less ram if PeriodAndVariable was a long and by using
+        /// modulo.
+        /// </summary>
+        [ProtoMember(25)]
+        public GekkoDictionary<PeriodAndVariable, List<int>> precedents = null;
 
         public int GetEqNumber(string eqName)
         {
@@ -598,6 +616,26 @@ namespace Gekko
             {
                 this.a[period][variable] = value;
             }
+        }
+
+        /// <summary>
+        /// Converts to internal integer representation of time period (using t0 from scalar model)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public int FromGekkoTimeToTimeInteger(GekkoTime t)
+        {
+            return GekkoTime.Observations(this.t0, t) - 1;
+        }
+
+        /// <summary>
+        /// Converts from internal integer representation of time period (using t0 from scalar model)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public GekkoTime FromTimeIntegerToGekkoTime(int t)
+        {
+            return this.t0.Add(t);
         }
 
         /// <summary>

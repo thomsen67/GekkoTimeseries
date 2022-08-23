@@ -14268,6 +14268,20 @@ namespace Gekko
         /// <returns></returns>
         public static string Find(O.Find o)  //returns equation name
         {
+            if (G.GetModelType() == EModelType.GAMSScalar)
+            {
+                return Gekko.Decomp.Find(o);
+            }
+            else
+            {
+                //probably obsolete
+                return FindOld(o);
+            }
+        }
+
+        private static string FindOld(O.Find o)
+        {
+            //probably obsolete soon....!
 
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             string variableName = vars[0];

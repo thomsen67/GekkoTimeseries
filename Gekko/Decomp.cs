@@ -2315,7 +2315,7 @@ namespace Gekko
                     // TODO TODO TODO
                     // TODO TODO TODO
 
-                    int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
+                    int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(t);
 
                     int eqNumber = -12345;
 
@@ -2409,7 +2409,7 @@ namespace Gekko
                                 }
                             }
 
-                            
+
 
                             if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
                             {
@@ -2557,7 +2557,7 @@ namespace Gekko
             }
 
             return d;
-        }  
+        }        
 
         private static void DecompInitDict(DecompData d)
         {
@@ -3993,6 +3993,106 @@ namespace Gekko
             return found;
         }
 
+        public static string Find(O.Find o)
+        {
+            List<string> vars = O.Restrict(o.iv, false, false, false, true);
+            string variableName = vars[0];
+
+            //for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+            //{
+            //    //see also #as7f3læaf9
+            //    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+            //    string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+            //}
+
+
+            Globals.itemHandler = new ItemHandler();
+
+            string firstText = null;
+            List<string> firstList = new List<string>();
+            string firstEqName = null;
+
+            int lineCounter = 0;
+
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
+            {
+                string eqName = kvp.Value[0].nameGams;  //has only 1
+
+                int counter = 0;
+                foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
+                {
+                    if (eqVarsGams == null) continue;
+                    counter++;
+                    {
+                        bool found = false;
+                        foreach (string ss in eqVarsGams.equationVariables) //foreach variable (first item is name)
+                        {
+                            string[] ss2 = ss.Split('¤');
+                            string ss3 = ss2[0];
+                            if (ss2.Length > 1 && ss2[1] == "[0]")
+                            {
+                                if (G.Equal(variableName, ss3))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            //List<string> yy = m3;
+                            string xx = G.ReplaceTurtle(Stringlist.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
+
+                            string bool1 = "";
+                            string bool2 = "";
+                            string tt = "tx0";
+                            if (eqName == "E_qY_tot")
+                            {
+                                bool1 = Globals.protectSymbol;
+                                bool2 = Globals.protectSymbol;
+                            }
+                            else if (eqName == "E_vCalvo")
+                            {
+                                tt = "tx0e";
+                            }
+                            else if (eqName == "E_vCalvo_tEnd")
+                            {
+                                tt = "tend";
+                            }
+
+                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3));
+                            lineCounter++;
+
+                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
+
+                            if (firstText == null)
+                            {
+                                firstText = xx2[0].lhs + " = " + xx2[0].rhs;
+                                firstEqName = eqName;
+                                firstList.AddRange(eqVarsGams.equationVariables);
+                            }
+                        }
+                    }
+                }
+            }
+
+            string rv = null;
+            WindowEquationBrowser eb = new WindowEquationBrowser();
+            eb.Title = variableName + " - " + "Gekko equations";
+            eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+            //eb.EquationBrowserSetLabel(variableName);
+            eb._activeEquation = firstEqName;
+            eb._activeVariable = null;
+            eb._t1 = o.t1;
+            eb._t2 = o.t2;
+            bool? b = eb.ShowDialog();
+            rv = eb._activeEquation;
+            if (b != true) rv = null;  //only when OK is pressed (or Enter)
+            eb.Close();
+            return rv;
+        }
+
         public enum ENormalizerType
         {
             None,
@@ -4027,6 +4127,22 @@ namespace Gekko
         {
             this.date = date;
             this.variable = variable;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + this.date; //the 17 and 31 is a trick (primes) to get the hashcodes as distinct as possible.
+            hash = hash * 31 + this.variable;
+            return hash;
+        }
+
+        public override bool Equals(object obj)
+        {                        
+            PeriodAndVariable other = (PeriodAndVariable)obj;
+            if (other == null) return false;
+            if (this.date == other.date && this.variable == other.variable) return true;
+            return false;
         }
     }
 }
