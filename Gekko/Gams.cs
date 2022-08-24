@@ -259,10 +259,11 @@ namespace Gekko
             return assembly;
         }
 
-        private static Assembly Compile5(List<string> eqs)
+        private static Assembly Compile5(List<string> eqsCs, List<string> eqsHuman)
         {            
-            StringBuilder code = new StringBuilder();            
-
+            StringBuilder code = new StringBuilder();
+            bool b = eqsHuman.Count == 0;
+            
             code.AppendLine("using System;");
             code.AppendLine("using System.Collections.Generic;");
             code.AppendLine("using System.Text;");
@@ -273,14 +274,16 @@ namespace Gekko
 
             code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)");
             code.AppendLine("{");
-            for (int i = 0; i < eqs.Count; i++)
+            
+            for (int i = 0; i < eqsCs.Count; i++)
             {
+                if (b) eqsHuman.Add(eqsCs[i]);
                 code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd) =>");
                 code.AppendLine("{"); //start dynamic function
                 code.AppendLine("int[] b = bb[i];");
                 code.AppendLine("int[] d = dd[i];");
                 code.AppendLine("double sum = 0d;");                
-                code.AppendLine(eqs[i]);
+                code.AppendLine(eqsCs[i]);
                 code.AppendLine("return sum;");
                 code.AppendLine("};");  //end dynamic function
                 code.AppendLine();
@@ -1051,10 +1054,8 @@ namespace Gekko
             //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
             //if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
             //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
-
-            List<string> eqNames = null;
-
-            Assembly assembly = Compile5(codeLines);
+            
+            Assembly assembly = Compile5(codeLines, helper.equationChunks);
             new Writeln("Compile finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
@@ -1117,6 +1118,7 @@ namespace Gekko
                 Program.model.modelGamsScalar.count = helper.count;
                 Program.model.modelGamsScalar.known = helper.known;
                 Program.model.modelGamsScalar.unique = helper.unique;
+                Program.model.modelGamsScalar.equationChunks = helper.equationChunks;
                 //
                 // Note that GAMS equation periods are not very useful.
                 // In principle, e1[2020] .. may designate an equation with
@@ -1290,12 +1292,12 @@ namespace Gekko
         }
 
         private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper)
-        {            
+        {
+            //Remember: the human readable code is derived from this, so beware if changes are made,
+            //cf. #af931klljaf89efw.
             helper.Clear();
             int more = 2;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqLine.ToString(), more);  //1 empty "" token
-
-
             //probe, checking for **
             for (int i = 0; i < tokens.Count() - more; i++)
             {
@@ -1464,15 +1466,7 @@ namespace Gekko
                     if (th1.type == ETokenType.Word && th1Next.s == "(")
                     {
                         //can be a function:                    
-                        if (G.Equal(th1.s, "log")) s = "M.Log";
-                        else if (G.Equal(th1.s, "exp")) s = "M.Exp";
-                        else if (G.Equal(th1.s, "abs")) s = "M.Abs";
-                        else if (G.Equal(th1.s, "max")) s = "M.Max";
-                        else if (G.Equal(th1.s, "min")) s = "M.Min";
-                        else if (G.Equal(th1.s, "power")) s = "M.Power";
-                        else if (G.Equal(th1.s, "sqr")) s = "M.Sqr";
-                        else if (G.Equal(th1.s, "sqrt")) s = "M.Sqrt";
-                        else if (G.Equal(th1.s, "tanh")) s = "M.Tanh";
+                        s = RenameFunctions(th1, true);
                     }
                     HandleEqLineAppend(helper, i, s);
                 }
@@ -1493,20 +1487,35 @@ namespace Gekko
             helper.c.AddRange(helper.exoValues);            
             helper.d.Add(helper.exo);
 
-            ////Precedents are taken from helper.endo that comes in (period, variable) pairs
-            //List<PeriodAndVariable> pre = new List<PeriodAndVariable>();
-            //for (int i = 0; i < helper.endo.Count; i += 2)
-            //{
-            //    PeriodAndVariable pav = new PeriodAndVariable(helper.endo[i], helper.endo[i + 1]);
-            //    pre.Add(pav);
-            //}
-            //helper.precedentsScalar.Add(pre);
-
             return tokens;  //to compare with next
+        }
+
+        public static string RenameFunctions(TokenHelper th1, bool b)
+        {
+            string s = null;
+            if (b)
+            {
+                if (G.Equal(th1.s, "log")) s = "M.Log";
+                else if (G.Equal(th1.s, "exp")) s = "M.Exp";
+                else if (G.Equal(th1.s, "abs")) s = "M.Abs";
+                else if (G.Equal(th1.s, "max")) s = "M.Max";
+                else if (G.Equal(th1.s, "min")) s = "M.Min";
+                else if (G.Equal(th1.s, "power")) s = "M.Power";
+                else if (G.Equal(th1.s, "sqr")) s = "M.Sqr";
+                else if (G.Equal(th1.s, "sqrt")) s = "M.Sqrt";
+                else if (G.Equal(th1.s, "tanh")) s = "M.Tanh";
+            }
+            else
+            {
+                th1.s = th1.s.ToLower();  //the "M." is removed elsewhere
+            }
+            return s;
         }
 
         private static void HandleEqLineAppend(EqLineHelper helper, int i, string s)
         {
+            //Remember: the human readable code is derived from this, so beware if changes are made,
+            //cf. #af931klljaf89efw.
             if (helper.addBefore.ContainsKey(i))
             {
                 helper.sb.Append(helper.addBefore[i]);
@@ -1875,7 +1884,7 @@ namespace Gekko
                 Program.model.modelGamsScalar.aTemp = null;
                 
                 //Loading of Func<>s
-                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
+                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines, Program.model.modelGamsScalar.equationChunks);
                 
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
                 Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
@@ -4830,6 +4839,7 @@ namespace Gekko
         public List<double> c = new List<double>();
         public List<List<int>> d = new List<List<int>>();
         public List<int> eqPointers = new List<int>();
+        public List<string> equationChunks = new List<string>();
 
         public string[] dict_FromEqNumberToEqName = null;
         public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -4851,7 +4861,7 @@ namespace Gekko
         public List<int> endo = new List<int>();  //comes in pairs (time, variable)
         public List<int> exo = new List<int>();
         public List<double> exoValues = new List<double>();
-        public StringBuilder sb = new StringBuilder();
+        public StringBuilder sb = new StringBuilder(); //contains the C# code
         public Dictionary<int, string> addBefore = new Dictionary<int, string>();  //inefficient?
         public Dictionary<int, string> remove = new Dictionary<int, string>();     //inefficient?        
 

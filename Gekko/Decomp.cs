@@ -4006,9 +4006,9 @@ namespace Gekko
             List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
             new Writeln("Variable " + variableName2 + ":");
             foreach (int eq in eqNumbers)
-            {
-                string s = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[eq];
-                new Writeln("---> " + s);
+            {                
+                string s = Program.model.modelGamsScalar.GetEquationText(eq);
+                new Writeln(s);
             }
 
             string rv = null;
@@ -4025,7 +4025,7 @@ namespace Gekko
             if (b != true) rv = null;  //only when OK is pressed (or Enter)
             eb.Close();
             return rv;
-        }
+        }        
 
         public enum ENormalizerType
         {

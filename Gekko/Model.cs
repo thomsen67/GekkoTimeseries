@@ -535,6 +535,12 @@ namespace Gekko
         [ProtoMember(25)]
         public GekkoDictionary<PeriodAndVariable, List<int>> precedents = null;
 
+        /// <summary>
+        /// Condensed equations in text format
+        /// </summary>
+        [ProtoMember(26)]
+        public List<string> equationChunks = null;
+
         public int GetEqNumber(string eqName)
         {
             //TODO: handle errors
@@ -896,6 +902,103 @@ namespace Gekko
             {
                 G.SetNaN(Program.model.modelGamsScalar.r_ref);
             }
+        }
+
+        /// <summary>
+        /// Gets human-readable equation text corresponding to (unfolded) equation number.
+        /// Uses equationChunks list, which is only about 1% of full scalar model size.
+        /// The result uses the C# code (modified a bit), where stuff like a[b[0]][b[1]] and
+        /// c[d[0]] is replaced with "real" variable[period]. By avoiding the full scalar model,
+        /// a lot of RAM is saved.
+        /// </summary>
+        /// <param name="eq"></param>
+        /// <returns></returns>
+        public string GetEquationText(int eq)
+        {
+            //Remember: this code is dependent upon the exact format of 
+            //the C# code used for the functions. Cf. #af931klljaf89efw.
+            int ii = this.ee[eq];
+            string ss = this.equationChunks[ii];
+            StringBuilder sb = new StringBuilder();
+            int more = 15;
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
+                        
+            for (int i = tokens.Count() - more - 1; i >= 1; i--)
+            {
+                //handle translation of "-y + x1 =E 2" into "-y + x1 - (0)", where () represents RHS
+                //which is always constant  
+                if (tokens[i].s == ";" && tokens[i - 1].s == ")")
+                {
+                    tokens[i].s = "";
+                    tokens[i - 1].s = "";
+                    for (int j = i - 1; j >= 1; j--)
+                    {
+                        if (tokens[j].s == "(" && tokens[j - 1].s == "-")
+                        {
+                            tokens[j].s = "";
+                            tokens[j - 1].s = "=";
+                            tokens[j].leftblanks = 1;
+                            tokens[j - 1].leftblanks = 1;
+                            goto Lbl1;
+                        }
+                    }
+                }
+            }
+
+        Lbl1:;
+
+            bool start = false;
+            for (int i = 0; i < tokens.Count() - more; i++)
+            {
+                if (tokens[i].s == "*" && tokens[i + 1].leftblanks == 0 && tokens[i + 1].s == "/")
+                {
+                    start = true;
+                    i += 1;
+                    continue;
+                }
+                
+                if (!start) continue;
+
+                if (tokens[i].s == "+" || tokens[i].s == "-" || tokens[i].s == "*" || tokens[i].s == "/")
+                {
+                    tokens[i].leftblanks = 1;
+                    tokens[i + 1].leftblanks = 1;
+                }
+
+                if (tokens[i].s == "a" && tokens[i + 1].s == "[" && tokens[i + 2].s == "b" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]" && tokens[i + 7].s == "[" && tokens[i + 8].s == "b" && tokens[i + 9].s == "[" && tokens[i + 11].s == "]" && tokens[i + 12].s == "]")
+                {
+                    int i1 = this.bb[eq][int.Parse(tokens[i + 4].s)];
+                    int i2 = this.bb[eq][int.Parse(tokens[i + 10].s)];
+                    GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
+                    string varname = this.GetVarNameA(i2);
+                    sb.Append(G.Blanks(tokens[i].leftblanks) + varname + "[" + gt.ToString() + "]");  //HMMM INDEXES !!!!
+                    i += 12;
+                }
+                else if (tokens[i].s == "c" && tokens[i + 1].s == "[" && tokens[i + 2].s == "d" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]")
+                {
+                    int i1 = int.Parse(tokens[i + 4].s);
+                    double c = this.cc[this.dd[eq][i1]];
+                    sb.Append(G.Blanks(tokens[i].leftblanks) + c.ToString());
+                    i += 6;
+                }
+                else if (tokens[i].s == "M" && tokens[i + 1].s == ".")
+                {
+                    tokens[i].s = "";
+                    tokens[i + 1].s = "";
+                    Gekko.GamsModel.RenameFunctions(tokens[i + 2], false);
+                    sb.Append(tokens[i + 2].ToString());
+                    i += 2;
+                }
+                //else if (tokens[i].s == ";")
+                //{
+                //    //skip
+                //}                
+                else
+                {
+                    sb.Append(tokens[i].ToString());
+                }                
+            }
+            return sb.ToString().Trim();
         }
     }
 

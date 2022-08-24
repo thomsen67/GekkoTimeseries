@@ -150,55 +150,62 @@ namespace Gekko
 
         public void EquationBrowserSetEquationButtons2(string eqName)
         {
-            List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
-            ModelGamsEquation equation = equations[0]; //always only 1
-                        
+            if (G.GetModelType() == EModelType.GAMSScalar)
             {
-                                
-                DecompOperator op = new DecompOperator("d");
-                
-                string residualName = "residual___";
-                int funcCounter = 0;
 
-                string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
-                if (equation.expressions == null || equation.expressions.Count == 0)
+            }
+            else if (G.GetModelType() == EModelType.GAMSRaw)
+            {
+                List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
+                ModelGamsEquation equation = equations[0]; //always only 1
+
                 {
-                    Globals.expressions = null;  //maybe not necessary
-                    Program.CallEval(equation.conditionals, s1);
-                    equation.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-                    Globals.expressions = null;  //maybe not necessary   
-                }
 
-                if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
-                {
-                    new Error("Internal error #8973428374");
-                }
+                    DecompOperator op = new DecompOperator("d");
 
-                //fixme: [0] must be counter
-                DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                    string residualName = "residual___";
+                    int funcCounter = 0;
 
-                double max = 0d;
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
-                {
-                    double v = kvp.Value.GetDataSimple(_t1);
-                    if (G.isNumericalError(v)) v = 0d;
-                    else v = Math.Abs(v);
-                    max = Math.Max(v, max);
-                }
-
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
-                {
-                    string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                    double v = kvp.Value.GetDataSimple(_t1);
-
-                    ToggleButton b = null;
-                    _buttons.TryGetValue(ss5, out b);
-                    if (b != null)
+                    string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
+                    if (equation.expressions == null || equation.expressions.Count == 0)
                     {
-                        int i1 = 240;
-                        int i2 = 255;
-                        int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
-                        b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
+                        Globals.expressions = null;  //maybe not necessary
+                        Program.CallEval(equation.conditionals, s1);
+                        equation.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                        Globals.expressions = null;  //maybe not necessary   
+                    }
+
+                    if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
+                    {
+                        new Error("Internal error #8973428374");
+                    }
+
+                    //fixme: [0] must be counter
+                    DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+
+                    double max = 0d;
+                    foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                    {
+                        double v = kvp.Value.GetDataSimple(_t1);
+                        if (G.isNumericalError(v)) v = 0d;
+                        else v = Math.Abs(v);
+                        max = Math.Max(v, max);
+                    }
+
+                    foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                    {
+                        string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                        double v = kvp.Value.GetDataSimple(_t1);
+
+                        ToggleButton b = null;
+                        _buttons.TryGetValue(ss5, out b);
+                        if (b != null)
+                        {
+                            int i1 = 240;
+                            int i2 = 255;
+                            int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                            b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
+                        }
                     }
                 }
             }
