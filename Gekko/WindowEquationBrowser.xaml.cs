@@ -82,11 +82,15 @@ namespace Gekko
         }
 
         private void EquationBrowserSetEquationAndButtons(string eqName)
-        {
-            ModelGamsEquation eq = Program.model.modelGams.equationsByEqname[eqName][0]; //only returns 1            
+        {            
             int i = 0;  //TODO TODO TODO!!! qwerty         
             string s = GetEquationText(eqName);
-            this.EquationBrowserSetEquationButtons(eqName, s, eq.expressionVariablesWithSets[i].equationVariables);
+            if (false)
+            {
+                //we skip parallel coloring for now
+                ModelGamsEquation eq = Program.model.modelGams.equationsByEqname[eqName][0]; //only returns 1            
+                this.EquationBrowserSetEquationButtons(eqName, s, eq.expressionVariablesWithSets[i].equationVariables);
+            }
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -122,8 +126,11 @@ namespace Gekko
         
         private static string GetEquationText(string name)
         {
-            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
-            string s = xx2[0].lhs + " = " + xx2[0].rhs;
+            //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
+            //string s = xx2[0].lhs + " = " + xx2[0].rhs;
+            int i = -12345; Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
+            if (i == -12345) new Error("Could not find equation name '" + name + "'");
+            string s = Program.model.modelGamsScalar.GetEquationText(i);
             return s;            
         }
 
@@ -138,14 +145,14 @@ namespace Gekko
         }
 
         public void EquationBrowserSetEquationButtons(string eqName, string firstText, List<string> firstList)
-        {            
+        {
             EquationBrowserSetEquationButtons1(eqName, firstText, firstList);
             //Dispatching the color update
             //So first non-colored buttons are shown, and then the background thread colors them
             //If the coloring is very time-consuming, scrolling down with arrows may freeze a bit. To solve this,
             //a background worker thread that is no longer relevant would need to be killed
             //or we could wait 0.5 second before any coloring?
-            this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);            
+            this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         public void EquationBrowserSetEquationButtons2(string eqName)
@@ -326,11 +333,8 @@ namespace Gekko
         private readonly ItemHandler _itemHandler;
 
         public MainWindowViewModel()
-        {
-            //_itemHandler=WindowEquationBrowser.ite
-
+        {            
             _itemHandler = Globals.itemHandler;            
-
         }
 
         public List<EquationListItem> Items

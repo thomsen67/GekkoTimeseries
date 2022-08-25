@@ -20163,7 +20163,7 @@ namespace Gekko
 
             try
             {
-                //used for unzipping
+                //used for 
                 Program.CreateTempFilesFolder2();
             }
             catch { }; //fail silently
