@@ -307,7 +307,7 @@ namespace Gekko
 
         /// <summary>
         /// This method gets run at Gekko startup (not RESET/RESTART, real GUI startup).
-        /// Beware that if something must also be availible for unit tests and Gekcel,
+        /// Beware that if something must also be available for unit tests and Gekcel,
         /// put it in InitUfunctionsAndArithmeticsAndMore().
         /// </summary>
         private void GuiAutoExecStuff()

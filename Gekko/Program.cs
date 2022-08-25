@@ -16896,7 +16896,7 @@ namespace Gekko
             }
 
             return tempFileName;
-        }
+        }        
 
         /// <summary>
         /// Select from a list of files of a given type. Opens a GUI window.
@@ -20160,6 +20160,13 @@ namespace Gekko
             {
                 Globals.timeStrings[i - Globals.timeStringsStart] = i.ToString();
             }
+
+            try
+            {
+                //used for unzipping
+                Program.CreateTempFilesFolder2();
+            }
+            catch { }; //fail silently
         }
 
         public static List<string> Add2Lists(List<string> x1, List<string> x2)
