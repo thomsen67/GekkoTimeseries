@@ -12,7 +12,7 @@ namespace Gekko
     public class Matrix : IVariable
     {        
         //Because protobuf only handles 1d arrays
-        [ProtoBeforeSerialization]
+        //[ProtoBeforeSerialization] --> see in Databank.cs
         public void BeforeProtobufWrite()
         {            
             this.dataProtobufHelper0___NOTOUCH = this.data.GetLength(0);
@@ -28,7 +28,7 @@ namespace Gekko
         }
 
         //Because protobuf only handles 1d arrays
-        [ProtoAfterDeserialization]
+        //[ProtoAfterDeserialization] --> see in Databank.cs
         public void AfterProtobufRead()
         {
             this.data = new double[this.dataProtobufHelper0___NOTOUCH, this.dataProtobufHelper1___NOTOUCH];
