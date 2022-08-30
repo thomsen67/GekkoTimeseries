@@ -4027,8 +4027,23 @@ namespace Gekko
                 {
                     //see also #as7f3læaf9
                     PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eq][i], Program.model.modelGamsScalar.bb[eq][i + 1]);
-                    Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
-                    xx.Add(tup.Item1 + "[" + tup.Item2.ToString() + "]");
+                    Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();                    
+                    string bank, name, freq; string[] indexes;
+                    G.Chop_Chop(tup.Item1, out bank, out name, out freq, out indexes);
+                    string[] indexes2 = null;
+                    if (indexes == null)
+                    {
+                        indexes2 = new string[1];
+                        indexes2[0] = tup.Item2.ToString();
+                    }
+                    else
+                    {
+                        indexes2 = new string[indexes.Length + 1];
+                        Array.Copy(indexes, indexes2, indexes2.Length - 1);
+                        indexes2[indexes2.Length - 1] = tup.Item2.ToString();
+                    }
+                    string name2 = G.Chop_Unchop(bank, name, freq, indexes2, true);
+                    xx.Add(name2);
                 }
                 
                 string bool1 = "";

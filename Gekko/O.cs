@@ -3915,7 +3915,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// /// How does this relate to the G.Chop...() methods?
+        /// Chops up into all components
         /// </summary>
         /// <param name="input2"></param>
         /// <param name="dbName"></param>

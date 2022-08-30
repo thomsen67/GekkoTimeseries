@@ -1107,6 +1107,44 @@ namespace Gekko
             else return null;
         }
 
+        /// <summary>
+        /// /// Chops up into all components
+        /// </summary>
+        /// <param name="input2"></param>
+        /// <param name="dbName"></param>
+        /// <param name="varName"></param>
+        /// <param name="freq"></param>
+        /// <param name="indexes"></param>
+        public static void Chop_Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes) {
+            O.Chop(input2, out dbName, out varName, out freq, out indexes);
+        }
+
+        /// <summary>
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Index elements contain blanks like [a, b, c], not [a,b,c].
+        /// Else see overload.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string Chop_Unchop(string bank, string name, string freq, string[] index)
+        {
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        /// <summary>
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string Chop_Unchop(string bank, string name, string freq, string[] index, bool listBlanks)
+        {
+            return O.UnChop(bank, name, freq, index, listBlanks);
+        }
 
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================

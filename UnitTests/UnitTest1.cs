@@ -8340,7 +8340,7 @@ namespace UnitTests
             I("option freq w;");
             I("time 2020 2021;");
             I("DOWNLOAD 'https://api.statbank.dk/v1/data' eksp02.json;");
-            _AssertSeries(First(), "eksp02_BNOEGLE_30!w", EFreq.W, 2020, 1, 12158d, sharedDelta);
+            _AssertSeries(First(), "eksp02_BNOEGLE_30!w", EFreq.W, 2020, 1, 12157d, sharedDelta);
         }
 
         private static void Helper_AssertPx(bool holes, bool download)
@@ -12175,10 +12175,37 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompOperators()
+        public void _Test_Find()
         {
-            // Note: <dp>, <rdp> and <mp> are not tested here
-            // But a good sanity test of all the others
+            //
+            //
+            //e1[t]    .. ctot[t]  =E=  sum(a, c[a, t]);
+            //e2[a, t] .. c[a, t]  =E=  0.2 * y[a-1, t-1] + 0.5 * y[a, t] + 0.3 * y[a+1, t+1];
+            //
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model <gms> agesimple2.zip;");
+            I("#a = seq(18, 20).strings();");
+            I("y = series(1);");
+            I("c = series(1);");
+            I("time 2018 2022;");
+            I("y[17] = 100.000,     112.000,     123.000,     134.000,     149.000;");
+            I("y[18] = 103.000,     113.000,     124.000,     133.000,     143.000;");
+            I("y[19] = 102.000,     113.000,     122.000,     133.000,     144.000;");
+            I("y[20] = 105.000,     115.000,     122.000,     137.000,     145.000;");
+            I("y[21] = 107.000,     114.000,     126.000,     132.000,     145.000;");
+            I("time 2019 2021;");
+            I("c[18] = 113.100,   124.300,     134.300;");
+            I("c[19] = 113.700,   124.700,     134.800;");
+            I("c[20] = 115.700,   123.200,     136.400;");
+            I("ctot =  342.500,   372.200,     405.500;");
+            //I("find <2021 2021> c[19];");
+        }
+
+        [TestMethod]
+        public void _Test_DecompOperators()
+        {            
+            //Good sanity test of all the others
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
@@ -12310,7 +12337,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, -(11d / 136d) * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <xdp> qwerty
+            // <xdp>
             // -----------------------------------------------------------------------                        
             I("decomp3 <xdp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
@@ -12338,7 +12365,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, (11d / 99d) * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <dp> qwerty
+            // <dp>
             // -----------------------------------------------------------------------            
             I("decomp3 <dp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
@@ -12439,7 +12466,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, -(2d / 130d) * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <xrdp> qwerty
+            // <xrdp>
             // -----------------------------------------------------------------------            
             I("decomp3 <xrdp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
@@ -12467,7 +12494,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, (2d / 101d) * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <rdp> qwerty
+            // <rdp>
             // -----------------------------------------------------------------------
             I("decomp3 <rdp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
@@ -12564,7 +12591,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, -3d / 128d * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <xmp> qwerty
+            // <xmp>
             // -----------------------------------------------------------------------
             I("decomp3 <xmp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
@@ -12600,7 +12627,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 3).number, 3d / 110d * 100d, sharedTableDelta);
 
             // -----------------------------------------------------------------------
-            // <mp> qwerty
+            // <mp>
             // -----------------------------------------------------------------------            
             I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
