@@ -13167,7 +13167,8 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_GAMSEquationsSmall()
-        {            
+        {
+            Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
@@ -13195,6 +13196,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_GAMSEquationsLarge()
         {
+            Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");

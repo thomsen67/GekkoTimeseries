@@ -7,9 +7,10 @@ using ProtoBuf;
 
 namespace Gekko
 {
+
     [ProtoContract]
     public class Matrix : IVariable
-    {
+    {        
         //Because protobuf only handles 1d arrays
         [ProtoBeforeSerialization]
         public void BeforeProtobufWrite()

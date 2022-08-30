@@ -30,6 +30,63 @@ namespace Gekko
         //Databanks: version 1.0 is tsd inside zip, version 1.1 is using protobuffers,
         //version 1.2 is for Gekko 3.0.
 
+        [ProtoBeforeSerialization]
+        public void BeforeProtobufWrite()
+        {
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                Recurse(kvp.Value, true);
+            }
+        }
+
+        [ProtoAfterDeserialization]
+        public void AfterProtobufRead()
+        {
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                Recurse(kvp.Value, false);
+            }
+        }
+
+        /// <summary>
+        /// We have to recurse here, because [ProtoBeforeSerialization] and
+        /// [ProtoAfterDeserialization] do not work inside an object tree structure,
+        /// but only at the uppermost object. Before, this was put in Matrix.cs only.
+        /// </summary>
+        /// <param name="iv"></param>
+        /// <param name="b"></param>
+        public void Recurse(IVariable iv, bool b)
+        {
+            if (iv.Type() == EVariableType.Matrix)
+            {
+                Matrix m = (Matrix)iv;
+                if (b)
+                {
+                    m.BeforeProtobufWrite();
+                }
+                else
+                {
+                    m.AfterProtobufRead();
+                }
+            }
+            else if (iv.Type() == EVariableType.List)
+            {
+                List thisList = (List)iv;
+                foreach (IVariable iv2 in thisList.list)
+                {
+                    Recurse(iv2, b);
+                }
+            }
+            else if (iv.Type() == EVariableType.Map)
+            {
+                Map thisMap = (Map)iv;
+                foreach (KeyValuePair<string, IVariable> kvp in thisMap.storage)
+                {
+                    Recurse(kvp.Value, b);
+                }
+            }
+        }
+
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
