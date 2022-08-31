@@ -23,17 +23,20 @@ namespace Gekko
         //            call it HELPER_methodname().
         //NOTE:
 
-        public enum EElementByElementType {
+        public enum EElementByElementType
+        {
             Times,
             Divide
         }
 
-        public enum ESumDim {
+        public enum ESumDim
+        {
             Rows,
             Cols
         }
 
-        public enum ESumType {
+        public enum ESumType
+        {
             Min,
             Max,
             Sum,
@@ -114,7 +117,7 @@ namespace Gekko
             GekkoTime gt = (ths as ScalarDate).date;
             return new ScalarVal(gt.super);
         }
-        
+
         public static IVariable getweek(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             //%d.getWeek() is only legal for a %d of weekly frequency.
@@ -139,7 +142,7 @@ namespace Gekko
                     txt.MoreAdd("date('w') function. Hence, to find the week number of a given daily date %d, you can use %d.date('w').getWeek(). Note ");
                     txt.MoreAdd("here that %d.date('w').getYear() will get the year of the weekly date, and this year may be different from %d.getYear()!");
                 }
-                 
+
                 return null;
             }
         }
@@ -222,7 +225,7 @@ namespace Gekko
             if (gt.freq != EFreq.D)
             {
                 new Error("getweekday() expects daily date");
-            }            
+            }
 
             DateTime dt1 = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.Strict);
             int day = (int)dt1.DayOfWeek;  //sunday = 0, monday = 1, ... , saturday = 6.
@@ -250,7 +253,7 @@ namespace Gekko
                 }
                 new Error("Unexpected error #623uikhd7af6");  //should not be possible
                 return null;
-            }            
+            }
         }
 
         public static IVariable getparent(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
@@ -1594,7 +1597,7 @@ namespace Gekko
         }
 
         public static IVariable null2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {            
+        {
             return GekkoNull.gekkoNull;
         }
 
@@ -2131,15 +2134,35 @@ namespace Gekko
             x_series.meta.domains = ss;
         }
 
+        /// <summary>
+        /// Tests if a variable is an array-series
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static IVariable isarrayseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {
-            IVariable rv = Globals.scalarVal0;
+        {            
             Series x_series = x as Series;
             if (x_series == null) return Globals.scalarVal0;
-            if (x_series.type == ESeriesType.ArraySuper)
-            {
-                return Globals.scalarVal1;
-            }
+            if (x_series.type == ESeriesType.ArraySuper) return Globals.scalarVal1;            
+            return Globals.scalarVal0;
+        }
+
+        /// <summary>
+        /// Tests if a variable is a timeless series
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static IVariable istimelessseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {            
+            Series x_series = x as Series;
+            if (x_series == null) return Globals.scalarVal0;
+            if (x_series.type == ESeriesType.Timeless) return Globals.scalarVal1;            
             return Globals.scalarVal0;
         }
 
@@ -2252,7 +2275,7 @@ namespace Gekko
             }
             else new Error("setFixType() expects argument 'parameter' or 'variable'");
         }
-
+        
         /// <summary>
         /// Gets info on subseries inside an array-series:
         /// - len/length: the number of subseries
@@ -2601,8 +2624,8 @@ namespace Gekko
             {
                 return new ScalarVal(t.super); //Annual: for plots, 0.5 will be added to align them with the higher frequencies
             }
-            else if (t.freq == EFreq.Q)   
-            {                
+            else if (t.freq == EFreq.Q)
+            {
                 return new ScalarVal(t.super + 1d / GekkoTimeStuff.numberOfQuarters / 2d + 1d / GekkoTimeStuff.numberOfQuarters * (t.sub - 1));  //2001q1 --> 0.125, 2001q2 --> 0.375, ...
             }
             else if (t.freq == EFreq.M)
@@ -2981,7 +3004,7 @@ namespace Gekko
                 new Error("pch(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
-        }        
+        }
 
         public static IVariable observations(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
@@ -3131,7 +3154,7 @@ namespace Gekko
         {
             //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
             //on the full sample. Therefore, _t1 and _t2 are ignored.
-            
+
             Series input = null;
             Series overlay = null;
             string method = "linear";  //default
@@ -3140,7 +3163,7 @@ namespace Gekko
             {
                 new Error("smooth(): did not expect 0 arguments.");
             }
-            
+
             input = O.ConvertToSeries(x[0]) as Series;
 
             GekkoSmpl smplHere = new GekkoSmpl(input.GetRealDataPeriodFirst(), input.GetRealDataPeriodLast());
@@ -3188,7 +3211,8 @@ namespace Gekko
             else if (G.Equal(method, "overlay")) method2 = ESmoothTypes.Overlay;
             else
             {
-                new Error("Expected smooth() method to be 'linear', 'geometric', 'spline', 'repeat' or 'overlay' -- not '" + method + "'"); ;            }
+                new Error("Expected smooth() method to be 'linear', 'geometric', 'spline', 'repeat' or 'overlay' -- not '" + method + "'"); ;
+            }
 
             Series lhs = new Series(input.freq, null);  //could this be light?
             Program.SmoothHelper(lhs, input, method2, overlay);
@@ -3276,7 +3300,7 @@ namespace Gekko
                     else
                     {
                         method = s;
-                    }                    
+                    }
                     if (x.Length >= 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the destination frequency first, and then the method.");
                 }
                 else
@@ -3302,7 +3326,7 @@ namespace Gekko
             }
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
-                                    
+
             CollapseHelper helper = new CollapseHelper();
             if (method != null) helper.method = method;
             if (missing != null) helper.collapse_missing = missing;
@@ -3371,7 +3395,7 @@ namespace Gekko
                 else if (ts.freq == EFreq.Q) freq_destination = "m";
                 else if (ts.freq == EFreq.M) freq_destination = "d";
                 else if (ts.freq == EFreq.W) freq_destination = "d";
-                else if (ts.freq == EFreq.D) new Error("You cannot input a daily series for interpolate().");                
+                else if (ts.freq == EFreq.D) new Error("You cannot input a daily series for interpolate().");
             }
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
@@ -3721,12 +3745,12 @@ namespace Gekko
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
             FindFileHelper ffh = Program.FindFile(s1, null, true, true, smpl.p);
             if (ffh.realPathAndFileName == null) new Error("Could not find file: " + s1);
-            string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);            
+            string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
             return new ScalarString(txt);
         }
 
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
-        {            
+        {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
             FindFileHelper ffh = Program.FindFile(s1, null, true, true, smpl.p);
             if (ffh.realPathAndFileName == null) return Globals.scalarVal0;
@@ -4263,7 +4287,7 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)  
+        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             GekkoTime d = GekkoTime.tNull;
             if (x.Type() == EVariableType.Val)
@@ -4291,7 +4315,7 @@ namespace Gekko
             }
             return new ScalarDate(d);
         }
-        
+
         public static IVariable val(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             if (G.IsGekkoNull(x1)) return x1;
@@ -5086,7 +5110,7 @@ namespace Gekko
         {
             return Math.Pow((1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))), (sigma / (1 - sigma))) * y / kappa * Math.Pow((Math.Pow((p1 / p2), (1 - sigma)) * Math.Pow((((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))) / (1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))))), sigma) + 1), (sigma / (1 - sigma)));
         }
-        
+
         public static IVariable prepend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x)
         {
             return append(smpl, _t1, _t2, ths, Globals.scalarVal1, x);
@@ -5112,7 +5136,7 @@ namespace Gekko
                 new Error("Cannot insert at position " + i);
                 //throw new GekkoException();
             }
-            temp.list.Insert(i - 1, x);            
+            temp.list.Insert(i - 1, x);
             return temp;
         }
 
@@ -5154,12 +5178,12 @@ namespace Gekko
             List temp = ths as List;
             if (x.Type() == EVariableType.List)
             {
-                List x_list = x as List;                
+                List x_list = x as List;
                 temp = temp.DeepClone(null) as List;
                 temp.list.AddRange(x_list.list);
-            }            
+            }
             else
-            {                
+            {
                 FunctionError("extend", x);
             }
             return temp;
@@ -5190,7 +5214,7 @@ namespace Gekko
                 FunctionError("prefix", ths);
                 throw new GekkoException();
             }
-            return rv;            
+            return rv;
         }
 
         //See also prefix()
@@ -5219,7 +5243,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }        
+        }
 
         private static void FunctionError(string s, IVariable x)
         {
