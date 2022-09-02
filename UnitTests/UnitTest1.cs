@@ -12073,7 +12073,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompAgeLead()
         {
-
+            // NOTE: not scalar model!
+            //
             // Consider this model, run over t = 2021, 2022
             // over the ages #a = 18, 19
             //
@@ -12149,7 +12150,7 @@ namespace UnitTests
 
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

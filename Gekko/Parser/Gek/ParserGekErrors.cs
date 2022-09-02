@@ -481,12 +481,34 @@ namespace Gekko.Parser.Gek
                 int col2 = i + 1;
                 if (statementLine[i] == '£')
                 {
+                    
+                    string nextLegalChar = null;  //used for ANTLR messages themselves
+                    for (int ii = i + 1; ii < statementLine.Length; ii++)
+                    {
+                        if (statementLine[ii] != '£' && statementLine[ii] != ' ')
+                        {
+                            nextLegalChar = statementLine[ii].ToString();
+                            break;
+                        }
+                    }
+
                     //move pointers 1 pos to the left
                     foreach (KeyValuePair<long, ErrorHelper> kvp in errorDict2)
                     {
                         int ln = (int)(kvp.Key / (long)1e9);
                         int col = (int)(kvp.Key % (long)1e9);
                         if (col < col2) continue;  //only move after '£'
+
+                        if (nextLegalChar != null)
+                        {
+                            for (int j = 0; j < kvp.Value.errors.Count; j++)
+                            {
+                                if (kvp.Value.errors[j].Contains("'¨'"))
+                                {
+                                    kvp.Value.errors[j] = kvp.Value.errors[j].Replace("'¨'", "'" + nextLegalChar + "'");
+                                }
+                            }
+                        }
                         kvp.Value.offset -= 1;
                     }
                 }

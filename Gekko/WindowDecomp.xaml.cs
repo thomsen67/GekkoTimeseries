@@ -987,41 +987,39 @@ namespace Gekko
                 endCol = 1;
             }
 
-            if (true)
+
+            for (int i = startRow; i <= endRow; i++)
             {
-                for (int i = startRow; i <= endRow; i++)
+                for (int j = startCol; j <= endCol; j++)
                 {
-                    for (int j = startCol; j <= endCol; j++)
+                    Cell c = table.Get(i, j);
+                    if (c == null)
                     {
-                        Cell c = table.Get(i, j);
-                        if (c == null)
-                        {
-                            AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
-                            continue;
-                        }
-                        string s = "";
-                        bool leftAlign = false;
-
-                        string ss = c.numberFormat;
-                        string[] sss = ss.Split('.');
-                        string ssss = sss[sss.Length - 1];
-                        int xx = int.Parse(ssss);
-
-                        if (c.cellType == CellType.Text)
-                        {
-                            s = c.CellText.TextData[0];
-                            leftAlign = true;
-                        }
-                        else if (c.cellType == CellType.Number)
-                        {
-                            s = G.UpdprtFormat(c.number, xx, false);
-                        }
-                        else if (c.cellType == CellType.Date) s = c.date;
-
-                        if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
-
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
+                        continue;
                     }
+                    string s = "";
+                    bool leftAlign = false;
+
+                    string ss = c.numberFormat;
+                    string[] sss = ss.Split('.');
+                    string ssss = sss[sss.Length - 1];
+                    int xx = int.Parse(ssss);
+
+                    if (c.cellType == CellType.Text)
+                    {
+                        s = c.CellText.TextData[0];
+                        leftAlign = true;
+                    }
+                    else if (c.cellType == CellType.Number)
+                    {
+                        s = G.UpdprtFormat(c.number, xx, false);
+                    }
+                    else if (c.cellType == CellType.Date) s = c.date;
+
+                    if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
+
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
                 }
             }
         }

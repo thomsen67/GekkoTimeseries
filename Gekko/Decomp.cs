@@ -1273,6 +1273,7 @@ namespace Gekko
             {
                 foreach (string s in decompOptions2.link[0].endo)
                 {
+                    //Transforms from for instance Work:x¤[+1] into Work:x¤[2002].
                     string x = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(s, 0, t);
                     if (!endo.ContainsKey(x))
                     {
@@ -2870,7 +2871,7 @@ namespace Gekko
                         FrameLightRow dr = new FrameLightRow(frame);
                         //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
 
-                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");
+                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");                        
 
                         dr.Set(frame, col_fullVariableName, new CellLight(dictName2));
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));

@@ -13676,6 +13676,12 @@ namespace Gekko
         public static bool HasGamsEquation(string var)
         {
             if (var == null) return false;
+            //TODO TODO
+            //TODO TODO
+            //TODO TODO
+            //TODO TODO
+            //TODO TODO
+            if (G.GetModelType() == EModelType.GAMSScalar) return true;
             return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
         }
 
