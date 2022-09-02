@@ -2342,7 +2342,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.count = ECountType.N;
+                this.decompOptions2.count = ECountType.Names;
                 RecalcCellsWithNewType(false);
             }
         }

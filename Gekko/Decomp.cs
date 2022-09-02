@@ -2722,7 +2722,7 @@ namespace Gekko
                         }
                     }
 
-                    foreach (string varname in dd.storage.Keys)
+                    foreach (string dictName in dd.storage.Keys)
                     {
                         i++;
 
@@ -2736,7 +2736,7 @@ namespace Gekko
                         //there is some repeated work done here, but not really bad
                         //problem is we prefer to do one period at a time, to sum up, adjust etc.
 
-                        string[] ss = varname.Split('¤');
+                        string[] ss = dictName.Split('¤');
                         string fullName = ss[0];
                         lag = ss[1];
                         if (lag == "[0]")
@@ -2791,7 +2791,7 @@ namespace Gekko
 
                         if (true)
                         {
-                            if (varname.Contains(Globals.decompResidualName))
+                            if (dictName.Contains(Globals.decompResidualName))
                             {
                                 dLevel = double.NaN;
                             }
@@ -2802,7 +2802,7 @@ namespace Gekko
 
                                 if (op.operatorLower.StartsWith("x"))
                                 {
-                                    Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, varname);
+                                    Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
                                     Series tsFirst = tup.Item1;
                                     Series tsRef = tup.Item2;
                                     dLevel = tsFirst.GetDataSimple(t2);
@@ -2848,27 +2848,31 @@ namespace Gekko
                         double dAlternative = double.NaN;
                         if (op.isDoubleDifQuo)  //dp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.isDoubleDifRef) //rdp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = double.NaN;
                         }
 
                         FrameLightRow dr = new FrameLightRow(frame);
-                        dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
+                        //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
+
+                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");
+
+                        dr.Set(frame, col_fullVariableName, new CellLight(dictName2));
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
                         dr.Set(frame, col_t, new CellLight(t2.ToString()));
                         dr.Set(frame, col_variable, new CellLight(varName));
@@ -3091,6 +3095,11 @@ namespace Gekko
                     td.levelRefLag += dLevelRefLag;
                     td.levelRefLag2 += dLevelRefLag2;
                     td.n += 1;
+                    //BEWARE
+                    //BEWARE
+                    //BEWARE Is this too time-consuming?
+                    //BEWARE
+                    //BEWARE
                     td.fullVariableNames.Add(fullVariableName);
                 }            
             }
@@ -3301,6 +3310,7 @@ namespace Gekko
                     if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();
+                    
                     if (decompOptions2.count == ECountType.N)
                     {
                         tab.SetNumber(i + 2, j + 2, n, "f16.0");

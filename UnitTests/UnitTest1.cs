@@ -12149,7 +12149,7 @@ namespace UnitTests
 
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            Globals.showDecompTable = true;  //will show the following decomp table and then abort
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -12199,7 +12199,7 @@ namespace UnitTests
             I("c[19] = 113.700,   124.700,     134.800;");
             I("c[20] = 115.700,   123.200,     136.400;");
             I("ctot =  342.500,   372.200,     405.500;");
-            I("find <2021 2021> c[19];");
+            //I("find <2021 2021> c[19];");
         }
 
         [TestMethod]
