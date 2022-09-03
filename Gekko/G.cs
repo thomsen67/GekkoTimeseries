@@ -1146,6 +1146,105 @@ namespace Gekko
             return O.UnChop(bank, name, freq, index, listBlanks);
         }
 
+        /// <summary>
+        /// Adds a dimension to a name. If inputName = "x" and inputIndex = "40", the result
+        /// will be x[40]. If inputName is "x[a, b]", the result will be "x[a, b, 40]".
+        /// Dimension is always added last.
+        /// </summary>
+        /// <param name="inputName"></param>
+        /// <param name="inputIndex"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionAddLast(string inputName, string inputIndex)
+        {
+            string bank = null; string name = null; string freq = null; string[] indexes = null;
+            G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
+            string[] indexes2 = null;
+            if (indexes == null)
+            {
+                indexes2 = new string[1];
+                indexes2[0] = inputIndex;
+            }
+            else
+            {
+                indexes2 = new string[indexes.Length + 1];
+                Array.Copy(indexes, indexes2, indexes2.Length - 1);
+                indexes2[indexes2.Length - 1] = inputIndex;
+            }
+            return G.Chop_Unchop(bank, name, freq, indexes2, true);
+        }
+
+        /// <summary>
+        /// Removes last dimension. For instance, "x[40]" becomes "x", and "x[a, b, 40]" becomes "x[a, b]".
+        /// If no dimension like "x", the result will also be "x".
+        /// </summary>
+        /// <param name="inputName"></param>
+        /// <param name="inputIndex"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionRemoveLast(string inputName)
+        {            
+            string bank = null; string name = null; string freq = null; string[] indexes = null;
+            G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
+            string[] indexes2 = null;
+            if (indexes == null || indexes.Length == 1)
+            {
+                //indexes2 will be null
+            }
+            else
+            {
+                indexes2 = new string[indexes.Length - 1];
+                Array.Copy(indexes, indexes2, indexes2.Length);
+            }
+            return G.Chop_Unchop(bank, name, freq, indexes2, true);
+        }
+
+        /// <summary>
+        /// Handles a lag or lead like for instance "x[+1]".
+        /// If name = "x", t0 = 2001 and t = 2002, it will return "x[+1]".
+        /// With merge=false, "x[a]" will become "x[a][+1]", whereas with merge=true,
+        /// we get "x[a, +1]". The former is normal.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="t0"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionAddLag(string name, GekkoTime t0, GekkoTime t, bool merge)
+        {
+            string name2;
+            string slag = GekkoTime.GetLagString(t0, t);
+            if (slag == null)
+            {
+                name2 = name;
+            }
+            else
+            {
+                if (merge) name2 = G.Chop_DimensionAddLast(name, slag);
+                else name2 = name + "[" + slag + "]";
+            }
+            return name2;
+        }
+
+
+        /// <summary>
+        /// Sets lag when there is an existing time, like "x[a, 2002]", which for t0=2001 would be
+        /// changed into "x[a][+1]" if merge=false (which is normal), or else "x[a, +1]".
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="t0"></param>
+        /// <param name="t"></param>
+        /// <param name="merge"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionSetLag(string name, GekkoTime t0, bool merge)
+        {
+            List<string> ss = Chop_GetIndex(name);
+            if (ss == null) new Error("No index found");
+            string time = ss[ss.Count - 1];
+            GekkoTime t = GekkoTime.FromStringToGekkoTime(time);
+            //string slag = GekkoTime.GetLagString(t0, t);
+            string name7 = Chop_DimensionRemoveLast(name);
+            string name8 = Chop_DimensionAddLag(name7, t0, t, merge);
+            return name8;
+        }
+
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================

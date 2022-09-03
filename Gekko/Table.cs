@@ -1534,6 +1534,7 @@ namespace Gekko
 
         public string date;  //FIXME: quarters etc. Really ought to be a GekkoTime object
         public GekkoTime date_hack = GekkoTime.tNull;  //used to smuggle in dates, until above issue is fixed 
+        public List<string> vars_hack = null;          //used to smuggle in "atomic" variables contained in a cell in a DECOMP table
 
         public double number;
         public bool numberShouldShowAsN = false;

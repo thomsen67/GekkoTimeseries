@@ -150,7 +150,6 @@ namespace Gekko
                     if (iv_series == null || iv_series.type != ESeriesType.ArraySuper)
                     {
                         new Error("Expected array-series variable");
-                        //throw new GekkoException();
                     }
 
                     rv = iv_series.FindArraySeries(smpl, Stringlist.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used

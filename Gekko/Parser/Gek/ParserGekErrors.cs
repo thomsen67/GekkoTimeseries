@@ -198,8 +198,7 @@ namespace Gekko.Parser.Gek
                             
                             //
                             // handle glue symbols
-                            //
-                            
+                            //                            
                             statementLine = HandleGlueSymbols(statement, statementLine, statementLine2, statementLine3);                            
 
                             //

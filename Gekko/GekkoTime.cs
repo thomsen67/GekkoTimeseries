@@ -1534,6 +1534,21 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// For t0=2001 and t1=2002, this will return "+1" (or "-1" if t1=2000). If same period, null is returned.
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string GetLagString(GekkoTime t0, GekkoTime t)
+        {
+            int lag = GekkoTime.Observations(t0, t) - 1;
+            string slag = null;
+            if (lag < 0) slag = lag.ToString();
+            if (lag > 0) slag = "+" + lag.ToString();
+            return slag;
+        }
+
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
         {
             //========================================================================================================

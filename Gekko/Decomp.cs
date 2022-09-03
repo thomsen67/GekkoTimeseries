@@ -3324,6 +3324,9 @@ namespace Gekko
                     {                        
                         tab.SetNumber(i + 2, j + 2, d, format2);                        
                     }
+
+                    Cell c = tab.Get(i + 2, j + 2);
+                    c.vars_hack = fullVariableNames;
                 }
             }
 
@@ -4009,13 +4012,15 @@ namespace Gekko
         {
             //For scalar model
 
+            bool showExplicitTime = false;
+
             Globals.itemHandler = new ItemHandler();  //hack
 
             if (!o.t1.Equals(o.t2)) new Error("FIND expects same start and end period");
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t1);
-            string variableName2 = vars[0] + "[" + o.t1.ToString() + "]";
             string variableName = vars[0];
+            string variableName2 = variableName + "[" + o.t1.ToString() + "]";            
             int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);            
             new Writeln("Variable " + variableName2 + ":");
@@ -4038,25 +4043,19 @@ namespace Gekko
                 {
                     //see also #as7f3læaf9
                     PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eq][i], Program.model.modelGamsScalar.bb[eq][i + 1]);
-                    Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();                    
-                    string bank, name, freq; string[] indexes;
-                    G.Chop_Chop(tup.Item1, out bank, out name, out freq, out indexes);
-                    string[] indexes2 = null;
-                    if (indexes == null)
+                    Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
+                    string name2 = null;
+                    if (showExplicitTime)
                     {
-                        indexes2 = new string[1];
-                        indexes2[0] = tup.Item2.ToString();
+                        name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
                     }
                     else
                     {
-                        indexes2 = new string[indexes.Length + 1];
-                        Array.Copy(indexes, indexes2, indexes2.Length - 1);
-                        indexes2[indexes2.Length - 1] = tup.Item2.ToString();
+                        name2 = G.Chop_DimensionAddLag(tup.Item1, o.t1, tup.Item2, false);
                     }
-                    string name2 = G.Chop_Unchop(bank, name, freq, indexes2, true);
                     xx.Add(name2);
                 }
-                
+
                 string bool1 = "";
                 string bool2 = "";
                 bool1 = Globals.protectSymbol;
@@ -4064,7 +4063,9 @@ namespace Gekko
 
                 string tt = "tx0";
 
-                Globals.itemHandler.Add(new EquationListItem(eqName, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3));
+                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t1, false);
+
+                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3));
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];

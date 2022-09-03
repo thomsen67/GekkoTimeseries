@@ -1518,6 +1518,8 @@ namespace Gekko
             CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
 
             Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
+            Cell c2 = this.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
+            if (c2 == null) MessageBox.Show("Could not find cell");
 
             if (c != null && c.cellType == CellType.Text)
             {
@@ -1525,7 +1527,13 @@ namespace Gekko
                 // ---------------------------------------
                 // FIND
                 // ---------------------------------------
-                string var = c.CellText.TextData[0];
+                                
+                List<string> vars = c2.vars_hack;
+                if (vars == null) MessageBox.Show("Could not find any vars");
+
+                //string var = c.CellText.TextData[0];
+                string var = vars[0];  //#dskla8asjkdfa
+
                 O.Find o = new O.Find();
                 List m = new List(new List<string>() { var });
                 o.iv = m;
