@@ -49,7 +49,7 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {            
             this._activeVariable = null;
-            this.EquationBrowserSetEquation(_activeEquation);
+            this.EquationBrowserSetEquation(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -69,22 +69,22 @@ namespace Gekko
                 this.EquationBrowserSetLabel(_activeVariable);
             }
             else
-            {
-                this.EquationBrowserSetEquation(_activeEquation);
+            {                
+                this.EquationBrowserSetEquation(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
             }
         }
 
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
-            EquationListItem item = e.AddedItems[0] as EquationListItem;
-            this.EquationBrowserSetEquationAndButtons(item.Name);
+            EquationListItem item = e.AddedItems[0] as EquationListItem;            
+            this.EquationBrowserSetEquationAndButtons(item.Name, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
             this._activeEquation = item.Name;            
         }
 
-        private void EquationBrowserSetEquationAndButtons(string eqName)
+        private void EquationBrowserSetEquationAndButtons(string eqName, bool showTime, GekkoTime t0)
         {            
             int i = 0;  //TODO TODO TODO!!! qwerty         
-            string s = ModelGamsScalar.GetEquationText(eqName);
+            string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);
             if (false)
             {
                 //we skip parallel coloring for now
@@ -96,19 +96,21 @@ namespace Gekko
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
             ListViewItem x = sender as ListViewItem;
-            EquationListItem item = x.Content as EquationListItem;            
-            this.EquationBrowserSetEquationAndButtons(item.Name);
+            EquationListItem item = x.Content as EquationListItem;                        
+            this.EquationBrowserSetEquationAndButtons(item.Name, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
-            this.EquationBrowserSetEquationAndButtons(_activeEquation);            
+            bool showTime = false;
+            GekkoTime t0 = Globals.uglyHack_find.t1;            
+            this.EquationBrowserSetEquationAndButtons(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void EquationBrowserSetEquation(string eq)
+        private void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {            
-            string s = Model.EquationText(eq, ModelGamsScalar.GetEquationText(eq));            
+            string s = Model.LayoutEquationText(eq, ModelGamsScalar.GetEquationText(eq, showTime, t0));
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);
         }
@@ -214,7 +216,7 @@ namespace Gekko
             //this._activeVariable = null;
             this.windowEquationBrowserLabel.Inlines.Clear();
 
-            string s7 = Model.EquationText(eqName, firstText);
+            string s7 = Model.LayoutEquationText(eqName, firstText);
             this.windowEquationBrowserLabel.Inlines.Add(s7);
 
             //this.windowEquationBrowserLabel.Inlines.Add(firstText);

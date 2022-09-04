@@ -188,13 +188,13 @@ namespace Gekko
             {
                 foreach (Link link in decompOptions.link)
                 {
-                    rv += EquationText(link.eqname, link.expressionText);
+                    rv += LayoutEquationText(link.eqname, link.expressionText);
                 }
             }
             return rv;
         }
 
-        public static string EquationText(string eqname, string expressionText)
+        public static string LayoutEquationText(string eqname, string expressionText)
         {
             string rv = "";
             rv += "Equation: " + eqname + "" + G.NL;
@@ -1010,12 +1010,12 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetEquationText(string name)
+        public static string GetEquationText(string name, bool showTime, GekkoTime t0)
         {
             int i = -12345;
             Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
             if (i == -12345) new Error("Could not find equation name '" + name + "'");
-            string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(i);
+            string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(i, showTime, t0);
             return s;
         }
 
@@ -1028,7 +1028,7 @@ namespace Gekko
         /// </summary>
         /// <param name="eq"></param>
         /// <returns></returns>
-        public string GetEquationTextUnfolded(int eq)
+        public string GetEquationTextUnfolded(int eq, bool showTime, GekkoTime t0)
         {
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
@@ -1086,11 +1086,21 @@ namespace Gekko
                     int i2 = this.bb[eq][int.Parse(tokens[i + 10].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
                     string varname = this.GetVarNameA(i2);
-                    sb.Append(G.Blanks(tokens[i].leftblanks) + varname + "[" + gt.ToString() + "]");  //HMMM INDEXES !!!!
+                    string varname2 = null;
+                    if (showTime)
+                    {
+                        varname2 = G.Chop_DimensionAddLast( varname, gt.ToString());
+                    }
+                    else
+                    {
+                        varname2 = G.Chop_DimensionAddLag(varname, t0, gt, false);
+                    }
+                    sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
                     i += 12;
                 }
                 else if (tokens[i].s == "c" && tokens[i + 1].s == "[" && tokens[i + 2].s == "d" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]")
                 {
+                    //constants
                     int i1 = int.Parse(tokens[i + 4].s);
                     double c = this.cc[this.dd[eq][i1]];
                     sb.Append(G.Blanks(tokens[i].leftblanks) + c.ToString());
@@ -1098,6 +1108,7 @@ namespace Gekko
                 }
                 else if (tokens[i].s == "M" && tokens[i + 1].s == ".")
                 {
+                    //M.Log(...) etc.
                     tokens[i].s = "";
                     tokens[i + 1].s = "";
                     Gekko.GamsModel.RenameFunctions(tokens[i + 2], false);

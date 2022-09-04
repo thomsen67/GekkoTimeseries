@@ -8036,6 +8036,8 @@ namespace Gekko
 
         public class Find
         {
+            public bool showTime = false;
+            public GekkoTime t0 = GekkoTime.tNull;  //selected time
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             public List iv = null;            
@@ -8043,9 +8045,17 @@ namespace Gekko
             public string rv = null; //return value
 
             public void Exe()
-            {
-                G.CheckLegalPeriod(this.t1, this.t2);
-                this.rv = Program.Find(this);
+            {                
+                try
+                {
+                    Globals.uglyHack_find = this; //ugly hack to use global variable, but the treeView cannot be opened more than 1 at a time anyway.                
+                    G.CheckLegalPeriod(this.t1, this.t2);
+                    this.rv = Program.Find(this);
+                }
+                finally
+                {
+                    Globals.uglyHack_find = null;
+                }
             }
         }
 

@@ -167,6 +167,8 @@ namespace Gekko
 
         public static DecompOptions2 uglyHack_decompOptions2 = null;
         public static string uglyHack_name = null;
+        public static O.Find uglyHack_find = null;
+
         public static bool isAgeHierarchy = true;
         public static string ageHierarchyDivider = "..";
         public static string ageHierarchyName = "a10";

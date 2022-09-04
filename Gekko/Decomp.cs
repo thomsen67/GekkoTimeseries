@@ -4010,17 +4010,16 @@ namespace Gekko
 
         public static string Find(O.Find o)
         {
-            //For scalar model
-
-            bool showExplicitTime = false;
+            //For scalar model            
 
             Globals.itemHandler = new ItemHandler();  //hack
 
             if (!o.t1.Equals(o.t2)) new Error("FIND expects same start and end period");
+            o.t0 = o.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
-            int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t1);
+            int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
-            string variableName2 = variableName + "[" + o.t1.ToString() + "]";            
+            string variableName2 = variableName + "[" + o.t0.ToString() + "]";            
             int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);            
             new Writeln("Variable " + variableName2 + ":");
@@ -4033,8 +4032,8 @@ namespace Gekko
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
             foreach (int eq in eqNumbers)
-            {                
-                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq);
+            {
+                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, o.showTime, o.t0);
                 new Writeln(equationText);
                 string eqName = Program.model.modelGamsScalar.GetEqName(eq);
 
@@ -4045,13 +4044,13 @@ namespace Gekko
                     PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eq][i], Program.model.modelGamsScalar.bb[eq][i + 1]);
                     Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
                     string name2 = null;
-                    if (showExplicitTime)
+                    if (o.showTime)
                     {
                         name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
                     }
                     else
                     {
-                        name2 = G.Chop_DimensionAddLag(tup.Item1, o.t1, tup.Item2, false);
+                        name2 = G.Chop_DimensionAddLag(tup.Item1, o.t0, tup.Item2, false);
                     }
                     xx.Add(name2);
                 }
@@ -4063,7 +4062,7 @@ namespace Gekko
 
                 string tt = "tx0";
 
-                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t1, false);
+                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
 
                 Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3));
                 lineCounter++;
@@ -4147,7 +4146,7 @@ namespace Gekko
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
-            eb._activeVariable = null;
+            eb._activeVariable = null;            
             eb._t1 = o.t1;
             eb._t2 = o.t2;
             bool? b = eb.ShowDialog();
