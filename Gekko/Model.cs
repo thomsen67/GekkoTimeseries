@@ -28,6 +28,7 @@ using System.Reflection;
 using MathNet.Numerics.LinearAlgebra.Sparse;
 using ProtoBuf;
 using System.IO;
+using System.Linq;
 
 namespace Gekko
 {
@@ -102,6 +103,105 @@ namespace Gekko
         public ModelGekko modelGekko = null;
         public ModelGams modelGams = null;
         public ModelGamsScalar modelGamsScalar = null;
+
+        /// <summary>
+        /// This gets folded equations from GAMS code. See also how to get unfolded equations: #jseds78hsd33.
+        /// </summary>
+        /// <param name="decompOptions"></param>
+        /// <returns></returns>
+        public static string GetEquationTextFolded(DecompOptions2 decompOptions)
+        {
+            string rv = "";
+            List<string> eqNames = new List<string>();
+            if (decompOptions.modelType == EModelType.GAMSScalar)
+            {
+                StringBuilder sb = new StringBuilder();
+                List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
+                if (rawModel != null)
+                {
+                    int count2 = 0;
+                    foreach (Link link in decompOptions.link)
+                    {
+                        //
+                        // TODO: handle a semicolon in a comment, for instance after # 
+                        //
+                        count2++;
+                        if (count2 == 1)
+                        {
+                            sb.AppendLine("");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("");
+                        }
+                        else
+                        {
+                            sb.AppendLine("");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("");
+                        }
+                        string eqName = link.GAMS_dsh[0].name;  //probably link.GAMS_dsh[1].name is the same, or ....????
+                        for (int i = 0; i < rawModel.Count; i++)
+                        {
+                            int pos = rawModel[i].IndexOf(eqName + "[", StringComparison.OrdinalIgnoreCase);
+                            if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
+                            {
+                                eqNames.Add(eqName);
+                                int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
+                                for (int j = i; j < rawModel.Count; j++)
+                                {
+                                    string s = rawModel[j];
+                                    int count = s.TakeWhile(Char.IsWhiteSpace).Count();
+                                    if (count >= count0) s = s.Substring(count0);
+                                    else s = s.Substring(count);
+
+                                    sb.AppendLine(s);
+                                    if (rawModel[j].Contains(";"))
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                string s2 = sb.ToString();
+                ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
+
+                StringBuilder sb2 = new StringBuilder();
+                sb2.AppendLine(decompOptions.link.Count + " equation" + G.S(decompOptions.link.Count));
+                foreach (string eqName in eqNames)
+                {
+                    foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
+                    {
+                        sb2.AppendLine("");
+                        sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb2.AppendLine("");
+                        sb2.AppendLine("$-condition: " + eq.conditionals);
+                        //sb2.AppendLine("");
+                        sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");
+                    }
+                }
+                rv = sb2.ToString() + sb.ToString();
+            }
+            else
+            {
+                foreach (Link link in decompOptions.link)
+                {
+                    rv += EquationText(link.eqname, link.expressionText);
+                }
+            }
+            return rv;
+        }
+
+        public static string EquationText(string eqname, string expressionText)
+        {
+            string rv = "";
+            rv += "Equation: " + eqname + "" + G.NL;
+            rv += "------------------------------------------" + G.NL;
+            rv += expressionText + G.NL + G.NL;
+            return rv;
+        }
     }
 
     [ProtoContract]
@@ -522,10 +622,10 @@ namespace Gekko
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         [ProtoMember(23)]
-        public List<string> codeLines = null; //C# source code
+        public List<string> csCodeLines = null; //C# source code
 
         [ProtoMember(24)]
-        public List<string> rawModel = null;  //in GAMS format
+        public List<string> gamsFoldedModel = null;  //in GAMS format
 
         /// <summary>
         /// Points a period-and-variable to the unfolded equations it is part of. This could
@@ -905,15 +1005,30 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Gets human-readable equation text corresponding to (unfolded) equation number (string input).
+        /// See #jseds78hsd33.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string GetEquationText(string name)
+        {
+            int i = -12345;
+            Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
+            if (i == -12345) new Error("Could not find equation name '" + name + "'");
+            string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(i);
+            return s;
+        }
+
+        /// <summary>
         /// Gets human-readable equation text corresponding to (unfolded) equation number.
         /// Uses equationChunks list, which is only about 1% of full scalar model size.
         /// The result uses the C# code (modified a bit), where stuff like a[b[0]][b[1]] and
-        /// c[d[0]] is replaced with "real" variable[period]. By avoiding the full scalar model,
-        /// a lot of RAM is saved.
+        /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full scalar model in human-readable form (up to 1 mio eqs),
+        /// a lot of RAM is saved. See also folded equations: #jseds78hsd33.
         /// </summary>
         /// <param name="eq"></param>
         /// <returns></returns>
-        public string GetEquationText(int eq)
+        public string GetEquationTextUnfolded(int eq)
         {
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
@@ -988,11 +1103,7 @@ namespace Gekko
                     Gekko.GamsModel.RenameFunctions(tokens[i + 2], false);
                     sb.Append(tokens[i + 2].ToString());
                     i += 2;
-                }
-                //else if (tokens[i].s == ";")
-                //{
-                //    //skip
-                //}                
+                }                               
                 else
                 {
                     sb.Append(tokens[i].ToString());
@@ -1000,6 +1111,7 @@ namespace Gekko
             }
             return sb.ToString().Trim();
         }
+
     }
 
     [ProtoContract]

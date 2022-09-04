@@ -4034,7 +4034,7 @@ namespace Gekko
             List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
             foreach (int eq in eqNumbers)
             {                
-                string equationText = Program.model.modelGamsScalar.GetEquationText(eq);
+                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq);
                 new Writeln(equationText);
                 string eqName = Program.model.modelGamsScalar.GetEqName(eq);
 

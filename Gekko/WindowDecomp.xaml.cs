@@ -1484,7 +1484,7 @@ namespace Gekko
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
                 string s = null;               
-                s = FindEquationText2(this.decompOptions2);               
+                s = Model.GetEquationTextFolded(this.decompOptions2);               
                 //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
             }
@@ -1676,7 +1676,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string s = FindEquationText2(this.decompOptions2);
+                    string s = Model.GetEquationTextFolded(this.decompOptions2);
                     //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                     equation.Text = s;
                 }
@@ -1760,7 +1760,7 @@ namespace Gekko
                 frame = new FrameLight();
                 Table table = Decomp.DecompMain(smpl, per1, per2, this.decompOptions2, frame, refresh, ref this.decompDatas);
 
-                string s = FindEquationText2(this.decompOptions2);
+                string s = Model.GetEquationTextFolded(this.decompOptions2);
                 equation.Text = s;
                 //
                 // NOTE:
@@ -2012,101 +2012,7 @@ namespace Gekko
                 if (eh == null) return ""; //probably only when model is changed while UDVALG window is open (this is illegal anyway, and a popup will appear)
                 else return ((EquationHelper)eh).equationText;
             }
-        }
-
-        public static string FindEquationText2(DecompOptions2 decompOptions)
-        {
-            string rv = "";
-            List<string> eqNames = new List<string>();
-            if (decompOptions.modelType == EModelType.GAMSScalar)
-            {                
-                StringBuilder sb = new StringBuilder();                
-                List<string> rawModel = Program.model.modelGamsScalar.rawModel;
-                if (rawModel != null)
-                {
-                    int count2 = 0;
-                    foreach (Link link in decompOptions.link)
-                    {
-                        //
-                        // TODO: handle a semicolon in a comment, for instance after # 
-                        //
-                        count2++;
-                        if (count2 == 1)
-                        {
-                            sb.AppendLine("");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("");
-                        }
-                        else
-                        {
-                            sb.AppendLine("");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("");
-                        }
-                        string eqName = link.GAMS_dsh[0].name;  //probably link.GAMS_dsh[1].name is the same, or ....????
-                        for (int i = 0; i < rawModel.Count; i++)
-                        {
-                            int pos = rawModel[i].IndexOf(eqName + "[", StringComparison.OrdinalIgnoreCase);
-                            if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
-                            {
-                                eqNames.Add(eqName);
-                                int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
-                                for (int j = i; j < rawModel.Count; j++)
-                                {
-                                    string s = rawModel[j];
-                                    int count = s.TakeWhile(Char.IsWhiteSpace).Count();
-                                    if (count >= count0) s = s.Substring(count0);
-                                    else s = s.Substring(count);
-
-                                    sb.AppendLine(s);
-                                    if (rawModel[j].Contains(";"))
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }                        
-                    }
-                }
-                string s2 = sb.ToString();
-                ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
-
-                StringBuilder sb2 = new StringBuilder();
-                sb2.AppendLine(decompOptions.link.Count + " equation" + G.S(decompOptions.link.Count));
-                foreach (string eqName in eqNames)
-                {
-                    foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
-                    {
-                        sb2.AppendLine("");
-                        sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb2.AppendLine("");
-                        sb2.AppendLine("$-condition: " + eq.conditionals);
-                        //sb2.AppendLine("");
-                        sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");                        
-                    }
-                }
-                rv = sb2.ToString() + sb.ToString();
-            }
-            else
-            {
-                foreach (Link link in decompOptions.link)
-                {
-                    rv += EquationText(link.eqname, link.expressionText);
-                }
-            }
-            return rv;
-        }
-
-        public static string EquationText(string eqname, string expressionText)
-        {
-            string rv = "";
-            rv += "Equation: " + eqname + "" + G.NL;
-            rv += "------------------------------------------" + G.NL;
-            rv += expressionText + G.NL + G.NL;
-            return rv;
-        }
+        }        
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)
         {

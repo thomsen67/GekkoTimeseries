@@ -84,7 +84,7 @@ namespace Gekko
         private void EquationBrowserSetEquationAndButtons(string eqName)
         {            
             int i = 0;  //TODO TODO TODO!!! qwerty         
-            string s = GetEquationText(eqName);
+            string s = ModelGamsScalar.GetEquationText(eqName);
             if (false)
             {
                 //we skip parallel coloring for now
@@ -108,8 +108,7 @@ namespace Gekko
 
         private void EquationBrowserSetEquation(string eq)
         {            
-            string s = WindowDecomp.EquationText(eq, GetEquationText(eq));
-            
+            string s = Model.EquationText(eq, ModelGamsScalar.GetEquationText(eq));            
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);
         }
@@ -122,17 +121,8 @@ namespace Gekko
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-        }
+        }       
         
-        private static string GetEquationText(string name)
-        {
-            //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
-            //string s = xx2[0].lhs + " = " + xx2[0].rhs;
-            int i = -12345; Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
-            if (i == -12345) new Error("Could not find equation name '" + name + "'");
-            string s = Program.model.modelGamsScalar.GetEquationText(i);
-            return s;            
-        }
 
         public void EquationBrowserSetLabel(string variableName)
         {
@@ -224,7 +214,7 @@ namespace Gekko
             //this._activeVariable = null;
             this.windowEquationBrowserLabel.Inlines.Clear();
 
-            string s7 = WindowDecomp.EquationText(eqName, firstText);
+            string s7 = Model.EquationText(eqName, firstText);
             this.windowEquationBrowserLabel.Inlines.Add(s7);
 
             //this.windowEquationBrowserLabel.Inlines.Add(firstText);

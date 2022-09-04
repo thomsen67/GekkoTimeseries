@@ -903,7 +903,7 @@ namespace Gekko
             helper.a = new double[periods][];
             for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count]; //beware: 0-based            
 
-            List<string> codeLines = new List<string>();
+            List<string> csCodeLines = new List<string>();
 
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
@@ -923,7 +923,7 @@ namespace Gekko
                                 semis++;
                                 int hits2 = helper.known;
                                 tokensLast = HandleEqLine(eqLine, tokensLast, helper);
-                                if (helper.known == hits2) RemoveDoubleDots(helper, codeLines);
+                                if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
                                 eqLine = new StringBuilder();
                             }
                             status = 1;
@@ -982,7 +982,7 @@ namespace Gekko
                                 eqLine.Append(line);
                                 int hits2 = helper.known;
                                 tokensLast = HandleEqLine(eqLine, tokensLast, helper);
-                                if (helper.known == hits2) RemoveDoubleDots(helper, codeLines);
+                                if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
                                 eqLine = new StringBuilder();
                             }
                             else
@@ -1018,7 +1018,7 @@ namespace Gekko
 
             if (false)
             {
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(csCodeLines).ToString());
             }
 
             foreach (string line in values)
@@ -1055,7 +1055,7 @@ namespace Gekko
             //if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
             //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
             
-            Assembly assembly = Compile5(codeLines, helper.equationChunks);
+            Assembly assembly = Compile5(csCodeLines, helper.equationChunks);
             new Writeln("Compile finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
@@ -1085,7 +1085,7 @@ namespace Gekko
             new Writeln("Loading funcs took: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
-            List<string> rawModel = new List<string>();
+            List<string> gamsFoldedModel = new List<string>();
             if (input.ffh_rawModel != null)
             {                
                 using (FileStream fs = Program.WaitForFileStream(input.ffh_rawModel.realPathAndFileName, input.ffh_rawModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
@@ -1094,7 +1094,7 @@ namespace Gekko
                     string line = null;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        rawModel.Add(line);
+                        gamsFoldedModel.Add(line);
                     }
                 }
             }
@@ -1139,8 +1139,8 @@ namespace Gekko
                 Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
 
                 // -------------- raw codelines ---------
-                Program.model.modelGamsScalar.codeLines = codeLines;
-                Program.model.modelGamsScalar.rawModel = rawModel;
+                Program.model.modelGamsScalar.csCodeLines = csCodeLines;
+                Program.model.modelGamsScalar.gamsFoldedModel = gamsFoldedModel;
 
                 Program.model.modelGamsScalar.precedents = new GekkoDictionary<PeriodAndVariable, List<int>>();
                 //mapping from a varname to the equations it is part of                
@@ -1885,7 +1885,7 @@ namespace Gekko
                 Program.model.modelGamsScalar.aTemp = null;
                 
                 //Loading of Func<>s
-                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines, Program.model.modelGamsScalar.equationChunks);
+                Assembly assembly = Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.equationChunks);
                 
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
                 Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
