@@ -1013,7 +1013,8 @@ namespace Gekko
         public static string GetEquationText(string name, bool showTime, GekkoTime t0)
         {
             int i = -12345;
-            Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
+            bool ok = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
+            if (!ok) i = -12345;
             if (i == -12345) new Error("Could not find equation name '" + name + "'");
             string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(i, showTime, t0);
             return s;
