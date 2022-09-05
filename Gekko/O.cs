@@ -9521,10 +9521,10 @@ namespace Gekko
                     G.Writeln("OPTION databank search = yes;");
                     G.Writeln("OPTION databank create auto = yes;");
                     G.Writeln("OPTION solve data create auto = yes;");
-                    G.Writeln("");
-                    G.Writeln("Please note that this mode is more flexible, but also has more room for errors, if care ", Globals.warningColor);
-                    G.Writeln("is not taken (for instance whether a variable is a model variable, or whether a variable ", Globals.warningColor);
-                    G.Writeln("is from the first-position databank or stems from some other open databank).", Globals.warningColor);
+                    //G.Writeln("");
+                    //G.Writeln("Please note that this mode is more flexible, but also has more room for errors, if care ", Globals.warningColor);
+                    //G.Writeln("is not taken (for instance whether a variable is a model variable, or whether a variable ", Globals.warningColor);
+                    //G.Writeln("is from the first-position databank or stems from some other open databank).", Globals.warningColor);
                 }
                 else
                 {

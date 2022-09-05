@@ -188,15 +188,16 @@ namespace Gekko
             {
                 foreach (Link link in decompOptions.link)
                 {
-                    rv += LayoutEquationText(link.eqname, link.expressionText);
+                    rv += LayoutEquationText(link.eqname, link.expressionText, true, GekkoTime.tNull);
                 }
             }
             return rv;
         }
 
-        public static string LayoutEquationText(string eqname, string expressionText)
+        public static string LayoutEquationText(string eqname, string expressionText, bool showTime, GekkoTime t0)
         {
             string rv = "";
+            if (!showTime) eqname = G.Chop_DimensionSetLag(eqname, t0, false);
             rv += "Equation: " + eqname + "" + G.NL;
             rv += "------------------------------------------" + G.NL;
             rv += expressionText + G.NL + G.NL;

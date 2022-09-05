@@ -85,12 +85,16 @@ namespace Gekko
         {            
             int i = 0;  //TODO TODO TODO!!! qwerty         
             string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);
-            if (false)
+            if (true)
+            {
+                this.EquationBrowserSetEquation(eqName, showTime, t0);
+            }
+            else
             {
                 //we skip parallel coloring for now
                 ModelGamsEquation eq = Program.model.modelGams.equationsByEqname[eqName][0]; //only returns 1            
                 this.EquationBrowserSetEquationButtons(eqName, s, eq.expressionVariablesWithSets[i].equationVariables);
-            }
+            }            
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -108,9 +112,9 @@ namespace Gekko
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
+        public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {            
-            string s = Model.LayoutEquationText(eq, ModelGamsScalar.GetEquationText(eq, showTime, t0));
+            string s = Model.LayoutEquationText(eq, ModelGamsScalar.GetEquationText(eq, showTime, t0), showTime, t0);
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);
         }
@@ -216,7 +220,7 @@ namespace Gekko
             //this._activeVariable = null;
             this.windowEquationBrowserLabel.Inlines.Clear();
 
-            string s7 = Model.LayoutEquationText(eqName, firstText);
+            string s7 = Model.LayoutEquationText(eqName, firstText, true, GekkoTime.tNull);
             this.windowEquationBrowserLabel.Inlines.Add(s7);
 
             //this.windowEquationBrowserLabel.Inlines.Add(firstText);

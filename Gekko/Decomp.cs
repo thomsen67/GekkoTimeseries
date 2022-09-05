@@ -4149,6 +4149,9 @@ namespace Gekko
             eb._activeVariable = null;            
             eb._t1 = o.t1;
             eb._t2 = o.t2;
+
+            eb.EquationBrowserSetEquation(firstEqName, o.showTime, o.t0);
+
             bool? b = eb.ShowDialog();
             rv = eb._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)

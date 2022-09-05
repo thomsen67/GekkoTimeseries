@@ -818,7 +818,8 @@ namespace Gekko
         public static string warningString = "+++ WARNING: ";
         public static string noteString = "+++ NOTE: ";
 
-        public static System.Drawing.Color warningColor = System.Drawing.Color.OrangeRed;
+        //public static System.Drawing.Color warningColor = System.Drawing.Color.OrangeRed;
+        public static System.Drawing.Color warningColor = System.Drawing.Color.FromArgb(51, 102, 204);
         public static System.Windows.Media.Color GrayExcelLine = System.Windows.Media.Color.FromArgb(255, 208, 215, 229); //as in Excel
         public static System.Windows.Media.Color GrayExcelSelect = System.Windows.Media.Color.FromArgb(255, 234, 236, 245);  //as in Excel
         public static System.Drawing.Color LightBlueWord = System.Drawing.Color.FromArgb(74, 130, 189);  //as auto-tables in Word                
