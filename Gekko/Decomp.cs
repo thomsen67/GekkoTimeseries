@@ -4064,7 +4064,7 @@ namespace Gekko
 
                 string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3));
+                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3, eqName));
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];

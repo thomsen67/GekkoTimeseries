@@ -77,8 +77,8 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;            
-            this.EquationBrowserSetEquationAndButtons(item.Name, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
-            this._activeEquation = item.Name;            
+            this.EquationBrowserSetEquationAndButtons(item.fullName, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            this._activeEquation = item.fullName;            
         }
 
         private void EquationBrowserSetEquationAndButtons(string eqName, bool showTime, GekkoTime t0)
@@ -97,7 +97,7 @@ namespace Gekko
         {
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;                        
-            this.EquationBrowserSetEquationAndButtons(item.Name, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            this.EquationBrowserSetEquationAndButtons(item.fullName, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -276,7 +276,7 @@ namespace Gekko
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, bool isSelected)
+        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, bool isSelected, string fullName2)
         {
             Name = name;
             Sub = sub;
@@ -286,6 +286,7 @@ namespace Gekko
             Vars = vars;
             LineColor = lineColor;
             isSelected = isSelected;
+            fullName = fullName2;
         }
 
         public string Name { get; set; }
@@ -303,6 +304,8 @@ namespace Gekko
         public string LineColor { get; set; }
 
         public bool IsSelected { get; set; }
+
+        public string fullName = null;
     }
 
     public class ItemHandler

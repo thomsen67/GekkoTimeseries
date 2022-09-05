@@ -14347,7 +14347,8 @@ namespace Gekko
                                 tt = "tend";
                             }
 
-                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3));
+                            //all this is obsolete anyway...?
+                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3, eqName));
                             lineCounter++;
 
                             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
