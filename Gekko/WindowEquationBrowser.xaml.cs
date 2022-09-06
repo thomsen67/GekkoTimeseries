@@ -59,6 +59,18 @@ namespace Gekko
         {            
             ToggleButton b = sender as ToggleButton;
             string s = b.Content.ToString();
+            if (s.Contains("[-"))
+            {
+                //lag
+                int idx = s.IndexOf("[-");
+                s = G.Substring(s, 0, idx - 1);
+            }
+            else if (s.Contains("[+"))
+            {
+                //lag
+                int idx = s.IndexOf("[+");
+                s = G.Substring(s, 0, idx - 1);
+            }
             this.EquationBrowserSetLabel(s);
         }
 
@@ -154,11 +166,7 @@ namespace Gekko
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
-                //return;
                 
-                //List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
-                //ModelGamsEquation equation = equations[0]; //always only 1
-
                 string residualName = "residual___";
                 int funcCounter = 0;                
                 DecompOperator operatorTemp = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
@@ -176,9 +184,9 @@ namespace Gekko
                 //HMMMM [0]
                 //HMMMM [0]
                 //HMMMM [0]
+                //HMMMM [0] link[0] is ok, but the other [0] is not.
                 //HMMMM [0]
-                //HMMMM [0]
-                //HMMMM [0]
+                //HMMMM [0]                
                 DecompStartHelper dsh = decompOptionsTemp.link[0].GAMS_dsh[0];
 
                 //fixme: [0] must be counter
