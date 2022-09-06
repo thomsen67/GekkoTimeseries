@@ -154,19 +154,38 @@ namespace Gekko
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
-                return;
+                //return;
                 
                 //List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
                 //ModelGamsEquation equation = equations[0]; //always only 1
 
                 string residualName = "residual___";
                 int funcCounter = 0;                
-                DecompOperator op = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
+                DecompOperator operatorTemp = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
 
-                DecompStartHelper dsh = new DecompStartHelper();                
+                //!!! a bit of a waste of time, but is probably not significantly slowing
+                //    down the FIND window.
+                DecompOptions2 decompOptionsTemp = this.findOptions.decompOptions2.Clone();
+
+                //decompOptionsTemp.link.Clear();
+                //decompOptionsTemp.link.Add(new Link());
+
+                decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
+                Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp);
+
+                //HMMMM [0]
+                //HMMMM [0]
+                //HMMMM [0]
+                //HMMMM [0]
+                //HMMMM [0]
+                //HMMMM [0]
+                DecompStartHelper dsh = decompOptionsTemp.link[0].GAMS_dsh[0];
 
                 //fixme: [0] must be counter
-                DecompData dd = Decomp.DecompLowLevelScalar(this.findOptions.t0, this.findOptions.t0, 0, null, op, residualName, ref funcCounter);
+
+                GekkoTime gt1, gt2;
+                DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.findOptions.t0, this.findOptions.t0, decompOptionsTemp.prtOptionLower);
+                DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
 
                 double max = 0d;
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)

@@ -2527,7 +2527,7 @@ namespace Gekko
                 Link temp = new Link();
                 temp.varnames = x1.varnames;
                 temp.eqname = x1.eqname;
-                temp.expressions = x1.expressions; //probably ok not to clone
+                temp.expressions = x1.expressions; //shallow copy
                 d.link.Add(temp);
             }
 
@@ -2565,10 +2565,13 @@ namespace Gekko
                 tempEndo.Add(s);
             }
             d.new_endo = tempEndo;
-
-            d.dataPattern = new Data();
-            d.dataPattern.dataCellsGradQuo = (Series)this.dataPattern.dataCellsGradQuo.DeepClone(null);
-            d.dataPattern.dataCellsGradRef = (Series)this.dataPattern.dataCellsGradRef.DeepClone(null);
+            
+            if (this.dataPattern != null)
+            {
+                d.dataPattern = new Data();
+                d.dataPattern.dataCellsGradQuo = (Series)this.dataPattern.dataCellsGradQuo.DeepClone(null);
+                d.dataPattern.dataCellsGradRef = (Series)this.dataPattern.dataCellsGradRef.DeepClone(null);
+            }
 
             return d;
         }

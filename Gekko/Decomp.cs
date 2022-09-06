@@ -503,23 +503,11 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <returns></returns>
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
-        {
-            DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
+        {   
+            GekkoTime gt1, gt2;
+            DecompOperator op = DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.prtOptionLower);
+
             decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
-
-            GekkoTime gt1 = per1;
-            GekkoTime gt2 = per2;
-            if (op.isRaw)
-            {
-                gt1 = per1.Add(op.lagData[0]);
-                gt2 = per2.Add(op.lagData[1]);
-            }
-            else
-            {
-                gt1 = per1.Add(op.lagGradient[0]);
-                gt2 = per2.Add(op.lagGradient[1]);
-            }
-
             DateTime t0 = DateTime.Now;
 
             //EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
@@ -545,7 +533,7 @@ namespace Gekko
 
             int funcCounter = 0;
             //G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
-            
+
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
                 PrepareEquations(per1, per2, op, decompOptions2);
@@ -604,7 +592,7 @@ namespace Gekko
                 {
                     DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
                 }
-                
+
                 bool[] used = new bool[decompDatas.storage.Count];
                 used[0] = true;  //primary equation
 
@@ -613,7 +601,7 @@ namespace Gekko
                 //linking
                 //linking
                 //linking
-                
+
 
                 //------------------------
                 //Example: e1: y = c + i + g  --> y - (c + i + g)
@@ -641,7 +629,7 @@ namespace Gekko
                         else
                         {
                             //decomp period by period, showing lags/leads.
-                            
+
                             if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                             {
                                 bool refreshObjects = true;
@@ -652,7 +640,7 @@ namespace Gekko
                                 }
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                                 {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op);                                    
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op);
                                 }
                             }
                             else
@@ -731,6 +719,24 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        public static DecompOperator DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, string prtOption)
+        {
+            DecompOperator op = new DecompOperator(prtOption);
+            gt1 = per1;
+            gt2 = per2;
+            if (op.isRaw)
+            {
+                gt1 = per1.Add(op.lagData[0]);
+                gt2 = per2.Add(op.lagData[1]);
+            }
+            else
+            {
+                gt1 = per1.Add(op.lagGradient[0]);
+                gt2 = per2.Add(op.lagGradient[1]);
+            }
+            return op;
         }
 
         private static void PrintDecompData(DecompData y)
@@ -958,7 +964,16 @@ namespace Gekko
             }
         }
 
-        private static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2)
+        /// <summary>
+        /// Gathers info that makes it easier to use the equations for decomp later on.
+        /// Only does it for the used equations, not all equations.
+        /// Uses lists from .new_from, .new_endo and .new_select.
+        /// </summary>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="operator1"></param>
+        /// <param name="decompOptions2"></param>
+        public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2)
         {
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
@@ -4142,6 +4157,9 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// This is probably only for equation names
+    /// </summary>
     public class DecompStartHelper
     {
         public string name = null; //the "x" in "x[a, b, <time>]"
