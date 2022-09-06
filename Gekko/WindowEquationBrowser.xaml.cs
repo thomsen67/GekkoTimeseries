@@ -193,7 +193,7 @@ namespace Gekko
                     double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                     if (G.isNumericalError(v)) v = 0d;
                     else v = Math.Abs(v);
-                    max = Math.Max(v, max);
+                    max = Math.Max(v, max); 
                 }
 
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
