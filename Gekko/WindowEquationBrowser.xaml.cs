@@ -27,11 +27,11 @@ namespace Gekko
 
         public string _activeEquation = null; //this always has a non-null value
         public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
-        public GekkoTime _t1 = GekkoTime.tNull;
-        public GekkoTime _t2 = GekkoTime.tNull;
+        //public GekkoTime _t1 = GekkoTime.tNull;
+        //public GekkoTime _t2 = GekkoTime.tNull;
         public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);        
         public O.Find findOptions = null;
-        public DecompOptions2 decompOptions2 = null;
+        //public DecompOptions2 decompOptions2 = null;
 
         public WindowEquationBrowser(O.Find o)
         {
@@ -89,7 +89,10 @@ namespace Gekko
             int i = 0;  //TODO TODO TODO!!! qwerty         
             string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);            
             this.EquationBrowserSetEquation(eqName, showTime, t0);
-            this.EquationBrowserSetEquationButtons(eqName, "lkdfjaf", new List<string>() { "lkj", "kljlkj" });                        
+            if (false)
+            {
+                this.EquationBrowserSetEquationButtons(eqName, "lkdfjaf", new List<string>() { "lkj", "kljlkj" });
+            }
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -127,7 +130,7 @@ namespace Gekko
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, _t1, _t2, null);
+            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);
             this.windowEquationBrowserLabel.Inlines.Clear();
             foreach (string s in ss)
             {
@@ -158,15 +161,15 @@ namespace Gekko
 
                 string residualName = "residual___";
                 int funcCounter = 0;                
-                DecompOperator op = new DecompOperator(this.decompOptions2.operatorHelper.guiDecompOperator);
+                DecompOperator op = new DecompOperator(this.findOptions.decompOptions2.operatorHelper.guiDecompOperator);
                 
                 //fixme: [0] must be counter
-                DecompData dd = Decomp.DecompLowLevelScalar(_t1, _t1, 0, null, op, residualName, ref funcCounter);
+                DecompData dd = Decomp.DecompLowLevelScalar(this.findOptions.t0, this.findOptions.t0, 0, null, op, residualName, ref funcCounter);
 
                 double max = 0d;
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                 {
-                    double v = kvp.Value.GetDataSimple(_t1);
+                    double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                     if (G.isNumericalError(v)) v = 0d;
                     else v = Math.Abs(v);
                     max = Math.Max(v, max);
@@ -175,7 +178,7 @@ namespace Gekko
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                 {
                     string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                    double v = kvp.Value.GetDataSimple(_t1);
+                    double v = kvp.Value.GetDataSimple(this.findOptions.t0);
 
                     ToggleButton b = null;
                     _buttons.TryGetValue(ss5, out b);
@@ -216,12 +219,12 @@ namespace Gekko
                     }
 
                     //fixme: [0] must be counter
-                    DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                    DecompData dd = Gekko.Decomp.DecompLowLevel(this.findOptions.t0, this.findOptions.t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
 
                     double max = 0d;
                     foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                     {
-                        double v = kvp.Value.GetDataSimple(_t1);
+                        double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                         if (G.isNumericalError(v)) v = 0d;
                         else v = Math.Abs(v);
                         max = Math.Max(v, max);
@@ -230,7 +233,7 @@ namespace Gekko
                     foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                     {
                         string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                        double v = kvp.Value.GetDataSimple(_t1);
+                        double v = kvp.Value.GetDataSimple(this.findOptions.t0);
 
                         ToggleButton b = null;
                         _buttons.TryGetValue(ss5, out b);

@@ -4141,14 +4141,15 @@ namespace Gekko
 
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser(o);
+            //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;            
-            eb._t1 = o.decompOptions2.t1;
-            eb._t2 = o.decompOptions2.t2;
+            //eb._t1 = o.decompOptions2.t1;
+            //eb._t2 = o.decompOptions2.t2;
 
             eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 
