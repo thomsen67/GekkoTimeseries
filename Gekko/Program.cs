@@ -14366,14 +14366,14 @@ namespace Gekko
             }
 
             string rv = null;
-            WindowEquationBrowser eb = new WindowEquationBrowser();
+            WindowEquationBrowser eb = new WindowEquationBrowser(null);
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             //eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;
-            eb._t1 = o.t1;
-            eb._t2 = o.t2;
+            eb._t1 = o.decompOptions2.t1;
+            eb._t2 = o.decompOptions2.t2;
             bool? b = eb.ShowDialog();
             rv = eb._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)

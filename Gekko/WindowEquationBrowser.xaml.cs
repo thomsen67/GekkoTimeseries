@@ -29,10 +29,13 @@ namespace Gekko
         public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
         public GekkoTime _t1 = GekkoTime.tNull;
         public GekkoTime _t2 = GekkoTime.tNull;
-        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);        
+        public O.Find findOptions = null;
+        public DecompOptions2 decompOptions2 = null;
 
-        public WindowEquationBrowser()
-        {            
+        public WindowEquationBrowser(O.Find o)
+        {
+            this.findOptions = o;
             InitializeComponent();
             this.windowEquationBrowserListView.SelectedIndex = 0;
             this.windowEquationBrowserListView.Focus();            
@@ -49,7 +52,7 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {            
             this._activeVariable = null;
-            this.EquationBrowserSetEquation(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -70,45 +73,37 @@ namespace Gekko
             }
             else
             {                
-                this.EquationBrowserSetEquation(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+                this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             }
         }
 
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;            
-            this.EquationBrowserSetEquationAndButtons(item.fullName, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            this.EquationBrowserSetEquationAndButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeEquation = item.fullName;            
         }
 
         private void EquationBrowserSetEquationAndButtons(string eqName, bool showTime, GekkoTime t0)
         {            
             int i = 0;  //TODO TODO TODO!!! qwerty         
-            string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);
-            if (true)
-            {
-                this.EquationBrowserSetEquation(eqName, showTime, t0);
-            }
-            else
-            {
-                //we skip parallel coloring for now
-                ModelGamsEquation eq = Program.model.modelGams.equationsByEqname[eqName][0]; //only returns 1            
-                this.EquationBrowserSetEquationButtons(eqName, s, eq.expressionVariablesWithSets[i].equationVariables);
-            }            
+            string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);            
+            this.EquationBrowserSetEquation(eqName, showTime, t0);
+            this.EquationBrowserSetEquationButtons(eqName, "lkdfjaf", new List<string>() { "lkj", "kljlkj" });                        
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;                        
-            this.EquationBrowserSetEquationAndButtons(item.fullName, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            this.EquationBrowserSetEquationAndButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
             bool showTime = false;
-            GekkoTime t0 = Globals.uglyHack_find.t1;            
-            this.EquationBrowserSetEquationAndButtons(_activeEquation, Globals.uglyHack_find.showTime, Globals.uglyHack_find.t0);
+            GekkoTime t0 = this.findOptions.decompOptions2.t1;            
+            this.EquationBrowserSetEquationAndButtons(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
@@ -148,13 +143,50 @@ namespace Gekko
             //If the coloring is very time-consuming, scrolling down with arrows may freeze a bit. To solve this,
             //a background worker thread that is no longer relevant would need to be killed
             //or we could wait 0.5 second before any coloring?
-            this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);
+            if (false)
+            {
+                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);
+            }
         }
 
         public void EquationBrowserSetEquationButtons2(string eqName)
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
+                //List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
+                //ModelGamsEquation equation = equations[0]; //always only 1
+
+                string residualName = "residual___";
+                int funcCounter = 0;                
+                DecompOperator op = new DecompOperator(this.decompOptions2.operatorHelper.guiDecompOperator);
+                
+                //fixme: [0] must be counter
+                DecompData dd = Decomp.DecompLowLevelScalar(_t1, _t1, 0, null, op, residualName, ref funcCounter);
+
+                double max = 0d;
+                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                {
+                    double v = kvp.Value.GetDataSimple(_t1);
+                    if (G.isNumericalError(v)) v = 0d;
+                    else v = Math.Abs(v);
+                    max = Math.Max(v, max);
+                }
+
+                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                {
+                    string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                    double v = kvp.Value.GetDataSimple(_t1);
+
+                    ToggleButton b = null;
+                    _buttons.TryGetValue(ss5, out b);
+                    if (b != null)
+                    {
+                        int i1 = 240;
+                        int i2 = 255;
+                        int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                        b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
+                    }
+                }
 
             }
             else if (G.GetModelType() == EModelType.GAMSRaw)

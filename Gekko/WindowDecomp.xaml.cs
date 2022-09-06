@@ -72,7 +72,8 @@ namespace Gekko
         private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
         ListViewDragDropManager<GekkoTask> dragMgr;
 
-        public DecompOptions2 decompOptions2 = null;
+        public DecompOptions2 decompOptions2 = null;        
+        public string uglyHack_name = null;
 
         public ObservableCollection<GekkoTask> taskList
         {
@@ -98,22 +99,16 @@ namespace Gekko
             if (task.Pivot_TaskType == TaskType.Filters) isTree = true;            
 
             if (isTree)
-            {
-                Globals.uglyHack_decompOptions2 = decompOptions2;  //ugly hack to use global variable, but the treeView cannot be opened more than 1 at a time anyway.
-                Globals.uglyHack_name = task.Pivot_Text;
+            {                
                 WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
                 w.ShowDialog();
-                Globals.uglyHack_decompOptions2 = null;
-                Globals.uglyHack_name = null;
 
                 System.Windows.Controls.TreeView tree = w.tree;
                 List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
                 FooViewModel model = items[0];
                 List<string> selected = new List<string>();
                 Walk(model, selected, 0);
-                //
-
-                
+                //                                
 
                 List<string> selectedOld = null;
 
@@ -1534,39 +1529,39 @@ namespace Gekko
                 //string var = c.CellText.TextData[0];
                 string var = vars[0];  //#dskla8asjkdfa
 
-                O.Find o = new O.Find();
+                O.Find o = new O.Find(this.decompOptions2);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
-                o.opt_prtcode = this.decompOptions2.prtOptionLower;
-                o.t1 = this.decompOptions2.t1;
-                o.t2 = this.decompOptions2.t2;
+                //o.opt_prtcode = this.decompOptions2.prtOptionLower;
+                //o.t1 = this.decompOptions2.t1;
+                //o.t2 = this.decompOptions2.t2;
                 o.Exe();
 
-                if (o.rv != null)
-                {
-                    // ---------------------------------------
-                    // DECOMP
-                    // ---------------------------------------
-                    O.Decomp2 o0 = new O.Decomp2();
-                    o0.type = @"ASTDECOMP3";
-                    o0.label = o.rv;
-                    o0.t1 = o.t1;
-                    o0.t2 = o.t2;
-                    o0.opt_prtcode = o.opt_prtcode;
+                //if (o.rv != null)
+                //{
+                //    // ---------------------------------------
+                //    // DECOMP
+                //    // ---------------------------------------
+                //    O.Decomp2 o0 = new O.Decomp2();
+                //    o0.type = @"ASTDECOMP3";
+                //    o0.label = o.rv;
+                //    o0.t1 = o.t1;
+                //    o0.t2 = o.t2;
+                //    o0.opt_prtcode = o.opt_prtcode;
 
-                    o0.decompItems = new List<DecompItems>();                    
+                //    o0.decompItems = new List<DecompItems>();                    
 
-                    o0.select.Add(O.FlattenIVariablesSeq(false, new
-                     List(new List<IVariable> { new ScalarString(var) })));
+                //    o0.select.Add(O.FlattenIVariablesSeq(false, new
+                //     List(new List<IVariable> { new ScalarString(var) })));
 
-                    o0.from.Add(O.FlattenIVariablesSeq(false,
-                     new List(new List<IVariable> { new ScalarString(o.rv) })));
+                //    o0.from.Add(O.FlattenIVariablesSeq(false,
+                //     new List(new List<IVariable> { new ScalarString(o.rv) })));
 
-                    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
-                     List<IVariable> { new ScalarString(var) })));
+                //    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
+                //     List<IVariable> { new ScalarString(var) })));
 
-                    o0.Exe();
-                }
+                //    o0.Exe();
+                //}
             }
             else
             {
@@ -1786,13 +1781,17 @@ namespace Gekko
 
             }
             catch (Exception e)
-            {
+            {                
                 if (G.IsUnitTesting())
                 {
                     throw e;  //we want that error for unist tests!
                 }
                 else
                 {
+                    if (Globals.runningOnTTComputer)
+                    {
+                        MessageBox.Show(e.Message + " --trace-> " + e.StackTrace);
+                    }
                     this.isClosing = true;
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
                     throw e;
@@ -2387,6 +2386,7 @@ namespace Gekko
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
         public EModelType modelType = EModelType.Unknown;
         public bool missingAsZero = false;
+        public bool showTime = false;
 
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();

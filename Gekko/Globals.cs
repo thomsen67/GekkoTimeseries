@@ -121,6 +121,9 @@ namespace Gekko
         
         public static List<string> unitTestsPromtingHelper = null;
 
+        public static string uglyHack_name;  //only for a treeview window
+        public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
+
         public static bool nolog = false;      //-nolog parameter for gekko.exe
         public static bool hideGui = false;    //true for use without GUI window
         public static bool excelDna = false;  //true for use with ExcelDna solution
@@ -163,11 +166,7 @@ namespace Gekko
 
         public static string equationCodeY = "y";
         public static string equationCodeT = "t";
-        public static string equationCodeP = "p";
-
-        public static DecompOptions2 uglyHack_decompOptions2 = null;
-        public static string uglyHack_name = null;
-        public static O.Find uglyHack_find = null;
+        public static string equationCodeP = "p";        
 
         public static bool isAgeHierarchy = true;
         public static string ageHierarchyDivider = "..";

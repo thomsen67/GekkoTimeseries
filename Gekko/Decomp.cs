@@ -4013,9 +4013,8 @@ namespace Gekko
             //For scalar model            
 
             Globals.itemHandler = new ItemHandler();  //hack
-
-            if (!o.t1.Equals(o.t2)) new Error("FIND expects same start and end period");
-            o.t0 = o.t1;  //selected time
+                        
+            o.t0 = o.decompOptions2.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
@@ -4033,7 +4032,7 @@ namespace Gekko
             List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
             foreach (int eq in eqNumbers)
             {
-                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, o.showTime, o.t0);
+                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, o.decompOptions2.showTime, o.t0);
                 new Writeln(equationText);
                 string eqName = Program.model.modelGamsScalar.GetEqName(eq);
 
@@ -4044,7 +4043,7 @@ namespace Gekko
                     PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eq][i], Program.model.modelGamsScalar.bb[eq][i + 1]);
                     Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
                     string name2 = null;
-                    if (o.showTime)
+                    if (o.decompOptions2.showTime)
                     {
                         name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
                     }
@@ -4141,16 +4140,17 @@ namespace Gekko
             //}
 
             string rv = null;
-            WindowEquationBrowser eb = new WindowEquationBrowser();
+            WindowEquationBrowser eb = new WindowEquationBrowser(o);
+            //eb.findOptions = o;
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;            
-            eb._t1 = o.t1;
-            eb._t2 = o.t2;
+            eb._t1 = o.decompOptions2.t1;
+            eb._t2 = o.decompOptions2.t2;
 
-            eb.EquationBrowserSetEquation(firstEqName, o.showTime, o.t0);
+            eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 
             bool? b = eb.ShowDialog();
             rv = eb._activeEquation;
