@@ -1149,12 +1149,13 @@ namespace Gekko
         /// <summary>
         /// Adds a dimension to a name. If inputName = "x" and inputIndex = "40", the result
         /// will be x[40]. If inputName is "x[a, b]", the result will be "x[a, b, 40]".
+        /// Last argument true means between commas (normal).
         /// Dimension is always added last.
         /// </summary>
         /// <param name="inputName"></param>
         /// <param name="inputIndex"></param>
         /// <returns></returns>
-        public static string Chop_DimensionAddLast(string inputName, string inputIndex)
+        public static string Chop_DimensionAddLast(string inputName, string inputIndex, bool listBlanks)
         {
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
@@ -1170,17 +1171,22 @@ namespace Gekko
                 Array.Copy(indexes, indexes2, indexes2.Length - 1);
                 indexes2[indexes2.Length - 1] = inputIndex;
             }
-            return G.Chop_Unchop(bank, name, freq, indexes2, true);
+            return G.Chop_Unchop(bank, name, freq, indexes2, listBlanks);
         }
 
-        /// <summary>
-        /// Removes last dimension. For instance, "x[40]" becomes "x", and "x[a, b, 40]" becomes "x[a, b]".
-        /// If no dimension like "x", the result will also be "x".
-        /// </summary>
-        /// <param name="inputName"></param>
-        /// <param name="inputIndex"></param>
-        /// <returns></returns>
-        public static string Chop_DimensionRemoveLast(string inputName)
+        public static string Chop_DimensionAddLast(string inputName, string inputIndex)
+        {
+            return Chop_DimensionAddLast(inputName, inputIndex, true);
+        }
+
+            /// <summary>
+            /// Removes last dimension. For instance, "x[40]" becomes "x", and "x[a, b, 40]" becomes "x[a, b]".
+            /// If no dimension like "x", the result will also be "x".
+            /// </summary>
+            /// <param name="inputName"></param>
+            /// <param name="inputIndex"></param>
+            /// <returns></returns>
+            public static string Chop_DimensionRemoveLast(string inputName)
         {            
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);

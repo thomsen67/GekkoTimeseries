@@ -453,7 +453,12 @@ namespace Gekko
                 if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                 DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
                 //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
-                string s2 = AddTimeToIndexes(s, time);
+                //
+
+                //string s2 = AddTimeToIndexes(s, time);
+
+                string s2 = G.Chop_DimensionAddLast(s, time.ToString(), false);
+
                 int eqNumber = -12345;
                 bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
                 if (!b)
@@ -466,25 +471,10 @@ namespace Gekko
                 element.periods[i] = elementPeriod;
             }
         }
-
+        
         /// <summary>
-        /// Adds time to an index like x[a, b, c] so it becomes x[a,b,c,2020] for instance.
-        /// Note: no blanks used after commas. Particular method only for use in Decomp.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        private static string AddTimeToIndexes(string s, GekkoTime time)
-        {
-            List<string> indexes2 = G.Chop_GetIndex(s);
-            string name2 = G.Chop_GetName(s);
-            indexes2.Add(time.ToString());
-            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), false);
-            return s2;
-        }
-
-        /// <summary>
-        /// Overload, using a list of indexes instead.
+        /// For a name like "x" and a list like {"a", "b"}, time is added and returns like for instance "x[a,b,2001]".
+        /// Note no blanks.
         /// </summary>
         /// <param name="name2"></param>
         /// <param name="indexes2"></param>

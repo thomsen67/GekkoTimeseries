@@ -161,8 +161,10 @@ namespace Gekko
 
                 string residualName = "residual___";
                 int funcCounter = 0;                
-                DecompOperator op = new DecompOperator(this.findOptions.decompOptions2.operatorHelper.guiDecompOperator);
-                
+                DecompOperator op = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
+
+                DecompStartHelper dsh = new DecompStartHelper();                
+
                 //fixme: [0] must be counter
                 DecompData dd = Decomp.DecompLowLevelScalar(this.findOptions.t0, this.findOptions.t0, 0, null, op, residualName, ref funcCounter);
 
