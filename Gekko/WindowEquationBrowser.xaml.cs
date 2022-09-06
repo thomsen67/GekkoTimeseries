@@ -86,13 +86,11 @@ namespace Gekko
 
         private void EquationBrowserSetEquationAndButtons(string eqName, bool showTime, GekkoTime t0)
         {            
-            int i = 0;  //TODO TODO TODO!!! qwerty         
-            string s = ModelGamsScalar.GetEquationText(eqName, showTime, t0);            
+            string s = Program.model.modelGamsScalar.GetEquationText(eqName, showTime, t0);
             this.EquationBrowserSetEquation(eqName, showTime, t0);
-            if (false)
-            {
-                this.EquationBrowserSetEquationButtons(eqName, "lkdfjaf", new List<string>() { "lkj", "kljlkj" });
-            }
+            int eqNumber = Program.model.modelGamsScalar.GetEqNumber(eqName);
+            List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
+            this.EquationBrowserSetEquationButtons(eqName, s, precedents);
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
@@ -112,7 +110,7 @@ namespace Gekko
 
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {            
-            string s = Model.LayoutEquationText(eq, ModelGamsScalar.GetEquationText(eq, showTime, t0), showTime, t0);
+            string s = Model.LayoutEquationText(eq, Program.model.modelGamsScalar.GetEquationText(eq, showTime, t0), showTime, t0);
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);
         }
@@ -146,7 +144,7 @@ namespace Gekko
             //If the coloring is very time-consuming, scrolling down with arrows may freeze a bit. To solve this,
             //a background worker thread that is no longer relevant would need to be killed
             //or we could wait 0.5 second before any coloring?
-            if (false)
+            if (true)
             {
                 this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);
             }
@@ -156,6 +154,8 @@ namespace Gekko
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
+                return;
+                
                 //List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
                 //ModelGamsEquation equation = equations[0]; //always only 1
 

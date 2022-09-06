@@ -4030,29 +4030,13 @@ namespace Gekko
             int lineCounter = 0;
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.precedents[pav];
-            foreach (int eq in eqNumbers)
+            foreach (int eqNumber in eqNumbers)
             {
-                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, o.decompOptions2.showTime, o.t0);
+                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompOptions2.showTime, o.t0);
                 new Writeln(equationText);
-                string eqName = Program.model.modelGamsScalar.GetEqName(eq);
 
-                List<string> xx = new List<string>();
-                for (int i = 0; i < Program.model.modelGamsScalar.bb[eq].Length; i += 2)
-                {
-                    //see also #as7f3læaf9
-                    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eq][i], Program.model.modelGamsScalar.bb[eq][i + 1]);
-                    Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
-                    string name2 = null;
-                    if (o.decompOptions2.showTime)
-                    {
-                        name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
-                    }
-                    else
-                    {
-                        name2 = G.Chop_DimensionAddLag(tup.Item1, o.t0, tup.Item2, false);
-                    }
-                    xx.Add(name2);
-                }
+                string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
+                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompOptions2.showTime, o.t0);
 
                 string bool1 = "";
                 string bool2 = "";
@@ -4063,7 +4047,7 @@ namespace Gekko
 
                 string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(xx, true), "Black", lineCounter == 3, eqName));
+                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 3, eqName));
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
@@ -4072,10 +4056,10 @@ namespace Gekko
                 {
                     firstText = equationText;
                     firstEqName = eqName;
-                    firstList.AddRange(xx);
+                    firstList.AddRange(precedents);
                 }
             }
-            
+
             //foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
             //{
             //    string eqName = kvp.Value[0].nameGams;  //has only 1

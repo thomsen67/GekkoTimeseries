@@ -666,6 +666,36 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For an equation number, get the string names of precedents. If showTime is false, a list like "x", "x[-1]"
+        /// is returned, else a list like "x[2001]", "x[2000]" is returned. In the latter case, t0 can be set to TNull.
+        /// </summary>
+        /// <param name="eqNumber"></param>
+        /// <param name="showTime"></param>
+        /// <param name="t0"></param>
+        /// <returns></returns>
+        public List<string> GetPrecedentsNames(int eqNumber, bool showTime, GekkoTime t0)
+        {
+            List<string> precedents = new List<string>();
+            for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+            {
+                //see also #as7f3læaf9
+                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
+                string name2 = null;
+                if (showTime)
+                {
+                    name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
+                }
+                else
+                {
+                    name2 = G.Chop_DimensionAddLag(tup.Item1, t0, tup.Item2, false);
+                }
+                precedents.Add(name2);
+            }
+            return precedents;
+        }
+
+        /// <summary>
         /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into Program.model.modelGamsScalar.r array,
         /// at the slot i. Note that this is slightly slower than calling functions[...] directly, so beware
         /// if calling it in a tight loop.
@@ -1011,13 +1041,13 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetEquationText(string name, bool showTime, GekkoTime t0)
+        public string GetEquationText(string name, bool showTime, GekkoTime t0)
         {
             int i = -12345;
-            bool ok = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
+            bool ok = this.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
             if (!ok) i = -12345;
             if (i == -12345) new Error("Could not find equation name '" + name + "'");
-            string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(i, showTime, t0);
+            string s = this.GetEquationTextUnfolded(i, showTime, t0);
             return s;
         }
 
