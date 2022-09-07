@@ -15159,7 +15159,7 @@ string cc1b=
         [TestMethod]
         public void _Test_StackTrace1()
         {
-            I("RESET;");
+            I("RESET;"); 
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
             string s = null;
             string ss = null;
