@@ -684,10 +684,9 @@ namespace Gekko
         public List<string> GetPrecedentsNames(int eqNumber, bool showTime, GekkoTime t0)
         {
             List<string> precedents = new List<string>();
-            for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+            foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
             {
-                //see also #as7f3læaf9
-                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                //see also #as7f3læaf9                
                 Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
                 string name2 = null;
                 if (showTime)

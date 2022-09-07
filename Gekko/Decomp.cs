@@ -1357,10 +1357,8 @@ namespace Gekko
                             int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[eqName];
 
                             //foreach precedent variable
-                            for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                            foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
                             {
-                                //see also #as7f3læaf9
-                                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
                                 int date = dp.date;
                                 string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date, Program.model.modelGamsScalar.t0);
@@ -2338,13 +2336,14 @@ namespace Gekko
                     double y1 = double.NaN;
 
                     //foreach precedent variable
-                    for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                    int i = -1;
+                    foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
                     {
                         // --------------------------------------------
                         // This is where the decomposition takes place
                         // --------------------------------------------
 
-                        PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                        i++;
                         string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
 
                         if (op.isRaw)
