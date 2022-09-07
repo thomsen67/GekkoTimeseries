@@ -634,7 +634,15 @@ namespace Gekko
         /// modulo.
         /// </summary>
         [ProtoMember(25)]
-        public GekkoDictionary<PeriodAndVariable, List<int>> precedents = null;
+        public GekkoDictionary<PeriodAndVariable, List<int>> dependents = null;
+
+        /// <summary>
+        /// Points an equation number to a list of period-and-variables, that is, the variables
+        /// that are part of the equation. Does not contain dublets, in contrast to the
+        /// bb array.b e
+        /// </summary>
+        [ProtoMember(27)]
+        public List<ModelScalarEquation> precedents = null;
 
         /// <summary>
         /// Condensed equations in text format
@@ -1155,6 +1163,13 @@ namespace Gekko
             return sb.ToString().Trim();
         }
 
+    }
+
+    [ProtoContract]
+    public class ModelScalarEquation
+    {
+        [ProtoMember(1)]
+        public List<PeriodAndVariable> vars = new List<PeriodAndVariable>();
     }
 
     [ProtoContract]

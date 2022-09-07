@@ -292,7 +292,7 @@ namespace Gekko
             code.AppendLine("}");  //end class
             code.AppendLine("}");  //end namespace
 
-            if (false)
+            if (Globals.PPP)
             {
                 File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
             }
@@ -1142,25 +1142,40 @@ namespace Gekko
                 Program.model.modelGamsScalar.csCodeLines = csCodeLines;
                 Program.model.modelGamsScalar.gamsFoldedModel = gamsFoldedModel;
 
-                Program.model.modelGamsScalar.precedents = new GekkoDictionary<PeriodAndVariable, List<int>>();
-                //mapping from a varname to the equations it is part of                
+                Program.model.modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
+
+                Program.model.modelGamsScalar.precedents = new List<ModelScalarEquation>();
                 for (int eqNumber = 0; eqNumber < Program.model.modelGamsScalar.CountEqs(1); eqNumber++)
                 {
+                    ModelScalarEquation l = new ModelScalarEquation();
+                    Program.model.modelGamsScalar.precedents.Add(l);
                     //foreach precedent variable
                     for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
                     {
                         PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                        if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
+                    }
+                }
+
+                //mapping from a varname to the equations it is part of                
+                for (int eqNumber = 0; eqNumber < Program.model.modelGamsScalar.CountEqs(1); eqNumber++)
+                {
+                    //foreach precedent variable
+                    foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
+                    {
+                        //for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                        //{
+                        //PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                         List<int> eqsHere = null;
-                        Program.model.modelGamsScalar.precedents.TryGetValue(dp, out eqsHere);
+                        Program.model.modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
                         if (eqsHere == null)
                         {
-                            Program.model.modelGamsScalar.precedents.Add(dp, new List<int>() { eqNumber });
+                            Program.model.modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
                         }
                         else
                         {
                             if (eqsHere.Contains(eqNumber))
                             {
-                                var xx = Program.model.modelGamsScalar.bb[eqNumber];
                                 new Error("Strange!");
                             }
                             eqsHere.Add(eqNumber);
@@ -1170,7 +1185,7 @@ namespace Gekko
 
                 if (false && Globals.runningOnTTComputer)
                 {
-                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in Program.model.modelGamsScalar.precedents)
+                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in Program.model.modelGamsScalar.dependents)
                     {
                         string varName = Program.model.modelGamsScalar.GetVarNameA(kvp.Key.variable);
                         GekkoTime t = Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
@@ -1433,12 +1448,14 @@ namespace Gekko
                     ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);                    
                     int i1 = (GekkoTime.Observations(helper.t0, time) - 1);
                     int i2 = helper.dict_FromVarNameToANumber[resultingFullName];
-                    HandleEqLineAppend(helper, i, "a[b[" + helper.endo.Count + "]][b[" + (helper.endo.Count + 1) + "]]");
-                    bool good = true;
+                                        
+                    int ii1 = helper.endo.Count;
+                    int ii2 = helper.endo.Count + 1;
 
-                    bool useDict = true;
-                    if (true)
-                    {
+
+                    bool seenBefore = false;
+                    if (Globals.XX_removedublets)
+                    {                        
                         //tested that a dictionary<int, int> with (x-)number as key is not faster
                         //maybe lookup is faster for long eqs, but an int has to be added to dict
                         //each time. So for now, we just search the list.
@@ -1446,13 +1463,17 @@ namespace Gekko
                         {
                             if (helper.endo[ii] == i1 && helper.endo[ii + 1] == i2)
                             {
-                                good = false;
+                                seenBefore = true;
+                                ii1 = ii;
+                                ii2 = ii + 1;
                                 break;
                             }
                         }
                     }
 
-                    if (good)
+                    HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]][b[" + ii2 + "]]");
+                                        
+                    if (!seenBefore)
                     {
                         //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
                         helper.endo.Add(i1);
@@ -1484,6 +1505,18 @@ namespace Gekko
             helper.count++;
             helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
             helper.b.Add(helper.endo);  //also works as precedents
+
+            if (Globals.PPP)
+            {
+                string s = null;
+                for (int i = 0; i < helper.endo.Count; i++)
+                {
+                    s += helper.endo[i] + " ";
+                    if (i % 2 == 1) s += "--- ";
+                }
+                MessageBox.Show(s);
+            }
+
             helper.c.AddRange(helper.exoValues);            
             helper.d.Add(helper.exo);
 

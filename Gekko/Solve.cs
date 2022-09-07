@@ -753,7 +753,21 @@ namespace Gekko
                         for (int i = 0; i < Program.model.modelGamsScalar.eqCounts; i++)
                         {
                             functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
-                                                                    //double x = r[i];                        
+                                                                    //double x = r[i];  
+
+                            //if (false && i == 1)
+                            //{
+                            //    int[] b = bb[i];
+                            //    int[] d = dd[i];   //      0 1   2 3   4 5   6 7   8 9
+                            //    //-------------------------------------------------------
+                            //    double[] c = cc;   // b's: 1 0   2 0   0 0
+                            //    //                    b's: 1 0   2 0   1 0   2 0   0 0
+                            //      double ri = -c[d[0]] * a[b[0]][b[1]] + a[b[2]][b[3]] / (c[d[1]] + a[b[0]][b[1]]) + M.Tanh(c[d[2]] * a[b[2]][b[3]]) + M.Sqr(a[b[0]][b[1]]) - (c[d[3]]);
+                            //    //double ri = -c[d[0]] * a[b[0]][b[1]] + a[b[2]][b[3]] / (c[d[1]] + a[b[4]][b[5]]) + M.Tanh(c[d[2]] * a[b[6]][b[7]]) + M.Sqr(a[b[8]][b[9]]) - (c[d[3]]);
+                            //    double dif = ri - r[i];
+
+                            //}
+
                         }
                     }
                     new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
