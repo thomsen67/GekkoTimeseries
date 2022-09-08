@@ -4035,10 +4035,8 @@ namespace Gekko
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.dependents[pav];
             foreach (int eqNumber in eqNumbers)
-            {
-                string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompOptions2.showTime, o.t0);
-                new Writeln(equationText);
-
+            {               
+                
                 string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
                 List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompOptions2.showTime, o.t0);
 
@@ -4055,78 +4053,17 @@ namespace Gekko
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-
+                
                 if (firstText == null)
                 {
+                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompOptions2.showTime, o.t0);
                     firstText = equationText;
                     firstEqName = eqName;
                     firstList.AddRange(precedents);
                 }
             }
 
-            //foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
-            //{
-            //    string eqName = kvp.Value[0].nameGams;  //has only 1
-
-            //    int counter = 0;
-            //    foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
-            //    {
-            //        if (eqVarsGams == null) continue;
-            //        counter++;
-            //        {
-            //            bool found = false;
-            //            foreach (string ss in eqVarsGams.equationVariables) //foreach variable (first item is name)
-            //            {
-            //                string[] ss2 = ss.Split('¤');
-            //                string ss3 = ss2[0];
-            //                if (ss2.Length > 1 && ss2[1] == "[0]")
-            //                {
-            //                    if (G.Equal(variableName, ss3))
-            //                    {
-            //                        found = true;
-            //                        break;
-            //                    }
-            //                }
-            //            }
-
-            //            if (found)
-            //            {
-            //                //List<string> yy = m3;
-            //                string xx = G.ReplaceTurtle(Stringlist.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
-
-            //                string bool1 = "";
-            //                string bool2 = "";
-            //                string tt = "tx0";
-            //                if (eqName == "E_qY_tot")
-            //                {
-            //                    bool1 = Globals.protectSymbol;
-            //                    bool2 = Globals.protectSymbol;
-            //                }
-            //                else if (eqName == "E_vCalvo")
-            //                {
-            //                    tt = "tx0e";
-            //                }
-            //                else if (eqName == "E_vCalvo_tEnd")
-            //                {
-            //                    tt = "tend";
-            //                }
-
-            //                Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3));
-            //                lineCounter++;
-
-            //                List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-
-            //                if (firstText == null)
-            //                {
-            //                    firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-            //                    firstEqName = eqName;
-            //                    firstList.AddRange(eqVarsGams.equationVariables);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
+            
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser(o);
             //eb.findOptions.decompOptions2 = decompOptions2;
@@ -4135,9 +4072,7 @@ namespace Gekko
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
-            eb._activeVariable = null;            
-            //eb._t1 = o.decompOptions2.t1;
-            //eb._t2 = o.decompOptions2.t2;
+            eb._activeVariable = null;     
 
             eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 

@@ -282,10 +282,10 @@ namespace Gekko
         {
             //this._activeEquation = eqName;
             //this._activeVariable = null;
-            this.windowEquationBrowserLabel.Inlines.Clear();
 
-            string s7 = Model.LayoutEquationText(eqName, firstText, true, GekkoTime.tNull);
-            this.windowEquationBrowserLabel.Inlines.Add(s7);
+            //this.windowEquationBrowserLabel.Inlines.Clear();
+            //string s7 = Model.LayoutEquationText(eqName, firstText, true, GekkoTime.tNull);
+            //this.windowEquationBrowserLabel.Inlines.Add(s7);
 
             //this.windowEquationBrowserLabel.Inlines.Add(firstText);
 

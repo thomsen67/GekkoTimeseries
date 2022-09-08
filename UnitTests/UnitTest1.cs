@@ -11559,12 +11559,13 @@ namespace UnitTests
                 //
                 // Decomp for 2028.
                 //
-                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+
                 //Does not work to use atot, must use tot.
                 //I("decomp3 <2028 2028 m> vHhx[tot] from E_jvHhx_aTot endo vHhx[tot] rows vars, lags cols time;");
                 //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_akt[akt, tot] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a] endo vHh[IndlAktier,tot], vHh[IndlAktier,#a]  rows vars, lags cols time;");
+                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 I("decomp3 <2028 2032 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
 
                 //TODO: result...
@@ -11732,7 +11733,7 @@ namespace UnitTests
             //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
             //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
-            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> x[y] from e1, e2 endo x[y], x[c] rows vars, #i cols time;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
