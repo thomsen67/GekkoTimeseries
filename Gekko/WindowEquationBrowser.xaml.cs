@@ -196,7 +196,8 @@ namespace Gekko
                 DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
 
                 double max = 0d;
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+
+                foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                 {
                     double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                     if (G.isNumericalError(v)) v = 0d;
@@ -204,7 +205,7 @@ namespace Gekko
                     max = Math.Max(v, max); 
                 }
 
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                 {
                     string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
                     double v = kvp.Value.GetDataSimple(this.findOptions.t0);
@@ -251,7 +252,7 @@ namespace Gekko
                     DecompData dd = Gekko.Decomp.DecompLowLevel(this.findOptions.t0, this.findOptions.t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
 
                     double max = 0d;
-                    foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                    foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                         if (G.isNumericalError(v)) v = 0d;
@@ -259,7 +260,7 @@ namespace Gekko
                         max = Math.Max(v, max);
                     }
 
-                    foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                    foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
                         double v = kvp.Value.GetDataSimple(this.findOptions.t0);
@@ -309,12 +310,13 @@ namespace Gekko
             {
                 if (s == "residual___") continue;
                 string ss5 = G.ReplaceTurtle(s);
-
-                //Button b = new Button();
-
+                
+                TextBlock tb = new TextBlock();
+                tb.Text = ss5;
                 ToggleButton b = new ToggleButton();
+                b.Content = tb;
+                //b.Content = ss5;
 
-                b.Content = ss5;
                 var cStyle = new System.Windows.Style(typeof(Border));
                 cStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(4)));
                 b.Resources.Add(typeof(Border), cStyle);

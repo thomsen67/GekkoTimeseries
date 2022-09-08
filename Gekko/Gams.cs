@@ -1426,7 +1426,7 @@ namespace Gekko
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
                     string eqname = helper.dict_FromEqNumberToEqName[number];
                     string helper2 = "";
-                    if (Globals.runningOnTTComputer) helper2 = "/* " + eqname + " */  ";  //only for debugging
+                    //if (Globals.runningOnTTComputer) helper2 = "/* " + eqname + " */  ";  //only for debugging
                     HandleEqLineAppend(helper, i, helper2);
                 }
                 else if (IsXVariable(th1, th1Next))

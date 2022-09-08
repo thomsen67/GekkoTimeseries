@@ -11565,7 +11565,7 @@ namespace UnitTests
                 //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_akt[akt, tot] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a] endo vHh[IndlAktier,tot], vHh[IndlAktier,#a]  rows vars, lags cols time;");
-                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 I("decomp3 <2028 2032 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
 
                 //TODO: result...

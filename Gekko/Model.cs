@@ -1104,10 +1104,9 @@ namespace Gekko
             bool start = false;
             for (int i = 0; i < tokens.Count() - more; i++)
             {
-                if (tokens[i].s == "*" && tokens[i + 1].leftblanks == 0 && tokens[i + 1].s == "/")
+                if (start == false && tokens[i].s == "=")
                 {
                     start = true;
-                    i += 1;
                     continue;
                 }
                 
