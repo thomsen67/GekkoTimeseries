@@ -672,7 +672,7 @@ namespace Gekko
                     Application.Run(gui);
                 }
             }
-            catch
+            catch (Exception e)
             {
                 throw;
             }

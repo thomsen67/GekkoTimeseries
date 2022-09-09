@@ -16,7 +16,7 @@
             <!--<Setter Property="Height" Value="25" />-->
             <Setter Property="Padding" Value="0,4" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Border.BorderThickness" Value="0,0,0,.5" />
+            <Setter Property="Border.BorderThickness" Value="0,0,0,0" />  <!-- can set the last to 0.5 and then control via binding LineColor if needed  -->
             <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
             <Setter Property= "IsSelected" Value="{Binding IsSelecteddd, Mode=TwoWay}"/>
             <EventSetter Event="MouseEnter" Handler="OnEquationListMouseEnter" />

@@ -44,9 +44,18 @@ namespace Gekko
         public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
         {
             ToggleButton b = sender as ToggleButton;
-            string s = b.Content.ToString();
+            string s = ((TextBlock)b.Content).Text;
             this.EquationBrowserSetLabel(s);
             this._activeVariable = s;
+
+            foreach (object o in this.windowEquationBrowserButtons.Children)
+            {
+                ToggleButton tb = o as ToggleButton;
+                if (tb == null) continue;
+                if (((TextBlock)tb.Content).Text == s) continue;                
+                tb.IsChecked = false;
+            }
+
         }
 
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
@@ -58,7 +67,7 @@ namespace Gekko
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
         {            
             ToggleButton b = sender as ToggleButton;
-            string s = b.Content.ToString();
+            string s = ((TextBlock)b.Content).Text;
             if (s.Contains("[-"))
             {
                 //lag
@@ -77,7 +86,7 @@ namespace Gekko
         public void OnVariableButtonLeave(object sender, MouseEventArgs e)
         {            
             ToggleButton b = sender as ToggleButton;
-            string s = b.Content.ToString();
+            string s = ((TextBlock)b.Content).Text;
             string ss = null;
             if (_activeVariable != null)
             {
@@ -315,7 +324,6 @@ namespace Gekko
                 tb.Text = ss5;
                 ToggleButton b = new ToggleButton();
                 b.Content = tb;
-                //b.Content = ss5;
 
                 var cStyle = new System.Windows.Style(typeof(Border));
                 cStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(4)));
