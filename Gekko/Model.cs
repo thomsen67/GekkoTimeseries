@@ -109,18 +109,18 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static string GetEquationTextFolded(DecompOptions2 decompOptions)
+        public static string GetEquationTextFolded(EModelType modelType, List<Link> links)
         {
             string rv = "";
             List<string> eqNames = new List<string>();
-            if (decompOptions.modelType == EModelType.GAMSScalar)
+            if (modelType == EModelType.GAMSScalar)
             {
                 StringBuilder sb = new StringBuilder();
                 List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
                 if (rawModel != null)
                 {
                     int count2 = 0;
-                    foreach (Link link in decompOptions.link)
+                    foreach (Link link in links)
                     {
                         //
                         // TODO: handle a semicolon in a comment, for instance after # 
@@ -169,7 +169,7 @@ namespace Gekko
                 ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
 
                 StringBuilder sb2 = new StringBuilder();
-                sb2.AppendLine(decompOptions.link.Count + " equation" + G.S(decompOptions.link.Count));
+                sb2.AppendLine(links.Count + " equation" + G.S(links.Count));
                 foreach (string eqName in eqNames)
                 {
                     foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
@@ -182,25 +182,15 @@ namespace Gekko
                         sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");
                     }
                 }
-                rv = sb2.ToString() + sb.ToString();
+                rv = sb2.ToString() + sb.ToString();                
             }
             else
             {
-                foreach (Link link in decompOptions.link)
+                foreach (Link link in links)
                 {
-                    rv += LayoutEquationText(link.eqname, link.expressionText, true, GekkoTime.tNull);
+                    rv += "Equation: " + link.eqname + G.NL + G.NL + link.expressionText + G.NL + G.NL;
                 }
             }
-            return rv;
-        }
-
-        public static string LayoutEquationText(string eqname, string expressionText, bool showTime, GekkoTime t0)
-        {
-            string rv = "";
-            if (!showTime) eqname = G.Chop_DimensionSetLag(eqname, t0, false);
-            rv += "Equation: " + eqname + "" + G.NL;
-            rv += "------------------------------------------" + G.NL;
-            rv += expressionText + G.NL + G.NL;
             return rv;
         }
     }
@@ -1043,19 +1033,26 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets human-readable equation text corresponding to (unfolded) equation number (string input).
+        /// Gets human-readable equation text corresponding to (folded) equation number (string input).
         /// See #jseds78hsd33.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string GetEquationText(string name, bool showTime, GekkoTime t0)
+        public string GetEquationTextUnfolded(string name, bool showTime, GekkoTime t0)
         {
             int i = -12345;
             bool ok = this.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
             if (!ok) i = -12345;
             if (i == -12345) new Error("Could not find equation name '" + name + "'");
             string s = this.GetEquationTextUnfolded(i, showTime, t0);
-            return s;
+
+            string rv = "";
+            if (!showTime) name = G.Chop_DimensionSetLag(name, t0, false);
+            rv += "Equation: " + name + "" + G.NL;
+            rv += "------------------------------------------" + G.NL;
+            rv += s + G.NL + G.NL;
+
+            return rv;
         }
 
         /// <summary>

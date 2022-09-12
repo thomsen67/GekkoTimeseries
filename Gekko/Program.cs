@@ -14368,7 +14368,7 @@ namespace Gekko
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser(null);
             eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+            eb.EquationBrowserSetButtons(firstEqName, firstList);
             //eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;

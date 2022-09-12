@@ -101,37 +101,36 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;            
-            this.EquationBrowserSetEquationAndButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeEquation = item.fullName;            
         }
 
-        private void EquationBrowserSetEquationAndButtons(string eqName, bool showTime, GekkoTime t0)
+        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0)
         {            
-            string s = Program.model.modelGamsScalar.GetEquationText(eqName, showTime, t0);
             this.EquationBrowserSetEquation(eqName, showTime, t0);
             int eqNumber = Program.model.modelGamsScalar.GetEqNumber(eqName);
             List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
-            this.EquationBrowserSetEquationButtons(eqName, s, precedents);
+            this.EquationBrowserSetButtons(eqName, precedents);
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;                        
-            this.EquationBrowserSetEquationAndButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
             bool showTime = false;
             GekkoTime t0 = this.findOptions.decompOptions2.t1;            
-            this.EquationBrowserSetEquationAndButtons(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetButtons(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {            
-            string s = Model.LayoutEquationText(eq, Program.model.modelGamsScalar.GetEquationText(eq, showTime, t0), showTime, t0);
+            string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, showTime, t0);
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);
         }
@@ -157,9 +156,9 @@ namespace Gekko
             }
         }
 
-        public void EquationBrowserSetEquationButtons(string eqName, string firstText, List<string> firstList)
+        public void EquationBrowserSetButtons(string eqName, List<string> firstList)
         {
-            EquationBrowserSetEquationButtons1(eqName, firstText, firstList);
+            EquationBrowserSetButtons1(eqName, firstList);
             //Dispatching the color update
             //So first non-colored buttons are shown, and then the background thread colors them
             //If the coloring is very time-consuming, scrolling down with arrows may freeze a bit. To solve this,
@@ -288,26 +287,9 @@ namespace Gekko
             }
         }
 
-        public void EquationBrowserSetEquationButtons1(string eqName, string firstText, List<string> firstList)
-        {
-            //this._activeEquation = eqName;
-            //this._activeVariable = null;
-
-            //this.windowEquationBrowserLabel.Inlines.Clear();
-            //string s7 = Model.LayoutEquationText(eqName, firstText, true, GekkoTime.tNull);
-            //this.windowEquationBrowserLabel.Inlines.Add(s7);
-
-            //this.windowEquationBrowserLabel.Inlines.Add(firstText);
-
-            //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
-            //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
-
-
-            //eb.windowEquationBrowserText.LineHeight = 12d;
-            //eb.windowEquationBrowserText.LineStackingStrategy = System.Windows.LineStackingStrategy.BlockLineHeight;
-
-            Random r = new Random();            
-
+        public void EquationBrowserSetButtons1(string eqName, List<string> firstList)
+        {           
+            
             this.windowEquationBrowserButtons.Children.Clear();
             this._buttons.Clear();
             TextBlock txt = new TextBlock();

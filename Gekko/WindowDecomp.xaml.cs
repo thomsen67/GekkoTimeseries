@@ -1479,8 +1479,7 @@ namespace Gekko
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
                 string s = null;               
-                s = Model.GetEquationTextFolded(this.decompOptions2);               
-                //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
                 equation.Text = s;
             }
         }        
@@ -1670,8 +1669,8 @@ namespace Gekko
                     }
                 }
                 else
-                {
-                    string s = Model.GetEquationTextFolded(this.decompOptions2);
+                {                    
+                    string s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
                     //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                     equation.Text = s;
                 }
@@ -1755,7 +1754,7 @@ namespace Gekko
                 frame = new FrameLight();
                 Table table = Decomp.DecompMain(smpl, per1, per2, this.decompOptions2, frame, refresh, ref this.decompDatas);
 
-                string s = Model.GetEquationTextFolded(this.decompOptions2);
+                string s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
                 equation.Text = s;
                 //
                 // NOTE:

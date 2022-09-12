@@ -4069,7 +4069,7 @@ namespace Gekko
             //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
             eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+            eb.EquationBrowserSetButtons(firstEqName, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;     
