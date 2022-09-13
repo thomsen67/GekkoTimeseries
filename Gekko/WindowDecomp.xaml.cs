@@ -1478,8 +1478,14 @@ namespace Gekko
                 int x; int y;
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
-                string s = null;               
-                s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
+                string s = null;
+                if (this.decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    List<string> eqNames = new List<string>();
+                    foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
+                    s = Model.GetEquationTextFoldedScalar(eqNames);
+                }
+                else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
                 equation.Text = s;
             }
         }        
@@ -1669,9 +1675,15 @@ namespace Gekko
                     }
                 }
                 else
-                {                    
-                    string s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
-                    //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                {
+                    string s = null;
+                    if (this.decompOptions2.modelType == EModelType.GAMSScalar)
+                    {
+                        List<string> eqNames = new List<string>();
+                        foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
+                        s = Model.GetEquationTextFoldedScalar(eqNames);
+                    }
+                    else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
                     equation.Text = s;
                 }
             }
@@ -1754,7 +1766,14 @@ namespace Gekko
                 frame = new FrameLight();
                 Table table = Decomp.DecompMain(smpl, per1, per2, this.decompOptions2, frame, refresh, ref this.decompDatas);
 
-                string s = Model.GetEquationTextFolded(this.decompOptions2.modelType, this.decompOptions2.link);
+                string s = null;
+                if (this.decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    List<string> eqNames = new List<string>();
+                    foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
+                    s = Model.GetEquationTextFoldedScalar(eqNames);
+                }
+                else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
                 equation.Text = s;
                 //
                 // NOTE:

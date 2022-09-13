@@ -129,7 +129,8 @@ namespace Gekko
         }
 
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
-        {            
+        {
+            string s2 =  Program.model. modelGamsScalar.GetEquationTextUnfolded(eq, showTime, t0);
             string s = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, showTime, t0);
             this.windowEquationBrowserLabel.Inlines.Clear();
             this.windowEquationBrowserLabel.Inlines.Add(s);

@@ -97,7 +97,7 @@ namespace Gekko
         //public Type assemblyEigen = null;        
         
     }
-        
+
     public class Model
     {
         public ModelGekko modelGekko = null;
@@ -105,93 +105,97 @@ namespace Gekko
         public ModelGamsScalar modelGamsScalar = null;
 
         /// <summary>
-        /// This gets folded equations from GAMS code. See also how to get unfolded equations: #jseds78hsd33.
+        /// This gets folded equations from GAMS code scalar model. See also how to get unfolded equations: #jseds78hsd33.
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static string GetEquationTextFolded(EModelType modelType, List<Link> links)
+        public static string GetEquationTextFoldedScalar(List<string>eqNames)
         {
             string rv = "";
-            List<string> eqNames = new List<string>();
-            if (modelType == EModelType.GAMSScalar)
-            {
-                StringBuilder sb = new StringBuilder();
-                List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
-                if (rawModel != null)
-                {
-                    int count2 = 0;
-                    foreach (Link link in links)
-                    {
-                        //
-                        // TODO: handle a semicolon in a comment, for instance after # 
-                        //
-                        count2++;
-                        if (count2 == 1)
-                        {
-                            sb.AppendLine("");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("");
-                        }
-                        else
-                        {
-                            sb.AppendLine("");
-                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb.AppendLine("");
-                        }
-                        string eqName = link.GAMS_dsh[0].name;  //probably link.GAMS_dsh[1].name is the same, or ....????
-                        for (int i = 0; i < rawModel.Count; i++)
-                        {
-                            int pos = rawModel[i].IndexOf(eqName + "[", StringComparison.OrdinalIgnoreCase);
-                            if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
-                            {
-                                eqNames.Add(eqName);
-                                int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
-                                for (int j = i; j < rawModel.Count; j++)
-                                {
-                                    string s = rawModel[j];
-                                    int count = s.TakeWhile(Char.IsWhiteSpace).Count();
-                                    if (count >= count0) s = s.Substring(count0);
-                                    else s = s.Substring(count);
 
-                                    sb.AppendLine(s);
-                                    if (rawModel[j].Contains(";"))
-                                    {
-                                        break;
-                                    }
+            StringBuilder sb = new StringBuilder();
+            List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
+            if (rawModel != null)
+            {
+                int count2 = 0;
+                foreach (string eqName in eqNames)
+                {
+                    //
+                    // TODO: handle a semicolon in a comment, for instance after # 
+                    //
+                    count2++;
+                    if (count2 == 1)
+                    {
+                        sb.AppendLine("");
+                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
+                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb.AppendLine("");
+                    }
+                    else
+                    {
+                        sb.AppendLine("");
+                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb.AppendLine("");
+                    }
+                    
+                    for (int i = 0; i < rawModel.Count; i++)
+                    {                        
+                        if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
+                        {                            
+                            int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
+                            for (int j = i; j < rawModel.Count; j++)
+                            {
+                                string s = rawModel[j];
+                                int count = s.TakeWhile(Char.IsWhiteSpace).Count();
+                                if (count >= count0) s = s.Substring(count0);
+                                else s = s.Substring(count);
+
+                                sb.AppendLine(s);
+                                if (rawModel[j].Contains(";"))
+                                {
+                                    break;
                                 }
                             }
                         }
                     }
                 }
-                string s2 = sb.ToString();
-                ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
-
-                StringBuilder sb2 = new StringBuilder();
-                sb2.AppendLine(links.Count + " equation" + G.S(links.Count));
-                foreach (string eqName in eqNames)
-                {
-                    foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
-                    {
-                        sb2.AppendLine("");
-                        sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb2.AppendLine("");
-                        sb2.AppendLine("$-condition: " + eq.conditionals);
-                        //sb2.AppendLine("");
-                        sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");
-                    }
-                }
-                rv = sb2.ToString() + sb.ToString();                
             }
-            else
+
+            string s2 = sb.ToString();
+            ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
+            StringBuilder sb2 = new StringBuilder();
+            sb2.AppendLine(eqNames.Count + " equation" + G.S(eqNames.Count));
+            foreach (string eqName in eqNames)
             {
-                foreach (Link link in links)
+                foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
                 {
-                    rv += "Equation: " + link.eqname + G.NL + G.NL + link.expressionText + G.NL + G.NL;
+                    sb2.AppendLine("");
+                    sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                    sb2.AppendLine("");
+                    if (!G.NullOrBlanks(eq.conditionals)) sb2.AppendLine("$-condition: " + eq.conditionals);
+                    sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");
                 }
+            }
+            rv = sb2.ToString() + sb.ToString();
+            return rv;
+        }
+
+        /// <summary>
+        /// This gets folded equations from GAMS code nonscalar model. See also how to get unfolded equations: #jseds78hsd33.
+        /// </summary>
+        /// <param name="decompOptions"></param>
+        /// <returns></returns>
+        public static string GetEquationTextFoldedNonScalar(EModelType modelType, List<Link> links)
+        {
+            string rv = "";
+            List<string> eqNames = new List<string>();
+            foreach (Link link in links)
+            {
+                rv += "Equation: " + link.eqname + G.NL + G.NL + link.expressionText + G.NL + G.NL;
             }
             return rv;
+
         }
     }
 
@@ -1033,7 +1037,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets human-readable equation text corresponding to (folded) equation number (string input).
+        /// Gets human-readable equation text corresponding to (folded) equation name (string input).
         /// See #jseds78hsd33.
         /// </summary>
         /// <param name="name"></param>
