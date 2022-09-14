@@ -23328,6 +23328,32 @@ namespace Gekko
             return s2;
         }
 
+        public static DataTable GetDataTable()
+        {
+            DataTable dt = new DataTable();
+            int NUM_COLS_TO_CREATE = 10;
+            int NUM_COLS_TO_WRITE_TO = 10;
+            int NUM_ROWS = 1000;
+
+            //add a table with 1000 columns
+            for (int i = 0; i < NUM_COLS_TO_CREATE; i++)
+            {
+                dt.Columns.Add("x" + i, typeof(string));
+            }
+            for (int i = 0; i < NUM_ROWS; i++)
+            {
+                var theRow = dt.NewRow();
+                for (int j = 0; j < NUM_COLS_TO_WRITE_TO; j++)
+                {
+                    theRow[j] = "whatever";
+                }
+
+                //add the row *after* populating it
+                dt.Rows.Add(theRow);
+            }
+            return dt;
+        }
+
         public static void GraphThreadFunction(Object o)
         {
             GraphOptions graphOptions = (GraphOptions)o;

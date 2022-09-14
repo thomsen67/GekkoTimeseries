@@ -3633,7 +3633,7 @@ namespace Gekko
             string file = G.AddExtension(fileLocal, "." + "gdx");
             int offset = (int)Program.options.gams_time_offset;
             DateTime dt1 = DateTime.Now;
-            int skippedSets = 0;
+            //int skippedSets = 0;
             int importedSets = 0;
             int counterVariables = 0;
             int counterParameters = 0;
@@ -3652,14 +3652,13 @@ namespace Gekko
 
             if (Program.options.gams_fast)
             {
-                ReadGdxFast(databank, prefix, hasPrefix, file, offset, ref skippedSets, ref importedSets, ref counterVariables, ref counterParameters, ref yearMax, ref yearMin, freq, ref gamsDir);
+                ReadGdxFast(databank, prefix, hasPrefix, file, offset, ref importedSets, ref counterVariables, ref counterParameters, ref yearMax, ref yearMin, freq, ref gamsDir);
             }
             else
             {
                 new Error("The slow gdx reader is not maintained, try the faster GDX reader with: OPTION gams fast = yes;");
             }
-            G.Writeln("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");
-            if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
+            G.Writeln("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");            
 
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;
@@ -3678,7 +3677,7 @@ namespace Gekko
             databank.Trim();
         }
 
-        private static void ReadGdxFast(Databank databank, string prefix, bool hasPrefix, string file, int offset, ref int skippedSets, ref int importedSets, ref int counterVariables, ref int counterParameters, ref int yearMax, ref int yearMin, EFreq freq, ref string gamsDir)
+        private static void ReadGdxFast(Databank databank, string prefix, bool hasPrefix, string file, int offset, ref int importedSets, ref int counterVariables, ref int counterParameters, ref int yearMax, ref int yearMin, EFreq freq, ref string gamsDir)
         {
             if (Program.options.gams_time_detect_auto)
             {
@@ -3775,23 +3774,40 @@ namespace Gekko
                             //  ======================================
                             //
 
-                            if (gdxDimensions != 1)
+                            List<string> setData = null; //contains names of sets (entryNr --> symbolName)
+                            List setData2 = null; //list of above
+                            if (gdxDimensions == 1)
                             {
-                                skippedSets++;
-                                continue;
+                                setData = new List<string>();
                             }
-                            List<string> setData = new List<string>();  //contains names of sets (entryNr --> symbolName)
+                            else
+                            {
+                                setData2 = new List();
+                            }
+                            
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
                                 new Error("gdx error");
-                                //throw new GekkoException();
                             }
+                            
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                             {
-                                string s = null;
-                                s = uel[index[0]];
-                                setData.Add(s);
-
+                                if (gdxDimensions == 1)
+                                {
+                                    string s = null;
+                                    s = uel[index[0]];
+                                    setData.Add(s);
+                                }
+                                else
+                                {
+                                    List<string> m = new List<string>();
+                                    for (int ii = 0; ii < gdxDimensions; ii++)
+                                    {
+                                        m.Add(uel[index[ii]]);
+                                    }
+                                    List mm = new List(m);
+                                    setData2.Add(mm);
+                                }
                             }
                             gdx.gdxDataReadDone();
 
@@ -3801,7 +3817,18 @@ namespace Gekko
                             {
                                 databank.RemoveIVariable(name);
                             }
-                            List ml = new List(setData);
+
+                            List ml = null;
+
+                            if (gdxDimensions == 1)
+                            {
+                                ml = new List(setData);
+                            }
+                            else
+                            {
+                                ml = setData2;
+                            }
+                            
                             databank.AddIVariable(name, ml);
 
                             importedSets++;
