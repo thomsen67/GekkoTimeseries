@@ -615,6 +615,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_CONSTANT;
     ASTOPT_STRING_COLLAPSE;
     ASTOPT_STRING_COLORS;
+	ASTOPT_STRING_TABLE;
     ASTOPT_STRING_COLS;
     ASTOPT_STRING_CSV;
     ASTOPT_STRING_D;
@@ -3420,6 +3421,7 @@ prtOpt1Helper:              filter
 						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT						
 						  | STACK (EQUAL yesNo)? -> ^(ASTOPT_STRING_STACK yesNo?)  //PLOT
 						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
+						  | TABLE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TABLE yesNo?)
 						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
 						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			
 						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		

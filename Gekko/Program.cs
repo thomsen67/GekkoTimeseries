@@ -1707,13 +1707,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-
-            if (true && Globals.runningOnTTComputer)
-            {
-                WindowTableViewer w = new WindowTableViewer();
-                w.ShowDialog();
-            }
-
+            
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
@@ -11470,6 +11464,7 @@ namespace Gekko
                         new Writeln("Start Cmd4.g");
                         Program.ExecuteShellCommand(s4, false);
                         new Writeln("End Cmd4.g");
+                        new Writeln("Parsing finished");
                     }
                     break;
                 case "--gray":
@@ -23334,31 +23329,107 @@ namespace Gekko
             return s2;
         }
 
-        public static DataTable GetDataTable()
+        public static DataTable GetDataTable(IVariable input)
         {
             DataTable dt = new DataTable();
-            int NUM_COLS_TO_CREATE = 10;
-            int NUM_COLS_TO_WRITE_TO = 10;
-            int NUM_ROWS = 1000000;
 
-            //add a table with 1000 columns
-            for (int i = 0; i < NUM_COLS_TO_CREATE; i++)
+            List m1 = input as List;
+            if (m1 == null) new Error("The variable is not a list");
+                        
+            int maxCols = 1;
+            int i = -1;
+            foreach (IVariable iv in m1.list)
             {
-                dt.Columns.Add("dim" + (i + 1), typeof(string));
+                i++;
+                List iv2 = iv as List;
+                if (iv2 == null) new Error("Sub-element #" + (i + 1) + " is not a (sub)list");
+                if (iv2.Count() > maxCols) maxCols = iv2.Count();
             }
-            for (int i = 0; i < NUM_ROWS; i++)
+            
+            for (int ii = 0; ii < maxCols; ii++)
             {
-                var theRow = dt.NewRow();
-                for (int j = 0; j < NUM_COLS_TO_WRITE_TO; j++)
-                {
-                    theRow[j] = "xx " + i + " " + j;
-                }
+                dt.Columns.Add("" + (ii + 1), typeof(string));
+            }
 
-                //add the row *after* populating it
-                dt.Rows.Add(theRow);
+            i = -1;
+            foreach (IVariable x2 in m1.list)
+            {
+                i++;
+                var dtRow = dt.NewRow();
+                List m2 = x2 as List;
+                int j = -1;
+                foreach (IVariable x3 in m2.list)
+                {
+                    j++;
+                    string s = null;
+                    try
+                    {
+                        s = x3.ConvertToString();
+                    }
+                    catch
+                    {
+                        new Error("Element " + (i + 1) + ", " + (j + 1) + "");
+                    }
+                    dtRow[j] = "  " + s + "  ";
+                }
+                //add the row *after* populating it (else slow)
+                dt.Rows.Add(dtRow);
             }
             return dt;
         }
+
+        //public static DataTable GetDataTable(IVariable input)
+        //{
+        //    DataTable dt = new DataTable();
+
+        //    List m1 = input as List;
+        //    if (m1 == null) new Error("The variable is not a list");
+
+        //    int maxCols = 1;
+        //    int i = -1;
+        //    foreach (IVariable iv in m1.list)
+        //    {
+        //        i++;
+        //        List iv2 = iv as List;
+        //        if (iv2 == null) new Error("Sub-element #" + (i + 1) + " is not a (sub)list");
+        //        if (iv2.Count() > maxCols) maxCols = iv2.Count();
+        //    }
+
+        //    for (int ii = 0; ii < maxCols; ii++)
+        //    {
+        //        dt.Columns.Add("  dim" + (ii + 1) + "  ", typeof(string));
+        //    }
+
+        //    i = -1;
+        //    foreach (IVariable x2 in m1.list)
+        //    {
+        //        i++;
+        //        var dtRow = dt.NewRow();
+        //        List m2 = x2 as List;
+        //        int j = -1;
+        //        foreach (IVariable x3 in m2.list)
+        //        {
+        //            j++;
+        //            string s = null;
+        //            ScalarString ss = x3 as ScalarString;
+        //            s = ss.string2;
+        //            //try
+        //            //{
+        //            //    s = x3.ConvertToString();
+        //            //}
+        //            //catch
+        //            //{
+        //            //    new Error("Element " + (i + 1) + ", " + (j + 1) + "");
+        //            //}
+
+        //            dtRow[j] = "  " + s + "  ";
+        //        }
+        //        //add the row *after* populating it (else slow)
+        //        dt.Rows.Add(dtRow);
+        //    }
+        //    return dt;
+        //}
+
 
         public static void GraphThreadFunction(Object o)
         {
