@@ -1706,7 +1706,13 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {            
+        {
+
+            if (true && Globals.runningOnTTComputer)
+            {
+                WindowTableViewer w = new WindowTableViewer();
+                w.ShowDialog();
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -23333,19 +23339,19 @@ namespace Gekko
             DataTable dt = new DataTable();
             int NUM_COLS_TO_CREATE = 10;
             int NUM_COLS_TO_WRITE_TO = 10;
-            int NUM_ROWS = 1000;
+            int NUM_ROWS = 1000000;
 
             //add a table with 1000 columns
             for (int i = 0; i < NUM_COLS_TO_CREATE; i++)
             {
-                dt.Columns.Add("x" + i, typeof(string));
+                dt.Columns.Add("dim" + (i + 1), typeof(string));
             }
             for (int i = 0; i < NUM_ROWS; i++)
             {
                 var theRow = dt.NewRow();
                 for (int j = 0; j < NUM_COLS_TO_WRITE_TO; j++)
                 {
-                    theRow[j] = "whatever";
+                    theRow[j] = "xx " + i + " " + j;
                 }
 
                 //add the row *after* populating it
