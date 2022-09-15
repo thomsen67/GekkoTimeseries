@@ -616,6 +616,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_COLLAPSE;
     ASTOPT_STRING_COLORS;
 	ASTOPT_STRING_TABLE;
+	ASTOPT_STRING_VIEW;
     ASTOPT_STRING_COLS;
     ASTOPT_STRING_CSV;
     ASTOPT_STRING_D;
@@ -1136,6 +1137,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	VIEW = 'VIEW';
 	KEEPTYPES      = 'KEEPTYPES'     ;
 	PREDICT      = 'PREDICT'     ;
     FIND      = 'FIND'     ;
@@ -1775,6 +1777,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("view", VIEW);
 										d.Add("keeptypes"               , KEEPTYPES  );
 										d.Add("predict"               , PREDICT  );
                                         d.Add("find"               , FIND  );
@@ -3421,7 +3424,7 @@ prtOpt1Helper:              filter
 						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT						
 						  | STACK (EQUAL yesNo)? -> ^(ASTOPT_STRING_STACK yesNo?)  //PLOT
 						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
-						  | TABLE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TABLE yesNo?)
+						  | VIEW (EQUAL yesNo)? -> ^(ASTOPT_STRING_VIEW yesNo?)
 						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
 						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			
 						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		
@@ -4209,6 +4212,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  VIEW|
   LIBRARY|
   KEEPTYPES|
   PREDICT|

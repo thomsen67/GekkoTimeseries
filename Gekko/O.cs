@@ -8671,7 +8671,7 @@ namespace Gekko
             public string opt_dateformat = null;
             public string opt_datetype = null;
 
-            public string opt_table = null;  //only for PRT, starts a data viewer
+            public string opt_view = null;  //only for PRT, starts a data viewer
 
             public void Exe()
             {
@@ -8708,15 +8708,18 @@ namespace Gekko
                 //      c[i2]
                 //      c[i3]
 
-                if (G.Equal(opt_table, "yes"))
+                EPrintTypes type = Print.GetPrintType(this);
+
+                if (G.Equal(opt_view, "yes"))
                 {
-                    if (!G.Equal(prtType, "prt")) new Error("You can only combine <table> option with PRT");
+                    if (!(type == EPrintTypes.Print)) new Error("You can only combine <table> option with PRT");
                     if (this.prtElements.Count > 1) new Error("Expected 1 element for PRT<table>");
                     Element e = this.prtElements[0];
                     IVariable[] vars = e.variable;
                     IVariable iv = vars[0];  //vars[1] is just multiplier value
                     DataTable dt = Program.GetDataTable(iv);
                     WindowTableViewer w = new WindowTableViewer(dt);
+                    w.Title = "Gekko viewer";
                     w.ShowDialog();
                     return;
                 }
@@ -8847,7 +8850,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries || Print.IsGmulprt(this, Print.GetPrintType(this)))
+                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries || Print.IsGmulprt(this, type))
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)

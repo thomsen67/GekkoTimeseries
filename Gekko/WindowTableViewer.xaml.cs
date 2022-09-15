@@ -24,6 +24,7 @@ namespace Gekko
         public WindowTableViewer(DataTable dt)
         {
             InitializeComponent();
+            PreviewKeyDown += (s, e) => { if (e.Key == Key.Escape) Close(); };
             grid1.DataContext = dt.DefaultView;
         }
     }

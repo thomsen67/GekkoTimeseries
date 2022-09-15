@@ -1713,7 +1713,7 @@ namespace Gekko
                 Speed.Run();
             }
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {                
                 ProtoSpeed(1);
                 ProtoSpeed(2);
@@ -2162,13 +2162,13 @@ namespace Gekko
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
             }
             Databank source = Program.databanks.GetFirst();
-            int half = source.storage.Count / n + 1;
+            int fraction = source.storage.Count / n + 1;
 
             int counter = -1;
             foreach (KeyValuePair<string, IVariable> kvp in source.storage)
             {
                 counter++;
-                lists[counter / half].Add(kvp);
+                lists[counter / fraction].Add(kvp);
             }
 
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
@@ -2217,14 +2217,13 @@ namespace Gekko
                 {
                     db.storage.Add(kvp.Key, kvp.Value);
                 }
-            }
-            //remember to do the Deep...something that binds parents/children.
-            MessageBox.Show("!!");
+            }           
 
             new Writeln("Deserialize (" + n + "): " + G.Seconds(t));
+                        
+            MessageBox.Show("Remember to do the Deep...something that binds parents/children");
 
-
-            if (n == 4) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
+            //if (n == 4) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
         }
 
         /// <summary>
@@ -23331,51 +23330,82 @@ namespace Gekko
 
         public static DataTable GetDataTable(IVariable input)
         {
+            int decimals = 4; //TODO, depend on PRT settings
+
             DataTable dt = new DataTable();
 
             List m1 = input as List;
-            if (m1 == null) new Error("The variable is not a list");
+            if (m1 == null)
+            {
+                dt.Columns.Add("1", typeof(string));
+                var dtRow = dt.NewRow();                
+                dtRow[0] = GetText(input, decimals);
+                dt.Rows.Add(dtRow);
+                return dt;
+            }
                         
             int maxCols = 1;
             int i = -1;
             foreach (IVariable iv in m1.list)
             {
                 i++;
-                List iv2 = iv as List;
-                if (iv2 == null) new Error("Sub-element #" + (i + 1) + " is not a (sub)list");
-                if (iv2.Count() > maxCols) maxCols = iv2.Count();
+                List iv2 = iv as List;                
+                if (iv2 != null && iv2.Count() > maxCols) maxCols = iv2.Count();
             }
             
             for (int ii = 0; ii < maxCols; ii++)
             {
-                dt.Columns.Add("" + (ii + 1), typeof(string));
+                dt.Columns.Add("" + (ii + 1) + "", typeof(string));
             }
 
             i = -1;
-            foreach (IVariable x2 in m1.list)
+            foreach (IVariable x2 in m1.list)  //we know m1 is a list
             {
                 i++;
                 var dtRow = dt.NewRow();
-                List m2 = x2 as List;
-                int j = -1;
-                foreach (IVariable x3 in m2.list)
+                if (x2.Type() != EVariableType.List)
                 {
-                    j++;
-                    string s = null;
-                    try
+                    dtRow[0] = GetText(x2, decimals);
+                }
+                else
+                {
+                    List m2 = x2 as List;
+                    int j = -1;
+                    foreach (IVariable x3 in m2.list)
                     {
-                        s = x3.ConvertToString();
+                        j++;
+                        string s = null;
+                        s = GetText(x3, decimals);
+                        dtRow[j] = s;
                     }
-                    catch
-                    {
-                        new Error("Element " + (i + 1) + ", " + (j + 1) + "");
-                    }
-                    dtRow[j] = "  " + s + "  ";
                 }
                 //add the row *after* populating it (else slow)
                 dt.Rows.Add(dtRow);
             }
             return dt;
+        }
+
+        private static string GetText(IVariable x3, int decimals)
+        {
+            string s;
+            if (x3.Type() == EVariableType.String)
+            {
+                s = ((ScalarString)x3).string2;
+            }
+            else if (x3.Type() == EVariableType.Date)
+            {
+                s = ((ScalarDate)x3).date.ToString();
+            }
+            else if (x3.Type() == EVariableType.Val)
+            {
+                s = G.UpdprtFormat(((ScalarVal)x3).val, decimals, false);
+            }
+            else
+            {
+                s = "[" + x3.Type().ToString().ToLower() + "]";
+            }
+
+            return s;
         }
 
         //public static DataTable GetDataTable(IVariable input)
