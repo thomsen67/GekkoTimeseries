@@ -168,7 +168,9 @@ namespace Gekko
             sb2.AppendLine(eqNames.Count + " equation" + G.S(eqNames.Count));
             foreach (string eqName in eqNames)
             {
-                foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
+                List<ModelGamsEquation> temp = null; g.equationsByEqname.TryGetValue(eqName, out temp);
+                if (temp == null) continue;
+                foreach (ModelGamsEquation eq in temp)
                 {
                     sb2.AppendLine("");
                     sb2.AppendLine("----------------------------------------------------------------------------------------------------------");

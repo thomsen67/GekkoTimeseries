@@ -11565,7 +11565,7 @@ namespace UnitTests
                 //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_akt[akt, tot] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
                 //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a] endo vHh[IndlAktier,tot], vHh[IndlAktier,#a]  rows vars, lags cols time;");
-                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 I("decomp3 <2028 2032 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
 
                 //TODO: result...
@@ -11576,6 +11576,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Trace()
         {
+            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
             //data lineage is a description of how data flows in its life cycle
             //traceability is the activity
             //data origin or provenance: where it comes from originally -->
@@ -11733,7 +11734,7 @@ namespace UnitTests
             //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
             //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
-            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> x[y] from e1, e2 endo x[y], x[c] rows vars, #i cols time;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
@@ -15005,14 +15006,7 @@ string cc1b=
             string c2 = Globals.unitTestScreenOutput.ToString();
 
             string cc2 =
-@"*** ERROR: Parsing file: c:\Thomas\Gekko\regres\StackTrace\cc2.gcm line 5 pos 1
-           did not expect input 'x'
-    [   5]:   x = (y+;  
-              ^
-              ^
-*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c2.gcm, line 1
-    [   1]:   run cc2;
-
+@"
     Call stack: Command line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c2.gcm (run-time error in line 1)";
 
@@ -15156,7 +15150,7 @@ string cc1b=
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1a" + G.NL
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 10" + G.NL
-              + @"    [  10]:   " + G.NL
+              + @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -15173,7 +15167,7 @@ string cc1b=
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1b" + G.NL
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 20" + G.NL
-              + @"    [  20]:   " + G.NL
+              + @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -15190,7 +15184,7 @@ string cc1b=
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1c" + G.NL
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 28" + G.NL
-              + @"    [  28]:   " + G.NL
+              + @"    [  28]:   %v = HELPER_error('1c'); //line 30" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
