@@ -1978,7 +1978,7 @@ namespace Gekko
                     //i16 11000   5600    read<first> gdx
                     //-------------------------------------------------------------------------------
                     //could be 10-20% faster if arrays used instead of ts.SetData().
-                    //caching would be around 180+700+1400 = 2500. 
+                    //caching would be around "file copy" + "md5" + "deflate" = 180+700+1400 = 2500. 
                     //  Faster if gdx is zipped and hash, maybe 1900 = 3 x faster.
                     //  Then read<gdx> first time would go from 2400 to 3400 = 40% worse.
                     //reading gbk directly would be 2400.
@@ -2204,7 +2204,6 @@ namespace Gekko
                 using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
                 {
                     RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                    //lists[(int)index] = serializer.Deserialize(fs, null, typeof(List<KeyValuePair<string, IVariable>>)) as List<KeyValuePair<string, IVariable>>;
                     lists[(int)index] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
                 }
                 return 0;

@@ -35,7 +35,9 @@ namespace Gekko
 
         //bugfix options (options starting with "bugfix_" are not shown in user manual or in "option?"
         public bool bugfix_import_export = false;  //not mentioned in help                     
-        public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
+        public bool bugfix_missing = true;         //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
+        public bool bugfix_readfast = true;        //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
+
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -299,6 +301,7 @@ namespace Gekko
             
             Add("BUGFIX IMPORT EXPORT", Globals.xbool);
             Add("BUGFIX MISSING", Globals.xbool);
+            Add("BUGFIX READFAST", Globals.xbool);
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
             Add("DATABANK FILE CACHE", Globals.xnameOrString, "all", "nongbk", "none");
