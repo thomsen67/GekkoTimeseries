@@ -1719,8 +1719,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (true && Globals.runningOnTTComputer)
-            {
-                int k = 3;  //partitions/threads
+            {                
                 int sum = 0;
                 List<CountHelper> x = new List<CountHelper>();
                 Count count = new Count();
@@ -2269,18 +2268,18 @@ namespace Gekko
             }, _ => { });
 
             Databank db = new Databank("temp");
+            TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
                 foreach (KeyValuePair<string, IVariable> kvp in list)
                 {
-                    db.storage.Add(kvp.Key, kvp.Value);
+                    db.storage.Add(kvp.Key, kvp.Value);                                     
+                    kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
                 }
             }           
 
-            new Writeln("Deserialize (" + n + "): " + G.Seconds(t));
-                        
-            MessageBox.Show("Remember to do the Deep...something that binds parents/children");
-
+            new Writeln("Deserialize (" + n + "): " + G.Seconds(t));                       
+            
             //if (n == 4) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
         }
 
