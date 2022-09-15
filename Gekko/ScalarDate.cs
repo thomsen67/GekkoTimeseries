@@ -175,6 +175,12 @@ namespace Gekko
             return new ScalarDate(this.date);
         }
 
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            count.n += Globals.count2;  //probably not way off
+        }
+
         public void DeepTrim()
         {
             //do nothing, nothing to trim

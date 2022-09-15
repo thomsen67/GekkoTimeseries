@@ -122,6 +122,11 @@ namespace Gekko
             return gekkoNull;
         }
 
+        public void DeepCount(Count count)
+        {
+            //do nothing
+        }
+
         public void DeepTrim()
         {
             return;

@@ -492,6 +492,18 @@ namespace Gekko
             return l;
         }
 
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            foreach (IVariable iv in this.list)
+            {
+                if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
+                {
+                    iv.DeepCount(count);
+                }
+            }
+        }
+
         public void DeepTrim()
         {            
             foreach (IVariable iv in this.list)

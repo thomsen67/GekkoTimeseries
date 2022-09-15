@@ -634,6 +634,12 @@ namespace Gekko
             return m;
         }
 
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            count.n += this.data.Length * Globals.count2;
+        }
+
         public void DeepTrim()
         {
             //do nothing, nothing to trim

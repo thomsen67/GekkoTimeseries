@@ -100,6 +100,8 @@ namespace Gekko
         
         IVariable DeepClone(GekkoSmplSimple truncate);
 
+        void DeepCount(Count count);
+
         void DeepTrim();
 
         void DeepCleanup(TwoInts yearsMinMax);

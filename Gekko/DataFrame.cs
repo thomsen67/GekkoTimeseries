@@ -131,6 +131,11 @@ namespace Gekko
             return new ScalarVal(this.val);
         }
 
+        public void DeepCount(Count count)
+        {
+            //do nothing
+        }
+
         public void DeepTrim()
         {
             //do nothing, nothing to trim

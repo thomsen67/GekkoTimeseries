@@ -261,13 +261,24 @@ namespace Gekko
             return temp;
         }
 
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
+                {
+                    kvp.Value.DeepCount(count);
+                }
+            }
+        }
+
         public void DeepTrim()
         {            
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
                 if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
-                {
-                    //Globals.mem++;
+                {                    
                     kvp.Value.DeepTrim();
                 }                
             }            

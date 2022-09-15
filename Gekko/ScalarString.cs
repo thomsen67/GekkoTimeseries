@@ -378,6 +378,12 @@ namespace Gekko
             return ss;
         }
 
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            count.n += Globals.count3 * this.string2.Length;
+        }
+
         public void DeepTrim()
         {
             //do nothing, nothing to trim

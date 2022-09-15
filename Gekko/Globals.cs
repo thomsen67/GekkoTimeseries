@@ -101,6 +101,10 @@ namespace Gekko
         public const string languageDaDK = "da-DK";
         public const string languageEnUS = "en-US";
 
+        public const int count1 = 32; //dead weight of an object (guess, too low for series...)
+        public const int count2 = 8;  //double value is 8 bytes
+        public const int count3 = 2;  //one char inside string is 2 bytes
+
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
 
         //Must be near the top of Globals.cs

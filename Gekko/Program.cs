@@ -158,6 +158,17 @@ namespace Gekko
         Ols
     }
 
+    public class Count
+    {
+        public int n = 0;
+    }
+
+    public class CountHelper
+    {
+        public string name = null;
+        public int n = 0;
+    }
+
     public class CollapseHelper
     {
         public string method = "total";
@@ -1707,13 +1718,61 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (true && Globals.runningOnTTComputer)
+            {
+                int k = 3;  //partitions/threads
+                int sum = 0;
+                List<CountHelper> x = new List<CountHelper>();
+                Count count = new Count();
+                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+                {
+                    count.n = 0;
+                    kvp.Value.DeepCount(count);
+                    CountHelper ch = new CountHelper();
+                    ch.name = kvp.Key;
+                    ch.n = count.n;
+                    x.Add(ch);
+                    sum += ch.n;
+                }
+                var sorted = x.OrderByDescending(o => o.n);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
+                List<List<CountHelper>> yy = new List<List<CountHelper>>();
+                List<int> sums = new List<int>();
+                for (int i = 0; i < k; i++)
+                {
+                    yy.Add(new List<CountHelper>());
+                    sums.Add(0);
+                }
+
+                foreach (CountHelper ch in sorted)
+                {
+                    //new Writeln(ch.name + " --> " + ch.n);
+                    int imin = -12345;
+                    int min = int.MaxValue;
+                    for (int i = 0; i < k; i++)
+                    {
+                        if (sums[i] < min)
+                        {
+                            min = sums[i];
+                            imin = i;
+                        }
+                    }
+                    yy[imin].Add(ch);
+                    sums[imin] += ch.n;
+                }
+                new Writeln("Sum = " + sum + ", in MB = " + sum / 1000000);
+                for (int i = 0; i < k; i++)
+                {
+                    new Writeln("list" + i + " = " + sums[i]);
+                }
+            }
             
+
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {                
                 ProtoSpeed(1);
                 ProtoSpeed(2);

@@ -2732,6 +2732,26 @@ namespace Gekko
             return tsCopy;
         }
 
+        /// <summary>
+        /// Counting approx size
+        /// </summary>
+        /// <returns></returns>
+        public void DeepCount(Count count)
+        {
+            count.n += Globals.count1;
+            if (this.type == ESeriesType.ArraySuper)
+            {   
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {
+                    kvp.Value.DeepCount(count);
+                }
+            }
+            else
+            {
+                if (this.data.GetDataArray_ONLY_INTERNAL_USE() != null) count.n += this.data.GetDataArray_ONLY_INTERNAL_USE().Length * Globals.count2;
+            }
+        }
+
         public void DeepTrim()
         {             
             if (this.type == ESeriesType.ArraySuper)
