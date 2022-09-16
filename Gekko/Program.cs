@@ -1728,14 +1728,11 @@ namespace Gekko
             {   
                 Databank b = Program.databanks.GetFirst();
 
-                Databank rv1 = ReadParallel(1, b);
-                Databank rv2 = ReadParallel(2, b);
-                Databank rv3 = ReadParallel(3, b);
-                Databank rv4 = ReadParallel(4, b);
-                Databank rv5 = ReadParallel(5, b);
-                Databank rv6 = ReadParallel(6, b);
-                Databank rv7 = ReadParallel(7, b);
-                Databank rv8 = ReadParallel(8, b);
+                int k = 4;
+                WriteParallel(k, b, b.GetFileNameWithPath());
+                Databank db = ReadParallel(b.GetFileNameWithPath());
+                if (false) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), b, db, "absolute", false, false);
+
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -2236,21 +2233,30 @@ namespace Gekko
             return rv;
         }
 
-        public static Databank WriteParallel(int k, Databank source)
+        public static void WriteParallel(int k, Databank source, string fileName)
         {
             bool print = false;
+            if (Globals.runningOnTTComputer) print = true;
 
             DateTime t = DateTime.Now;            
-            string hash = Program.GetMD5Hash(null, source.GetFileNameWithPath());
+            string hash = Program.GetMD5Hash(null, fileName);
             string hashTime = G.Seconds(t);
 
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
+                        
+            string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
+            string[] hits = Directory.GetFiles(Globals.localTempFilesLocation, part2 + "*" + Globals.cacheExtension);
+            foreach (string hit in hits)
+            {
+                //Clean sheet for this hash
+                File.Delete(hit);
+            }
 
             for (int i = 0; i < k; i++)
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + "" + Globals.cacheExtension);
+                files.Add(Globals.localTempFilesLocation + "\\" + part2 + (i + 1) + "of" + k + Globals.cacheExtension);
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
@@ -2285,98 +2291,34 @@ namespace Gekko
             }).All(_ => _);
 
             if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
-            t = DateTime.Now;
-
-            Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
-            {
-                //See https://github.com/protobuf-net/protobuf-net/issues/668
-                //About double speed on TT pc, compared to no parallel                    
-                using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
-                {
-                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                    int i = (int)index;
-                    lists[i] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
-                    TwoInts yearMinMax = twoIntss[i];
-                    foreach (KeyValuePair<string, IVariable> kvp in lists[i])
-                    {
-                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
-                    }
-                }
-                return 0;
-            }, _ => { });
-
-            Databank db = new Databank("temp");
-            DateTime t2 = DateTime.Now;
-            foreach (List<KeyValuePair<string, IVariable>> list in lists)
-            {
-                foreach (KeyValuePair<string, IVariable> kvp in list)
-                {
-                    db.storage.Add(kvp.Key, kvp.Value);                                     
-                    //kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
-                }
-            }
-            lists = null;  //free for GC
-
-            if (print) new Writeln("Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
-
-            if (false)
-            {
-                Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
-            }
-
-            return db;
+            
         }
 
-        public static Databank ReadParallel(int k, Databank source)
+        public static Databank ReadParallel(string fileName)
         {
-            bool balance = true;
             bool print = false;
+            if (Globals.runningOnTTComputer) print = true;
 
             DateTime t = DateTime.Now;
-            string hash = Program.GetMD5Hash(null, source.GetFileNameWithPath());
+            string hash = Program.GetMD5Hash(null, fileName);
             string hashTime = G.Seconds(t);
 
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
 
+            string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
+            int k = ValidateFileNames(part2);
+            if (k == -12345) return null;  //could not find anything useful in cache
+
             for (int i = 0; i < k; i++)
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + "" + Globals.cacheExtension);
+                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-
-            lists = SplitVarsInSameSizeParts(source.storage, k, print);
-
-            lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
-            {
-                try
-                {
-                    if (File.Exists(files[i])) File.Delete(files[i]);
-                }
-                catch (Exception e)
-                {
-                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
-                }
-
-                using (FileStream fs = WaitForFileStream(files[i], null, GekkoFileReadOrWrite.Write))
-                {
-                    try
-                    {
-                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                        serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        serializer.Serialize(fs, x);
-                    }
-                    catch (Exception e)
-                    {
-                        new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
-                    }
-                }
-                return true;
-            }).All(_ => _);
-
-            if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
+            
+            //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
 
             Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
@@ -2404,19 +2346,52 @@ namespace Gekko
                 foreach (KeyValuePair<string, IVariable> kvp in list)
                 {
                     db.storage.Add(kvp.Key, kvp.Value);
-                    //kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
                 }
             }
             lists = null;  //free for GC
 
             if (print) new Writeln("Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
 
-            if (false)
-            {
-                Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
-            }
-
             return db;
+        }
+
+        private static int ValidateFileNames(string part2)
+        {            
+            string[] hits = Directory.GetFiles(Globals.localTempFilesLocation, part2 + "*" + Globals.cacheExtension);            
+            int k = ValidateFileNames2(part2, hits);
+            if (k == -12345)
+            {
+                //clean up
+                foreach (string hit in hits)
+                {
+                    File.Delete(hit);
+                }
+            }
+            return k;
+        }
+
+        private static int ValidateFileNames2(string part2, string[] hits)
+        {             
+            int i2 = -12345;
+            try
+            {
+                string s = hits[0].Replace(Globals.localTempFilesLocation + "\\" + part2, "").Replace(Globals.cacheExtension, "").Trim();
+                int idx = s.IndexOf("of");
+                string s2 = s.Substring("of".Length + idx);
+                i2 = int.Parse(s2);
+            }
+            catch
+            {
+                return -12345;
+            }
+            if (i2 <= 0) return -12345;
+            if (i2 != hits.Length) return -12345;
+
+            for (int i = 0; i < i2; i++)
+            {
+                if (!hits.Contains(Globals.localTempFilesLocation + "\\" + part2 + (i + 1) + "of" + i2 + Globals.cacheExtension)) return -12345;
+            }            
+            return i2;  //is -12345 if something is wrong
         }
 
         /// <summary>
