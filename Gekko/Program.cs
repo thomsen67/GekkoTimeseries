@@ -165,7 +165,7 @@ namespace Gekko
 
     public class CountHelper
     {
-        public string name = null;
+        public KeyValuePair<string, IVariable> kvp;
         public int n = 0;
     }
 
@@ -1724,12 +1724,18 @@ namespace Gekko
                 Speed.Run();
             }
 
-            if (false && Globals.runningOnTTComputer)
-            {                
-                ProtoSpeed(1);
-                ProtoSpeed(2);
-                ProtoSpeed(3);
-                ProtoSpeed(4);
+            if (true && Globals.runningOnTTComputer)
+            {   
+                Databank b = Program.databanks.GetFirst();
+
+                Databank rv1 = ReadParallel(1, b);
+                Databank rv2 = ReadParallel(2, b);
+                Databank rv3 = ReadParallel(3, b);
+                Databank rv4 = ReadParallel(4, b);
+                Databank rv5 = ReadParallel(5, b);
+                Databank rv6 = ReadParallel(6, b);
+                Databank rv7 = ReadParallel(7, b);
+                Databank rv8 = ReadParallel(8, b);
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -1966,7 +1972,7 @@ namespace Gekko
                 //int buf = 4096;
                 //buf = int.Parse(text);
 
-                if (true)
+                if (true && Globals.runningOnTTComputer)
                 {
 
                     //   debug rel64      gdx is 127 mb, zipped 27 mb with compression. 
@@ -2160,8 +2166,20 @@ namespace Gekko
             else G.Writeln(text);
         }
 
-        private static List<List<CountHelper>> SplitVarsInKContainers(Dictionary<string, IVariable> storage, int k)
+        private static List<List<KeyValuePair<string, IVariable>>> SplitVarsInSameSizeParts(Dictionary<string, IVariable> storage, int k, bool print)
         {
+            if (k == 1)
+            {
+                List<KeyValuePair<string, IVariable>> list = new List<KeyValuePair<string, IVariable>>();
+                foreach (KeyValuePair<string, IVariable> kvp in storage)
+                {
+                    list.Add(kvp);
+                }
+                List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+                lists.Add(list);
+                return lists;
+            }
+
             int sum = 0;
             List<CountHelper> x = new List<CountHelper>();
             Count count = new Count();
@@ -2170,17 +2188,17 @@ namespace Gekko
                 count.n = 0;
                 kvp.Value.DeepCount(count);
                 CountHelper ch = new CountHelper();
-                ch.name = kvp.Key;
+                ch.kvp = kvp;
                 ch.n = count.n;
                 x.Add(ch);
                 sum += ch.n;
             }
             var sorted = x.OrderByDescending(o => o.n);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
-            List<List<CountHelper>> yy = new List<List<CountHelper>>();
+            List<List<KeyValuePair<string, IVariable>>> rv = new List<List<KeyValuePair<string, IVariable>>>();
             List<int> sums = new List<int>();
             for (int i = 0; i < k; i++)
             {
-                yy.Add(new List<CountHelper>());
+                rv.Add(new List<KeyValuePair<string, IVariable>>());
                 sums.Add(0);
             }
 
@@ -2191,51 +2209,65 @@ namespace Gekko
                 int min = int.MaxValue;
                 for (int i = 0; i < k; i++)
                 {
+                    //BEWARE
+                    //BEWARE
+                    //BEWARE Is this loop fast enough? Can perhaps be sped up a bit?
+                    //BEWARE
+                    //BEWARE
                     if (sums[i] < min)
                     {
                         min = sums[i];
                         imin = i;
                     }
                 }
-                yy[imin].Add(ch);
+                rv[imin].Add(ch.kvp);
                 sums[imin] += ch.n;
             }
-            new Writeln("Sum = " + sum + ", in MB = " + sum / 1000000);
-            for (int i = 0; i < k; i++)
+            if (Globals.runningOnTTComputer)
             {
-                new Writeln("list" + i + " = " + sums[i]);
-            }
+                List<string> shares = new List<string>();
+                for (int i = 0; i < k; i++)
+                {
+                    shares.Add("" + G.UpdprtFormat((double)sums[i] / (double)sum * 100d, 2, false));
+                }
+                if(print) new Writeln("TTH: Proxy " + sum / 1000000 + " MB -- " + Stringlist.GetListWithCommas(shares));
+            }            
 
-            return yy;
+            return rv;
         }
 
-        private static void ProtoSpeed(int k)
+        public static Databank WriteParallel(int k, Databank source)
         {
-            DateTime t = DateTime.Now;
-            
-            Dictionary<string, IVariable> storage = Program.databanks.GetFirst().storage;
-            List<List<CountHelper>> yy = SplitVarsInKContainers(storage, k);
+            bool print = false;
 
-            string hash = "abc123";
+            DateTime t = DateTime.Now;            
+            string hash = Program.GetMD5Hash(null, source.GetFileNameWithPath());
+            string hashTime = G.Seconds(t);
+
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+            List<TwoInts> twoIntss = new List<TwoInts>();
+
             for (int i = 0; i < k; i++)
             {
                 files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + "" + Globals.cacheExtension);
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
+                twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-            Databank source = Program.databanks.GetFirst();
-            int fraction = source.storage.Count / k + 1;
-
-            int counter = -1;
-            foreach (KeyValuePair<string, IVariable> kvp in source.storage)
-            {
-                counter++;
-                lists[counter / fraction].Add(kvp);
-            }
-
+            
+            lists = SplitVarsInSameSizeParts(source.storage, k, print);
+            
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
+                try
+                {
+                    if (File.Exists(files[i])) File.Delete(files[i]);
+                }
+                catch (Exception e)
+                {
+                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                }
+
                 using (FileStream fs = WaitForFileStream(files[i], null, GekkoFileReadOrWrite.Write))
                 {
                     try
@@ -2252,13 +2284,8 @@ namespace Gekko
                 return true;
             }).All(_ => _);
 
-            new Writeln("Serialize (" + k + "): " + G.Seconds(t));
+            if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
-
-            for (int i = 0; i < lists.Count; i++)
-            {
-                lists[i] = new List<KeyValuePair<string, IVariable>>();
-            }
 
             Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
             {
@@ -2267,25 +2294,129 @@ namespace Gekko
                 using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
                 {
                     RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                    lists[(int)index] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+                    int i = (int)index;
+                    lists[i] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+                    TwoInts yearMinMax = twoIntss[i];
+                    foreach (KeyValuePair<string, IVariable> kvp in lists[i])
+                    {
+                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
+                    }
                 }
                 return 0;
             }, _ => { });
 
             Databank db = new Databank("temp");
-            TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
+            DateTime t2 = DateTime.Now;
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
                 foreach (KeyValuePair<string, IVariable> kvp in list)
                 {
                     db.storage.Add(kvp.Key, kvp.Value);                                     
-                    kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
+                    //kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
                 }
-            }           
+            }
+            lists = null;  //free for GC
 
-            new Writeln("Deserialize (" + k + "): " + G.Seconds(t));                       
-            
-            //if (n == 4) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
+            if (print) new Writeln("Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
+
+            if (false)
+            {
+                Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
+            }
+
+            return db;
+        }
+
+        public static Databank ReadParallel(int k, Databank source)
+        {
+            bool balance = true;
+            bool print = false;
+
+            DateTime t = DateTime.Now;
+            string hash = Program.GetMD5Hash(null, source.GetFileNameWithPath());
+            string hashTime = G.Seconds(t);
+
+            List<string> files = new List<string>();
+            List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+            List<TwoInts> twoIntss = new List<TwoInts>();
+
+            for (int i = 0; i < k; i++)
+            {
+                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + "" + Globals.cacheExtension);
+                lists.Add(new List<KeyValuePair<string, IVariable>>());
+                twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
+            }
+
+            lists = SplitVarsInSameSizeParts(source.storage, k, print);
+
+            lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+            {
+                try
+                {
+                    if (File.Exists(files[i])) File.Delete(files[i]);
+                }
+                catch (Exception e)
+                {
+                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                }
+
+                using (FileStream fs = WaitForFileStream(files[i], null, GekkoFileReadOrWrite.Write))
+                {
+                    try
+                    {
+                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                        serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                        serializer.Serialize(fs, x);
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                    }
+                }
+                return true;
+            }).All(_ => _);
+
+            if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
+            t = DateTime.Now;
+
+            Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+            {
+                //See https://github.com/protobuf-net/protobuf-net/issues/668
+                //About double speed on TT pc, compared to no parallel                    
+                using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
+                {
+                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                    int i = (int)index;
+                    lists[i] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+                    TwoInts yearMinMax = twoIntss[i];
+                    foreach (KeyValuePair<string, IVariable> kvp in lists[i])
+                    {
+                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
+                    }
+                }
+                return 0;
+            }, _ => { });
+
+            Databank db = new Databank("temp");
+            DateTime t2 = DateTime.Now;
+            foreach (List<KeyValuePair<string, IVariable>> list in lists)
+            {
+                foreach (KeyValuePair<string, IVariable> kvp in list)
+                {
+                    db.storage.Add(kvp.Key, kvp.Value);
+                    //kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
+                }
+            }
+            lists = null;  //free for GC
+
+            if (print) new Writeln("Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
+
+            if (false)
+            {
+                Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
+            }
+
+            return db;
         }
 
         /// <summary>
