@@ -2290,6 +2290,13 @@ namespace Gekko
                 return true;
             }).All(_ => _);
 
+            List<string> sfiles = new List<string>();
+            foreach (string file in files)
+            {
+                sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
+            }
+
+            if (print) new Writeln("Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
             if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             
         }
