@@ -2346,7 +2346,7 @@ namespace Gekko
                 return 0;
             }, _ => { });
 
-            Databank db = new Databank("temp");
+            Databank db = new Databank("temporary");
             DateTime t2 = DateTime.Now;
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
@@ -3773,6 +3773,8 @@ namespace Gekko
         /// <returns></returns>
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
+            string fileRemember = file;  //because file may change when reading
+            
             //note: file is altered below, not sure why
             //file is the "real" system filepath and filename.
             //When we get here, the file is typically already copied (copylocal option)
@@ -3788,41 +3790,19 @@ namespace Gekko
 
             //first we (may) look in the protobuffer cache, to see if there is a hit.
 
-            bool cache_loadedFromProtobuf = false;
-            string cache_hash = null;
-            string cache_fileNameAndPath = null;
+            bool cache_loadedFromProtobuf = false;            
             if (MayUseDatabankCache(oRead))
             {
-                DateTime t0 = DateTime.Now;
-                cache_hash = GetMD5Hash(null, file);
-                if (Globals.runningOnTTComputer) new Writeln("TTH md5 --> " + G.Seconds(t0));
-                cache_fileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + cache_hash + Globals.cacheExtension;
-                
-                if (File.Exists(cache_fileNameAndPath))
+                Databank databankTemp2 = ReadParallel(fileRemember);
+                if (databankTemp2 == null)
                 {
-                    try
-                    {
-                        using (FileStream fs = Program.WaitForFileStream(cache_fileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                        {
-                            DateTime t1 = DateTime.Now;
-                            databankTemp = Serializer.Deserialize<Databank>(fs);
-                            if (Globals.runningOnTTComputer) new Writeln("TTH deserialize --> " + G.Seconds(t1));
-                            cache_loadedFromProtobuf = true;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        if (G.IsUnitTesting())
-                        {
-                            throw;
-                        }
-                        else
-                        {
-                            //do nothing, we then have to parse the file
-                            cache_loadedFromProtobuf = false;
-                        }
-                    }
-                }                
+                    //do nothing, we then have to parse the file
+                }
+                else
+                {
+                    cache_loadedFromProtobuf = true;
+                    databankTemp = databankTemp2;  //also has the name "temporary" but never mind
+                }
             }
 
             if (cache_loadedFromProtobuf)
@@ -3880,15 +3860,7 @@ namespace Gekko
 
                     try //not the end of world if it fails
                     {
-                        //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                        serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        DateTime t2 = DateTime.Now;
-                        using (FileStream fs = Program.WaitForFileStream(cache_fileNameAndPath, null, Program.GekkoFileReadOrWrite.Write))
-                        {
-                            serializer.Serialize(fs, databankTemp);
-                        }
-                        if (Globals.runningOnTTComputer) new Writeln("TTH serialize --> " + G.Seconds(t2));
+                        WriteParallel(Globals.processors, databankTemp, fileRemember);
                     }
                     catch (Exception e)
                     {
@@ -3907,7 +3879,21 @@ namespace Gekko
         /// <returns></returns>
         private static bool MayUseDatabankCache(ReadOpenMulbkHelper oRead)
         {
-            return Program.options.databank_file_cache == "all" || (Program.options.databank_file_cache == "nongbk" && oRead.Type != EDataFormat.Gbk);
+            //Only allows the typical "bulk" formats. The 2D formats are fishy: what about 
+            //offset and transpose?
+
+            bool gbk = oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None;
+            bool nonGbk = oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gdx || oRead.Type == EDataFormat.Px || oRead.Type == EDataFormat.Flat;
+
+            if (Program.options.databank_file_cache == "all")
+            {
+                if (gbk || nonGbk) return true;
+            }
+            else if (Program.options.databank_file_cache == "nongbk")
+            {
+                if (nonGbk) return true;
+            }            
+            return false;
         }
 
         /// <summary>
