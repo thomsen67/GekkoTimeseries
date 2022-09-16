@@ -1718,54 +1718,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
-            {                
-                int sum = 0;
-                List<CountHelper> x = new List<CountHelper>();
-                Count count = new Count();
-                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
-                {
-                    count.n = 0;
-                    kvp.Value.DeepCount(count);
-                    CountHelper ch = new CountHelper();
-                    ch.name = kvp.Key;
-                    ch.n = count.n;
-                    x.Add(ch);
-                    sum += ch.n;
-                }
-                var sorted = x.OrderByDescending(o => o.n);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
-                List<List<CountHelper>> yy = new List<List<CountHelper>>();
-                List<int> sums = new List<int>();
-                for (int i = 0; i < k; i++)
-                {
-                    yy.Add(new List<CountHelper>());
-                    sums.Add(0);
-                }
-
-                foreach (CountHelper ch in sorted)
-                {
-                    //new Writeln(ch.name + " --> " + ch.n);
-                    int imin = -12345;
-                    int min = int.MaxValue;
-                    for (int i = 0; i < k; i++)
-                    {
-                        if (sums[i] < min)
-                        {
-                            min = sums[i];
-                            imin = i;
-                        }
-                    }
-                    yy[imin].Add(ch);
-                    sums[imin] += ch.n;
-                }
-                new Writeln("Sum = " + sum + ", in MB = " + sum / 1000000);
-                for (int i = 0; i < k; i++)
-                {
-                    new Writeln("list" + i + " = " + sums[i]);
-                }
-            }
             
-
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
@@ -2207,20 +2160,72 @@ namespace Gekko
             else G.Writeln(text);
         }
 
-        private static void ProtoSpeed(int n)
+        private static List<List<CountHelper>> SplitVarsInKContainers(Dictionary<string, IVariable> storage, int k)
+        {
+            int sum = 0;
+            List<CountHelper> x = new List<CountHelper>();
+            Count count = new Count();
+            foreach (KeyValuePair<string, IVariable> kvp in storage)
+            {
+                count.n = 0;
+                kvp.Value.DeepCount(count);
+                CountHelper ch = new CountHelper();
+                ch.name = kvp.Key;
+                ch.n = count.n;
+                x.Add(ch);
+                sum += ch.n;
+            }
+            var sorted = x.OrderByDescending(o => o.n);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
+            List<List<CountHelper>> yy = new List<List<CountHelper>>();
+            List<int> sums = new List<int>();
+            for (int i = 0; i < k; i++)
+            {
+                yy.Add(new List<CountHelper>());
+                sums.Add(0);
+            }
+
+            foreach (CountHelper ch in sorted)
+            {
+                //new Writeln(ch.name + " --> " + ch.n);
+                int imin = -12345;
+                int min = int.MaxValue;
+                for (int i = 0; i < k; i++)
+                {
+                    if (sums[i] < min)
+                    {
+                        min = sums[i];
+                        imin = i;
+                    }
+                }
+                yy[imin].Add(ch);
+                sums[imin] += ch.n;
+            }
+            new Writeln("Sum = " + sum + ", in MB = " + sum / 1000000);
+            for (int i = 0; i < k; i++)
+            {
+                new Writeln("list" + i + " = " + sums[i]);
+            }
+
+            return yy;
+        }
+
+        private static void ProtoSpeed(int k)
         {
             DateTime t = DateTime.Now;
+            
+            Dictionary<string, IVariable> storage = Program.databanks.GetFirst().storage;
+            List<List<CountHelper>> yy = SplitVarsInKContainers(storage, k);
 
             string hash = "abc123";
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < k; i++)
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + n + "" + Globals.cacheExtension);
+                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + "" + Globals.cacheExtension);
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
             }
             Databank source = Program.databanks.GetFirst();
-            int fraction = source.storage.Count / n + 1;
+            int fraction = source.storage.Count / k + 1;
 
             int counter = -1;
             foreach (KeyValuePair<string, IVariable> kvp in source.storage)
@@ -2247,7 +2252,7 @@ namespace Gekko
                 return true;
             }).All(_ => _);
 
-            new Writeln("Serialize (" + n + "): " + G.Seconds(t));
+            new Writeln("Serialize (" + k + "): " + G.Seconds(t));
             t = DateTime.Now;
 
             for (int i = 0; i < lists.Count; i++)
@@ -2278,7 +2283,7 @@ namespace Gekko
                 }
             }           
 
-            new Writeln("Deserialize (" + n + "): " + G.Seconds(t));                       
+            new Writeln("Deserialize (" + k + "): " + G.Seconds(t));                       
             
             //if (n == 4) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), source, db, "absolute", false, false);
         }
