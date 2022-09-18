@@ -8713,7 +8713,7 @@ namespace Gekko
                 if (G.Equal(opt_view, "yes"))
                 {
                     if (!(type == EPrintTypes.Print)) new Error("You can only combine <table> option with PRT");
-                    if (this.prtElements.Count > 1) new Error("Expected 1 element for PRT<table>");
+                    if (this.prtElements.Count > 1) new Error("Expected 1 element for PRT<view>");
                     Element e = this.prtElements[0];
                     IVariable[] vars = e.variable;
                     IVariable iv = vars[0];  //vars[1] is just multiplier value

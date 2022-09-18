@@ -163,6 +163,19 @@ namespace Gekko
         public int n = 0;
     }
 
+    public class NonSeriesHelper
+    {
+        public int depth = 0;
+        public int rows = 0;
+        public void Message()
+        {
+            if (this.depth > 0 && this.rows > 20)
+            {
+                new Note("PRT<view> is convenient for nested lists.");
+            }
+        }
+    }
+
     public class CountHelper
     {
         public KeyValuePair<string, IVariable> kvp;
@@ -1718,21 +1731,11 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+
             
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
-            }
-
-            if (true && Globals.runningOnTTComputer)
-            {   
-                Databank b = Program.databanks.GetFirst();
-
-                int k = 4;
-                WriteParallel(k, b, b.GetFileNameWithPath());
-                Databank db = ReadParallel(b.GetFileNameWithPath());
-                if (false) Sam(new GekkoTime(EFreq.A, 1900, 1, 1), new GekkoTime(EFreq.A, 2200, 1, 1), b, db, "absolute", false, false);
-
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -1932,6 +1935,7 @@ namespace Gekko
                     throw;
                 }
             }
+
 
             if (true && Globals.runningOnTTComputer)
             {
@@ -2233,14 +2237,14 @@ namespace Gekko
             return rv;
         }
 
-        public static void WriteParallel(int k, Databank source, string fileName)
+        public static void WriteParallel(int k, Databank source, string fileName, ReadInfo readInfo)
         {
-            bool print = false;
-            if (Globals.runningOnTTComputer) print = true;
-
-            DateTime t = DateTime.Now;            
+            DateTime t = DateTime.Now;
             string hash = Program.GetMD5Hash(null, fileName);
             string hashTime = G.Seconds(t);
+
+            bool print = false;
+            if (Globals.runningOnTTComputer) print = true;
 
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
@@ -2296,16 +2300,33 @@ namespace Gekko
                 sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
             }
 
-            if (print) new Writeln("Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
-            if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
-            
+            if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
+            //if (print) new Writeln("TTH: Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);            
+            readInfo.note += "Cache write time: " + G.Seconds(t) + ". ";
+
         }
 
-        public static Databank ReadParallel(string fileName)
+        public static Databank ReadParallel(string fileName, out int year1, out int year2, ReadInfo readInfo)
         {
+            // Test of read of large calib.gdx (176 MB) with different number of splitfiles.
+            //
+            // 1    6.40
+            // 2    4.30
+            // 3    3.90
+            // 4    3.70
+            // 5    3.70
+            // ... after this about the same
+            //
+            // Perhaps with many splitfiles, the lower bound is 3.70 s, but with larger variability.
+            // Seems that split = 3 at least. Perhaps the processors+1 rule is ok, therefore 5?
+            //
+            // When we have a 1of1, just read it without parallel.foreach (same for write).
+
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
 
+            year1 = int.MaxValue;
+            year2 = int.MinValue;
             DateTime t = DateTime.Now;
             string hash = Program.GetMD5Hash(null, fileName);
             string hashTime = G.Seconds(t);
@@ -2324,7 +2345,7 @@ namespace Gekko
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-            
+
             //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
 
@@ -2340,7 +2361,7 @@ namespace Gekko
                     TwoInts yearMinMax = twoIntss[i];
                     foreach (KeyValuePair<string, IVariable> kvp in lists[i])
                     {
-                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                    
+                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
                     }
                 }
                 return 0;
@@ -2357,8 +2378,14 @@ namespace Gekko
             }
             lists = null;  //free for GC
 
-            if (print) new Writeln("Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
+            for (int i = 0; i < k; i++)
+            {
+                if (twoIntss[i].int1 < year1) year1 = twoIntss[i].int1;
+                if (twoIntss[i].int2 > year2) year2 = twoIntss[i].int2;
+            }
 
+            //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
+            readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
             return db;
         }
 
@@ -3774,6 +3801,7 @@ namespace Gekko
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             string fileRemember = file;  //because file may change when reading
+            long fileRememberSize = new FileInfo(fileRemember).Length;
             
             //note: file is altered below, not sure why
             //file is the "real" system filepath and filename.
@@ -3791,9 +3819,13 @@ namespace Gekko
             //first we (may) look in the protobuffer cache, to see if there is a hit.
 
             bool cache_loadedFromProtobuf = false;            
-            if (MayUseDatabankCache(oRead))
+            if (MayUseDatabankCache(oRead.Type, fileRememberSize))
             {
-                Databank databankTemp2 = ReadParallel(fileRemember);
+                int year1, year2;
+                Databank databankTemp2 = ReadParallel(fileRemember, out year1, out year2, readInfo);
+                if (year1 == int.MaxValue) year1 = -12345;
+                if (year2 == int.MinValue) year2 = -12345;
+
                 if (databankTemp2 == null)
                 {
                     //do nothing, we then have to parse the file
@@ -3801,7 +3833,10 @@ namespace Gekko
                 else
                 {
                     cache_loadedFromProtobuf = true;
-                    databankTemp = databankTemp2;  //also has the name "temporary" but never mind
+                    databankTemp = databankTemp2;  //also has the name "temporary" but this is not important
+                    readInfo.startPerInFile = year1;
+                    readInfo.endPerInFile = year2;
+                    readInfo.variables = databankTemp2.storage.Count;
                 }
             }
 
@@ -3855,12 +3890,11 @@ namespace Gekko
                     }
                 }
 
-                if (MayUseDatabankCache(oRead))
+                if (MayUseDatabankCache(oRead.Type, fileRememberSize))
                 {
-
                     try //not the end of world if it fails
-                    {
-                        WriteParallel(Globals.processors, databankTemp, fileRemember);
+                    {                        
+                        WriteParallel(Program.options.system_threads, databankTemp, fileRemember, readInfo);
                     }
                     catch (Exception e)
                     {
@@ -3873,25 +3907,26 @@ namespace Gekko
         }
 
         /// <summary>
-        /// True if options.databank_file_cache == "all", or if file type is != gbk and options.databank_file_cache == "nongbk"
+        /// True if options.databank_file_cache == "all", or if file type is != gbk and 
+        /// options.databank_file_cache == "nongbk"
         /// </summary>
         /// <param name="oRead"></param>
         /// <returns></returns>
-        private static bool MayUseDatabankCache(ReadOpenMulbkHelper oRead)
+        private static bool MayUseDatabankCache(EDataFormat type, long bytes)
         {
             //Only allows the typical "bulk" formats. The 2D formats are fishy: what about 
             //offset and transpose?
 
-            bool gbk = oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None;
-            bool nonGbk = oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gdx || oRead.Type == EDataFormat.Px || oRead.Type == EDataFormat.Flat;
+            bool gbk = type == EDataFormat.Gbk || type == EDataFormat.None;
+            bool nonGbk = type == EDataFormat.Tsd || type == EDataFormat.Tsdx || type == EDataFormat.Gdx || type == EDataFormat.Px || type == EDataFormat.Flat;
 
             if (Program.options.databank_file_cache == "all")
             {
-                if (gbk || nonGbk) return true;
+                if ((gbk && bytes > Globals.cacheSize2) || (nonGbk && bytes > Globals.cacheSize1)) return true;
             }
             else if (Program.options.databank_file_cache == "nongbk")
             {
-                if (nonGbk) return true;
+                if (nonGbk && bytes > Globals.cacheSize1) return true;
             }            
             return false;
         }
@@ -4684,11 +4719,10 @@ namespace Gekko
             //need to be 100% correct.
             if (ts.type != ESeriesType.Timeless)
             {
-                yearMinMax.int1 = Math.Min(yearMinMax.int1, ts.GetPeriodFirst().super);
-                yearMinMax.int2 = Math.Max(yearMinMax.int2, ts.GetPeriodLast().super);
+                if (!ts.GetPeriodFirst().IsNull()) yearMinMax.int1 = Math.Min(yearMinMax.int1, ts.GetPeriodFirst().super);
+                if (!ts.GetPeriodLast().IsNull()) yearMinMax.int2 = Math.Max(yearMinMax.int2, ts.GetPeriodLast().super);
             }
         }
-
 
         /// <summary>
         /// Small helper method.
@@ -11465,12 +11499,7 @@ namespace Gekko
                         //not intended for "normal" Gekko users.
                         MakeBatFileForAremos();
                     }
-                    break;
-                case "--flush":
-                    {
-                        Flush();  //removes cached models
-                    }
-                    break;
+                    break;                
                 case "--deploy":
                     {
                         //Deploy
@@ -12907,19 +12936,21 @@ namespace Gekko
         /// Look at this for Gekko 4.0.
         /// See also GetShaHash().
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="inputText"></param>
         /// <returns></returns>
-        public static string GetMD5Hash(string input, string fileNameWithPath)
+        public static string GetMD5Hash(string inputText, string fileNameWithPath)
         {            
-            if (input != null && fileNameWithPath != null) new Error("Wrong call"); //one of them must be null
+            if (inputText != null && fileNameWithPath != null) new Error("Wrong call"); //one of them must be null
+
+            DateTime t0 = DateTime.Now;
 
             string hash = null;
 
-            if (input != null)
+            if (inputText != null)
             {
                 // step 1, calculate MD5 hash from input
                 MD5 md5 = MD5.Create();
-                byte[] inputBytes = Encoding.UTF8.GetBytes(input);  //UTF8 seems best choice
+                byte[] inputBytes = Encoding.UTF8.GetBytes(inputText);  //UTF8 seems best choice
                 byte[] hash2 = md5.ComputeHash(inputBytes);
                 // step 2, convert byte array to hex string
                 StringBuilder sb = new StringBuilder();
@@ -12942,6 +12973,7 @@ namespace Gekko
                 }
             }
             else new Error("Wrong call");
+            if (Globals.runningOnTTComputer) new Writeln("TTH: MD5 took " + G.Seconds(t0));
             return hash;
         }
 
@@ -13450,7 +13482,9 @@ namespace Gekko
 
                 if (ts == null)
                 {
-                    PrintNonSeries(x, null, 0);
+                    NonSeriesHelper helper = new NonSeriesHelper();
+                    PrintNonSeries(x, null, 0, helper);
+                    helper.Message();
                     nonSeries++;
                     continue;
                 }
@@ -20771,87 +20805,113 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Flushes all cache files. I
+        /// </summary>
         public static void Flush()
         {
-            new Writeln("Deleting/flushing temporary folders: " + System.Windows.Forms.Application.LocalUserAppDataPath);
+            Flush(true);
+        }
 
-            try
+        /// <summary>
+        /// If hard==true, flushes all cache files. If soft, checks a limit and flushes all cache files if over limit.
+        /// </summary>
+        /// <param name="hard"></param>
+        public static void Flush(bool hard)
+        {
+            if (hard)
             {
-                Directory.Delete(Globals.localTempFilesLocation, true);
-            }
-            catch { };
+                new Writeln("Deleting/flushing temporary folders: " + System.Windows.Forms.Application.LocalUserAppDataPath);
 
-            try
-            {
-                Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
-            }
-            catch { };
+                FlushHelper();
 
-            //This is necessary regarding the first, but in principle not regarding the two next.
-
-            try
-            {
-                Directory.CreateDirectory(Globals.localTempFilesLocation);
-            }
-            catch { };
-
-            try
-            {
-                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot);
-            }
-            catch { };
-
-            try
-            {
-                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot + "\\tempfiles");
-            }
-            catch { };            
-
-            if (false)
-            {
-                //If we need something like LRU cache, not deleting everything,
-                //the stuff below could be resurrected.
-
-                string path = "??";
-
-                try
+                if (false)
                 {
-                    long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
-                                                     //1000 MB corresponds to > 120 different large models
-                    double fraction = 0.8d;
-                    long sum = 0L;
+                    //If we need something like LRU cache, not deleting everything,
+                    //the stuff below could be resurrected.
 
-                    FileInfo[] files = new DirectoryInfo(path).GetFiles();
+                    string path = "??";
 
-                    List<DateTimeHelper> ddd = new List<DateTimeHelper>();
-                    foreach (FileInfo file in files)
+                    try
                     {
-                        if (G.Equal(file.Extension, Globals.cacheExtensionModel) || G.Equal(file.Extension, Globals.cacheExtension))
+                        long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
+                                                         //1000 MB corresponds to > 120 different large models
+                        double fraction = 0.8d;
+                        long sum = 0L;
+
+                        FileInfo[] files = new DirectoryInfo(path).GetFiles();
+
+                        List<DateTimeHelper> ddd = new List<DateTimeHelper>();
+                        foreach (FileInfo file in files)
                         {
-                            sum += file.Length;
-                            ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
+                            if (G.Equal(file.Extension, Globals.cacheExtensionModel) || G.Equal(file.Extension, Globals.cacheExtension))
+                            {
+                                sum += file.Length;
+                                ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
+                            }
+                        }
+
+                        if (sum > sumMax)
+                        {
+                            ddd.Sort((a, b) => a.dt.CompareTo(b.dt));
+                            double temp = (double)sumMax * fraction;  //we crop it some more, so we don't have to delete files for a while (= speedy startup)
+                            long tooMuch = sum - (long)(temp);
+                            long sum2 = 0L;
+                            foreach (DateTimeHelper d in ddd)
+                            {
+                                sum2 += d.size;
+                                File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)                        
+                                if (sum2 > tooMuch) break;
+                            }
                         }
                     }
-
-                    if (sum > sumMax)
+                    catch (Exception e)
                     {
-                        ddd.Sort((a, b) => a.dt.CompareTo(b.dt));
-                        double temp = (double)sumMax * fraction;  //we crop it some more, so we don't have to delete files for a while (= speedy startup)
-                        long tooMuch = sum - (long)(temp);
-                        long sum2 = 0L;
-                        foreach (DateTimeHelper d in ddd)
-                        {
-                            sum2 += d.size;
-                            File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)                        
-                            if (sum2 > tooMuch) break;
-                        }
+                        //fail silently, sometimes the files may be locked temporarily
                     }
                 }
-                catch (Exception e)
+            }
+            else
+            {
+                //if soft, flush localTempFilesLocation if localTempFilesLocation > cacheSize4
+                long size = CacheFilesSize();
+                if (size > Globals.cacheFileMax)
                 {
-                    //fail silently, sometimes the files may be locked temporarily
+                    FlushHelper();
+                    new Writeln("Gekko cache files were deleted because limit of " + G.UpdprtFormat((double)Globals.cacheFileMax / 1000000000d, 2, false) + " GB was exceeded.");
                 }
             }
+        }
+
+        /// <summary>
+        /// In bytes
+        /// </summary>
+        /// <returns></returns>
+        public static long CacheFilesSize()
+        {
+            long size = DirSize(new DirectoryInfo(Globals.localTempFilesLocation));
+            return size;
+        }
+
+        /// <summary>
+        /// Size of dir including subdirs (in bytes)
+        /// </summary>
+        public static long DirSize(DirectoryInfo d)
+        {
+            long size = 0;
+            // Add file sizes.
+            FileInfo[] fis = d.GetFiles();
+            foreach (FileInfo fi in fis)
+            {
+                size += fi.Length;
+            }
+            // Add subdirectory sizes.
+            DirectoryInfo[] dis = d.GetDirectories();
+            foreach (DirectoryInfo di in dis)
+            {
+                size += DirSize(di);
+            }
+            return size;
         }
 
         public static List<string> GetDatabankInfo(StampTypes type)
@@ -22271,11 +22331,13 @@ namespace Gekko
             {
                 string[] w = Print.RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
                 string labelGiven = G.ReplaceGlueSymbols(w[0]);
-                PrintNonSeries(element.variable[0], labelGiven, 0);
+                NonSeriesHelper helper = new NonSeriesHelper();
+                PrintNonSeries(element.variable[0], labelGiven, 0, helper);
+                helper.Message();
             }
         }
 
-        private static string PrintNonSeries(IVariable x, string labelGiven, int depth)
+        private static string PrintNonSeries(IVariable x, string labelGiven, int depth, NonSeriesHelper helper)
         {
             string s = "";
             string pling = "'";
@@ -22283,11 +22345,11 @@ namespace Gekko
             {
                 if (x.Type() == EVariableType.List)
                 {
-                    G.Writeln2(labelGiven);
+                    G.Writeln2(labelGiven);                    
                     List x_list = x as List;
                     for (int i = 0; i < x_list.Count(); i++)
                     {
-                        string ss = PrintNonSeries(x_list.list[i], null, depth + 1);
+                        string ss = PrintNonSeries(x_list.list[i], null, depth + 1, helper);
                         s += ss;
                         if (x_list.Count() == 1)
                         {
@@ -22358,10 +22420,12 @@ namespace Gekko
                 //depth > 0
                 if (x.Type() == EVariableType.List)
                 {
+                    if (depth > helper.depth) helper.depth = depth;
                     List x_list = x as List;
                     for (int i = 0; i < x_list.Count(); i++)
                     {
-                        string ss = PrintNonSeries(x_list.list[i], null, depth + 1);
+                        helper.rows++;
+                        string ss = PrintNonSeries(x_list.list[i], null, depth + 1, helper);
                         s += ss;
                         if (x_list.Count() == 1)
                         {
@@ -29503,6 +29567,44 @@ namespace Gekko
             xx.Close();
         }
 
+        /// <summary>
+        /// Actually deletes the files (both cache and gnuplot files)
+        /// </summary>
+        private static void FlushHelper()
+        {
+            try
+            {
+                Directory.Delete(Globals.localTempFilesLocation, true);
+            }
+            catch { };
+
+            try
+            {
+                Directory.Delete(Globals.localTempFilesLocationGnuplot, true);
+            }
+            catch { };
+
+            //This is necessary regarding the first, but in principle not regarding the two next.
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocation);
+            }
+            catch { };
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot);
+            }
+            catch { };
+
+            try
+            {
+                Directory.CreateDirectory(Globals.localTempFilesLocationGnuplot + "\\tempfiles");
+            }
+            catch { };
+        }
+
         [ProtoContract]
         public class ReadInfo
         {
@@ -29526,6 +29628,8 @@ namespace Gekko
             public bool open = false;
             public bool shouldMerge = false;
             public string pcim = "";  //only used for PCIM databanks.
+            public string note = null;
+            public string gamsNote = null;
 
             // ------- from XML
             public string databankVersion = "";
@@ -29617,7 +29721,12 @@ namespace Gekko
                     tab.CurRow.Next();
                     tab.CurRow.SetText(1, "           " + this.dbName + " databank now contains " + total + " variables (" + this.startPerResultingBank + "-" + this.endPerResultingBank + ")");
                 }
-                tab.CurRow.SetText(1, "Note     : Press F2 for info on databanks");
+                tab.CurRow.SetText(1, "Note     : Press F2 for info on databanks. " + this.note);
+                if (this.gamsNote != null)
+                {
+                    tab.CurRow.Next();
+                    tab.CurRow.SetText(1, "GAMS     : " + this.gamsNote);
+                }
 
                 tab.CurRow.SetBottomBorder(1, 1);
                 tab.CurRow.SetLeftBorder(1);

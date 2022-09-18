@@ -523,8 +523,12 @@ namespace Gekko
             if (cleanup)  //This is only run if last Gekko start is more than 14 days ago. To avoid superflous cleanup,
             {             //that may take up to 0.1 sec if there are many .mdl files or other stuff to look through.
                 DateTime t1 = DateTime.Now;
-                Program.Flush();
-                new Writeln("General cleanup of temporary Gekko files (" + G.Seconds(t1) + ") -- done occasionally");
+                Program.Flush(true);
+                new Writeln("General cleanup of Gekko cache files (" + G.Seconds(t1) + ") -- done occasionally");
+            }
+            else
+            {
+                Program.Flush(false);  //checks that folders are not unreasonably large
             }
 
             UserSettings us = null;
@@ -3170,10 +3174,11 @@ namespace Gekko
 
         private void deleteTempFilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult myDialogResult = MessageBox.Show("Temporary files are Gekko-made temporary files, most notably " + G.NL + " cached model files in binary form. Clicking 'Yes' now will delete " + G.NL + " these files, saving some room on the hard disk, and forcing  " + G.NL + " Gekko to re-parse and re-compile a model, even if it has been  " + G.NL + " loaded before.", "Delete temp files", MessageBoxButtons.YesNo);
+            DialogResult myDialogResult = MessageBox.Show("Cache files are Gekko-made temporary files, most notably " + G.NL + " cached model files in binary form. Clicking 'Yes' now will delete " + G.NL + " these files, saving some room on the hard disk, and forcing  " + G.NL + " Gekko to re-read databanks and models.", "Delete cache files", MessageBoxButtons.YesNo);
             if (myDialogResult == DialogResult.Yes)
             {
-                Program.Flush();
+                Program.Flush(true);
+                new Writeln("Gekko cache files deleted");
             }
         }
 

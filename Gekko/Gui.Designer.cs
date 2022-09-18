@@ -656,7 +656,7 @@ namespace Gekko
             // 
             this.deleteTempFilesToolStripMenuItem.Name = "deleteTempFilesToolStripMenuItem";
             this.deleteTempFilesToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
-            this.deleteTempFilesToolStripMenuItem.Text = "Delete temp files...";
+            this.deleteTempFilesToolStripMenuItem.Text = "Delete cache files...";
             this.deleteTempFilesToolStripMenuItem.Click += new System.EventHandler(this.deleteTempFilesToolStripMenuItem_Click);
             // 
             // toolStripSeparator3

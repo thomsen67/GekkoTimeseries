@@ -230,9 +230,10 @@ namespace Gekko
         public bool solve_static = false;
         // ---
         public string string_interpolate_format_val = ""; //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used. //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
-        // ---
+                
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
+        public int system_threads = 5; //cores+1 (augment for > 4 cores, count physical cores not logical cores).
         // ---
         public string table_decimalseparator = "period";  //comma|period        
         public double table_html_datawidth = 5.5;  //in 'em' units
@@ -497,6 +498,7 @@ namespace Gekko
             Add("STRING INTERPOLATE FORMAT VAL", Globals.xstring);
             Add("SYSTEM CODE SPLIT", Globals.xint);
             Add("SYSTEM CLONE", Globals.xbool);
+            Add("SYSTEM THREADS", Globals.xint);            
             Add("TABLE DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                  //#kljsdfasfdlkj
             Add("TABLE HTML DATAWIDTH", Globals.xval);
             Add("TABLE HTML FIRSTCOLWIDTH", Globals.xval);

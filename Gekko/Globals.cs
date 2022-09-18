@@ -101,10 +101,13 @@ namespace Gekko
         public const string languageDaDK = "da-DK";
         public const string languageEnUS = "en-US";
 
-        public const int processors = 6; //splitting of cache protobuf databanks
-        public const int count1 = 32; //dead weight of an object (guess, too low for series...)
-        public const int count2 = 8;  //double value is 8 bytes
-        public const int count3 = 2;  //one char inside string is 2 bytes
+        //See Program.options.system_threads = 5;
+        public const double cacheSize1 = 5e6;  //non-gbk
+        public const double cacheSize2 = 10e6; //gbk
+        public const double cacheFileMax = 50e9;  //bytes, flush always if over
+        public const int count1 = 32;  //dead weight of an object (guess, too low for series...)
+        public const int count2 = 8;   //double value is 8 bytes
+        public const int count3 = 2;   //one char inside string is 2 bytes
 
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
 

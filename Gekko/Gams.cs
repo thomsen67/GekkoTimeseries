@@ -3658,7 +3658,7 @@ namespace Gekko
             {
                 new Error("The slow gdx reader is not maintained, try the faster GDX reader with: OPTION gams fast = yes;");
             }
-            G.Writeln("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");            
+            readInfo.gamsNote = counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets";
 
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;

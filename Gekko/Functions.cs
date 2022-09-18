@@ -1985,6 +1985,74 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
+        public static void flush(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            Program.Flush(true);  //removes cached models
+            new Writeln("Gekko cache files deleted");
+        }
+
+        //Expect time dimension to be last for each "record", like (('a', 'b', '2001'), ('a', 'c', '2002'))
+        public static IVariable toseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            IVariable rv = null;
+
+            List x_list = x as List;
+            if (x_list == null) new Error("toSeries() expects list input");
+            int n = x_list.list.Count;
+            if (n < 1) new Error("Expected >= 1 elements");
+            int cols = -12345;
+            for (int i = 0; i < x_list.list.Count; i++)
+            {
+                IVariable iv = x_list.list[i];
+                List y_list = iv as List;
+                if (y_list == null) new Error("Sub-element #" + (i + 1) + " is not a list");
+                if (cols == -12345) cols = y_list.list.Count;
+                else
+                {
+                    if (cols != y_list.list.Count) new Error("Expected sub-list #" + (i + 1) + " to have " + cols + " elements");
+                }
+            }
+
+            int time = cols - 1;  //TODO, choose column (now last)
+            EFreq freq = GekkoTime.FromStringToGekkoTime(((List)x_list.list[0]).list[time].ToString()).freq;
+
+            Series z = new Series(freq, null);
+            z.meta.label = null;
+            z.SetArrayTimeseries(cols - 1, true);            
+
+            for (int i = 0; i < x_list.list.Count; i++)
+            {
+                List row = x_list.list[i] as List;
+                string[] ss = new string[cols - 1];
+                GekkoTime gt = GekkoTime.tNull;
+                int count = -1;
+                for (int j = 0; j < cols; j++)
+                {
+                    string s2 = row.list[j].ConvertToString();
+                    if (j == time)
+                    {
+                        gt = GekkoTime.FromStringToGekkoTime(s2);
+                        continue;
+                    }
+                    count++;
+                    ss[count] = s2;
+                }
+                if (gt.IsNull()) new Writeln("Time not found for row #" + (i + 1));
+                MultidimItem map = new MultidimItem(ss, z);
+                IVariable tsSub = null;
+                z.dimensionsStorage.TryGetValue(map, out tsSub);
+                if (tsSub == null)
+                {
+                    tsSub = new Series(freq, null);
+                    z.dimensionsStorage.AddIVariableWithOverwrite(map, tsSub);
+                }                
+                (tsSub as Series).SetData(gt, 1d);
+            }            
+            
+            rv = z;
+            return rv;
+        }
+
         public static IVariable rnorm(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable means, IVariable vcov)
         {
             //Maybe it is stupid that we are using stddev versus matrix of covariance
