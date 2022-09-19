@@ -1992,12 +1992,12 @@ namespace Gekko
         }
 
         //Expect time dimension to be last for each "record", like (('a', 'b', '2001'), ('a', 'c', '2002'))
-        public static IVariable toseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        public static IVariable binary(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             IVariable rv = null;
 
             List x_list = x as List;
-            if (x_list == null) new Error("toSeries() expects list input");
+            if (x_list == null) new Error("binary() expects list input");
             int n = x_list.list.Count;
             if (n < 1) new Error("Expected >= 1 elements");
             int cols = -12345;
@@ -2013,12 +2013,15 @@ namespace Gekko
                 }
             }
 
+            if (cols < 2) new Error("Expcedted sub-lists to have at least two elements each");
             int time = cols - 1;  //TODO, choose column (now last)
-            EFreq freq = GekkoTime.FromStringToGekkoTime(((List)x_list.list[0]).list[time].ToString()).freq;
+            IVariable iv2 = ((List)x_list.list[0]).list[time];                        
+            GekkoTime oneTime = GekkoTime.FromIVariableToGekkoTime(iv2);
+            EFreq freq = oneTime.freq;
 
             Series z = new Series(freq, null);
             z.meta.label = null;
-            z.SetArrayTimeseries(cols - 1, true);            
+            z.SetArrayTimeseries(cols, true);
 
             for (int i = 0; i < x_list.list.Count; i++)
             {
@@ -2028,12 +2031,12 @@ namespace Gekko
                 int count = -1;
                 for (int j = 0; j < cols; j++)
                 {
-                    string s2 = row.list[j].ConvertToString();
                     if (j == time)
                     {
-                        gt = GekkoTime.FromStringToGekkoTime(s2);
+                        gt = GekkoTime.FromIVariableToGekkoTime(row.list[j]);
                         continue;
                     }
+                    string s2 = row.list[j].ConvertToString();
                     count++;
                     ss[count] = s2;
                 }
@@ -2045,13 +2048,13 @@ namespace Gekko
                 {
                     tsSub = new Series(freq, null);
                     z.dimensionsStorage.AddIVariableWithOverwrite(map, tsSub);
-                }                
+                }
                 (tsSub as Series).SetData(gt, 1d);
-            }            
-            
+            }
+
             rv = z;
             return rv;
-        }
+        }        
 
         public static IVariable rnorm(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable means, IVariable vcov)
         {
@@ -4546,46 +4549,48 @@ namespace Gekko
                     double d2 = O.ConvertToVal(x2);
                     double d3 = O.ConvertToVal(x3);
 
-                    Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                    Series lhs = null;
 
                     if (ths_series.type == ESeriesType.ArraySuper)
                     {
-                        new Error("Replace(): you cannot use array-series as argument");
-                        //throw new GekkoException();
-                    }
+                        lhs = new Series(ths_series.freq, null);
+                        lhs.dimensionsStorage = new Multidim();
+                        lhs.dimensions = ths_series.dimensions;
+                        lhs.type = ESeriesType.ArraySuper;
+                        lhs.meta = new SeriesMetaInformation();
 
-                    if (ths_series.type == ESeriesType.Timeless)
+                        foreach (KeyValuePair<MultidimItem, IVariable> kvp in ths_series.dimensionsStorage.storage)
+                        {
+                            Series sub = kvp.Value as Series;
+                            Series sub2 = replace(smpl, _t1, _t2, sub, x2, x3, isInside, max) as Series;
+                            sub2.type = ESeriesType.Normal;
+                            lhs.dimensionsStorage.AddIVariableWithOverwrite(kvp.Key, sub2);
+                        }
+                    }
+                    else if (ths_series.type == ESeriesType.Timeless)
                     {
-                        new Error("Replace(): you cannot use timeless series as argument");
-                        //throw new GekkoException();
+                        lhs = new Series(ESeriesType.Timeless, ths_series.freq, null, double.NaN);
+                        double d_existing = ths_series.GetTimelessData();
+                        double rv = Helper_Replace(d_existing, d2, d3);
+                        lhs.SetTimelessData(rv);
                     }
-
-                    foreach (GekkoTime t in smpl.Iterate12())
+                    else
                     {
-                        //will only replace for current sample, not outside of it! So PRT dif(replace(x, m(), 1)) may spring a surprise since relpace does not replace before sample start. But not intended for that though.
-                        double d = ths_series.GetDataSimple(t);
-                        if (double.IsNaN(d2) && double.IsNaN(d))
+                        lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                        foreach (GekkoTime t in smpl.Iterate12())
                         {
-                            lhs.SetData(t, d3);
-                        }
-                        else if (d == d2)
-                        {
-                            lhs.SetData(t, d3);
-                        }
-                        else
-                        {
-                            //replicate
-                            lhs.SetData(t, d);
+                            //will only replace for current sample, not outside of it! So PRT dif(replace(x, m(), 1)) may spring a surprise since relpace does not replace before sample start. But not intended for that though.
+                            double d_existing = ths_series.GetDataSimple(t);
+                            double rv = Helper_Replace(d_existing, d2, d3);
+                            lhs.SetData(t, rv);
                         }
                     }
-
                     return lhs;
 
                 }
                 else
                 {
                     new Error("Replace(): you cannot use series type with 'inside' or 'max'"); return null;
-                    //throw new GekkoException();
                 }
             }
             else
@@ -4593,6 +4598,26 @@ namespace Gekko
                 FunctionError("replace", ths);  //throws exception
                 return null;
             }
+        }
+
+        private static double Helper_Replace(double d_existing, double d2, double d3)
+        {
+            double rv = double.NaN;
+            if (double.IsNaN(d_existing) && double.IsNaN(d2))
+            {
+                rv = d3;
+            }
+            else if (d_existing == d2)
+            {
+                rv = d3;
+            }
+            else
+            {
+                //replicate
+                rv = d_existing;
+            }
+
+            return rv;
         }
 
         public static IVariable gekkoversion(GekkoSmpl smpl, IVariable _t1, IVariable _t2)

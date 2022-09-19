@@ -598,7 +598,6 @@ namespace Gekko
             if (this.type != ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #100");
-                //throw new GekkoException();
             }
             if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
@@ -614,7 +613,6 @@ namespace Gekko
             if (this.type != ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #1009");
-                //throw new GekkoException();
             }
             if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {

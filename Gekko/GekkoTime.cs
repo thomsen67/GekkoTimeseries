@@ -728,6 +728,20 @@ namespace Gekko
             return t;
         }
 
+        /// <summary>
+        /// Tries to convert a scalar string/date/val into a GekkoTime. Reason why O.ConvertToDate() is not
+        /// used is that it does not accept strings.
+        /// </summary>
+        /// <param name="iv2"></param>
+        /// <returns></returns>
+        public static GekkoTime FromIVariableToGekkoTime(IVariable iv2)
+        {
+            GekkoTime oneTime;
+            if (iv2.Type() == EVariableType.String) oneTime = GekkoTime.FromStringToGekkoTime(iv2.ConvertToString());
+            else oneTime = O.ConvertToDate(iv2);
+            return oneTime;
+        }
+
         public static DateTime FromGekkoTimeToDateTime(GekkoTime gt, O.GetDateChoices firstLast)
         {
             //See also #09834753425, converting from GekkoTime to GekkoTime

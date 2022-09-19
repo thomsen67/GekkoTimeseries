@@ -2237,11 +2237,15 @@ namespace Gekko
             return rv;
         }
 
-        public static void WriteParallel(int k, Databank source, string fileName, ReadInfo readInfo)
+        public static void WriteParallel(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
             DateTime t = DateTime.Now;
-            string hash = Program.GetMD5Hash(null, fileName);
-            string hashTime = G.Seconds(t);
+            if (hash == null)  
+            {
+                //never happens? When an unseen file is encountered, ReadParallel will have computed the hash to see if it is known.
+                //so this is just for double safety.
+                hash = Program.GetMD5Hash(null, fileName);
+            }
 
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -2302,11 +2306,15 @@ namespace Gekko
 
             if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
             //if (print) new Writeln("TTH: Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);            
-            readInfo.note += "Cache write time: " + G.Seconds(t) + ". ";
+
+            double milliseconds = (DateTime.Now - t).TotalMilliseconds;
+            milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
+            string s = G.SecondsFormat(milliseconds);
+            readInfo.note += "Cache write time: " + s + ". ";
 
         }
 
-        public static Databank ReadParallel(string fileName, out int year1, out int year2, ReadInfo readInfo)
+        public static Databank ReadParallel(string fileName, out int year1, out int year2, out string hash, out double hashMs, ReadInfo readInfo)
         {
             // Test of read of large calib.gdx (176 MB) with different number of splitfiles.
             //
@@ -2328,8 +2336,8 @@ namespace Gekko
             year1 = int.MaxValue;
             year2 = int.MinValue;
             DateTime t = DateTime.Now;
-            string hash = Program.GetMD5Hash(null, fileName);
-            string hashTime = G.Seconds(t);
+            hash = Program.GetMD5Hash(null, fileName);
+            hashMs = (DateTime.Now - t).TotalMilliseconds;
 
             List<string> files = new List<string>();
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
@@ -3818,11 +3826,14 @@ namespace Gekko
 
             //first we (may) look in the protobuffer cache, to see if there is a hit.
 
+            string hash = null;  //may be set via ReadParallel, to be reused by WriteParallel to avoid double work
+            double hashMs = double.NaN;
+
             bool cache_loadedFromProtobuf = false;            
             if (MayUseDatabankCache(oRead.Type, fileRememberSize))
             {
                 int year1, year2;
-                Databank databankTemp2 = ReadParallel(fileRemember, out year1, out year2, readInfo);
+                Databank databankTemp2 = ReadParallel(fileRemember, out year1, out year2, out hash, out hashMs, readInfo);
                 if (year1 == int.MaxValue) year1 = -12345;
                 if (year2 == int.MinValue) year2 = -12345;
 
@@ -3894,7 +3905,7 @@ namespace Gekko
                 {
                     try //not the end of world if it fails
                     {                        
-                        WriteParallel(Program.options.system_threads, databankTemp, fileRemember, readInfo);
+                        WriteParallel(Program.options.system_threads, databankTemp, fileRemember, hash, hashMs, readInfo);
                     }
                     catch (Exception e)
                     {

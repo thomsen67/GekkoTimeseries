@@ -3664,7 +3664,7 @@ namespace Gekko
             readInfo.endPerInFile = yearMax;
             readInfo.nanCounter = 0;
 
-            readInfo.variables = counterVariables + counterParameters;
+            readInfo.variables = counterVariables + counterParameters + importedSets;
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
 
             readInfo.startPerResultingBank = readInfo.startPerInFile;
