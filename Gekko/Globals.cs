@@ -38,10 +38,7 @@ namespace Gekko
     /// Contains global variables, settings etc.
     /// </summary>
     public class Globals
-    {
-        public const bool XX_removedublets = false;
-        public const bool PPP = false;
-
+    {   
         public const string smpl = "§¤£";  //this line must be at top
         public const string libraryDriveCheatString = "library___name___";
         public static bool HANDLE_LIBRARY = false;

@@ -533,11 +533,14 @@ namespace Gekko
 
         [ProtoMember(5)]
         public int[] ee = null;
-        
+
+        // ------------------------------------
+
         //not protobuffed
         public double[] r = null;
 
-        //this protobuf is often not needed
+        //this protobuf is often not needed. Suppose it contains 
+        //the values from the scalar model.
         [ProtoMember(6)]
         public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
@@ -645,6 +648,10 @@ namespace Gekko
         /// </summary>
         [ProtoMember(26)]
         public List<string> equationChunks = null;
+
+        // =============================================
+        // =============================================
+        // =============================================
 
         public int GetEqNumber(string eqName)
         {

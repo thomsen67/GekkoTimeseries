@@ -259,8 +259,10 @@ namespace Gekko
             return assembly;
         }
 
-        private static Assembly Compile5(List<string> eqsCs, List<string> eqsHuman)
-        {            
+        private static Assembly Compile5(List<string> eqsCs, List<string> eqsHuman, Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)
+        {
+            DateTime dt1 = DateTime.Now;
+
             StringBuilder code = new StringBuilder();
             bool b = eqsHuman.Count == 0;
             
@@ -291,12 +293,7 @@ namespace Gekko
             code.AppendLine("}");  //method
             code.AppendLine("}");  //end class
             code.AppendLine("}");  //end namespace
-
-            if (Globals.PPP)
-            {
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
-            }
-
+            
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
             compilerParams.CompilerOptions = Program.GetCompilerOptions();
@@ -317,6 +314,14 @@ namespace Gekko
                 new Error("Compilation failed");
             }
             Assembly assembly = cr.CompiledAssembly;
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Compile finished: " + G.Seconds(dt1));
+
+            dt1 = DateTime.Now;
+            Object[] o = new Object[1] { functions };
+            assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Loading funcs took: " + G.Seconds(dt1));
+            
             return assembly;
         }
 
@@ -883,7 +888,7 @@ namespace Gekko
                 helper.dict_FromEqChunkNumberToEqName[kvp.Value] = kvp.Key;
             }
 
-            new Writeln("Import dictionary finished: " + G.Seconds(dt1));
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Import dictionary finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
             TokenList tokensLast = null;
@@ -1009,7 +1014,7 @@ namespace Gekko
                     }
                 }
             }
-            new Writeln("GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
+            if(Globals.runningOnTTComputer) new Writeln("TTH: GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
             dt1 = DateTime.Now;
 
             //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
@@ -1047,18 +1052,13 @@ namespace Gekko
                 }
                 helper.a[i1][i2] = d;
             }
-            new Writeln("Endogenous values read: " + G.Seconds(dt1));
-            dt1 = DateTime.Now;
-
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
+            
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
             //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
             //if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
             //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
-            
-            Assembly assembly = Compile5(csCodeLines, helper.equationChunks);
-            new Writeln("Compile finished: " + G.Seconds(dt1));
-            dt1 = DateTime.Now;
-
+                        
             double[] r = G.CreateNaN(eqCounts2);
             Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];
             double[][] a = helper.a;
@@ -1067,22 +1067,24 @@ namespace Gekko
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
             int[] ee = helper.eqPointers.ToArray();
 
-            new Writeln("Data preparation finished: " + G.Seconds(dt1));
+            Assembly assembly = Compile5(csCodeLines, helper.equationChunks, functions);
+            
             dt1 = DateTime.Now;
 
-            using (var txt = new Writeln())
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Data preparation finished: " + G.Seconds(dt1));
+            
+            if (Globals.runningOnTTComputer)
             {
-                txt.MainAdd("======================================================================");
-                txt.MainNewLineTight();
-                txt.MainAdd("===> Setting up everything took: " + G.Seconds(dt0) + ", all included");
-                txt.MainNewLineTight();
-                txt.MainAdd("======================================================================");
-            }
+                using (var txt = new Writeln())
+                {
+                    txt.MainAdd("======================================================================");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("======================================================================");
+                }
+            }            
 
-            Object[] o = new Object[1] { functions };
-            assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
-
-            new Writeln("Loading funcs took: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
             List<string> gamsFoldedModel = new List<string>();
@@ -1099,7 +1101,9 @@ namespace Gekko
                 }
             }
 
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
 
+            dt1 = DateTime.Now;
             if (true)
             {
                 Program.model = new Model();
@@ -1199,6 +1203,9 @@ namespace Gekko
                     }
                 }                
             }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
+
             return;
         }
 
@@ -1426,7 +1433,6 @@ namespace Gekko
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
                     string eqname = helper.dict_FromEqNumberToEqName[number];
                     string helper2 = "";
-                    //if (Globals.runningOnTTComputer) helper2 = "/* " + eqname + " */  ";  //only for debugging
                     HandleEqLineAppend(helper, i, helper2);
                 }
                 else if (IsXVariable(th1, th1Next))
@@ -1452,25 +1458,8 @@ namespace Gekko
                     int ii1 = helper.endo.Count;
                     int ii2 = helper.endo.Count + 1;
 
-
                     bool seenBefore = false;
-                    if (Globals.XX_removedublets)
-                    {                        
-                        //tested that a dictionary<int, int> with (x-)number as key is not faster
-                        //maybe lookup is faster for long eqs, but an int has to be added to dict
-                        //each time. So for now, we just search the list.
-                        for (int ii = 0; ii < helper.endo.Count; ii += 2)
-                        {
-                            if (helper.endo[ii] == i1 && helper.endo[ii + 1] == i2)
-                            {
-                                seenBefore = true;
-                                ii1 = ii;
-                                ii2 = ii + 1;
-                                break;
-                            }
-                        }
-                    }
-
+                    
                     HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]][b[" + ii2 + "]]");
                                         
                     if (!seenBefore)
@@ -1505,18 +1494,7 @@ namespace Gekko
             helper.count++;
             helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
             helper.b.Add(helper.endo);  //also works as precedents
-
-            if (Globals.PPP)
-            {
-                string s = null;
-                for (int i = 0; i < helper.endo.Count; i++)
-                {
-                    s += helper.endo[i] + " ";
-                    if (i % 2 == 1) s += "--- ";
-                }
-                MessageBox.Show(s);
-            }
-
+            
             helper.c.AddRange(helper.exoValues);            
             helper.d.Add(helper.exo);
 
@@ -1688,7 +1666,7 @@ namespace Gekko
             input.zipFilePathAndName = fileName;
 
             DateTime t2 = DateTime.Now;
-            string modelHash = Program.GetShaHash(input.zipFilePathAndName);
+            string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);
 
             //these objects typically get overridden soon
             Program.model = new Model();
@@ -1791,7 +1769,7 @@ namespace Gekko
                     input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, o.p);
                 }
 
-                new Writeln("Unzip: " + G.Seconds(t3));
+                if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
 
                 ReadGamsScalarModelEquations(input);                                  
 
@@ -1814,7 +1792,8 @@ namespace Gekko
                     {
                         serializer2.Serialize(fs, Program.model.modelGamsScalar);
                     }
-                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+
+                    if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
                 }
                 catch (Exception e)
                 {
@@ -1886,6 +1865,9 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
             }
+
+            var xx = Program.model.modelGamsScalar;
+
         }
 
         /// <summary>
@@ -1916,13 +1898,14 @@ namespace Gekko
                     Program.model.modelGamsScalar.a[i] = Program.model.modelGamsScalar.aTemp[i].storage;
                 }
                 Program.model.modelGamsScalar.aTemp = null;
-                
+
                 //Loading of Func<>s
-                Assembly assembly = Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.equationChunks);
-                
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
-                Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
-                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                                     
+                Assembly assembly = Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.equationChunks, Program.model.modelGamsScalar.functions);
+                
+                //Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
+                //Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
+                //assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                                     
             }
             else
             {

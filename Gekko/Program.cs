@@ -12945,7 +12945,6 @@ namespace Gekko
         /// Note that (b) is much faster on a file than first getting the file as a string.
         /// The two versions are kept in 1 method to keep them together. Probably the internals are identical?
         /// Look at this for Gekko 4.0.
-        /// See also GetShaHash().
         /// </summary>
         /// <param name="inputText"></param>
         /// <returns></returns>
@@ -12972,6 +12971,21 @@ namespace Gekko
             }
             else if (fileNameWithPath != null)
             {
+                //tried physically splitting file in n chunks --> 
+                //has about same speed as MD5 itself... (0.6 s for a 176 MB file)                
+                //also, copying the file with File.Copy is not that much slower than MD5 itself.
+                //So we need to use something that operates on the file itself, also cannot put it in
+                //byte[] array and operate on this.
+                //Maybe just accept it, or wait until a suitable parallel implementation of SHA3.
+                //Cannot use xxHash and similar directly, they produce a ulong suitable for Dictionary
+                //hashing.
+                //In general, allowing READ <type> xx.zip, where file.type is inside the zip would be nice,
+                //because then the hashing would be faster. User would have to zip gdx files though.
+                //
+                //!! actually if xxHash returns 128 bits (uint128), that is actually the same as
+                //   MD5. Then the question is about collisions... Maybe when this:
+                //   https://github.com/uranium62/xxHash adds stream support for 128 bit hashes.
+                //
                 using (var md5Instance = MD5.Create())
                 {
                     using (var stream = File.OpenRead(fileNameWithPath))
@@ -12979,34 +12993,15 @@ namespace Gekko
                         byte[] hash2 = md5Instance.ComputeHash(stream);
                         //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
                         //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
-                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");                        
+                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
                     }
                 }
             }
             else new Error("Wrong call");
+
             if (Globals.runningOnTTComputer) new Writeln("TTH: MD5 took " + G.Seconds(t0));
             return hash;
-        }
-
-        /// <summary>
-        /// Obtains SHA256 hash code from a file input (good for large files). Removes "-" separator from the output string (which is in hex).
-        /// Note that there is no waiting for file access: this could be implemented if needed (WaitForFileStream).
-        /// There is a read buffer size of 1.2 MB which may be good for large files. See also GetMD5Hash().
-        /// Some symbols in the returned hash are replaced, so SHA here is not completely standard.
-        /// </summary>
-        /// <param name="fileNameWithPath"></param>
-        /// <returns></returns>
-        public static string GetShaHash(string fileNameWithPath)
-        {
-            using (var stream = new FileStream(fileNameWithPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
-            {
-                SHA256Managed sha = new SHA256Managed();
-                byte[] hash = sha.ComputeHash(stream);                
-                string s = Convert.ToBase64String(hash).Replace("=", "").Replace("+", "a").Replace("/", "b");
-                return s;
-            }
-        }
-
+        }        
 
         /// <summary>
         /// RUN command.
