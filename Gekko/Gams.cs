@@ -132,11 +132,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Splits up equatoins in the number of threads, and for each thread cuts up so 
+        /// Splits up equations (by int number 0...n-1) in the number of threads, 
+        /// and for each thread cuts up so 
         /// that the number of equations in each method is not larger than eqsPerChunk.
         /// Afterwards, foreach (List&lt;TwoInts> c1 in chunks) { foreach (TwoInts c2 in c1)
         /// { for (int i = c2.int1; i&lt;c2.int2; i++) { ... will loop i from 0 to n-1 (including)
         /// with increment 1 and no holes. Here, chunks is the return value from method.
+        /// For n &lt; 500, no chunking is done.
         /// </summary>         
         private static List<List<TwoInts>> Chunker(int n, int threads, int eqsPerChunk)
         {
@@ -925,18 +927,6 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Data preparation finished: " + G.Seconds(dt1));
             
-            if (Globals.runningOnTTComputer)
-            {
-                using (var txt = new Writeln())
-                {
-                    txt.MainAdd("======================================================================");
-                    txt.MainNewLineTight();
-                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");
-                    txt.MainNewLineTight();
-                    txt.MainAdd("======================================================================");
-                }
-            }            
-
             dt1 = DateTime.Now;
 
             List<string> gamsFoldedModel = new List<string>();
@@ -1056,6 +1046,18 @@ namespace Gekko
             }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
+
+            if (Globals.runningOnTTComputer)
+            {
+                using (var txt = new Writeln())
+                {
+                    txt.MainAdd("======================================================================");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("======================================================================");
+                }
+            }
 
             return;
         }
@@ -1635,6 +1637,32 @@ namespace Gekko
                     //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                     RuntimeTypeModel serializer2 = RuntimeTypeModel.Create();
                     serializer2.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+                    if (false)
+                    {
+                        //Can be used to test size of protobuf
+                        //Just comment out one of the objects and look at the protobuf
+                        //Beware that when running it as-is, it is expected that protobuf size is around 0.
+                        //Sizes in MB, XX means 1 mio elements.
+                        Program.model.modelGamsScalar.bbTemp = null;    //26.5 XX
+                        Program.model.modelGamsScalar.cc = null;        // 2.4 
+                        Program.model.modelGamsScalar.ddTemp = null;  //11.0 XX
+                        Program.model.modelGamsScalar.ee = null;     // 3.2 XX
+                        Program.model.modelGamsScalar.aTemp = null;  //9.6
+                        Program.model.modelGamsScalar.dict_FromANumberToVarName = null; //0.2
+                        Program.model.modelGamsScalar.dict_FromVarNameToANumber = null; //0.3
+                        Program.model.modelGamsScalar.dict_FromEqChunkNumberToEqName = null;  // 0.0
+                        Program.model.modelGamsScalar.dict_FromEqNameToEqChunkNumber = null; //0.0
+                        Program.model.modelGamsScalar.dict_FromEqNumberToEqName = null;  //25.4 XX
+                        Program.model.modelGamsScalar.dict_FromEqNameToEqNumber = null; //31.8 XX
+                        Program.model.modelGamsScalar.dict_FromVarNumberToVarName = null; //22.8 XX
+                        Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = null; //29.2 XX
+                        Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = null; //4.1 XX
+                        Program.model.modelGamsScalar.csCodeLines = null; //1.7
+                        Program.model.modelGamsScalar.gamsFoldedModel = null; //0.3
+                        Program.model.modelGamsScalar.dependents = null; //26.8  XX
+                        Program.model.modelGamsScalar.precedents = null; //36.1  XX
+                    }
 
                     // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;

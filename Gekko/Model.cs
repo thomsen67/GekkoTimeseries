@@ -512,8 +512,7 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGamsScalar
-    {
-        
+    {        
         [ProtoMember(1)]
         public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
         

@@ -163,6 +163,17 @@ namespace Gekko
         public int n = 0;
     }
 
+    public class StringDouble
+    {
+        public string s = null;
+        public double d = double.NaN;
+        public StringDouble(double d, string s)
+        {
+            this.s = s;
+            this.d = d;
+        }
+    }
+
     public class NonSeriesHelper
     {
         public int depth = 0;
@@ -1731,7 +1742,10 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-
+            if(true && Globals.runningOnTTComputer)
+            {
+                SplitVars();
+            }
             
             if (false && Globals.runningOnTTComputer)
             {
@@ -2167,6 +2181,15 @@ namespace Gekko
             else G.Writeln(text);
         }
 
+        /// <summary>
+        /// Splits a Dictionary of string/IVariable by size into a nested list for parallel use.
+        /// Imagine splitteing the numbers 3, 6, 4, 9, 3, 10, 3, 1, 2 into three equal-size lists.
+        /// This method tries to do its best. See also #78auyfioauif8a9s.
+        /// </summary>
+        /// <param name="storage"></param>
+        /// <param name="k"></param>
+        /// <param name="print"></param>
+        /// <returns></returns>
         private static List<List<KeyValuePair<string, IVariable>>> SplitVarsInSameSizeParts(Dictionary<string, IVariable> storage, int k, bool print)
         {
             if (k == 1)
@@ -2225,16 +2248,124 @@ namespace Gekko
                 sums[imin] += ch.n;
             }
             if (Globals.runningOnTTComputer)
-            {
-                List<string> shares = new List<string>();
-                for (int i = 0; i < k; i++)
+            {                
+                if (print)
                 {
-                    shares.Add("" + G.UpdprtFormat((double)sums[i] / (double)sum * 100d, 2, false));
+                    List<string> shares = new List<string>();
+                    for (int i = 0; i < k; i++)
+                    {
+                        shares.Add("" + G.UpdprtFormat((double)sums[i] / (double)sum * 100d, 2, false));
+                    }
+                    new Writeln("TTH: Proxy " + sum / 1000000 + " MB -- " + Stringlist.GetListWithCommas(shares));
                 }
-                if(print) new Writeln("TTH: Proxy " + sum / 1000000 + " MB -- " + Stringlist.GetListWithCommas(shares));
             }            
 
             return rv;
+        }
+
+        /// <summary>
+        /// BEWARE: as a side-effect, storage input is sorted by double size.
+        /// Splits a Dictionary of string/double by size into k sub-lists for parallel use.
+        /// Imagine splitting the numbers 3, 6, 4, 9, 3, 10, 3, 1, 2 into three equal-size lists.
+        /// This method tries to do its best. See also #78auyfioauif8a9s.
+        /// </summary>
+        /// <param name="storage"></param>
+        /// <param name="k"></param>
+        /// <param name="print"></param>
+        /// <returns></returns>
+        private static List<List<StringDouble>> SplitVarsInSameSizeParts(List<StringDouble> storage, int k, bool print)
+        {
+            if (k == 1)
+            {
+                List<StringDouble> list = new List<StringDouble>();
+                foreach (StringDouble kvp in storage)
+                {
+                    list.Add(kvp);
+                }
+                List<List<StringDouble>> lists = new List<List<StringDouble>>();
+                lists.Add(list);
+                return lists;
+            }
+
+            double sum = 0;
+            List<CountHelper> x = new List<CountHelper>();
+            Count count = new Count();
+            foreach (StringDouble kvp in storage)
+            {                
+                sum += kvp.d;
+            }
+            var sorted = storage.OrderByDescending(o => o.d);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
+            List<List<StringDouble>> rv = new List<List<StringDouble>>();
+            List<double> sums = new List<double>();
+            for (int i = 0; i < k; i++)
+            {
+                rv.Add(new List<StringDouble>());
+                sums.Add(0d);
+            }
+
+            foreach (StringDouble ch in sorted)
+            {
+                //new Writeln(ch.name + " --> " + ch.n);
+                int imin = -12345;
+                double min = double.MaxValue;
+                for (int i = 0; i < k; i++)
+                {
+                    //BEWARE
+                    //BEWARE
+                    //BEWARE Is this loop fast enough? Can perhaps be sped up a bit?
+                    //BEWARE
+                    //BEWARE
+                    if (sums[i] < min)
+                    {
+                        min = sums[i];
+                        imin = i;
+                    }
+                }
+                rv[imin].Add(ch);
+                sums[imin] += ch.d;
+            }
+            if (Globals.runningOnTTComputer)
+            {                
+                if (print)
+                {
+                    List<string> shares = new List<string>();
+                    for (int i = 0; i < k; i++)
+                    {
+                        shares.Add("" + G.UpdprtFormat(sums[i] / sum * 100d, 2, false));
+                    }
+                    new Writeln("TTH: Sum is " + G.UpdprtFormat(sum, 2, false) + " MB , " + k + " %shares " + Stringlist.GetListWithCommas(shares) + ", goal = " + G.UpdprtFormat(100d / k, 2, false));
+                }
+            }
+
+            return rv;
+        }
+
+        public static void SplitVars()
+        {
+            List<StringDouble> a = new List<StringDouble>();
+            //x means 1 mio elements, (x) has them in two dimensions
+            a.Add(new StringDouble(0.0, "dict_FromEqChunkNumberToEqName"));
+            a.Add(new StringDouble(0.0, "dict_FromEqNameToEqChunkNumber"));
+            a.Add(new StringDouble(0.2, "dict_FromANumberToVarName"));
+            a.Add(new StringDouble(0.3, "dict_FromVarNameToANumber"));
+            a.Add(new StringDouble(0.3, "gamsFoldedModel"));
+            a.Add(new StringDouble(1.7, "csCodeLines"));
+            a.Add(new StringDouble(2.4, "cc"));
+            a.Add(new StringDouble(3.2, "ee")); //x
+            a.Add(new StringDouble(4.1, "dict_FromEqNumberToEqChunkNumber")); //x
+            a.Add(new StringDouble(9.6, "aTemp")); //(x)
+            a.Add(new StringDouble(11.0, "ddTemp")); //x
+            a.Add(new StringDouble(22.8, "dict_FromVarNumberToVarName")); //x
+            a.Add(new StringDouble(25.4, "dict_FromEqNumberToEqName")); //x
+            a.Add(new StringDouble(26.5, "bbTemp")); //x
+            a.Add(new StringDouble(26.8, "dependents")); //x
+            a.Add(new StringDouble(29.2, "dict_FromVarNameToVarNumber")); //x
+            a.Add(new StringDouble(31.8, "dict_FromEqNameToEqNumber")); //x
+            a.Add(new StringDouble(36.1, "precedents")); //x
+            for (int k = 1; k <= 10; k++)
+            {
+                SplitVarsInSameSizeParts(a, k, true);
+            }
         }
 
         public static void WriteParallel(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
