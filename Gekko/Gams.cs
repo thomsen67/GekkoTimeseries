@@ -26,303 +26,97 @@ namespace Gekko
 {    
 
     public static class GamsModel  //The rest of this class is in GamsWrappers.cs
-    {
-        public static Assembly Compile1(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0, bool sw)
+    {   
+        
+        private static void Compile5(List<string> eqsCs, Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)
         {
-            int eqsPerMethod = 1000;  //10000 is like ADAM, gives around 100 batches            
-            DateTime dt2 = DateTime.Now;
-            List<string> eqs2 = null;
+            //NOTE: for each processor, about 2000 eqs max, else sub-chunk!
 
-            int chunkLines = 5000;  //seems to be a good number, not too small and not too large, around 5:22 min.
-            List<List<string>> chunks = new List<List<string>>();
-            int counter = 0;
-            int counterMax = counter + chunkLines;
-            List<string> currentChunk = new List<string>();
-            foreach (string eqline in eqs)
+            DateTime dt0 = DateTime.Now;            
+
+            int n = eqsCs.Count;
+            int threads = Program.options.system_threads;  //5 seems pretty good for this, maybe around 2000 eqs per chunk
+
+            List<TwoInts> chunks = new List<TwoInts>();
+
+            if (n < 500)
             {
-                counter++;
-                if (eqline.Contains("..") && counter >= counterMax)
-                {
-                    chunks.Add(currentChunk);
-                    currentChunk = new List<string>();
-                    counterMax = counter + chunkLines;
-                }
-                currentChunk.Add(eqline);
-            }
-            chunks.Add(currentChunk);
-
-            int tjek = 0;
-            foreach (List<string> x in chunks) tjek += x.Count;
-            if (tjek != eqs.Count) new Error("Mismatch of chunks");
-
-            eqs = null;
-
-            List<Parser.Gek.GekkoSB> codes = new List<Parser.Gek.GekkoSB>();
-
-            for (int ichunk = 0; ichunk < chunks.Count; ichunk++)
-            {
-                List<string> chunk = chunks[ichunk];
-                DateTime dt3 = DateTime.Now;
-                string textInput = Stringlist.ExtractTextFromLines(chunk).ToString();
-                DateTime dt0 = DateTime.Now;
-                ANTLRStringStream input = new ANTLRStringStream(textInput);
-                List<string> errors = null;
-                CommonTree t = null;
-                // Create a lexer attached to that input
-                GAMSLexer lexer = new GAMSLexer(input);
-                // Create a stream of tokens pulled from the lexer
-                CommonTokenStream tokens = new CommonTokenStream(lexer);
-                // Create a parser attached to the token stream
-                GAMSParser parser = new GAMSParser(tokens);
-                // Invoke the program rule in get return value
-                GAMSParser.gams_return gams = null;
-                DateTime t0 = DateTime.Now;
-
-                bool print = false;
-                ASTNodeGAMS root = new ASTNodeGAMS(null);
-
-                try
-                {
-                    DateTime tt0 = DateTime.Now;
-                    //new Writeln("START PARSE ANTLR");
-                    gams = parser.gams();
-                    //new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
-                    errors = parser.GetErrors();
-                    t = (CommonTree)gams.Tree;
-                    Compile2(t, root, 0, tokens, print);
-
-                    if (true)
-                    {
-                        lexer = null; tokens = null; parser = null; gams = null; t = null;
-                        chunks[ichunk] = null;
-                    }
-
-                    if (errors.Count > 0)
-                    {
-                        new Warning("GAMS parse error");
-                    }
-                }
-                catch (Exception e)
-                {
-                    new Warning("GAMS other error");
-                }
-
-                if (true)
-                {
-                    WalkHelper wh = new WalkHelper();
-                    wh.eqNames = eqNames;
-                    wh.dictEqs = dictEqs;
-                    wh.dictVars = dictVars;
-                    wh.time0 = time0;
-                    wh.dictA = dictA;
-                    wh.useMFunctions = false;
-                    Controlled controlled = new Controlled();
-                    Compile3(root, 0, wh, controlled);
-                    foreach (ASTNodeGAMS child in root.ChildrenIterator())
-                    {
-                        codes.Add(child.Code);
-                    }
-                }
-                new Writeln("Chunk #" + (ichunk + 1) + " (" + chunk.Count + ") of " + chunks.Count + " (" + G.Seconds(dt3) + ")");
-            }
-
-            new Writeln("All chunks done: " + G.Seconds(dt2));
-
-            eqs2 = new List<string>();
-            foreach (Parser.Gek.GekkoSB sb in codes)
-            {
-                eqs2.Add(sb.ToString());
-            }
-            //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Eqs.cs", Stringlist.ExtractTextFromLines(eqs2).ToString());
-            
-            Assembly assembly = Compile4(eqs2, eqsPerMethod, sw);
-            return assembly;
-        }
-
-        private static Assembly Compile4(List<string> eqs, int eqsPerMethod, bool sw)
-        {
-            DateTime t0 = DateTime.Now;
-            bool failSafe = false;
-                        
-            StringBuilder code = new StringBuilder();
-            StringBuilder code2 = new StringBuilder();
-
-            List<List<int>> numbers = new List<List<int>>();
-            List<int> n = null;
-            int counter = -1;
-            foreach (string eq in eqs)
-            {
-                counter++;
-                if (counter % eqsPerMethod == 0)
-                {
-                    if (n != null) numbers.Add(n);
-                    n = new List<int>();
-                }
-                n.Add(counter);
-            }
-            if (n != null) numbers.Add(n);
-
-            int tjek = 0; foreach (var xx in numbers) tjek += xx.Count;
-            if (tjek != eqs.Count) new Error("Mismatch");
-
-            bool printTime = false;
-            
-
-            code.AppendLine("using System;");
-            code.AppendLine("using System.Collections.Generic;");
-            code.AppendLine("using System.Text;");
-            code.AppendLine("namespace Gekko");
-            code.AppendLine("{");
-            code.AppendLine("public class Equations");
-            code.AppendLine("{");
-
-            if (sw)
-            {
-                code.AppendLine("public static void Residual(int i, double[] r, double[][] a)");
-                code.AppendLine("{");
-                code.AppendLine("switch(i) {");
-                for (int j = 0; j < eqs.Count; j++)
-                {
-                    string s2 = eqs[j].ToString();
-                    code.AppendLine("case " + j + ":" + s2 + "; break;");
-                }
-                code.AppendLine("default:; break;");
-                code.AppendLine("}");  //switch
-                code.AppendLine("}");  //method
+                chunks.Add(new TwoInts(0, n));
             }
             else
             {
-                code.AppendLine("public static void Residuals(double[] r, double[][] a)");
+                int k = n / threads;
+                for (int j = 0; j < threads - 1; j++)
+                {
+                    //over threads-1                    
+                    chunks.Add(new TwoInts(j * k, (j + 1) * k));
+                }
+                chunks.Add(new TwoInts((threads - 1) * k, n));
+            }
+
+            Parallel.ForEach(chunks, () => 0, (x, pls, index, s) =>
+            {
+                TwoInts chunk = chunks[(int)index];
+                DateTime dt1 = DateTime.Now;
+                StringBuilder code = new StringBuilder();
+
+                code.AppendLine("using System;");
+                code.AppendLine("using System.Collections.Generic;");
+                code.AppendLine("using System.Text;");
+                code.AppendLine("namespace Gekko");
                 code.AppendLine("{");
-                if (printTime)
+                code.AppendLine("public class Equations");
+                code.AppendLine("{");
+
+                code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)");
+                code.AppendLine("{");
+                for (int i = chunk.int1; i < chunk.int2; i++)
                 {
-                    code.AppendLine("new Writeln(\"Starting Residuals() in dynamic code \" + DateTime.Now.ToString());");
+                    code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd) =>");
+                    code.AppendLine("{"); //start dynamic function
+                    code.AppendLine("int[] b = bb[i];");
+                    code.AppendLine("int[] d = dd[i];");
+                    code.AppendLine("double sum = 0d;");
+                    code.AppendLine(eqsCs[i]);
+                    code.AppendLine("return sum;");
+                    code.AppendLine("};");  //end dynamic function
+                    code.AppendLine();
                 }
+                code.AppendLine("}");  //method
+                code.AppendLine("}");  //end class
+                code.AppendLine("}");  //end namespace
 
-                for (int i = 0; i < numbers.Count; i++)
+                CompilerParameters compilerParams = new CompilerParameters();
+                compilerParams = new CompilerParameters();
+                compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                compilerParams.GenerateInMemory = true;
+                compilerParams.IncludeDebugInformation = false;
+                compilerParams.ReferencedAssemblies.Add("system.dll");
+                Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
+                compilerParams.GenerateExecutable = false;
+                string s2 = code.ToString();
+                CompilerResults cr = null;
+                try
                 {
-                    code.AppendLine("Residuals" + i + "(r, a);");
+                    cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2);
                 }
-
-                if (printTime)
+                catch (Exception e)
                 {
-                    code.AppendLine("new Writeln(\"Ending Residuals() in dynamic code \" + DateTime.Now.ToString());");
+                    new Error("Compilation failed");
                 }
-                code.AppendLine("}");  //end method
+                Assembly assembly = cr.CompiledAssembly;
 
-                for (int i = 0; i < numbers.Count; i++)
-                {
-                    code.AppendLine("public static void Residuals" + i + "(double[] r, double[][] a)");
-                    code.AppendLine("{");
-                    for (int j = 0; j < numbers[i].Count; j++)
-                    {                        
-                        code.AppendLine(eqs[numbers[i][j]].ToString() + ";");
-                    }
-                    code.AppendLine("}"); //end method
-                }
-            }
+                //if (Globals.runningOnTTComputer) new Writeln("TTH: Compile finished: " + G.Seconds(dt1));
 
-            code.AppendLine("}");  //end class
-            code.AppendLine("}");  //end namespace
-
-            // !!!!!!!!!!!!!!!!
-            // !!!!!!!!!!!!!!!!
-            // !!!!!!!!!!!!!!!!  remove this
-            // !!!!!!!!!!!!!!!!
-            // !!!!!!!!!!!!!!!!
-            // !!!!!!!!!!!!!!!!
-            //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
-
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Program.GetCompilerOptions();
-            compilerParams.GenerateInMemory = true;
-            compilerParams.IncludeDebugInformation = false;
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);  --> no need to reference Gekko?
-            Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
-            compilerParams.GenerateExecutable = false;
-            string s = code.ToString();
-            DateTime t = DateTime.Now;
-            new Writeln("Start compile");
-            CompilerResults cr = null;
-            try
-            {
-                cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
-            }
-            catch (Exception e)
-            {
-
-            }
-            new Writeln("End compile "+G.Seconds(t));
-            Assembly assembly = cr.CompiledAssembly;
-            return assembly;
-        }
-
-        private static Assembly Compile5(List<string> eqsCs, List<string> eqsHuman, Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)
-        {
-            DateTime dt1 = DateTime.Now;
-
-            StringBuilder code = new StringBuilder();
-            bool b = eqsHuman.Count == 0;
+                DateTime dt2 = DateTime.Now;
+                Object[] o = new Object[1] { functions };
+                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
+                //if (Globals.runningOnTTComputer) new Writeln("TTH: Loading funcs took: " + G.Seconds(dt2));
+                //if (Globals.runningOnTTComputer) new Writeln("TTH: Chunk " + chunk.int1 + "-" + chunk.int2);
+                return 0;
+            }, _ => { });
             
-            code.AppendLine("using System;");
-            code.AppendLine("using System.Collections.Generic;");
-            code.AppendLine("using System.Text;");
-            code.AppendLine("namespace Gekko");
-            code.AppendLine("{");
-            code.AppendLine("public class Equations");
-            code.AppendLine("{");
-
-            code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)");
-            code.AppendLine("{");
-            
-            for (int i = 0; i < eqsCs.Count; i++)
-            {
-                if (b) eqsHuman.Add(eqsCs[i]);
-                code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd) =>");
-                code.AppendLine("{"); //start dynamic function
-                code.AppendLine("int[] b = bb[i];");
-                code.AppendLine("int[] d = dd[i];");
-                code.AppendLine("double sum = 0d;");                
-                code.AppendLine(eqsCs[i]);
-                code.AppendLine("return sum;");
-                code.AppendLine("};");  //end dynamic function
-                code.AppendLine();
-            }
-            code.AppendLine("}");  //method
-            code.AppendLine("}");  //end class
-            code.AppendLine("}");  //end namespace
-            
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Program.GetCompilerOptions();
-            compilerParams.GenerateInMemory = true;
-            compilerParams.IncludeDebugInformation = false;
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);  --> no need to reference Gekko?
-            Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
-            compilerParams.GenerateExecutable = false;
-            string s = code.ToString();
-            CompilerResults cr = null;
-            try
-            {
-                cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
-            }
-            catch (Exception e)
-            {
-                new Error("Compilation failed");
-            }
-            Assembly assembly = cr.CompiledAssembly;
-
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Compile finished: " + G.Seconds(dt1));
-
-            dt1 = DateTime.Now;
-            Object[] o = new Object[1] { functions };
-            assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Loading funcs took: " + G.Seconds(dt1));
-            
-            return assembly;
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Complete Compile5 --> : " + G.Seconds(dt0));
         }
 
         private static bool DetectNullNode(CommonTree ast)
@@ -1067,7 +861,7 @@ namespace Gekko
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
             int[] ee = helper.eqPointers.ToArray();
 
-            Assembly assembly = Compile5(csCodeLines, helper.equationChunks, functions);
+            Compile5(csCodeLines, functions);
             
             dt1 = DateTime.Now;
 
@@ -1122,7 +916,6 @@ namespace Gekko
                 Program.model.modelGamsScalar.count = helper.count;
                 Program.model.modelGamsScalar.known = helper.known;
                 Program.model.modelGamsScalar.unique = helper.unique;
-                Program.model.modelGamsScalar.equationChunks = helper.equationChunks;
                 //
                 // Note that GAMS equation periods are not very useful.
                 // In principle, e1[2020] .. may designate an equation with
@@ -1901,7 +1694,7 @@ namespace Gekko
 
                 //Loading of Func<>s
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
-                Assembly assembly = Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.equationChunks, Program.model.modelGamsScalar.functions);
+                Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.functions);
                 
                 //Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
                 //Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
@@ -4884,8 +4677,7 @@ namespace Gekko
         public List<List<int>> b = new List<List<int>>();
         public List<double> c = new List<double>();
         public List<List<int>> d = new List<List<int>>();
-        public List<int> eqPointers = new List<int>();
-        public List<string> equationChunks = new List<string>();
+        public List<int> eqPointers = new List<int>();        
 
         public string[] dict_FromEqNumberToEqName = null;
         public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);

@@ -641,13 +641,7 @@ namespace Gekko
         /// bb array.b e
         /// </summary>
         [ProtoMember(27)]
-        public List<ModelScalarEquation> precedents = null;
-
-        /// <summary>
-        /// Condensed equations in text format
-        /// </summary>
-        [ProtoMember(26)]
-        public List<string> equationChunks = null;
+        public List<ModelScalarEquation> precedents = null;        
 
         // =============================================
         // =============================================
@@ -1082,7 +1076,7 @@ namespace Gekko
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
             int ii = this.ee[eq];
-            string ss = this.equationChunks[ii];
+            string ss = this.csCodeLines[ii];
             StringBuilder sb = new StringBuilder();
             int more = 15;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
