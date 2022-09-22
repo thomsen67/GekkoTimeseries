@@ -1513,36 +1513,59 @@ namespace Gekko
 
             //these objects typically get overridden soon
             Program.model = new Model();
-            Program.model.modelGamsScalar = new ModelGamsScalar();
-            
+            Program.model.modelGamsScalar = new ModelGamsScalar();            
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
             {
-                if (File.Exists(mdlFileNameAndPath))
+                try
                 {
-                    try
+                    if (Globals.modelParallelProtobuf)
                     {
-                        DateTime dt1 = DateTime.Now;
-                        DateTime t0 = DateTime.Now;                        
-                        Program.model.modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
-                        timeLoadCache = "deflate: " + G.Seconds(t0);
-                        Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
-                        DateTime t1 = DateTime.Now;
-                        GAMSScalarModelHelper(true);
-                        timeCompile = "compile: " + G.Seconds(t1);
-                    }
-                    catch (Exception e)
-                    {
-                        if (G.IsUnitTesting())
+                        //TODO 
+                        //TODO 
+                        //TODO do something about ms here
+                        //TODO 
+                        //TODO 
+                        double hashMs = 0d;
+                        DateTime t0 = DateTime.Now;
+                        bool problem = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
+                        new Writeln("Parallel protobuf read: " + G.Seconds(t0));
+                        if (problem)
                         {
-                            throw;
+                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                         }
                         else
                         {
-                            //do nothing, we then have to parse the file
-                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                            GAMSScalarModelHelper(true);
+                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                         }
+                    }
+                    else
+                    {
+                        if (File.Exists(mdlFileNameAndPath))
+                        {
+                            DateTime dt1 = DateTime.Now;
+                            DateTime t0 = DateTime.Now;
+                            Program.model.modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
+                            timeLoadCache = "deflate: " + G.Seconds(t0);
+                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            DateTime t1 = DateTime.Now;
+                            GAMSScalarModelHelper(true);
+                            timeCompile = "compile: " + G.Seconds(t1);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (G.IsUnitTesting())
+                    {
+                        throw;
+                    }
+                    else
+                    {
+                        //do nothing, we then have to parse the file
+                        Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                     }
                 }
             }

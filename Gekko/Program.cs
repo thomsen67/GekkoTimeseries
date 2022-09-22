@@ -2396,16 +2396,7 @@ namespace Gekko
             // ---------------------------------------
 
             sb = new StringBuilder();
-            sb.AppendLine("public static void ProtobufModelGamsScalar5b(List<string> files){");
-            sb.AppendLine("int n = files.Count;");
-            sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
-            sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
-            sb.AppendLine("for(int i = 1; i <= n + 1; i++) {");
-            sb.AppendLine("  m.Add(new ModelGamsScalar());");
-            sb.AppendLine("}");
-            sb.AppendLine("for(int i = 0;i <= n; i++) {");
-            sb.AppendLine("  m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);");
-            sb.AppendLine("}");
+            sb.AppendLine("public static void ProtobufModelGamsScalar5b(List<ModelGamsScalar>m){");            
             i = 0;
             foreach (List<StringDouble> x1 in aa)
             {
@@ -2464,21 +2455,10 @@ namespace Gekko
             m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
             m[0].dict_FromEqNumberToEqName = null;            
             return m;
-        }
+        }        
 
-        public static void ProtobufModelGamsScalar5b(List<string> files)
+        public static void ProtobufModelGamsScalar5b(List<ModelGamsScalar>m)
         {
-            int n = files.Count;
-            if (n != 5) new Error("Hov");
-            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
-            for (int i = 1; i <= n; i++)
-            {
-                m.Add(new ModelGamsScalar());
-            }
-            for (int i = 0; i <= n; i++)
-            {
-                m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);
-            }
             m[0].precedents = m[1].precedents;
             m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
             m[0].ee = m[1].ee;
@@ -2567,7 +2547,8 @@ namespace Gekko
         {
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
-            List<string> files = GetSplitCacheFileNames(k, inputFileName, "model", ref hash);
+            //Note: k+1 because the first list[0] object is very tiny
+            List<string> files = GetSplitCacheFileNames(k + 1, inputFileName, "model", ref hash);
 
             List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k);
 
@@ -2585,6 +2566,8 @@ namespace Gekko
                 return true;
             }).All(_ => _);
 
+            ProtobufModelGamsScalar5b(lists);
+
             List<string> sfiles = new List<string>();
             foreach (string file in files)
             {
@@ -2596,6 +2579,49 @@ namespace Gekko
             milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
             string s = G.SecondsFormat(milliseconds);
             if (print) new Writeln("TTH: WriteParallelModel: " + s);
+        }
+
+        /// <summary>
+        /// Reads model protobuf files in parallel.
+        /// </summary>
+        public static bool ReadParallelModel(string fileName, string hash)
+        {
+            bool print = false;
+            if (Globals.runningOnTTComputer) print = true;
+            DateTime t = DateTime.Now;
+            //hash = Program.GetMD5Hash(null, fileName);
+            //hashMs = (DateTime.Now - t).TotalMilliseconds;
+
+            List<string> files = new List<string>();
+            List<ModelGamsScalar> lists = new List<ModelGamsScalar>();
+
+            string part2 = Globals.gekkoVersion + "_" + "model" + "_" + hash + "_";
+            int k = ValidateFileNames(part2);
+            if (k == -12345) return true;  //could not find anything useful in cache
+
+            for (int i = 0; i < k; i++)
+            {
+                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);
+                lists.Add(new ModelGamsScalar());
+            }
+
+            //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
+            t = DateTime.Now;
+
+            Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+            {
+                //See https://github.com/protobuf-net/protobuf-net/issues/668
+                //About double speed on TT pc, compared to no parallel  
+                int i = (int)index;
+                string fileName2 = files[i];
+                ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
+                lists[i] = o;
+                return 0;
+            }, _ => { });
+
+            ProtobufModelGamsScalar5b(lists);            
+            lists = null;  //free for GC     
+            return false;
         }
 
         public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
