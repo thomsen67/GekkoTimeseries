@@ -2367,17 +2367,40 @@ namespace Gekko
             List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, 5, true);
             StringBuilder sb = new StringBuilder();
             int i = 0;
-            sb.AppendLine("ModelGamsScalar m0 = Program.model.modelGamsScalar;");
+            sb.AppendLine("int n = 5;");
+            sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
+            sb.AppendLine("for(int i = 1; i <= n; i++) {");
+            sb.AppendLine("  m.Add(new ModelGamsScalar());");
+            sb.AppendLine("}");
+            sb.AppendLine("ModelGamsScalar m[0] = Program.model.modelGamsScalar;");
             foreach (List<StringDouble> x1 in aa)
             {
                 i++;  //starts with 1
                 sb.AppendLine("m" + i + " = new ModelGamsScalar();");
                 foreach (StringDouble x2 in x1)
                 {
-                    sb.AppendLine("m" + i + "." + x2.s + " = m0" + "." + x2.s + ";");
-                    sb.AppendLine("m0" + "." + x2.s + " = null;");
+                    sb.AppendLine("m[" + i + "]." + x2.s + " = m[0]" + "." + x2.s + ";");
+                    sb.AppendLine("m[0]" + "." + x2.s + " = null;");
                 }
             }
+            sb.AppendLine("for(int i = 0;i <= n; i++) {");
+            sb.AppendLine("  Program.ProtobufWrite(m[i], files[i]);");
+            sb.AppendLine("}");
+            sb.AppendLine(" --- after protobuf read");
+            sb.AppendLine("for(int i = 0;i <= n; i++) {");
+            sb.AppendLine("  Program.ProtobufRead(m[i], files[i]);");
+            sb.AppendLine("}");
+            foreach (List<StringDouble> x1 in aa)
+            {
+                i++;  //starts with 1
+                foreach (StringDouble x2 in x1)
+                {
+                    sb.AppendLine("m[0]" + x2.s + " = m[" + i + "]." + "." + x2.s + ";");
+                }
+            }
+
+
+
 
             //ModelGamsScalar m0 = new ModelGamsScalar();
             //m.precedents = null;
