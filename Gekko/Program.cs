@@ -1742,11 +1742,11 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if(true && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
                 SplitVars();
             }
-            
+
             if (false && Globals.runningOnTTComputer)
             {
                 Speed.Run();
@@ -1757,7 +1757,7 @@ namespace Gekko
                 DateTime t0 = DateTime.Now;
                 new Writeln("Start");
                 double x = 0;
-                for (double i = 1; i <= 1e10; i++ )
+                for (double i = 1; i <= 1e10; i++)
                 {
                     x += i;
                 }
@@ -1790,7 +1790,7 @@ namespace Gekko
                 G.Writeln("------------------------------------------------------------------------------------------");
                 G.Write(@"copy d to e; --- copied Work:e!a from Work:d!a --- trace: "); G.WriteLink("Work:d!a", ""); G.Writeln();
                 G.Writeln(@"2024-2025: e <2024 2025> = 22, 23;");
-                G.Writeln("------------------------------------------------------------------------------------------");                
+                G.Writeln("------------------------------------------------------------------------------------------");
                 G.Writeln();
                 G.Writeln("------------------------------------------------------------------------------------------");
                 G.Writeln(@"Work:d!a --> Work:e!a --> Work:e!a");
@@ -1957,7 +1957,7 @@ namespace Gekko
                 //maybe buffer not larger then 1 mio.
 
                 int i = 0;
-                
+
                 if (text.EndsWith("i1")) i = 1;
                 else if (text.EndsWith("i2")) i = 2;
                 else if (text.EndsWith("i3")) i = 3;
@@ -1981,7 +1981,7 @@ namespace Gekko
                 string file3 = @"c:\Tools\test\makro0.gbk";    //gbk version
                 string file4 = @"c:\Tools\test\makro0a.gbk";    //gbk version uncompressed
                 string file5 = @"c:\Tools\test\makro0.data";   //data protobuf file
-                string fileFolder = @"c:\Tools\test\file";   
+                string fileFolder = @"c:\Tools\test\file";
                 DateTime dt0 = DateTime.Now;
 
                 //int buf = 4096;
@@ -2107,7 +2107,7 @@ namespace Gekko
                         Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
                     }
                     else if (i == 15)
-                    {                        
+                    {
                         Databank deserializedDatabank = ProtobufRead<Databank>(file5);
                     }
                     else if (i == 16)
@@ -2244,7 +2244,7 @@ namespace Gekko
                 sums[imin] += ch.n;
             }
             if (Globals.runningOnTTComputer)
-            {                
+            {
                 if (print)
                 {
                     List<string> shares = new List<string>();
@@ -2254,7 +2254,7 @@ namespace Gekko
                     }
                     new Writeln("TTH: Proxy " + sum / 1000000 + " MB -- " + Stringlist.GetListWithCommas(shares));
                 }
-            }            
+            }
 
             return rv;
         }
@@ -2287,7 +2287,7 @@ namespace Gekko
             List<CountHelper> x = new List<CountHelper>();
             Count count = new Count();
             foreach (StringDouble kvp in storage)
-            {                
+            {
                 sum += kvp.d;
             }
             var sorted = storage.OrderByDescending(o => o.d);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
@@ -2321,7 +2321,7 @@ namespace Gekko
                 sums[imin] += ch.d;
             }
             if (Globals.runningOnTTComputer)
-            {                
+            {
                 if (print)
                 {
                     List<string> shares = new List<string>();
@@ -2359,20 +2359,26 @@ namespace Gekko
             a.Add(new StringDouble("dependents", 26.8)); //x
             a.Add(new StringDouble("dict_FromVarNameToVarNumber", 29.2)); //x
             a.Add(new StringDouble("dict_FromEqNameToEqNumber", 31.8)); //x
-            a.Add(new StringDouble("precedents", 36.1)); //x           
-            List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, 5, true);
+            a.Add(new StringDouble("precedents", 36.1)); //x  
+
+            int n = 5;
+
+            List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, n, true);
+
             StringBuilder sb = new StringBuilder();
-            int i = 0;
-            sb.AppendLine("int n = 5;");
+            sb.AppendLine("public static void ProtobufModelGamsScalar5a(List<string> files){");
+            sb.AppendLine("int n = files.Count;");
+            sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
             sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
             sb.AppendLine("for(int i = 1; i <= n; i++) {");
             sb.AppendLine("  m.Add(new ModelGamsScalar());");
             sb.AppendLine("}");
-            sb.AppendLine("ModelGamsScalar m[0] = Program.model.modelGamsScalar;");
+            sb.AppendLine("m[0] = Program.model.modelGamsScalar;");
+            int i = 0;
             foreach (List<StringDouble> x1 in aa)
             {
                 i++;  //starts with 1
-                sb.AppendLine("m" + i + " = new ModelGamsScalar();");
+                sb.AppendLine("m[" + i + "] = new ModelGamsScalar();");
                 foreach (StringDouble x2 in x1)
                 {
                     sb.AppendLine("m[" + i + "]." + x2.s + " = m[0]" + "." + x2.s + ";");
@@ -2382,27 +2388,186 @@ namespace Gekko
             sb.AppendLine("for(int i = 0;i <= n; i++) {");
             sb.AppendLine("  Program.ProtobufWrite(m[i], files[i]);");
             sb.AppendLine("}");
-            sb.AppendLine(" --- after protobuf read");
-            sb.AppendLine("for(int i = 0;i <= n; i++) {");
-            sb.AppendLine("  Program.ProtobufRead(m[i], files[i]);");
             sb.AppendLine("}");
+            File.WriteAllText("c:\\tools\\Model1.cs", sb.ToString());
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // ---------------------------------------
+
+            sb = new StringBuilder();
+            sb.AppendLine("public static void ProtobufModelGamsScalar5b(List<string> files){");
+            sb.AppendLine("int n = files.Count;");
+            sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
+            sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
+            sb.AppendLine("for(int i = 1; i <= n; i++) {");
+            sb.AppendLine("  m.Add(new ModelGamsScalar());");
+            sb.AppendLine("}");
+            sb.AppendLine("for(int i = 0;i <= n; i++) {");
+            sb.AppendLine("  m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);");
+            sb.AppendLine("}");
+            i = 0;
             foreach (List<StringDouble> x1 in aa)
             {
                 i++;  //starts with 1
                 foreach (StringDouble x2 in x1)
                 {
-                    sb.AppendLine("m[0]" + x2.s + " = m[" + i + "]." + "." + x2.s + ";");
+                    sb.AppendLine("m[0]." + x2.s + " = m[" + i + "]" + "." + x2.s + ";");
                 }
             }
+            sb.AppendLine("Program.model.modelGamsScalar = m[0];");
+            sb.AppendLine("}");
+            File.WriteAllText("c:\\tools\\Model2.cs", sb.ToString());
 
-
-
-
-            //ModelGamsScalar m0 = new ModelGamsScalar();
-            //m.precedents = null;
-
+            new Writeln("See c:\\tools\\Model1.cs/Model2.cs for code");
 
         }
+
+        public static void ProtobufModelGamsScalar5a(List<string> files)
+        {
+            int n = files.Count;
+            if (n != 5) new Error("Hov");
+            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
+            for (int i = 1; i <= n; i++)
+            {
+                m.Add(new ModelGamsScalar());
+            }
+            m[0] = Program.model.modelGamsScalar;
+            m[1] = new ModelGamsScalar();
+            m[1].precedents = m[0].precedents;
+            m[0].precedents = null;
+            m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
+            m[0].dict_FromEqNumberToEqChunkNumber = null;
+            m[1].ee = m[0].ee;
+            m[0].ee = null;
+            m[2] = new ModelGamsScalar();
+            m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
+            m[0].dict_FromEqNameToEqNumber = null;
+            m[2].aTemp = m[0].aTemp;
+            m[0].aTemp = null;
+            m[2].csCodeLines = m[0].csCodeLines;
+            m[0].csCodeLines = null;
+            m[3] = new ModelGamsScalar();
+            m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
+            m[0].dict_FromVarNameToVarNumber = null;
+            m[3].ddTemp = m[0].ddTemp;
+            m[0].ddTemp = null;
+            m[3].cc = m[0].cc;
+            m[0].cc = null;
+            m[4] = new ModelGamsScalar();
+            m[4].dependents = m[0].dependents;
+            m[0].dependents = null;
+            m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
+            m[0].dict_FromVarNumberToVarName = null;
+            m[5] = new ModelGamsScalar();
+            m[5].bbTemp = m[0].bbTemp;
+            m[0].bbTemp = null;
+            m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
+            m[0].dict_FromEqNumberToEqName = null;
+            for (int i = 0; i <= n; i++)
+            {
+                Program.ProtobufWrite(m[i], files[i]);
+            }
+        }
+
+        public static void ProtobufModelGamsScalar5b(List<string> files)
+        {
+            int n = files.Count;
+            if (n != 5) new Error("Hov");
+            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
+            for (int i = 1; i <= n; i++)
+            {
+                m.Add(new ModelGamsScalar());
+            }
+            for (int i = 0; i <= n; i++)
+            {
+                m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);
+            }
+            m[0].precedents = m[1].precedents;
+            m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
+            m[0].ee = m[1].ee;
+            m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
+            m[0].aTemp = m[2].aTemp;
+            m[0].csCodeLines = m[2].csCodeLines;
+            m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
+            m[0].ddTemp = m[3].ddTemp;
+            m[0].cc = m[3].cc;
+            m[0].dependents = m[4].dependents;
+            m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
+            m[0].bbTemp = m[5].bbTemp;
+            m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
+            Program.model.modelGamsScalar = m[0];
+        }
+
+
+        public static void ProtobufModelGamsScalar1(List<string> files)
+        {
+            int n = 5;
+            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
+            for (int i = 1; i <= n; i++)
+            {
+                m.Add(new ModelGamsScalar());
+            }
+            m[0] = Program.model.modelGamsScalar;
+            m[1] = new ModelGamsScalar();
+            m[1].precedents = m[0].precedents;
+            m[0].precedents = null;
+            m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
+            m[0].dict_FromEqNumberToEqChunkNumber = null;
+            m[1].ee = m[0].ee;
+            m[0].ee = null;
+            m[2] = new ModelGamsScalar();
+            m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
+            m[0].dict_FromEqNameToEqNumber = null;
+            m[2].aTemp = m[0].aTemp;
+            m[0].aTemp = null;
+            m[2].csCodeLines = m[0].csCodeLines;
+            m[0].csCodeLines = null;
+            m[3] = new ModelGamsScalar();
+            m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
+            m[0].dict_FromVarNameToVarNumber = null;
+            m[3].ddTemp = m[0].ddTemp;
+            m[0].ddTemp = null;
+            m[3].cc = m[0].cc;
+            m[0].cc = null;
+            m[4] = new ModelGamsScalar();
+            m[4].dependents = m[0].dependents;
+            m[0].dependents = null;
+            m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
+            m[0].dict_FromVarNumberToVarName = null;
+            m[5] = new ModelGamsScalar();
+            m[5].bbTemp = m[0].bbTemp;
+            m[0].bbTemp = null;
+            m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
+            m[0].dict_FromEqNumberToEqName = null;
+            for (int i = 0; i <= n; i++)
+            {
+                Program.ProtobufWrite(m[i], files[i]);
+            }
+
+            // --- after protobuf write
+
+            for (int i = 0; i <= n; i++)
+            {
+                m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);
+            }
+            m[0].precedents = m[1].precedents;
+            m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
+            m[0].ee = m[1].ee;
+            m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
+            m[0].aTemp = m[2].aTemp;
+            m[0].csCodeLines = m[2].csCodeLines;
+            m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
+            m[0].ddTemp = m[3].ddTemp;
+            m[0].cc = m[3].cc;
+            m[0].dependents = m[4].dependents;
+            m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
+            m[0].bbTemp = m[5].bbTemp;
+            m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
+            Program.model.modelGamsScalar = m[0];
+
+        }       
+
 
         public static void WriteParallel(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
@@ -2448,9 +2613,7 @@ namespace Gekko
                 {
                     new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
                 }
-
                 ProtobufWrite(x, files[i]);
-
                 return true;
             }).All(_ => _);
 
