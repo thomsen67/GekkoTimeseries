@@ -2520,17 +2520,17 @@ namespace Gekko
             Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
             {
                 //See https://github.com/protobuf-net/protobuf-net/issues/668
-                //About double speed on TT pc, compared to no parallel                    
-                using (FileStream fs = WaitForFileStream(files[(int)index], null, GekkoFileReadOrWrite.Read))
+                //About double speed on TT pc, compared to no parallel  
+
+                int i = (int)index;
+                string fileName2 = files[i];
+                object o = ProtobufRead(fileName2);
+
+                lists[i] = o as List<KeyValuePair<string, IVariable>>;
+                TwoInts yearMinMax = twoIntss[i];
+                foreach (KeyValuePair<string, IVariable> kvp in lists[i])
                 {
-                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                    int i = (int)index;
-                    lists[i] = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
-                    TwoInts yearMinMax = twoIntss[i];
-                    foreach (KeyValuePair<string, IVariable> kvp in lists[i])
-                    {
-                        kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
-                    }
+                    kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
                 }
                 return 0;
             }, _ => { });
@@ -2555,6 +2555,18 @@ namespace Gekko
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
             return db;
+        }
+
+        private static object ProtobufRead<T>(string fileName2)
+        {
+            object o;
+            using (FileStream fs = WaitForFileStream(fileName2, null, GekkoFileReadOrWrite.Read))
+            {
+                RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                o = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+            }
+
+            return o;
         }
 
         private static int ValidateFileNames(string part2)
