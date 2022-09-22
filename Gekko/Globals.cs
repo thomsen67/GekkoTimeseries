@@ -101,6 +101,7 @@ namespace Gekko
         // ------------------------------------------------------------
         // Protobuf tuning start
         // ------------------------------------------------------------        
+        public static bool modelParallelProtobuf = true;
         public const double cacheSize1 = 5e6;    //non-gbk
         public const double cacheSize2 = 10e6;   //gbk
         public const double cacheFileMax = 50e9; //bytes, flush always if over

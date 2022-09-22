@@ -1618,40 +1618,23 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
+                    GAMSScalarModelHelper(false);
 
-                    GAMSScalarModelHelper(false);                                        
-
-                    if (false)
+                    if (Globals.modelParallelProtobuf)
                     {
-                        //Can be used to test size of protobuf
-                        //Just comment out one of the objects and look at the protobuf
-                        //Beware that when running it as-is, it is expected that protobuf size is around 0.
-                        //Sizes in MB, XX means 1 mio elements.
-                        Program.model.modelGamsScalar.bbTemp = null;    //26.5 XX
-                        Program.model.modelGamsScalar.cc = null;        // 2.4 
-                        Program.model.modelGamsScalar.ddTemp = null;  //11.0 XX
-                        Program.model.modelGamsScalar.ee = null;     // 3.2 XX
-                        Program.model.modelGamsScalar.aTemp = null;  //9.6
-                        Program.model.modelGamsScalar.dict_FromANumberToVarName = null; //0.2
-                        Program.model.modelGamsScalar.dict_FromVarNameToANumber = null; //0.3
-                        Program.model.modelGamsScalar.dict_FromEqChunkNumberToEqName = null;  // 0.0
-                        Program.model.modelGamsScalar.dict_FromEqNameToEqChunkNumber = null; //0.0
-                        Program.model.modelGamsScalar.dict_FromEqNumberToEqName = null;  //25.4 XX
-                        Program.model.modelGamsScalar.dict_FromEqNameToEqNumber = null; //31.8 XX
-                        Program.model.modelGamsScalar.dict_FromVarNumberToVarName = null; //22.8 XX
-                        Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = null; //29.2 XX
-                        Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = null; //4.1 XX
-                        Program.model.modelGamsScalar.csCodeLines = null; //1.7
-                        Program.model.modelGamsScalar.gamsFoldedModel = null; //0.3
-                        Program.model.modelGamsScalar.dependents = null; //26.8  XX
-                        Program.model.modelGamsScalar.precedents = null; //36.1  XX
+                        //TODO
+                        //TODO what about last argument ms?
+                        //TODO
+                        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0);
                     }
-
-                    // ----- SERIALIZE
-                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    Program.ProtobufWrite(Program.model.modelGamsScalar, pathAndFilename);                   
-                    if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
+                    else
+                    {
+                        // ----- SERIALIZE
+                        string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                        Program.ProtobufWrite(Program.model.modelGamsScalar, pathAndFilename);
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
+                    }
                 }
                 catch (Exception e)
                 {

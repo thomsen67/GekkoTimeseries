@@ -2366,11 +2366,10 @@ namespace Gekko
             List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, n, true);
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("public static void ProtobufModelGamsScalar5a(List<string> files){");
-            sb.AppendLine("int n = files.Count;");
+            sb.AppendLine("public static List<string> ProtobufModelGamsScalar5a(int n){");
             sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
             sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
-            sb.AppendLine("for(int i = 1; i <= n; i++) {");
+            sb.AppendLine("for(int i = 1; i <= n + 1; i++) {");
             sb.AppendLine("  m.Add(new ModelGamsScalar());");
             sb.AppendLine("}");
             sb.AppendLine("m[0] = Program.model.modelGamsScalar;");
@@ -2388,6 +2387,7 @@ namespace Gekko
             sb.AppendLine("for(int i = 0;i <= n; i++) {");
             sb.AppendLine("  Program.ProtobufWrite(m[i], files[i]);");
             sb.AppendLine("}");
+            sb.AppendLine("return m;");
             sb.AppendLine("}");
             File.WriteAllText("c:\\tools\\Model1.cs", sb.ToString());
 
@@ -2400,7 +2400,7 @@ namespace Gekko
             sb.AppendLine("int n = files.Count;");
             sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
             sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
-            sb.AppendLine("for(int i = 1; i <= n; i++) {");
+            sb.AppendLine("for(int i = 1; i <= n + 1; i++) {");
             sb.AppendLine("  m.Add(new ModelGamsScalar());");
             sb.AppendLine("}");
             sb.AppendLine("for(int i = 0;i <= n; i++) {");
@@ -2423,12 +2423,11 @@ namespace Gekko
 
         }
 
-        public static void ProtobufModelGamsScalar5a(List<string> files)
-        {
-            int n = files.Count;
+        public static List<ModelGamsScalar> ProtobufModelGamsScalar5a(int n)
+        {            
             if (n != 5) new Error("Hov");
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
-            for (int i = 1; i <= n; i++)
+            for (int i = 1; i <= n + 1; i++)
             {
                 m.Add(new ModelGamsScalar());
             }
@@ -2463,11 +2462,8 @@ namespace Gekko
             m[5].bbTemp = m[0].bbTemp;
             m[0].bbTemp = null;
             m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
-            m[0].dict_FromEqNumberToEqName = null;
-            for (int i = 0; i <= n; i++)
-            {
-                Program.ProtobufWrite(m[i], files[i]);
-            }
+            m[0].dict_FromEqNumberToEqName = null;            
+            return m;
         }
 
         public static void ProtobufModelGamsScalar5b(List<string> files)
@@ -2565,44 +2561,60 @@ namespace Gekko
             m[0].bbTemp = m[5].bbTemp;
             m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
             Program.model.modelGamsScalar = m[0];
+        }
 
-        }       
-
-
-        public static void WriteParallel(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
+        public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs)
         {
             DateTime t = DateTime.Now;
-            if (hash == null)  
+            bool print = false; if (Globals.runningOnTTComputer) print = true;
+            List<string> files = GetSplitCacheFileNames(k, inputFileName, "model", ref hash);
+
+            List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k);
+
+            lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
-                //never happens? When an unseen file is encountered, ReadParallel will have computed the hash to see if it is known.
-                //so this is just for double safety.
-                hash = Program.GetMD5Hash(null, fileName);
+                try
+                {
+                    if (File.Exists(files[i])) File.Delete(files[i]);
+                }
+                catch (Exception e)
+                {
+                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                }
+                ProtobufWrite(x, files[i]);
+                return true;
+            }).All(_ => _);
+
+            List<string> sfiles = new List<string>();
+            foreach (string file in files)
+            {
+                sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
             }
+            if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));            
 
-            bool print = false;
-            if (Globals.runningOnTTComputer) print = true;
+            double milliseconds = (DateTime.Now - t).TotalMilliseconds;
+            milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
+            string s = G.SecondsFormat(milliseconds);
+            if (print) new Writeln("TTH: WriteParallelModel: " + s);
+        }
 
-            List<string> files = new List<string>();
+        public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
+        {
+            DateTime t = DateTime.Now;
+            bool print = false; if (Globals.runningOnTTComputer) print = true;
+            
+            List<string> files = GetSplitCacheFileNames(k, fileName, "data", ref hash);
+
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
-                        
-            string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
-            string[] hits = Directory.GetFiles(Globals.localTempFilesLocation, part2 + "*" + Globals.cacheExtension);
-            foreach (string hit in hits)
-            {
-                //Clean sheet for this hash
-                File.Delete(hit);
-            }
-
             for (int i = 0; i < k; i++)
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + part2 + (i + 1) + "of" + k + Globals.cacheExtension);
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-            
+
             lists = SplitVarsInSameSizeParts(source.storage, k, print);
-            
+
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
                 try
@@ -2633,7 +2645,44 @@ namespace Gekko
 
         }
 
-        public static Databank ReadParallel(string fileName, out int year1, out int year2, out string hash, out double hashMs, ReadInfo readInfo)
+        /// <summary>
+        /// Makes k files with names [hash]...1of5, ...2of5, etc. If hash==null, it will be calculated and returned.
+        /// Type is "data" or "model". If something containg the hash name is present, these files are deleted first.
+        /// 
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="inputFileNameUsedForHash"></param>
+        /// <param name="type"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        private static List<string> GetSplitCacheFileNames(int k, string inputFileNameUsedForHash, string type, ref string hash)
+        {
+            if (hash == null)
+            {
+                //never happens? When an unseen file is encountered, ReadParallel will have computed the hash to see if it is known.
+                //so this is just for double safety.
+                hash = Program.GetMD5Hash(null, inputFileNameUsedForHash);
+            }
+
+            List<string> files = new List<string>();
+
+            string part2 = Globals.gekkoVersion + "_" + type + "_" + hash + "_";
+            string[] hits = Directory.GetFiles(Globals.localTempFilesLocation, part2 + "*" + Globals.cacheExtension);
+            foreach (string hit in hits)
+            {
+                //Clean sheet for this hash
+                File.Delete(hit);
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                files.Add(Globals.localTempFilesLocation + "\\" + part2 + (i + 1) + "of" + k + Globals.cacheExtension);
+            }
+
+            return files;
+        }
+
+        public static Databank ReadParallelDatabank(string fileName, out int year1, out int year2, out string hash, out double hashMs, ReadInfo readInfo)
         {
             // Test of read of large calib.gdx (176 MB) with different number of splitfiles.
             //
@@ -4162,7 +4211,7 @@ namespace Gekko
             if (MayUseDatabankCache(oRead.Type, fileRememberSize))
             {
                 int year1, year2;
-                Databank databankTemp2 = ReadParallel(fileRemember, out year1, out year2, out hash, out hashMs, readInfo);
+                Databank databankTemp2 = ReadParallelDatabank(fileRemember, out year1, out year2, out hash, out hashMs, readInfo);
                 if (year1 == int.MaxValue) year1 = -12345;
                 if (year2 == int.MinValue) year2 = -12345;
 
@@ -4234,7 +4283,7 @@ namespace Gekko
                 {
                     try //not the end of world if it fails
                     {                        
-                        WriteParallel(Program.options.system_threads, databankTemp, fileRemember, hash, hashMs, readInfo);
+                        WriteParallelDatabank(Program.options.system_threads, databankTemp, fileRemember, hash, hashMs, readInfo);
                     }
                     catch (Exception e)
                     {
