@@ -19247,15 +19247,13 @@ namespace Gekko
                 }
 
                 ProtobufWrite(databank, pathAndFilename2);
+                count = databank.storage.Count;  //must be before the finally
             }
             finally
             {
                 //so we are sure it always gets pointed back to its real Dictionary<>!
                 databank.storage = storageOriginal;
-            }
-
-
-            count = databank.storage.Count;
+            }            
 
             DateTime dt0 = DateTime.Now;
 
