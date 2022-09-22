@@ -167,7 +167,7 @@ namespace Gekko
     {
         public string s = null;
         public double d = double.NaN;
-        public StringDouble(double d, string s)
+        public StringDouble(string s, double d)
         {
             this.s = s;
             this.d = d;
@@ -2344,28 +2344,45 @@ namespace Gekko
         {
             List<StringDouble> a = new List<StringDouble>();
             //x means 1 mio elements, (x) has them in two dimensions
-            a.Add(new StringDouble(0.0, "dict_FromEqChunkNumberToEqName"));
-            a.Add(new StringDouble(0.0, "dict_FromEqNameToEqChunkNumber"));
-            a.Add(new StringDouble(0.2, "dict_FromANumberToVarName"));
-            a.Add(new StringDouble(0.3, "dict_FromVarNameToANumber"));
-            a.Add(new StringDouble(0.3, "gamsFoldedModel"));
-            a.Add(new StringDouble(1.7, "csCodeLines"));
-            a.Add(new StringDouble(2.4, "cc"));
-            a.Add(new StringDouble(3.2, "ee")); //x
-            a.Add(new StringDouble(4.1, "dict_FromEqNumberToEqChunkNumber")); //x
-            a.Add(new StringDouble(9.6, "aTemp")); //(x)
-            a.Add(new StringDouble(11.0, "ddTemp")); //x
-            a.Add(new StringDouble(22.8, "dict_FromVarNumberToVarName")); //x
-            a.Add(new StringDouble(25.4, "dict_FromEqNumberToEqName")); //x
-            a.Add(new StringDouble(26.5, "bbTemp")); //x
-            a.Add(new StringDouble(26.8, "dependents")); //x
-            a.Add(new StringDouble(29.2, "dict_FromVarNameToVarNumber")); //x
-            a.Add(new StringDouble(31.8, "dict_FromEqNameToEqNumber")); //x
-            a.Add(new StringDouble(36.1, "precedents")); //x
-            for (int k = 1; k <= 10; k++)
+            //
+            //These data are obtained manually. Could use reflection on the top-most objects in modelGamsScalar,
+            //and try to switch off the objects one by one and measure difference in written protobuf.
+            //When doing this, just read an existing full protobuf (faster than reading gdx).
+            //Small objects are pruned here. All the C# code, for all thread numbers ought to be generated
+            //automatically, but here we just generate for threads=5. On top, there is the modelGamsScalar object
+            //itself, so we get 6 chunks (but this object is small when the sub-objects below are removed).
+            a.Add(new StringDouble("csCodeLines", 1.7));
+            a.Add(new StringDouble("cc", 2.4));
+            a.Add(new StringDouble("ee", 3.2)); //x
+            a.Add(new StringDouble("dict_FromEqNumberToEqChunkNumber", 4.1)); //x
+            a.Add(new StringDouble("aTemp", 9.6)); //(x)
+            a.Add(new StringDouble("ddTemp", 11.0)); //x
+            a.Add(new StringDouble("dict_FromVarNumberToVarName", 22.8)); //x
+            a.Add(new StringDouble("dict_FromEqNumberToEqName", 25.4)); //x
+            a.Add(new StringDouble("bbTemp", 26.5)); //x
+            a.Add(new StringDouble("dependents", 26.8)); //x
+            a.Add(new StringDouble("dict_FromVarNameToVarNumber", 29.2)); //x
+            a.Add(new StringDouble("dict_FromEqNameToEqNumber", 31.8)); //x
+            a.Add(new StringDouble("precedents", 36.1)); //x           
+            List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, 5, true);
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            sb.AppendLine("ModelGamsScalar m0 = Program.model.modelGamsScalar;");
+            foreach (List<StringDouble> x1 in aa)
             {
-                SplitVarsInSameSizeParts(a, k, true);
+                i++;  //starts with 1
+                sb.AppendLine("m" + i + " = new ModelGamsScalar();");
+                foreach (StringDouble x2 in x1)
+                {
+                    sb.AppendLine("m" + i + "." + x2.s + " = m0" + "." + x2.s + ";");
+                    sb.AppendLine("m0" + "." + x2.s + " = null;");
+                }
             }
+
+            //ModelGamsScalar m0 = new ModelGamsScalar();
+            //m.precedents = null;
+
+
         }
 
         public static void WriteParallel(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
@@ -2413,19 +2430,8 @@ namespace Gekko
                     new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
                 }
 
-                using (FileStream fs = WaitForFileStream(files[i], null, GekkoFileReadOrWrite.Write))
-                {
-                    try
-                    {
-                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                        serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        serializer.Serialize(fs, x);
-                    }
-                    catch (Exception e)
-                    {
-                        new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
-                    }
-                }
+                ProtobufWrite(x, files[i]);
+
                 return true;
             }).All(_ => _);
 
@@ -18993,27 +18999,16 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                using (FileStream fs = WaitForFileStream(pathAndFilename2, null, GekkoFileReadOrWrite.Write))
-                {
-                    try
-                    {
-                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                        serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        serializer.Serialize(fs, databank);
-                        count = databank.storage.Count;
-                    }
-                    catch (Exception e)
-                    {
-                        new Error("Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers). Message: " + e.Message);
-                    }
-
-                }
+                ProtobufWrite(databank, pathAndFilename2);
             }
             finally
             {
                 //so we are sure it always gets pointed back to its real Dictionary<>!
                 databank.storage = storageOriginal;
             }
+
+
+            count = databank.storage.Count;
 
             DateTime dt0 = DateTime.Now;
 
@@ -19032,6 +19027,31 @@ namespace Gekko
                 }
             }
             return count;
+        }
+
+        /// <summary>
+        /// Writes an object to protobuffer file
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="pathAndFilename2"></param>
+        public static void ProtobufWrite(object o, string pathAndFilename2)
+        {
+            using (FileStream fs = WaitForFileStream(pathAndFilename2, null, GekkoFileReadOrWrite.Write))
+            {
+                try
+                {
+                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                    //But this way, it is more thread-safe?
+                    //And a lot of small objects are not protobuffed anyway?
+                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
+                    serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                    serializer.Serialize(fs, o);
+                }
+                catch (Exception e)
+                {
+                    new Error("Technical problem while writing protobuffer file. Message: " + e.Message);
+                }
+            }
         }
 
         public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)

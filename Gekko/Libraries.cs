@@ -537,16 +537,10 @@ namespace Gekko
                         
                         try //not the end of world if it fails
                         {                            
-                            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                            RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                            serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                             // ----- SERIALIZE                    
                             string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Globals.cacheExtension;
-                            string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-                            {
-                                serializer.Serialize(fs, library);
-                            }
+                            string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;                            
+                            Program.ProtobufWrite(library, pathAndFilename);
                         }
                         catch (Exception e)
                         {

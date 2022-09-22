@@ -81,23 +81,13 @@ namespace Gekko.Parser.Frm
                 DateTime dt1 = DateTime.Now;
 
                 PutListsIntoModelListHelper();
-
-                //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-
-
                 // ----- SERIALIZE
                 //string outputPath = Globals.localTempFilesLocation;
                 //DeleteFolder(outputPath);
                 //Directory.CreateDirectory(outputPath);
                 string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + Globals.cacheExtensionModel;
-                string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-                {
-                    //Serializer.Serialize(fs, m);
-                    serializer.Serialize(fs, Program.model.modelGekko);
-                }
+                string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;                
+                Program.ProtobufWrite(Program.model.modelGekko, pathAndFilename);
                 //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
                 G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
             }

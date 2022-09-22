@@ -1478,18 +1478,11 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-
-                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                    serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-
+                                        
                     // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-                    {
-                        serializer.Serialize(fs, Program.model.modelGams);
-                    }
+                    Program.ProtobufWrite(Program.model.modelGams, pathAndFilename);
                     G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                 }
                 catch (Exception e)
@@ -1632,11 +1625,7 @@ namespace Gekko
                 {
                     DateTime dt1 = DateTime.Now;
 
-                    GAMSScalarModelHelper(false);                    
-
-                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer2 = RuntimeTypeModel.Create();
-                    serializer2.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                    GAMSScalarModelHelper(false);                                        
 
                     if (false)
                     {
@@ -1667,11 +1656,7 @@ namespace Gekko
                     // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
-                    {
-                        serializer2.Serialize(fs, Program.model.modelGamsScalar);
-                    }
-
+                    Program.ProtobufWrite(Program.model.modelGamsScalar, pathAndFilename);                   
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
                 }
                 catch (Exception e)
