@@ -1437,12 +1437,9 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime dt1 = DateTime.Now;
-                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                        {
-                            Program.model.modelGams = Serializer.Deserialize<ModelGams>(fs);
-                            Program.model.modelGams.modelInfo.loadedFromMdlFile = true;
-                        }
+                        DateTime dt1 = DateTime.Now;                        
+                        Program.model.modelGams = Program.ProtobufRead<ModelGams>(mdlFileNameAndPath);
+                        Program.model.modelGams.modelInfo.loadedFromMdlFile = true;
                         G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                     }
                     catch (Exception e)
@@ -1527,16 +1524,13 @@ namespace Gekko
                     try
                     {
                         DateTime dt1 = DateTime.Now;
-                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                        {
-                            DateTime t0 = DateTime.Now;
-                            Program.model.modelGamsScalar = Serializer.Deserialize<ModelGamsScalar>(fs);
-                            timeLoadCache = "deflate: " + G.Seconds(t0);
-                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
-                            DateTime t1 = DateTime.Now;
-                            GAMSScalarModelHelper(true);
-                            timeCompile = "compile: " + G.Seconds(t1);
-                        }
+                        DateTime t0 = DateTime.Now;                        
+                        Program.model.modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
+                        timeLoadCache = "deflate: " + G.Seconds(t0);
+                        Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                        DateTime t1 = DateTime.Now;
+                        GAMSScalarModelHelper(true);
+                        timeCompile = "compile: " + G.Seconds(t1);
                     }
                     catch (Exception e)
                     {

@@ -2107,12 +2107,8 @@ namespace Gekko
                         Program.RunGekkoCommands("read <first> " + file4 + ";", "", 0, new P());
                     }
                     else if (i == 15)
-                    {
-                        using (FileStream fs = WaitForFileStream(file5, null, GekkoFileReadOrWrite.Read))
-                        {
-                            RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                            Databank deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
-                        }
+                    {                        
+                        Databank deserializedDatabank = ProtobufRead<Databank>(file5);
                     }
                     else if (i == 16)
                     {
@@ -2524,9 +2520,8 @@ namespace Gekko
 
                 int i = (int)index;
                 string fileName2 = files[i];
-                object o = ProtobufRead(fileName2);
-
-                lists[i] = o as List<KeyValuePair<string, IVariable>>;
+                List<KeyValuePair<string, IVariable>> o = ProtobufRead<List<KeyValuePair<string, IVariable>>>(fileName2);
+                lists[i] = o;
                 TwoInts yearMinMax = twoIntss[i];
                 foreach (KeyValuePair<string, IVariable> kvp in lists[i])
                 {
@@ -2557,15 +2552,14 @@ namespace Gekko
             return db;
         }
 
-        private static object ProtobufRead<T>(string fileName2)
+        public static T ProtobufRead<T>(string fileName2)
         {
-            object o;
+            T o;
             using (FileStream fs = WaitForFileStream(fileName2, null, GekkoFileReadOrWrite.Read))
             {
                 RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                o = Serializer.Deserialize<List<KeyValuePair<string, IVariable>>>(fs);
+                o = Serializer.Deserialize<T>(fs);
             }
-
             return o;
         }
 
@@ -4705,39 +4699,31 @@ namespace Gekko
                 else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) fileName = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
                 else
                 {
-                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);                    
+                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
                 }
 
-                using (FileStream fs = WaitForFileStream(fileName, null, GekkoFileReadOrWrite.Read))
+
+                ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                //RuntimeTypeModel serializer = TypeModel.Create();
+                //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                try
                 {
-                    ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    //RuntimeTypeModel serializer = TypeModel.Create();
-                    //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                    try
+                    DateTime dt3 = DateTime.Now;
+                    deserializedDatabank = ProtobufRead<Databank>(fileName);
+                    TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
+                    foreach (IVariable iv in deserializedDatabank.storage.Values)
                     {
-                        DateTime dt3 = DateTime.Now;
-
-                        RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-
-                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
-
-                        TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
-                        foreach (IVariable iv in deserializedDatabank.storage.Values)
-                        {
-                            iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
-                        }
-                        readInfo.variables = deserializedDatabank.storage.Count;
-                        readInfo.startPerInFile = yearMinMax.int1;
-                        readInfo.endPerInFile = yearMinMax.int2;
-                        G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
+                        iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                     }
-                    catch (Exception e)
-                    {
-                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers). Message: " + e.Message + ". Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
-                    }
-
-                }  //end of using
-
+                    readInfo.variables = deserializedDatabank.storage.Count;
+                    readInfo.startPerInFile = yearMinMax.int1;
+                    readInfo.endPerInFile = yearMinMax.int2;
+                    G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
+                }
+                catch (Exception e)
+                {
+                    new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers). Message: " + e.Message + ". Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
+                }
             }
 
             if (true)
@@ -16379,17 +16365,7 @@ namespace Gekko
             try
             {
                 DateTime dt1 = DateTime.Now;
-                //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                //RuntimeTypeModel serializer = TypeModel.Create();
-                //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                // ----- DESERIALIZE
-                //DeleteFolder(outputPath);
-                //Directory.CreateDirectory(outputPath);
-                //WaitForZipRead(outputPath, mdlFileNameAndPath);
-                using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, null, GekkoFileReadOrWrite.Read))
-                {
-                    Program.model.modelGekko = Serializer.Deserialize<ModelGekko>(fs);
-                }
+                Program.model.modelGekko = ProtobufRead<ModelGekko>(mdlFileNameAndPath);
 
                 GetListsFromModelListHelper();
 

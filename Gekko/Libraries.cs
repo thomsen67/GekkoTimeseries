@@ -499,11 +499,8 @@ namespace Gekko
                         {
                             try
                             {                                
-                                using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
-                                {
-                                    library = Serializer.Deserialize<Library>(fs);
-                                    loadedFromProtobuf = true;
-                                }
+                                library = Program.ProtobufRead<Library>(libFileNameAndPath);
+                                loadedFromProtobuf = true;
                             }
                             catch (Exception e)
                             {
