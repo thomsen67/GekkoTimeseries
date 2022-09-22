@@ -2607,7 +2607,6 @@ namespace Gekko
 
             //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
-
             Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
             {
                 //See https://github.com/protobuf-net/protobuf-net/issues/668
@@ -2618,7 +2617,6 @@ namespace Gekko
                 lists[i] = o;
                 return 0;
             }, _ => { });
-
             ProtobufModelGamsScalar5b(lists);            
             lists = null;  //free for GC     
             return false;
