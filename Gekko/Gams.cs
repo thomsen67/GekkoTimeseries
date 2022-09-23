@@ -40,28 +40,6 @@ namespace Gekko
 
             List<List<TwoInts>> chunks = Chunker(n, threads, eqsPerChunk);
 
-            if (true)
-            {
-                DateTime t0 = DateTime.Now;
-                List<int> check = new List<int>();
-                foreach (List<TwoInts> c1 in chunks)
-                {
-                    foreach (TwoInts c2 in c1)
-                    {
-                        for (int i = c2.int1; i < c2.int2; i++)
-                        {
-                            check.Add(i);
-                        }
-                    }
-                }
-                if (check.Count != n) new Error("!!!");
-                for (int i = 0; i < check.Count; i++)
-                {
-                    if (check[i] != i) new Error("!!!");
-                }
-                new Writeln("TTH: Remove sometime ... Integrity check ok! " + G.Seconds(t0));
-            }
-
             Parallel.ForEach(chunks, () => 0, (x, pls, index, s) =>
             {
                 List<TwoInts> chunkList = chunks[(int)index];
@@ -138,42 +116,38 @@ namespace Gekko
         /// Afterwards, foreach (List&lt;TwoInts> c1 in chunks) { foreach (TwoInts c2 in c1)
         /// { for (int i = c2.int1; i&lt;c2.int2; i++) { ... will loop i from 0 to n-1 (including)
         /// with increment 1 and no holes. Here, chunks is the return value from method.
-        /// For n &lt; 500, no chunking is done.
+        /// For n &lt; 500, no chunking is done. Method has been tested on all 1 mio. combinations of
+        /// n = 1..100, threads=1..100 and eqsPerChunk=1..100, and in all cases the resulting
+        /// triple loop loops through the n values 0..n-1 with increment 1 and no holes.
+        /// So method seems safe for input values > 0, not "forgetting" any equations. 
+        /// Note: eqsPerChunk should be understood as max eqs per chunk.
         /// </summary>         
-        private static List<List<TwoInts>> Chunker(int n, int threads, int eqsPerChunk)
+        public static List<List<TwoInts>> Chunker(int n, int threads, int eqsPerChunk)
         {
             List<List<TwoInts>> chunks = new List<List<TwoInts>>();
 
-            if (n < 500)
+            List<TwoInts> chunksTemp = new List<TwoInts>();
+            int k1 = n / threads;  //eqs per thread
+            for (int j1 = 0; j1 < threads - 1; j1++)
             {
-                chunks.Add(new List<TwoInts>());
-                chunks[0].Add(new TwoInts(0, n)); //one processor that takes it all
+                //over threads-1                    
+                chunksTemp.Add(new TwoInts(j1 * k1, (j1 + 1) * k1));
             }
-            else
+            chunksTemp.Add(new TwoInts((threads - 1) * k1, n));
+
+            foreach (TwoInts xx in chunksTemp)
             {
-                List<TwoInts> chunksTemp = new List<TwoInts>();
-                int k1 = n / threads;  //eqs per thread
-                for (int j1 = 0; j1 < threads - 1; j1++)
+                List<TwoInts> chunksFor1Thread = new List<TwoInts>();
+                int count = xx.int2 - xx.int1;
+                int splits = count / eqsPerChunk + 1;
+
+                for (int j2 = 0; j2 < splits - 1; j2++)
                 {
                     //over threads-1                    
-                    chunksTemp.Add(new TwoInts(j1 * k1, (j1 + 1) * k1));
+                    chunksFor1Thread.Add(new TwoInts(xx.int1 + j2 * eqsPerChunk, xx.int1 + (j2 + 1) * eqsPerChunk));
                 }
-                chunksTemp.Add(new TwoInts((threads - 1) * k1, n));
-
-                foreach (TwoInts xx in chunksTemp)
-                {
-                    List<TwoInts> chunksFor1Thread = new List<TwoInts>();
-                    int count = xx.int2 - xx.int1;
-                    int splits = count / eqsPerChunk + 1;
-
-                    for (int j2 = 0; j2 < splits - 1; j2++)
-                    {
-                        //over threads-1                    
-                        chunksFor1Thread.Add(new TwoInts(xx.int1 + j2 * eqsPerChunk, xx.int1 + (j2 + 1) * eqsPerChunk));
-                    }
-                    chunksFor1Thread.Add(new TwoInts(xx.int1 + (splits - 1) * eqsPerChunk, xx.int1 + count));
-                    chunks.Add(chunksFor1Thread);
-                }
+                chunksFor1Thread.Add(new TwoInts(xx.int1 + (splits - 1) * eqsPerChunk, xx.int1 + count));
+                chunks.Add(chunksFor1Thread);
             }
 
             return chunks;
@@ -1530,7 +1504,7 @@ namespace Gekko
                         double hashMs = 0d;
                         DateTime t0 = DateTime.Now;
                         bool problem = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
-                        new Writeln("Parallel protobuf read: " + G.Seconds(t0));
+                        if(Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         if (problem)
                         {
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
