@@ -1742,7 +1742,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 SplitVars();
             }
@@ -2607,16 +2607,32 @@ namespace Gekko
 
             //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
             t = DateTime.Now;
-            Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+
+            if (Globals.test_runParallelAsSequential)
             {
-                //See https://github.com/protobuf-net/protobuf-net/issues/668
-                //About double speed on TT pc, compared to no parallel  
-                int i = (int)index;
-                string fileName2 = files[i];
-                ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
-                lists[i] = o;
-                return 0;
-            }, _ => { });
+                for (int i = 0; i < lists.Count; i++)
+                {
+                    DateTime t0 = DateTime.Now;
+                    string fileName2 = files[i];
+                    ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
+                    lists[i] = o;
+                    new Writeln("Seq" + i + ": " + G.Seconds(t0));
+                }
+            }
+            else
+            {
+                Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+                {
+                    //See https://github.com/protobuf-net/protobuf-net/issues/668
+                    //About double speed on TT pc, compared to no parallel  
+                    int i = (int)index;
+                    string fileName2 = files[i];
+                    ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
+                    lists[i] = o;
+                    return 0;
+                }, _ => { });
+            }
+
             ProtobufModelGamsScalar5b(lists);            
             lists = null;  //free for GC     
             return false;

@@ -101,7 +101,7 @@ namespace Gekko
         // ------------------------------------------------------------
         // Protobuf tuning start
         // ------------------------------------------------------------        
-        public static bool modelParallelProtobuf = false;
+        public static bool modelParallelProtobuf = true;
         public const double cacheSize1 = 5e6;    //non-gbk
         public const double cacheSize2 = 10e6;   //gbk
         public const double cacheFileMax = 50e9; //bytes, flush always if over
@@ -110,6 +110,7 @@ namespace Gekko
         public const int count2 = 8;   //double value is 8 bytes
         public const int count3 = 2;   //one char inside string is 2 bytes
         public const int eqsPerChunk = 1000;  //for each thread, how big are blocks (too large blocks harms compilation)
+        public const bool test_runParallelAsSequential = false;
         // ------------------------------------------------------------
         // Protobuf tuning end
         // ------------------------------------------------------------
