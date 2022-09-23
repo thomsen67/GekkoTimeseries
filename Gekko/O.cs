@@ -8037,22 +8037,39 @@ namespace Gekko
 
         public class Find
         {
-            //public bool showTime = false;
-            public GekkoTime t0 = GekkoTime.tNull;  //selected time
-            //public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            //public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
-            public List iv = null;            
-            //public string opt_prtcode = null;
+            //input
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
+            public string opt_prtcode = null;
+            public List iv = null;
+
+            //--- extra ---
+
+            public GekkoTime t0 = GekkoTime.tNull;  //selected time            
             public string rv = null; //return value
             public DecompOptions2 decompOptions2 = null;  //for read only
 
+            public Find()
+            {
+                //called from FIND                
+            }
+
             public Find(DecompOptions2 opt)
             {
+                //called from DECOMP
                 this.decompOptions2 = opt;
             }
 
             public void Exe()
             {
+                if (this.decompOptions2 == null)
+                {
+                    this.decompOptions2 = new DecompOptions2();
+                    this.decompOptions2.t1 = this.t1;
+                    this.decompOptions2.t2 = this.t2;
+                    if (this.opt_prtcode == null) this.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
+                    else this.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
+                }                                
                 G.CheckLegalPeriod(this.decompOptions2.t1, this.decompOptions2.t2);
                 this.rv = Program.Find(this);
             }

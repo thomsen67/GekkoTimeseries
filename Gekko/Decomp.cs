@@ -1029,7 +1029,7 @@ namespace Gekko
                 if (counter == 0)
                 {
                     link.endo = new List<string>();
-                    link.endo.AddRange(decompOptions2.new_endo);
+                    link.endo.AddRange(decompOptions2.new_endo);   Her går det galt
                     link.varnames = new List<string>();
                     link.varnames.AddRange(decompOptions2.new_select);
                 }
@@ -4076,10 +4076,20 @@ namespace Gekko
 
             eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 
-            bool? b = eb.ShowDialog();
-            rv = eb._activeEquation;
-            if (b != true) rv = null;  //only when OK is pressed (or Enter)
-            eb.Close();
+            try
+            {
+                bool? b = eb.ShowDialog();
+                rv = eb._activeEquation;
+                if (b != true) rv = null;  //only when OK is pressed (or Enter)
+                eb.Close();
+            }
+            catch (Exception e)
+            {
+
+            }
+
+
+            
             return rv;
         }        
 

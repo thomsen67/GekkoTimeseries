@@ -2563,26 +2563,35 @@ namespace Gekko
             }
             d.rows = tempRows;
 
-            List<string> tempSelect = new List<string>();
-            foreach (string s in this.new_select)
+            if (this.new_select != null)
             {
-                tempSelect.Add(s);
+                List<string> tempSelect = new List<string>();
+                foreach (string s in this.new_select)
+                {
+                    tempSelect.Add(s);
+                }
+                d.new_select = tempSelect;
             }
-            d.new_select = tempSelect;
 
-            List<string> tempFrom = new List<string>();
-            foreach (string s in this.new_from)
+            if (this.new_from != null)
             {
-                tempFrom.Add(s);
+                List<string> tempFrom = new List<string>();
+                foreach (string s in this.new_from)
+                {
+                    tempFrom.Add(s);
+                }
+                d.new_from = tempFrom;
             }
-            d.new_from = tempFrom;
 
-            List<string> tempEndo = new List<string>();
-            foreach (string s in this.new_endo)
+            if (this.new_endo != null)
             {
-                tempEndo.Add(s);
+                List<string> tempEndo = new List<string>();
+                foreach (string s in this.new_endo)
+                {
+                    tempEndo.Add(s);
+                }
+                d.new_endo = tempEndo;
             }
-            d.new_endo = tempEndo;
             
             if (this.dataPattern != null)
             {
