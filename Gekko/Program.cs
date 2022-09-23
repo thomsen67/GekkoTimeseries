@@ -2370,7 +2370,7 @@ namespace Gekko
             sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
             sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
             sb.AppendLine("for(int i = 1; i <= n + 1; i++) {");
-            sb.AppendLine("  m.Add(new ModelGamsScalar());");
+            sb.AppendLine("  m.Add(null);");
             sb.AppendLine("}");
             sb.AppendLine("m[0] = Program.model.modelGamsScalar;");
             int i = 0;

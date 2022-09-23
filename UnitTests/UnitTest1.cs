@@ -13175,27 +13175,30 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_GAMSEquationsLarge()
-        {
-            Program.Flush(); //wipes out existing cached models
-            Globals.unitTestScreenOutput.Clear();
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
-            I("MODEL <gms> makro.zip;");
+        {            
+            for (int i = 0; i < 2; i++)
+            {
+                Globals.unitTestScreenOutput.Clear();
+                if (i==0) I("flush();");  //test without or with cache
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+                I("MODEL <gms> makro.zip;");
 
-            //1 time back and forth takes about 0.3s in debug mode
-            //A good test of reading and writing from GAMS scalar model a array.
-            Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                //1 time back and forth takes about 0.3s in debug mode
+                //A good test of reading and writing from GAMS scalar model a array.
+                Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
+                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
-            I("SIM;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));                       
-            
-            //TODO
-            //TODO
-            //TODO Do a better test of the resulting model object
-            //TODO
-            //TODO
+                I("SIM;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));
+
+                //TODO
+                //TODO
+                //TODO Do a better test of the resulting model object
+                //TODO
+                //TODO
+            }
 
         }
 

@@ -733,7 +733,7 @@ namespace Gekko
                 // test the scalar model
 
                 bool testForZeroResiduals = false;
-                int rep1 = 10;
+                int rep1 = 5;
                 int rep2 = 100;
                 double rss = double.NaN;
                 for (int j1 = 0; j1 < rep1; j1++)

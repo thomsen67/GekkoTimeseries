@@ -615,7 +615,7 @@ namespace Gekko
             //1063359 evaluations x 100 took 5.75 sec
             //1063359 evaluations x 100 took 5.49 sec            
             //So after warmup about 5 sec for 1e8 evals in debug mode
-            //  --> Sometimes seen it around 4.1 in debug mode (best release mode: around 3.52).
+            //  --> Sometimes seen it around 4.1 in debug mode (best release mode: around 3.40).
 
             //Note: cf. these interfaces from Python or Julia to GAMS: https://www.gams.com/blog/2020/06/new-and-improved-gams-links-for-pyomo-and-jump/
 
@@ -1763,13 +1763,14 @@ namespace Gekko
                 }
                 Program.model.modelGamsScalar.aTemp = null;
 
+                // -----
+
+                Program.model.modelGamsScalar.r_ref = G.CreateNaN(Program.model.modelGamsScalar.CountEqs(1));
+                Program.model.modelGamsScalar.r = G.CreateNaN(Program.model.modelGamsScalar.CountEqs(1));                
+
                 //Loading of Func<>s
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
-                Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.functions);
-                
-                //Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
-                //Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
-                //assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                                     
+                Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.functions);                                
             }
             else
             {
