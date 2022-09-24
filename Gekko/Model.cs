@@ -512,10 +512,10 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGamsScalar
-    {        
+    {
         [ProtoMember(1)]
         public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
-        
+
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
 
@@ -543,12 +543,12 @@ namespace Gekko
         [ProtoMember(6)]
         public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
-        
+
         // ------------------------------------
-        
+
         //not protobuffed
         public double[] r_ref = null;
-        
+
         //not protobuffed
         public double[][] a_ref = null;
 
@@ -640,7 +640,7 @@ namespace Gekko
         /// bb array.b e
         /// </summary>
         [ProtoMember(27)]
-        public List<ModelScalarEquation> precedents = null;        
+        public List<ModelScalarEquation> precedents = null;
 
         // =============================================
         // =============================================
@@ -706,6 +706,7 @@ namespace Gekko
         /// <param name="i"></param>
         public double Eval(int i, bool isRef, ref int funcCounter)
         {
+
             //NOTE: this.functions() can return a sum (with illegals signal).
             funcCounter++;
             if (isRef)
@@ -717,8 +718,8 @@ namespace Gekko
             {
                 this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);
                 return this.r[i];
-            }            
-        }
+            }
+        }    
 
         /// <summary>
         /// Get data in GAMS scalar model.

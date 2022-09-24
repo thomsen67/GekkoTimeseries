@@ -1529,17 +1529,11 @@ namespace Gekko
                 // ---------------------------------------
                                 
                 List<string> vars = c2.vars_hack;
-                if (vars == null) MessageBox.Show("Could not find any vars");
-
-                //string var = c.CellText.TextData[0];
+                if (vars == null) MessageBox.Show("Could not find any vars");                
                 string var = vars[0];  //#dskla8asjkdfa
-
                 O.Find o = new O.Find(this.decompOptions2);
                 List m = new List(new List<string>() { var });
-                o.iv = m;
-                //o.opt_prtcode = this.decompOptions2.prtOptionLower;
-                //o.t1 = this.decompOptions2.t1;
-                //o.t2 = this.decompOptions2.t2;
+                o.iv = m;                
                 o.Exe();
 
                 //if (o.rv != null)

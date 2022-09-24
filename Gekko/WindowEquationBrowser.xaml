@@ -39,7 +39,7 @@
                 <RowDefinition Height="5" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView"  SelectionChanged="OnEquationListSelectLine" >
+            <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView" SelectionChanged="OnEquationListSelectLine" PreviewMouseRightButtonDown="OnEquationListRightButtonDown" >
                 <ListView.View>
                     <GridView>
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />

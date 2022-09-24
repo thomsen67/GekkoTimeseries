@@ -98,6 +98,44 @@ namespace Gekko
             }
         }
 
+        private void OnEquationListRightButtonDown(object sender, MouseButtonEventArgs e)
+        {            
+            EquationListItem item = ((FrameworkElement)e.OriginalSource).DataContext as EquationListItem;
+            string name = item.fullName;
+            Globals.selectedEquation = name;
+            O.Decomp2 d = new O.Decomp2();
+
+            //HACK
+            //HACK
+            //HACK  operator
+            //HACK
+            //HACK
+            d.opt_prtcode = "d";
+
+            //HACK
+            //HACK
+            //HACK  time
+            //HACK
+            //HACK
+            d.t1 = new GekkoTime(EFreq.A, 2003, 1);
+            d.t2 = new GekkoTime(EFreq.A, 2003, 1);
+
+            //HACK
+            //HACK
+            //HACK  y
+            //HACK
+            //HACK
+            string name2 = G.Chop_DimensionRemoveLast(name);  //e1[2004] --> e1
+            List select = new List(new List<string>() { "y" });
+            d.select = new List<IVariable>() { select };
+            List from = new List(new List<string>() { name2 });
+            d.from = new List<IVariable>() { from };
+            List endo = new List(new List<string>() { "y" });
+            d.endo = new List<IVariable>() { endo };
+            d.name = new ScalarString(name);
+            d.Exe();
+        }
+
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;            

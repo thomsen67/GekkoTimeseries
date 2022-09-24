@@ -304,7 +304,8 @@ namespace Gekko
 
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
-            if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
+            
+            if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.modelType = G.GetModelType();
@@ -363,8 +364,8 @@ namespace Gekko
                 decompOptions2.link.Add(temp);
             }
 
-            if (decompOptions2.type == "ASTDECOMP3")
-            {                
+            if (decompOptions2.type == "ASTDECOMP3" || decompOptions2.modelType == EModelType.GAMSScalar)
+            {
                 //Here, for scalar we need to assemble the equations like this:
                 // e1[a, 2001], e1[a, 2001], e1[b, 2002], e1[b, 2002], e2[x, 2001], e2[x, 2001], e2[y, 2002], e2[y, 2002]
                 // Produces 2 Link objects, each consisting of a list of 2 sub-objects.
@@ -384,7 +385,7 @@ namespace Gekko
                         ModelGamsScalar.FlushAAndRArrays();
                         Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                         Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
-                    }                    
+                    }
                 }
                 else
                 {
@@ -1026,12 +1027,36 @@ namespace Gekko
                     link.GAMS_eqNumber = counter;
                 }
 
+                //    O.Decomp2 o0 = new O.Decomp2();
+                //    o0.type = @"ASTDECOMP3";
+                //    o0.label = o.rv;
+                //    o0.t1 = o.t1;
+                //    o0.t2 = o.t2;
+                //    o0.opt_prtcode = o.opt_prtcode;
+
+                //    o0.decompItems = new List<DecompItems>();                    
+
+                //    o0.select.Add(O.FlattenIVariablesSeq(false, new
+                //     List(new List<IVariable> { new ScalarString(var) })));
+
+                //    o0.from.Add(O.FlattenIVariablesSeq(false,
+                //     new List(new List<IVariable> { new ScalarString(o.rv) })));
+
+                //    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
+                //     List<IVariable> { new ScalarString(var) })));
+
                 if (counter == 0)
                 {
-                    link.endo = new List<string>();
-                    link.endo.AddRange(decompOptions2.new_endo);   Her går det galt
-                    link.varnames = new List<string>();
-                    link.varnames.AddRange(decompOptions2.new_select);
+                    if (decompOptions2.new_endo != null)
+                    {
+                        link.endo = new List<string>();
+                        link.endo.AddRange(decompOptions2.new_endo);
+                    }
+                    if (decompOptions2.new_select != null)
+                    {
+                        link.varnames = new List<string>();
+                        link.varnames.AddRange(decompOptions2.new_select);
+                    }
                 }
                 else
                 {

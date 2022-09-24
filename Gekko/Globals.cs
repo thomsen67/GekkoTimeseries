@@ -129,15 +129,16 @@ namespace Gekko
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter
         public static int goodBufferSizeForShaHashCode = 50000;  //some use 1200000 but 50000 seems just enough (tested --> 20% faster than using 4096 which is default)
-
-        public static ItemHandler itemHandler = null;  //hack
-
+        
         public static bool decompSubstitute = false;
 
         public static StreamWriter sw = null;        
         
         public static List<string> unitTestsPromtingHelper = null;
 
+        //GUI hacks
+        public static string selectedEquation = null;  //when the user right-clicks in FIND window
+        public static ItemHandler itemHandler = null;  //hack regardig FIND window
         public static string uglyHack_name;  //only for a treeview window
         public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
 
