@@ -1524,17 +1524,14 @@ namespace Gekko
 
             if (c != null && c.cellType == CellType.Text)
             {
-
                 // ---------------------------------------
                 // FIND
                 // ---------------------------------------
-                                
-                List<string> vars = c2.vars_hack;
-                if (vars == null) MessageBox.Show("Could not find any vars");                
-                string var = vars[0];  //#dskla8asjkdfa
+
+                string var = HiddenVariableHelper(c2);
                 O.Find o = new O.Find(this.decompOptions2);
                 List m = new List(new List<string>() { var });
-                o.iv = m;                
+                o.iv = m;
                 o.Exe();
 
                 //if (o.rv != null)
@@ -1569,6 +1566,14 @@ namespace Gekko
             }
         }
 
+        private static string HiddenVariableHelper(Cell c2)
+        {
+            List<string> vars = c2.vars_hack;
+            if (vars == null) MessageBox.Show("Could not find any vars");
+            string var = vars[0];  //#dskla8asjkdfa
+            return var;
+        }
+
         private void Cell_Enter(object sender, MouseEventArgs e)
         {
             GekkoDockPanel2 dockPanel = (GekkoDockPanel2)sender;
@@ -1587,6 +1592,8 @@ namespace Gekko
             else
             {
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
+                Cell c2 = this.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
+                if (c2 == null) MessageBox.Show("Could not find cell");
 
                 if (dockPanel.type == GekkoTableTypes.Left)
                 {
@@ -1659,18 +1666,12 @@ namespace Gekko
                             }
                             else
                             {
-                                string txt = "";
-                                if (false)
-                                {
-                                    foreach (string s in Program.GetVariableExplanationAugmented(var2, null))
-                                    {
-                                        txt += s + G.NL;
-                                    }
-                                }
-
-                                List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, true, this.decompOptions2.t1, this.decompOptions2.t2, null);
-                                txt = Stringlist.ExtractTextFromLines(ss).ToString();
-
+                                //List<string> vars = c2.vars_hack;
+                                //if (vars == null) MessageBox.Show("Could not find any vars");                                
+                                //string var7 = vars[0];  //#dskla8asjkdfa                                
+                                string var7 = HiddenVariableHelper(c2);
+                                List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompOptions2.t1, this.decompOptions2.t2, null);
+                                string txt = Stringlist.ExtractTextFromLines(ss).ToString();
                                 this.equation.Text = txt;
                             }
                         }
