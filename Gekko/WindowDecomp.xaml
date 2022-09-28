@@ -674,14 +674,14 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="700" />
+                <ColumnDefinition Width="*" Name="splitterHorizontal" />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Grid HorizontalAlignment="Left">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" Name="splitterVertical" />
                     <RowDefinition Height="5" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>

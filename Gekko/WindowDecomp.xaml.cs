@@ -756,6 +756,8 @@ namespace Gekko
             this.Left = Globals.guiDecompWindowLeftDistance;
             this.Height = Globals.guiDecompWindowHeightDistance;
             this.Width = Globals.guiDecompWindowWidthDistance;
+            this.splitterHorizontal.Width = new GridLength(Globals.guiDecompWindowSplitterHorizontal);
+            this.splitterVertical.Height = new GridLength(Globals.guiDecompWindowSplitterVertical);
 
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
 

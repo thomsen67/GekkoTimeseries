@@ -744,6 +744,8 @@ namespace Gekko
         public static int guiDecompWindowLeftDistance = 100;
         public static int guiDecompWindowHeightDistance = 600;
         public static int guiDecompWindowWidthDistance = 900;
+        public static int guiDecompWindowSplitterHorizontal = 700;
+        public static int guiDecompWindowSplitterVertical = 250;
 
         public static int guiErrorWindowTopDistance = 100;
         public static int guiErrorWindowLeftDistance = 150;
