@@ -176,13 +176,17 @@ namespace Gekko
             else return this.name;
         }
 
+        /// <summary>
+        /// Gets databank that the series, subseries or array-series resides in.
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Databank GetParentDatabank()
         {
             //also works for array-subseries
             if (this.name == null && Globals.runningOnTTComputer)
             {
-                new Error("Parent db error");
-                //throw new GekkoException();
+                new Warning("TTH: Parent problem (.name)");
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
@@ -960,6 +964,8 @@ namespace Gekko
                 index1 = ResizeDataArray(gt1);
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
+
+            //#afdsa78sdf7as89
             System.Array.Copy(input, inputOffset, this.data.GetDataArray_ONLY_INTERNAL_USE(), index1, index2 - index1 + 1);
 
             if (replaceNaNWith0)
@@ -1660,7 +1666,7 @@ namespace Gekko
 
         private static Series ArithmeticsArraySeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.GetArraySeriesTempName(x1_series.freq), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1699,7 +1705,7 @@ namespace Gekko
 
         private static Series ArithmeticsArraySeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.GetArraySeriesTempName(x1_series.freq), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1738,7 +1744,7 @@ namespace Gekko
 
         private static Series ArithmeticsSeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x2_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x2_series.freq)), x2_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x2_series.freq, G.GetArraySeriesTempName(x2_series.freq), x2_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1788,7 +1794,7 @@ namespace Gekko
                 //throw new GekkoException();
             }
 
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.GetArraySeriesTempName(x1_series.freq), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -2414,6 +2420,7 @@ namespace Gekko
 
             Program.PrecedentsHelper(null, rv, this.GetParentDatabank());
             Program.Trace("[" + mi.ToString() + "]", this.GetParentDatabank(), rv, isLhs);
+
             return rv;
         }        
 

@@ -3650,7 +3650,18 @@ namespace Gekko
         public static string GetNameAndFreqPretty(string input)
         {
             return GetNameAndFreqPretty(input, true);
-        }      
+        }
+
+        /// <summary>
+        /// An array-series must have a name, also when it is created as part of an expression.
+        /// The name has no significance, but must end with !-freq.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static string GetArraySeriesTempName(EFreq freq)
+        {
+            return G.Chop_AddFreq(Globals.seriesArraySuperName, freq);
+        }
 
         /// <summary>
         /// Check that t1 is less than or equal to t2

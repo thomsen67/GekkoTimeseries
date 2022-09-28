@@ -4042,14 +4042,14 @@ namespace Gekko
             //For scalar model            
 
             Globals.itemHandler = new ItemHandler();  //hack
-                        
+
             o.t0 = o.decompOptions2.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
-            string variableName2 = variableName + "[" + o.t0.ToString() + "]";            
+            string variableName2 = variableName + "[" + o.t0.ToString() + "]";
             int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
-            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);            
+            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
             new Writeln("Variable " + variableName2 + ":");
 
             string firstText = null;
@@ -4060,8 +4060,8 @@ namespace Gekko
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.dependents[pav];
             foreach (int eqNumber in eqNumbers)
-            {               
-                
+            {
+
                 string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
                 List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompOptions2.showTime, o.t0);
 
@@ -4078,7 +4078,7 @@ namespace Gekko
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-                
+
                 if (firstText == null)
                 {
                     string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompOptions2.showTime, o.t0);
@@ -4088,7 +4088,7 @@ namespace Gekko
                 }
             }
 
-            
+
             string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser(o);
             //eb.findOptions.decompOptions2 = decompOptions2;
@@ -4097,26 +4097,17 @@ namespace Gekko
             eb.EquationBrowserSetButtons(firstEqName, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
-            eb._activeVariable = null;     
+            eb._activeVariable = null;
 
             eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 
-            try
-            {
-                bool? b = eb.ShowDialog();
-                rv = eb._activeEquation;
-                if (b != true) rv = null;  //only when OK is pressed (or Enter)
-                eb.Close();
-            }
-            catch (Exception e)
-            {
+            bool? b = eb.ShowDialog();
+            rv = eb._activeEquation;
+            if (b != true) rv = null;  //only when OK is pressed (or Enter)
+            eb.Close();
 
-            }
-
-
-            
             return rv;
-        }        
+        }
 
         public enum ENormalizerType
         {

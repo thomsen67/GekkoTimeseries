@@ -665,6 +665,7 @@ namespace Gekko
                 //throw new GekkoException();
             }
 
+            //For Gekko 4.0, set name to G.GetArraySeriesTempName(G.ConvertFreq(EFreq.U))
             Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
@@ -2013,13 +2014,13 @@ namespace Gekko
                 }
             }
 
-            if (cols < 2) new Error("Expcedted sub-lists to have at least two elements each");
+            if (cols < 2) new Error("Expected sub-lists to have at least two elements each");
             int time = cols - 1;  //TODO, choose column (now last)
-            IVariable iv2 = ((List)x_list.list[0]).list[time];                        
+            IVariable iv2 = ((List)x_list.list[0]).list[time];
             GekkoTime oneTime = GekkoTime.FromIVariableToGekkoTime(iv2);
             EFreq freq = oneTime.freq;
 
-            Series z = new Series(freq, null);
+            Series z = new Series(freq, G.GetArraySeriesTempName(freq));  //without this "name", precedents etc. will crash
             z.meta.label = null;
             z.SetArrayTimeseries(cols, true);
 
@@ -2049,7 +2050,8 @@ namespace Gekko
                     tsSub = new Series(freq, null);
                     z.dimensionsStorage.AddIVariableWithOverwrite(map, tsSub);
                 }
-                (tsSub as Series).SetData(gt, 1d);
+                Series tsSub_series = (Series)tsSub;
+                tsSub_series.SetData(gt, 1d);
             }
 
             rv = z;
