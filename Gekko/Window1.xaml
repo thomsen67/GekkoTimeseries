@@ -12,7 +12,6 @@
         </StatusBar>
         <StackPanel>
 
-
             <Grid Name="grid0" Height="153" Width="838" ShowGridLines="False" Margin="10,10,10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10" />
@@ -143,19 +142,6 @@
                         <RadioButton Name="radioButton10" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton10_Checked" ToolTip="Absolute time-change in percentage time growth rate (decomposed)"></RadioButton>
                     </Border>
                 </DockPanel>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 <DockPanel Grid.ColumnSpan="2" Grid.Row="0" Grid.Column="8">
                     <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares Work and Ref databanks">Multiplier</TextBlock>
