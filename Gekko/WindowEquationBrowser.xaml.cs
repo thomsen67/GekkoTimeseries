@@ -152,8 +152,9 @@ namespace Gekko
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {
             string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0);
-            this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add(s);
+            this.windowEquationBrowserLabel.Text = s;
+            //this.windowEquationBrowserLabel.Inlines.Clear();
+            //this.windowEquationBrowserLabel.Inlines.Add(s);
         }        
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
@@ -169,12 +170,9 @@ namespace Gekko
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);
-            this.windowEquationBrowserLabel.Inlines.Clear();
-            foreach (string s in ss)
-            {
-                this.windowEquationBrowserLabel.Inlines.Add(s + G.NL);
-            }
+            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);            
+            string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
+            this.windowEquationBrowserLabel.Text = s7;
         }
 
         public void EquationBrowserSetButtons(string eqName, List<string> firstList)

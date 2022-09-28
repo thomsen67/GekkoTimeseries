@@ -4050,7 +4050,7 @@ namespace Gekko
             string variableName2 = variableName + "[" + o.t0.ToString() + "]";
             int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-            new Writeln("Variable " + variableName2 + ":");
+            //new Writeln("Variable " + variableName2 + ":");
 
             string firstText = null;
             List<string> firstList = new List<string>();

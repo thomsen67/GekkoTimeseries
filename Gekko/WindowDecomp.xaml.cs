@@ -1660,10 +1660,17 @@ namespace Gekko
                             else
                             {
                                 string txt = "";
-                                foreach (string s in Program.GetVariableExplanationAugmented(var2, null))
+                                if (false)
                                 {
-                                    txt += s + G.NL;
+                                    foreach (string s in Program.GetVariableExplanationAugmented(var2, null))
+                                    {
+                                        txt += s + G.NL;
+                                    }
                                 }
+
+                                List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, true, this.decompOptions2.t1, this.decompOptions2.t2, null);
+                                txt = Stringlist.ExtractTextFromLines(ss).ToString();
+
                                 this.equation.Text = txt;
                             }
                         }
