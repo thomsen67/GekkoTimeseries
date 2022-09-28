@@ -449,7 +449,7 @@ namespace Gekko
                 int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
-                    new Error("Period " + time.ToString() + " outside GAMS scalar model period (GAMS model runs over " + Program.model.modelGamsScalar.t0.ToString() + " to " + Program.model.modelGamsScalar.t2.ToString());
+                    new Error("Period " + time.ToString() + " outside GAMS scalar model period (GAMS model runs over " + Program.model.modelGamsScalar.t0.ToString() + " to " + Program.model.modelGamsScalar.t2.ToString() + ").");
                 }
                 if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                 DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();

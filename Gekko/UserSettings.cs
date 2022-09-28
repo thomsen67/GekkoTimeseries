@@ -447,6 +447,34 @@ namespace Gekko
                 this["DecompWindowLeftDistance"] = (int)value;
             }
         }
+
+        [DefaultSettingValue("600")]
+        [UserScopedSetting()]
+        public int DecompWindowHeightDistance
+        {
+            get
+            {
+                return ((int)this["DecompWindowHeightDistance"]);
+            }
+            set
+            {
+                this["DecompWindowHeightDistance"] = (int)value;
+            }
+        }
+        [DefaultSettingValue("900")]
+        [UserScopedSetting()]
+        public int DecompWindowWidthDistance
+        {
+            get
+            {
+                return ((int)this["DecompWindowWidthDistance"]);
+            }
+            set
+            {
+                this["DecompWindowWidthDistance"] = (int)value;
+            }
+        }
+
         [DefaultSettingValue("100")]
         [UserScopedSetting()]
         public int ErrorWindowTopDistance

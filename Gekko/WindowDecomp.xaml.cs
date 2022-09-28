@@ -747,15 +747,16 @@ namespace Gekko
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
             Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidth);
             this.gridUpperLeft.Width = Globals.guiTableCellWidth;
-            this.gridUpperLeft.Height = Globals.guiTableCellHeight;
-            
+            this.gridUpperLeft.Height = Globals.guiTableCellHeight;            
 
             this.frozenRows = Globals.freezeDecompRows;
             this.frozenCols = Globals.freezeDecompCols;
 
             this.Top = Globals.guiDecompWindowTopDistance;
             this.Left = Globals.guiDecompWindowLeftDistance;
-                        
+            this.Height = Globals.guiDecompWindowHeightDistance;
+            this.Width = Globals.guiDecompWindowWidthDistance;
+
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
 
             this.KeyDown += new KeyEventHandler(Window_KeyDown); //new System.Windows.Forms.KeyEventHandler(this.radioButton1_KeyDown);
@@ -1520,7 +1521,6 @@ namespace Gekko
 
             Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
             Cell c2 = this.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
-            if (c2 == null) MessageBox.Show("Could not find cell");
 
             if (c != null && c.cellType == CellType.Text)
             {
@@ -1568,6 +1568,7 @@ namespace Gekko
 
         private static string HiddenVariableHelper(Cell c2)
         {
+            if (c2 == null) return null;
             List<string> vars = c2.vars_hack;
             if (vars == null) MessageBox.Show("Could not find any vars");
             string var = vars[0];  //#dskla8asjkdfa
@@ -1594,8 +1595,7 @@ namespace Gekko
             else
             {
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
-                Cell c2 = this.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
-                if (c2 == null) MessageBox.Show("Could not find cell");
+                Cell c2 = this.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd                
 
                 if (dockPanel.type == GekkoTableTypes.Left)
                 {
@@ -2218,6 +2218,8 @@ namespace Gekko
         {
             Globals.guiDecompWindowTopDistance = Math.Max(1, (int)this.Top);
             Globals.guiDecompWindowLeftDistance = Math.Max(1, (int)this.Left);
+            Globals.guiDecompWindowHeightDistance = Math.Max(1, (int)this.Height);
+            Globals.guiDecompWindowWidthDistance = Math.Max(1, (int)this.Width);
             try
             {
                 if (Globals.windowsDecomp2 != null && this != null) Globals.windowsDecomp2.Remove(this);

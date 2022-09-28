@@ -416,7 +416,6 @@ namespace Gekko
             Globals.guiRecentFoldersCache.Capacity = 20;
             if (track) MessageBox.Show("2");
 
-
             Configuration config = null;
             try
             {
@@ -867,6 +866,8 @@ namespace Gekko
             Globals.guiGraphWindowLeftDistance = us.GraphWindowLeftDistance;
             Globals.guiDecompWindowTopDistance = us.DecompWindowTopDistance;
             Globals.guiDecompWindowLeftDistance = us.DecompWindowLeftDistance;
+            Globals.guiDecompWindowHeightDistance = us.DecompWindowHeightDistance;
+            Globals.guiDecompWindowWidthDistance = us.DecompWindowWidthDistance;
             Globals.guiErrorWindowTopDistance = us.ErrorWindowTopDistance;
             Globals.guiErrorWindowLeftDistance = us.ErrorWindowLeftDistance;
 
@@ -943,6 +944,8 @@ namespace Gekko
             us.GraphWindowLeftDistance = Globals.guiGraphWindowLeftDistance;
             us.DecompWindowTopDistance = Globals.guiDecompWindowTopDistance;
             us.DecompWindowLeftDistance = Globals.guiDecompWindowLeftDistance;
+            us.DecompWindowHeightDistance = Globals.guiDecompWindowHeightDistance;
+            us.DecompWindowWidthDistance = Globals.guiDecompWindowWidthDistance;
             us.ErrorWindowTopDistance = Globals.guiErrorWindowTopDistance;
             us.ErrorWindowLeftDistance = Globals.guiErrorWindowLeftDistance;
 

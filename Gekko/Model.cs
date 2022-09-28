@@ -126,7 +126,7 @@ namespace Gekko
                     count2++;
                     if (true)
                     {
-                        if (count2 > 1) sb2.AppendLine(" ----- ");
+                        //if (count2 > 1) sb2.AppendLine(" ----- ");
                     }
                     else
                     {
@@ -186,7 +186,7 @@ namespace Gekko
                     count2++;
                     if (true)
                     {
-                        if (count2 > 1) sb1.AppendLine(" ----- ");
+                        //if (count2 > 1) sb1.AppendLine(" ----- ");
                     }
                     else
                     {
@@ -237,7 +237,7 @@ namespace Gekko
             string s2 = null;
             foreach (string s in eqs)
             {
-                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL + G.NL;
+                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;
             }
             return s1 + G.NL + s2;
         }
