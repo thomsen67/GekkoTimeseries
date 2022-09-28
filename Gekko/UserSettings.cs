@@ -475,6 +475,33 @@ namespace Gekko
             }
         }
 
+        [DefaultSettingValue("700")]
+        [UserScopedSetting()]
+        public int DecompWindowSplitterHorizontal
+        {
+            get
+            {
+                return ((int)this["DecompWindowSplitterHorizontal"]);
+            }
+            set
+            {
+                this["DecompWindowSplitterHorizontal"] = (int)value;
+            }
+        }
+        [DefaultSettingValue("250")]
+        [UserScopedSetting()]
+        public int DecompWindowSplitterVertical
+        {
+            get
+            {
+                return ((int)this["DecompWindowSplitterVertical"]);
+            }
+            set
+            {
+                this["DecompWindowSplitterVertical"] = (int)value;
+            }
+        }
+        
         [DefaultSettingValue("100")]
         [UserScopedSetting()]
         public int ErrorWindowTopDistance

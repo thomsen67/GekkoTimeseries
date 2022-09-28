@@ -868,6 +868,8 @@ namespace Gekko
             Globals.guiDecompWindowLeftDistance = us.DecompWindowLeftDistance;
             Globals.guiDecompWindowHeightDistance = us.DecompWindowHeightDistance;
             Globals.guiDecompWindowWidthDistance = us.DecompWindowWidthDistance;
+            Globals.guiDecompWindowSplitterHorizontal = us.DecompWindowSplitterHorizontal;
+            Globals.guiDecompWindowSplitterVertical = us.DecompWindowSplitterVertical;
             Globals.guiErrorWindowTopDistance = us.ErrorWindowTopDistance;
             Globals.guiErrorWindowLeftDistance = us.ErrorWindowLeftDistance;
 
@@ -946,6 +948,8 @@ namespace Gekko
             us.DecompWindowLeftDistance = Globals.guiDecompWindowLeftDistance;
             us.DecompWindowHeightDistance = Globals.guiDecompWindowHeightDistance;
             us.DecompWindowWidthDistance = Globals.guiDecompWindowWidthDistance;
+            us.DecompWindowSplitterHorizontal = Globals.guiDecompWindowSplitterHorizontal;
+            us.DecompWindowSplitterVertical = Globals.guiDecompWindowSplitterVertical;
             us.ErrorWindowTopDistance = Globals.guiErrorWindowTopDistance;
             us.ErrorWindowLeftDistance = Globals.guiErrorWindowLeftDistance;
 

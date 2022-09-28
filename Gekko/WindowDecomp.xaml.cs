@@ -2222,6 +2222,9 @@ namespace Gekko
             Globals.guiDecompWindowLeftDistance = Math.Max(1, (int)this.Left);
             Globals.guiDecompWindowHeightDistance = Math.Max(1, (int)this.Height);
             Globals.guiDecompWindowWidthDistance = Math.Max(1, (int)this.Width);
+            Globals.guiDecompWindowSplitterHorizontal = Math.Max(1, (int)this.splitterHorizontal.Width.Value);
+            Globals.guiDecompWindowSplitterVertical = Math.Max(1, (int)this.splitterVertical.Height.Value);
+
             try
             {
                 if (Globals.windowsDecomp2 != null && this != null) Globals.windowsDecomp2.Remove(this);
