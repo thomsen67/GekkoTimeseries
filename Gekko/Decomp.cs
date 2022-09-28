@@ -864,7 +864,7 @@ namespace Gekko
                             if (isLead)
                             {
                                 int lag; string name;
-                                ConvertFromTurtleName(childVariableName, out lag, out name);
+                                ConvertFromTurtleName(childVariableName, true, out name, out lag);
                                 childVariableName = ConvertToTurtleName(name, lag + 1);
                             }
 
@@ -1507,18 +1507,18 @@ namespace Gekko
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
                 int lag; string name;
-                ConvertFromTurtleName(endoReverse[row], out lag, out name);                
+                ConvertFromTurtleName(endoReverse[row], true, out name, out lag);                
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count; col++)
                 {
                     string endoName = endoReverse[row];
                     int etime; string ename;
-                    ConvertFromTurtleName(endoName, out etime, out ename);
+                    ConvertFromTurtleName(endoName, true, out ename, out etime);
 
                     string exoName = exoReverse[col];
                     int xtime; string xname;
-                    ConvertFromTurtleName(exoName, out xtime, out xname);
+                    ConvertFromTurtleName(exoName, true, out xname, out xtime);
 
                     string enewName = ConvertToTurtleName(ename, 0);
                     int xlag = xtime - etime;
@@ -1693,18 +1693,35 @@ namespace Gekko
             return s + "¤" + slag;
         }
 
-        private static void ConvertFromTurtleName(string childVariableName, out int lag, out string name)
+        /// <summary>
+        /// Splits something like x[a, b]¤[-1] up into -1 and x[a, b]. If no ¤, the lag is 0.
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <param name="lag"></param>
+        /// <param name="name"></param>
+        public static void ConvertFromTurtleName(string varname, bool strict, out string name, out int lag)
         {
-            if (childVariableName == null)
+            lag = -12345;
+            name = null;
+            if (varname == null)
             {
-                lag = -12345;
-                name = null;
+                //do nothing
             }
             else
             {
-                string[] ss = childVariableName.Split('¤');
-                lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
-                name = ss[0];
+                string[] ss = varname.Split('¤');
+                if (strict && ss.Length != 2) new Error("Turtle error");
+                if (ss.Length == 1)
+                {
+                    lag = 0;
+                    name = varname;
+                }
+                else if (ss.Length == 2)
+                {
+                    lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
+                    name = ss[0];
+                }
+                else new Error("Turtle error");
             }
         }
 
@@ -2980,7 +2997,7 @@ namespace Gekko
             tab.writeOnce = true;
 
             int xlag = 0; string temp = null;
-            ConvertFromTurtleName(decompDataMAINClone[parentI].lhs, out xlag, out temp);
+            ConvertFromTurtleName(decompDataMAINClone[parentI].lhs, true, out temp, out xlag);
             string normalizerVariableWithIndex = null;
             if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
 

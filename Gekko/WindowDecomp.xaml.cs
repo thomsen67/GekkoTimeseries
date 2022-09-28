@@ -1571,7 +1571,9 @@ namespace Gekko
             List<string> vars = c2.vars_hack;
             if (vars == null) MessageBox.Show("Could not find any vars");
             string var = vars[0];  //#dskla8asjkdfa
-            return var;
+            int lag; string name;
+            Decomp.ConvertFromTurtleName(var, false, out name, out lag);
+            return name;
         }
 
         private void Cell_Enter(object sender, MouseEventArgs e)
