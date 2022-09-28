@@ -550,8 +550,8 @@ namespace Gekko
         public static bool initializeDataArrayWithNaN = true;
         public static bool simulationCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
-        public const string seriesArraySubName = "[array]"; //change to [sub] in Gekko 4.0.
-        public const string seriesArraySuperName = "temp";  //change to [super] in Gekko 4.0.
+        public const string seriesArraySubName = "[array]";
+        public const string seriesArraySuperName = "intermediate_expression";
 
         public static int simCounter = 0;
 
