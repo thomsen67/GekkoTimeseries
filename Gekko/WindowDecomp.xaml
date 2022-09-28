@@ -712,9 +712,9 @@
 
                 <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
 
-                <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
                     <TextBlock Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"></TextBlock>
-                </ScrollViewer>
+                </ScrollViewer>                
 
                 <!--<Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>-->
 

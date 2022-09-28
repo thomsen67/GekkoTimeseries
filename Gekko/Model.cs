@@ -113,7 +113,7 @@ namespace Gekko
         {
             string rv = "";
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
             List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
             if (rawModel != null)
             {
@@ -124,19 +124,26 @@ namespace Gekko
                     // TODO: handle a semicolon in a comment, for instance after # 
                     //
                     count2++;
-                    if (count2 == 1)
+                    if (true)
                     {
-                        sb.AppendLine("");
-                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
-                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb.AppendLine("");
+                        if (count2 > 1) sb2.AppendLine(" ----- ");
                     }
                     else
                     {
-                        sb.AppendLine("");
-                        sb.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb.AppendLine("");
+                        if (count2 == 1)
+                        {
+                            sb2.AppendLine("");
+                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb2.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
+                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb2.AppendLine("");
+                        }
+                        else
+                        {
+                            sb2.AppendLine("");
+                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb2.AppendLine("");
+                        }
                     }
                     
                     for (int i = 0; i < rawModel.Count; i++)
@@ -151,7 +158,7 @@ namespace Gekko
                                 if (count >= count0) s = s.Substring(count0);
                                 else s = s.Substring(count);
 
-                                sb.AppendLine(s);
+                                sb2.AppendLine(s);
                                 if (rawModel[j].Contains(";"))
                                 {
                                     break;
@@ -161,26 +168,78 @@ namespace Gekko
                     }
                 }
             }
+            string s2 = sb2.ToString();
 
-            string s2 = sb.ToString();
             ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
-            StringBuilder sb2 = new StringBuilder();
-            sb2.AppendLine(eqNames.Count + " equation" + G.S(eqNames.Count));
+            StringBuilder sb1 = new StringBuilder();
+            if (false)
+            {
+                sb1.AppendLine(eqNames.Count + " equation" + G.S(eqNames.Count));
+            }
             foreach (string eqName in eqNames)
             {
+                int count2 = 0;
                 List<ModelGamsEquation> temp = null; g.equationsByEqname.TryGetValue(eqName, out temp);
                 if (temp == null) continue;
                 foreach (ModelGamsEquation eq in temp)
                 {
-                    sb2.AppendLine("");
-                    sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                    sb2.AppendLine("");
-                    if (!G.NullOrBlanks(eq.conditionals)) sb2.AppendLine("$-condition: " + eq.conditionals);
-                    sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");
+                    count2++;
+                    if (true)
+                    {
+                        if (count2 > 1) sb1.AppendLine(" ----- ");
+                    }
+                    else
+                    {
+                        sb1.AppendLine("");
+                        sb1.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb1.AppendLine("");
+                    }
+                    if (!G.NullOrBlanks(eq.conditionals)) sb1.AppendLine("$-condition: " + eq.conditionals);
+                    sb1.AppendLine(eq.lhs + " = " + eq.rhs + ";");
                 }
             }
-            rv = sb2.ToString() + sb.ToString();
+            rv = sb2.ToString() + G.NL + sb1.ToString();
             return rv;
+        }
+
+        /// <summary>
+        /// Helper, for the DECOMP window not the FIND window.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0)
+        {
+            string s;
+            List<string> eqNames = new List<string>();
+            foreach (Link link in links)
+            {
+                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
+            }
+            s = Model.GetEquationText(eqNames, showTime, t0);
+            return s;
+        }
+
+        /// <summary>
+        /// The central equation text method for scalar models. Gets equation text from both folded and unfolded equations.
+        /// </summary>
+        /// <param name="eq"></param>
+        /// <param name="showTime"></param>
+        /// <param name="t0"></param>
+        /// <returns></returns>
+        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
+        {
+            List<string> eqs2 = new List<string>();
+            foreach (string s in eqs)
+            {
+                eqs2.Add(G.Chop_RemoveIndex(s));
+            }
+            string s1 = Model.GetEquationTextFoldedScalar(eqs2);
+
+            string s2 = null;
+            foreach (string s in eqs)
+            {
+                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL + G.NL;
+            }
+            return s1 + G.NL + s2;
         }
 
         /// <summary>
@@ -1055,10 +1114,10 @@ namespace Gekko
 
             string rv = "";
             if (!showTime) name = G.Chop_DimensionSetLag(name, t0, false);
-            rv += "Equation: " + name + "" + G.NL;
-            rv += "------------------------------------------" + G.NL;
-            rv += s + G.NL + G.NL;
-
+            //rv += "Equation: " + name + "" + G.NL;
+            //rv += "------------------------------------------" + G.NL;
+            //rv += s + G.NL + G.NL;
+            rv = s;
             return rv;
         }
 

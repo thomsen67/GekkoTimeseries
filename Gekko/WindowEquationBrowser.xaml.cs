@@ -151,12 +151,10 @@ namespace Gekko
 
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {
-            string eq2 = G.Chop_RemoveIndex(eq);
-            string s1 = Model.GetEquationTextFoldedScalar(new List<string>() { eq2 });
-            string s2 = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, showTime, t0);
+            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0);
             this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add(s1 + G.NL + G.NL + s2);
-        }
+            this.windowEquationBrowserLabel.Inlines.Add(s);
+        }        
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {

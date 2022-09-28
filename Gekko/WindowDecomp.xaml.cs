@@ -1481,11 +1481,12 @@ namespace Gekko
                 string s = null;
                 if (this.decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    List<string> eqNames = new List<string>();
-                    foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
-                    s = Model.GetEquationTextFoldedScalar(eqNames);
+                    s = Model.GetEquationTextHelper(decompOptions2.link, decompOptions2.showTime, decompOptions2.t1);
                 }
-                else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                else
+                {
+                    s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                }
                 equation.Text = s;
             }
         }        
@@ -1673,11 +1674,12 @@ namespace Gekko
                     string s = null;
                     if (this.decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        List<string> eqNames = new List<string>();
-                        foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
-                        s = Model.GetEquationTextFoldedScalar(eqNames);
+                        s = Model.GetEquationTextHelper(decompOptions2.link, decompOptions2.showTime, decompOptions2.t1);
                     }
-                    else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                    else
+                    {
+                        s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                    }
                     equation.Text = s;
                 }
             }
@@ -1763,11 +1765,12 @@ namespace Gekko
                 string s = null;
                 if (this.decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    List<string> eqNames = new List<string>();
-                    foreach (Link link in this.decompOptions2.link) eqNames.Add(link.GAMS_dsh[0].name);
-                    s = Model.GetEquationTextFoldedScalar(eqNames);
+                    s = Model.GetEquationTextHelper(decompOptions2.link, decompOptions2.showTime, decompOptions2.t1);
                 }
-                else s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                else
+                {
+                    s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
+                }
                 equation.Text = s;
                 //
                 // NOTE:
@@ -1809,7 +1812,7 @@ namespace Gekko
                     throw e;
                 }
             }
-        }               
+        }       
 
         private void SetRadioButtonsDefaults()
         {
