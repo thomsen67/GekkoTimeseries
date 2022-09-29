@@ -368,9 +368,19 @@
 
                 <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
 
-                <ScrollViewer Grid.Row="2" Background="LightYellow">
-                    <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
-                </ScrollViewer>
+                <TabControl Grid.Row="2"  Margin="0, 5, 0, 0">
+                    <TabItem Header="Equations">
+                        <ScrollViewer Background="LightYellow">
+                            <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Header="Gekko code">
+                        <ScrollViewer Background="LightYellow">
+                            <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>                
+                
             </Grid>
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
             <ListView Grid.Column="2" Name="listView" HorizontalAlignment="Left" 

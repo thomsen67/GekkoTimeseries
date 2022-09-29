@@ -1531,36 +1531,11 @@ namespace Gekko
                 // ---------------------------------------
 
                 string var = HiddenVariableHelper(c2);
-                O.Find o = new O.Find(this.decompOptions2);
+                DecompOptions2 opt = this.decompOptions2.Clone();
+                O.Find o = new O.Find(opt);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
-                o.Exe();
-
-                //if (o.rv != null)
-                //{
-                //    // ---------------------------------------
-                //    // DECOMP
-                //    // ---------------------------------------
-                //    O.Decomp2 o0 = new O.Decomp2();
-                //    o0.type = @"ASTDECOMP3";
-                //    o0.label = o.rv;
-                //    o0.t1 = o.t1;
-                //    o0.t2 = o.t2;
-                //    o0.opt_prtcode = o.opt_prtcode;
-
-                //    o0.decompItems = new List<DecompItems>();                    
-
-                //    o0.select.Add(O.FlattenIVariablesSeq(false, new
-                //     List(new List<IVariable> { new ScalarString(var) })));
-
-                //    o0.from.Add(O.FlattenIVariablesSeq(false,
-                //     new List(new List<IVariable> { new ScalarString(o.rv) })));
-
-                //    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
-                //     List<IVariable> { new ScalarString(var) })));
-
-                //    o0.Exe();
-                //}
+                o.Exe();               
             }
             else
             {
@@ -1783,7 +1758,9 @@ namespace Gekko
                 {
                     s = Model.GetEquationTextFoldedNonScalar(this.decompOptions2.modelType, this.decompOptions2.link);
                 }
-                equation.Text = s;
+                this.equation.Text = s;
+                this.code.Text = decompOptions2.code.Last() + G.NL + G.Blanks(200);  //blanks hack, also used elsewhere
+
                 //
                 // NOTE:
                 //
@@ -2419,6 +2396,7 @@ namespace Gekko
         public EModelType modelType = EModelType.Unknown;
         public bool missingAsZero = false;
         public bool showTime = false;
+        public List<string> code = new List<string>();
 
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
@@ -2504,6 +2482,9 @@ namespace Gekko
             d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
+
+            d.code = new List<string>();
+            foreach (string s in this.code) d.code.Add(s);
 
             d.modelType = this.modelType;
             

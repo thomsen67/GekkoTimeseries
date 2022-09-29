@@ -98,23 +98,21 @@ namespace Gekko
             }
         }
 
-        private void OnEquationListRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;
             
-            DependencyObject dep = e.OriginalSource as DependencyObject;
-            while ((dep != null))
-            {
-                dep = VisualTreeHelper.GetParent(dep);
-            }
-
-            TextBlock tb = e.OriginalSource as TextBlock;
-            GridViewRowPresenter p = tb.Parent as GridViewRowPresenter;
-            foreach (object tb2 in p.Columns)
-            {
-
-            }
+            //DependencyObject dep = e.OriginalSource as DependencyObject;
+            //while ((dep != null))
+            //{
+            //    dep = VisualTreeHelper.GetParent(dep);
+            //}
+            //TextBlock tb = e.OriginalSource as TextBlock;
+            //GridViewRowPresenter p = tb.Parent as GridViewRowPresenter;
+            //foreach (object tb2 in p.Columns)
+            //{
+            //}
 
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
@@ -131,6 +129,10 @@ namespace Gekko
             List endo = new List(new List<string>() { varName });
             d.endo = new List<IVariable>() { endo };
             d.name = new ScalarString(eqName);
+
+            d.decompOptions2 = this.findOptions.decompOptions2.Clone();
+            d.decompOptions2.code.Add("decomp3 " + varName + " from " + eqName + " endo " + varName);
+
             d.Exe();
         }
 
@@ -139,15 +141,7 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;            
             this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeEquation = item.fullName;            
-        }
-
-        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0)
-        {            
-            this.EquationBrowserSetEquation(eqName, showTime, t0);
-            int eqNumber = Program.model.modelGamsScalar.GetEqNumber(eqName);
-            List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
-            this.EquationBrowserSetButtons(eqName, precedents);
-        }
+        }        
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
@@ -164,12 +158,18 @@ namespace Gekko
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
+        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0)
+        {
+            this.EquationBrowserSetEquation(eqName, showTime, t0);
+            int eqNumber = Program.model.modelGamsScalar.GetEqNumber(eqName);
+            List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
+            this.EquationBrowserSetButtons(eqName, precedents);
+        }
+
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
         {
             string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0);
             this.windowEquationBrowserLabel.Text = s;
-            //this.windowEquationBrowserLabel.Inlines.Clear();
-            //this.windowEquationBrowserLabel.Inlines.Add(s);
         }        
 
         private void btnOk_Click(object sender, RoutedEventArgs e)

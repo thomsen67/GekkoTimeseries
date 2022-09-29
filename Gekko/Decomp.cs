@@ -304,24 +304,32 @@ namespace Gekko
 
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
-            
+
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
-            DecompOptions2 decompOptions2 = new DecompOptions2();
-            decompOptions2.modelType = G.GetModelType();
-            decompOptions2.decompTablesFormat.showErrors = true; //
-            decompOptions2.t1 = o.t1;
-            decompOptions2.t2 = o.t2;
-            decompOptions2.expressionOld = o.label;
-            decompOptions2.expression = o.expression;
-            decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
-            if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
-            if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
-            if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
-            else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
-
-            decompOptions2.name = o.name;
-            decompOptions2.isNew = true;
+            DecompOptions2 decompOptions2 = null;
+            if (o.decompOptions2 != null)
+            {
+                decompOptions2 = o.decompOptions2;
+            }
+            else
+            {
+                decompOptions2 = new DecompOptions2();
+                decompOptions2.code = new List<string>() { o.label + ";" };
+                decompOptions2.modelType = G.GetModelType();
+                decompOptions2.decompTablesFormat.showErrors = true; //
+                decompOptions2.t1 = o.t1;
+                decompOptions2.t2 = o.t2;
+                decompOptions2.expressionOld = o.label;
+                decompOptions2.expression = o.expression;
+                decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
+                if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
+                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
+                if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
+                else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
+                decompOptions2.name = o.name;
+                decompOptions2.isNew = true;
+            }
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
             if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);

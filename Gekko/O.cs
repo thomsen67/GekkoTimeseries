@@ -8146,6 +8146,8 @@ namespace Gekko
             public List<IVariable> from = new List<IVariable>();
             public List<IVariable> endo = new List<IVariable>();
 
+            public DecompOptions2 decompOptions2 = null;  //used from a FIND window
+
             public void Exe()
             {
                 //See source code documentation
