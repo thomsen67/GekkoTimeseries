@@ -99,8 +99,22 @@ namespace Gekko
         }
 
         private void OnEquationListRightButtonDown(object sender, MouseButtonEventArgs e)
-        {            
-            EquationListItem item = ((FrameworkElement)e.OriginalSource).DataContext as EquationListItem;
+        {
+            FrameworkElement fe = e.OriginalSource as FrameworkElement;
+            EquationListItem item = fe.DataContext as EquationListItem;
+            
+            DependencyObject dep = e.OriginalSource as DependencyObject;
+            while ((dep != null))
+            {
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            //int i = this.windowEquationBrowserListView.ItemContainerGenerator.IndexFromContainer(dep);
+            //object o = windowEquationBrowserListView.SelectedValue;
+            //System.Data.DataRowView value = (System.Data.DataRowView)windowEquationBrowserListView.SelectedValue;
+            //string s = value.Row[0].ToString();
+
+
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
             O.Decomp2 d = new O.Decomp2();            
