@@ -215,6 +215,7 @@ namespace Gekko
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
             }
             s = Model.GetEquationText(eqNames, showTime, t0);
+            s += G.NL + G.Blanks(200);  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
 
@@ -226,7 +227,7 @@ namespace Gekko
         /// <param name="t0"></param>
         /// <returns></returns>
         public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
-        {
+        {            
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
             {
