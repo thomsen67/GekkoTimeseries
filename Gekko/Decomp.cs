@@ -4126,10 +4126,17 @@ namespace Gekko
 
             eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
 
-            bool? b = eb.ShowDialog();
-            rv = eb._activeEquation;
-            if (b != true) rv = null;  //only when OK is pressed (or Enter)
-            eb.Close();
+            if (false)
+            {
+                eb.Show();
+            }
+            else
+            {
+                bool? b = eb.ShowDialog();
+                rv = eb._activeEquation;
+                if (b != true) rv = null;  //only when OK is pressed (or Enter)
+                eb.Close();
+            }
 
             return rv;
         }
