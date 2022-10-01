@@ -411,6 +411,17 @@ namespace Gekko
             decompOptions2.free.Clear();
             foreach (string s in decompOptions2.all)
             {
+
+                if (s == "value") continue;
+                if (s == "valueAlternative") continue;
+                if (s == "valueLevel") continue;
+                if (s == "valueLevelLag") continue;
+                if (s == "valueLevelLag2") continue;
+                if (s == "valueLevelRef") continue;
+                if (s == "valueLevelRefLag") continue;
+                if (s == "valueLevelRefLag2") continue;
+                if (s == "fullVariableName") continue;                
+
                 if (this.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
                 {
                 }
@@ -741,6 +752,8 @@ namespace Gekko
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();
             this.isInitializing = false;  //ready for clicking
+
+            this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
 
             DataContext = new ViewModel();  //MVVM style
 
@@ -2337,6 +2350,11 @@ namespace Gekko
                 this.decompOptions2.count = ECountType.None;
                 RecalcCellsWithNewType(false);
             }
+        }
+
+        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

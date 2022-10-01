@@ -105,6 +105,14 @@
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
+            <Button  Grid.Row="0" Grid.Column="1"  Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="U)"  Width="50" HorizontalAlignment="Left" Opacity="0.8" Content="Merge" Click="ButtonSelect_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
             <DockPanel Grid.Row="1" Grid.Column="3">
                 <Border BorderThickness="3,3,0,0" BorderBrush="LightGray"  CornerRadius="10,0,0,0">
                     <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Shows each variable as it is">Raw</TextBlock>
@@ -323,7 +331,13 @@
             
             <Button Grid.Column="11" Grid.Row="4" Margin="73.542,1.625,0,1.875" Name="button2" ToolTip="More decimals" Click="button2_Click" FontSize="10" AllowDrop="False" HorizontalAlignment="Left" Width="18.875" Opacity="0.7">.00</Button>
             <Button Grid.Column="11" Grid.Row="4" HorizontalAlignment="Right" Margin="0,1.625,19.125,1.875" Name="button3" Width="18" ToolTip="Fewer decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
-            <Button Name="button1" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Opacity="0.8" Content="Refresh"></Button>
+            <Button Name="button1" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Height="22" Opacity="0.8" Content="Refresh">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
             
 
         </Grid>
