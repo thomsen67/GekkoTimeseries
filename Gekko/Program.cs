@@ -166,50 +166,48 @@ namespace Gekko
     }
 
     public class DecompFind
-    {        
+    {                
+    
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
-        public List<DecompFindItem> stack = new List<DecompFindItem>();
-
-        public DecompFind(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
-        {            
-            this.stack = new List<DecompFindItem>();
-            this.Add(decompOptions2, type, window);
-        }
-
-        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
-        {
-            DecompFindItem item = new DecompFindItem(type, this.stack.Count, decompOptions2, window);
-            this.stack.Add(item);
-        }
-
-        public DecompOptions2 GetDecompOptions()
-        {
-            return this.stack[this.stack.Count - 1].decompOptions2;
-        }
-
-        /// <summary>
-        /// In some cases, the window object is set when constructing DecompFind, but sometimes
-        /// it must be set just before opening the window in GUI.
-        /// </summary>
-        public void SetWindow(object window)
-        {
-            this.stack[this.stack.Count - 1].window = window;
-        }
-    }
-
-    public class DecompFindItem
-    {
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
         public DecompOptions2 decompOptions2 = null;
         public object window = null;
+        public DecompFind parent = null;
+        public List<DecompFind> children = new List<DecompFind>();
 
-        public DecompFindItem(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window)
+        public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window)
         {
             this.type = type;
             this.depth = depth;
             this.decompOptions2 = decompOptions2;
             this.window = window;  //either WindowDecomp or WindowFind
+        }
+
+        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
+        {
+            this.children.Add(new DecompFind(type, -12345, decompOptions2, window));
+        }
+
+        public void SetWindow(object window)
+        {
+            //TODO
+        }
+
+        public DecompOptions2 GetDecompOptions()
+        {
+            return this.decompOptions2;
+        }
+
+        public int GetDepth()
+        {
+            DecompFind parent = this;
+            for (int i = 0; i < int.MaxValue; i++)
+            {
+                parent = parent.parent;
+                if (parent == null) return i;
+            }
+            return -12345;
         }
     }
 

@@ -8064,7 +8064,7 @@ namespace Gekko
             {
                 if (this.decompFind == null)
                 {
-                    this.decompFind = new DecompFind(new DecompOptions2(), EDecompFindNavigation.Find, null);
+                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, -12345, new DecompOptions2(), null);
                     this.decompFind.GetDecompOptions().t1 = this.t1;
                     this.decompFind.GetDecompOptions().t2 = this.t2;
                     if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank

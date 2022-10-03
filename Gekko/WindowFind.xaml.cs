@@ -38,7 +38,7 @@ namespace Gekko
             //WHY NEW OBJECT?
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFind(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find, this);
+                this.decompFind = new DecompFind(EDecompFindNavigation.Find, -12345, o.decompFind.GetDecompOptions(), this);
             }
             else
             {

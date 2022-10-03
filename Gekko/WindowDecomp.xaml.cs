@@ -749,7 +749,7 @@ namespace Gekko
         {
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFind(decompOptions2, EDecompFindNavigation.Decomp, this);
+                this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, decompOptions2, this);
             }
             else
             {
