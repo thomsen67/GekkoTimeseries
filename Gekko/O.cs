@@ -8069,6 +8069,8 @@ namespace Gekko
                     this.decompFind.GetDecompOptions().t2 = this.t2;
                     if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank
                     else this.decompFind.GetDecompOptions().prtOptionLower = this.opt_prtcode.ToLower();
+                    this.decompFind.GetDecompOptions().modelType = G.GetModelType();
+                    this.decompFind.GetDecompOptions().decompTablesFormat.showErrors = true; //
                 }                                
                 G.CheckLegalPeriod(this.decompFind.GetDecompOptions().t1, this.decompFind.GetDecompOptions().t2);
                 this.rv = Program.Find(this);

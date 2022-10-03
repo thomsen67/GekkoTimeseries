@@ -121,18 +121,7 @@ namespace Gekko
         {
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;
-
-            //DependencyObject dep = e.OriginalSource as DependencyObject;
-            //while ((dep != null))
-            //{
-            //    dep = VisualTreeHelper.GetParent(dep);
-            //}
-            //TextBlock tb = e.OriginalSource as TextBlock;
-            //GridViewRowPresenter p = tb.Parent as GridViewRowPresenter;
-            //foreach (object tb2 in p.Columns)
-            //{
-            //}
-
+            
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
             O.Decomp2 d = new O.Decomp2();
