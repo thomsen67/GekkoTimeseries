@@ -4115,28 +4115,22 @@ namespace Gekko
 
 
             string rv = null;
-            WindowFind eb = new WindowFind(o);
+            WindowFind windowFind = new WindowFind(o);
             //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
-            eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetButtons(firstEqName, firstList);
-            eb.EquationBrowserSetLabel(variableName);
-            eb._activeEquation = firstEqName;
-            eb._activeVariable = null;
+            windowFind.Title = variableName + " - " + "Gekko equations";
+            windowFind.EquationBrowserSetButtons(firstEqName, firstList);
+            windowFind.EquationBrowserSetLabel(variableName);
+            windowFind._activeEquation = firstEqName;
+            windowFind._activeVariable = null;
 
-            eb.EquationBrowserSetEquation(firstEqName, o.decompFind.GetDecompOptions().showTime, o.t0);
-
-            if (false)
-            {
-                eb.Show();
-            }
-            else
-            {
-                bool? b = eb.ShowDialog();
-                rv = eb._activeEquation;
-                if (b != true) rv = null;  //only when OK is pressed (or Enter)
-                eb.Close();
-            }
+            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.GetDecompOptions().showTime, o.t0);
+            windowFind.decompFind.SetWindow(windowFind);
+            
+            bool? b = windowFind.ShowDialog();
+            rv = windowFind._activeEquation;
+            if (b != true) rv = null;  //only when OK is pressed (or Enter)
+            windowFind.Close();
 
             return rv;
         }

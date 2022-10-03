@@ -38,11 +38,11 @@ namespace Gekko
             //WHY NEW OBJECT?
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFind(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
+                this.decompFind = new DecompFind(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find, this);
             }
             else
             {
-                this.decompFind.Add(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
+                this.decompFind.Add(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find, this);
             }
 
             //HACKY:

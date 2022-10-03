@@ -8049,6 +8049,11 @@ namespace Gekko
             public string rv = null; //return value
             public DecompFind decompFind = null;  //from a DECOMP window            
 
+            //do not delete, used in dynamic code
+            public Find()
+            {
+            }
+
             public Find(DecompFind opt)
             {
                 //called from DECOMP
@@ -8059,7 +8064,7 @@ namespace Gekko
             {
                 if (this.decompFind == null)
                 {
-                    this.decompFind = new DecompFind(new DecompOptions2(), EDecompFindNavigation.Find);
+                    this.decompFind = new DecompFind(new DecompOptions2(), EDecompFindNavigation.Find, null);
                     this.decompFind.GetDecompOptions().t1 = this.t1;
                     this.decompFind.GetDecompOptions().t2 = this.t2;
                     if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank

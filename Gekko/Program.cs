@@ -170,21 +170,30 @@ namespace Gekko
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
         public List<DecompFindItem> stack = new List<DecompFindItem>();
 
-        public DecompFind(DecompOptions2 decompOptions2, EDecompFindNavigation type)
+        public DecompFind(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
         {            
             this.stack = new List<DecompFindItem>();
-            this.Add(decompOptions2, type);
+            this.Add(decompOptions2, type, window);
         }
 
-        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type)
+        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
         {
-            DecompFindItem item = new DecompFindItem(type, this.stack.Count, decompOptions2, this);
+            DecompFindItem item = new DecompFindItem(type, this.stack.Count, decompOptions2, window);
             this.stack.Add(item);
         }
 
         public DecompOptions2 GetDecompOptions()
         {
             return this.stack[this.stack.Count - 1].decompOptions2;
+        }
+
+        /// <summary>
+        /// In some cases, the window object is set when constructing DecompFind, but sometimes
+        /// it must be set just before opening the window in GUI.
+        /// </summary>
+        public void SetWindow(object window)
+        {
+            this.stack[this.stack.Count - 1].window = window;
         }
     }
 
