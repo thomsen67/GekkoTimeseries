@@ -424,18 +424,25 @@ namespace Gekko
                 }
             }
 
-            CrossThreadStuff.Decomp2(o.decompFind);
-
-            //Also see #9237532567
-            //This stuff makes sure we wait for the window to open, before we move on with the code.
-            for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+            if (true)
             {
-                System.Threading.Thread.Sleep(10);  //0.01s
-                if (decompOptions2.numberOfRecalcs > 0)
-                {
-                    break;
-                }
+                Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind);
             }
+            else
+            {
+                //probably so that windows can be opened without waiting for other windows closing
+                CrossThreadStuff.Decomp2(o.decompFind);
+                //Also see #9237532567
+                //This stuff makes sure we wait for the window to open, before we move on with the code.
+                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                {
+                    System.Threading.Thread.Sleep(10);  //0.01s
+                    if (decompOptions2.numberOfRecalcs > 0)
+                    {
+                        break;
+                    }
+                }
+            }            
         }
 
         /// <summary>
