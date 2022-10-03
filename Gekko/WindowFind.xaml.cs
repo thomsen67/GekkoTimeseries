@@ -36,7 +36,15 @@ namespace Gekko
         public WindowFind(O.Find o)
         {
             //WHY NEW OBJECT?
-            this.decompFind = new DecompFindNavigation(o.decompOptions2, EDecompFindNavigation.Find);
+            if (this.decompFind == null)
+            {
+                this.decompFind = new DecompFindNavigation(o.decompOptions2, EDecompFindNavigation.Find);
+            }
+            else
+            {
+                this.decompFind.Add(o.decompOptions2, EDecompFindNavigation.Find);
+            }
+
             //HACKY:
             if (this.decompFind.GetDecompOptions().t0.IsNull()) this.decompFind.GetDecompOptions().t0 = o.t0;
             if (this.decompFind.GetDecompOptions().t1.IsNull()) this.decompFind.GetDecompOptions().t1 = o.t1;

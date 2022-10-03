@@ -173,6 +173,11 @@ namespace Gekko
         public DecompFindNavigation(DecompOptions2 decompOptions2, EDecompFindNavigation type)
         {            
             this.stack = new List<DecompFindNavigationItem>();
+            this.Add(decompOptions2, type);
+        }
+
+        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type)
+        {
             DecompFindNavigationItem item = new DecompFindNavigationItem(type, this.stack.Count, decompOptions2, this);
             this.stack.Add(item);
         }

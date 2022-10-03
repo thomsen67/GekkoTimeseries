@@ -753,11 +753,8 @@ namespace Gekko
             }
             else
             {
-                
+                this.decompFind.Add(decompOptions2, EDecompFindNavigation.Decomp);
             }
-
-            //DecompFindNavigationItem item = new DecompFindNavigationItem(EDecompFindNavigation.Decomp, this.decompFind.stack.Count, decompOptions2, this);
-            //this.decompFind.stack.Add(item);            
 
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();
