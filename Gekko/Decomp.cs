@@ -1777,9 +1777,9 @@ namespace Gekko
             }
 
             DecompOptions2 decompOptions = (DecompOptions2)o;
-            WindowDecomp w = null;
-            w = new WindowDecomp(decompOptions);
-            Globals.windowsDecomp2.Add(w);            
+            WindowDecomp windowDecomp = null;
+            windowDecomp = new WindowDecomp(decompOptions);
+            Globals.windowsDecomp2.Add(windowDecomp);            
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
@@ -1854,29 +1854,29 @@ namespace Gekko
 
             if (decompOptions.name == null)
             {
-                w.Title = "Decompose expression";
+                windowDecomp.Title = "Decompose expression";
             }
             else
             {
-                w.Title = "Decompose " + decompOptions.variable + "";
+                windowDecomp.Title = "Decompose " + decompOptions.variable + "";
             }
-            w.Tag = decompOptions;
+            windowDecomp.Tag = decompOptions;
 
-            w.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-            w.SetRadioButtons();
-            w.isInitializing = false;
+            windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+            windowDecomp.SetRadioButtons();
+            windowDecomp.isInitializing = false;
 
-            w.RecalcCellsWithNewType(true);
+            windowDecomp.RecalcCellsWithNewType(true);
             decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
             if (G.IsUnitTesting() && Globals.showDecompTable == false)
             {
                 Globals.windowsDecomp2.Clear();
-                w = null;
+                windowDecomp = null;
             }
             else
             {
-                if (w.isClosing)  //if something goes wrong, .isClosing will be true
+                if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
                 {
                     //The line below removes the window from the global list of active windows.
                     //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
@@ -1884,10 +1884,10 @@ namespace Gekko
                 }
                 else
                 {
-                    w.decompFind.SetWindow(w);
-                    w.ShowDialog();
-                    w.Close();  //probably superfluous
-                    w = null;  //probably superfluous
+                    windowDecomp.decompFind.SetWindow(windowDecomp);
+                    windowDecomp.ShowDialog();
+                    windowDecomp.Close();  //probably superfluous
+                    windowDecomp = null;  //probably superfluous
                     if (Globals.showDecompTable)
                     {
                         Globals.showDecompTable = false;
