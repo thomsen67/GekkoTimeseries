@@ -211,10 +211,16 @@ namespace Gekko
             return this.decompOptions2;
         }
 
-        public int GetDepth()
-        {            
-            return this.depth;
-        }
+        public DecompFind SearchUpwards(EDecompFindNavigation type)
+        {
+            DecompFind parent = this.parent;
+            while (true)
+            {
+                if (parent.type == type) return parent;
+                parent = parent.parent;
+                if (parent == null) return null;
+            }
+        }        
     }
 
     public class Count

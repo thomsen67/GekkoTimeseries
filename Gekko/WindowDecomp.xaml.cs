@@ -2367,7 +2367,16 @@ namespace Gekko
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
+            DecompFind dfPreviousFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
+            DecompFind dfPreviousDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
+            WindowFind find = dfPreviousFind.window as WindowFind;
 
+            List<string> codeNew = this.decompFind.decompOptions2.code;
+            List<string> codeOld = dfPreviousDecomp.decompOptions2.code;
+
+            if (find != null) find.Close();
+            this.Close();
+            
         }
     }
 
