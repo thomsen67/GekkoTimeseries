@@ -57,6 +57,8 @@ namespace Gekko
             None, Rows, Cols, Filters, Invisible
         }
 
+        public DecompFindNavigation decompFind = null;
+
         public DecompDatas decompDatas = new DecompDatas(); //stores data for reuse, for instance for fast pivot selection
 
         public int frozenRows=0;

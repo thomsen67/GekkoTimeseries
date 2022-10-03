@@ -158,6 +158,24 @@ namespace Gekko
         Ols
     }
 
+    public enum EDecompFindNavigation
+    {
+        Decomp,
+        Find,
+        Unknown
+    }
+
+    public class DecompFindNavigation
+    {
+        public List<DecompFindNavigationItem> stack = new List<DecompFindNavigationItem>();
+    }
+
+    public class DecompFindNavigationItem
+    {
+        int depth = 0;
+        public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
+    }
+
     public class Count
     {
         public int n = 0;
