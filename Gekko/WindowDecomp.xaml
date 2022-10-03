@@ -105,7 +105,7 @@
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
-            <Button  Grid.Row="0" Grid.Column="1"  Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="U)"  Width="50" HorizontalAlignment="Left" Opacity="0.8" Content="Merge" Click="ButtonSelect_Click">
+            <Button  Grid.Row="0" Grid.Column="1"  Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50" HorizontalAlignment="Left" Opacity="0.8" Content="Merge" Click="ButtonSelect_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>

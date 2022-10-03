@@ -167,14 +167,24 @@ namespace Gekko
 
     public class DecompFindNavigation
     {
-        public DecompOptions2 decompOptions2 = null;
+        private DecompOptions2 decompOptions2 = null;
         public List<DecompFindNavigationItem> stack = new List<DecompFindNavigationItem>();
+
+        public DecompFindNavigation(DecompOptions2 decompOptions2)
+        {
+            this.decompOptions2 = decompOptions2;
+        }
+
+        public DecompOptions2 GetDecompOptions()
+        {
+            return this.decompOptions2;
+        }
     }
 
     public class DecompFindNavigationItem
     {
         int depth = 0;
-        public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
+        public EDecompFindNavigation type = EDecompFindNavigation.Unknown;        
     }
 
     public class Count
