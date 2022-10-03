@@ -36,8 +36,8 @@ namespace Gekko
         /// Just because of threads, calls DecompGetFuncExpressionsAndRecalc()
         /// </summary>
         /// <param name="o"></param>        
-        delegate void Decomp2Callback(DecompOptions2 o); //weird delegate pattern, but it works!
-        public static void Decomp2(DecompOptions2 o)
+        delegate void Decomp2Callback(DecompFind o); //weird delegate pattern, but it works!
+        public static void Decomp2(DecompFind o)
         {
             if (Gui.gui != null && Gui.gui.InvokeRequired)
             {

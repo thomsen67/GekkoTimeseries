@@ -329,6 +329,7 @@ namespace Gekko
                 else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
+                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null);
             }
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
@@ -423,7 +424,7 @@ namespace Gekko
                 }
             }
 
-            CrossThreadStuff.Decomp2(decompOptions2);
+            CrossThreadStuff.Decomp2(o.decompFind);
 
             //Also see #9237532567
             //This stuff makes sure we wait for the window to open, before we move on with the code.
@@ -1769,16 +1770,16 @@ namespace Gekko
         /// DecompEvalGekko().
         /// </summary>
         /// <param name="o"></param>
-        public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
+        public static void DecompGetFuncExpressionsAndRecalc(DecompFind o)
         {
-            if (o.modelType == EModelType.Unknown)
+            DecompFind df = (DecompFind)o;
+            DecompOptions2 decompOptions = df.decompOptions2;
+            if (decompOptions.modelType == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
-
-            DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp windowDecomp = null;
-            windowDecomp = new WindowDecomp(decompOptions);
+            windowDecomp = new WindowDecomp(df);
             Globals.windowsDecomp2.Add(windowDecomp);            
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());

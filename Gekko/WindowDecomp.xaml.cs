@@ -745,17 +745,17 @@ namespace Gekko
             }
         }
 
-        public WindowDecomp(DecompOptions2 decompOptions2)
+        public WindowDecomp(DecompFind df)
         {
-            if (this.decompFind == null)
-            {
-                this.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, this);
-            }
-            else
-            {
-                this.decompFind.CreateChild(decompOptions2, EDecompFindNavigation.Decomp, this);
-            }
-
+            //if (this.decompFind == null)
+            //{
+            //    this.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, this);
+            //}
+            //else
+            //{
+            //    this.decompFind.CreateChild(decompOptions2, EDecompFindNavigation.Decomp, this);
+            //}
+            this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();
             this.isInitializing = false;  //ready for clicking
