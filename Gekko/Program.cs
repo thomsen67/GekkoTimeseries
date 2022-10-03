@@ -184,7 +184,7 @@ namespace Gekko
             this.window = window;  //either WindowDecomp or WindowFind
         }
 
-        public DecompFind AddChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
+        public DecompFind CreateChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
         {
             DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window);
             child.parent = this;

@@ -753,7 +753,7 @@ namespace Gekko
             }
             else
             {
-                this.decompFind.AddChild(decompOptions2, EDecompFindNavigation.Decomp, this);
+                this.decompFind.CreateChild(decompOptions2, EDecompFindNavigation.Decomp, this);
             }
 
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
