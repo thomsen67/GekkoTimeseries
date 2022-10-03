@@ -69,6 +69,14 @@
         </Style>
     </Window.Resources>
 
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
+    </Window.CommandBindings>
+
     <DockPanel>
         <StatusBar Name="status" DockPanel.Dock="Bottom">
             <StatusBarItem>

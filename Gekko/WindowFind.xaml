@@ -23,9 +23,15 @@
             <EventSetter Event="MouseEnter" Handler="OnEquationListMouseEnter" />
             <EventSetter Event="MouseLeave" Handler="OnEquationListMouseLeave" />
         </Style>
-
-
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
+    </Window.CommandBindings>
 
     <DockPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" Margin="10,10,10,10">

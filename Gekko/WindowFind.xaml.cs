@@ -117,6 +117,11 @@ namespace Gekko
             }
         }
 
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             FrameworkElement fe = e.OriginalSource as FrameworkElement;

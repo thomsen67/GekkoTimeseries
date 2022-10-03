@@ -782,7 +782,7 @@ namespace Gekko
 
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
 
-            this.KeyDown += new KeyEventHandler(Window_KeyDown); //new System.Windows.Forms.KeyEventHandler(this.radioButton1_KeyDown);
+            //this.KeyDown += new KeyEventHandler(Window_KeyDown); //new System.Windows.Forms.KeyEventHandler(this.radioButton1_KeyDown);
 
             this.decompFind.GetDecompOptions().guiDecompChangedCells.Clear();
             this.decompFind.GetDecompOptions().guiDecompIsSelecting = false;
@@ -1714,13 +1714,18 @@ namespace Gekko
             }
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            if (e.Key.ToString() == "Escape")
-            {
-                this.Close();
-            }
+            this.Close();
         }
+
+        //private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        //{
+        //    if (e.Key.ToString() == "Escape")
+        //    {
+        //        this.Close();
+        //    }
+        //}
 
         /// <summary>
         /// When something in the Gekko decomp GUI is changed (for instance, a field is dragged), this method is called.
