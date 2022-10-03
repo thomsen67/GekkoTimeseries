@@ -30,7 +30,7 @@ namespace Gekko
         //public GekkoTime _t1 = GekkoTime.tNull;
         //public GekkoTime _t2 = GekkoTime.tNull;
         public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
-        public DecompFindNavigation decompFind = null;
+        public DecompFind decompFind = null;
         //public DecompOptions2 decompOptions2 = null;
 
         public WindowFind(O.Find o)
@@ -38,7 +38,7 @@ namespace Gekko
             //WHY NEW OBJECT?
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFindNavigation(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
+                this.decompFind = new DecompFind(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
             }
             else
             {

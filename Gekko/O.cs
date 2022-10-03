@@ -8047,9 +8047,9 @@ namespace Gekko
 
             public GekkoTime t0 = GekkoTime.tNull;  //selected time            
             public string rv = null; //return value
-            public DecompFindNavigation decompFind = null;  //from a DECOMP window            
+            public DecompFind decompFind = null;  //from a DECOMP window            
 
-            public Find(DecompFindNavigation opt)
+            public Find(DecompFind opt)
             {
                 //called from DECOMP
                 this.decompFind = opt;
@@ -8059,7 +8059,7 @@ namespace Gekko
             {
                 if (this.decompFind == null)
                 {
-                    this.decompFind = new DecompFindNavigation(new DecompOptions2(), EDecompFindNavigation.Find);
+                    this.decompFind = new DecompFind(new DecompOptions2(), EDecompFindNavigation.Find);
                     this.decompFind.GetDecompOptions().t1 = this.t1;
                     this.decompFind.GetDecompOptions().t2 = this.t2;
                     if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank
@@ -8140,7 +8140,7 @@ namespace Gekko
             public List<IVariable> from = new List<IVariable>();
             public List<IVariable> endo = new List<IVariable>();
 
-            public DecompFindNavigation decompFind = null;  //used from a FIND window
+            public DecompFind decompFind = null;  //used from a FIND window
 
             public void Exe()
             {

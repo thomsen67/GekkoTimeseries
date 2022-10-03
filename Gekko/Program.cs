@@ -165,20 +165,20 @@ namespace Gekko
         Unknown
     }
 
-    public class DecompFindNavigation
+    public class DecompFind
     {        
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
-        public List<DecompFindNavigationItem> stack = new List<DecompFindNavigationItem>();
+        public List<DecompFindItem> stack = new List<DecompFindItem>();
 
-        public DecompFindNavigation(DecompOptions2 decompOptions2, EDecompFindNavigation type)
+        public DecompFind(DecompOptions2 decompOptions2, EDecompFindNavigation type)
         {            
-            this.stack = new List<DecompFindNavigationItem>();
+            this.stack = new List<DecompFindItem>();
             this.Add(decompOptions2, type);
         }
 
         public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type)
         {
-            DecompFindNavigationItem item = new DecompFindNavigationItem(type, this.stack.Count, decompOptions2, this);
+            DecompFindItem item = new DecompFindItem(type, this.stack.Count, decompOptions2, this);
             this.stack.Add(item);
         }
 
@@ -188,14 +188,14 @@ namespace Gekko
         }
     }
 
-    public class DecompFindNavigationItem
+    public class DecompFindItem
     {
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
         public DecompOptions2 decompOptions2 = null;
         public object window = null;
 
-        public DecompFindNavigationItem(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window)
+        public DecompFindItem(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window)
         {
             this.type = type;
             this.depth = depth;

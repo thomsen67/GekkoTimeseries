@@ -57,7 +57,7 @@ namespace Gekko
             None, Rows, Cols, Filters, Invisible
         }
 
-        public DecompFindNavigation decompFind = null;
+        public DecompFind decompFind = null;
 
         public DecompDatas decompDatas = new DecompDatas(); //stores data for reuse, for instance for fast pivot selection
 
@@ -749,7 +749,7 @@ namespace Gekko
         {
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFindNavigation(decompOptions2, EDecompFindNavigation.Decomp);
+                this.decompFind = new DecompFind(decompOptions2, EDecompFindNavigation.Decomp);
             }
             else
             {
