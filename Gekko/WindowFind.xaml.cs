@@ -38,11 +38,11 @@ namespace Gekko
             //WHY NEW OBJECT?
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFindNavigation(o.decompOptions2, EDecompFindNavigation.Find);
+                this.decompFind = new DecompFindNavigation(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
             }
             else
             {
-                this.decompFind.Add(o.decompOptions2, EDecompFindNavigation.Find);
+                this.decompFind.Add(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find);
             }
 
             //HACKY:
@@ -147,8 +147,8 @@ namespace Gekko
             d.endo = new List<IVariable>() { endo };
             d.name = new ScalarString(eqName);
 
-            d.decompOptions2 = this.decompFind.GetDecompOptions().Clone();
-            d.decompOptions2.code.Add("decomp3 " + varName + " from " + eqName + " endo " + varName);
+            d.decompFind = this.decompFind;
+            d.decompFind.GetDecompOptions().code.Add("decomp3 " + varName + " from " + eqName + " endo " + varName);
 
             d.Exe();
         }

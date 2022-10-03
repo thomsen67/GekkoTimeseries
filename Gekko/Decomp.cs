@@ -308,9 +308,9 @@ namespace Gekko
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
             DecompOptions2 decompOptions2 = null;
-            if (o.decompOptions2 != null)
+            if (o.decompFind != null)
             {
-                decompOptions2 = o.decompOptions2;
+                decompOptions2 = o.decompFind.GetDecompOptions();
             }
             else
             {
@@ -4068,7 +4068,7 @@ namespace Gekko
 
             Globals.itemHandler = new ItemHandler();  //hack
 
-            o.t0 = o.decompOptions2.t1;  //selected time
+            o.t0 = o.decompFind.GetDecompOptions().t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
@@ -4088,7 +4088,7 @@ namespace Gekko
             {
 
                 string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
-                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompOptions2.showTime, o.t0);
+                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompFind.GetDecompOptions().showTime, o.t0);
 
                 string bool1 = "";
                 string bool2 = "";
@@ -4106,7 +4106,7 @@ namespace Gekko
 
                 if (firstText == null)
                 {
-                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompOptions2.showTime, o.t0);
+                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompFind.GetDecompOptions().showTime, o.t0);
                     firstText = equationText;
                     firstEqName = eqName;
                     firstList.AddRange(precedents);
@@ -4124,7 +4124,7 @@ namespace Gekko
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;
 
-            eb.EquationBrowserSetEquation(firstEqName, o.decompOptions2.showTime, o.t0);
+            eb.EquationBrowserSetEquation(firstEqName, o.decompFind.GetDecompOptions().showTime, o.t0);
 
             if (false)
             {

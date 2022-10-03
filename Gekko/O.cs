@@ -8047,30 +8047,25 @@ namespace Gekko
 
             public GekkoTime t0 = GekkoTime.tNull;  //selected time            
             public string rv = null; //return value
-            public DecompOptions2 decompOptions2 = null;  //for read only
+            public DecompFindNavigation decompFind = null;  //from a DECOMP window            
 
-            public Find()
-            {
-                //called from FIND                
-            }
-
-            public Find(DecompOptions2 opt)
+            public Find(DecompFindNavigation opt)
             {
                 //called from DECOMP
-                this.decompOptions2 = opt;
+                this.decompFind = opt;
             }
 
             public void Exe()
             {
-                if (this.decompOptions2 == null)
+                if (this.decompFind == null)
                 {
-                    this.decompOptions2 = new DecompOptions2();
-                    this.decompOptions2.t1 = this.t1;
-                    this.decompOptions2.t2 = this.t2;
-                    if (this.opt_prtcode == null) this.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
-                    else this.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
+                    this.decompFind = new DecompFindNavigation(new DecompOptions2(), EDecompFindNavigation.Find);
+                    this.decompFind.GetDecompOptions().t1 = this.t1;
+                    this.decompFind.GetDecompOptions().t2 = this.t2;
+                    if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank
+                    else this.decompFind.GetDecompOptions().prtOptionLower = this.opt_prtcode.ToLower();
                 }                                
-                G.CheckLegalPeriod(this.decompOptions2.t1, this.decompOptions2.t2);
+                G.CheckLegalPeriod(this.decompFind.GetDecompOptions().t1, this.decompFind.GetDecompOptions().t2);
                 this.rv = Program.Find(this);
             }
         }
@@ -8145,7 +8140,7 @@ namespace Gekko
             public List<IVariable> from = new List<IVariable>();
             public List<IVariable> endo = new List<IVariable>();
 
-            public DecompOptions2 decompOptions2 = null;  //used from a FIND window
+            public DecompFindNavigation decompFind = null;  //used from a FIND window
 
             public void Exe()
             {

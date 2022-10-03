@@ -1551,8 +1551,8 @@ namespace Gekko
                 // ---------------------------------------
 
                 string var = HiddenVariableHelper(c2);
-                DecompOptions2 opt = this.decompFind.GetDecompOptions().Clone();
-                O.Find o = new O.Find(opt);
+                //DecompOptions2 opt = this.decompFind.GetDecompOptions().Clone();
+                O.Find o = new O.Find(this.decompFind);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
                 o.Exe();               
