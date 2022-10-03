@@ -2409,6 +2409,10 @@ namespace Gekko
 
     public class DecompOptions2
     {
+        //FIND STUFF
+        public List iv = null;
+        public GekkoTime t0 = GekkoTime.tNull;
+
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
         public EModelType modelType = EModelType.Unknown;
@@ -2429,6 +2433,7 @@ namespace Gekko
         public Func<GekkoSmpl, IVariable> expression = null;
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
+
         
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;

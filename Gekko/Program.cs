@@ -168,6 +168,7 @@ namespace Gekko
     public class DecompFindNavigation
     {
         private DecompOptions2 decompOptions2 = null;
+        private GekkoTime t0 = GekkoTime.tNull;
         public List<DecompFindNavigationItem> stack = new List<DecompFindNavigationItem>();
 
         public DecompFindNavigation(DecompOptions2 decompOptions2)

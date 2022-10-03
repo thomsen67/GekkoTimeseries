@@ -30,12 +30,21 @@ namespace Gekko
         //public GekkoTime _t1 = GekkoTime.tNull;
         //public GekkoTime _t2 = GekkoTime.tNull;
         public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
-        public O.Find findOptions = null;
+        public DecompFindNavigation decompFind = null;
         //public DecompOptions2 decompOptions2 = null;
 
         public WindowFind(O.Find o)
         {
-            this.findOptions = o;
+            //WHY NEW OBJECT?
+            this.decompFind = new DecompFindNavigation(o.decompOptions2);
+            //HACKY:
+            if (this.decompFind.GetDecompOptions().t0.IsNull()) this.decompFind.GetDecompOptions().t0 = o.t0;
+            if (this.decompFind.GetDecompOptions().t1.IsNull()) this.decompFind.GetDecompOptions().t1 = o.t1;
+            if (this.decompFind.GetDecompOptions().t2.IsNull()) this.decompFind.GetDecompOptions().t2 = o.t2;
+            this.decompFind.GetDecompOptions().iv = o.iv;
+            if (o.opt_prtcode != null) this.decompFind.GetDecompOptions().prtOptionLower = o.opt_prtcode.ToLower();
+
+            //this.findOptions = o;
             InitializeComponent();
             this.windowEquationBrowserListView.SelectedIndex = 0;
             this.windowEquationBrowserListView.Focus();
@@ -61,7 +70,7 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {
             this._activeVariable = null;
-            this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetEquation(_activeEquation, this.decompFind.GetDecompOptions().showTime, this.decompFind.GetDecompOptions().t0);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -94,7 +103,7 @@ namespace Gekko
             }
             else
             {
-                this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+                this.EquationBrowserSetEquation(_activeEquation, this.decompFind.GetDecompOptions().showTime, this.decompFind.GetDecompOptions().t0);
             }
         }
 
@@ -117,10 +126,10 @@ namespace Gekko
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
             O.Decomp2 d = new O.Decomp2();
-            d.opt_prtcode = this.findOptions.decompOptions2.prtOptionLower;
-            d.t1 = this.findOptions.decompOptions2.t1;
-            d.t2 = this.findOptions.decompOptions2.t2;
-            string varName = this.findOptions.iv.list[0].ConvertToString();
+            d.opt_prtcode = this.decompFind.GetDecompOptions().prtOptionLower;
+            d.t1 = this.decompFind.GetDecompOptions().t1;
+            d.t2 = this.decompFind.GetDecompOptions().t2;
+            string varName = this.decompFind.GetDecompOptions().iv.list[0].ConvertToString();
 
             List select = new List(new List<string>() { varName });
             d.select = new List<IVariable>() { select };
@@ -130,7 +139,7 @@ namespace Gekko
             d.endo = new List<IVariable>() { endo };
             d.name = new ScalarString(eqName);
 
-            d.decompOptions2 = this.findOptions.decompOptions2.Clone();
+            d.decompOptions2 = this.decompFind.GetDecompOptions().Clone();
             d.decompOptions2.code.Add("decomp3 " + varName + " from " + eqName + " endo " + varName);
 
             d.Exe();
@@ -139,7 +148,7 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.GetDecompOptions().showTime, this.decompFind.GetDecompOptions().t0);
             this._activeEquation = item.fullName;
         }
 
@@ -147,14 +156,14 @@ namespace Gekko
         {
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.GetDecompOptions().showTime, this.decompFind.GetDecompOptions().t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
             bool showTime = false;
-            GekkoTime t0 = this.findOptions.decompOptions2.t1;
-            this.EquationBrowserSetButtons(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
+            GekkoTime t0 = this.decompFind.GetDecompOptions().t1;
+            this.EquationBrowserSetButtons(_activeEquation, this.decompFind.GetDecompOptions().showTime, this.decompFind.GetDecompOptions().t0);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
@@ -185,7 +194,7 @@ namespace Gekko
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);
+            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.decompFind.GetDecompOptions().t1, this.decompFind.GetDecompOptions().t2, null);
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
             this.windowEquationBrowserLabel.Text = s7;
         }
@@ -211,11 +220,11 @@ namespace Gekko
 
                 string residualName = "residual___";
                 int funcCounter = 0;
-                DecompOperator operatorTemp = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
+                DecompOperator operatorTemp = new DecompOperator(this.decompFind.GetDecompOptions().prtOptionLower);
 
                 //!!! a bit of a waste of time, but is probably not significantly slowing
                 //    down the FIND window.
-                DecompOptions2 decompOptionsTemp = this.findOptions.decompOptions2.Clone();
+                DecompOptions2 decompOptionsTemp = this.decompFind.GetDecompOptions().Clone();
 
                 //decompOptionsTemp.link.Clear();
                 //decompOptionsTemp.link.Add(new Link());
@@ -234,14 +243,14 @@ namespace Gekko
                 //fixme: [0] must be counter
 
                 GekkoTime gt1, gt2;
-                DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.findOptions.t0, this.findOptions.t0, decompOptionsTemp.prtOptionLower);
+                DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.GetDecompOptions().t0, this.decompFind.GetDecompOptions().t0, decompOptionsTemp.prtOptionLower);
                 DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
 
                 double max = 0d;
 
                 foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                 {
-                    double v = kvp.Value.GetDataSimple(this.findOptions.t0);
+                    double v = kvp.Value.GetDataSimple(this.decompFind.GetDecompOptions().t0);
                     if (G.isNumericalError(v)) v = 0d;
                     else v = Math.Abs(v);
                     max = Math.Max(v, max);
@@ -250,7 +259,7 @@ namespace Gekko
                 foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                 {
                     string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                    double v = kvp.Value.GetDataSimple(this.findOptions.t0);
+                    double v = kvp.Value.GetDataSimple(this.decompFind.GetDecompOptions().t0);
 
                     ToggleButton b = null;
                     _buttons.TryGetValue(ss5, out b);
@@ -291,12 +300,12 @@ namespace Gekko
                     }
 
                     //fixme: [0] must be counter
-                    DecompData dd = Gekko.Decomp.DecompLowLevel(this.findOptions.t0, this.findOptions.t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                    DecompData dd = Gekko.Decomp.DecompLowLevel(this.decompFind.GetDecompOptions().t0, this.decompFind.GetDecompOptions().t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
 
                     double max = 0d;
                     foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
-                        double v = kvp.Value.GetDataSimple(this.findOptions.t0);
+                        double v = kvp.Value.GetDataSimple(this.decompFind.GetDecompOptions().t0);
                         if (G.isNumericalError(v)) v = 0d;
                         else v = Math.Abs(v);
                         max = Math.Max(v, max);
@@ -305,7 +314,7 @@ namespace Gekko
                     foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                        double v = kvp.Value.GetDataSimple(this.findOptions.t0);
+                        double v = kvp.Value.GetDataSimple(this.decompFind.GetDecompOptions().t0);
 
                         ToggleButton b = null;
                         _buttons.TryGetValue(ss5, out b);
