@@ -747,8 +747,18 @@ namespace Gekko
 
         public WindowDecomp(DecompOptions2 decompOptions)
         {
+            if (this.decompFind == null)
+            {
+                this.decompFind = new DecompFindNavigation(decompOptions);                
+            }
+            else
+            {
+                
+            }
 
-            if (this.decompFind == null) this.decompFind = new DecompFindNavigation(decompOptions);
+            DecompFindNavigationItem item = new DecompFindNavigationItem(EDecompFindNavigation.Decomp, this.decompFind.stack.Count, this);
+            this.decompFind.stack.Add(item);            
+
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();
             this.isInitializing = false;  //ready for clicking

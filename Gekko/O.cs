@@ -8118,7 +8118,6 @@ namespace Gekko
             }
         }
 
-
         public class Decomp2
         {
             //New DECOMP, see source code documentation

@@ -184,8 +184,16 @@ namespace Gekko
 
     public class DecompFindNavigationItem
     {
-        int depth = 0;
-        public EDecompFindNavigation type = EDecompFindNavigation.Unknown;        
+        public int depth = 0;
+        public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
+        public object window = null;
+
+        public DecompFindNavigationItem(EDecompFindNavigation type, int depth, object window)
+        {
+            this.type = type;
+            this.depth = depth;
+            this.window = window;  //either WindowDecomp or WindowFind
+        }
     }
 
     public class Count
