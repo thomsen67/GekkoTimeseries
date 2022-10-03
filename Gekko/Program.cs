@@ -15007,7 +15007,7 @@ namespace Gekko
             }
 
             string rv = null;
-            WindowEquationBrowser eb = new WindowEquationBrowser(null);
+            WindowFind eb = new WindowFind(null);
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetButtons(firstEqName, firstList);
             //eb.EquationBrowserSetLabel(variableName);

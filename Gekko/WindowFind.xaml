@@ -1,4 +1,4 @@
-﻿<Window x:Class="Gekko.WindowEquationBrowser"
+﻿<Window x:Class="Gekko.WindowFind"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
@@ -16,13 +16,14 @@
             <!--<Setter Property="Height" Value="25" />-->
             <Setter Property="Padding" Value="0,4" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Border.BorderThickness" Value="0,0,0,0" />  <!-- can set the last to 0.5 and then control via binding LineColor if needed  -->
+            <Setter Property="Border.BorderThickness" Value="0,0,0,0" />
+            <!-- can set the last to 0.5 and then control via binding LineColor if needed  -->
             <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
             <Setter Property= "IsSelected" Value="{Binding IsSelecteddd, Mode=TwoWay}"/>
             <EventSetter Event="MouseEnter" Handler="OnEquationListMouseEnter" />
-            <EventSetter Event="MouseLeave" Handler="OnEquationListMouseLeave" />            
+            <EventSetter Event="MouseLeave" Handler="OnEquationListMouseLeave" />
         </Style>
-        
+
 
     </Window.Resources>
 
@@ -55,11 +56,12 @@
             <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
                 <TextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
             </ScrollViewer>
-            <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" />            
+            <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" />
             <ScrollViewer Grid.Row="4" HorizontalAlignment="Stretch">
                 <WrapPanel Name="windowEquationBrowserButtons" Margin="10"></WrapPanel>
-            </ScrollViewer>            
-        </Grid>        
+            </ScrollViewer>
+        </Grid>
     </DockPanel>
 
 </Window>
+

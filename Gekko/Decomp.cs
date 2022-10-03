@@ -4115,7 +4115,7 @@ namespace Gekko
 
 
             string rv = null;
-            WindowEquationBrowser eb = new WindowEquationBrowser(o);
+            WindowFind eb = new WindowFind(o);
             //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
             eb.Title = variableName + " - " + "Gekko equations";

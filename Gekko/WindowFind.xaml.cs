@@ -20,25 +20,25 @@ namespace Gekko
     /// <summary>
     /// Interaction logic for WindowEquationBrowser.xaml
     /// </summary>
-        
 
-    public partial class WindowEquationBrowser
+
+    public partial class WindowFind
     {
 
         public string _activeEquation = null; //this always has a non-null value
         public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
         //public GekkoTime _t1 = GekkoTime.tNull;
         //public GekkoTime _t2 = GekkoTime.tNull;
-        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);        
+        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
         public O.Find findOptions = null;
         //public DecompOptions2 decompOptions2 = null;
 
-        public WindowEquationBrowser(O.Find o)
+        public WindowFind(O.Find o)
         {
             this.findOptions = o;
             InitializeComponent();
             this.windowEquationBrowserListView.SelectedIndex = 0;
-            this.windowEquationBrowserListView.Focus();            
+            this.windowEquationBrowserListView.Focus();
         }
 
         public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
@@ -52,20 +52,20 @@ namespace Gekko
             {
                 ToggleButton tb = o as ToggleButton;
                 if (tb == null) continue;
-                if (((TextBlock)tb.Content).Text == s) continue;                
+                if (((TextBlock)tb.Content).Text == s) continue;
                 tb.IsChecked = false;
             }
 
         }
 
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
-        {            
+        {
             this._activeVariable = null;
             this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
-        {            
+        {
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;
             if (s.Contains("[-"))
@@ -84,7 +84,7 @@ namespace Gekko
         }
 
         public void OnVariableButtonLeave(object sender, MouseEventArgs e)
-        {            
+        {
             ToggleButton b = sender as ToggleButton;
             string s = ((TextBlock)b.Content).Text;
             string ss = null;
@@ -93,7 +93,7 @@ namespace Gekko
                 this.EquationBrowserSetLabel(_activeVariable);
             }
             else
-            {                
+            {
                 this.EquationBrowserSetEquation(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             }
         }
@@ -102,7 +102,7 @@ namespace Gekko
         {
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;
-            
+
             //DependencyObject dep = e.OriginalSource as DependencyObject;
             //while ((dep != null))
             //{
@@ -116,7 +116,7 @@ namespace Gekko
 
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
-            O.Decomp2 d = new O.Decomp2();            
+            O.Decomp2 d = new O.Decomp2();
             d.opt_prtcode = this.findOptions.decompOptions2.prtOptionLower;
             d.t1 = this.findOptions.decompOptions2.t1;
             d.t2 = this.findOptions.decompOptions2.t2;
@@ -138,22 +138,22 @@ namespace Gekko
 
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
-            EquationListItem item = e.AddedItems[0] as EquationListItem;            
+            EquationListItem item = e.AddedItems[0] as EquationListItem;
             this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
-            this._activeEquation = item.fullName;            
-        }        
+            this._activeEquation = item.fullName;
+        }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
             ListViewItem x = sender as ListViewItem;
-            EquationListItem item = x.Content as EquationListItem;                        
+            EquationListItem item = x.Content as EquationListItem;
             this.EquationBrowserSetButtons(item.fullName, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
             bool showTime = false;
-            GekkoTime t0 = this.findOptions.decompOptions2.t1;            
+            GekkoTime t0 = this.findOptions.decompOptions2.t1;
             this.EquationBrowserSetButtons(_activeEquation, this.findOptions.decompOptions2.showTime, this.findOptions.t0);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
@@ -170,22 +170,22 @@ namespace Gekko
         {
             string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0);
             this.windowEquationBrowserLabel.Text = s;
-        }        
+        }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;            
+            DialogResult = true;
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-        }       
-        
+        }
+
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);            
+            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.findOptions.decompOptions2.t1, this.findOptions.decompOptions2.t2, null);
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
             this.windowEquationBrowserLabel.Text = s7;
         }
@@ -208,9 +208,9 @@ namespace Gekko
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
-                
+
                 string residualName = "residual___";
-                int funcCounter = 0;                
+                int funcCounter = 0;
                 DecompOperator operatorTemp = new DecompOperator(this.findOptions.decompOptions2.prtOptionLower);
 
                 //!!! a bit of a waste of time, but is probably not significantly slowing
@@ -244,7 +244,7 @@ namespace Gekko
                     double v = kvp.Value.GetDataSimple(this.findOptions.t0);
                     if (G.isNumericalError(v)) v = 0d;
                     else v = Math.Abs(v);
-                    max = Math.Max(v, max); 
+                    max = Math.Max(v, max);
                 }
 
                 foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
@@ -322,20 +322,20 @@ namespace Gekko
         }
 
         public void EquationBrowserSetButtons1(string eqName, List<string> firstList)
-        {           
-            
+        {
+
             this.windowEquationBrowserButtons.Children.Clear();
             this._buttons.Clear();
             TextBlock txt = new TextBlock();
             txt.Text = "Variables: ";
             txt.VerticalAlignment = VerticalAlignment.Center;
             this.windowEquationBrowserButtons.Children.Add(txt);
-            
+
             foreach (string s in firstList)
             {
                 if (s == "residual___") continue;
                 string ss5 = G.ReplaceTurtle(s);
-                
+
                 TextBlock tb = new TextBlock();
                 tb.Text = ss5;
                 ToggleButton b = new ToggleButton();
@@ -360,12 +360,12 @@ namespace Gekko
                 b.Checked += this.OnVariableButtonToggle;
                 b.Unchecked += this.OnVariableButtonUntoggle;
 
-                this.windowEquationBrowserButtons.Children.Add(b);                
+                this.windowEquationBrowserButtons.Children.Add(b);
                 _buttons.Add(ss5, b);
             }
 
-            
-        }       
+
+        }
     }
 
     public class EquationListItem
@@ -388,7 +388,7 @@ namespace Gekko
         public string Sub { get; set; }
 
         public string Dep { get; set; }
-        
+
         public string Lhs { get; set; }
 
         public string Per { get; set; }
@@ -422,8 +422,8 @@ namespace Gekko
         private readonly ItemHandler _itemHandler;
 
         public MainWindowViewModel()
-        {            
-            _itemHandler = Globals.itemHandler;            
+        {
+            _itemHandler = Globals.itemHandler;
         }
 
         public List<EquationListItem> Items

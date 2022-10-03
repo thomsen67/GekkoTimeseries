@@ -427,6 +427,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translate_2_4_to_3_0.cs" />
+    <Compile Include="WindowFind.xaml.cs">
+      <DependentUpon>WindowFind.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowTableViewer.xaml.cs">
       <DependentUpon>WindowTableViewer.xaml</DependentUpon>
     </Compile>
@@ -495,9 +498,6 @@
     </Compile>
     <Compile Include="WindowDecompSortEtc.xaml.cs">
       <DependentUpon>WindowDecompSortEtc.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WindowEquationBrowser.xaml.cs">
-      <DependentUpon>WindowEquationBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowIntellisense.xaml.cs">
       <DependentUpon>WindowIntellisense.xaml</DependentUpon>
@@ -617,7 +617,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WindowEquationBrowser.xaml">
+    <Page Include="WindowFind.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
