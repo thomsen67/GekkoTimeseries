@@ -749,11 +749,11 @@ namespace Gekko
         {
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, decompOptions2, this);
+                this.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, this);
             }
             else
             {
-                this.decompFind.Add(decompOptions2, EDecompFindNavigation.Decomp, this);
+                this.decompFind.AddChild(decompOptions2, EDecompFindNavigation.Decomp, this);
             }
 
             this.isInitializing = true; //so that radiobuttons etc do not fire right now

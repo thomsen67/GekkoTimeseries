@@ -1884,6 +1884,7 @@ namespace Gekko
                 }
                 else
                 {
+                    w.decompFind.SetWindow(w);
                     w.ShowDialog();
                     w.Close();  //probably superfluous
                     w = null;  //probably superfluous

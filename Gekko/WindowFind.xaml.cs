@@ -34,15 +34,14 @@ namespace Gekko
         //public DecompOptions2 decompOptions2 = null;
 
         public WindowFind(O.Find o)
-        {
-            //WHY NEW OBJECT?
+        {            
             if (this.decompFind == null)
             {
-                this.decompFind = new DecompFind(EDecompFindNavigation.Find, -12345, o.decompFind.GetDecompOptions(), this);
+                this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, o.decompFind.GetDecompOptions(), this);
             }
             else
             {
-                this.decompFind.Add(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find, this);
+                this.decompFind.AddChild(o.decompFind.GetDecompOptions(), EDecompFindNavigation.Find, this);
             }
 
             //HACKY:
@@ -147,7 +146,9 @@ namespace Gekko
             d.endo = new List<IVariable>() { endo };
             d.name = new ScalarString(eqName);
 
-            d.decompFind = this.decompFind;
+            //d.decompFind = this.decompFind;
+            d.decompFind = this.decompFind.AddChild(this.decompFind.decompOptions2.Clone(), EDecompFindNavigation.Decomp, null);
+
             d.decompFind.GetDecompOptions().code.Add("decomp3 " + varName + " from " + eqName + " endo " + varName);
 
             d.Exe();

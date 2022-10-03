@@ -184,14 +184,17 @@ namespace Gekko
             this.window = window;  //either WindowDecomp or WindowFind
         }
 
-        public void Add(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
+        public DecompFind AddChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
         {
-            this.children.Add(new DecompFind(type, -12345, decompOptions2, window));
+            DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window);
+            child.parent = this;
+            this.children.Add(child);
+            return child;
         }
 
         public void SetWindow(object window)
         {
-            //TODO
+            this.window = window;
         }
 
         public DecompOptions2 GetDecompOptions()
@@ -200,14 +203,8 @@ namespace Gekko
         }
 
         public int GetDepth()
-        {
-            DecompFind parent = this;
-            for (int i = 0; i < int.MaxValue; i++)
-            {
-                parent = parent.parent;
-                if (parent == null) return i;
-            }
-            return -12345;
+        {            
+            return this.depth;
         }
     }
 

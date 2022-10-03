@@ -8054,17 +8054,17 @@ namespace Gekko
             {
             }
 
-            public Find(DecompFind opt)
+            public Find(DecompFind df)
             {
-                //called from DECOMP
-                this.decompFind = opt;
+                //called from DECOMP                
+                this.decompFind = df.AddChild(df.decompOptions2.Clone(), EDecompFindNavigation.Find, null);
             }
 
             public void Exe()
             {
                 if (this.decompFind == null)
                 {
-                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, -12345, new DecompOptions2(), null);
+                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null);
                     this.decompFind.GetDecompOptions().t1 = this.t1;
                     this.decompFind.GetDecompOptions().t2 = this.t2;
                     if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank
