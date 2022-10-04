@@ -2367,16 +2367,13 @@ namespace Gekko
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
-            DecompFind dfPreviousFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
-            if (dfPreviousFind == null) return;
-            DecompFind dfPreviousDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
-            if (dfPreviousDecomp == null) return;
-            WindowFind windowFind = dfPreviousFind.window as WindowFind;
-            WindowDecomp windowDecomp = dfPreviousDecomp.window as WindowDecomp;
-
-            string codeNew = this.decompFind.GetDecompOptions().code;
-            string codeOld = dfPreviousDecomp.GetDecompOptions().code;
-
+            DecompFind dfFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
+            if (dfFind == null) return;
+            DecompFind dfDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
+            if (dfDecomp == null) return;
+            WindowFind windowFind = dfFind.window as WindowFind;
+            WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
+            
             if (windowFind != null) windowFind.Close();
             this.Close();
 
@@ -2392,16 +2389,18 @@ namespace Gekko
 
             List<string> thisFrom = this.decompFind.GetDecompOptions().new_from;
             List<string> thisEndo = this.decompFind.GetDecompOptions().new_endo;
-            dfPreviousDecomp.GetDecompOptions().new_from.AddRange(thisFrom);
-            dfPreviousDecomp.GetDecompOptions().new_endo.AddRange(thisEndo);
+            dfDecomp.GetDecompOptions().new_from.AddRange(thisFrom);
+            dfDecomp.GetDecompOptions().new_endo.AddRange(thisEndo);
             //
             //
             // HACK HACK HACK --> move .decompDatas inside .decompFind maybe
             //
             //
-            windowDecomp.decompDatas = new DecompDatas();  //hmmm
-            Decomp.DecompGetFuncExpressionsAndRecalc(dfPreviousDecomp, windowDecomp);
-
+            windowDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
+            List<string> select = this.decompFind.GetDecompOptions().new_select;
+            string code = "decomp3 " + Stringlist.GetListWithCommas(select) + " from " + Stringlist.GetListWithCommas(thisFrom) + " endo " + Stringlist.GetListWithCommas(thisEndo) + ";";
+            dfDecomp.GetDecompOptions().code = code;
+            Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
         }
     }
 

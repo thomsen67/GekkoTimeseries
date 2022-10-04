@@ -146,7 +146,7 @@ namespace Gekko
             //d.decompFind = this.decompFind;
             decomp.decompFind = this.decompFind.CreateChild(this.decompFind.GetDecompOptions().Clone(), EDecompFindNavigation.Decomp, null);
 
-            decomp.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName;
+            decomp.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName + ";";
 
             decomp.Exe();
         }
