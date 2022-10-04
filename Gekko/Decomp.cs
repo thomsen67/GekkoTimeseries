@@ -4101,22 +4101,40 @@ namespace Gekko
             int lineCounter = 0;
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.dependents[pav];
+
+            List<EqHelper> eqs = new List<EqHelper>();
             foreach (int eqNumber in eqNumbers)
             {
-
                 string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
-                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
+                EqHelper e = new EqHelper();
+                e.eqName = eqName;
+                e.eqName3 = eqName3;
+                e.eqNumber = eqNumber;
+                eqs.Add(e);
+            }
+
+            foreach (EqHelper helper in eqs)
+            {
+                
+
+            }
+
+            foreach (EqHelper helper in eqs)
+            {
+                string eqName = helper.eqName;
+                string eqName3 = helper.eqName3;
+
+                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
 
                 string bool1 = "";
                 string bool2 = "";
                 bool1 = Globals.protectSymbol;
                 bool2 = Globals.protectSymbol;
 
-                string tt = "tx0";
+                string tt = "tx0";                
 
-                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
-
-                Globals.itemHandler.Add(new EquationListItem(eqName3, counter2 + " of " + 17, bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 3, eqName));
+                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 3, eqName));
                 lineCounter++;
 
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];

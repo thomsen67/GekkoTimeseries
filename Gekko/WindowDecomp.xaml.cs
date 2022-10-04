@@ -2381,9 +2381,7 @@ namespace Gekko
             string txt = "  Merged";
             windowDecomp.textSelect.Text = txt;
             //blink message a bit, and then remove
-            Program.DelayAction(1000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));            
-            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;

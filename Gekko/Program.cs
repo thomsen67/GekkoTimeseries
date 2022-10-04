@@ -1176,9 +1176,17 @@ namespace Gekko
         }
     }
 
-    /// <summary>
-    /// Simple helper class, obsolete??
-    /// </summary>
+    public class EqHelper
+    {
+        public string eqName = null;
+        public string eqName3 = null;
+        public int eqNumber = -12345;
+        public bool best = false;
+    }
+
+        /// <summary>
+        /// Simple helper class, obsolete??
+        /// </summary>
     public class TwoStrings
     {
         public string s1 = null;
