@@ -170,7 +170,13 @@ namespace Gekko
             }
             string s2 = sb2.ToString();
 
-            ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
+            //
+            //
+            // TODO: get this list from DECOMP3<options>
+            //       probably it should be put inside the model object.
+            //
+            //
+            
             StringBuilder sb1 = new StringBuilder();
             if (false)
             {
@@ -179,7 +185,7 @@ namespace Gekko
             foreach (string eqName in eqNames)
             {
                 int count2 = 0;
-                List<ModelGamsEquation> temp = null; g.equationsByEqname.TryGetValue(eqName, out temp);
+                List<ModelGamsEquation> temp = null; Program.model.modelGamsScalar.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
                 if (temp == null) continue;
                 foreach (ModelGamsEquation eq in temp)
                 {
@@ -701,6 +707,9 @@ namespace Gekko
         /// </summary>
         [ProtoMember(27)]
         public List<ModelScalarEquation> precedents = null;
+
+        [ProtoMember(28)]
+        public ModelGams modelGams = null;
 
         // =============================================
         // =============================================

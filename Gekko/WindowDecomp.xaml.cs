@@ -2402,6 +2402,7 @@ namespace Gekko
             string code = s2 + " from " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_endo) + ";";
             dfDecomp.decompOptions2.code = code;
             windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
+            Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
         }        
     }
 

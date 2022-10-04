@@ -917,6 +917,11 @@ namespace Gekko
                 }
             }
 
+            IVariable nestedListOfDependents_opt_dep = null;
+            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
+            GekkoDictionary<string, string> dependents = tup.Item1;
+            ModelGams g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);            
+
             if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
 
             dt1 = DateTime.Now;
@@ -924,6 +929,8 @@ namespace Gekko
             {
                 Program.model = new Model();
                 Program.model.modelGamsScalar = new ModelGamsScalar();
+                // -----
+                Program.model.modelGamsScalar.modelGams = g;
                 // -------------- these can evaluate an equation ---------
                 Program.model.modelGamsScalar.functions = functions;
                 Program.model.modelGamsScalar.a = a;
@@ -1398,7 +1405,7 @@ namespace Gekko
             Program.model = new Model();
             Program.model.modelGams = new ModelGams();
 
-            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
+            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
             string dependentsHash = tup.Item2.ToString();
             string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
@@ -1608,7 +1615,7 @@ namespace Gekko
 
                 if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
 
-                ReadGamsScalarModelEquations(input);                                  
+                ReadGamsScalarModelEquations(input);                
 
                 DateTime t1 = DateTime.Now;
 
@@ -2481,7 +2488,7 @@ namespace Gekko
             return eqs;
         }
 
-        private static Tuple<GekkoDictionary<string, string>, StringBuilder> GetDependentsGams(O.Model o)
+        public static Tuple<GekkoDictionary<string, string>, StringBuilder> GetDependentsGams(IVariable opt_dep)
         {
             GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             //hashHelper: will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
@@ -2491,7 +2498,7 @@ namespace Gekko
             hashHelper.AppendLine();
             hashHelper.AppendLine("--- dependents ---");
 
-            IVariable lhsList = o.opt_dep;
+            IVariable lhsList = opt_dep;
             if (lhsList != null)
             {
                 List lhsList_list = lhsList as List;
