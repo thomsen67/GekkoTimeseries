@@ -310,7 +310,7 @@ namespace Gekko
             DecompOptions2 decompOptions2 = null;
             if (o.decompFind != null)
             {
-                decompOptions2 = o.decompFind.GetDecompOptions();
+                decompOptions2 = o.decompFind.decompOptions2;
             }
             else
             {
@@ -1781,7 +1781,7 @@ namespace Gekko
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
         {
             bool createNewWindow = windowDecomp == null;
-            DecompOptions2 decompOptions = decompFind.GetDecompOptions();
+            DecompOptions2 decompOptions = decompFind.decompOptions2;
             if (decompOptions.modelType == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
@@ -4085,7 +4085,7 @@ namespace Gekko
 
             Globals.itemHandler = new ItemHandler();  //hack
 
-            o.t0 = o.decompFind.GetDecompOptions().t1;  //selected time
+            o.t0 = o.decompFind.decompOptions2.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
@@ -4105,7 +4105,7 @@ namespace Gekko
             {
 
                 string eqName = Program.model.modelGamsScalar.GetEqName(eqNumber);
-                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompFind.GetDecompOptions().showTime, o.t0);
+                List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
 
                 string bool1 = "";
                 string bool2 = "";
@@ -4123,7 +4123,7 @@ namespace Gekko
 
                 if (firstText == null)
                 {
-                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompFind.GetDecompOptions().showTime, o.t0);
+                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
                     firstText = equationText;
                     firstEqName = eqName;
                     firstList.AddRange(precedents);
@@ -4141,7 +4141,7 @@ namespace Gekko
             windowFind._activeEquation = firstEqName;
             windowFind._activeVariable = null;
 
-            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.GetDecompOptions().showTime, o.t0);
+            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0);
             windowFind.decompFind.SetWindow(windowFind);
             
             bool? b = windowFind.ShowDialog();

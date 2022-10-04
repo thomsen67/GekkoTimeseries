@@ -8057,7 +8057,7 @@ namespace Gekko
             public Find(DecompFind df)
             {
                 //called from DECOMP                
-                this.decompFind = df.CreateChild(df.GetDecompOptions().Clone(), EDecompFindNavigation.Find, null);
+                this.decompFind = df.CreateChild(df.decompOptions2.Clone(), EDecompFindNavigation.Find, null);
             }
 
             public void Exe()
@@ -8065,14 +8065,14 @@ namespace Gekko
                 if (this.decompFind == null)
                 {
                     this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null);
-                    this.decompFind.GetDecompOptions().t1 = this.t1;
-                    this.decompFind.GetDecompOptions().t2 = this.t2;
-                    if (this.opt_prtcode == null) this.decompFind.GetDecompOptions().prtOptionLower = "d";  //does not use a Ref bank
-                    else this.decompFind.GetDecompOptions().prtOptionLower = this.opt_prtcode.ToLower();
-                    this.decompFind.GetDecompOptions().modelType = G.GetModelType();
-                    this.decompFind.GetDecompOptions().decompTablesFormat.showErrors = true; //
+                    this.decompFind.decompOptions2.t1 = this.t1;
+                    this.decompFind.decompOptions2.t2 = this.t2;
+                    if (this.opt_prtcode == null) this.decompFind.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
+                    else this.decompFind.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
+                    this.decompFind.decompOptions2.modelType = G.GetModelType();
+                    this.decompFind.decompOptions2.decompTablesFormat.showErrors = true; //
                 }                                
-                G.CheckLegalPeriod(this.decompFind.GetDecompOptions().t1, this.decompFind.GetDecompOptions().t2);
+                G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);
                 this.rv = Program.Find(this);
             }
         }

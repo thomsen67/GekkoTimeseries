@@ -171,7 +171,7 @@ namespace Gekko
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
-        private DecompOptions2 decompOptions2 = null;
+        public DecompOptions2 decompOptions2 = null;
         public object window = null;
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
@@ -204,12 +204,7 @@ namespace Gekko
                 if (w2 != null) s += w2.decompFind.depth + " find depth ";
                 MessageBox.Show("LKJlkj   " + s);
             }
-        }
-
-        public DecompOptions2 GetDecompOptions()
-        {
-            return this.decompOptions2;
-        }        
+        }     
 
         /// <summary>
         /// Finds parent window by type. May return null.
