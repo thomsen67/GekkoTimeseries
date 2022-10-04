@@ -2371,28 +2371,46 @@ namespace Gekko
             if (dfPreviousFind == null) return;
             DecompFind dfPreviousDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
             if (dfPreviousDecomp == null) return;
-            WindowFind find = dfPreviousFind.window as WindowFind;
-            WindowDecomp decomp = dfPreviousDecomp.window as WindowDecomp;
+            WindowFind windowFind = dfPreviousFind.window as WindowFind;
+            WindowDecomp windowDecomp = dfPreviousDecomp.window as WindowDecomp;
 
-            string codeNew = this.decompFind.decompOptions2.code;
-            string codeOld = dfPreviousDecomp.decompOptions2.code;
+            string codeNew = this.decompFind.GetDecompOptions().code;
+            string codeOld = dfPreviousDecomp.GetDecompOptions().code;
 
-            if (find != null) find.Close();
+            if (windowFind != null) windowFind.Close();
             this.Close();
 
+            windowDecomp.Focus();
             string txt = "  Merged";
-            decomp.textSelect.Text = txt;
-            //decomp.textSelect.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(100, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));            
-            decomp.Focus();
-            //removes the gray "merge" text after 3 seconds
-            Program.DelayAction(1000, new Action(() => { try { decomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(2000, new Action(() => { try { decomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(4000, new Action(() => { try { decomp.textSelect.Text = ""; } catch { } }));
+            windowDecomp.textSelect.Text = txt;
+            //blink message a bit
+            Program.DelayAction(750, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(4000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
-            //decomp.buttonSelect.BorderThickness = new Thickness(0, 0, 0, 0);
-            //decomp.buttonSelect.IsEnabled = false;
-            //decomp.buttonSelect.Visibility = Visibility.Visible;
+            //string eqName = G.Chop_DimensionRemoveLast(item.fullName);
+            //Globals.selectedEquation = eqName;
+            //O.Decomp2 decomp = new O.Decomp2();
+            //decomp.opt_prtcode = this.decompFind.GetDecompOptions().prtOptionLower;
+            //decomp.t1 = this.decompFind.GetDecompOptions().t1;
+            //decomp.t2 = this.decompFind.GetDecompOptions().t2;
+            //string varName = this.decompFind.GetDecompOptions().iv.list[0].ConvertToString();
 
+            //List select = new List(new List<string>() { varName });
+            //decomp.select = new List<IVariable>() { select };
+            //List from = new List(new List<string>() { eqName });
+            //decomp.from = new List<IVariable>() { from };
+            //List endo = new List(new List<string>() { varName });
+            //decomp.endo = new List<IVariable>() { endo };
+            //decomp.name = new ScalarString(eqName);
+
+            //decomp.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName;
+
+            //decomp.Exe();
+
+            Decomp.DecompGetFuncExpressionsAndRecalc(dfPreviousDecomp, windowDecomp);
+            //DecompOptions2 decompOptions2 = windowDecomp.decompFind.GetDecompOptions();
+            //windowDecomp.RecalcCellsWithNewType(true);
 
         }
     }

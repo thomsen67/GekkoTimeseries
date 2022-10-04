@@ -426,7 +426,7 @@ namespace Gekko
 
             if (true)
             {
-                Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind);
+                Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
             }
             else
             {
@@ -1774,19 +1774,20 @@ namespace Gekko
         /// <summary>
         /// Kind of an entry point for decomposition, also called when buttons are clicked etc.
         /// For a GAMS model, this calls DecompEvalGams(), and for a Gekko model, this calls 
-        /// DecompEvalGekko().
+        /// DecompEvalGekko(). Opens up a new window, unless windowDecomp != null. If windowDecomp is used,
+        /// make sure that decompFind corresponds to the windowDecomp window (perhaps taken as windowDecomp.decompFind).
         /// </summary>
         /// <param name="o"></param>
-        public static void DecompGetFuncExpressionsAndRecalc(DecompFind o)
+        public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
         {
-            DecompFind df = (DecompFind)o;
-            DecompOptions2 decompOptions = df.decompOptions2;
+            bool createNewWindow = windowDecomp == null;
+            DecompOptions2 decompOptions = decompFind.GetDecompOptions();
             if (decompOptions.modelType == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
-            WindowDecomp windowDecomp = null;
-            windowDecomp = new WindowDecomp(df);
+
+            if (createNewWindow) windowDecomp = new WindowDecomp(decompFind);
             Globals.windowsDecomp2.Add(windowDecomp);            
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
@@ -1859,49 +1860,56 @@ namespace Gekko
                 else new Error("Model type error");
             }
             //G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
-
-            if (decompOptions.name == null)
+            
+            if (createNewWindow)
             {
-                windowDecomp.Title = "Decompose expression";
-            }
-            else
-            {
-                windowDecomp.Title = "Decompose " + decompOptions.variable + "";
-            }
-            windowDecomp.Tag = decompOptions;
-
-            windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-            windowDecomp.SetRadioButtons();
-            windowDecomp.isInitializing = false;
-
-            windowDecomp.RecalcCellsWithNewType(true);
-            decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
-
-            if (G.IsUnitTesting() && Globals.showDecompTable == false)
-            {
-                Globals.windowsDecomp2.Clear();
-                windowDecomp = null;
-            }
-            else
-            {
-                if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
+                if (decompOptions.name == null)
                 {
-                    //The line below removes the window from the global list of active windows.
-                    //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                    if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                    windowDecomp.Title = "Decompose expression";
                 }
                 else
                 {
-                    windowDecomp.decompFind.SetWindow(windowDecomp);
-                    windowDecomp.ShowDialog();
-                    windowDecomp.Close();  //probably superfluous
-                    windowDecomp = null;  //probably superfluous
-                    if (Globals.showDecompTable)
+                    windowDecomp.Title = "Decompose " + decompOptions.variable + "";
+                }
+                windowDecomp.Tag = decompOptions;
+
+                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                windowDecomp.SetRadioButtons();
+                windowDecomp.isInitializing = false;
+
+                windowDecomp.RecalcCellsWithNewType(true);
+                decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
+
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                {
+                    Globals.windowsDecomp2.Clear();
+                    windowDecomp = null;
+                }
+                else
+                {
+                    if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
                     {
-                        Globals.showDecompTable = false;
-                        new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                        //The line below removes the window from the global list of active windows.
+                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                    }
+                    else
+                    {
+                        windowDecomp.decompFind.SetWindow(windowDecomp);
+                        windowDecomp.ShowDialog();
+                        windowDecomp.Close();  //probably superfluous
+                        windowDecomp = null;  //probably superfluous
+                        if (Globals.showDecompTable)
+                        {
+                            Globals.showDecompTable = false;
+                            new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                        }
                     }
                 }
+            }
+            else
+            {
+                windowDecomp.RecalcCellsWithNewType(true);
             }
         }
 

@@ -8057,7 +8057,7 @@ namespace Gekko
             public Find(DecompFind df)
             {
                 //called from DECOMP                
-                this.decompFind = df.CreateChild(df.decompOptions2.Clone(), EDecompFindNavigation.Find, null);
+                this.decompFind = df.CreateChild(df.GetDecompOptions().Clone(), EDecompFindNavigation.Find, null);
             }
 
             public void Exe()

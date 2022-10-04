@@ -171,7 +171,7 @@ namespace Gekko
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
-        public DecompOptions2 decompOptions2 = null;
+        private DecompOptions2 decompOptions2 = null;
         public object window = null;
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
@@ -28783,7 +28783,6 @@ namespace Gekko
                 action.Invoke();
                 timer.Stop();
             };
-
             timer.Interval = TimeSpan.FromMilliseconds(millisecond);
             timer.Start();
         }

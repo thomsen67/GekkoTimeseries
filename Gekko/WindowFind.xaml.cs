@@ -129,26 +129,26 @@ namespace Gekko
             
             string eqName = G.Chop_DimensionRemoveLast(item.fullName);
             Globals.selectedEquation = eqName;
-            O.Decomp2 d = new O.Decomp2();
-            d.opt_prtcode = this.decompFind.GetDecompOptions().prtOptionLower;
-            d.t1 = this.decompFind.GetDecompOptions().t1;
-            d.t2 = this.decompFind.GetDecompOptions().t2;
+            O.Decomp2 decomp = new O.Decomp2();
+            decomp.opt_prtcode = this.decompFind.GetDecompOptions().prtOptionLower;
+            decomp.t1 = this.decompFind.GetDecompOptions().t1;
+            decomp.t2 = this.decompFind.GetDecompOptions().t2;
             string varName = this.decompFind.GetDecompOptions().iv.list[0].ConvertToString();
 
             List select = new List(new List<string>() { varName });
-            d.select = new List<IVariable>() { select };
+            decomp.select = new List<IVariable>() { select };
             List from = new List(new List<string>() { eqName });
-            d.from = new List<IVariable>() { from };
+            decomp.from = new List<IVariable>() { from };
             List endo = new List(new List<string>() { varName });
-            d.endo = new List<IVariable>() { endo };
-            d.name = new ScalarString(eqName);
+            decomp.endo = new List<IVariable>() { endo };
+            decomp.name = new ScalarString(eqName);
 
             //d.decompFind = this.decompFind;
-            d.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(), EDecompFindNavigation.Decomp, null);
+            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.GetDecompOptions().Clone(), EDecompFindNavigation.Decomp, null);
 
-            d.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName;
+            decomp.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName;
 
-            d.Exe();
+            decomp.Exe();
         }
 
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
