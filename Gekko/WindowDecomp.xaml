@@ -113,13 +113,18 @@
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
-            <Button  Grid.Row="0" Grid.Column="1"  Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50" HorizontalAlignment="Left" Opacity="0.8" Content="Merge" Click="ButtonSelect_Click">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
+                <Button Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50"  Opacity="0.8" Content="Merge" Click="ButtonSelect_Click"  Height="22" Margin="11,0,0,0" VerticalAlignment="Top">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <TextBox Name="textSelect" VerticalAlignment="Center" BorderThickness="0,0,0,0" Foreground="Gray">
+                </TextBox>
+            </StackPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="3">
                 <Border BorderThickness="3,3,0,0" BorderBrush="LightGray"  CornerRadius="10,0,0,0">
@@ -336,7 +341,7 @@
             <CheckBox Grid.Column="11" Grid.Row="1" Name="checkBox2" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options, code 'r', 'rd', 'rp', etc.)" Content="Ref databank values" Margin="0,3,6.333,3"></CheckBox>
 
             <TextBlock Grid.Column="11" Grid.Row="3" Name="textBlock2" Text="Decimals:" Margin="17.25,21.722,62.75,0.278" Grid.RowSpan="2" ToolTip="Change number of decimals" />
-            
+
             <Button Grid.Column="11" Grid.Row="4" Margin="73.542,1.625,0,1.875" Name="button2" ToolTip="More decimals" Click="button2_Click" FontSize="10" AllowDrop="False" HorizontalAlignment="Left" Width="18.875" Opacity="0.7">.00</Button>
             <Button Grid.Column="11" Grid.Row="4" HorizontalAlignment="Right" Margin="0,1.625,19.125,1.875" Name="button3" Width="18" ToolTip="Fewer decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
             <Button Name="button1" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Height="22" Opacity="0.8" Content="Refresh">
@@ -346,7 +351,7 @@
                     </Style>
                 </Button.Resources>
             </Button>
-            
+
 
         </Grid>
 
@@ -401,8 +406,8 @@
                             <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
                         </ScrollViewer>
                     </TabItem>
-                </TabControl>                
-                
+                </TabControl>
+
             </Grid>
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
             <ListView Grid.Column="2" Name="listView" HorizontalAlignment="Left" 

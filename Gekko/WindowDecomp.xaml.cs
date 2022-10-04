@@ -761,7 +761,7 @@ namespace Gekko
             this.isInitializing = false;  //ready for clicking
             
             this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
-            if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Hidden;
+            if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Collapsed;
 
             DataContext = new ViewModel();  //MVVM style
 
@@ -2368,15 +2368,32 @@ namespace Gekko
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
             DecompFind dfPreviousFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
+            if (dfPreviousFind == null) return;
             DecompFind dfPreviousDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
+            if (dfPreviousDecomp == null) return;
             WindowFind find = dfPreviousFind.window as WindowFind;
+            WindowDecomp decomp = dfPreviousDecomp.window as WindowDecomp;
 
-            List<string> codeNew = this.decompFind.decompOptions2.code;
-            List<string> codeOld = dfPreviousDecomp.decompOptions2.code;
+            string codeNew = this.decompFind.decompOptions2.code;
+            string codeOld = dfPreviousDecomp.decompOptions2.code;
 
             if (find != null) find.Close();
             this.Close();
-            
+
+            string txt = "  Merged";
+            decomp.textSelect.Text = txt;
+            //decomp.textSelect.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(100, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));            
+            decomp.Focus();
+            //removes the gray "merge" text after 3 seconds
+            Program.DelayAction(1000, new Action(() => { try { decomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(2000, new Action(() => { try { decomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(4000, new Action(() => { try { decomp.textSelect.Text = ""; } catch { } }));
+
+            //decomp.buttonSelect.BorderThickness = new Thickness(0, 0, 0, 0);
+            //decomp.buttonSelect.IsEnabled = false;
+            //decomp.buttonSelect.Visibility = Visibility.Visible;
+
+
         }
     }
 
@@ -2440,7 +2457,7 @@ namespace Gekko
         public EModelType modelType = EModelType.Unknown;
         public bool missingAsZero = false;
         public bool showTime = false;
-        public List<string> code = new List<string>();
+        public string code = null;
 
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
@@ -2528,8 +2545,7 @@ namespace Gekko
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
 
-            d.code = new List<string>();
-            foreach (string s in this.code) d.code.Add(s);
+            d.code = this.code;
 
             d.modelType = this.modelType;
             

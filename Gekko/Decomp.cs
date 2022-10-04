@@ -315,7 +315,7 @@ namespace Gekko
             else
             {
                 decompOptions2 = new DecompOptions2();
-                decompOptions2.code = new List<string>() { o.label + ";" };
+                decompOptions2.code = o.label + ";";
                 decompOptions2.modelType = G.GetModelType();
                 decompOptions2.decompTablesFormat.showErrors = true; //
                 decompOptions2.t1 = o.t1;

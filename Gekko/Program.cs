@@ -209,8 +209,13 @@ namespace Gekko
         public DecompOptions2 GetDecompOptions()
         {
             return this.decompOptions2;
-        }
+        }        
 
+        /// <summary>
+        /// Finds parent window by type. May return null.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public DecompFind SearchUpwards(EDecompFindNavigation type)
         {
             DecompFind parent = this.parent;
@@ -28763,6 +28768,24 @@ namespace Gekko
                 if (varlistDublets.Count == 0) compareFile.WriteLine("<none>");
                 compareFile.Flush();
             }
+        }
+
+        /// <summary>
+        /// Fires an action after x milliseconds.
+        /// </summary>
+        /// <param name="millisecond"></param>
+        /// <param name="action"></param>
+        public static void DelayAction(int millisecond, Action action)
+        {
+            var timer = new System.Windows.Threading.DispatcherTimer();
+            timer.Tick += delegate
+            {
+                action.Invoke();
+                timer.Stop();
+            };
+
+            timer.Interval = TimeSpan.FromMilliseconds(millisecond);
+            timer.Start();
         }
 
         /// <summary>
