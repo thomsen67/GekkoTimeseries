@@ -1671,7 +1671,7 @@ namespace Gekko
                                 //string var7 = vars[0];  //#dskla8asjkdfa                                
                                 string var7 = HiddenVariableHelper(c2);
                                 List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
-                                string txt = Stringlist.ExtractTextFromLines(ss).ToString();
+                                string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                 this.equation.Text = txt;
                             }
                         }
@@ -1785,7 +1785,7 @@ namespace Gekko
                     s = Model.GetEquationTextFoldedNonScalar(this.decompFind.decompOptions2.modelType, this.decompFind.decompOptions2.link);
                 }
                 this.equation.Text = s;
-                this.code.Text = this.decompFind.decompOptions2.code.Last() + G.NL + G.Blanks(200);  //blanks hack, also used elsewhere
+                this.code.Text = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
 
                 //
                 // NOTE:
@@ -2373,18 +2373,16 @@ namespace Gekko
             if (dfDecomp == null) return;
             WindowFind windowFind = dfFind.window as WindowFind;
             WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
-            
+
             if (windowFind != null) windowFind.Close();
             this.Close();
 
             windowDecomp.Focus();
             string txt = "  Merged";
             windowDecomp.textSelect.Text = txt;
-            //blink message a bit
+            //blink message a bit, and then remove
             Program.DelayAction(1000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(1200, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(2200, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));            
             Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
@@ -2398,11 +2396,13 @@ namespace Gekko
             //
             windowDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
             List<string> select = this.decompFind.decompOptions2.new_select;
-            string code = "decomp3 " + Stringlist.GetListWithCommas(select) + " from " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_endo) + ";";
+            string oldCode = dfDecomp.decompOptions2.code;
+            int i = oldCode.IndexOf(" from ", StringComparison.OrdinalIgnoreCase);
+            string s2 = G.Substring(oldCode, 0, i - 1).Trim();
+            string code = s2 + " from " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_endo) + ";";
             dfDecomp.decompOptions2.code = code;
-            windowDecomp.code.Text = dfDecomp.decompOptions2.code;            
-            Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
-        }
+            windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
+        }        
     }
 
     public class GekkoDockPanel2 : DockPanel

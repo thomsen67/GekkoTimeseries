@@ -14409,11 +14409,9 @@ namespace Gekko
                 }
                 G.Writeln();
             }
-
-            //List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
+            
             List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex);
-
-
+            
             if (G.IsUnitTesting())
             {
                 Globals.unitTestDependents = new List<string>();
@@ -23399,7 +23397,10 @@ namespace Gekko
             }
         }
 
-
+        public static string SetBlanks()
+        {
+            return G.NL + G.Blanks(200);
+        }
 
 
         private static int PrintPrettify(O.Prt o, Table tab, int numberOfLabelsLinesMax, bool transpose, int maxLabelsLinesFound, bool identicalCodes, string oneOperatorLabel, int virtualRowsStart, int virtualRowsMaxSeen)
