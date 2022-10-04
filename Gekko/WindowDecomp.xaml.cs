@@ -2384,33 +2384,23 @@ namespace Gekko
             string txt = "  Merged";
             windowDecomp.textSelect.Text = txt;
             //blink message a bit
-            Program.DelayAction(750, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(4000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(1000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(1200, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(2200, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
-            //string eqName = G.Chop_DimensionRemoveLast(item.fullName);
-            //Globals.selectedEquation = eqName;
-            //O.Decomp2 decomp = new O.Decomp2();
-            //decomp.opt_prtcode = this.decompFind.GetDecompOptions().prtOptionLower;
-            //decomp.t1 = this.decompFind.GetDecompOptions().t1;
-            //decomp.t2 = this.decompFind.GetDecompOptions().t2;
-            //string varName = this.decompFind.GetDecompOptions().iv.list[0].ConvertToString();
-
-            //List select = new List(new List<string>() { varName });
-            //decomp.select = new List<IVariable>() { select };
-            //List from = new List(new List<string>() { eqName });
-            //decomp.from = new List<IVariable>() { from };
-            //List endo = new List(new List<string>() { varName });
-            //decomp.endo = new List<IVariable>() { endo };
-            //decomp.name = new ScalarString(eqName);
-
-            //decomp.decompFind.GetDecompOptions().code = "decomp3 " + varName + " from " + eqName + " endo " + varName;
-
-            //decomp.Exe();
-
+            List<string> thisFrom = this.decompFind.GetDecompOptions().new_from;
+            List<string> thisEndo = this.decompFind.GetDecompOptions().new_endo;
+            dfPreviousDecomp.GetDecompOptions().new_from.AddRange(thisFrom);
+            dfPreviousDecomp.GetDecompOptions().new_endo.AddRange(thisEndo);
+            //
+            //
+            // HACK HACK HACK --> move .decompDatas inside .decompFind maybe
+            //
+            //
+            windowDecomp.decompDatas = new DecompDatas();  //hmmm
             Decomp.DecompGetFuncExpressionsAndRecalc(dfPreviousDecomp, windowDecomp);
-            //DecompOptions2 decompOptions2 = windowDecomp.decompFind.GetDecompOptions();
-            //windowDecomp.RecalcCellsWithNewType(true);
 
         }
     }
