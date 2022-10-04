@@ -4141,7 +4141,7 @@ namespace Gekko
 
                 if (firstText == null)
                 {
-                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+                    string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
                     firstText = equationText;
                     firstEqName = eqName;
                     firstList.AddRange(precedents);
