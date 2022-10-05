@@ -391,6 +391,7 @@ namespace Gekko
             }
 
             this.decompFind.decompOptions2.freeFilter.Clear();
+            this.decompFind.decompOptions2.free.Clear();
             foreach (string s in this.decompFind.decompOptions2.all)
             {
                 if (s == "value") continue;
@@ -415,20 +416,6 @@ namespace Gekko
                 {
                     this.decompFind.decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
                 }
-            }
-
-            this.decompFind.decompOptions2.free.Clear();
-            foreach (string s in this.decompFind.decompOptions2.all)
-            {
-                if (s == "value") continue;
-                if (s == "valueAlternative") continue;
-                if (s == "valueLevel") continue;
-                if (s == "valueLevelLag") continue;
-                if (s == "valueLevelLag2") continue;
-                if (s == "valueLevelRef") continue;
-                if (s == "valueLevelRefLag") continue;
-                if (s == "valueLevelRefLag2") continue;
-                if (s == "fullVariableName") continue;                
 
                 if (this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
                 {
@@ -438,8 +425,7 @@ namespace Gekko
                 {
                     this.decompFind.decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
                 }
-            }
-
+            }            
 
             //if (taskType == TaskType.Filters)
             //{
