@@ -4133,12 +4133,11 @@ namespace Gekko
                 bool1 = Globals.protectSymbol;
                 bool2 = Globals.protectSymbol;
 
-                string tt = "tx0";                
+                string tt = "tx0";
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 1, eqName));
+                int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
+                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == selectedRow, eqName));
                 
-                //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-
                 if (firstText == null)
                 {
                     string equationText = Program.model.modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);

@@ -43,20 +43,17 @@ namespace Gekko
             if (this.decompFind.decompOptions2.t2.IsNull()) this.decompFind.decompOptions2.t2 = o.t2;
             this.decompFind.decompOptions2.iv = o.iv;
             if (o.opt_prtcode != null) this.decompFind.decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
-
-            //this.findOptions = o;
+                        
             InitializeComponent();
-            this.windowEquationBrowserListView.SelectedIndex = 0;
-            //object oo = this.windowEquationBrowserListView.Items;
-
-            //object oo = this.windowEquationBrowserListView.ItemContainerGenerator.ContainerFromIndex(0);
-            //ListViewItem listViewItem = this.windowEquationBrowserListView.ItemContainerGenerator.ContainerFromIndex(0) as ListViewItem;
-
-            //listViewItem.Focus();
-
-
-            //this.windowEquationBrowserListView.MoveFocus;
             this.windowEquationBrowserListView.Focus();
+            //
+            //
+            // HMMM, very difficult to get the first line in focus, even if it is selected in wpf (cf. #jk8dsfa7yauewfh)
+            //
+            //
+            //this.windowEquationBrowserListView.ScrollIntoView(this.windowEquationBrowserListView.Items[0]);
+            //this.windowEquationBrowserListView.SelectedIndex = 0;            
+
         }
 
         public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
@@ -400,7 +397,7 @@ namespace Gekko
             Per = per;
             Vars = vars;
             LineColor = lineColor;
-            isSelected = isSelected;
+            IsSelected = isSelected;
             fullName = fullName2;
         }
 
