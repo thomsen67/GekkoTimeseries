@@ -856,6 +856,7 @@ namespace Gekko
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
 
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
+        public static int decompFontSize = 13;
         public static System.Windows.Media.SolidColorBrush decompSolidColorBrush = new System.Windows.Media.SolidColorBrush(Globals.GrayExcelLine);
 
         public static double missingVariableZero = 0d;

@@ -513,7 +513,7 @@ namespace Gekko
                 if (leftAlign) textBlock.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
                 textBlock.FontFamily = Globals.decompFontFamily;
-                textBlock.FontSize = 13d;
+                textBlock.FontSize = Globals.decompFontSize;
                 textBlock.Padding = new Thickness(2, 2, 4, 3);
 
                 dockPanel.type = type;
