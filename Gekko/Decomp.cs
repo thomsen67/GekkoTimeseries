@@ -3195,7 +3195,7 @@ namespace Gekko
             for (int i = 0; i < rownames3.Count; i++)
             {
                 bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]);
-                bool b2 = rownamesFirst == null && orderNormalize && rownames3[i].Contains(Globals.pivotHelper2);
+                bool b2 = rownamesFirst == null && orderNormalize && (rownames3[i] != null && rownames3[i].Contains(Globals.pivotHelper2));
                 if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
                 {
                     rownamesFirst = rownames3[i];
@@ -3210,7 +3210,7 @@ namespace Gekko
             for (int i = 0; i < colnames3.Count; i++)
             {
                 bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]);
-                bool b2 = colnamesFirst == null && orderNormalize && colnames3[i].Contains(Globals.pivotHelper2);
+                bool b2 = colnamesFirst == null && orderNormalize && (colnames3[i] != null && colnames3[i].Contains(Globals.pivotHelper2));
                 if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
                 {
                     colnamesFirst = colnames3[i];
@@ -3409,7 +3409,7 @@ namespace Gekko
                 string s = rownames[i];
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
                 }
                 tab.Set(i + 2, 1, s);
             }
@@ -3419,7 +3419,7 @@ namespace Gekko
                 string s = colnames[j];
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
                 }
                 tab.Set(1, j + 2, s);
             }
