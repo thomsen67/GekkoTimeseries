@@ -47,6 +47,15 @@ namespace Gekko
             //this.findOptions = o;
             InitializeComponent();
             this.windowEquationBrowserListView.SelectedIndex = 0;
+            //object oo = this.windowEquationBrowserListView.Items;
+
+            //object oo = this.windowEquationBrowserListView.ItemContainerGenerator.ContainerFromIndex(0);
+            //ListViewItem listViewItem = this.windowEquationBrowserListView.ItemContainerGenerator.ContainerFromIndex(0) as ListViewItem;
+
+            //listViewItem.Focus();
+
+
+            //this.windowEquationBrowserListView.MoveFocus;
             this.windowEquationBrowserListView.Focus();
         }
 
@@ -155,7 +164,6 @@ namespace Gekko
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
-
             this.windowFindStatusBar.Text = Globals.windowFindStatusBarText;
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;

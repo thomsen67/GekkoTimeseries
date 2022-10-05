@@ -2380,13 +2380,10 @@ namespace Gekko
             windowDecomp.Focus();
             string txt = "  Merged...";
             //blink message a bit, and then remove
-            //windowDecomp.textSelect.Text = txt;
-            Program.DelayAction(500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            //Program.DelayAction(3500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            //Program.DelayAction(4500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            windowDecomp.textSelect.Text = txt;
+            Program.DelayAction(1000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(2500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;

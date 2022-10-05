@@ -4098,7 +4098,7 @@ namespace Gekko
             List<string> firstList = new List<string>();
             string firstEqName = null;
 
-            int lineCounter = 0;
+            int lineCounter = -1;
             int counter2 = 0;
             List<int> eqNumbers = Program.model.modelGamsScalar.dependents[pav];
 
@@ -4122,6 +4122,7 @@ namespace Gekko
 
             foreach (EqHelper helper in eqs)
             {
+                lineCounter++;
                 string eqName = helper.eqName;
                 string eqName3 = helper.eqName3;
 
@@ -4134,9 +4135,8 @@ namespace Gekko
 
                 string tt = "tx0";                
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 3, eqName));
-                lineCounter++;
-
+                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == 1, eqName));
+                
                 //List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
 
                 if (firstText == null)

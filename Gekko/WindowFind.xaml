@@ -64,6 +64,8 @@
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="500" DisplayMemberBinding="{Binding Vars}" />
                     </GridView>
                 </ListView.View>
+                
+                
             </ListView>
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
             <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
