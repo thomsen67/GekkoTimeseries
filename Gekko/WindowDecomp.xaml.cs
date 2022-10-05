@@ -69,8 +69,8 @@ namespace Gekko
         
         public Grid _grid = null;
 
-        public StatusBar _status = null;
-        public TextBlock _statusText = null;
+        //public StatusBar _status = null;
+        //public TextBlock _statusText = null;
         private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
         ListViewDragDropManager<GekkoTask> dragMgr;
         
@@ -754,12 +754,13 @@ namespace Gekko
             //else
             //{
             //    this.decompFind.CreateChild(decompOptions2, EDecompFindNavigation.Decomp, this);
-            //}
+            //}            
+
             this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
-            InitializeComponent();
+            InitializeComponent();            
             this.isInitializing = false;  //ready for clicking
-            
+
             this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
             if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Collapsed;
 
@@ -825,10 +826,10 @@ namespace Gekko
                 //Table table = this.decompOptions.guiDecompValues;
                 //MakeTable(table);                
             }
-            _status = status;
-            _statusText = statusText;
+            //_status = status;
+            //_statusText = statusText;
             //this.decompOptions.guiDecompOperator = "n";   
-            //RefreshList();
+            //RefreshList();            
             this.Loaded += WindowDecomp_Loaded;
         }
 
@@ -1053,8 +1054,7 @@ namespace Gekko
             else if ((Keyboard.Modifiers == ModifierKeys.Control) && (e.Key == Key.A))
             {
                 this.scrollView1.ScrollToHome();                
-                _statusText.Text = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";  //because sums are not meaningful anyway
-                
+                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText2;  //because sums are not meaningful anyway
                 DefaultGrid(this.grid1);
                 this.canvasBorder.BorderBrush = Brushes.Black;
                 this.canvasBorder.BorderThickness = new Thickness(3);
@@ -1460,10 +1460,10 @@ namespace Gekko
                     }
                 }                
             }            
-            TextBlock text = _statusText;
-            text.FontFamily = new FontFamily("Calibri");
-            text.FontSize = 13d;
-            text.Text = "Sum: " + sum + "   Count: " + count + "   Avg: " + (sum / (double)count);
+            //TextBlock text = _statusText;
+            //text.FontFamily = new FontFamily("Calibri");
+            //text.FontSize = 13d;
+            this.windowDecompStatusBar.Text = "Sum: " + sum + "   Count: " + count + "   Avg: " + (sum / (double)count);
         }
 
         private void DefaultGrid(Grid g)
@@ -1495,9 +1495,7 @@ namespace Gekko
             }
             else
             {
-                //G.Writeln("cell " + row + " " + col);
-                //this.equation.Background = Brushes.LightYellow;
-                //this.equation.Foreground = Brushes.White;
+                this.windowDecompStatusBar.Text = "";
 
                 int x; int y;
                 CoordConversion(out x, out y, dockPanel.type, row, col);
@@ -1602,7 +1600,8 @@ namespace Gekko
                         if (c.cellType == CellType.Text)
                         {
                             //this.equation.Background = Brushes.LightYellow;
-                            //G.Writeln(c.CellText.TextData[0]);
+                            //G.Writeln(c.CellText.TextData[0]);                            
+
                             string var = c.CellText.TextData[0];
 
                             string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);
@@ -1666,6 +1665,7 @@ namespace Gekko
                             }
                             else
                             {
+                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;
                                 //List<string> vars = c2.vars_hack;
                                 //if (vars == null) MessageBox.Show("Could not find any vars");                                
                                 //string var7 = vars[0];  //#dskla8asjkdfa                                
@@ -1762,7 +1762,7 @@ namespace Gekko
 
                 SetRadioButtonsDefaults();
 
-                _statusText.Text = "";
+                if(!this.isInitializing) this.windowDecompStatusBar.Text = "";
 
                 GekkoTime per1 = this.decompFind.decompOptions2.t1;
                 GekkoTime per2 = this.decompFind.decompOptions2.t2;                
@@ -2378,10 +2378,15 @@ namespace Gekko
             this.Close();
 
             windowDecomp.Focus();
-            string txt = "  Merged";
-            windowDecomp.textSelect.Text = txt;
+            string txt = "  Merged...";
             //blink message a bit, and then remove
-            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            //windowDecomp.textSelect.Text = txt;
+            Program.DelayAction(500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            Program.DelayAction(2000, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            //Program.DelayAction(3500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            //Program.DelayAction(4500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;

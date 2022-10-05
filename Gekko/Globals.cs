@@ -159,6 +159,10 @@ namespace Gekko
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
 
+        public static string windowFindStatusBarText = "Left-click to decompose equation, right-click (or Ctrl+left-click) to select equation";
+        public static string windowDecompStatusBarText = "Left-click to find equation(s)";
+        public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";        
+
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------

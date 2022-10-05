@@ -78,12 +78,11 @@
     </Window.CommandBindings>
 
     <DockPanel>
-        <StatusBar Name="status" DockPanel.Dock="Bottom">
+        <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
-                <TextBlock Name="statusText"></TextBlock>
+                <TextBlock Name="windowDecompStatusBar" Foreground="Gray"/>
             </StatusBarItem>
         </StatusBar>
-
         <Grid Name="grid0" Height="153" Width="838" ShowGridLines="False" Margin="10,10,10,0" DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />

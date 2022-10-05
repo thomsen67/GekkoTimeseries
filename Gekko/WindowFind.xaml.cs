@@ -34,17 +34,7 @@ namespace Gekko
         //public DecompOptions2 decompOptions2 = null;
 
         public WindowFind(O.Find o)
-        {
-            //if (this.decompFind == null)
-            //{
-            //    this.decompFind = o.decompFind.CreateChild(o.decompFind.decompOptions2, EDecompFindNavigation.Find, this);
-            //    //this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, o.decompFind.decompOptions2, this);
-            //}
-            //else
-            //{
-            //    MessageBox.Show("lkjdf hov");
-            //}
-
+        {            
             this.decompFind = o.decompFind;
 
             //HACKY:
@@ -124,6 +114,11 @@ namespace Gekko
 
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) || Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            {
+                //ignore if combined with ctrl or alt, only a clean left-clik is a link
+                return;
+            }
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;
             
@@ -160,6 +155,8 @@ namespace Gekko
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
+
+            this.windowFindStatusBar.Text = Globals.windowFindStatusBarText;
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;
             this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
@@ -167,6 +164,7 @@ namespace Gekko
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
+            this.windowFindStatusBar.Text = "";
             bool showTime = false;
             GekkoTime t0 = this.decompFind.decompOptions2.t1;
             this.EquationBrowserSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
