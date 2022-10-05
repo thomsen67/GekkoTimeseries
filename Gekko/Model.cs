@@ -109,103 +109,33 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static string GetEquationTextFoldedScalar(List<string>eqNames)
+        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames)
         {
             string rv = "";
-
-            StringBuilder sb2 = new StringBuilder();
-            List<string> rawModel = Program.model.modelGamsScalar.gamsFoldedModel;
-            if (rawModel != null)
-            {
-                int count2 = 0;
-                foreach (string eqName in eqNames)
-                {
-                    //
-                    // TODO: handle a semicolon in a comment, for instance after # 
-                    //
-                    count2++;
-                    if (true)
-                    {
-                        //if (count2 > 1) sb2.AppendLine(" ----- ");
-                    }
-                    else
-                    {
-                        if (count2 == 1)
-                        {
-                            sb2.AppendLine("");
-                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb2.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
-                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb2.AppendLine("");
-                        }
-                        else
-                        {
-                            sb2.AppendLine("");
-                            sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
-                            sb2.AppendLine("");
-                        }
-                    }
-                    
-                    for (int i = 0; i < rawModel.Count; i++)
-                    {                        
-                        if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
-                        {                            
-                            int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
-                            for (int j = i; j < rawModel.Count; j++)
-                            {
-                                string s = rawModel[j];
-                                int count = s.TakeWhile(Char.IsWhiteSpace).Count();
-                                if (count >= count0) s = s.Substring(count0);
-                                else s = s.Substring(count);
-
-                                sb2.AppendLine(s);
-                                if (rawModel[j].Contains(";"))
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            string s2 = sb2.ToString();
-
-            //
-            //
-            // TODO: get this list from DECOMP3<options>
-            //       probably it should be put inside the model object.
-            //
-            //
-            
             StringBuilder sb1 = new StringBuilder();
-            if (false)
-            {
-                sb1.AppendLine(eqNames.Count + " equation" + G.S(eqNames.Count));
-            }
+            StringBuilder sb2 = new StringBuilder();
+
+            int i = -1;
             foreach (string eqName in eqNames)
             {
-                int count2 = 0;
+                i++;                
                 List<ModelGamsEquation> temp = null; Program.model.modelGamsScalar.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
                 if (temp == null) continue;
                 foreach (ModelGamsEquation eq in temp)
-                {
-                    count2++;
-                    if (true)
-                    {
-                        //if (count2 > 1) sb1.AppendLine(" ----- ");
-                    }
-                    else
-                    {
-                        sb1.AppendLine("");
-                        sb1.AppendLine("----------------------------------------------------------------------------------------------------------");
-                        sb1.AppendLine("");
-                    }
-                    if (!G.NullOrBlanks(eq.conditionals)) sb1.AppendLine("$-condition: " + eq.conditionals);
+                {                    
+                    if (i > 0) sb1.AppendLine();
                     sb1.AppendLine(eq.lhs + " = " + eq.rhs + ";");
+                    if (!G.NullOrBlanks(eq.conditionals)) sb1.AppendLine("with $-condition: " + eq.conditionals);                    
+
+                    if (i > 0) sb2.AppendLine();
+                    sb2.AppendLine(eq.lhsGams + " =E= " + eq.rhsGams + ";");
+                    if (!G.NullOrBlanks(eq.conditionalsGams)) sb2.AppendLine("with $-condition: " + eq.conditionalsGams);                    
                 }
             }
-            rv = sb2.ToString() + G.NL + sb1.ToString();
-            return rv;
+
+            TwoStrings two = new TwoStrings(sb1.ToString(), sb2.ToString());
+
+            return two;
         }
 
         /// <summary>
@@ -239,14 +169,18 @@ namespace Gekko
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            string s1 = Model.GetEquationTextFoldedScalar(eqs2);
+            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2);
 
             string s2 = null;
+            int i = -1;
             foreach (string s in eqs)
             {
-                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;
+                i++;
+                if (i > 0) s2 += G.NL;
+                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
-            return s1 + G.NL + s2;
+            string rv = two.s1 + G.NL + "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL + "-------------- GAMS --------------" + G.NL + G.NL + two.s2;
+            return rv;
         }
 
         /// <summary>

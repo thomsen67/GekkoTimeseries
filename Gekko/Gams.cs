@@ -966,7 +966,7 @@ namespace Gekko
 
                 // -------------- raw codelines ---------
                 Program.model.modelGamsScalar.csCodeLines = csCodeLines;
-                Program.model.modelGamsScalar.gamsFoldedModel = gamsFoldedModel;
+                //Program.model.modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
 
                 Program.model.modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
 
