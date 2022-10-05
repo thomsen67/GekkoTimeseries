@@ -333,7 +333,11 @@
                 </Border>
             </DockPanel>
             <CheckBox Grid.Column="11" Grid.Row="2" Name="checkBox1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Show as shares</CheckBox>
-            <CheckBox Grid.Column="11" Grid.Row="3" x:Name="checkBoxErrors" HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Show count of elements" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Margin="0,3,48.333,3" Content="Count" Width="83"/>
+            <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
+                <CheckBox  x:Name="checkBoxErrors" VerticalAlignment="Center" ToolTip="Show count of elements" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Margin="0,0,0,0" Content="Count" Width="60"/>
+                <CheckBox x:Name="checkBoxNames" VerticalAlignment="Center" ToolTip="Show names of elements" Margin="0,0,0,0" Content="Names" Width="60" Checked="CheckBoxNames_Checked" Unchecked="CheckBoxNames_Unchecked" />
+            </StackPanel>
+            
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options
             </TextBlock>

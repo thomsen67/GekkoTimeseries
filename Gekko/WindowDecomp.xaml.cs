@@ -761,7 +761,7 @@ namespace Gekko
             DataContext = new ViewModel();  //MVVM style
 
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
-            Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidth);
+            Canvas.SetLeft(this.frezenBorder2, Globals.guiTableCellWidth);
             this.gridUpperLeft.Width = Globals.guiTableCellWidth;
             this.gridUpperLeft.Height = Globals.guiTableCellHeight;            
 
@@ -2282,7 +2282,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.count = ECountType.Names;
+                this.decompFind.decompOptions2.count = ECountType.N;
                 RecalcCellsWithNewType(false);
             }
         }
@@ -2398,6 +2398,33 @@ namespace Gekko
             windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
             Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
         }        
+
+        private void CheckBoxNames_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                Globals.guiTableCellWidth = 2 * Globals.guiTableCellWidth;
+                try
+                {
+                    this.decompFind.decompOptions2.count = ECountType.Names;
+                    RecalcCellsWithNewType(false);
+                }
+                finally
+                {
+                    Globals.guiTableCellWidth = Globals.guiTableCellWidth / 2;
+                }
+            }
+        }
+
+        private void CheckBoxNames_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.count = ECountType.None;
+                RecalcCellsWithNewType(false);
+            }
+        }
+
     }
 
     public class GekkoDockPanel2 : DockPanel
