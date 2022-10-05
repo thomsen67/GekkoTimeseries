@@ -761,8 +761,8 @@ namespace Gekko
             DataContext = new ViewModel();  //MVVM style
 
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
-            Canvas.SetLeft(this.frezenBorder2, Globals.guiTableCellWidth);
-            this.gridUpperLeft.Width = Globals.guiTableCellWidth;
+            Canvas.SetLeft(this.frezenBorder2, Globals.guiTableCellWidthFirst);
+            this.gridUpperLeft.Width = Globals.guiTableCellWidthFirst;
             this.gridUpperLeft.Height = Globals.guiTableCellHeight;            
 
             this.frozenRows = Globals.freezeDecompRows;
@@ -837,13 +837,11 @@ namespace Gekko
                 }
                 for (int j = 1 + this.frozenCols; j <= table.GetColMaxNumber(); j++)
                 {
-                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });
                 }
 
                 g.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(Globals.guiTableCellHeight) });  //otherwise, the last row does not show up in gui...
                 g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });  //otherwise, the last col does not show up in gui...
-
-
             }
             else if (type == GekkoTableTypes.Top)
             {
@@ -853,7 +851,7 @@ namespace Gekko
                 }
                 for (int j = 1 + this.frozenCols; j <= table.GetColMaxNumber(); j++)
                 {
-                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });
                 }
             }
             else if (type == GekkoTableTypes.Left)
@@ -864,13 +862,13 @@ namespace Gekko
                 }
                 for (int j = 1; j <= 1; j++)
                 {
-                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst)});
                 }
             }
             else if (type == GekkoTableTypes.UpperLeft)
             {                
                 g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });                
-                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });                
+                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });                
             }
         }
 
@@ -1124,7 +1122,12 @@ namespace Gekko
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
-            dockPanel.Width = Globals.guiTableCellWidth;
+            int w = Globals.guiTableCellWidth;
+            if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
+            {
+                w = Globals.guiTableCellWidthFirst;                
+            }
+            dockPanel.Width = w;
             dockPanel.Height = Globals.guiTableCellHeight;
             var border = new Border();
             TextBlock textBlock = new TextBlock();
@@ -2403,7 +2406,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                Globals.guiTableCellWidth = 2 * Globals.guiTableCellWidth;
+                Globals.guiTableCellWidth = 3 * Globals.guiTableCellWidth;
                 try
                 {
                     this.decompFind.decompOptions2.count = ECountType.Names;
@@ -2411,7 +2414,7 @@ namespace Gekko
                 }
                 finally
                 {
-                    Globals.guiTableCellWidth = Globals.guiTableCellWidth / 2;
+                    Globals.guiTableCellWidth = Globals.guiTableCellWidth / 3;
                 }
             }
         }

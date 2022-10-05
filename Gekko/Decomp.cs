@@ -3390,8 +3390,9 @@ namespace Gekko
                     else if (decompOptions2.count == ECountType.Names)
                     {
                         List<string> tmp = new List<string>();
-                        foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", ""));
-                        tab.Set(i + 2, j + 2, Stringlist.GetListWithCommas(tmp));
+                        foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "")); //x[a]¤[-1] --> x[a][-1]
+                        string tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                        tab.Set(i + 2, j + 2, tmp2);
                     }
                     else
                     {                        

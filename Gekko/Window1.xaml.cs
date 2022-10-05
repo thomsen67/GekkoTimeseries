@@ -189,10 +189,9 @@ namespace Gekko
             isInitializing = false;
 
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
-            Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidth);
+            Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidthFirst);
             this.gridUpperLeft.Width = Globals.guiTableCellWidth;
-            this.gridUpperLeft.Height = Globals.guiTableCellHeight;
-            
+            this.gridUpperLeft.Height = Globals.guiTableCellHeight;            
 
             this.frozenRows = Globals.freezeDecompRows;
             this.frozenCols = Globals.freezeDecompCols;
