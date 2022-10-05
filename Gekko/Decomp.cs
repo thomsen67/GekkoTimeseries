@@ -4160,8 +4160,9 @@ namespace Gekko
 
                 string bool1 = "";
                 string bool2 = "";
-                bool1 = Globals.protectSymbol;
-                bool2 = Globals.protectSymbol;
+
+                if(helper.best) bool1 = Globals.protectSymbol;
+                //bool2 = Globals.protectSymbol;
 
                 string tt = "tx0";
 

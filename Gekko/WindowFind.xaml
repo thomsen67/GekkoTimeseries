@@ -60,7 +60,7 @@
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />
                         <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Sub" Width="70" DisplayMemberBinding="{Binding Sub}" />-->
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Dep" Width="40" DisplayMemberBinding="{Binding Dep}" />
-                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="40" DisplayMemberBinding="{Binding Lhs}" />
+                        <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="40" DisplayMemberBinding="{Binding Lhs}" />-->
                         <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Per" Width="50" DisplayMemberBinding="{Binding Per}" />-->
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="620" DisplayMemberBinding="{Binding Vars}" />
                     </GridView>                    
