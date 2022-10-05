@@ -137,7 +137,6 @@ namespace Gekko
         public static List<string> unitTestsPromtingHelper = null;
 
         //GUI hacks
-        public static string selectedEquation = null;  //when the user right-clicks in FIND window
         public static ItemHandler itemHandler = null;  //hack regardig FIND window
         public static string uglyHack_name;  //only for a treeview window
         public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window

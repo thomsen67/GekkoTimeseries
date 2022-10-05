@@ -52,8 +52,17 @@ namespace Gekko
             //
             //
             //this.windowEquationBrowserListView.ScrollIntoView(this.windowEquationBrowserListView.Items[0]);
-            //this.windowEquationBrowserListView.SelectedIndex = 0;            
+            //this.windowEquationBrowserListView.SelectedIndex = 0;
+        }
 
+        private void WindowKeyDown(object sender, KeyEventArgs e)
+        {
+            //var viewModel = DataContext as YourViewModel;
+            //viewModel.YourCommand.Execute(null);
+            if (e.Key == Key.Return)
+            {
+                CallDecomp(this._activeEquation);
+            }
         }
 
         public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
@@ -126,10 +135,14 @@ namespace Gekko
                 return;
             }
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
-            EquationListItem item = fe.DataContext as EquationListItem;
-            
-            string eqName = G.Chop_DimensionRemoveLast(item.fullName);
-            Globals.selectedEquation = eqName;
+            EquationListItem item = fe.DataContext as EquationListItem;            
+            CallDecomp(item.fullName);
+        }
+
+        private void CallDecomp(string fullName)
+        {
+            string eqName = G.Chop_DimensionRemoveLast(fullName);
+
             O.Decomp2 decomp = new O.Decomp2();
             decomp.opt_prtcode = this.decompFind.decompOptions2.prtOptionLower;
             decomp.t1 = this.decompFind.decompOptions2.t1;
