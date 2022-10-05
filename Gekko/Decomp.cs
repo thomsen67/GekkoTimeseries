@@ -4117,13 +4117,40 @@ namespace Gekko
                 eqs.Add(e);
             }
 
+            List<EqHelper> eqsNew = new List<EqHelper>();
+            List<EqHelper> eqsNew1 = new List<EqHelper>();
+            List<EqHelper> eqsNew2 = new List<EqHelper>();
+            string s = vars[0];
+            string s2 = G.Chop_RemoveIndex(s);
+            List<ModelGamsEquation> m = null;  Program.model.modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out m);
+            if (m == null) m = new List<ModelGamsEquation>();
             foreach (EqHelper helper in eqs)
             {
-                
-
+                foreach (ModelGamsEquation mm in m)
+                {
+                    if (G.Equal(helper.eqName3, mm.nameGams))
+                    {
+                        helper.best = true;
+                    }
+                }
             }
 
             foreach (EqHelper helper in eqs)
+            {
+                if (helper.best) eqsNew1.Add(helper);
+            }
+
+            foreach (EqHelper helper in eqs)
+            {
+                if (!helper.best) eqsNew2.Add(helper);
+            }            
+            
+            var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqName3);
+            var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqName3);
+            eqsNew.AddRange(eqsNew1a);
+            eqsNew.AddRange(eqsNew2a);
+
+            foreach (EqHelper helper in eqsNew )
             {
                 lineCounter++;
                 string eqName = helper.eqName;
