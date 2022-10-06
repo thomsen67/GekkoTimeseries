@@ -129,11 +129,12 @@ namespace Gekko
 
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) || Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
-            {
-                //ignore if combined with ctrl or alt, only a clean left-clik is a link
-                return;
-            }
+            if (e.ClickCount != 2) return;
+            //if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) || Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            //{
+            //    //ignore if combined with ctrl or alt, only a clean left-clik is a link
+            //    return;
+            //}
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;            
             CallDecomp(item.fullName);
@@ -160,6 +161,7 @@ namespace Gekko
             //d.decompFind = this.decompFind;
             decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(), EDecompFindNavigation.Decomp, null);
 
+            decomp.type = "ASTDECOMP3";  //else old style decomp is used...
             decomp.decompFind.decompOptions2.code = "decomp3 " + varName + " from " + eqName + " endo " + varName + ";";
 
             decomp.Exe();

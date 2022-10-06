@@ -1522,9 +1522,10 @@ namespace Gekko
             tb.TextDecorations = null;
         }
 
-        private void Mouse_Down(object sender, MouseEventArgs e)
+        private void Mouse_Down(object sender, MouseButtonEventArgs e) // MouseEventArgs e)
         {
             //#98732498724
+            if (e.ClickCount != 2) return;
             TextBlock tb = (TextBlock)sender;
             Border b = (Border)(tb.Parent);
             DockPanel dp = (DockPanel)(b.Parent);

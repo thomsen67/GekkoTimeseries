@@ -1149,6 +1149,7 @@ namespace Gekko
         /// <summary>
         /// Adds a dimension to a name. If inputName = "x" and inputIndex = "40", the result
         /// will be x[40]. If inputName is "x[a, b]", the result will be "x[a, b, 40]".
+        /// If inputname is "x[]", it will be treated as if it was "x".
         /// Last argument true means between commas (normal).
         /// Dimension is always added last.
         /// </summary>
@@ -1160,7 +1161,7 @@ namespace Gekko
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
             string[] indexes2 = null;
-            if (indexes == null)
+            if (indexes == null || (indexes.Length == 1 && G.NullOrBlanks(indexes[0])))
             {
                 indexes2 = new string[1];
                 indexes2[0] = inputIndex;

@@ -148,7 +148,8 @@ namespace Gekko
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
             {
-                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
+                //eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
+                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, t0.ToString(), false));
             }
             s = Model.GetEquationText(eqNames, showTime, t0);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
@@ -1053,16 +1054,11 @@ namespace Gekko
             int i = -12345;
             bool ok = this.dict_FromEqNameToEqNumber.TryGetValue(name, out i);
             if (!ok) i = -12345;
-            if (i == -12345) new Error("Could not find equation name '" + name + "'");
-            string s = this.GetEquationTextUnfolded(i, showTime, t0);
-
-            string rv = "";
-            if (!showTime) name = G.Chop_DimensionSetLag(name, t0, false);
-            //rv += "Equation: " + name + "" + G.NL;
-            //rv += "------------------------------------------" + G.NL;
-            //rv += s + G.NL + G.NL;
-            rv = s;
-            return rv;
+            if (i == -12345)
+            {
+                return "...scalar equation '" + name + "' could not be found...";
+            }
+            return this.GetEquationTextUnfolded(i, showTime, t0);
         }
 
         /// <summary>
