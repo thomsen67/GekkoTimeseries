@@ -5229,7 +5229,7 @@ stringInQuotes:             StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
  //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the
  //      GLUE token is defined from.
-
+ defined from
 fragment NEWLINE2:          '\n' ;
 fragment NEWLINE3:          '\r\n' ;
 fragment DIGIT:             '0'..'9' ;

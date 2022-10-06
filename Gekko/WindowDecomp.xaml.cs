@@ -2571,6 +2571,11 @@ namespace Gekko
 
         public DecompOptions2 Clone()
         {
+            return Clone(true);
+        }
+
+        public DecompOptions2 Clone(bool all)
+        {
             //clones relevant parts for new window
             DecompOptions2 d = new DecompOptions2();
             d.decompTablesFormat = new DecompTablesFormat2();
@@ -2639,19 +2644,27 @@ namespace Gekko
                 d.link.Add(temp);
             }
 
-            List<string> tempCols = new List<string>();
-            foreach (string s in this.cols)
+            if (all)
             {
-                tempCols.Add(s);
-            }
-            d.cols = tempCols;
 
-            List<string> tempRows = new List<string>();
-            foreach (string s in this.rows)
-            {
-                tempRows.Add(s);
+                List<string> tempCols = new List<string>();
+                foreach (string s in this.cols)
+                {
+                    tempCols.Add(s);
+                }
+                d.cols = tempCols;
+
+                List<string> tempRows = new List<string>();
+                foreach (string s in this.rows)
+                {
+                    tempRows.Add(s);
+                }
+                d.rows = tempRows;
             }
-            d.rows = tempRows;
+            else
+            {
+                Decomp.ResetRowsColsSelection(d);
+            }
 
             if (this.new_select != null)
             {

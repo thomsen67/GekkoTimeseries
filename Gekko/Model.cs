@@ -1164,6 +1164,11 @@ namespace Gekko
             return sb.ToString().Trim();
         }
 
+        public string GamsModelDefinedString()
+        {
+            return "GAMS model is defined over the period " + this.t0.ToString() + " to " + this.t2.ToString();
+        }
+
     }
 
     [ProtoContract]

@@ -8056,8 +8056,9 @@ namespace Gekko
 
             public Find(DecompFind df)
             {
-                //called from DECOMP                
-                this.decompFind = df.CreateChild(df.decompOptions2.Clone(), EDecompFindNavigation.Find, null);
+                //called from DECOMP             
+                DecompOptions2 temp = df.decompOptions2.Clone(false);
+                this.decompFind = df.CreateChild(temp, EDecompFindNavigation.Find, null);
             }
 
             public void Exe()
@@ -8067,7 +8068,11 @@ namespace Gekko
                     this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null);
                     this.decompFind.decompOptions2.t1 = this.t1;
                     this.decompFind.decompOptions2.t2 = this.t2;
-                    if (this.opt_prtcode == null) this.decompFind.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
+                    if (this.opt_prtcode == null)
+                    {
+                        new Error("You must state operator for FIND, for instance FIND<d> or FIND<m>, etc.");
+                        //this.decompFind.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
+                    }
                     else this.decompFind.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
                     this.decompFind.decompOptions2.modelType = G.GetModelType();
                     this.decompFind.decompOptions2.decompTablesFormat.showErrors = true; //

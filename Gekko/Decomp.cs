@@ -456,7 +456,7 @@ namespace Gekko
         /// <param name="element"></param>
         /// <param name="type"></param>
         /// <param name="doubleDif"></param>
-        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, DecompOperator op)
+        private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, DecompOperator op, bool showErrors)
         {
             int deduct = op.lagGradient[0];
             if(op.isRaw) deduct = op.lagData[0];
@@ -465,7 +465,7 @@ namespace Gekko
                 int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
-                    new Error("Period " + time.ToString() + " outside GAMS scalar model period (GAMS model runs over " + Program.model.modelGamsScalar.t0.ToString() + " to " + Program.model.modelGamsScalar.t2.ToString() + ").");
+                    if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + Program.model.modelGamsScalar.GamsModelDefinedString() + ".");
                 }
                 if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                 DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
@@ -480,7 +480,7 @@ namespace Gekko
                 bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
                 if (!b)
                 {
-                    new Error("Could not find the equation '" + s2 + "'");
+                    if(showErrors) new Error("Could not find the equation '" + s2 + "'");
                 }
                 //int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
                 elementPeriod.eqNumber = eqNumber;
@@ -488,7 +488,7 @@ namespace Gekko
                 element.periods[i] = elementPeriod;
             }
         }
-        
+
         /// <summary>
         /// For a name like "x" and a list like {"a", "b"}, time is added and returns like for instance "x[a,b,2001]".
         /// Note no blanks.
@@ -553,7 +553,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                PrepareEquations(per1, per2, op, decompOptions2);
+                PrepareEquations(per1, per2, op, decompOptions2, true);
             }
 
             if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
@@ -990,7 +990,7 @@ namespace Gekko
         /// <param name="per2"></param>
         /// <param name="operator1"></param>
         /// <param name="decompOptions2"></param>
-        public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2)
+        public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2, bool showErrors)
         {
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
@@ -1026,7 +1026,7 @@ namespace Gekko
                     elements.Add(mmi, element);
                 }
                 
-                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors);
             }
 
             int counter = -1;
@@ -2694,8 +2694,7 @@ namespace Gekko
 
             if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             {
-                decompOptions2.rows = new List<string>() { "vars", "lags" };
-                decompOptions2.cols = new List<string>() { "time" };
+                ResetRowsColsSelection(decompOptions2);
             }
 
             if (decompOptions2.filters == null)
@@ -3433,6 +3432,16 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Set back to vars and lags on rows, and time on cols
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        public static void ResetRowsColsSelection(DecompOptions2 decompOptions2)
+        {
+            decompOptions2.rows = new List<string>() { "vars", "lags" };
+            decompOptions2.cols = new List<string>() { "time" };
+        }
+
+        /// <summary>
         /// The decomp provides a linearization where the contributions sum to 0.
         /// Here, this is "translated" into the normal decomp way of showing it.
         /// This method is old, bad and soon obsolete.
@@ -4104,7 +4113,10 @@ namespace Gekko
             int lineCounter = -1;
             int counter2 = 0;
             List<int> eqNumbers = null; Program.model.modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-            if (eqNumbers == null) new Error("Could not find " + variableName + "[" + Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable");
+            if (eqNumbers == null)
+            {
+                new Error("Could not find " + variableName + "[" + Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + Program.model.modelGamsScalar.GamsModelDefinedString() + ".");
+            }
 
             List<EqHelper> eqs = new List<EqHelper>();
             foreach (int eqNumber in eqNumbers)

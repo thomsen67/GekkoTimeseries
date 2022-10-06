@@ -159,7 +159,7 @@ namespace Gekko
             decomp.name = new ScalarString(eqName);
 
             //d.decompFind = this.decompFind;
-            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(), EDecompFindNavigation.Decomp, null);
+            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
             decomp.decompFind.decompOptions2.code = "decomp3 " + varName + " from " + eqName + " endo " + varName + ";";
@@ -265,7 +265,7 @@ namespace Gekko
                     //decompOptionsTemp.link.Add(new Link());
 
                     decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
-                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp);
+                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false);
 
                     //HMMMM [0]
                     //HMMMM [0]
@@ -302,7 +302,15 @@ namespace Gekko
                         {
                             int i1 = 240;
                             int i2 = 255;
-                            int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                            int ii = i2;
+                            if (max == 0d)
+                            {
+                                //do nothing
+                            }
+                            else
+                            {
+                                ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                            }
                             if (ii < 0 || ii > 255)
                             {
                                 if (Globals.runningOnTTComputer) MessageBox.Show("ERROR: byte value is " + ii);
