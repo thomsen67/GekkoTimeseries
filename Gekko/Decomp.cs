@@ -4092,8 +4092,8 @@ namespace Gekko
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0];
-            string variableName2 = variableName + "[" + o.t0.ToString() + "]";
-            int aNumber = Program.model.modelGamsScalar.dict_FromVarNameToANumber[variableName];
+            int aNumber = -12345; bool good = Program.model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
+            if (!good) new Error("Could not find variable '" + variableName + "'");
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
             //new Writeln("Variable " + variableName2 + ":");
 
