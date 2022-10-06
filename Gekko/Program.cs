@@ -2025,7 +2025,7 @@ namespace Gekko
             }
 
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
 
                 //maybe buffer not larger then 1 mio.
@@ -31605,7 +31605,7 @@ namespace Gekko
             }
             if (j == -12345)
             {
-                new Error("Could not find name '" + colname + "'");
+                new Error("Could not find name '" + G.HandleInternalIdentifyer1(colname) + "'");
             }
             return j;
         }

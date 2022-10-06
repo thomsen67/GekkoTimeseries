@@ -4103,7 +4103,8 @@ namespace Gekko
 
             int lineCounter = -1;
             int counter2 = 0;
-            List<int> eqNumbers = Program.model.modelGamsScalar.dependents[pav];
+            List<int> eqNumbers = null; Program.model.modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+            if (eqNumbers == null) new Error("Could not find " + variableName + "[" + Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable");
 
             List<EqHelper> eqs = new List<EqHelper>();
             foreach (int eqNumber in eqNumbers)
@@ -4273,6 +4274,6 @@ namespace Gekko
             if (other == null) return false;
             if (this.date == other.date && this.variable == other.variable) return true;
             return false;
-        }
+        }        
     }
 }

@@ -186,7 +186,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method
+        /// Helper method for DECOMP
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>

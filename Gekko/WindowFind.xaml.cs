@@ -233,100 +233,56 @@ namespace Gekko
             //or we could wait 0.5 second before any coloring?
             if (true)
             {
-                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);
+                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtonsColors(eqName)), System.Windows.Threading.DispatcherPriority.Background);
             }
+            try
+            {
+
+            }
+            catch
+            {
+
+            }
+
         }
 
-        public void EquationBrowserSetEquationButtons2(string eqName)
+        public void EquationBrowserSetEquationButtonsColors(string eqName)
         {
-            if (G.GetModelType() == EModelType.GAMSScalar)
+            try
             {
-
-                string residualName = "residual___";
-                int funcCounter = 0;
-                DecompOperator operatorTemp = new DecompOperator(this.decompFind.decompOptions2.prtOptionLower);
-
-                //!!! a bit of a waste of time, but is probably not significantly slowing
-                //    down the FIND window.
-                DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();
-
-                //decompOptionsTemp.link.Clear();
-                //decompOptionsTemp.link.Add(new Link());
-
-                decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
-                Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp);
-
-                //HMMMM [0]
-                //HMMMM [0]
-                //HMMMM [0]
-                //HMMMM [0] link[0] is ok, but the other [0] is not.
-                //HMMMM [0]
-                //HMMMM [0]                
-                DecompStartHelper dsh = decompOptionsTemp.link[0].GAMS_dsh[0];
-
-                //fixme: [0] must be counter
-
-                GekkoTime gt1, gt2;
-                DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.prtOptionLower);
-                DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
-
-                double max = 0d;
-
-                foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                if (G.GetModelType() == EModelType.GAMSScalar)
                 {
-                    double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.t0);
-                    if (G.isNumericalError(v)) v = 0d;
-                    else v = Math.Abs(v);
-                    max = Math.Max(v, max);
-                }
-
-                foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
-                {
-                    string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                    double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.t0);
-
-                    ToggleButton b = null;
-                    _buttons.TryGetValue(ss5, out b);
-                    if (b != null)
-                    {
-                        int i1 = 240;
-                        int i2 = 255;
-                        int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
-                        b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
-                    }
-                }
-
-            }
-            else if (G.GetModelType() == EModelType.GAMSRaw)
-            {
-                List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
-                ModelGamsEquation equation = equations[0]; //always only 1
-
-                {
-
-                    DecompOperator op = new DecompOperator("d");
 
                     string residualName = "residual___";
                     int funcCounter = 0;
+                    DecompOperator operatorTemp = new DecompOperator(this.decompFind.decompOptions2.prtOptionLower);
 
-                    string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
-                    if (equation.expressions == null || equation.expressions.Count == 0)
-                    {
-                        Globals.expressions = null;  //maybe not necessary
-                        Program.CallEval(equation.conditionals, s1);
-                        equation.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-                        Globals.expressions = null;  //maybe not necessary   
-                    }
+                    //!!! a bit of a waste of time, but is probably not significantly slowing
+                    //    down the FIND window.
+                    DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();
 
-                    if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
-                    {
-                        new Error("Internal error #8973428374");
-                    }
+                    //decompOptionsTemp.link.Clear();
+                    //decompOptionsTemp.link.Add(new Link());
+
+                    decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
+                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp);
+
+                    //HMMMM [0]
+                    //HMMMM [0]
+                    //HMMMM [0]
+                    //HMMMM [0] link[0] is ok, but the other [0] is not.
+                    //HMMMM [0]
+                    //HMMMM [0]                
+                    DecompStartHelper dsh = decompOptionsTemp.link[0].GAMS_dsh[0];
 
                     //fixme: [0] must be counter
-                    DecompData dd = Gekko.Decomp.DecompLowLevel(this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+
+                    GekkoTime gt1, gt2;
+                    DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.prtOptionLower);
+                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
 
                     double max = 0d;
+
                     foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
                     {
                         double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.t0);
@@ -347,10 +303,73 @@ namespace Gekko
                             int i1 = 240;
                             int i2 = 255;
                             int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                            if (ii < 0 || ii > 255)
+                            {
+                                if (Globals.runningOnTTComputer) MessageBox.Show("ERROR: byte value is " + ii);
+                            }
                             b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
                         }
                     }
                 }
+                else if (G.GetModelType() == EModelType.GAMSRaw)
+                {
+                    List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
+                    ModelGamsEquation equation = equations[0]; //always only 1
+
+                    {
+
+                        DecompOperator op = new DecompOperator("d");
+
+                        string residualName = "residual___";
+                        int funcCounter = 0;
+
+                        string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
+                        if (equation.expressions == null || equation.expressions.Count == 0)
+                        {
+                            Globals.expressions = null;  //maybe not necessary
+                            Program.CallEval(equation.conditionals, s1);
+                            equation.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                            Globals.expressions = null;  //maybe not necessary   
+                        }
+
+                        if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
+                        {
+                            new Error("Internal error #8973428374");
+                        }
+
+                        //fixme: [0] must be counter
+                        DecompData dd = Gekko.Decomp.DecompLowLevel(this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, equation.expressions[0], Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+
+                        double max = 0d;
+                        foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                        {
+                            double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.t0);
+                            if (G.isNumericalError(v)) v = 0d;
+                            else v = Math.Abs(v);
+                            max = Math.Max(v, max);
+                        }
+
+                        foreach (KeyValuePair<string, Series> kvp in Decomp.GetDecompDatas(dd, op.type).storage)
+                        {
+                            string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                            double v = kvp.Value.GetDataSimple(this.decompFind.decompOptions2.t0);
+
+                            ToggleButton b = null;
+                            _buttons.TryGetValue(ss5, out b);
+                            if (b != null)
+                            {
+                                int i1 = 240;
+                                int i2 = 255;
+                                int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                                b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Button color problem...");
             }
         }
 
