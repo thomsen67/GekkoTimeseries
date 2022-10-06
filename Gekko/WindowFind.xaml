@@ -20,6 +20,7 @@
             <Setter Property="Border.BorderThickness" Value="0,0,0,0" />
             <!-- can set the last to 0.5 and then control via binding LineColor if needed  -->
             <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
+            <Setter Property="Foreground" Value="{Binding TextColor}" />
             <Setter Property= "IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
             <EventSetter Event="MouseEnter" Handler="OnEquationListMouseEnter" />
             <EventSetter Event="MouseLeave" Handler="OnEquationListMouseLeave" />
@@ -57,12 +58,12 @@
             <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView" SelectionChanged="OnEquationListSelectLine" PreviewMouseLeftButtonDown="OnEquationListLeftButtonDown" >
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="150" DisplayMemberBinding="{Binding Name}" />
                         <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Sub" Width="70" DisplayMemberBinding="{Binding Sub}" />-->
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Dep" Width="40" DisplayMemberBinding="{Binding Dep}" />
                         <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="40" DisplayMemberBinding="{Binding Lhs}" />-->
                         <!--<GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Per" Width="50" DisplayMemberBinding="{Binding Per}" />-->
-                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="620" DisplayMemberBinding="{Binding Vars}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="570" DisplayMemberBinding="{Binding Vars}" />
                     </GridView>                    
                 </ListView.View>                
             </ListView>

@@ -841,7 +841,7 @@ namespace Gekko
                 }
 
                 g.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(Globals.guiTableCellHeight) });  //otherwise, the last row does not show up in gui...
-                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });  //otherwise, the last col does not show up in gui...
+                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });  //otherwise, the last col does not show up in gui...
             }
             else if (type == GekkoTableTypes.Top)
             {
@@ -1736,9 +1736,7 @@ namespace Gekko
                 if (this.decompFind.decompOptions2.expression == null)
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
-                }
-
-                //SetRadioButtonDefaults();
+                }                
 
                 //string transformationCodeAugmented = null;
                 if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator != null)

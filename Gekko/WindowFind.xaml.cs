@@ -430,7 +430,7 @@ namespace Gekko
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, bool isSelected, string fullName2)
+        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, string textColor, bool isSelected, string fullName2)
         {
             Name = name;
             Sub = sub;
@@ -439,6 +439,7 @@ namespace Gekko
             Per = per;
             Vars = vars;
             LineColor = lineColor;
+            TextColor = textColor;
             IsSelected = isSelected;
             fullName = fullName2;
         }
@@ -456,6 +457,8 @@ namespace Gekko
         public string Vars { get; set; }
 
         public string LineColor { get; set; }
+
+        public string TextColor { get; set; }
 
         public bool IsSelected { get; set; }
 

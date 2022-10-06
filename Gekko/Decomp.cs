@@ -328,7 +328,7 @@ namespace Gekko
                 if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
                 else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
                 decompOptions2.name = o.name;
-                decompOptions2.isNew = true;
+                decompOptions2.isNew = true;                
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null);
             }
 
@@ -1454,7 +1454,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        new Error("Decomp problem");
+                                        new Error("DECOMP matrix problem");
                                     }
                                 }
                             }
@@ -1481,38 +1481,48 @@ namespace Gekko
             double[,] effect = null;
 
             if (!op.isRaw)
-            {
-
-                try
+            {                
+                if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                 {
-                    double[,] temp = (double[,])mEndo.Clone();
-                    inverse = Program.InvertMatrix(temp);
+                    //nothing happens, so we can say that the effect is also zeroes...
+                    effect = new double[endo.Count, exo.Count];
                 }
-                catch (Exception e)
+                else
                 {
-                    bool nan = false;
-                    foreach (double d in mEndo)
+
+                    try
                     {
-                        if (G.isNumericalError(d))
+                        double[,] temp = (double[,])mEndo.Clone();
+                        inverse = Program.InvertMatrix(temp);
+                    }
+                    catch (Exception e)
+                    {
+                        bool nan = false;
+                        foreach (double d in mEndo)
                         {
-                            nan = true;
-                            break;
+                            if (G.isNumericalError(d))
+                            {
+                                nan = true;
+                                break;
+                            }
+                        }
+                        if (!nan)
+                        {
+                            string extra = null;
+                            if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
+                            new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
+                            throw;
+                        }
+                        else
+                        {
+                            //We allow this, may just be some missing data
+                            inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
                         }
                     }
-                    if (!nan)
-                    {
-                        new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString(), false);
-                        throw;
-                    }
-                    else
-                    {
-                        //We allow this, may just be some missing data
-                        inverse = G.CreateArrayDouble(mEndo.GetLength(0), mEndo.GetLength(1), double.NaN);
-                    }
-                }
 
-                effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
-                //the effect matrix is #endo x #exo    
+                    effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
+                                                                       //the effect matrix is #endo x #exo    
+                }
             }
 
             for (int row = 0; row < endo.Count; row++)
@@ -1570,6 +1580,24 @@ namespace Gekko
             }
 
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+        }
+
+        /// <summary>
+        /// Checks if both matrices contain only zeroes
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="mExo"></param>
+        /// <returns></returns>
+        private static bool CheckIfEverythingIsZero(double[,] x)
+        {
+            bool nul = true;
+            foreach (double d in x)
+            {
+                if (d == 0d) continue;
+                nul = false;
+                break;
+            }
+            return nul;
         }
 
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
@@ -4181,13 +4209,16 @@ namespace Gekko
 
                 int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
 
-                bool known = false;
-                if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                string textColor = "Black";
+                if (o.decompFind.decompOptions2.new_from != null)
                 {
-                    known = true;
+                    if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                    {
+                        textColor = "Gray";
+                    }
                 }
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == selectedRow, eqName));
+                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
                 
                 if (firstText == null)
                 {
