@@ -4180,6 +4180,13 @@ namespace Gekko
                 string tt = "tx0";
 
                 int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
+
+                bool known = false;
+                if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                {
+                    known = true;
+                }
+
                 Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", lineCounter == selectedRow, eqName));
                 
                 if (firstText == null)
