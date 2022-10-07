@@ -17273,7 +17273,18 @@ namespace Gekko
             FindFileHelper rv = new FindFileHelper();
             bool success = false;
             string currentLibrary = null;
-            if (p != null) currentLibrary = p.GetCurrentLibrary(p.GetDepthM1());
+            if (p != null)
+            {
+                try
+                {
+                    currentLibrary = p.GetCurrentLibrary(p.GetDepthM1());
+                }
+                catch
+                {
+                    //The menu system (menu.html) does not like the above.
+                    //Fix this properly for Gekko 4.0.
+                }
+            }
 
             bool hasPath = filenameMaybeWithoutPath.Contains("\\") || filenameMaybeWithoutPath.Contains(":");
 

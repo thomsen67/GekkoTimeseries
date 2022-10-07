@@ -156,13 +156,17 @@ namespace Gekko
             decomp.from = new List<IVariable>() { from };
             List endo = new List(new List<string>() { varName });
             decomp.endo = new List<IVariable>() { endo };
-            decomp.name = new ScalarString(eqName);
-
-            //d.decompFind = this.decompFind;
+            decomp.name = new ScalarString(eqName);            
             decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
-            decomp.decompFind.decompOptions2.code = "decomp3 " + varName + " from " + eqName + " endo " + varName + ";";
+
+            //
+            //
+            // HACK, <m> is hard-coded below
+            //
+            //
+            decomp.decompFind.decompOptions2.code = "decomp3 <m>" + varName + " from " + eqName + " endo " + varName + ";";
 
             decomp.Exe();
         }

@@ -404,7 +404,7 @@
                             <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
                         </ScrollViewer>
                     </TabItem>
-                    <TabItem Header="Query">
+                    <TabItem Header="Code">
                         <ScrollViewer Background="LightYellow">
                             <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
                         </ScrollViewer>
