@@ -1799,6 +1799,9 @@ namespace Gekko
                 }
                 else
                 {
+                    string more = null;
+                    if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + ")";
+                    if(this.decompFind.window!=null) (this.decompFind.window as WindowDecomp).Title = " " + this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
                     ClearGrid();
                     MakeGuiTable2(table, this.decompFind.decompOptions2);
                 }
@@ -2375,11 +2378,9 @@ namespace Gekko
 
             windowDecomp.Focus();
             string txt = "  Merged...";
-            //blink message a bit, and then remove
-            windowDecomp.textSelect.Text = txt;
-            Program.DelayAction(1000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-            Program.DelayAction(1500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
-            Program.DelayAction(2500, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            //blink message a bit, and then remove            
+            Program.DelayAction(500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;

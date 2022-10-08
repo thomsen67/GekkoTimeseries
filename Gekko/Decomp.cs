@@ -386,6 +386,7 @@ namespace Gekko
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+                
 
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
@@ -1809,8 +1810,8 @@ namespace Gekko
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
         {
             bool createNewWindow = windowDecomp == null;
-            DecompOptions2 decompOptions = decompFind.decompOptions2;
-            if (decompOptions.modelType == EModelType.Unknown)
+            DecompOptions2 decompOptions2 = decompFind.decompOptions2;
+            if (decompOptions2.modelType == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
@@ -1820,11 +1821,11 @@ namespace Gekko
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
-            foreach (Link link in decompOptions.link)
+            foreach (Link link in decompOptions2.link)
             {
                 count++;
 
-                if (decompOptions.modelType == EModelType.Gekko)
+                if (decompOptions2.modelType == EModelType.Gekko)
                 {
                     //Gekko model
                     //Gekko model
@@ -1840,14 +1841,14 @@ namespace Gekko
                         // NEW GEKKO MODEL DECOMP
                         EquationHelper found = DecompEvalGekko(link.varnames[0]);
                         link.expressions = found.expressions;
-                        decompOptions.expressionOld = found.equationText;
+                        decompOptions2.expressionOld = found.equationText;
                     }
                     else
                     {
                         new Error("Expected 1 link expression");
                     }
                 }
-                else if (decompOptions.modelType == EModelType.GAMSRaw)
+                else if (decompOptions2.modelType == EModelType.GAMSRaw)
                 {
                     //GAMS model
                     //GAMS model
@@ -1865,7 +1866,7 @@ namespace Gekko
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
                 }
-                else if (decompOptions.modelType == EModelType.GAMSScalar)
+                else if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
                     //GAMS scalar model
                     //GAMS scalar model
@@ -1891,22 +1892,29 @@ namespace Gekko
             
             if (createNewWindow)
             {
-                if (decompOptions.name == null)
-                {
-                    windowDecomp.Title = "Decompose expression";
+                if (decompOptions2.type == "ASTDECOMP3")
+                {                   
+
                 }
                 else
                 {
-                    windowDecomp.Title = "Decompose " + decompOptions.variable + "";
+                    if (decompOptions2.name == null)
+                    {
+                        windowDecomp.Title = "Decompose expression";
+                    }
+                    else
+                    {
+                        windowDecomp.Title = "Decompose " + decompOptions2.variable + "";
+                    }
                 }
-                windowDecomp.Tag = decompOptions;
+                windowDecomp.Tag = decompOptions2;
 
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
 
                 windowDecomp.RecalcCellsWithNewType(true);
-                decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
+                decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on
 
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
