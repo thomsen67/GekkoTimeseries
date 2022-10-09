@@ -1800,8 +1800,8 @@ namespace Gekko
                 else
                 {
                     string more = null;
-                    if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + ")";
-                    if(this.decompFind.window!=null) (this.decompFind.window as WindowDecomp).Title = " " + this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
+                    if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + " more)";
+                    if(this.decompFind.window!=null) (this.decompFind.window as WindowDecomp).Title = this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
                     ClearGrid();
                     MakeGuiTable2(table, this.decompFind.decompOptions2);
                 }

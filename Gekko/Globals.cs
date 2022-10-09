@@ -425,7 +425,8 @@ namespace Gekko
         public static readonly ScalarString scalarStringStar = new ScalarString("*");
         public static readonly ScalarString scalarStringYes = new ScalarString("yes");
         public static readonly ScalarString scalarStringNo = new ScalarString("no");
-        
+
+        public static bool useMAsDefaultOperatorInFindWindow = true;  //use <m> as default      
 
         public static bool fastGauss = true;  //Beware: RES command should switch the option off
                 

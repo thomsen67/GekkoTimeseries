@@ -8070,8 +8070,25 @@ namespace Gekko
                     this.decompFind.decompOptions2.t2 = this.t2;
                     if (this.opt_prtcode == null)
                     {
-                        new Error("You must state operator for FIND, for instance FIND<d> or FIND<m>, etc.");
-                        //this.decompFind.decompOptions2.prtOptionLower = "d";  //does not use a Ref bank
+                        bool canUseM = false;
+                        int w = Program.databanks.GetFirst().storage.Count;
+                        int r = Program.databanks.GetRef().storage.Count;
+                        if (w != 0 && r != 0)
+                        {
+                            double rel = (double)w / (double)r;
+                            if (rel > 0.9d && rel < 1.1d) canUseM = true;
+                        }
+
+                        if (Globals.useMAsDefaultOperatorInFindWindow && canUseM)
+                        {
+                            //if Work or Ref are empty, or if Ref is not of approximate same size
+                            //as Work, we will not use "m" but instead "d".                            
+                            this.decompFind.decompOptions2.prtOptionLower = "m";
+                        }
+                        else
+                        {
+                            this.decompFind.decompOptions2.prtOptionLower = "d";
+                        }
                     }
                     else this.decompFind.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
                     this.decompFind.decompOptions2.modelType = G.GetModelType();

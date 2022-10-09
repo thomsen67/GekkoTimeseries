@@ -1813,10 +1813,14 @@ namespace Gekko
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompOptions2.modelType == EModelType.Unknown)
             {
-                new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
+                new Error("It seems no model is loaded, cf. the MODEL command.");
             }
 
-            if (createNewWindow) windowDecomp = new WindowDecomp(decompFind);
+            if (createNewWindow)
+            {
+                windowDecomp = new WindowDecomp(decompFind);
+                decompFind.window = windowDecomp;
+            }
             Globals.windowsDecomp2.Add(windowDecomp);            
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
@@ -4136,11 +4140,58 @@ namespace Gekko
             o.t0 = o.decompFind.decompOptions2.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
-            string variableName = vars[0];
+            string variableName = vars[0].Replace(" ", "");  //no blanks
             int aNumber = -12345; bool good = Program.model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
-            if (!good) new Error("Could not find variable '" + variableName + "'");
+            if (!good)
+            {
+                bool variableExists = false;
+                bool variableExistsAndHasIndex = false;
+                foreach (KeyValuePair<string, int> kvp in Program.model.modelGamsScalar.dict_FromVarNameToANumber)
+                {
+
+                    if (G.Equal(G.Chop_RemoveIndex(variableName), G.Chop_RemoveIndex(kvp.Key)))
+                    {
+                        variableExists = true;
+                        if (G.Chop_HasIndex(kvp.Key)) variableExistsAndHasIndex = true;
+                        break;
+                    }
+                }
+
+                if (!variableExists)
+                {
+                    new Error("The variable " + G.Chop_RemoveIndex(variableName) + " does not exist in the model. You may use the INDEX command to search for variable names, or DISP '...' to search descriptions.");
+                }
+
+                if (G.Chop_HasIndex(variableName))
+                {
+                    if (variableExistsAndHasIndex)
+                    {
+                        new Error("The " + G.Chop_GetName(variableName) + " element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable " + G.Chop_GetName(variableName) + " does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.");
+                    }
+                    else
+                    {
+                        new Error("The model variable " + G.Chop_GetName(variableName) + " has no index/dimensions. Try 'FIND " + G.Chop_GetName(variableName) + ";'");
+                    }
+                }
+                else
+                {
+                    if (variableExistsAndHasIndex)
+                    {
+                        new Error("The variable " + variableName + " exists in the model, but has index/dimensions. You may use 'DISP " + variableName + ";' to see the elements of the variable.");
+                    }
+                    else
+                    {
+                        //...how could we ever end here?
+                        new Error("The variable " + variableName + " cannot be found in the model.");
+                    }
+                }
+
+
+                
+
+
+            }
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-            //new Writeln("Variable " + variableName2 + ":");
 
             string firstText = null;
             List<string> firstList = new List<string>();
@@ -4242,7 +4293,7 @@ namespace Gekko
             WindowFind windowFind = new WindowFind(o);
             //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
-            windowFind.Title = variableName + " - " + "Gekko equations";
+            windowFind.Title = variableName + " - " + "Gekko find";
             windowFind.EquationBrowserSetButtons(firstEqName, firstList);
             windowFind.EquationBrowserSetLabel(variableName);
             windowFind._activeEquation = firstEqName;
@@ -4316,6 +4367,17 @@ namespace Gekko
             GekkoTime gt = Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(this.date);
             Tuple<string, GekkoTime> tup = new Tuple<string, GekkoTime>(varName, gt);
             return tup;
+        }
+
+        private string ToStringPretty()
+        {
+            Tuple<string, GekkoTime> xx = this.GetVariableAndPeriod();
+            return xx.Item1 + "[" + xx.Item2.ToString() + "]";
+        }
+
+        public override string ToString()
+        {
+            return ToStringPretty();
         }
 
         public override int GetHashCode()

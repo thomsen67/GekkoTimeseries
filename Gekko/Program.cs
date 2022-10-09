@@ -165,6 +165,13 @@ namespace Gekko
         Unknown
     }
 
+    public class Flood
+    {
+        public int color = -12345;
+        public PeriodAndVariable pv = null;
+        public Flood parent = null;
+    }
+
     public class DecompFind
     {                
     
@@ -1815,6 +1822,68 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (true && Globals.runningOnTTComputer)
+            {
+                //Speed-up: doing flood-fill from the endpoint and make them meet?
+
+                Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
+                string x1 = "qBNP";
+                string x2 = "vtKilde";
+                int a1 = Program.model.modelGamsScalar.dict_FromVarNameToANumber[x1];
+                int a2 = Program.model.modelGamsScalar.dict_FromVarNameToANumber[x2];
+                int t = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, 2027, 1));
+
+                PeriodAndVariable pv1 = new PeriodAndVariable(t, a1);
+                PeriodAndVariable pv2 = new PeriodAndVariable(t, a2);
+
+                Flood start = new Flood();
+                start.color = 0;
+                start.parent = null;
+                start.pv = pv1;
+
+                Flood end = new Flood();
+                end.color = -12345;
+                end.parent = null;
+                end.pv = pv2;
+
+                List<Flood> xxx = new List<Flood>();
+                xxx.Add(start);
+                                
+                while (true)
+                {
+                    bool done = false;
+                    List<Flood> yyy = new List<Flood>();
+                    foreach (Flood x in xxx)
+                    {
+                        yyy.AddRange(Flood1Color(x, end, colors, out done));
+                        if (done) break;
+                    }
+                    if (done) break;
+                    if (yyy.Count == 0) break;
+                    xxx = yyy;
+                }
+
+                List<string> temp = new List<string>();
+                Flood f = colors[pv2];
+                while (true)
+                {
+                    string label = null;
+                    try
+                    {
+                        string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod().Item1), EFreq.A);
+                        Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
+                        label = ts.meta.label;
+                    } catch { };
+                    temp.Add(f.color + ": " + f.pv.ToString() + "   ---   " + label);
+                    if (f.parent == null) break;
+                    f = f.parent;
+                }
+                temp.Reverse();
+                foreach (string s in temp)
+                {
+                    new Writeln(s);
+                }
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -2249,6 +2318,48 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
+        }
+
+        /// <summary>
+        /// From the variable pv, flood the adjacent variables with color color.
+        /// </summary>
+        /// <param name="flood"></param>
+        /// <param name="color"></param>
+        /// <param name="colors"></param>
+        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done)
+        {
+            done = false;
+            List<Flood> rv = new List<Flood>();
+            List<int> eqs = Program.model.modelGamsScalar.dependents[flood.pv];
+            foreach (int eq in eqs)
+            {
+                //string eqName = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[eq];
+                ModelScalarEquation eqs2 = Program.model.modelGamsScalar.precedents[eq];
+                foreach (PeriodAndVariable pv2 in eqs2.vars)
+                {   
+                    //new Writeln("equation " + eqName + " containing variable " + pv.GetVariableAndPeriod().Item1 + " in " + pv.GetVariableAndPeriod().Item2.ToString());
+                    Flood found = null; colors.TryGetValue(pv2, out found);
+                    if (found != null)
+                    {
+                        //skip, must have <= color
+                    }
+                    else
+                    {
+                        Flood f = new Flood();
+                        f.color = flood.color + 1;
+                        f.parent = flood;
+                        f.pv = pv2;
+                        colors.Add(pv2, f);
+                        rv.Add(f);
+                    }
+                    if (floodEnd.pv.Equals(pv2))
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+            }
+            return rv;
         }
 
         /// <summary>
@@ -14958,7 +15069,12 @@ namespace Gekko
         /// <returns></returns>
         public static string Find(O.Find o)  //returns equation name
         {
-            if (G.GetModelType() == EModelType.GAMSScalar)
+            if (G.GetModelType() == EModelType.Unknown)
+            {
+                new Error("It seems no model is loaded, cf. the MODEL command.");
+                return null;  //will never happen
+            }
+            else if (G.GetModelType() == EModelType.GAMSScalar)
             {
                 return Gekko.Decomp.Find(o);
             }
