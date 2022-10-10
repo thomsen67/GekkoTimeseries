@@ -169,6 +169,7 @@ namespace Gekko
     {
         public int color = -12345;
         public PeriodAndVariable pv = null;
+        public int eq = -12345;
         public Flood parent = null;
     }
 
@@ -1821,69 +1822,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
-            if (true && Globals.runningOnTTComputer)
-            {
-                //Speed-up: doing flood-fill from the endpoint and make them meet?
-
-                Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
-                string x1 = "qBNP";
-                string x2 = "vtKilde";
-                int a1 = Program.model.modelGamsScalar.dict_FromVarNameToANumber[x1];
-                int a2 = Program.model.modelGamsScalar.dict_FromVarNameToANumber[x2];
-                int t = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, 2027, 1));
-
-                PeriodAndVariable pv1 = new PeriodAndVariable(t, a1);
-                PeriodAndVariable pv2 = new PeriodAndVariable(t, a2);
-
-                Flood start = new Flood();
-                start.color = 0;
-                start.parent = null;
-                start.pv = pv1;
-
-                Flood end = new Flood();
-                end.color = -12345;
-                end.parent = null;
-                end.pv = pv2;
-
-                List<Flood> xxx = new List<Flood>();
-                xxx.Add(start);
-                                
-                while (true)
-                {
-                    bool done = false;
-                    List<Flood> yyy = new List<Flood>();
-                    foreach (Flood x in xxx)
-                    {
-                        yyy.AddRange(Flood1Color(x, end, colors, out done));
-                        if (done) break;
-                    }
-                    if (done) break;
-                    if (yyy.Count == 0) break;
-                    xxx = yyy;
-                }
-
-                List<string> temp = new List<string>();
-                Flood f = colors[pv2];
-                while (true)
-                {
-                    string label = null;
-                    try
-                    {
-                        string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod().Item1), EFreq.A);
-                        Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
-                        label = ts.meta.label;
-                    } catch { };
-                    temp.Add(f.color + ": " + f.pv.ToString() + "   ---   " + label);
-                    if (f.parent == null) break;
-                    f = f.parent;
-                }
-                temp.Reverse();
-                foreach (string s in temp)
-                {
-                    new Writeln(s);
-                }
-            }
+        {   
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -2332,8 +2271,7 @@ namespace Gekko
             List<Flood> rv = new List<Flood>();
             List<int> eqs = Program.model.modelGamsScalar.dependents[flood.pv];
             foreach (int eq in eqs)
-            {
-                //string eqName = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[eq];
+            {                
                 ModelScalarEquation eqs2 = Program.model.modelGamsScalar.precedents[eq];
                 foreach (PeriodAndVariable pv2 in eqs2.vars)
                 {   
@@ -2349,6 +2287,7 @@ namespace Gekko
                         f.color = flood.color + 1;
                         f.parent = flood;
                         f.pv = pv2;
+                        f.eq = eq;
                         colors.Add(pv2, f);
                         rv.Add(f);
                     }

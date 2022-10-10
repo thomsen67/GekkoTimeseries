@@ -379,7 +379,7 @@ namespace Gekko
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
                 if (Globals.runningOnTTComputer) new Writeln("TTH: Button color problem...");
             }

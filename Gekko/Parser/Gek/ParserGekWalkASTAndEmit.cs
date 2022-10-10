@@ -5012,6 +5012,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("O.Find o" + Num(node) + " = new O.Find();" + G.NL);
                         GetCodeFromAllChildren(node, node[0]);  //options                            
                         node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
+                        if (node[2] != null) node.Code.A("o" + Num(node) + ".iv2 = " + node[2].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

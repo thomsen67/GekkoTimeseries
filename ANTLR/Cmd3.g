@@ -2959,7 +2959,7 @@ eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, i
 // FIND
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-find:                       FIND findOpt1? seqOfBankvarnamesOnly1 -> ^({token("ASTFIND", ASTFIND, input.LT(1).Line)} ^(ASTOPT_ findOpt1?) seqOfBankvarnamesOnly1);
+find:                       FIND findOpt1? seqOfBankvarnamesOnly1 (TO seqOfBankvarnamesOnly1)? -> ^({token("ASTFIND", ASTFIND, input.LT(1).Line)} ^(ASTOPT_ findOpt1?) seqOfBankvarnamesOnly1+);
 
 findOpt1:					ISNOTQUAL
 						  | leftAngle2          findOpt1h* RIGHTANGLE -> ^(ASTOPT1 findOpt1h*)							
@@ -5229,7 +5229,6 @@ stringInQuotes:             StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
  //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the
  //      GLUE token is defined from.
- defined from
 fragment NEWLINE2:          '\n' ;
 fragment NEWLINE3:          '\r\n' ;
 fragment DIGIT:             '0'..'9' ;

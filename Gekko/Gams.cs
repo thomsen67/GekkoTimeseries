@@ -1511,15 +1511,18 @@ namespace Gekko
                         double hashMs = 0d;
                         DateTime t0 = DateTime.Now;
                         bool problem = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
-                        if(Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
+                        timeLoadCache = "cache: " + G.Seconds(t0);
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         if (problem)
                         {
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                         }
                         else
                         {
+                            DateTime t1 = DateTime.Now;
                             GAMSScalarModelHelper(true);
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            timeCompile = "compile: " + G.Seconds(t1);
                         }
                     }
                     else
@@ -1696,7 +1699,7 @@ namespace Gekko
                     }
                     if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
                     {
-                        txt.MainAdd("Cache: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
+                        txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
                     }
                     else
                     {

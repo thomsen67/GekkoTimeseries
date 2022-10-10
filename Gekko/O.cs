@@ -8041,7 +8041,8 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
             public string opt_prtcode = null;
-            public List iv = null;
+            public List iv = null;  //why list?
+            public List iv2 = null;  //why list?
 
             //--- extra ---
 

@@ -4133,63 +4133,31 @@ namespace Gekko
 
         public static string Find(O.Find o)
         {
-            //For scalar model            
+            //For scalar model     
+
+            //Runs pretty fast, but later on check is this is necessary...
+            ModelGamsScalar.FlushAAndRArrays();
+            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
 
             Globals.itemHandler = new ItemHandler();  //hack
 
             o.t0 = o.decompFind.decompOptions2.t1;  //selected time
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
+
+            if (o.iv2 != null)
+            {
+                List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
+                FindConnection(vars[0], vars2[0]);
+                return "";
+            }
+
             int timeIndex = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0].Replace(" ", "");  //no blanks
             int aNumber = -12345; bool good = Program.model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
             if (!good)
-            {
-                bool variableExists = false;
-                bool variableExistsAndHasIndex = false;
-                foreach (KeyValuePair<string, int> kvp in Program.model.modelGamsScalar.dict_FromVarNameToANumber)
-                {
-
-                    if (G.Equal(G.Chop_RemoveIndex(variableName), G.Chop_RemoveIndex(kvp.Key)))
-                    {
-                        variableExists = true;
-                        if (G.Chop_HasIndex(kvp.Key)) variableExistsAndHasIndex = true;
-                        break;
-                    }
-                }
-
-                if (!variableExists)
-                {
-                    new Error("The variable " + G.Chop_RemoveIndex(variableName) + " does not exist in the model. You may use the INDEX command to search for variable names, or DISP '...' to search descriptions.");
-                }
-
-                if (G.Chop_HasIndex(variableName))
-                {
-                    if (variableExistsAndHasIndex)
-                    {
-                        new Error("The " + G.Chop_GetName(variableName) + " element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable " + G.Chop_GetName(variableName) + " does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.");
-                    }
-                    else
-                    {
-                        new Error("The model variable " + G.Chop_GetName(variableName) + " has no index/dimensions. Try 'FIND " + G.Chop_GetName(variableName) + ";'");
-                    }
-                }
-                else
-                {
-                    if (variableExistsAndHasIndex)
-                    {
-                        new Error("The variable " + variableName + " exists in the model, but has index/dimensions. You may use 'DISP " + variableName + ";' to see the elements of the variable.");
-                    }
-                    else
-                    {
-                        //...how could we ever end here?
-                        new Error("The variable " + variableName + " cannot be found in the model.");
-                    }
-                }
-
-
-                
-
-
+            {                
+                new Error(NonFoundInModelError(variableName));
             }
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
@@ -4308,6 +4276,161 @@ namespace Gekko
             windowFind.Close();
 
             return rv;
+        }
+
+        private static string NonFoundInModelError(string variableName)
+        {
+            bool variableExists = false;
+            bool variableExistsAndHasIndex = false;
+            string error = null;
+            foreach (KeyValuePair<string, int> kvp in Program.model.modelGamsScalar.dict_FromVarNameToANumber)
+            {
+                if (G.Equal(G.Chop_RemoveIndex(variableName), G.Chop_RemoveIndex(kvp.Key)))
+                {
+                    variableExists = true;
+                    if (G.Chop_HasIndex(kvp.Key)) variableExistsAndHasIndex = true;
+                    break;
+                }
+            }
+
+            if (!variableExists)
+            {
+                error = "The variable " + G.Chop_RemoveIndex(variableName) + " does not exist in the model. You may use the INDEX command to search for variable names, or DISP '...' to search descriptions.";
+                return error;
+            }
+
+            if (G.Chop_HasIndex(variableName))
+            {
+                if (variableExistsAndHasIndex)
+                {
+                    error = "The " + G.Chop_GetName(variableName) + " element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable " + G.Chop_GetName(variableName) + " does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.";
+                    return error;
+                }
+                else
+                {
+                    error = "The model variable " + G.Chop_GetName(variableName) + " has no index/dimensions. Try 'FIND " + G.Chop_GetName(variableName) + ";'";
+                    return error;
+                }
+            }
+            else
+            {
+                if (variableExistsAndHasIndex)
+                {
+                    error = "The variable " + variableName + " exists in the model, but has index/dimensions. You may use 'DISP " + variableName + ";' to see the elements of the variable.";
+                    return error;
+                }
+                else
+                {
+                    //...how could we ever end here?
+                    error = "The variable " + variableName + " cannot be found in the model.";
+                    return error;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Find shortest model connection between two vars and print out the connection
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        private static void FindConnection(string x1, string x2)
+        {
+            //Speed-up: doing flood-fill from the endpoint and make them meet?
+
+            // ===> something fishy about some dict_...., where we need to remove blanks first.
+            // ===> fix that, so the dict is never called directly.
+
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+            int t2027 = Program.model.modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, 2027, 1));
+
+            Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
+
+            int a1 = -12345;
+            bool good1 = Program.model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x1, out a1);
+            if (!good1) new Error(NonFoundInModelError(x1));
+
+            int a2 = -12345;
+            bool good2 = Program.model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x2, out a2);
+            if (!good2) new Error(NonFoundInModelError(x2));            
+
+            PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
+            PeriodAndVariable pv2 = new PeriodAndVariable(t2027, a2);
+
+            Flood start = new Flood();
+            start.color = 0;
+            start.parent = null;
+            start.pv = pv1;
+
+            Flood end = new Flood();
+            end.color = -12345;
+            end.parent = null;
+            end.pv = pv2;
+
+            List<Flood> xxx = new List<Flood>();
+            xxx.Add(start);
+
+            while (true)
+            {
+                bool done = false;
+                List<Flood> yyy = new List<Flood>();
+                foreach (Flood x in xxx)
+                {
+                    yyy.AddRange(Program.Flood1Color(x, end, colors, out done));
+                    if (done) break;
+                }
+                if (done) break;
+                if (yyy.Count == 0) break;
+                xxx = yyy;
+            }
+
+            List<string> temp = new List<string>();
+            Flood f = colors[pv2];
+
+            while (true)
+            {
+                string label = null;
+                try
+                {
+                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod().Item1), EFreq.A);
+                    Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
+                    label = ts.meta.label;
+                }
+                catch { };
+                temp.Add(f.pv.ToString() + " (" + label + ")");
+                if (f.eq != -12345)
+                {
+                    temp.Add("--> " + Program.model.modelGamsScalar.dict_FromEqNumberToEqName[f.eq] + " --> ");
+                }
+                if (f.parent == null) break;
+                f = f.parent;
+            }
+            temp.Reverse();
+
+            //string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
+
+
+            using (Writeln txt = new Writeln("  ", int.MaxValue, System.Drawing.Color.Empty, false, ETabs.Main))
+            {
+                txt.MainAdd("--------------------- connection --------------------- ");
+                txt.MainNewLine();
+                foreach (string s2 in temp)
+                {
+                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
+                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    //string s3 = s2.Replace("[2025]", "[-2]").Replace("[2026]", "[-1]").Replace("[2027]", "").Replace("[2028]", "[+1]").Replace("[2029]", "[+2]");
+                    txt.MainAdd(s2);
+                    txt.MainNewLine();
+                }
+                txt.MainAdd("------------------------------------------------------ ");
+                txt.MainNewLine();
+            }
         }
 
         public enum ENormalizerType
