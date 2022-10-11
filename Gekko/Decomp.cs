@@ -294,6 +294,8 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompStart(O.Decomp2 o)
         {
+            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+
             //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
             //  eval might help.
             //In an equation like y[#a] = x[#a] + 5, there will be 100 equations if #a is 1..100. For each of these, lags are tried. So
@@ -329,7 +331,7 @@ namespace Gekko
                 else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;                
-                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null);
+                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, modelGamsScalar);
             }
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
@@ -389,8 +391,7 @@ namespace Gekko
                 
 
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {
-                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                {                    
                     if (MustLoadDataIntoModel())
                     {
                         ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
@@ -1918,7 +1919,7 @@ namespace Gekko
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
 
-                windowDecomp.RecalcCellsWithNewType(true, modelGamsScalar);
+                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
                 decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on
 
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
@@ -1950,7 +1951,7 @@ namespace Gekko
             }
             else
             {
-                windowDecomp.RecalcCellsWithNewType(true);
+                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
             }
         }
 
@@ -4270,7 +4271,7 @@ namespace Gekko
             windowFind._activeEquation = firstEqName;
             windowFind._activeVariable = null;
 
-            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0);
+            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
             windowFind.decompFind.SetWindow(windowFind);
             
             bool? b = windowFind.ShowDialog();
@@ -4499,11 +4500,6 @@ namespace Gekko
         {
             Tuple<string, GekkoTime> xx = this.GetVariableAndPeriod(modelGamsScalar);
             return xx.Item1 + "[" + xx.Item2.ToString() + "]";
-        }
-
-        public override string ToString()
-        {
-            return ToStringPretty(modelGamsScalar);
         }
 
         public override int GetHashCode()

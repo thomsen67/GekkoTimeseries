@@ -61,7 +61,7 @@ namespace Gekko
             //viewModel.YourCommand.Execute(null);
             if (e.Key == Key.Return)
             {
-                CallDecomp(this._activeEquation);
+                CallDecomp(this._activeEquation, decompFind.modelGamsScalar);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {
             this._activeVariable = null;
-            this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
+            this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -118,7 +118,7 @@ namespace Gekko
             }
             else
             {
-                this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
+                this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
             }
         }
 
@@ -137,10 +137,10 @@ namespace Gekko
             //}
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;            
-            CallDecomp(item.fullName);
+            CallDecomp(item.fullName, decompFind.modelGamsScalar);
         }
 
-        private void CallDecomp(string fullName)
+        private void CallDecomp(string fullName, ModelGamsScalar modelGamsScalar)
         {
             string eqName = G.Chop_DimensionRemoveLast(fullName);
 
@@ -157,7 +157,7 @@ namespace Gekko
             List endo = new List(new List<string>() { varName });
             decomp.endo = new List<IVariable>() { endo };
             decomp.name = new ScalarString(eqName);            
-            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null);
+            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, modelGamsScalar);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
 
@@ -174,7 +174,7 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
             this._activeEquation = item.fullName;
         }
 
@@ -183,7 +183,7 @@ namespace Gekko
             this.windowFindStatusBar.Text = Globals.windowFindStatusBarText;
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -191,16 +191,16 @@ namespace Gekko
             this.windowFindStatusBar.Text = "";
             bool showTime = false;
             GekkoTime t0 = this.decompFind.decompOptions2.t1;
-            this.EquationBrowserSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0);
+            this.EquationBrowserSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
         private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
         {
-            this.EquationBrowserSetEquation(eqName, showTime, t0);
+            this.EquationBrowserSetEquation(eqName, showTime, t0, modelGamsScalar);
             int eqNumber = modelGamsScalar.GetEqNumber(eqName);
             List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
-            this.EquationBrowserSetButtons(eqName, precedents);
+            this.EquationBrowserSetButtons(eqName, precedents, modelGamsScalar);
         }
 
         public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
@@ -227,7 +227,7 @@ namespace Gekko
             this.windowEquationBrowserLabel.Text = s7;
         }
 
-        public void EquationBrowserSetButtons(string eqName, List<string> firstList)
+        public void EquationBrowserSetButtons(string eqName, List<string> firstList, ModelGamsScalar modelGamsScalar)
         {
             EquationBrowserSetButtons1(eqName, firstList);
             //Dispatching the color update
@@ -237,7 +237,7 @@ namespace Gekko
             //or we could wait 0.5 second before any coloring?
             if (true)
             {
-                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtonsColors(eqName)), System.Windows.Threading.DispatcherPriority.Background);
+                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtonsColors(eqName, modelGamsScalar)), System.Windows.Threading.DispatcherPriority.Background);
             }
             try
             {

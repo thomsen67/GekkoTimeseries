@@ -183,18 +183,20 @@ namespace Gekko
         public object window = null;
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
+        public ModelGamsScalar modelGamsScalar = null;
 
-        public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window)
+        public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, ModelGamsScalar modelGamsScalar)
         {
             this.type = type;
             this.depth = depth;
             this.decompOptions2 = decompOptions2;
             this.window = window;  //either WindowDecomp or WindowFind
+            this.modelGamsScalar = modelGamsScalar;
         }
 
-        public DecompFind CreateChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window)
+        public DecompFind CreateChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window, ModelGamsScalar modelGamsScalar)
         {
-            DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window);
+            DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window, modelGamsScalar);
             child.parent = this;
             this.children.Add(child);
             return child;
@@ -15106,7 +15108,7 @@ namespace Gekko
             string rv = null;
             WindowFind eb = new WindowFind(null);
             eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetButtons(firstEqName, firstList);
+            eb.EquationBrowserSetButtons(firstEqName, firstList, null);
             //eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;

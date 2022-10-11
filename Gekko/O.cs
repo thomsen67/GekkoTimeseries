@@ -8059,14 +8059,15 @@ namespace Gekko
             {
                 //called from DECOMP             
                 DecompOptions2 temp = df.decompOptions2.Clone(false);
-                this.decompFind = df.CreateChild(temp, EDecompFindNavigation.Find, null);
+                this.decompFind = df.CreateChild(temp, EDecompFindNavigation.Find, null, df.modelGamsScalar);
             }
 
             public void Exe()
             {
                 if (this.decompFind == null)
                 {
-                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null);
+                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                    this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, new DecompOptions2(), null, modelGamsScalar);
                     this.decompFind.decompOptions2.t1 = this.t1;
                     this.decompFind.decompOptions2.t2 = this.t2;
                     if (this.opt_prtcode == null)
