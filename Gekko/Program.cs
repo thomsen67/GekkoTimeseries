@@ -2492,13 +2492,13 @@ namespace Gekko
             List<List<StringDouble>> aa = SplitVarsInSameSizeParts(a, n, true);
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("public static List<string> ProtobufModelGamsScalar5a(int n){");
+            sb.AppendLine("public static List<string> ProtobufModelGamsScalar5a(int n, ModelGamsScalar modelGamsScalar){");
             sb.AppendLine("if(n != " + n + ") new Error(\"Hov\");");
             sb.AppendLine("List<ModelGamsScalar> m = new List<ModelGamsScalar>();");
             sb.AppendLine("for(int i = 1; i <= n + 1; i++) {");
             sb.AppendLine("  m.Add(null);");
             sb.AppendLine("}");
-            sb.AppendLine("m[0] = Program.model.modelGamsScalar;");
+            sb.AppendLine("m[0] = modelGamsScalar;");
             int i = 0;
             foreach (List<StringDouble> x1 in aa)
             {
@@ -2522,7 +2522,7 @@ namespace Gekko
             // ---------------------------------------
 
             sb = new StringBuilder();
-            sb.AppendLine("public static void ProtobufModelGamsScalar5b(List<ModelGamsScalar>m){");            
+            sb.AppendLine("public static ModelGamsScalar ProtobufModelGamsScalar5b(List<ModelGamsScalar>m){");            
             i = 0;
             foreach (List<StringDouble> x1 in aa)
             {
@@ -2532,7 +2532,7 @@ namespace Gekko
                     sb.AppendLine("m[0]." + x2.s + " = m[" + i + "]" + "." + x2.s + ";");
                 }
             }
-            sb.AppendLine("Program.model.modelGamsScalar = m[0];");
+            sb.AppendLine("return m[0];");
             sb.AppendLine("}");
             File.WriteAllText("c:\\tools\\Model2.cs", sb.ToString());
 
@@ -2540,7 +2540,7 @@ namespace Gekko
 
         }
 
-        public static List<ModelGamsScalar> ProtobufModelGamsScalar5a(int n)
+        public static List<ModelGamsScalar> ProtobufModelGamsScalar5a(int n, ModelGamsScalar modelGamsScalar)
         {            
             if (n != 5) new Error("Hov");
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
@@ -2548,7 +2548,7 @@ namespace Gekko
             {
                 m.Add(new ModelGamsScalar());
             }
-            m[0] = Program.model.modelGamsScalar;
+            m[0] = modelGamsScalar;
             m[1] = new ModelGamsScalar();
             m[1].precedents = m[0].precedents;
             m[0].precedents = null;
@@ -2583,7 +2583,7 @@ namespace Gekko
             return m;
         }        
 
-        public static void ProtobufModelGamsScalar5b(List<ModelGamsScalar>m)
+        public static ModelGamsScalar ProtobufModelGamsScalar5b(List<ModelGamsScalar>m)
         {
             m[0].precedents = m[1].precedents;
             m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
@@ -2598,7 +2598,7 @@ namespace Gekko
             m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
             m[0].bbTemp = m[5].bbTemp;
             m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
-            Program.model.modelGamsScalar = m[0];
+            return m[0];
         }
 
 
@@ -2669,14 +2669,14 @@ namespace Gekko
             Program.model.modelGamsScalar = m[0];
         }
 
-        public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs)
+        public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, ModelGamsScalar modelGamsScalar)
         {
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
             List<string> files = GetSplitCacheFileNames(k + 1, inputFileName, "model", ref hash);
 
-            List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k);
+            List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k, modelGamsScalar);
 
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
@@ -2710,7 +2710,7 @@ namespace Gekko
         /// <summary>
         /// Reads model protobuf files in parallel.
         /// </summary>
-        public static bool ReadParallelModel(string fileName, string hash)
+        public static ModelGamsScalar ReadParallelModel(string fileName, string hash)
         {
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -2723,7 +2723,7 @@ namespace Gekko
 
             string part2 = Globals.gekkoVersion + "_" + "model" + "_" + hash + "_";
             int k = ValidateFileNames(part2);
-            if (k == -12345) return true;  //could not find anything useful in cache
+            if (k == -12345) return null;  //could not find anything useful in cache
 
             for (int i = 0; i < k; i++)
             {
@@ -2758,10 +2758,8 @@ namespace Gekko
                     return 0;
                 }, _ => { });
             }
-
-            ProtobufModelGamsScalar5b(lists);            
-            lists = null;  //free for GC     
-            return false;
+            
+            return ProtobufModelGamsScalar5b(lists);
         }
 
         public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
@@ -16564,7 +16562,9 @@ namespace Gekko
             }
             else if (modelType == EModelType.GAMSScalar)
             {
-                GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                ModelGamsScalar modelGamsScalar = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                Program.model = new Model();
+                Program.model.modelGamsScalar = modelGamsScalar;
                 Program.options.model_type = "gams";  //will not be set if something crashes above
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();

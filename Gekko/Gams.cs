@@ -1471,7 +1471,7 @@ namespace Gekko
         /// <summary>
         /// Read/load a GAMS scalar model from a suitable zip file. See also ReadGamsRawModel().
         /// </summary>
-        public static void ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
+        public static ModelGamsScalar ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
         {
             //TODO TODO TODO
             //TODO TODO TODO
@@ -1491,9 +1491,8 @@ namespace Gekko
             string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);
 
             //these objects typically get overridden soon
-            Program.model = new Model();
+            
             ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
-            Program.model.modelGamsScalar = modelGamsScalar;
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
@@ -1510,16 +1509,17 @@ namespace Gekko
                         //TODO 
                         double hashMs = 0d;
                         DateTime t0 = DateTime.Now;
-                        bool problem = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
+                        modelGamsScalar = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
                         timeLoadCache = "cache: " + G.Seconds(t0);
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
-                        if (problem)
+                        if (modelGamsScalar == null)
                         {
+                            modelGamsScalar = new ModelGamsScalar();
                             modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                         }
                         else
                         {
-                            DateTime t1 = DateTime.Now;
+                            DateTime t1 = DateTime.Now;                            
                             GAMSScalarModelHelper(true, modelGamsScalar);
                             modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             timeCompile = "compile: " + G.Seconds(t1);
@@ -1618,8 +1618,7 @@ namespace Gekko
 
                 if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
 
-                Program.model = new Model();
-                Program.model.modelGamsScalar = ReadGamsScalarModelEquations(input);
+                modelGamsScalar = ReadGamsScalarModelEquations(input);
 
                 DateTime t1 = DateTime.Now;
 
@@ -1633,7 +1632,7 @@ namespace Gekko
                         //TODO
                         //TODO what about last argument ms?
                         //TODO
-                        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0);
+                        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, modelGamsScalar);
                     }
                     else
                     {
@@ -1714,9 +1713,8 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
             }
-
-            var xx = modelGamsScalar;
-
+            return modelGamsScalar;
+            
         }
 
         /// <summary>
