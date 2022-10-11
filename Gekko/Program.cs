@@ -2269,10 +2269,10 @@ namespace Gekko
         {
             done = false;
             List<Flood> rv = new List<Flood>();
-            List<int> eqs = Program.model.modelGamsScalar.dependents[flood.pv];
+            List<int> eqs = modelGamsScalar.dependents[flood.pv];
             foreach (int eq in eqs)
             {                
-                ModelScalarEquation eqs2 = Program.model.modelGamsScalar.precedents[eq];
+                ModelScalarEquation eqs2 = modelGamsScalar.precedents[eq];
                 foreach (PeriodAndVariable pv2 in eqs2.vars)
                 {   
                     //new Writeln("equation " + eqName + " containing variable " + pv.GetVariableAndPeriod().Item1 + " in " + pv.GetVariableAndPeriod().Item2.ToString());

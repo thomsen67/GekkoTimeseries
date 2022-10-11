@@ -119,7 +119,7 @@ namespace Gekko
             foreach (string eqName in eqNames)
             {
                 i++;                
-                List<ModelGamsEquation> temp = null; Program.model.modelGamsScalar.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
+                List<ModelGamsEquation> temp = null; modelGamsScalar.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
                 if (temp == null) continue;
                 foreach (ModelGamsEquation eq in temp)
                 {                    
@@ -178,7 +178,7 @@ namespace Gekko
             {
                 i++;
                 if (i > 0) s2 += G.NL;
-                s2 += Program.model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
+                s2 += modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
             string rv = two.s1 + G.NL + "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL + "-------------- GAMS --------------" + G.NL + G.NL + two.s2;
             return rv;
@@ -684,7 +684,7 @@ namespace Gekko
         public List<string> GetPrecedentsNames(int eqNumber, bool showTime, GekkoTime t0)
         {
             List<string> precedents = new List<string>();
-            foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
+            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
             {
                 //see also #as7f3læaf9                
                 Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
@@ -703,7 +703,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into Program.model.modelGamsScalar.r array,
+        /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into modelGamsScalar.r array,
         /// at the slot i. Note that this is slightly slower than calling functions[...] directly, so beware
         /// if calling it in a tight loop.
         /// </summary>
@@ -1025,21 +1025,21 @@ namespace Gekko
         public static void FlushAAndRArrays()
         {
             //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
-            if (Program.model.modelGamsScalar.a != null)
+            if (modelGamsScalar.a != null)
             {
-                for (int j = 0; j < Program.model.modelGamsScalar.a.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a[j]);
+                for (int j = 0; j < modelGamsScalar.a.Length; j++) G.SetNaN(modelGamsScalar.a[j]);
             }
-            if (Program.model.modelGamsScalar.a_ref != null)
+            if (modelGamsScalar.a_ref != null)
             {
-                for (int j = 0; j < Program.model.modelGamsScalar.a_ref.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a_ref[j]);
+                for (int j = 0; j < modelGamsScalar.a_ref.Length; j++) G.SetNaN(modelGamsScalar.a_ref[j]);
             }
-            if (Program.model.modelGamsScalar.r != null)
+            if (modelGamsScalar.r != null)
             {
-                G.SetNaN(Program.model.modelGamsScalar.r);
+                G.SetNaN(modelGamsScalar.r);
             }
-            if (Program.model.modelGamsScalar.r_ref != null)
+            if (modelGamsScalar.r_ref != null)
             {
-                G.SetNaN(Program.model.modelGamsScalar.r_ref);
+                G.SetNaN(modelGamsScalar.r_ref);
             }
         }
 

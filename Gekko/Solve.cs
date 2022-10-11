@@ -742,40 +742,27 @@ namespace Gekko
                     for (int j2 = 0; j2 < rep2; j2++)
                     {
                         //This must run fast, else see PredictScalarModel()
-                        Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = Program.model.modelGamsScalar.functions;
-                        double[][] a = Program.model.modelGamsScalar.a;
-                        double[] r = Program.model.modelGamsScalar.r;
-                        int[][] bb = Program.model.modelGamsScalar.bb;
-                        double[] cc = Program.model.modelGamsScalar.cc;
-                        int[][] dd = Program.model.modelGamsScalar.dd;
-                        int[] ee = Program.model.modelGamsScalar.ee;
+                        Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = modelGamsScalar.functions;
+                        double[][] a = modelGamsScalar.a;
+                        double[] r = modelGamsScalar.r;
+                        int[][] bb = modelGamsScalar.bb;
+                        double[] cc = modelGamsScalar.cc;
+                        int[][] dd = modelGamsScalar.dd;
+                        int[] ee = modelGamsScalar.ee;
 
-                        for (int i = 0; i < Program.model.modelGamsScalar.eqCounts; i++)
+                        for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
                             functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
-                                                                    //double x = r[i];  
-
-                            //if (false && i == 1)
-                            //{
-                            //    int[] b = bb[i];
-                            //    int[] d = dd[i];   //      0 1   2 3   4 5   6 7   8 9
-                            //    //-------------------------------------------------------
-                            //    double[] c = cc;   // b's: 1 0   2 0   0 0
-                            //    //                    b's: 1 0   2 0   1 0   2 0   0 0
-                            //      double ri = -c[d[0]] * a[b[0]][b[1]] + a[b[2]][b[3]] / (c[d[1]] + a[b[0]][b[1]]) + M.Tanh(c[d[2]] * a[b[2]][b[3]]) + M.Sqr(a[b[0]][b[1]]) - (c[d[3]]);
-                            //    //double ri = -c[d[0]] * a[b[0]][b[1]] + a[b[2]][b[3]] / (c[d[1]] + a[b[4]][b[5]]) + M.Tanh(c[d[2]] * a[b[6]][b[7]]) + M.Sqr(a[b[8]][b[9]]) - (c[d[3]]);
-                            //    double dif = ri - r[i];
-
-                            //}
+                                                                    //double x = r[i];                              
 
                         }
                     }
-                    new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
+                    new Writeln(modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
 
                     if (j1 == 0)
                     {
                         rss = 0d;
-                        foreach (double d in Program.model.modelGamsScalar.r)
+                        foreach (double d in modelGamsScalar.r)
                         {
                             rss += d * d;
                         }

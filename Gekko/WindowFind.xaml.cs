@@ -198,8 +198,8 @@ namespace Gekko
         private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0)
         {
             this.EquationBrowserSetEquation(eqName, showTime, t0);
-            int eqNumber = Program.model.modelGamsScalar.GetEqNumber(eqName);
-            List<string> precedents = Program.model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
+            int eqNumber = modelGamsScalar.GetEqNumber(eqName);
+            List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
             this.EquationBrowserSetButtons(eqName, precedents);
         }
 

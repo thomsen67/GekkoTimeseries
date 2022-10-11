@@ -928,75 +928,75 @@ namespace Gekko
             if (true)
             {
                 Program.model = new Model();
-                Program.model.modelGamsScalar = new ModelGamsScalar();
+                modelGamsScalar = new ModelGamsScalar();
                 // -----
-                Program.model.modelGamsScalar.modelGams = g;
+                modelGamsScalar.modelGams = g;
                 // -------------- these can evaluate an equation ---------
-                Program.model.modelGamsScalar.functions = functions;
-                Program.model.modelGamsScalar.a = a;
-                Program.model.modelGamsScalar.r = r;
+                modelGamsScalar.functions = functions;
+                modelGamsScalar.a = a;
+                modelGamsScalar.r = r;
 
-                Program.model.modelGamsScalar.bb = bb;
-                Program.model.modelGamsScalar.cc = cc;
-                Program.model.modelGamsScalar.dd = dd;
-                Program.model.modelGamsScalar.ee = ee;
+                modelGamsScalar.bb = bb;
+                modelGamsScalar.cc = cc;
+                modelGamsScalar.dd = dd;
+                modelGamsScalar.ee = ee;
                 // -------------- helpers, counts -----------------------
-                Program.model.modelGamsScalar.eqCounts = eqCounts;
-                Program.model.modelGamsScalar.count = helper.count;
-                Program.model.modelGamsScalar.known = helper.known;
-                Program.model.modelGamsScalar.unique = helper.unique;
+                modelGamsScalar.eqCounts = eqCounts;
+                modelGamsScalar.count = helper.count;
+                modelGamsScalar.known = helper.known;
+                modelGamsScalar.unique = helper.unique;
                 //
                 // Note that GAMS equation periods are not very useful.
                 // In principle, e1[2020] .. may designate an equation with
                 // variables from 2025, so there are no guarantees.
-                Program.model.modelGamsScalar.t0 = helper.t0;
-                Program.model.modelGamsScalar.t1 = helper.t1;
-                Program.model.modelGamsScalar.t2 = helper.t2;
+                modelGamsScalar.t0 = helper.t0;
+                modelGamsScalar.t1 = helper.t1;
+                modelGamsScalar.t2 = helper.t2;
 
                 // -------------- helpers dictionaries ---------
-                Program.model.modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
-                Program.model.modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
-                Program.model.modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
-                Program.model.modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
-                Program.model.modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
-                Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
-                Program.model.modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
-                Program.model.modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
-                Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
+                modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
+                modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
+                modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
+                modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
+                modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
+                modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
+                modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
+                modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
+                modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
 
                 // -------------- raw codelines ---------
-                Program.model.modelGamsScalar.csCodeLines = csCodeLines;
-                //Program.model.modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
+                modelGamsScalar.csCodeLines = csCodeLines;
+                //modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
 
-                Program.model.modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
+                modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
 
-                Program.model.modelGamsScalar.precedents = new List<ModelScalarEquation>();
-                for (int eqNumber = 0; eqNumber < Program.model.modelGamsScalar.CountEqs(1); eqNumber++)
+                modelGamsScalar.precedents = new List<ModelScalarEquation>();
+                for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
                 {
                     ModelScalarEquation l = new ModelScalarEquation();
-                    Program.model.modelGamsScalar.precedents.Add(l);
+                    modelGamsScalar.precedents.Add(l);
                     //foreach precedent variable
-                    for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                    for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
                     {
-                        PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                        PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
                         if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
                     }
                 }
 
                 //mapping from a varname to the equations it is part of                
-                for (int eqNumber = 0; eqNumber < Program.model.modelGamsScalar.CountEqs(1); eqNumber++)
+                for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
                 {
                     //foreach precedent variable
-                    foreach (PeriodAndVariable dp in Program.model.modelGamsScalar.precedents[eqNumber].vars)
+                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                     {
-                        //for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                        //for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
                         //{
-                        //PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                        //PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
                         List<int> eqsHere = null;
-                        Program.model.modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
+                        modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
                         if (eqsHere == null)
                         {
-                            Program.model.modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
+                            modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
                         }
                         else
                         {
@@ -1011,14 +1011,14 @@ namespace Gekko
 
                 if (false && Globals.runningOnTTComputer)
                 {
-                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in Program.model.modelGamsScalar.dependents)
+                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
                     {
-                        string varName = Program.model.modelGamsScalar.GetVarNameA(kvp.Key.variable);
-                        GekkoTime t = Program.model.modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
+                        string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
+                        GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
                         string s = varName + "[" + t.ToString() + "] = ";
                         foreach (int i in kvp.Value)
                         {
-                            string eqName = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[i];
+                            string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
                             s += eqName + ", ";
                         }
                         new Writeln(s);
@@ -1494,7 +1494,7 @@ namespace Gekko
 
             //these objects typically get overridden soon
             Program.model = new Model();
-            Program.model.modelGamsScalar = new ModelGamsScalar();            
+            modelGamsScalar = new ModelGamsScalar();            
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
@@ -1515,13 +1515,13 @@ namespace Gekko
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         if (problem)
                         {
-                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                            modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                         }
                         else
                         {
                             DateTime t1 = DateTime.Now;
                             GAMSScalarModelHelper(true);
-                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             timeCompile = "compile: " + G.Seconds(t1);
                         }
                     }
@@ -1531,9 +1531,9 @@ namespace Gekko
                         {
                             DateTime dt1 = DateTime.Now;
                             DateTime t0 = DateTime.Now;
-                            Program.model.modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
+                            modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
                             timeLoadCache = "deflate: " + G.Seconds(t0);
-                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             DateTime t1 = DateTime.Now;
                             GAMSScalarModelHelper(true);
                             timeCompile = "compile: " + G.Seconds(t1);
@@ -1549,16 +1549,16 @@ namespace Gekko
                     else
                     {
                         //do nothing, we then have to parse the file
-                        Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                        modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                     }
                 }
             }
             else
             {
-                Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                modelGamsScalar.modelInfo.loadedFromMdlFile = false;
             }
 
-            if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
+            if (modelGamsScalar.modelInfo.loadedFromMdlFile)
             {
                 //no writing of .mdl file of course                
             }
@@ -1639,7 +1639,7 @@ namespace Gekko
                         // ----- SERIALIZE
                         string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                         string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                        Program.ProtobufWrite(Program.model.modelGamsScalar, pathAndFilename);
+                        Program.ProtobufWrite(modelGamsScalar, pathAndFilename);
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
                     }
                 }
@@ -1660,27 +1660,27 @@ namespace Gekko
             tab.CurRow.SetText(1, "Model   : " + input.zipFilePathAndName);
             tab.CurRow.Next();
 
-            tab.CurRow.SetText(1, "Periods : " + Program.model.modelGamsScalar.t1.ToString() + "-" + Program.model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(Program.model.modelGamsScalar.t1, Program.model.modelGamsScalar.t2) + " periods");
+            tab.CurRow.SetText(1, "Periods : " + modelGamsScalar.t1.ToString() + "-" + modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2) + " periods");
             //tab.CurRow.Next();                        
 
             //tab.CurRow.SetText(1, "Lags      : Largest lag = " + 0 + ", largest lead = " + 0);
             tab.CurRow.SetBottomBorder(1, 1);
             //tab.CurRow.Next();
-            //tab.CurRow.SetText(1, "Periods         = " + Program.model.modelGamsScalar.t1.ToString() + "-" + Program.model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(Program.model.modelGamsScalar.t1, Program.model.modelGamsScalar.t2) + " periods");
+            //tab.CurRow.SetText(1, "Periods         = " + modelGamsScalar.t1.ToString() + "-" + modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2) + " periods");
             //tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All eqs         = " + Program.model.modelGamsScalar.CountEqs(1) + " (all dimensions)");
+            tab.CurRow.SetText(1, "All eqs         = " + modelGamsScalar.CountEqs(1) + " (all dimensions)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eqs per period  = " + Program.model.modelGamsScalar.CountEqs(2) + " (no time dimension)");
+            tab.CurRow.SetText(1, "Eqs per period  = " + modelGamsScalar.CountEqs(2) + " (no time dimension)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eq names        = " + Program.model.modelGamsScalar.CountEqs(3) + " (no dimensions)");
+            tab.CurRow.SetText(1, "Eq names        = " + modelGamsScalar.CountEqs(3) + " (no dimensions)");
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All vars        = " + Program.model.modelGamsScalar.CountVars(1) + " (all dimensions)");
+            tab.CurRow.SetText(1, "All vars        = " + modelGamsScalar.CountVars(1) + " (all dimensions)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Vars per period = " + Program.model.modelGamsScalar.CountVars(2) + " (no time dimension)");
+            tab.CurRow.SetText(1, "Vars per period = " + modelGamsScalar.CountVars(2) + " (no time dimension)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Var names       = " + Program.model.modelGamsScalar.CountVars(3) + " (no dimensions)");
+            tab.CurRow.SetText(1, "Var names       = " + modelGamsScalar.CountVars(3) + " (no dimensions)");
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.SetLeftBorder(1);
             tab.CurRow.SetRightBorder(1);
@@ -1697,7 +1697,7 @@ namespace Gekko
                         txt.MainAdd(s);
                         txt.MainNewLineTight();
                     }
-                    if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
+                    if (modelGamsScalar.modelInfo.loadedFromMdlFile)
                     {
                         txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
                     }
@@ -1714,7 +1714,7 @@ namespace Gekko
                 Program.options.print_width = widthRemember;
             }
 
-            var xx = Program.model.modelGamsScalar;
+            var xx = modelGamsScalar;
 
         }
 
@@ -1726,60 +1726,60 @@ namespace Gekko
         {
             if (deserialize)
             {
-                Program.model.modelGamsScalar.bb = new int[Program.model.modelGamsScalar.bbTemp.Length][];
-                for (int i = 0; i < Program.model.modelGamsScalar.bbTemp.Length; i++)
+                modelGamsScalar.bb = new int[modelGamsScalar.bbTemp.Length][];
+                for (int i = 0; i < modelGamsScalar.bbTemp.Length; i++)
                 {
-                    Program.model.modelGamsScalar.bb[i] = Program.model.modelGamsScalar.bbTemp[i].storage;
+                    modelGamsScalar.bb[i] = modelGamsScalar.bbTemp[i].storage;
                 }
-                Program.model.modelGamsScalar.bbTemp = null;
+                modelGamsScalar.bbTemp = null;
 
-                Program.model.modelGamsScalar.dd = new int[Program.model.modelGamsScalar.ddTemp.Length][];
-                for (int i = 0; i < Program.model.modelGamsScalar.ddTemp.Length; i++)
+                modelGamsScalar.dd = new int[modelGamsScalar.ddTemp.Length][];
+                for (int i = 0; i < modelGamsScalar.ddTemp.Length; i++)
                 {
-                    Program.model.modelGamsScalar.dd[i] = Program.model.modelGamsScalar.ddTemp[i].storage;
+                    modelGamsScalar.dd[i] = modelGamsScalar.ddTemp[i].storage;
                 }
-                Program.model.modelGamsScalar.ddTemp = null;
+                modelGamsScalar.ddTemp = null;
 
-                Program.model.modelGamsScalar.a = new double[Program.model.modelGamsScalar.aTemp.Length][];
-                for (int i = 0; i < Program.model.modelGamsScalar.aTemp.Length; i++)
+                modelGamsScalar.a = new double[modelGamsScalar.aTemp.Length][];
+                for (int i = 0; i < modelGamsScalar.aTemp.Length; i++)
                 {
-                    Program.model.modelGamsScalar.a[i] = Program.model.modelGamsScalar.aTemp[i].storage;
+                    modelGamsScalar.a[i] = modelGamsScalar.aTemp[i].storage;
                 }
-                Program.model.modelGamsScalar.aTemp = null;
+                modelGamsScalar.aTemp = null;
 
                 // -----
 
-                Program.model.modelGamsScalar.r_ref = G.CreateNaN(Program.model.modelGamsScalar.CountEqs(1));
-                Program.model.modelGamsScalar.r = G.CreateNaN(Program.model.modelGamsScalar.CountEqs(1));                
+                modelGamsScalar.r_ref = G.CreateNaN(modelGamsScalar.CountEqs(1));
+                modelGamsScalar.r = G.CreateNaN(modelGamsScalar.CountEqs(1));                
 
                 //Loading of Func<>s
-                Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
-                Compile5(Program.model.modelGamsScalar.csCodeLines, Program.model.modelGamsScalar.functions);                                
+                modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[modelGamsScalar.unique];
+                Compile5(modelGamsScalar.csCodeLines, modelGamsScalar.functions);                                
             }
             else
             {
                 //Note: bbTemp, eeTemp and aTemp will never be changed, so we just point to these
                 //      arrays inside the real bb, ee and a objects. This should be safe: protobuf
                 //      does not tamper with these objects.
-                Program.model.modelGamsScalar.bbTemp = new IntArray[Program.model.modelGamsScalar.bb.Length];
-                for (int i = 0; i < Program.model.modelGamsScalar.bb.Length; i++)
+                modelGamsScalar.bbTemp = new IntArray[modelGamsScalar.bb.Length];
+                for (int i = 0; i < modelGamsScalar.bb.Length; i++)
                 {
-                    Program.model.modelGamsScalar.bbTemp[i] = new IntArray();
-                    Program.model.modelGamsScalar.bbTemp[i].storage = Program.model.modelGamsScalar.bb[i];
+                    modelGamsScalar.bbTemp[i] = new IntArray();
+                    modelGamsScalar.bbTemp[i].storage = modelGamsScalar.bb[i];
                 }
 
-                Program.model.modelGamsScalar.ddTemp = new IntArray[Program.model.modelGamsScalar.dd.Length];
-                for (int i = 0; i < Program.model.modelGamsScalar.dd.Length; i++)
+                modelGamsScalar.ddTemp = new IntArray[modelGamsScalar.dd.Length];
+                for (int i = 0; i < modelGamsScalar.dd.Length; i++)
                 {
-                    Program.model.modelGamsScalar.ddTemp[i] = new IntArray();
-                    Program.model.modelGamsScalar.ddTemp[i].storage = Program.model.modelGamsScalar.dd[i];
+                    modelGamsScalar.ddTemp[i] = new IntArray();
+                    modelGamsScalar.ddTemp[i].storage = modelGamsScalar.dd[i];
                 }
 
-                Program.model.modelGamsScalar.aTemp = new DoubleArray[Program.model.modelGamsScalar.a.Length];
-                for (int i = 0; i < Program.model.modelGamsScalar.a.Length; i++)
+                modelGamsScalar.aTemp = new DoubleArray[modelGamsScalar.a.Length];
+                for (int i = 0; i < modelGamsScalar.a.Length; i++)
                 {
-                    Program.model.modelGamsScalar.aTemp[i] = new DoubleArray();
-                    Program.model.modelGamsScalar.aTemp[i].storage = Program.model.modelGamsScalar.a[i];
+                    modelGamsScalar.aTemp[i] = new DoubleArray();
+                    modelGamsScalar.aTemp[i].storage = modelGamsScalar.a[i];
                 }
             }
         }
