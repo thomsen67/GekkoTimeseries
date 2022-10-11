@@ -4266,7 +4266,7 @@ namespace Gekko
             //eb.findOptions.decompOptions2 = decompOptions2;
             //eb.findOptions = o;
             windowFind.Title = variableName + " - " + "Gekko find";
-            windowFind.EquationBrowserSetButtons(firstEqName, firstList);
+            windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
             windowFind.EquationBrowserSetLabel(variableName);
             windowFind._activeEquation = firstEqName;
             windowFind._activeVariable = null;
