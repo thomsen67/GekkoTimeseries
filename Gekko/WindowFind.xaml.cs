@@ -195,7 +195,7 @@ namespace Gekko
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0)
+        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
         {
             this.EquationBrowserSetEquation(eqName, showTime, t0);
             int eqNumber = modelGamsScalar.GetEqNumber(eqName);
@@ -203,9 +203,9 @@ namespace Gekko
             this.EquationBrowserSetButtons(eqName, precedents);
         }
 
-        public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0)
+        public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
         {
-            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0);
+            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0, modelGamsScalar);
             this.windowEquationBrowserLabel.Text = s;
         }
 
@@ -250,7 +250,7 @@ namespace Gekko
 
         }
 
-        public void EquationBrowserSetEquationButtonsColors(string eqName)
+        public void EquationBrowserSetEquationButtonsColors(string eqName, ModelGamsScalar modelGamsScalar)
         {
             try
             {
@@ -269,7 +269,7 @@ namespace Gekko
                     //decompOptionsTemp.link.Add(new Link());
 
                     decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
-                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false);
+                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false, modelGamsScalar);
 
                     //HMMMM [0]
                     //HMMMM [0]
@@ -283,7 +283,7 @@ namespace Gekko
 
                     GekkoTime gt1, gt2;
                     DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.prtOptionLower);
-                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter);
+                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, modelGamsScalar);
 
                     double max = 0d;
 

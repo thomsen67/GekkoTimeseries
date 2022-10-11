@@ -571,7 +571,7 @@ namespace Gekko
             name = start;
         }
 
-        public static void ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
+        public static ModelGamsScalar ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -842,7 +842,7 @@ namespace Gekko
                     }
                 }
             }
-            if(Globals.runningOnTTComputer) new Writeln("TTH: GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
             dt1 = DateTime.Now;
 
             //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
@@ -881,12 +881,12 @@ namespace Gekko
                 helper.a[i1][i2] = d;
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
-            
+
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
             //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
             //if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
             //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
-                        
+
             double[] r = G.CreateNaN(eqCounts2);
             Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];
             double[][] a = helper.a;
@@ -896,16 +896,16 @@ namespace Gekko
             int[] ee = helper.eqPointers.ToArray();
 
             Compile5(csCodeLines, functions);
-            
+
             dt1 = DateTime.Now;
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Data preparation finished: " + G.Seconds(dt1));
-            
+
             dt1 = DateTime.Now;
 
             List<string> gamsFoldedModel = new List<string>();
             if (input.ffh_rawModel != null)
-            {                
+            {
                 using (FileStream fs = Program.WaitForFileStream(input.ffh_rawModel.realPathAndFileName, input.ffh_rawModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (StreamReader sr = new StreamReader(fs))
                 {
@@ -920,111 +920,109 @@ namespace Gekko
             IVariable nestedListOfDependents_opt_dep = null;
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
-            ModelGams g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);            
+            ModelGams g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
 
             dt1 = DateTime.Now;
-            if (true)
+
+            ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
+            // -----
+            modelGamsScalar.modelGams = g;
+            // -------------- these can evaluate an equation ---------
+            modelGamsScalar.functions = functions;
+            modelGamsScalar.a = a;
+            modelGamsScalar.r = r;
+
+            modelGamsScalar.bb = bb;
+            modelGamsScalar.cc = cc;
+            modelGamsScalar.dd = dd;
+            modelGamsScalar.ee = ee;
+            // -------------- helpers, counts -----------------------
+            modelGamsScalar.eqCounts = eqCounts;
+            modelGamsScalar.count = helper.count;
+            modelGamsScalar.known = helper.known;
+            modelGamsScalar.unique = helper.unique;
+            //
+            // Note that GAMS equation periods are not very useful.
+            // In principle, e1[2020] .. may designate an equation with
+            // variables from 2025, so there are no guarantees.
+            modelGamsScalar.t0 = helper.t0;
+            modelGamsScalar.t1 = helper.t1;
+            modelGamsScalar.t2 = helper.t2;
+
+            // -------------- helpers dictionaries ---------
+            modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
+            modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
+            modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
+            modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
+            modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
+            modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
+            modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
+            modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
+            modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
+
+            // -------------- raw codelines ---------
+            modelGamsScalar.csCodeLines = csCodeLines;
+            //modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
+
+            modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
+
+            modelGamsScalar.precedents = new List<ModelScalarEquation>();
+            for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
             {
-                Program.model = new Model();
-                modelGamsScalar = new ModelGamsScalar();
-                // -----
-                modelGamsScalar.modelGams = g;
-                // -------------- these can evaluate an equation ---------
-                modelGamsScalar.functions = functions;
-                modelGamsScalar.a = a;
-                modelGamsScalar.r = r;
-
-                modelGamsScalar.bb = bb;
-                modelGamsScalar.cc = cc;
-                modelGamsScalar.dd = dd;
-                modelGamsScalar.ee = ee;
-                // -------------- helpers, counts -----------------------
-                modelGamsScalar.eqCounts = eqCounts;
-                modelGamsScalar.count = helper.count;
-                modelGamsScalar.known = helper.known;
-                modelGamsScalar.unique = helper.unique;
-                //
-                // Note that GAMS equation periods are not very useful.
-                // In principle, e1[2020] .. may designate an equation with
-                // variables from 2025, so there are no guarantees.
-                modelGamsScalar.t0 = helper.t0;
-                modelGamsScalar.t1 = helper.t1;
-                modelGamsScalar.t2 = helper.t2;
-
-                // -------------- helpers dictionaries ---------
-                modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
-                modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
-                modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
-                modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
-                modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
-                modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
-                modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
-                modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
-                modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
-
-                // -------------- raw codelines ---------
-                modelGamsScalar.csCodeLines = csCodeLines;
-                //modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
-
-                modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
-
-                modelGamsScalar.precedents = new List<ModelScalarEquation>();
-                for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
+                ModelScalarEquation l = new ModelScalarEquation();
+                modelGamsScalar.precedents.Add(l);
+                //foreach precedent variable
+                for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
                 {
-                    ModelScalarEquation l = new ModelScalarEquation();
-                    modelGamsScalar.precedents.Add(l);
-                    //foreach precedent variable
-                    for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                    {
-                        PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                        if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
-                    }
+                    PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
+                    if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
                 }
-
-                //mapping from a varname to the equations it is part of                
-                for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
-                {
-                    //foreach precedent variable
-                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
-                    {
-                        //for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                        //{
-                        //PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                        List<int> eqsHere = null;
-                        modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
-                        if (eqsHere == null)
-                        {
-                            modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
-                        }
-                        else
-                        {
-                            if (eqsHere.Contains(eqNumber))
-                            {
-                                new Error("Strange!");
-                            }
-                            eqsHere.Add(eqNumber);
-                        }
-                    }
-                }
-
-                if (false && Globals.runningOnTTComputer)
-                {
-                    foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
-                    {
-                        string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
-                        GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
-                        string s = varName + "[" + t.ToString() + "] = ";
-                        foreach (int i in kvp.Value)
-                        {
-                            string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                            s += eqName + ", ";
-                        }
-                        new Writeln(s);
-                    }
-                }                
             }
+
+            //mapping from a varname to the equations it is part of                
+            for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
+            {
+                //foreach precedent variable
+                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                {
+                    //for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
+                    //{
+                    //PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
+                    List<int> eqsHere = null;
+                    modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
+                    if (eqsHere == null)
+                    {
+                        modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
+                    }
+                    else
+                    {
+                        if (eqsHere.Contains(eqNumber))
+                        {
+                            new Error("Strange!");
+                        }
+                        eqsHere.Add(eqNumber);
+                    }
+                }
+            }
+
+            if (false && Globals.runningOnTTComputer)
+            {
+                foreach (KeyValuePair<PeriodAndVariable, List<int>> kvp in modelGamsScalar.dependents)
+                {
+                    string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
+                    GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
+                    string s = varName + "[" + t.ToString() + "] = ";
+                    foreach (int i in kvp.Value)
+                    {
+                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        s += eqName + ", ";
+                    }
+                    new Writeln(s);
+                }
+            }
+
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
 
@@ -1040,7 +1038,7 @@ namespace Gekko
                 }
             }
 
-            return;
+            return modelGamsScalar;
         }
 
         /// <summary>
@@ -1494,7 +1492,9 @@ namespace Gekko
 
             //these objects typically get overridden soon
             Program.model = new Model();
-            modelGamsScalar = new ModelGamsScalar();            
+            ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
+            Program.model.modelGamsScalar = modelGamsScalar;
+
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
             if (Program.options.model_cache == true)
@@ -1520,7 +1520,7 @@ namespace Gekko
                         else
                         {
                             DateTime t1 = DateTime.Now;
-                            GAMSScalarModelHelper(true);
+                            GAMSScalarModelHelper(true, modelGamsScalar);
                             modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             timeCompile = "compile: " + G.Seconds(t1);
                         }
@@ -1535,7 +1535,7 @@ namespace Gekko
                             timeLoadCache = "deflate: " + G.Seconds(t0);
                             modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             DateTime t1 = DateTime.Now;
-                            GAMSScalarModelHelper(true);
+                            GAMSScalarModelHelper(true, modelGamsScalar);
                             timeCompile = "compile: " + G.Seconds(t1);
                         }
                     }
@@ -1618,14 +1618,15 @@ namespace Gekko
 
                 if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
 
-                ReadGamsScalarModelEquations(input);                
+                Program.model = new Model();
+                Program.model.modelGamsScalar = ReadGamsScalarModelEquations(input);
 
                 DateTime t1 = DateTime.Now;
 
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-                    GAMSScalarModelHelper(false);
+                    GAMSScalarModelHelper(false, modelGamsScalar);
 
                     if (Globals.modelParallelProtobuf)
                     {
@@ -1722,7 +1723,7 @@ namespace Gekko
         /// Inflate/deflate objects that mitigate the problem that protobuf does not support jagged arrays.
         /// </summary>
         /// <param name="deserialize"></param>
-        private static void GAMSScalarModelHelper(bool deserialize)
+        private static void GAMSScalarModelHelper(bool deserialize, ModelGamsScalar modelGamsScalar)
         {
             if (deserialize)
             {

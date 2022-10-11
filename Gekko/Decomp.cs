@@ -390,11 +390,12 @@ namespace Gekko
 
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
+                    ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
                     if (MustLoadDataIntoModel())
                     {
-                        ModelGamsScalar.FlushAAndRArrays();
-                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                        ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
+                        modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                        modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
                     }
                 }
                 else
@@ -520,7 +521,7 @@ namespace Gekko
         /// <param name="refresh"></param>
         /// <param name="decompDatas"></param>
         /// <returns></returns>
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
         {   
             GekkoTime gt1, gt2;
             DecompOperator op = DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.prtOptionLower);
@@ -554,7 +555,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                PrepareEquations(per1, per2, op, decompOptions2, true);
+                PrepareEquations(per1, per2, op, decompOptions2, true, modelGamsScalar);
             }
 
             if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
@@ -580,7 +581,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter, modelGamsScalar);
                             DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                         }
                     }
@@ -636,12 +637,12 @@ namespace Gekko
 
                             if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                             {
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op);
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op);  //Note: refreshObjects = false!
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op, modelGamsScalar);
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op, modelGamsScalar);  //Note: refreshObjects = false!
                             }
                             else
                             {
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op);
+                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op, modelGamsScalar);
                             }
                         }
                         else
@@ -653,12 +654,12 @@ namespace Gekko
                                 bool refreshObjects = true;
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                                 {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op);
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op, modelGamsScalar);
                                     refreshObjects = false;
                                 }
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                                 {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op);
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op, modelGamsScalar);
                                 }
                             }
                             else
@@ -669,7 +670,7 @@ namespace Gekko
                                 bool refreshObjects = true;
                                 foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                                 {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op);
+                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op, modelGamsScalar);
                                     refreshObjects = false;
                                 }
                             }
@@ -991,7 +992,7 @@ namespace Gekko
         /// <param name="per2"></param>
         /// <param name="operator1"></param>
         /// <param name="decompOptions2"></param>
-        public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2, bool showErrors, ModelGamsScalar model)
+        public static void PrepareEquations(GekkoTime per1, GekkoTime per2, DecompOperator operator1, DecompOptions2 decompOptions2, bool showErrors, ModelGamsScalar modelGamsScalar)
         {
             decompOptions2.link = new List<Link>();
             GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
@@ -1027,7 +1028,7 @@ namespace Gekko
                     elements.Add(mmi, element);
                 }
                 
-                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors, model);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
@@ -1309,7 +1310,7 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <param name="operatorOneOf3Types"></param>
         /// <param name="parentI"></param>
-        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op)
+        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1917,7 +1918,7 @@ namespace Gekko
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
 
-                windowDecomp.RecalcCellsWithNewType(true);
+                windowDecomp.RecalcCellsWithNewType(true, modelGamsScalar);
                 decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on
 
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
@@ -2395,7 +2396,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter, ModelGamsScalar modelGamsScalar)
         {
             // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
             // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
@@ -4133,12 +4134,14 @@ namespace Gekko
 
         public static string Find(O.Find o)
         {
+            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             //For scalar model     
 
-            //Runs pretty fast, but later on check is this is necessary...
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+            //Runs pretty fast, but later on check is this is necessary...            
+
+            ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
+            modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+            modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
 
             Globals.itemHandler = new ItemHandler();  //hack
 
@@ -4148,7 +4151,7 @@ namespace Gekko
             if (o.iv2 != null)
             {
                 List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
-                FindConnection(vars[0], vars2[0]);
+                FindConnection(vars[0], vars2[0], modelGamsScalar);
                 return "";
             }
 
@@ -4157,7 +4160,7 @@ namespace Gekko
             int aNumber = -12345; bool good = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
             if (!good)
             {                
-                new Error(NonFoundInModelError(variableName));
+                new Error(NonFoundInModelError(variableName, modelGamsScalar));
             }
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
@@ -4278,7 +4281,7 @@ namespace Gekko
             return rv;
         }
 
-        private static string NonFoundInModelError(string variableName)
+        private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)
         {
             bool variableExists = false;
             bool variableExistsAndHasIndex = false;
@@ -4333,7 +4336,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x1"></param>
         /// <param name="x2"></param>
-        private static void FindConnection(string x1, string x2)
+        private static void FindConnection(string x1, string x2, ModelGamsScalar modelGamsScalar)
         {
             //Speed-up: doing flood-fill from the endpoint and make them meet?
 
@@ -4351,11 +4354,11 @@ namespace Gekko
 
             int a1 = -12345;
             bool good1 = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x1, out a1);
-            if (!good1) new Error(NonFoundInModelError(x1));
+            if (!good1) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
             int a2 = -12345;
             bool good2 = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x2, out a2);
-            if (!good2) new Error(NonFoundInModelError(x2));            
+            if (!good2) new Error(NonFoundInModelError(x2, modelGamsScalar));            
 
             PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
             PeriodAndVariable pv2 = new PeriodAndVariable(t2027, a2);
@@ -4379,7 +4382,7 @@ namespace Gekko
                 List<Flood> yyy = new List<Flood>();
                 foreach (Flood x in xxx)
                 {
-                    yyy.AddRange(Program.Flood1Color(x, end, colors, out done));
+                    yyy.AddRange(Program.Flood1Color(x, end, colors, out done, modelGamsScalar));
                     if (done) break;
                 }
                 if (done) break;
@@ -4395,7 +4398,7 @@ namespace Gekko
                 string label = null;
                 try
                 {
-                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod().Item1), EFreq.A);
+                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1), EFreq.A);
                     Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
                     label = ts.meta.label;
                 }
@@ -4484,7 +4487,7 @@ namespace Gekko
         /// Converts from ints into something understandable
         /// </summary>
         /// <returns></returns>
-        public Tuple<string, GekkoTime> GetVariableAndPeriod()
+        public Tuple<string, GekkoTime> GetVariableAndPeriod(ModelGamsScalar modelGamsScalar)
         {
             string varName = modelGamsScalar.GetVarNameA(this.variable);
             GekkoTime gt = modelGamsScalar.FromTimeIntegerToGekkoTime(this.date);
@@ -4492,15 +4495,15 @@ namespace Gekko
             return tup;
         }
 
-        private string ToStringPretty()
+        private string ToStringPretty(ModelGamsScalar modelGamsScalar)
         {
-            Tuple<string, GekkoTime> xx = this.GetVariableAndPeriod();
+            Tuple<string, GekkoTime> xx = this.GetVariableAndPeriod(modelGamsScalar);
             return xx.Item1 + "[" + xx.Item2.ToString() + "]";
         }
 
         public override string ToString()
         {
-            return ToStringPretty();
+            return ToStringPretty(modelGamsScalar);
         }
 
         public override int GetHashCode()

@@ -109,7 +109,7 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames)
+        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames, ModelGamsScalar modelGamsScalar)
         {
             string rv = "";
             StringBuilder sb1 = new StringBuilder();
@@ -142,7 +142,7 @@ namespace Gekko
         /// Helper, for the DECOMP window not the FIND window.
         /// </summary>
         /// <returns></returns>
-        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0)
+        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
         {
             string s;
             List<string> eqNames = new List<string>();
@@ -151,7 +151,7 @@ namespace Gekko
                 //eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, t0.ToString(), false));
             }
-            s = Model.GetEquationText(eqNames, showTime, t0);
+            s = Model.GetEquationText(eqNames, showTime, t0, modelGamsScalar);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
@@ -163,14 +163,14 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
+        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
         {            
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2);
+            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, modelGamsScalar);
 
             string s2 = null;
             int i = -1;
@@ -684,10 +684,10 @@ namespace Gekko
         public List<string> GetPrecedentsNames(int eqNumber, bool showTime, GekkoTime t0)
         {
             List<string> precedents = new List<string>();
-            foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+            foreach (PeriodAndVariable dp in this.precedents[eqNumber].vars)
             {
                 //see also #as7f3læaf9                
-                Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod();
+                Tuple<string, GekkoTime> tup = dp.GetVariableAndPeriod(this);
                 string name2 = null;
                 if (showTime)
                 {
@@ -1022,7 +1022,7 @@ namespace Gekko
         /// <summary>
         /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
         /// </summary>
-        public static void FlushAAndRArrays()
+        public static void FlushAAndRArrays(ModelGamsScalar modelGamsScalar)
         {
             //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
             if (modelGamsScalar.a != null)

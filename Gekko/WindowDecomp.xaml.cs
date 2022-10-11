@@ -1500,7 +1500,7 @@ namespace Gekko
                 string s = null;
                 if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1);
+                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, modelGamsScalar);
                 }
                 else
                 {
@@ -1680,7 +1680,7 @@ namespace Gekko
                     string s = null;
                     if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1);
+                        s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, modelGamsScalar);
                     }
                     else
                     {
@@ -1729,7 +1729,7 @@ namespace Gekko
         /// When something in the Gekko decomp GUI is changed (for instance, a field is dragged), this method is called.
         /// </summary>
         /// <param name="refresh"></param>
-        public void RecalcCellsWithNewType(bool refresh)
+        public void RecalcCellsWithNewType(bool refresh, ModelGamsScalar modelGamsScalar)
         {
             try
             {
@@ -1769,12 +1769,12 @@ namespace Gekko
                 IVariable y0aRef = null;
 
                 frame = new FrameLight();
-                Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, frame, refresh, ref this.decompDatas);
+                Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, frame, refresh, ref this.decompDatas, modelGamsScalar);
 
                 string s = null;
                 if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1);
+                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, modelGamsScalar);
                 }
                 else
                 {

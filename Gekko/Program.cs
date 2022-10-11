@@ -2265,7 +2265,7 @@ namespace Gekko
         /// <param name="flood"></param>
         /// <param name="color"></param>
         /// <param name="colors"></param>
-        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done)
+        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done, ModelGamsScalar modelGamsScalar)
         {
             done = false;
             List<Flood> rv = new List<Flood>();

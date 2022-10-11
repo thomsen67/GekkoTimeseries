@@ -728,6 +728,8 @@ namespace Gekko
         {
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
+                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+
                 // test the scalar model
                 // test the scalar model
                 // test the scalar model
