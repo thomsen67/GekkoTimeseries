@@ -4213,24 +4213,6 @@ namespace Gekko
             return var;
         }
 
-        ///// <summary>
-        ///// Whether a Gekko model is loaded with MODEL
-        ///// </summary>
-        ///// <returns></returns>
-        //public static bool HasModelGekko()
-        //{
-        //    return Program.model != null && Program.model.modelGekko != null;
-        //}
-
-        ///// <summary>
-        ///// Whether a model is loaded with MODEL
-        ///// </summary>
-        ///// <returns></returns>
-        //public static bool HasModel()
-        //{
-        //    return Program.model != null && (Program.model.modelGekko != null || Program.model.modelGams != null || Program.model.modelGamsScalar != null);
-        //}
-
         /// <summary>
         /// Gets model type, looking at the global Program.model object. Normally returns .Gekko, .GAMSRaw or GAMSScalarModel. 
         /// If no model is defined, it returns .Unknown.
