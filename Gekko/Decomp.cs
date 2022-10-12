@@ -226,16 +226,16 @@ namespace Gekko
         public DecompOperator Clone()
         {
             DecompOperator rv = new DecompOperator();
-            rv.isPercentageType = false; //for formatting
-            rv.operatorLower = null;
-            rv.isRaw = false;
-            rv.isShares = false;
-            rv.isDoubleDifQuo = false;  //codes that contain 'dp'
-            rv.isDoubleDifRef = false;  //codes that contain 'rdp'
-            rv.lowLevel = Decomp.ELowLevel.Unknown; //.BothQuoAndRef --> <mp> or <xmp> type
+            rv.isPercentageType = this.isPercentageType;
+            rv.operatorLower = this.operatorLower;
+            rv.isRaw = this.isRaw;
+            rv.isShares = this.isShares;
+            rv.isDoubleDifQuo = this.isDoubleDifQuo;
+            rv.isDoubleDifRef = this.isDoubleDifRef;
+            rv.lowLevel = this.lowLevel;
             rv.lagData = new List<int>(); rv.lagData.AddRange(this.lagData);
-            rv.lagGradient = new List<int>() { 0, 0 }; rv.lagGradient.AddRange(this.lagData);
-            rv.type = Decomp.EContribType.Unknown;
+            rv.lagGradient = new List<int>(); rv.lagGradient.AddRange(this.lagGradient);
+            rv.type = this.type;
             return rv;
         }
     }
@@ -3642,6 +3642,8 @@ namespace Gekko
 
             return;
         }
+
+
         // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
         // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
         // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -3683,7 +3685,7 @@ namespace Gekko
             //the latter, these may no even have the same units!
             //Consider the equation x[a] + 500 * x[b] = 1000 * x[a][-1]/x[b][+1]. 
             //How would you meaningfully aggregate into x[a] and x[b] on LHS? If we are only decomposing
-            //x[a], we can look at how x[a] - @x[a] can be decomposed, which is easy enough. Burt 
+            //x[a], we can look at how x[a] - @x[a] can be decomposed, which is easy enough. But 
             //decomposing x[a] and x[b] at the same time on LHS? This would only make sense if the derivatives
             //of x[a] and x[b] are equal, for instance x[a] + x[b] = 1000 * x[a][-1]/x[b][+1]. Then we could
             //state the decomposition of x[a] + x[b] - (@x[a] + @x[b]).

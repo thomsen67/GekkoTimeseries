@@ -2093,7 +2093,7 @@ namespace Gekko
             {
 
                 string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
-                if (xx.StartsWith("x")) xx = "xr" + xx;
+                if (xx.StartsWith("x")) xx = "xr" + xx.Substring(1);
                 else xx = "r" + xx;
                 this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
@@ -2105,7 +2105,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
-                xx = xx.Replace("r", "");
+                if (xx.StartsWith("xr")) xx = "x" + xx.Substring(2);
+                else if (xx.StartsWith("r")) xx = xx.Substring(1);
                 this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2321,6 +2322,15 @@ namespace Gekko
             }
         }
 
+        private void CheckBoxErrors2_Checked_1(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBoxErrors2_Unchecked_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel
