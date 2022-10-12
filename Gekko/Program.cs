@@ -16561,10 +16561,9 @@ namespace Gekko
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSScalar)
-            {
-                ModelGamsScalar modelGamsScalar = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+            {                
                 Program.model = new Model();
-                Program.model.modelGamsScalar = modelGamsScalar;
+                Program.model.modelGamsScalar = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();

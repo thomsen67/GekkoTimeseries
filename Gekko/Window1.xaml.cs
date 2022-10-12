@@ -144,7 +144,7 @@ namespace Gekko
 
                 if (this.decompOptions.guiDecompIsShares)
                 {
-                    checkBox1.IsChecked = true;
+                    checkBoxShares.IsChecked = true;
                 }
 
                 if (this.decompOptions.decompTablesFormat.showErrors)
@@ -154,7 +154,7 @@ namespace Gekko
                 
                 if (this.decompOptions.guiDecompIsBaseline)
                 {
-                    checkBox2.IsChecked = true;
+                    checkBoxRef.IsChecked = true;
                 }
             }
             else
@@ -1080,10 +1080,10 @@ namespace Gekko
                 radioButton10.IsEnabled = true;
                 radioButton10.Opacity = 1.0;
                 //---
-                checkBox1.IsEnabled = true;
-                checkBox1.Opacity = 1.0;
-                checkBox2.IsEnabled = true;
-                checkBox2.Opacity = 1.0;
+                checkBoxShares.IsEnabled = true;
+                checkBoxShares.Opacity = 1.0;
+                checkBoxRef.IsEnabled = true;
+                checkBoxRef.Opacity = 1.0;
                 flowText.Opacity = 0.5;
                 flowText.Visibility = Visibility.Visible;
 
@@ -1142,15 +1142,15 @@ namespace Gekko
 
                 if (this.decompOptions.guiDecompIsRaw)
                 {
-                    checkBox1.IsEnabled = false;  //shares
-                    checkBox1.Opacity = 0.5;
+                    checkBoxShares.IsEnabled = false;  //shares
+                    checkBoxShares.Opacity = 0.5;
                     flowText.Visibility = Visibility.Collapsed;
                 }
 
                 if (G.Equal(transformationCodeAugmented, "m") || G.Equal(transformationCodeAugmented, "xm") || G.Equal(transformationCodeAugmented, "q") || G.Equal(transformationCodeAugmented, "xq") || G.Equal(transformationCodeAugmented, "mp") || G.Equal(transformationCodeAugmented, "xmp"))
                 {
-                    checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
-                    checkBox2.Opacity = 0.5;
+                    checkBoxRef.IsEnabled = false;  //baseline, not meaningful for multiplier types
+                    checkBoxRef.Opacity = 0.5;
                 }
 
                 _statusText.Text = "";

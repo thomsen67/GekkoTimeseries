@@ -332,7 +332,7 @@
                     <RadioButton Name="radioButton30" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" Checked="radioButton30_Checked" ToolTip="Abs. multiplier in percentage time growth rate (decomposed)"></RadioButton>
                 </Border>
             </DockPanel>
-            <CheckBox Grid.Column="11" Grid.Row="2" Name="checkBox1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Show as shares</CheckBox>
+            <CheckBox Grid.Column="11" Grid.Row="2" Name="checkBoxShares" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Show as shares</CheckBox>
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
                 <CheckBox  x:Name="checkBoxErrors" VerticalAlignment="Center" ToolTip="Show count of elements" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Margin="0,0,0,0" Content="Count" Width="60"/>
                 <CheckBox x:Name="checkBoxNames" VerticalAlignment="Center" ToolTip="Show names of elements" Margin="0,0,0,0" Content="Names" Width="60" Checked="CheckBoxNames_Checked" Unchecked="CheckBoxNames_Unchecked" />
@@ -341,7 +341,7 @@
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options
             </TextBlock>
-            <CheckBox Grid.Column="11" Grid.Row="1" Name="checkBox2" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options, code 'r', 'rd', 'rp', etc.)" Content="Ref databank values" Margin="0,3,6.333,3"></CheckBox>
+            <CheckBox Grid.Column="11" Grid.Row="1" Name="checkRef" VerticalAlignment="Center" HorizontalAlignment="Right" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options, code 'r', 'rd', 'rp', etc.)" Content="Ref databank values" Margin="0,3,6.333,3"></CheckBox>
 
             <TextBlock Grid.Column="11" Grid.Row="3" Name="textBlock2" Text="Decimals:" Margin="17.25,21.722,62.75,0.278" Grid.RowSpan="2" ToolTip="Change number of decimals" />
 

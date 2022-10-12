@@ -615,118 +615,89 @@ namespace Gekko
         private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //listView.SelectedItem = null;  --> no, then we cannot move the row
-        }        
+        }
 
-        public void SetRadioButtons() {
-            if (this.decompFind.decompOptions2.isSubWindow)
+        public void SetRadioButtons()
+        {
+
+            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw)
             {
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw)
+                if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
                 {
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
-                    {
-                        radioButton1.IsChecked = true;
-                    }
-                    else if(this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
-                    {
-                        radioButton2.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
-                    {
-                        radioButton4.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
-                    {
-                        radioButton9.IsChecked = true;
-                    }
-                    //else if (this.decompOptions.guiDecompOperator == "n")
-                    //{
-                    //    radioButton21.IsChecked = true;
-                    //}
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
-                    {
-                        radioButton22.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
-                    {
-                        radioButton24.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
-                    {
-                        radioButton29.IsChecked = true;
-                    }
+                    radioButton1.IsChecked = true;
                 }
-                else {
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
-                    {
-                        radioButton5.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
-                    {
-                        radioButton6.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
-                    {
-                        radioButton8.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
-                    {
-                        radioButton10.IsChecked = true;
-                    }
-
-
-                    //else if (this.decompOptions.guiDecompOperator == "n")
-                    //{
-                    //    radioButton25.IsChecked = true;
-                    //}
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
-                    {
-                        radioButton26.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
-                    {
-                        radioButton28.IsChecked = true;
-                    }
-                    else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
-                    {
-                        radioButton30.IsChecked = true;
-                    }
-                }
-
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
                 {
-                    checkBox1.IsChecked = true;
+                    radioButton2.IsChecked = true;
                 }
-
-                if (this.decompFind.decompOptions2.decompTablesFormat.showErrors)
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
                 {
-                    checkBoxErrors.IsChecked = true;
+                    radioButton4.IsChecked = true;
                 }
-                
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef)
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
                 {
-                    checkBox2.IsChecked = true;
+                    radioButton9.IsChecked = true;
+                }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
+                {
+                    radioButton22.IsChecked = true;
+                }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
+                {
+                    radioButton24.IsChecked = true;
+                }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
+                {
+                    radioButton29.IsChecked = true;
                 }
             }
             else
             {
-                //All these buttons are in the "Decomp" columns, codes are from e.g. UDVALG<p> or UDVALG<q> calls from command lines/files.
-                if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "d"))
+                if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
+                {
+                    radioButton5.IsChecked = true;
+                }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
                 {
                     radioButton6.IsChecked = true;
                 }
-                if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "p"))
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
                 {
                     radioButton8.IsChecked = true;
                 }
-                if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "m"))
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
+                {
+                    radioButton10.IsChecked = true;
+                }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
                 {
                     radioButton26.IsChecked = true;
                 }
-                if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "q"))
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
                 {
                     radioButton28.IsChecked = true;
                 }
+                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
+                {
+                    radioButton30.IsChecked = true;
+                }
             }
+
+            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
+            {
+                checkBoxShares.IsChecked = true;
+            }
+
+            if (this.decompFind.decompOptions2.decompTablesFormat.showErrors)
+            {
+                checkBoxErrors.IsChecked = true;
+            }
+
+            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef)
+            {
+                checkRef.IsChecked = true;
+            }
+
         }
 
         public class ViewModel
@@ -1863,10 +1834,10 @@ namespace Gekko
                 radioButton10.IsEnabled = true;
                 radioButton10.Opacity = 1.0;
                 //---
-                checkBox1.IsEnabled = true;
-                checkBox1.Opacity = 1.0;
-                checkBox2.IsEnabled = true;
-                checkBox2.Opacity = 1.0;
+                checkBoxShares.IsEnabled = true;
+                checkBoxShares.Opacity = 1.0;
+                checkRef.IsEnabled = true;
+                checkRef.Opacity = 1.0;
                 //flowText.Opacity = 0.5;
                 //flowText.Visibility = Visibility.Visible;
             }
@@ -1910,8 +1881,8 @@ namespace Gekko
 
             if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw)
             {
-                checkBox1.IsEnabled = false;  //shares
-                checkBox1.Opacity = 0.5;
+                checkBoxShares.IsEnabled = false;  //shares
+                checkBoxShares.Opacity = 0.5;
                 //flowText.Visibility = Visibility.Collapsed;
             }
 
@@ -1922,8 +1893,8 @@ namespace Gekko
             //hmmm but prtOptionLower cannot have x etc....??
             if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "m") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xm") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "q") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xq") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "mp") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xmp"))
             {
-                checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
-                checkBox2.Opacity = 0.5;
+                checkRef.IsEnabled = false;  //baseline, not meaningful for multiplier types
+                checkRef.Opacity = 0.5;
             }            
 
             if (false)
@@ -1933,8 +1904,8 @@ namespace Gekko
                 //TODO TODO TODO TODO TODO TODO  TODO TODO greyed out for now
                 //TODO TODO TODO TODO TODO TODO  TODO TODO
                 //TODO TODO TODO TODO TODO TODO  TODO TODO                
-                checkBox1.IsEnabled = false;
-                checkBox1.Opacity = 0.5;
+                checkBoxShares.IsEnabled = false;
+                checkBoxShares.Opacity = 0.5;
 
                 radioButton9.IsEnabled = false;
                 radioButton9.Opacity = 0.5;
