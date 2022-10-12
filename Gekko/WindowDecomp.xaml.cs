@@ -619,71 +619,66 @@ namespace Gekko
 
         public void SetRadioButtons()
         {
-
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw)
+            if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xn")
             {
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
-                {
-                    radioButton1.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
-                {
-                    radioButton2.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
-                {
-                    radioButton4.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
-                {
-                    radioButton9.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
-                {
-                    radioButton22.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
-                {
-                    radioButton24.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
-                {
-                    radioButton29.IsChecked = true;
-                }
+                radioButton1.IsChecked = true;
             }
-            else
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xd")
             {
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "n")
-                {
-                    radioButton5.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "d")
-                {
-                    radioButton6.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "p")
-                {
-                    radioButton8.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "dp")
-                {
-                    radioButton10.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "m")
-                {
-                    radioButton26.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "q")
-                {
-                    radioButton28.IsChecked = true;
-                }
-                else if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator == "mp")
-                {
-                    radioButton30.IsChecked = true;
-                }
+                radioButton2.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xp")
+            {
+                radioButton4.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xdp")
+            {
+                radioButton9.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xm")
+            {
+                radioButton22.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xq")
+            {
+                radioButton24.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xmp")
+            {
+                radioButton29.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "n")
+            {
+                radioButton5.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "d")
+            {
+                radioButton6.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "p")
+            {
+                radioButton8.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "dp")
+            {
+                radioButton10.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "m")
+            {
+                radioButton26.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "q")
+            {
+                radioButton28.IsChecked = true;
+            }
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "mp")
+            {
+                radioButton30.IsChecked = true;
+            }
+
+
+            if (this.decompFind.decompOptions2.decompOperator.isShares)
             {
                 checkBoxShares.IsChecked = true;
             }
@@ -693,11 +688,10 @@ namespace Gekko
                 checkBoxErrors.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef)
+            if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
             {
                 checkRef.IsChecked = true;
             }
-
         }
 
         public class ViewModel
@@ -1709,20 +1703,20 @@ namespace Gekko
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
                 }                
 
-                //string transformationCodeAugmented = null;
-                if (this.decompFind.decompOptions2.operatorHelper.guiDecompOperator != null)
-                {
-                    //There are 4 showing options: operator, isBaseline, isRaw, isShares.
-                    string transformationCodeAugmented = this.decompFind.decompOptions2.operatorHelper.guiDecompOperator;
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef) transformationCodeAugmented = "r" + transformationCodeAugmented;
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
-                    if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw && this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
-                    {
-                        new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
-                    }
-                    this.decompFind.decompOptions2.prtOptionLower = transformationCodeAugmented;
-                }
+                ////string transformationCodeAugmented = null;
+                //if (this.decompFind.decompOptions2.decompOperator != null)
+                //{
+                //    //There are 4 showing options: operator, isBaseline, isRaw, isShares.
+                //    string transformationCodeAugmented = this.decompFind.decompOptions2.decompOperator.operatorLower;
+                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef) transformationCodeAugmented = "r" + transformationCodeAugmented;
+                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
+                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
+                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw && this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
+                //    //{
+                //    //    new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
+                //    //}
+                //    this.decompFind.decompOptions2.prtOptionLower = transformationCodeAugmented;
+                //}
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
@@ -1842,7 +1836,7 @@ namespace Gekko
                 //flowText.Visibility = Visibility.Visible;
             }
 
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef)
+            if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
             {
                 radioButton22.IsEnabled = false;
                 radioButton22.Opacity = 0.5;
@@ -1858,7 +1852,7 @@ namespace Gekko
                 radioButton30.Opacity = 0.5;
             }
 
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
+            if (this.decompFind.decompOptions2.decompOperator.isShares)
             {
                 radioButton21.IsEnabled = false;
                 radioButton21.Opacity = 0.5;
@@ -1879,85 +1873,19 @@ namespace Gekko
                 radioButton9.Opacity = 0.5;
             }
 
-            if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw)
+            if (this.decompFind.decompOptions2.decompOperator.isRaw)
             {
                 checkBoxShares.IsEnabled = false;  //shares
                 checkBoxShares.Opacity = 0.5;
                 //flowText.Visibility = Visibility.Collapsed;
             }
-
-            //hmmm but prtOptionLower cannot have x etc....??
-            //hmmm but prtOptionLower cannot have x etc....??
-            //hmmm but prtOptionLower cannot have x etc....??
-            //hmmm but prtOptionLower cannot have x etc....??
-            //hmmm but prtOptionLower cannot have x etc....??
-            if (G.Equal(this.decompFind.decompOptions2.prtOptionLower, "m") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xm") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "q") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xq") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "mp") || G.Equal(this.decompFind.decompOptions2.prtOptionLower, "xmp"))
+            
+            if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.Multiplier)
             {
                 checkRef.IsEnabled = false;  //baseline, not meaningful for multiplier types
                 checkRef.Opacity = 0.5;
             }            
-
-            if (false)
-            {
-                //TODO TODO TODO TODO TODO TODO  TODO TODO
-                //TODO TODO TODO TODO TODO TODO  TODO TODO
-                //TODO TODO TODO TODO TODO TODO  TODO TODO greyed out for now
-                //TODO TODO TODO TODO TODO TODO  TODO TODO
-                //TODO TODO TODO TODO TODO TODO  TODO TODO                
-                checkBoxShares.IsEnabled = false;
-                checkBoxShares.Opacity = 0.5;
-
-                radioButton9.IsEnabled = false;
-                radioButton9.Opacity = 0.5;
-                radioButton10.IsEnabled = false;
-                radioButton10.Opacity = 0.5;
-                radioButton29.IsEnabled = false;
-                radioButton29.Opacity = 0.5;
-                radioButton30.IsEnabled = false;
-                radioButton30.Opacity = 0.5;
-            }
-        }
-
-        //private void SetRadioButtonDefaults()
-        //{
-        //    //Setting defaults
-        //    radioButton21.IsEnabled = true;
-        //    radioButton21.Opacity = 1.0;
-        //    radioButton22.IsEnabled = true;
-        //    radioButton22.Opacity = 1.0;
-        //    radioButton24.IsEnabled = true;
-        //    radioButton24.Opacity = 1.0;
-        //    radioButton29.IsEnabled = true;
-        //    radioButton29.Opacity = 1.0;
-        //    radioButton26.IsEnabled = true;
-        //    radioButton26.Opacity = 1.0;
-        //    radioButton28.IsEnabled = true;
-        //    radioButton28.Opacity = 1.0;
-        //    radioButton30.IsEnabled = true;
-        //    radioButton30.Opacity = 1.0;
-        //    //---
-        //    radioButton1.IsEnabled = true;
-        //    radioButton1.Opacity = 1.0;
-        //    radioButton2.IsEnabled = true;
-        //    radioButton2.Opacity = 1.0;
-        //    radioButton4.IsEnabled = true;
-        //    radioButton4.Opacity = 1.0;
-        //    radioButton9.IsEnabled = true;
-        //    radioButton9.Opacity = 1.0;
-        //    radioButton6.IsEnabled = true;
-        //    radioButton6.Opacity = 1.0;
-        //    radioButton8.IsEnabled = true;
-        //    radioButton8.Opacity = 1.0;
-        //    radioButton10.IsEnabled = true;
-        //    radioButton10.Opacity = 1.0;
-        //    //---
-        //    checkBox1.IsEnabled = true;
-        //    checkBox1.Opacity = 1.0;
-        //    checkBox2.IsEnabled = true;
-        //    checkBox2.Opacity = 1.0;
-        //    flowText.Opacity = 0.5;
-        //    flowText.Visibility = Visibility.Visible;
-        //}
+        }        
 
         private void ClearGrid()
         {
@@ -2017,8 +1945,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "n";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2027,8 +1954,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "d";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xd");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2037,8 +1963,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "d";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("d");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2047,8 +1972,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "p";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2057,78 +1981,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "p";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }        
-
-        private void radioButton21_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "n";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void radioButton22_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "m";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void radioButton26_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "m";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }        
-
-        private void radioButton24_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "q";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void radioButton28_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "q";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void radioButton29_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "mp";
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void radioButton30_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "mp";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("p");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2137,27 +1990,90 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = true;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "dp";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xdp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
-        }       
-        
+        }
+
         private void radioButton10_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw = false;
-                this.decompFind.decompOptions2.operatorHelper.guiDecompOperator = "dp";
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("dp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
+
+        private void radioButton21_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void radioButton22_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xm");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void radioButton26_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("m");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }        
+
+        private void radioButton24_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xq");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void radioButton28_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("q");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void radioButton29_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xmp");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void radioButton30_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator("mp");
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        
 
         private void checkBox1_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares = true;
+                this.decompFind.decompOptions2.decompOperator.isShares = true;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2166,7 +2082,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares = false;
+                this.decompFind.decompOptions2.decompOperator.isShares = false;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2175,7 +2091,11 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef = true;
+
+                string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
+                if (xx.StartsWith("x")) xx = "xr" + xx;
+                else xx = "r" + xx;
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2184,7 +2104,9 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef = false;
+                string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
+                xx = xx.Replace("r", "");
+                this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2405,35 +2327,7 @@ namespace Gekko
     {
         public WindowDecomp.GekkoTableTypes type = WindowDecomp.GekkoTableTypes.Unknown;
         public Brush originalBackgroundColor = null;
-    }
-
-    public enum EDecompOperatorBankTypes
-    {
-        Unknown,
-        Work,
-        Ref,
-        Both
-    }
-
-    public enum EDecompOperatorHelperTypes
-    {
-        Unknown,
-        N,
-        RN,
-        D,        
-        RD,
-        M        
-    }
-
-    public class DecompOperatorHelper
-    {
-        //this object contains the important operators regarding how
-        //the cells are shown.
-        public string guiDecompOperator = null;  //used to be "n"
-        public bool guiDecompIsShares = false;
-        public bool guiDecompIsRaw = true;
-        public bool guiDecompIsRef = false;       
-    }
+    }     
 
     public class DecompTablesFormat2
     {
@@ -2452,6 +2346,10 @@ namespace Gekko
 
     public class DecompOptions2
     {
+        //remember Clone()
+
+        public DecompOperator decompOperator = null;
+
         //FIND STUFF
         public List iv = null;
         public GekkoTime t0 = GekkoTime.tNull;
@@ -2462,10 +2360,7 @@ namespace Gekko
         public bool missingAsZero = false;
         public bool showTime = false;
         public string code = null;
-
-        //-------- tranformation start --------------
-        public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
-
+        
         public bool isNew = false;
 
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
@@ -2476,16 +2371,13 @@ namespace Gekko
         public Func<GekkoSmpl, IVariable> expression = null;
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
-
         
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
-        public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
+        //public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         public bool dyn = false;
         public ECountType count = ECountType.None;
-
-        public bool isSubWindow = false;  //when browsing/clicking, opening a new window
-
+        
         public List<string> subst = new List<string>();
 
         public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
@@ -2548,6 +2440,9 @@ namespace Gekko
         {
             //clones relevant parts for new window
             DecompOptions2 d = new DecompOptions2();
+
+            d.decompOperator = this.decompOperator.Clone();
+
             d.decompTablesFormat = new DecompTablesFormat2();
             d.decompTablesFormat.decimalsLevel = this.decompTablesFormat.decimalsLevel;
             d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
@@ -2562,17 +2457,11 @@ namespace Gekko
             d.variable = this.variable;
             d.t1 = this.t1;
             d.t2 = this.t2;
-            d.prtOptionLower = this.prtOptionLower;
+            
             d.dyn = this.dyn;
             d.count = this.count;
             d.missingAsZero = this.missingAsZero;
-
-            d.operatorHelper = new DecompOperatorHelper();
-            d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;
-            d.operatorHelper.guiDecompIsShares = this.operatorHelper.guiDecompIsShares;
-            d.operatorHelper.guiDecompIsRaw = this.operatorHelper.guiDecompIsRaw;
-            d.operatorHelper.guiDecompIsRef = this.operatorHelper.guiDecompIsRef;
-
+            
             d.modelHash = this.modelHash;
             d.type = this.type;
 

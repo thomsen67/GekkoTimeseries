@@ -42,7 +42,7 @@ namespace Gekko
             if (this.decompFind.decompOptions2.t1.IsNull()) this.decompFind.decompOptions2.t1 = o.t1;
             if (this.decompFind.decompOptions2.t2.IsNull()) this.decompFind.decompOptions2.t2 = o.t2;
             this.decompFind.decompOptions2.iv = o.iv;
-            if (o.opt_prtcode != null) this.decompFind.decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
+            if (o.opt_prtcode != null) this.decompFind.decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
                         
             InitializeComponent();
             this.windowEquationBrowserListView.Focus();
@@ -145,7 +145,7 @@ namespace Gekko
             string eqName = G.Chop_DimensionRemoveLast(fullName);
 
             O.Decomp2 decomp = new O.Decomp2();
-            decomp.opt_prtcode = this.decompFind.decompOptions2.prtOptionLower;
+            decomp.opt_prtcode = this.decompFind.decompOptions2.decompOperator.operatorLower;
             decomp.t1 = this.decompFind.decompOptions2.t1;
             decomp.t2 = this.decompFind.decompOptions2.t2;
             string varName = this.decompFind.decompOptions2.iv.list[0].ConvertToString();
@@ -259,7 +259,7 @@ namespace Gekko
 
                     string residualName = "residual___";
                     int funcCounter = 0;
-                    DecompOperator operatorTemp = new DecompOperator(this.decompFind.decompOptions2.prtOptionLower);
+                    DecompOperator operatorTemp = this.decompFind.decompOptions2.decompOperator.Clone();
 
                     //!!! a bit of a waste of time, but is probably not significantly slowing
                     //    down the FIND window.
@@ -282,7 +282,8 @@ namespace Gekko
                     //fixme: [0] must be counter
 
                     GekkoTime gt1, gt2;
-                    DecompOperator op = Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.prtOptionLower);
+                    DecompOperator op = decompOptionsTemp.decompOperator;
+                    Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.decompOperator);
                     DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, modelGamsScalar);
 
                     double max = 0d;

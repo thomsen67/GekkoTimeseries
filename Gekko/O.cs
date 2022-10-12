@@ -8085,14 +8085,17 @@ namespace Gekko
                         {
                             //if Work or Ref are empty, or if Ref is not of approximate same size
                             //as Work, we will not use "m" but instead "d".                            
-                            this.decompFind.decompOptions2.prtOptionLower = "m";
+                            this.decompFind.decompOptions2.decompOperator = new DecompOperator("m");
                         }
                         else
                         {
-                            this.decompFind.decompOptions2.prtOptionLower = "d";
+                            this.decompFind.decompOptions2.decompOperator = new DecompOperator("d");
                         }
                     }
-                    else this.decompFind.decompOptions2.prtOptionLower = this.opt_prtcode.ToLower();
+                    else
+                    {
+                        this.decompFind.decompOptions2.decompOperator = new DecompOperator(this.opt_prtcode.ToLower());
+                    }
                     this.decompFind.decompOptions2.modelType = G.GetModelType();
                     this.decompFind.decompOptions2.decompTablesFormat.showErrors = true; //
                 }                                

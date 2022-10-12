@@ -15,6 +15,7 @@ namespace Gekko
 
     public class DecompOperator
     {
+        //remember Clone()
         public bool isPercentageType = false; //for formatting
         public string operatorLower = null;
         public bool isRaw = false;
@@ -25,6 +26,10 @@ namespace Gekko
         public List<int> lagData = new List<int>() { 0, 0 };
         public List<int> lagGradient = new List<int>() { 0, 0 };
         public Decomp.EContribType type = Decomp.EContribType.Unknown;
+
+        public DecompOperator()
+        {
+        }
 
         public DecompOperator(string x)
         {
@@ -217,6 +222,22 @@ namespace Gekko
             }
             this.operatorLower = x;
         }
+
+        public DecompOperator Clone()
+        {
+            DecompOperator rv = new DecompOperator();
+            rv.isPercentageType = false; //for formatting
+            rv.operatorLower = null;
+            rv.isRaw = false;
+            rv.isShares = false;
+            rv.isDoubleDifQuo = false;  //codes that contain 'dp'
+            rv.isDoubleDifRef = false;  //codes that contain 'rdp'
+            rv.lowLevel = Decomp.ELowLevel.Unknown; //.BothQuoAndRef --> <mp> or <xmp> type
+            rv.lagData = new List<int>(); rv.lagData.AddRange(this.lagData);
+            rv.lagGradient = new List<int>() { 0, 0 }; rv.lagGradient.AddRange(this.lagData);
+            rv.type = Decomp.EContribType.Unknown;
+            return rv;
+        }
     }
 
     class AggContainer
@@ -324,7 +345,7 @@ namespace Gekko
                 decompOptions2.t2 = o.t2;
                 decompOptions2.expressionOld = o.label;
                 decompOptions2.expression = o.expression;
-                decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
+                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
                 if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
                 if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
                 if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
@@ -523,10 +544,10 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <returns></returns>
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
-        {   
-            GekkoTime gt1, gt2;
-            DecompOperator op = DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.prtOptionLower);
-
+        {
+            DecompOperator op = decompOptions2.decompOperator;  // <--- remove this alias sometimes
+            GekkoTime gt1, gt2;            
+            DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
             decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
             DateTime t0 = DateTime.Now;
 
@@ -741,9 +762,8 @@ namespace Gekko
             return table;
         }
 
-        public static DecompOperator DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, string prtOption)
-        {
-            DecompOperator op = new DecompOperator(prtOption);
+        public static void DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, DecompOperator op)
+        {         
             gt1 = per1;
             gt2 = per2;
             if (op.isRaw)
@@ -756,7 +776,6 @@ namespace Gekko
                 gt1 = per1.Add(op.lagGradient[0]);
                 gt2 = per2.Add(op.lagGradient[1]);
             }
-            return op;
         }
 
         private static void PrintDecompData(DecompData y)
@@ -3496,7 +3515,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         private static void DecompNormalizeOLD(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, EContribType operatorOneOf3Types)
         {
-            DecompOperator op = new DecompOperator(decompOptions2.prtOptionLower);
+            DecompOperator op = new DecompOperator(decompOptions2.decompOperator.operatorLower);
             EDecompBanks edb = DecompBanks_OLDREMOVESOON(op);
 
             bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
@@ -3689,9 +3708,8 @@ namespace Gekko
             string name = decompOptions2.link[parentI].varnames[j];
             d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
 
-            if (!decompOptions2.prtOptionLower.StartsWith("x"))
+            if (!decompOptions2.decompOperator.isRaw)
             {
-
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
                 //bool isResidualName = name == Globals.decompResidualName;
                 Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, d.lhs);
