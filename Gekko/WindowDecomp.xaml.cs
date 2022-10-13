@@ -1590,20 +1590,28 @@ namespace Gekko
             }
             else
             {
-                Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
-                Cell c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd                
+                bool variablesOnRows = AreVariablesOnRows(decompFind.decompOptions2);
 
-                if (dockPanel.type == GekkoTableTypes.Left)
+                Cell c = null;
+                Cell c2 = null;
+
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                if (variablesOnRows)
+                {
+                    c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd                
+                }
+                else
+                {
+                    c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd                
+                }
+
+                if ((variablesOnRows && dockPanel.type == GekkoTableTypes.Left) || (!variablesOnRows && dockPanel.type == GekkoTableTypes.Top))
                 {
                     if (c != null)
                     {
                         if (c.cellType == CellType.Text)
                         {
-                            //this.equation.Background = Brushes.LightYellow;
-                            //G.Writeln(c.CellText.TextData[0]);                            
-
                             string var = c.CellText.TextData[0];
-
                             string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);
 
                             if (G.Equal(var2, Globals.decompText0))
@@ -1627,7 +1635,6 @@ namespace Gekko
                                 {
                                     this.equation.Text = "This difference is the databank value minus the result of evaluating the right-hand side of the equation.";
                                 }
-
                             }
                             else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
@@ -1665,10 +1672,7 @@ namespace Gekko
                             }
                             else
                             {
-                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;
-                                //List<string> vars = c2.vars_hack;
-                                //if (vars == null) MessageBox.Show("Could not find any vars");                                
-                                //string var7 = vars[0];  //#dskla8asjkdfa                                
+                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;                                                             
                                 string var7 = HiddenVariableHelper(c2);
                                 List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
                                 string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
