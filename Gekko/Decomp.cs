@@ -3839,7 +3839,7 @@ namespace Gekko
             }
             else
             {
-                if (decompOptions2.showErrors)
+                //if (decompOptions2.showErrors)
                 {
                     if (varnames.Count == decompOptions2.link[0].expressions.Count)
                     {
