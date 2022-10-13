@@ -3862,7 +3862,7 @@ namespace Gekko
                 if (G.Equal(vars[i], "time")) vars[i] = col_t;
                 if (G.Equal(vars[i], "vars")) vars[i] = col_variable;
                 if (G.Equal(vars[i], "lags")) vars[i] = col_lag;
-                if (G.Equal(vars[i], "#uni")) vars[i] = col_universe;
+                if (G.Equal(vars[i], "#universe")) vars[i] = col_universe;
                 if (G.Equal(vars[i], "equ")) vars[i] = col_equ;
                 if (vars[i].StartsWith("#")) vars[i] = Globals.internalSetIdentifyer + vars[i].Substring(1);
             }
@@ -3875,7 +3875,7 @@ namespace Gekko
                 if (G.Equal(vars[i].name, "time")) vars[i].name = col_t;
                 if (G.Equal(vars[i].name, "vars")) vars[i].name = col_variable;
                 if (G.Equal(vars[i].name, "lags")) vars[i].name = col_lag;
-                if (G.Equal(vars[i].name, "#uni")) vars[i].name = col_universe;
+                if (G.Equal(vars[i].name, "#universe")) vars[i].name = col_universe;
                 if (G.Equal(vars[i].name, "equ")) vars[i].name = col_equ;
                 if (vars[i].name.StartsWith("#")) vars[i].name = Globals.internalSetIdentifyer + vars[i].name.Substring(1);
             }
@@ -3915,7 +3915,7 @@ namespace Gekko
             for (int i = 0; i < columnNames.Count; i++)
             {
                 columnNames[i] = G.HandleInternalIdentifyer1(columnNames[i]);
-                if (columnNames[i] == "universe") columnNames[i] = "#uni";
+                if (columnNames[i] == "universe") columnNames[i] = "#universe";
             }
             sb.AppendLine(string.Join(";", columnNames));
             foreach (FrameLightRow row in dt.rows)
