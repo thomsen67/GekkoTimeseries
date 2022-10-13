@@ -848,6 +848,8 @@ namespace Gekko
 
         private void PutTableIntoGrid(Grid g, Table table, GekkoTableTypes type, DecompOptions decompOptions)
         {
+            bool varsIsOnRows = false;
+
             int offsetRow = 0;
             int offsetCol = 0;
             int startRow = 0;
@@ -1095,6 +1097,7 @@ namespace Gekko
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor)
         {
+            bool b = true;
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
@@ -1137,11 +1140,14 @@ namespace Gekko
 
                     if (isEndogenous || s == Globals.decompText0)
                     {
-                        textBlock.MouseEnter += Mouse_Enter;
-                        textBlock.MouseLeave += Mouse_Leave;
-                        textBlock.MouseDown += Mouse_Down;
-                        textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
-                        if (i == 0) textBlock.FontWeight = FontWeights.Bold;
+                        if (b)
+                        {
+                            textBlock.MouseEnter += Mouse_Enter;
+                            textBlock.MouseLeave += Mouse_Leave;
+                            textBlock.MouseDown += Mouse_Down;
+                            textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
+                            if (i == 0) textBlock.FontWeight = FontWeights.Bold;
+                        }
                     }
                 }
                 textBlock.HorizontalAlignment = HorizontalAlignment.Right;

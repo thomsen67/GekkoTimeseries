@@ -1860,9 +1860,7 @@ namespace Gekko
 
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
-        public List<string> variable_subelement = null;
-
-        
+        public List<string> variable_subelement = null;        
         
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
@@ -1882,7 +1880,6 @@ namespace Gekko
 
         public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
         
-
         //-------- tranformation start --------------
         public string guiDecompTransformationCode = "n";
         public bool guiDecompIsShares = false;
