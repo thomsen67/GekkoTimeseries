@@ -16,11 +16,13 @@ namespace Gekko
     public class DecompOperator
     {
         //remember Clone()
-
-        //----- OPTIONS START ------------------------------------------- cf. #8yuads79afyghr
+                
+        //--------------------------------------------------------------- 
+        //----- These options are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
+        //--------------------------------------------------------------- 
         public string operatorLower = null;
         public bool isShares = false;
-        //----- OPTIONS END --------------------------------------------- cf. #8yuads79afyghr
+        //--------------------------------------------------------------- 
 
         public bool isPercentageType = false; //for formatting        
         public bool isRaw = false;

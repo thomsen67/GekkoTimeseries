@@ -619,19 +619,19 @@ namespace Gekko
 
         public void SetRadioButtons()
         {
-            if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xn")
+            if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xn" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrn")
             {
                 radioButton1.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xd")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xd" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrd")
             {
                 radioButton2.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xp")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrp")
             {
                 radioButton4.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xdp")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xdp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrdp")
             {
                 radioButton9.IsChecked = true;
             }
@@ -647,20 +647,19 @@ namespace Gekko
             {
                 radioButton29.IsChecked = true;
             }
-
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "n")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "n" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rn")
             {
                 radioButton5.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "d")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "d" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rd")
             {
                 radioButton6.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "p")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "p" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rp")
             {
                 radioButton8.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "dp")
+            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "dp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rdp")
             {
                 radioButton10.IsChecked = true;
             }
@@ -677,21 +676,30 @@ namespace Gekko
                 radioButton30.IsChecked = true;
             }
 
+            if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
+            {
+                checkRef.IsChecked = true;
+            }
 
             if (this.decompFind.decompOptions2.decompOperator.isShares)
             {
                 checkBoxShares.IsChecked = true;
             }
 
+            if (this.decompFind.decompOptions2.count == ECountType.N)
+            {
+                checkBoxCount.IsChecked = true;
+            }
+
+            if (this.decompFind.decompOptions2.count == ECountType.Names)
+            {
+                checkBoxNames.IsChecked = true;
+            }
+
             if (this.decompFind.decompOptions2.showErrors)
             {
                 checkBoxErrors.IsChecked = true;
-            }
-
-            if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
-            {
-                checkRef.IsChecked = true;
-            }
+            }            
         }
 
         public class ViewModel
@@ -2375,12 +2383,15 @@ namespace Gekko
     {
         //remember Clone()
 
-        //----- OPTIONS START ------------------------------------------- cf. #8yuads79afyghr
+
+        //--------------------------------------------------------------- 
+        //----- These options are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOperator
+        //--------------------------------------------------------------- 
         public ECountType count = ECountType.None;
         public bool showErrors = false;
         public int decimalsLevel = 4;
         public int decimalsPch = 2;
-        //----- OPTIONS END --------------------------------------------- cf. #8yuads79afyghr
+        //--------------------------------------------------------------- 
 
         public DecompOperator decompOperator = null;
 
@@ -2481,9 +2492,7 @@ namespace Gekko
             d.showErrors = this.showErrors;
 
             d.code = this.code;
-
-            d.showErrors = this.showErrors;
-
+            
             d.modelType = this.modelType;
             
             //d.tp = this.tp;
