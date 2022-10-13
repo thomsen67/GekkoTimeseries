@@ -4678,7 +4678,6 @@ ASTPLACEHOLDER [0]
 
                     }
                     break;
-                case "ASTDECOMP2":
                 case "ASTDECOMP3":
                     {
                         node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);

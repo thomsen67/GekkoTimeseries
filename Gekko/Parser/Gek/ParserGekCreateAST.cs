@@ -1369,10 +1369,6 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTDECOMP2" + Globals.parserExpressionSeparator))
-                    {
-                        flag = true;
-                    }
                     else if (ast.Text.StartsWith("ASTDECOMP3" + Globals.parserExpressionSeparator))
                     {
                         flag = true;

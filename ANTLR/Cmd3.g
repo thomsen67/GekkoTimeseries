@@ -2929,7 +2929,6 @@ decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> decompLink
 decompRows:                 ROWS seqOfBankvarnames -> seqOfBankvarnames;
 decompCols:                 COLS seqOfBankvarnames -> seqOfBankvarnames;
 
-
 decompWhere2:               decompWhere1 IN seqOfBankvarnamesOnly1 -> ^(ASTDECOMPWHERE2 decompWhere1 seqOfBankvarnamesOnly1);
 decompWhere1:               seqOfBankvarnamesOnly1 | expression;
 

@@ -1135,8 +1135,7 @@ namespace Gekko
                     {
                         EEndoOrExo e = Program.VariableTypeEndoExo(ss);
                         isEndogenous = e == EEndoOrExo.Endo;
-                    }
-                    
+                    }                    
 
                     if (isEndogenous || s == Globals.decompText0)
                     {
