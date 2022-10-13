@@ -801,7 +801,14 @@ namespace Gekko
             new Writeln("cellsContribM --------------------------------");
             PrintDecompDict(y.cellsContribM);
         }
-        
+
+        public static bool AreVariablesOnRows(DecompOptions2 decompOptions)
+        {
+            bool variableIsRow = false;
+            if (decompOptions.rows.Contains(Globals.col_variable)) variableIsRow = true;
+            return variableIsRow;
+        }
+
         private static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas)
         {
             decompDatas.storage = new List<List<DecompData>>();
@@ -2914,8 +2921,7 @@ namespace Gekko
                 decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
             }
             //get the free values end
-
-
+            
             List<string> varnames = decompOptions2.link[parentI].varnames;
 
             bool decompHasLag = false;
@@ -3295,7 +3301,58 @@ namespace Gekko
             {
                 tab.Set(1, 1, "%" + "  ");
             }
+            
+            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
 
+            if (areVariablesOnRows)
+            {
+                for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                {
+                    double value = tab.Get(2, j).number;
+                    for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                    {                        
+                        if (i == 2)
+                        {                            
+                            Cell c5 = new Cell();
+                            c5.cellType = CellType.Number;
+                            c5.number = -value;
+                            tab.Set(new Coord(i, j), c5);
+                        }
+                        if (op.isShares)
+                        {
+                            Cell c6 = new Cell();
+                            c6.cellType = CellType.Number;
+                            c6.number = tab.Get(i, j).number / (-value) * 100d;
+                            tab.Set(new Coord(i, j), c6);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                {
+                    double value = tab.Get(i, 2).number;
+                    for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                    {
+                        if (j == 2)
+                        {                            
+                            Cell c5 = new Cell();
+                            c5.cellType = CellType.Number;
+                            c5.number = -value;
+                            tab.Set(new Coord(i, j), c5);
+                        }
+                        if (op.isShares)
+                        {
+                            Cell c6 = new Cell();
+                            c6.cellType = CellType.Number;
+                            c6.number = tab.Get(i, j).number / (-value) * 100d;
+                            tab.Set(new Coord(i, j), c6);
+                        }
+                    }
+                }
+            }
+            
             return tab;
         }
 
@@ -3512,14 +3569,14 @@ namespace Gekko
                 new Error("Expected 1 variable for decomposition, got " + decompOptions2.link[parentI].varnames.Count);
             }
             
-            int j = 0;
-            DecompData d = decompDatasSupremeClone[j];
-            string name = decompOptions2.link[parentI].varnames[j];
+            int zero = 0;
+            DecompData d = decompDatasSupremeClone[zero];
+            string name = decompOptions2.link[parentI].varnames[zero];
             d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
 
             if (!decompOptions2.decompOperator.isRaw)
             {
-                Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
+                Series lhs2 = GetDecompDatas(decompDatasSupremeClone[zero], operatorOneOf3Types)[d.lhs];
                 //bool isResidualName = name == Globals.decompResidualName;
                 Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, d.lhs);
 
@@ -3538,48 +3595,13 @@ namespace Gekko
                     else if (operatorOneOf3Types == EContribType.M)
                     {
                         d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
-                    }
-
-                    // ----------------------------------------------
-
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK this only solves shares for d, rd, m
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    // HACK HACK HACK
-                    double factor = d2 / d1;
-                    if (op.isShares)
-                    {
-                        factor = 100; //--> fixes d, rd, m
-                    }
-
+                    }                    
+                    double factor = d2 / d1;                    
                     bool found = false;
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
-                        if (G.Equal(kvp.Key, d.lhs))
-                        {
-                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                            found = true;
-                        }
-                        else
-                        {
-                            //switch sign!
-                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                        }
-                    }
-                    if (found == false)
-                    {
-                        MessageBox.Show("*** ERROR: Did not find " + name + " for normalization");
-                    }
+                        kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                    }                    
                 }
             }
 

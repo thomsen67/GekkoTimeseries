@@ -940,7 +940,7 @@ namespace Gekko
             int startCol = 0;
             int endCol = 0;
 
-            bool variablesAreOnRows = AreVariablesOnRows(decompOptions);
+            bool variablesAreOnRows = Decomp.AreVariablesOnRows(decompOptions);
 
             if (type == GekkoTableTypes.TableContent)
             {
@@ -1012,14 +1012,7 @@ namespace Gekko
                     AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows);
                 }
             }
-        }
-
-        private static bool AreVariablesOnRows(DecompOptions2 decompOptions)
-        {
-            bool variableIsRow = false;
-            if (decompOptions.rows.Contains(Globals.col_variable)) variableIsRow = true;
-            return variableIsRow;
-        }
+        }        
 
         private void HandleKeyDownEvent(object sender, KeyEventArgs e)
         {            
@@ -1530,7 +1523,7 @@ namespace Gekko
             Cell c = null;
             Cell c2 = null;
 
-            if (AreVariablesOnRows(this.decompFind.decompOptions2))
+            if (Decomp.AreVariablesOnRows(this.decompFind.decompOptions2))
             {
                 CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
                 c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
@@ -1590,7 +1583,7 @@ namespace Gekko
             }
             else
             {
-                bool variablesOnRows = AreVariablesOnRows(decompFind.decompOptions2);
+                bool variablesOnRows = Decomp.AreVariablesOnRows(decompFind.decompOptions2);
 
                 Cell c = null;
                 Cell c2 = null;
