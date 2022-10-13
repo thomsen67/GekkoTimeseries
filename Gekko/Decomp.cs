@@ -621,9 +621,7 @@ namespace Gekko
                 if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
-
-                //G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
-
+                
                 if (decompOptions2.link[parentI].varnames == null)
                 {
                     decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
@@ -642,7 +640,6 @@ namespace Gekko
                 //linking
                 //linking
                 //linking
-
 
                 //------------------------
                 //Example: e1: y = c + i + g  --> y - (c + i + g)
@@ -2424,64 +2421,167 @@ namespace Gekko
             // as x[-1] in the 2002-contribution of e5. So if we visualize rows with x[-1], x, x[+1], z, etc.
             // and cols with 2001, 2002, 2003, etc., each atomic lowest level equation is actually present
             // separately in these columns.
-            
+
             //See #kljaf89usafasdf for Gekko  model
-            
+
             double eps = Globals.newtonSmallNumber;
 
             DecompData d = new DecompData();
 
-            DecompInitDict(d);                                    
+            DecompInitDict(d);
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             
-            if (true)
+            //foreach time period
+            foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
             {
-                //foreach time period
-                foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                // TODO TODO TODO
+                // TODO TODO TODO
+                // TODO TODO TODO
+                // TODO TODO TODO skip via a dictionary if already done
+                // TODO TODO TODO
+                // TODO TODO TODO
+                // TODO TODO TODO
+
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
+
+                int eqNumber = -12345;
+
+                string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+
+                bool b = modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber);
+                if (!b)
                 {
-                    // TODO TODO TODO
-                    // TODO TODO TODO
-                    // TODO TODO TODO
-                    // TODO TODO TODO skip via a dictionary if already done
-                    // TODO TODO TODO
-                    // TODO TODO TODO
-                    // TODO TODO TODO
+                    new Error("Could not find equation '" + s + "'");
+                }
 
-                    int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
+                double y0 = double.NaN;
+                double y1 = double.NaN;
 
-                    int eqNumber = -12345;
+                //foreach precedent variable
+                int i = -1;
+                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                {
+                    // --------------------------------------------
+                    // This is where the decomposition takes place
+                    // --------------------------------------------
 
-                    string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+                    i++;
+                    string varName = modelGamsScalar.GetVarNameA(dp.variable);
 
-                    bool b = modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber);
-                    if (!b)
+                    if (op.isRaw)
                     {
-                        new Error("Could not find equation '" + s + "'");
-                    }
+                        //raw data.
+                        //a bit of a hack here, since all data is fetched (extra will contain all periods),
+                        //and both quo and ref are fetched.
+                        //but it should be fast anyway
+                        //normal multiplier like <m>
 
-                    double y0 = double.NaN;
-                    double y1 = double.NaN;
-
-                    //foreach precedent variable
-                    int i = -1;
-                    foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
-                    {
-                        // --------------------------------------------
-                        // This is where the decomposition takes place
-                        // --------------------------------------------
-
-                        i++;
-                        string varName = modelGamsScalar.GetVarNameA(dp.variable);
-
-                        if (op.isRaw)
+                        if (i == 0)
                         {
-                            //raw data.
-                            //a bit of a hack here, since all data is fetched (extra will contain all periods),
-                            //and both quo and ref are fetched.
-                            //but it should be fast anyway
-                            //normal multiplier like <m>
+                            y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                            d.cellsRef[residualName].SetData(t, y0);
+                            y1 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                            d.cellsQuo[residualName].SetData(t, y1);
+                        }
+                        double x0 = modelGamsScalar.GetData(dp.date, dp.variable, true);
+                        double x1 = modelGamsScalar.GetData(dp.date, dp.variable, false);
+                        int lag2 = dp.date - timeIndex;
+                        string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                        d.cellsRef[name].SetData(t, x0);
+                        d.cellsQuo[name].SetData(t, x1);
+                        if (!vars.ContainsKey(name))  //for decomp pivot
+                        {
+                            vars.Add(name, 0);
+                        }
+                    }
+                    else
+                    {
+                        if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            //work difference like <d> ... or the special <mp>
+                            if (i == 0)
+                            {
+                                y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t, y0);
+                                y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t.Add(1), y1);
+                            }
+                            double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, false);
+                            double x1 = modelGamsScalar.GetData(dp.date + 1, dp.variable, false);
 
+                            try
+                            {
+                                double x0_after = x0_before + eps;
+                                modelGamsScalar.SetData(dp.date, dp.variable, false, x0_after);
+                                double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                double grad = (y0_after - y0) / eps;
+
+                                //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //see also #sf94lkjsdjæ
+                                if (!G.isNumericalError(grad))
+                                {
+                                    int lag2 = dp.date - timeIndex;
+                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
+                                    d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
+                                    d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
+                                    if (!vars.ContainsKey(name))  //for decomp pivot
+                                    {
+                                        vars.Add(name, 0);
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                modelGamsScalar.SetData(dp.date, dp.variable, false, x0_before);
+                            }
+                        }
+
+                        if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            //ref difference like <rd> ... or the special <mp>
+                            if (i == 0)
+                            {
+                                y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0);
+                                y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t.Add(1), y1);
+                            }
+                            double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, true);
+                            double x1 = modelGamsScalar.GetData(dp.date + 1, dp.variable, true);
+
+                            try
+                            {
+                                double x0_after = x0_before + eps;
+                                modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
+                                double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                double grad = (y0_after - y0) / eps;
+
+                                //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //see also #sf94lkjsdjæ
+                                if (!G.isNumericalError(grad))
+                                {
+                                    int lag2 = dp.date - timeIndex;
+                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
+                                    d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
+                                    d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
+                                    if (!vars.ContainsKey(name))  //for decomp pivot
+                                    {
+                                        vars.Add(name, 0);
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
+                            }
+                        }
+
+                        if (op.lowLevel == ELowLevel.Multiplier)
+                        {
+                            //normal multiplier like <m>
                             if (i == 0)
                             {
                                 y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
@@ -2489,209 +2589,99 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t, y1);
                             }
-                            double x0 = modelGamsScalar.GetData(dp.date, dp.variable, true);
+                            double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, true);
                             double x1 = modelGamsScalar.GetData(dp.date, dp.variable, false);
-                            int lag2 = dp.date - timeIndex;
-                            string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
-                            d.cellsRef[name].SetData(t, x0);
-                            d.cellsQuo[name].SetData(t, x1);
-                            if (!vars.ContainsKey(name))  //for decomp pivot
-                            {
-                                vars.Add(name, 0);
-                            }
-                        }
-                        else
-                        {
-                            if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
-                            {
-                                //work difference like <d> ... or the special <mp>
-                                if (i == 0)
-                                {
-                                    y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                                    d.cellsQuo[residualName].SetData(t, y0);
-                                    y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
-                                    d.cellsQuo[residualName].SetData(t.Add(1), y1);
-                                }
-                                double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, false);
-                                double x1 = modelGamsScalar.GetData(dp.date + 1, dp.variable, false);
 
-                                try
-                                {
-                                    double x0_after = x0_before + eps;
-                                    modelGamsScalar.SetData(dp.date, dp.variable, false, x0_after);
-                                    double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                                    double grad = (y0_after - y0) / eps;
+                            try
+                            {
+                                double x0_after = x0_before + eps;
+                                modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
+                                double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                double grad = (y0_after - y0) / eps;
 
-                                    //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
-                                    //see also #sf94lkjsdjæ
-                                    if (!G.isNumericalError(grad))
+                                //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                                //see also #sf94lkjsdjæ
+                                if (!G.isNumericalError(grad))
+                                {
+                                    int lag2 = dp.date - timeIndex;
+                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    d.cellsRef[name].SetData(t, x0_before);
+                                    d.cellsQuo[name].SetData(t, x1);
+                                    d.cellsGradRef[name].SetData(t, grad);
+                                    if (!vars.ContainsKey(name))  //for decomp pivot
                                     {
-                                        int lag2 = dp.date - timeIndex;
-                                        string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
-                                        d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
-                                        d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
-                                        d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
-                                        if (!vars.ContainsKey(name))  //for decomp pivot
-                                        {
-                                            vars.Add(name, 0);
-                                        }
+                                        vars.Add(name, 0);
                                     }
                                 }
-                                finally
-                                {
-                                    modelGamsScalar.SetData(dp.date, dp.variable, false, x0_before);
-                                }
                             }
-
-
-
-                            if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
+                            finally
                             {
-                                //ref difference like <rd> ... or the special <mp>
-                                if (i == 0)
-                                {
-                                    y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                    d.cellsRef[residualName].SetData(t, y0);
-                                    y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
-                                    d.cellsRef[residualName].SetData(t.Add(1), y1);
-                                }
-                                double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, true);
-                                double x1 = modelGamsScalar.GetData(dp.date + 1, dp.variable, true);
-
-                                try
-                                {
-                                    double x0_after = x0_before + eps;
-                                    modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
-                                    double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                    double grad = (y0_after - y0) / eps;
-
-                                    //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
-                                    //see also #sf94lkjsdjæ
-                                    if (!G.isNumericalError(grad))
-                                    {
-                                        int lag2 = dp.date - timeIndex;
-                                        string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
-                                        d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
-                                        d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
-                                        d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
-                                        if (!vars.ContainsKey(name))  //for decomp pivot
-                                        {
-                                            vars.Add(name, 0);
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
-                                }
+                                modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
                             }
-
-                            if (op.lowLevel == ELowLevel.Multiplier)
-                            {
-                                //normal multiplier like <m>
-                                if (i == 0)
-                                {
-                                    y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                    d.cellsRef[residualName].SetData(t, y0);
-                                    y1 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                                    d.cellsQuo[residualName].SetData(t, y1);
-                                }
-                                double x0_before = modelGamsScalar.GetData(dp.date, dp.variable, true);
-                                double x1 = modelGamsScalar.GetData(dp.date, dp.variable, false);
-
-                                try
-                                {
-                                    double x0_after = x0_before + eps;
-                                    modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
-                                    double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                    double grad = (y0_after - y0) / eps;
-
-                                    //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
-                                    //see also #sf94lkjsdjæ
-                                    if (!G.isNumericalError(grad))
-                                    {
-                                        int lag2 = dp.date - timeIndex;
-                                        string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
-                                        d.cellsRef[name].SetData(t, x0_before);
-                                        d.cellsQuo[name].SetData(t, x1);
-                                        d.cellsGradRef[name].SetData(t, grad);
-                                        if (!vars.ContainsKey(name))  //for decomp pivot
-                                        {
-                                            vars.Add(name, 0);
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
-                                }
-                            }
-
-
-                        }
-                    }
-                }
-
-                //Here, cellsQuo + cellsRef + cellsGradQuo + cellsGradRef are calculated.
-                //Grad tells us which lags are actually active.
-                //If we know that lags beforehand, we could limit the lag loop and save time here.
-
-                if (!op.isRaw)
-                {
-                    foreach (GekkoTime t2 in new GekkoTimeIterator(gt1, gt2))
-                    {
-                        int add = 1; if (op.lowLevel == ELowLevel.Multiplier) add = 0;
-                        GekkoTime t = t2.Add(add);
-                        foreach (string s in vars.Keys)
-                        {                            
-                            if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
-                            {
-                                double vQuo = d.cellsQuo[s].GetDataSimple(t);
-                                double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
-                                double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
-                                double dContribD = vGradQuoLag * (vQuo - vQuoLag);
-                                d.cellsContribD[s].SetData(t, dContribD);
-                            } 
-                            
-                            if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
-                            {
-                                double vRef = d.cellsRef[s].GetDataSimple(t);
-                                double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
-                                double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
-                                double dContribDRef = vGradRefLag * (vRef - vRefLag);
-                                d.cellsContribDRef[s].SetData(t, dContribDRef);
-                            }
-
-                            if (op.lowLevel == ELowLevel.Multiplier)
-                            {
-                                double vQuo = d.cellsQuo[s].GetDataSimple(t);
-                                double vRef = d.cellsRef[s].GetDataSimple(t);
-                                double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
-                                double dContribM = vGradRef * (vQuo - vRef);
-                                d.cellsContribM[s].SetData(t, dContribM);
-                            }
-                        }
-
-                        if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
-                        {
-                            d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
-                        }
-
-                        if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
-                        {
-                            d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
-                        }
-
-                        if (op.lowLevel == ELowLevel.Multiplier)
-                        {
-                            d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
                         }
                     }
                 }
             }
 
+            //Here, cellsQuo + cellsRef + cellsGradQuo + cellsGradRef are calculated.
+            //Grad tells us which lags are actually active.
+            //If we know that lags beforehand, we could limit the lag loop and save time here.
+
+            if (!op.isRaw)
+            {
+                foreach (GekkoTime t2 in new GekkoTimeIterator(gt1, gt2))
+                {
+                    int add = 1; if (op.lowLevel == ELowLevel.Multiplier) add = 0;
+                    GekkoTime t = t2.Add(add);
+                    foreach (string s in vars.Keys)
+                    {
+                        if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            double vQuo = d.cellsQuo[s].GetDataSimple(t);
+                            double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
+                            double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
+                            double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+                            d.cellsContribD[s].SetData(t, dContribD);
+                        }
+
+                        if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            double vRef = d.cellsRef[s].GetDataSimple(t);
+                            double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
+                            double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
+                            double dContribDRef = vGradRefLag * (vRef - vRefLag);
+                            d.cellsContribDRef[s].SetData(t, dContribDRef);
+                        }
+
+                        if (op.lowLevel == ELowLevel.Multiplier)
+                        {
+                            double vQuo = d.cellsQuo[s].GetDataSimple(t);
+                            double vRef = d.cellsRef[s].GetDataSimple(t);
+                            double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
+                            double dContribM = vGradRef * (vQuo - vRef);
+                            d.cellsContribM[s].SetData(t, dContribM);
+                        }
+                    }
+
+                    if (op.lowLevel == ELowLevel.OnlyQuo || op.lowLevel == ELowLevel.BothQuoAndRef)
+                    {
+                        d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
+                    }
+
+                    if (op.lowLevel == ELowLevel.OnlyRef || op.lowLevel == ELowLevel.BothQuoAndRef)
+                    {
+                        d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
+                    }
+
+                    if (op.lowLevel == ELowLevel.Multiplier)
+                    {
+                        d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
+                    }
+                }
+            }
+
             return d;
-        }        
+        }     
 
         private static void DecompInitDict(DecompData d)
         {
@@ -4283,8 +4273,6 @@ namespace Gekko
 
             string rv = null;
             WindowFind windowFind = new WindowFind(o);
-            //eb.findOptions.decompOptions2 = decompOptions2;
-            //eb.findOptions = o;
             windowFind.Title = variableName + " - " + "Gekko find";
             windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
             windowFind.EquationBrowserSetLabel(variableName);
