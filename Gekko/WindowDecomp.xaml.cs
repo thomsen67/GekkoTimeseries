@@ -403,6 +403,7 @@ namespace Gekko
                 if (s == "valueLevelRefLag") continue;
                 if (s == "valueLevelRefLag2") continue;
                 if (s == "fullVariableName") continue;
+                if (s == "equ") continue;
                 bool isFilter = false;
                 foreach (FrameFilter ff in this.decompFind.decompOptions2.filters)
                 {
@@ -2383,14 +2384,15 @@ namespace Gekko
     {
         //remember Clone()
 
-
         //--------------------------------------------------------------- 
-        //----- These options are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOperator
+        //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOperator
         //--------------------------------------------------------------- 
         public ECountType count = ECountType.None;
         public bool showErrors = false;
         public int decimalsLevel = 4;
         public int decimalsPch = 2;
+        public List<string> rows = new List<string>();
+        public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
 
         public DecompOperator decompOperator = null;
@@ -2419,7 +2421,7 @@ namespace Gekko
         
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
-        //public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
+
         public bool dyn = false;
         
         public List<string> subst = new List<string>();
@@ -2441,14 +2443,11 @@ namespace Gekko
         public bool guiDecompIsSelectingAll = false;
         public Dictionary<string, int> guiDecompChangedCells = new Dictionary<string, int>();
         public Table guiDecompValues = new Table();
-        //public bool isCalledFromDecompWindow = true;
         public LocalBanks localBanks = null;
         public string modelHash = null;
-        //public int decimals = 4;
         
         public string dream = null;  //experimental
-
-        //public DecompData decompData = null;
+                
         public bool hasCalculatedQuo = false;
         public bool hasCalculatedRef = false;
 
@@ -2457,8 +2456,7 @@ namespace Gekko
         public List<Link> link = new List<Link>();
         public List<List<string>> where = new List<List<string>>();
         public List<List<string>> group = new List<List<string>>();
-        public List<string> rows = new List<string>();
-        public List<string> cols = new List<string>();
+        
         // --------- used for dropdown lists in gui
 
         //TODO

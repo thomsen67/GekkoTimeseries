@@ -18,7 +18,7 @@ namespace Gekko
         //remember Clone()
                 
         //--------------------------------------------------------------- 
-        //----- These options are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
+        //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
         //--------------------------------------------------------------- 
         public string operatorLower = null;
         public bool isShares = false;
