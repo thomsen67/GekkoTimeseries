@@ -683,7 +683,7 @@ namespace Gekko
                 checkBoxShares.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.decompTablesFormat.showErrors)
+            if (this.decompFind.decompOptions2.showErrors)
             {
                 checkBoxErrors.IsChecked = true;
             }
@@ -2147,13 +2147,13 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompFind.decompOptions2.decompTablesFormat.isPercentageType)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType)
                 {
-                    this.decompFind.decompOptions2.decompTablesFormat.decimalsPch++;
+                    this.decompFind.decompOptions2.decimalsPch++;
                 }
                 else
                 {
-                    this.decompFind.decompOptions2.decompTablesFormat.decimalsLevel++;
+                    this.decompFind.decompOptions2.decimalsLevel++;
                 }
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2163,39 +2163,21 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompFind.decompOptions2.decompTablesFormat.isPercentageType)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType)
                 {
-                    this.decompFind.decompOptions2.decompTablesFormat.decimalsPch--;
-                    if (this.decompFind.decompOptions2.decompTablesFormat.decimalsPch < 0) this.decompFind.decompOptions2.decompTablesFormat.decimalsPch = 0;
+                    this.decompFind.decompOptions2.decimalsPch--;
+                    if (this.decompFind.decompOptions2.decimalsPch < 0) this.decompFind.decompOptions2.decimalsPch = 0;
                 }
                 else
                 {
-                    this.decompFind.decompOptions2.decompTablesFormat.decimalsLevel--;
-                    if (this.decompFind.decompOptions2.decompTablesFormat.decimalsLevel < 0) this.decompFind.decompOptions2.decompTablesFormat.decimalsLevel = 0;
+                    this.decompFind.decompOptions2.decimalsLevel--;
+                    if (this.decompFind.decompOptions2.decimalsLevel < 0) this.decompFind.decompOptions2.decimalsLevel = 0;
                 }
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
 
-        private void checkBoxErrors_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                checkBoxNames.IsChecked = false;
-                this.decompFind.decompOptions2.count = ECountType.N;
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
-
-        private void checkBoxErrors_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                checkBoxNames.IsChecked = false;
-                this.decompFind.decompOptions2.count = ECountType.None;
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);                
-            }
-        }
+        
 
         private void ListButton1_Click(object sender, RoutedEventArgs e)
         {
@@ -2242,23 +2224,23 @@ namespace Gekko
             foreach (GekkoTask t in m) taskList.Add(t);
         }
 
-        private void checkBoxErrors2_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.count = ECountType.Names;
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
+        //private void checkBoxErrors2_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    if (!isInitializing)
+        //    {
+        //        this.decompFind.decompOptions2.count = ECountType.Names;
+        //        RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+        //    }
+        //}
 
-        private void checkBoxErrors2_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (!isInitializing)
-            {
-                this.decompFind.decompOptions2.count = ECountType.None;
-                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-            }
-        }
+        //private void checkBoxErrors2_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    if (!isInitializing)
+        //    {
+        //        this.decompFind.decompOptions2.count = ECountType.None;
+        //        RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+        //    }
+        //}
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
@@ -2298,11 +2280,38 @@ namespace Gekko
             Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
         }        
 
+        
+        private void checkBoxCount_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
+                checkBoxNames.IsChecked = false;  //so it does not fire
+                checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+                this.decompFind.decompOptions2.count = ECountType.N;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void CheckBoxCount_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
+                checkBoxNames.IsChecked = false;  //so it does not fire
+                checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+                this.decompFind.decompOptions2.count = ECountType.None;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
         private void CheckBoxNames_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
-                checkBoxErrors.IsChecked = false;
+                checkBoxCount.Unchecked -= CheckBoxCount_Unchecked;
+                checkBoxCount.IsChecked = false;  //so it does not fire
+                checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
                 Globals.guiTableCellWidth = 3 * Globals.guiTableCellWidth;
                 try
                 {
@@ -2320,13 +2329,17 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                checkBoxErrors.IsChecked = false;
+                checkBoxCount.Unchecked -= CheckBoxCount_Unchecked;
+                checkBoxCount.IsChecked = false;  //so it does not fire
+                checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
+                checkBoxCount.IsChecked = false;
                 this.decompFind.decompOptions2.count = ECountType.None;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
 
-        private void CheckBoxErrors2_Checked_1(object sender, RoutedEventArgs e)
+
+        private void CheckBoxErrors_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
@@ -2335,7 +2348,7 @@ namespace Gekko
             }
         }
 
-        private void CheckBoxErrors2_Unchecked_1(object sender, RoutedEventArgs e)
+        private void CheckBoxErrors_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
@@ -2349,15 +2362,7 @@ namespace Gekko
     {
         public WindowDecomp.GekkoTableTypes type = WindowDecomp.GekkoTableTypes.Unknown;
         public Brush originalBackgroundColor = null;
-    }     
-
-    public class DecompTablesFormat2
-    {
-        public int decimalsLevel = 4;
-        public int decimalsPch = 2;
-        public bool isPercentageType = false;
-        public bool showErrors = false;
-    }
+    }         
 
     public enum ECountType
     {
@@ -2370,6 +2375,13 @@ namespace Gekko
     {
         //remember Clone()
 
+        //----- OPTIONS START ------------------------------------------- cf. #8yuads79afyghr
+        public ECountType count = ECountType.None;
+        public bool showErrors = false;
+        public int decimalsLevel = 4;
+        public int decimalsPch = 2;
+        //----- OPTIONS END --------------------------------------------- cf. #8yuads79afyghr
+
         public DecompOperator decompOperator = null;
 
         //FIND STUFF
@@ -2377,7 +2389,7 @@ namespace Gekko
         public GekkoTime t0 = GekkoTime.tNull;
 
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
-        public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
+        //public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
         public EModelType modelType = EModelType.Unknown;
         public bool missingAsZero = false;
         public bool showTime = false;
@@ -2398,8 +2410,6 @@ namespace Gekko
         public GekkoTime t2 = GekkoTime.tNull;
         //public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         public bool dyn = false;
-        public ECountType count = ECountType.None;
-        public bool showErrors = false;
         
         public List<string> subst = new List<string>();
 
@@ -2465,12 +2475,10 @@ namespace Gekko
             DecompOptions2 d = new DecompOptions2();
 
             d.decompOperator = this.decompOperator.Clone();
-
-            d.decompTablesFormat = new DecompTablesFormat2();
-            d.decompTablesFormat.decimalsLevel = this.decompTablesFormat.decimalsLevel;
-            d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
-            d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
-            d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
+                        
+            d.decimalsLevel = this.decimalsLevel;
+            d.decimalsPch = this.decimalsPch;
+            d.showErrors = this.showErrors;
 
             d.code = this.code;
 

@@ -16,10 +16,15 @@ namespace Gekko
     public class DecompOperator
     {
         //remember Clone()
-        public bool isPercentageType = false; //for formatting
+
+        //----- OPTIONS START ------------------------------------------- cf. #8yuads79afyghr
         public string operatorLower = null;
-        public bool isRaw = false;
         public bool isShares = false;
+        //----- OPTIONS END --------------------------------------------- cf. #8yuads79afyghr
+
+        public bool isPercentageType = false; //for formatting        
+        public bool isRaw = false;
+        
         public bool isDoubleDifQuo = false;  //codes that contain 'dp'
         public bool isDoubleDifRef = false;  //codes that contain 'rdp'
         public Decomp.ELowLevel lowLevel = Decomp.ELowLevel.Unknown; //.BothQuoAndRef --> <mp> or <xmp> type
@@ -340,7 +345,7 @@ namespace Gekko
                 decompOptions2 = new DecompOptions2();
                 decompOptions2.code = o.label + ";";
                 decompOptions2.modelType = G.GetModelType();
-                decompOptions2.decompTablesFormat.showErrors = true; //
+                decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
                 decompOptions2.t2 = o.t2;
                 decompOptions2.expressionOld = o.label;
@@ -548,7 +553,7 @@ namespace Gekko
             DecompOperator op = decompOptions2.decompOperator;  // <--- remove this alias sometimes
             GekkoTime gt1, gt2;            
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
-            decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
+            //decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
             DateTime t0 = DateTime.Now;
 
             //EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
@@ -746,7 +751,7 @@ namespace Gekko
             List<DecompData> decompDataMAINClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDataMAINClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompTablesFormat, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
 
             if (false)
             {
@@ -2711,7 +2716,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompTablesFormat2 format, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
 
@@ -3429,8 +3434,8 @@ namespace Gekko
                     }
 
                     int decimals = 0;
-                    if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
-                    else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
+                    if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
+                    else decimals = decompOptions2.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();
                     
                     if (decompOptions2.count == ECountType.N)
@@ -3474,7 +3479,7 @@ namespace Gekko
                 tab.Set(1, j + 2, s);
             }
 
-            if (decompOptions2.decompTablesFormat.isPercentageType)
+            if (decompOptions2.decompOperator.isPercentageType)
             {
                 tab.Set(1, 1, "%" + "  ");
             }
@@ -3818,23 +3823,21 @@ namespace Gekko
         private static bool OrderNormalize(DecompOptions2 decompOptions2, List<string> varnames)
         {
             bool orderNormalize = false;
-            if (decompOptions2.decompTablesFormat.showErrors)
-            {
-                if (decompOptions2.modelType == EModelType.GAMSScalar)
+
+            if (decompOptions2.modelType == EModelType.GAMSScalar)
+            {                
+                if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
                 {
-                    //HAAAAAAACK!
-                    //if (decompOptions2.prtOptionLower.StartsWith("x")) return false;
-                    //HMMMMM not sure about this and what it does, or if .GAMS_dsh.Count should be used
-                    if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
-                    {
-                        orderNormalize = true;
-                    }
-                    else
-                    {
-                        new Warning("Normalization ordering not implemented for sets of equations");
-                    }
+                    orderNormalize = true;
                 }
                 else
+                {
+                    new Warning("Normalization ordering not implemented for sets of equations");
+                }
+            }
+            else
+            {
+                if (decompOptions2.showErrors)
                 {
                     if (varnames.Count == decompOptions2.link[0].expressions.Count)
                     {
