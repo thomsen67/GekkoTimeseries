@@ -836,100 +836,100 @@ namespace Gekko
                 }
                 for (int j = 1; j <= 1; j++)
                 {
-                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst)});
+                    g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });
                 }
             }
             else if (type == GekkoTableTypes.UpperLeft)
-            {                
-                g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });                
-                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });                
+            {
+                g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });
             }
         }
 
-        private void PutTableIntoGrid(Grid g, Table table, GekkoTableTypes type, DecompOptions decompOptions)
-        {
-            bool varsIsOnRows = false;
+        //private void PutTableIntoGrid(Grid g, Table table, GekkoTableTypes type, DecompOptions decompOptions)
+        //{
+        //    bool varsIsOnRows = false;
 
-            int offsetRow = 0;
-            int offsetCol = 0;
-            int startRow = 0;
-            int endRow = 0;
-            int startCol = 0;
-            int endCol = 0;            
+        //    int offsetRow = 0;
+        //    int offsetCol = 0;
+        //    int startRow = 0;
+        //    int endRow = 0;
+        //    int startCol = 0;
+        //    int endCol = 0;            
 
-            if (type == GekkoTableTypes.TableContent)
-            {
-                startRow = this.frozenRows + 1;
-                startCol = this.frozenCols + 1;
-                endRow = table.GetRowMaxNumber();
-                endCol = table.GetColMaxNumber();
-                offsetRow = this.frozenRows;
-                offsetCol = this.frozenCols;
-            }
-            else if (type == GekkoTableTypes.Top)
-            {
-                startRow = 1;
-                startCol = frozenCols + 1;
-                endRow = this.frozenRows;
-                endCol = table.GetColMaxNumber();
-                offsetRow = 0;
-                offsetCol = frozenCols;
-            }
-            else if (type == GekkoTableTypes.Left)
-            {
-                startRow = frozenRows + 1;
-                startCol = 1;
-                endRow = table.GetRowMaxNumber();
-                endCol = this.frozenCols;
-                offsetRow = frozenRows;
-                offsetCol = 0;
-            }
-            else if (type == GekkoTableTypes.UpperLeft)
-            {
-                startRow = 1;
-                endRow = 1;
-                startCol = 1;
-                endCol = 1;                
-            }
+        //    if (type == GekkoTableTypes.TableContent)
+        //    {
+        //        startRow = this.frozenRows + 1;
+        //        startCol = this.frozenCols + 1;
+        //        endRow = table.GetRowMaxNumber();
+        //        endCol = table.GetColMaxNumber();
+        //        offsetRow = this.frozenRows;
+        //        offsetCol = this.frozenCols;
+        //    }
+        //    else if (type == GekkoTableTypes.Top)
+        //    {
+        //        startRow = 1;
+        //        startCol = frozenCols + 1;
+        //        endRow = this.frozenRows;
+        //        endCol = table.GetColMaxNumber();
+        //        offsetRow = 0;
+        //        offsetCol = frozenCols;
+        //    }
+        //    else if (type == GekkoTableTypes.Left)
+        //    {
+        //        startRow = frozenRows + 1;
+        //        startCol = 1;
+        //        endRow = table.GetRowMaxNumber();
+        //        endCol = this.frozenCols;
+        //        offsetRow = frozenRows;
+        //        offsetCol = 0;
+        //    }
+        //    else if (type == GekkoTableTypes.UpperLeft)
+        //    {
+        //        startRow = 1;
+        //        endRow = 1;
+        //        startCol = 1;
+        //        endCol = 1;                
+        //    }
 
-            if (true)
-            {
-                for (int i = startRow; i <= endRow; i++)
-                {
-                    for (int j = startCol; j <= endCol; j++)
-                    {
-                        Cell c = table.Get(i, j);
-                        if (c == null)
-                        {
-                            AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
-                            continue;
-                        }
-                        string s = "";
-                        bool leftAlign = false;
+        //    if (true)
+        //    {
+        //        for (int i = startRow; i <= endRow; i++)
+        //        {
+        //            for (int j = startCol; j <= endCol; j++)
+        //            {
+        //                Cell c = table.Get(i, j);
+        //                if (c == null)
+        //                {
+        //                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
+        //                    continue;
+        //                }
+        //                string s = "";
+        //                bool leftAlign = false;
 
-                        string ss = c.numberFormat;
-                        string[] sss = ss.Split('.');
-                        string ssss = sss[sss.Length - 1];
-                        int xx = int.Parse(ssss);
+        //                string ss = c.numberFormat;
+        //                string[] sss = ss.Split('.');
+        //                string ssss = sss[sss.Length - 1];
+        //                int xx = int.Parse(ssss);
 
-                        if (c.cellType == CellType.Text)
-                        {
-                            s = c.CellText.TextData[0];
-                            leftAlign = true;
-                        }
-                        else if (c.cellType == CellType.Number)
-                        {
-                            s = G.UpdprtFormat(c.number, xx, false);
-                        }
-                        else if (c.cellType == CellType.Date) s = c.date;
+        //                if (c.cellType == CellType.Text)
+        //                {
+        //                    s = c.CellText.TextData[0];
+        //                    leftAlign = true;
+        //                }
+        //                else if (c.cellType == CellType.Number)
+        //                {
+        //                    s = G.UpdprtFormat(c.number, xx, false);
+        //                }
+        //                else if (c.cellType == CellType.Date) s = c.date;
 
-                        if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
+        //                if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
 
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
-                    }
-                }
-            }
-        }
+        //                AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
+        //            }
+        //        }
+        //    }
+        //}
 
         private void PutTableIntoGrid2(Grid g, Table table, GekkoTableTypes type, DecompOptions2 decompOptions)
         {
@@ -939,6 +939,8 @@ namespace Gekko
             int endRow = 0;
             int startCol = 0;
             int endCol = 0;
+
+            bool variablesAreOnRows = AreVariablesOnRows(decompOptions);
 
             if (type == GekkoTableTypes.TableContent)
             {
@@ -983,7 +985,7 @@ namespace Gekko
                     Cell c = table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows);  //transparent
                         continue;
                     }
                     string s = "";
@@ -1007,9 +1009,16 @@ namespace Gekko
 
                     if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows);
                 }
             }
+        }
+
+        private static bool AreVariablesOnRows(DecompOptions2 decompOptions)
+        {
+            bool variableIsRow = false;
+            if (decompOptions.rows.Contains(Globals.col_variable)) variableIsRow = true;
+            return variableIsRow;
         }
 
         private void HandleKeyDownEvent(object sender, KeyEventArgs e)
@@ -1095,9 +1104,8 @@ namespace Gekko
             Clipboard.SetDataObject(s);
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor)
-        {
-            bool b = true;
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, bool variableIsRow)
+        {            
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
@@ -1120,13 +1128,11 @@ namespace Gekko
             }
             else 
             {
-                if (type == GekkoTableTypes.Left)
+                if ((variableIsRow && type == GekkoTableTypes.Left) || (!variableIsRow && type == GekkoTableTypes.Top))
                 {
+                    bool isEndogenous = false;
                     string ss = G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator);
                     ss = G.PrettifyTimeseriesHash(ss, true, true);
-
-                    bool isEndogenous = false;
-
                     if (G.Equal(Program.options.model_type, "gams"))
                     {
                         if (Program.HasGamsEquation(ss)) isEndogenous = true;
@@ -1135,20 +1141,25 @@ namespace Gekko
                     {
                         EEndoOrExo e = Program.VariableTypeEndoExo(ss);
                         isEndogenous = e == EEndoOrExo.Endo;
-                    }                    
+                    }
 
                     if (isEndogenous || s == Globals.decompText0)
                     {
-                        if (b)
+                        textBlock.MouseEnter += Mouse_Enter;
+                        textBlock.MouseLeave += Mouse_Leave;
+                        textBlock.MouseDown += Mouse_Down;
+                        textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
+                        if (variableIsRow)
                         {
-                            textBlock.MouseEnter += Mouse_Enter;
-                            textBlock.MouseLeave += Mouse_Leave;
-                            textBlock.MouseDown += Mouse_Down;
-                            textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
                             if (i == 0) textBlock.FontWeight = FontWeights.Bold;
+                        }
+                        else
+                        {
+                            if (j == 0) textBlock.FontWeight = FontWeights.Bold;
                         }
                     }
                 }
+
                 textBlock.HorizontalAlignment = HorizontalAlignment.Right;
                 if (leftAlign) textBlock.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
@@ -1515,10 +1526,22 @@ namespace Gekko
 
             int x = -12345;
             int y = -12345;
-            CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
 
-            Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
-            Cell c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
+            Cell c = null;
+            Cell c2 = null;
+
+            if (AreVariablesOnRows(this.decompFind.decompOptions2))
+            {
+                CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
+            }
+            else
+            {
+                CoordConversion(out x, out y, GekkoTableTypes.Top, row, col);
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd
+            }
 
             if (c != null && c.cellType == CellType.Text)
             {
@@ -1917,17 +1940,17 @@ namespace Gekko
             this.gridUpperLeft.Children.Clear();
         }
 
-        private void MakeTable(Table table, DecompOptions decompOptions)
-        {            
-            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);            
-            PutTableIntoGrid(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);            
-            CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
-            PutTableIntoGrid(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
-            CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
-            PutTableIntoGrid(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
-            CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
-            PutTableIntoGrid(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);            
-        }
+        //private void MakeTable(Table table, DecompOptions decompOptions)
+        //{            
+        //    CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);            
+        //    PutTableIntoGrid(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);            
+        //    CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
+        //    PutTableIntoGrid(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
+        //    CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
+        //    PutTableIntoGrid(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
+        //    CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
+        //    PutTableIntoGrid(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);            
+        //}
 
         private void MakeGuiTable2(Table table, DecompOptions2 decompOptions)
         {

@@ -151,8 +151,8 @@ namespace Gekko
 
         public static bool decompUnitCsvPivot = false;  //can activate xlsx pivot writing   
 
-        public static string internalColumnIdentifyer = "gekkopivot__";
-        public static string internalSetIdentifyer = "gekkoset__";
+        public const string internalColumnIdentifyer = "gekkopivot__";
+        public const string internalSetIdentifyer = "gekkoset__";
         public static string internalPivotRows = "Rows";
         public static string internalPivotCols = "Columns";
         public static string internalPivotFilters = "Filters";
@@ -160,7 +160,22 @@ namespace Gekko
 
         public static string windowFindStatusBarText = "Double-click to decompose equation, single-click to select";
         public static string windowDecompStatusBarText = "Double-click to find equation(s)";
-        public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";        
+        public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";
+
+        public const string col_t = internalColumnIdentifyer + "t";
+        public const string col_variable = Globals.internalColumnIdentifyer + "variable";
+        public const string col_lag = Globals.internalColumnIdentifyer + "lag";
+        public const string col_universe = Globals.internalColumnIdentifyer + "universe";
+        public const string col_value = Globals.internalColumnIdentifyer + "value";
+        public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
+        public const string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
+        public const string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
+        public const string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
+        public const string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
+        public const string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
+        public const string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
+        public const string col_equ = Globals.internalColumnIdentifyer + "equ";
+        public const string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
 
         // ----------------------------------------------------------------
         // GRADIENT

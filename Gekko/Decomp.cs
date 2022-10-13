@@ -2602,37 +2602,23 @@ namespace Gekko
             //<#universe>: universal set for elements without domain info
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
-
-            string col_t = Globals.internalColumnIdentifyer + "t";
-            string col_variable = Globals.internalColumnIdentifyer + "variable";
-            string col_lag = Globals.internalColumnIdentifyer + "lag";
-            string col_universe = Globals.internalColumnIdentifyer + "universe";
-            string col_value = Globals.internalColumnIdentifyer + "value";
-            string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";
-            string col_valueLevel = Globals.internalColumnIdentifyer + "valueLevel";
-            string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
-            string col_valueLevelLag2 = Globals.internalColumnIdentifyer + "valueLevelLag2";
-            string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
-            string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
-            string col_valueLevelRefLag2 = Globals.internalColumnIdentifyer + "valueLevelRefLag2";
-            string col_equ = Globals.internalColumnIdentifyer + "equ";
-            string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
+            
             string gekko_null = "null";            
 
-            frame.AddColName(col_t);
-            frame.AddColName(col_value);
-            frame.AddColName(col_valueAlternative);
-            frame.AddColName(col_valueLevel);
-            frame.AddColName(col_valueLevelLag);
-            frame.AddColName(col_valueLevelLag2);
-            frame.AddColName(col_valueLevelRef);
-            frame.AddColName(col_valueLevelRefLag);
-            frame.AddColName(col_valueLevelRefLag2);
-            frame.AddColName(col_variable);
-            frame.AddColName(col_lag);
-            frame.AddColName(col_universe);
-            frame.AddColName(col_equ);
-            frame.AddColName(col_fullVariableName);
+            frame.AddColName(Globals.col_t);
+            frame.AddColName(Globals.col_value);
+            frame.AddColName(Globals.col_valueAlternative);
+            frame.AddColName(Globals.col_valueLevel);
+            frame.AddColName(Globals.col_valueLevelLag);
+            frame.AddColName(Globals.col_valueLevelLag2);
+            frame.AddColName(Globals.col_valueLevelRef);
+            frame.AddColName(Globals.col_valueLevelRefLag);
+            frame.AddColName(Globals.col_valueLevelRefLag2);
+            frame.AddColName(Globals.col_variable);
+            frame.AddColName(Globals.col_lag);
+            frame.AddColName(Globals.col_universe);
+            frame.AddColName(Globals.col_equ);
+            frame.AddColName(Globals.col_fullVariableName);
             if (ageHierarchy)
             {
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
@@ -2714,7 +2700,7 @@ namespace Gekko
                                 {
                                     for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
                                     {
-                                        domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
+                                        domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, Globals.col_universe, ts.mmi.parent.meta.domains[ii]);
                                     }
                                 }
                             }
@@ -2724,7 +2710,7 @@ namespace Gekko
                                 if (domain != null)
                                 {
                                     string setname = domain.ToLower();
-                                    if (setname == null) setname = col_universe;
+                                    if (setname == null) setname = Globals.col_universe;
                                     frame.AddColName(setname);  //will .tolower() and ignore dublets
                                 }
                             }
@@ -2825,10 +2811,10 @@ namespace Gekko
 
                         string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");                        
 
-                        dr.Set(frame, col_fullVariableName, new CellLight(dictName2));
-                        dr.Set(frame, col_equ, new CellLight(super.ToString()));
-                        dr.Set(frame, col_t, new CellLight(t2.ToString()));
-                        dr.Set(frame, col_variable, new CellLight(varName));
+                        dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
+                        dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));
+                        dr.Set(frame, Globals.col_t, new CellLight(t2.ToString()));
+                        dr.Set(frame, Globals.col_variable, new CellLight(varName));
 
                         string lag2 = null;
                         if (true)
@@ -2841,7 +2827,7 @@ namespace Gekko
                             if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
                         }
 
-                        dr.Set(frame, col_lag, new CellLight(lag2));
+                        dr.Set(frame, Globals.col_lag, new CellLight(lag2));
 
                         if (indexes != null)
                         {
@@ -2857,20 +2843,20 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        dr.Set(frame, col_universe, new CellLight(index));
+                                        dr.Set(frame, Globals.col_universe, new CellLight(index));
                                     }
                                 }
                             }
                         }
 
-                        dr.Set(frame, col_value, new CellLight(d));
-                        dr.Set(frame, col_valueAlternative, new CellLight(dAlternative));
-                        dr.Set(frame, col_valueLevel, new CellLight(dLevel));
-                        dr.Set(frame, col_valueLevelLag, new CellLight(dLevelLag));
-                        dr.Set(frame, col_valueLevelLag2, new CellLight(dLevelLag2));
-                        dr.Set(frame, col_valueLevelRef, new CellLight(dLevelRef));
-                        dr.Set(frame, col_valueLevelRefLag, new CellLight(dLevelRefLag));
-                        dr.Set(frame, col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
+                        dr.Set(frame, Globals.col_value, new CellLight(d));
+                        dr.Set(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
+                        dr.Set(frame, Globals.col_valueLevel, new CellLight(dLevel));
+                        dr.Set(frame, Globals.col_valueLevelLag, new CellLight(dLevelLag));
+                        dr.Set(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
+                        dr.Set(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
+                        dr.Set(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
+                        dr.Set(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
 
                         frame.rows.Add(dr);
                     }
@@ -2907,9 +2893,9 @@ namespace Gekko
             string normalizerVariableWithIndex = null;
             if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
 
-            DecomposeReplaceVars(decompOptions2.rows, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(decompOptions2.filters, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
 
             List<string> rownames3 = new List<string>();
             List<string> colnames3 = new List<string>();
@@ -2933,7 +2919,7 @@ namespace Gekko
             List<string> varnames = decompOptions2.link[parentI].varnames;
 
             bool decompHasLag = false;
-            if (decompOptions2.rows.Contains(col_lag) || decompOptions2.cols.Contains(col_lag))
+            if (decompOptions2.rows.Contains(Globals.col_lag) || decompOptions2.cols.Contains(Globals.col_lag))
             {
                 decompHasLag = true;
             }
@@ -2951,9 +2937,9 @@ namespace Gekko
             {                
                 ENormalizerType normalizerType = ENormalizerType.None;
                 
-                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, col_fullVariableName).text))
+                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, Globals.col_fullVariableName).text))
                 {
-                    if (row.Get(frame, col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
+                    if (row.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
                     else normalizerType = ENormalizerType.NormalizerWithLagOrLead;
                 }
 
@@ -2999,7 +2985,7 @@ namespace Gekko
                 foreach (string s in decompOptions2.rows)
                 {                    
                     s1 = DecompAddText(frame, row, s1, s);
-                    if (s == col_variable) s1 += more;
+                    if (s == Globals.col_variable) s1 += more;
                 }
                 if (s1 != null)
                 {
@@ -3010,7 +2996,7 @@ namespace Gekko
                 foreach (string s in decompOptions2.cols)
                 {
                     s2 = DecompAddText(frame, row, s2, s);
-                    if (s == col_variable) s2 += more;
+                    if (s == Globals.col_variable) s2 += more;
                 }
                 if (s2 != null)
                 {
@@ -3021,15 +3007,15 @@ namespace Gekko
                 if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
                 if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
 
-                double d = row.Get(frame, col_value).data;
-                double dAlternative = row.Get(frame, col_valueAlternative).data;
-                double dLevel = row.Get(frame, col_valueLevel).data;
-                double dLevelLag = row.Get(frame, col_valueLevelLag).data;
-                double dLevelLag2 = row.Get(frame, col_valueLevelLag2).data;
-                double dLevelRef = row.Get(frame, col_valueLevelRef).data;
-                double dLevelRefLag = row.Get(frame, col_valueLevelRefLag).data;
-                double dLevelRefLag2 = row.Get(frame, col_valueLevelRefLag2).data;
-                string fullVariableName = row.Get(frame, col_fullVariableName).text;
+                double d = row.Get(frame, Globals.col_value).data;
+                double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
+                double dLevel = row.Get(frame, Globals.col_valueLevel).data;
+                double dLevelLag = row.Get(frame, Globals.col_valueLevelLag).data;
+                double dLevelLag2 = row.Get(frame, Globals.col_valueLevelLag2).data;
+                double dLevelRef = row.Get(frame, Globals.col_valueLevelRef).data;
+                double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
+                double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
+                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
 
                 AggContainer td = null;
                 agg.TryGetValue(key, out td);
