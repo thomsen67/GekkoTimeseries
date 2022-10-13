@@ -2181,6 +2181,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                checkBoxNames.IsChecked = false;
                 this.decompFind.decompOptions2.count = ECountType.N;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2190,6 +2191,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                checkBoxNames.IsChecked = false;
                 this.decompFind.decompOptions2.count = ECountType.None;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);                
             }
@@ -2272,8 +2274,8 @@ namespace Gekko
 
             windowDecomp.Focus();
             string txt = "  Merged...";
-            //blink message a bit, and then remove            
-            Program.DelayAction(500, new Action(() => { try { windowDecomp.textSelect.Text = txt; } catch { } }));
+            //show message a bit, and then remove    
+            windowDecomp.textSelect.Text = txt;
             Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
 
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
@@ -2300,6 +2302,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                checkBoxErrors.IsChecked = false;
                 Globals.guiTableCellWidth = 3 * Globals.guiTableCellWidth;
                 try
                 {
@@ -2317,6 +2320,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                checkBoxErrors.IsChecked = false;
                 this.decompFind.decompOptions2.count = ECountType.None;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2324,12 +2328,20 @@ namespace Gekko
 
         private void CheckBoxErrors2_Checked_1(object sender, RoutedEventArgs e)
         {
-
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.showErrors = true;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
         }
 
         private void CheckBoxErrors2_Unchecked_1(object sender, RoutedEventArgs e)
         {
-
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.showErrors = false;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
         }
     }
 
@@ -2387,6 +2399,7 @@ namespace Gekko
         //public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         public bool dyn = false;
         public ECountType count = ECountType.None;
+        public bool showErrors = false;
         
         public List<string> subst = new List<string>();
 
@@ -2460,6 +2473,8 @@ namespace Gekko
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
 
             d.code = this.code;
+
+            d.showErrors = this.showErrors;
 
             d.modelType = this.modelType;
             
