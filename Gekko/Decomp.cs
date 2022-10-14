@@ -3964,7 +3964,7 @@ namespace Gekko
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
             string variableName = vars[0].Replace(" ", "");  //no blanks
-            int aNumber = -12345; bool good = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);
+            int aNumber = -12345; bool good = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);            
             if (!good)
             {                
                 new Error(NonFoundInModelError(variableName, modelGamsScalar));
