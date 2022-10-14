@@ -31877,7 +31877,7 @@ namespace Gekko
     /// for instance if querying "x[a, b]".
     /// </summary>
     [ProtoContract]
-    public class GekkoDictionaryDimensional
+    public class GekkoDictionaryDimensional : IEnumerable<KeyValuePair<string, int>>
     {
         [ProtoMember(1)]
         private GekkoDictionary<string, int> storage = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -31929,6 +31929,21 @@ namespace Gekko
         public int Get(string s)
         {
             return Get(s, true);
+        }
+
+        public int Count()
+        {
+            return this.storage.Count;
+        }
+
+        public IEnumerator<KeyValuePair<string, int>> GetEnumerator()
+        {
+            return this.storage.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 

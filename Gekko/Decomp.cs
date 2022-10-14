@@ -507,9 +507,8 @@ namespace Gekko
 
                 string s2 = G.Chop_DimensionAddLast(s, time.ToString(), false);
 
-                int eqNumber = -12345;
-                bool b = modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
-                if (!b)
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s2);
+                if (eqNumber == -12345)
                 {
                     if(showErrors) new Error("Could not find the equation '" + s2 + "'");
                 }
@@ -1252,7 +1251,7 @@ namespace Gekko
                             //see also #as7f3læaf9
                             string eqName = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
                             if (k == 0) eqNames.Add(eqName);
-                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[eqName];
+                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(eqName);
 
                             //foreach precedent variable
                             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
@@ -2283,12 +2282,9 @@ namespace Gekko
 
                 int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
 
-                int eqNumber = -12345;
-
                 string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
-
-                bool b = modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber);
-                if (!b)
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
+                if (eqNumber == -12345)
                 {
                     new Error("Could not find equation '" + s + "'");
                 }
@@ -3975,10 +3971,10 @@ namespace Gekko
             }
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
-            string variableName = vars[0].Replace(" ", "");  //no blanks
-            int aNumber = -12345; bool good = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(variableName, out aNumber);            
-            if (!good)
-            {                
+            string variableName = vars[0]; //.Replace(" ", "");  //no blanks
+            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
+            if (aNumber != -12345)
+            {
                 new Error(NonFoundInModelError(variableName, modelGamsScalar));
             }
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
@@ -4169,13 +4165,11 @@ namespace Gekko
 
             Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
 
-            int a1 = -12345;
-            bool good1 = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x1, out a1);
-            if (!good1) new Error(NonFoundInModelError(x1, modelGamsScalar));
+            int a1 = modelGamsScalar.dict_FromVarNameToANumber.Get(x1);
+            if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
-            int a2 = -12345;
-            bool good2 = modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(x2, out a2);
-            if (!good2) new Error(NonFoundInModelError(x2, modelGamsScalar));            
+            int a2 = modelGamsScalar.dict_FromVarNameToANumber.Get(x2);
+            if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));            
 
             PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
             PeriodAndVariable pv2 = new PeriodAndVariable(t2027, a2);
