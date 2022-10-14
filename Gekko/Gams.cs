@@ -953,13 +953,13 @@ namespace Gekko
 
             // -------------- helpers dictionaries ---------
             modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
-            modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
+            modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;  //dict
             modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
-            modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
+            modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;  //dict
             modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
-            modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
+            modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;  //dict
             modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
-            modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
+            modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;  //dict
             modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
 
             // -------------- raw codelines ---------

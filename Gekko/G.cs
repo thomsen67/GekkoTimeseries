@@ -1821,6 +1821,22 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
+        /// But not tested.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string ReplaceBlanks(string s)
+        {
+            StringBuilder sb = new StringBuilder(s.Length);
+            foreach (char c in s)
+            {
+                if (c != ' ') sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Return this number of blanks.
         /// </summary>
         /// <param name="count"></param>

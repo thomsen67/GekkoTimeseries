@@ -31871,6 +31871,67 @@ namespace Gekko
         public YesNoNull isStatic = YesNoNull.Null;
     }
 
+    /// <summary>
+    /// Wrapper for dictionaries used in GAMS scalar model. This issue is that keys are represented
+    /// as for instance "x[a,b]", note no blanks. So the wrapper is to absolutely ensure that we avoid blanks-gotchas,
+    /// for instance if querying "x[a, b]".
+    /// </summary>
+    [ProtoContract]
+    public class GekkoDictionaryDimensional
+    {
+        [ProtoMember(1)]
+        private GekkoDictionary<string, int> storage = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Add something. Beware: case-insensitive keys. The input string may contain blanks,
+        /// which will be removed before add ("x[a, b]" becomes "x[a,b]").
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        public void Add(string s, int i, bool willRemoveBlanks)
+        {            
+            if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanks(s), i);
+            else this.storage.Add(s, i);
+        }
+
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        public void Add(string s, int i)
+        {
+            Add(s, i, true);
+        }
+
+        /// <summary>
+        /// See if s is in dictionary. Beware: case-insensitive keys. The input string may contain blanks,
+        /// which will be removed ("x[a, b]" becomes "x[a,b]").
+        /// Note: if key is not found, the method returns -12345.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public int Get(string s, bool willRemoveBlanks)
+        {
+            string s2 = null;
+            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            else s2 = s;
+            int i; bool b = this.storage.TryGetValue(s2, out i);  //is set to 0 if not found
+            if (!b) i = -12345;
+            return i;
+        }
+
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public int Get(string s)
+        {
+            return Get(s, true);
+        }
+    }
+
     public class GekkoDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public GekkoDictionary()
@@ -31880,7 +31941,6 @@ namespace Gekko
             {
                 //string keys should be called with ignorecase
                 new Error("Technical error 437834873");
-                //throw new GekkoException();
             }
         }
         //public GekkoDictionary(int capacity) : base(capacity) { }  //not used
@@ -31893,7 +31953,6 @@ namespace Gekko
                 {
                     //string keys should be called with ignorecase
                     new Error("Technical error 437834874");
-                    //throw new GekkoException();
                 }
             }
         }
