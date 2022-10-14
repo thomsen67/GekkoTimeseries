@@ -2944,7 +2944,6 @@ namespace Gekko
             if (left.storage.Length != right.storage.Length)
             {
                 new Error("#9843298473");
-                //throw new GekkoException();
             }
             for (int i = 0; i < left.storage.Length; i++)
             {

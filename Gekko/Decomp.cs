@@ -2567,11 +2567,10 @@ namespace Gekko
                     if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;
                     DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
                 }
-            }            
-
-            if (!op.isRaw)
+            }
+            else if (decompOptions2.modelType == EModelType.GAMSRaw || decompOptions2.modelType == EModelType.Gekko)  //is .Gekko even relevant here??
             {
-                if (decompOptions2.modelType != EModelType.GAMSScalar)                
+                if (!op.isRaw)
                 {
                     //Old and bad method, make it disappear soon!
                     DecompNormalizeOLD(per1, per2, decompOptions2, parentI, decompDataMAINClone, operatorOneOf3Types);
@@ -3301,24 +3300,39 @@ namespace Gekko
             {
                 tab.Set(1, 1, "%" + "  ");
             }
-            
-            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
 
+            if (decompOptions2.modelType == EModelType.GAMSScalar && !op.isRaw)
+            {
+                HandleSignAndShares(tab, decompOptions2);
+            }
+
+            return tab;
+        }
+
+        /// <summary>
+        /// At this point, decomp rows sum to 0, so we change the sign of the first row, so the rest sum
+        /// to the first. Also, percentages can be set, so first row is 100%. Also works for columns.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="decompOptions2"></param>
+        private static void HandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
+        {
+            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
             if (areVariablesOnRows)
             {
                 for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                 {
                     double value = tab.Get(2, j).number;
                     for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
-                    {                        
+                    {
                         if (i == 2)
-                        {                            
+                        {
                             Cell c5 = new Cell();
                             c5.cellType = CellType.Number;
                             c5.number = -value;
                             tab.Set(new Coord(i, j), c5);
                         }
-                        if (op.isShares)
+                        if (decompOptions2.decompOperator.isShares)
                         {
                             Cell c6 = new Cell();
                             c6.cellType = CellType.Number;
@@ -3336,13 +3350,13 @@ namespace Gekko
                     for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                     {
                         if (j == 2)
-                        {                            
+                        {
                             Cell c5 = new Cell();
                             c5.cellType = CellType.Number;
                             c5.number = -value;
                             tab.Set(new Coord(i, j), c5);
                         }
-                        if (op.isShares)
+                        if (decompOptions2.decompOperator.isShares)
                         {
                             Cell c6 = new Cell();
                             c6.cellType = CellType.Number;
@@ -3352,8 +3366,6 @@ namespace Gekko
                     }
                 }
             }
-            
-            return tab;
         }
 
         /// <summary>
@@ -3573,7 +3585,7 @@ namespace Gekko
             DecompData d = decompDatasSupremeClone[zero];
             string name = decompOptions2.link[parentI].varnames[zero];
             d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
-
+            
             if (!decompOptions2.decompOperator.isRaw)
             {
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone[zero], operatorOneOf3Types)[d.lhs];
