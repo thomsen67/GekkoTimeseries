@@ -675,11 +675,8 @@ namespace Gekko
                         int idx = ss2.IndexOf("[");
                         if (idx >= 0) eqName = ss2.Substring(0, idx);
                         helper.dict_FromEqNumberToEqName[n] = ss2;
-                        helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow
-                        if (helper.dict_FromEqNameToEqChunkNumber.Get(eqName) == -12345)
-                        {
-                            helper.dict_FromEqNameToEqChunkNumber.Add(eqName, helper.dict_FromEqNameToEqChunkNumber.Count());
-                        }
+                        helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow                        
+                        helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count());
                         helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
                     }
                     else if (status2 == 2)
@@ -696,10 +693,7 @@ namespace Gekko
                         ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);
                         if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
                         if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
-                        if (helper.dict_FromVarNameToANumber.Get(resultingFullName) == -12345)
-                        {
-                            helper.dict_FromVarNameToANumber.Add(resultingFullName, helper.dict_FromVarNameToANumber.Count());
-                        }
+                        helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count());
                     }
                 }
             }
@@ -959,7 +953,7 @@ namespace Gekko
             modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
             modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;  //dict ... used at all???
             modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
-            modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;  //dict
+            modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;  //dict ... used at all???
             modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
 
             // -------------- raw codelines ---------

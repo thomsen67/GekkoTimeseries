@@ -31889,7 +31889,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="i"></param>
         public void Add(string s, int i, bool willRemoveBlanks)
-        {            
+        {
             if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanks(s), i);
             else this.storage.Add(s, i);
         }
@@ -31902,6 +31902,29 @@ namespace Gekko
         public void Add(string s, int i)
         {
             Add(s, i, true);
+        }
+
+        /// <summary>
+        /// Add something, if it is not already present. Beware: case-insensitive keys. The input string may contain blanks,
+        /// which will be removed before add ("x[a, b]" becomes "x[a,b]").
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <param name="willRemoveBlanks"></param>
+        public void AddIfNotAlreadyThere(string s, int i, bool willRemoveBlanks)
+        {
+            string s2 = null;
+            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            else s2 = s;
+            if (!this.storage.ContainsKey(s2))
+            {
+                this.storage.Add(s2, i);
+            }
+        }
+
+        public void AddIfNotAlreadyThere(string s, int i)
+        {
+            AddIfNotAlreadyThere(s, i, true);
         }
 
         /// <summary>
