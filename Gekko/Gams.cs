@@ -1564,7 +1564,7 @@ namespace Gekko
             }
             else
             {
-                if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");
+                //if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");
                 FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, o.p);
                 string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
                 System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
