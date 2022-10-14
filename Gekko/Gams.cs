@@ -699,13 +699,13 @@ namespace Gekko
             }
 
             helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count()];
-            foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber)
+            foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber.GetDictionaryForIteration())
             {
                 helper.dict_FromANumberToVarName[kvp.Value] = kvp.Key;
             }
 
             helper.dict_FromEqChunkNumberToEqName = new string[helper.dict_FromEqNameToEqChunkNumber.Count()];
-            foreach (KeyValuePair<string, int> kvp in helper.dict_FromEqNameToEqChunkNumber)
+            foreach (KeyValuePair<string, int> kvp in helper.dict_FromEqNameToEqChunkNumber.GetDictionaryForIteration())
             {
                 helper.dict_FromEqChunkNumberToEqName[kvp.Value] = kvp.Key;
             }

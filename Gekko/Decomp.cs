@@ -4099,7 +4099,7 @@ namespace Gekko
             bool variableExists = false;
             bool variableExistsAndHasIndex = false;
             string error = null;
-            foreach (KeyValuePair<string, int> kvp in modelGamsScalar.dict_FromVarNameToANumber)
+            foreach (KeyValuePair<string, int> kvp in modelGamsScalar.dict_FromVarNameToANumber.GetDictionaryForIteration())
             {
                 if (G.Equal(G.Chop_RemoveIndex(variableName), G.Chop_RemoveIndex(kvp.Key)))
                 {
