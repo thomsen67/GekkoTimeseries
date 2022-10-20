@@ -549,7 +549,7 @@ namespace Gekko
         /// <param name="refresh"></param>
         /// <param name="decompDatas"></param>
         /// <returns></returns>
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
         {
             DecompOperator op = decompOptions2.decompOperator;  // <--- remove this alias sometimes
             GekkoTime gt1, gt2;            
@@ -746,7 +746,7 @@ namespace Gekko
             List<DecompData> decompDataMAINClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDataMAINClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types);
 
             if (false)
             {
@@ -2543,7 +2543,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
 
@@ -2603,8 +2603,8 @@ namespace Gekko
             //<#universe>: universal set for elements without domain info
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
-                       
 
+            FrameLight frame = new FrameLight();
             frame.AddColName(Globals.col_t);
             frame.AddColName(Globals.col_value);
             frame.AddColName(Globals.col_valueAlternative);

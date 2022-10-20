@@ -89,8 +89,6 @@ namespace Gekko
             }
         }
 
-        public FrameLight frame;
-
         private void OnButtonClick(object sender, RoutedEventArgs e)
         {            
             Button cmb = sender as Button;            
@@ -1728,9 +1726,8 @@ namespace Gekko
 
                 IVariable y0a = null;
                 IVariable y0aRef = null;
-
-                frame = new FrameLight();
-                Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, frame, refresh, ref this.decompDatas, modelGamsScalar);
+                                
+                Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, refresh, ref this.decompDatas, modelGamsScalar);
 
                 string s = null;
                 if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
