@@ -2781,6 +2781,12 @@ namespace Gekko
                 double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
                 string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
 
+                decompOptions2.all.Clear();
+                foreach (string s in frame.colnames)
+                {                    
+                    decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
+                }
+
                 AggContainer td = null;
                 agg.TryGetValue(key, out td);
                 if (td == null)

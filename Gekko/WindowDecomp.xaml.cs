@@ -380,15 +380,7 @@ namespace Gekko
         }
 
         private void RefreshList2(TaskType taskType)
-        {            
-            List<string> fields = frame.colnames;
-            this.decompFind.decompOptions2.all.Clear();
-            foreach (string s in frame.colnames)
-            {
-                string s2 = G.HandleInternalIdentifyer1(s);
-                this.decompFind.decompOptions2.all.Add(s2);
-            }
-
+        {   
             this.decompFind.decompOptions2.freeFilter.Clear();
             this.decompFind.decompOptions2.free.Clear();
             foreach (string s in this.decompFind.decompOptions2.all)
