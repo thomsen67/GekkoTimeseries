@@ -203,8 +203,7 @@ namespace Gekko
         public static string equationCodeY = "y";
         public static string equationCodeT = "t";
         public static string equationCodeP = "p";        
-
-        public static bool isAgeHierarchy = false;
+                
         public static string ageHierarchyDivider = "..";
         public static string ageHierarchyName = "a10";
         public static string ageName = "a";

@@ -347,7 +347,11 @@ namespace Gekko
 
                 this.Children = new List<FooViewModel>();
 
-                if (Globals.isAgeHierarchy && name == "#a" && list.Count > 10)  //pivotfix
+                //
+                // FIXME: access ageHierarchy from decompOptions2, perhaps via decompFind object attached to WindowTreeView...
+                //
+                bool ageHierarchy = false;
+                if (ageHierarchy && name == "#a" && list.Count > 10)  //pivotfix
                 {
                     SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
                     List<string> m2 = new List<string>();

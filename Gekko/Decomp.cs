@@ -2570,10 +2570,7 @@ namespace Gekko
                     //Old and bad method, make it disappear soon!
                     DecompNormalizeOLD(per1, per2, decompOptions2, parentI, decompDataMAINClone, operatorOneOf3Types);
                 }
-            }
-
-            bool ageHierarchy = Globals.isAgeHierarchy;
-            if (G.IsUnitTesting()) ageHierarchy = false;
+            }            
 
             if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             {
@@ -2595,56 +2592,9 @@ namespace Gekko
                     }
                 }
             }
-
-            //The DataTable dt will get the following colums:
-            //<t>:         time
-            //<variable>:  variable name, like fy or pop
-            //<lag>:       lag or lead
-            //<#universe>: universal set for elements without domain info
-            //#i:          set names, like #age, #sector, etc.
-            //<value>:     data value
-
-            FrameLight frame = new FrameLight();
-            frame.AddColName(Globals.col_t);
-            frame.AddColName(Globals.col_value);
-            frame.AddColName(Globals.col_valueAlternative);
-            frame.AddColName(Globals.col_valueLevel);
-            frame.AddColName(Globals.col_valueLevelLag);
-            frame.AddColName(Globals.col_valueLevelLag2);
-            frame.AddColName(Globals.col_valueLevelRef);
-            frame.AddColName(Globals.col_valueLevelRefLag);
-            frame.AddColName(Globals.col_valueLevelRefLag2);
-            frame.AddColName(Globals.col_variable);
-            frame.AddColName(Globals.col_lag);
-            frame.AddColName(Globals.col_universe);
-            frame.AddColName(Globals.col_equ);
-            frame.AddColName(Globals.col_fullVariableName);
-            if (ageHierarchy)
-            {
-                frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
-            }
             
-            //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
-
-            DecompPivotCreateDataframe(frame, smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
-
-            if (ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
-            {
-                foreach (FrameLightRow row in frame.rows)
-                {
-                    CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
-                    string s = c.text;
-                    int i = -12345;
-                    string s2 = "null";
-                    if (int.TryParse(s, out i))
-                    {
-                        s2 = G.GroupBy10(i);
-                    }
-                    //set a new column with aggregated ages
-                    row.Set(frame, Globals.internalSetIdentifyer + Globals.ageHierarchyName, new CellLight(s2));
-                }
-            }
-
+            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
+            
             if (false && Globals.decompUnitCsvPivot)
             {
                 WriteDatatableTocsv(frame);
@@ -3074,9 +3024,40 @@ namespace Gekko
             return tab;
         }
 
-        private static void DecompPivotCreateDataframe(FrameLight frame, GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2)
+        private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2)
         {
             int superN = decompDataMAINClone.Count;
+
+            //The DataTable dt will get the following colums:
+            //<t>:         time
+            //<variable>:  variable name, like fy or pop
+            //<lag>:       lag or lead
+            //<#universe>: universal set for elements without domain info
+            //#i:          set names, like #age, #sector, etc.
+            //<value>:     data value
+
+            FrameLight frame = new FrameLight();
+            frame.AddColName(Globals.col_t);
+            frame.AddColName(Globals.col_value);
+            frame.AddColName(Globals.col_valueAlternative);
+            frame.AddColName(Globals.col_valueLevel);
+            frame.AddColName(Globals.col_valueLevelLag);
+            frame.AddColName(Globals.col_valueLevelLag2);
+            frame.AddColName(Globals.col_valueLevelRef);
+            frame.AddColName(Globals.col_valueLevelRefLag);
+            frame.AddColName(Globals.col_valueLevelRefLag2);
+            frame.AddColName(Globals.col_variable);
+            frame.AddColName(Globals.col_lag);
+            frame.AddColName(Globals.col_universe);
+            frame.AddColName(Globals.col_equ);
+            frame.AddColName(Globals.col_fullVariableName);
+            if (decompOptions2.ageHierarchy)
+            {
+                frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
+            }
+
+            //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
+            
             for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
                 int j = 0;
@@ -3309,6 +3290,25 @@ namespace Gekko
                     }
                 }
             }
+
+            if (decompOptions2.ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
+            {
+                foreach (FrameLightRow row in frame.rows)
+                {
+                    CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
+                    string s = c.text;
+                    int i = -12345;
+                    string s2 = "null";
+                    if (int.TryParse(s, out i))
+                    {
+                        s2 = G.GroupBy10(i);
+                    }
+                    //set a new column with aggregated ages
+                    row.Set(frame, Globals.internalSetIdentifyer + Globals.ageHierarchyName, new CellLight(s2));
+                }
+            }
+
+            return frame;
         }
 
         /// <summary>

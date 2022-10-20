@@ -295,7 +295,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
+            if (decompOptions2.ageHierarchy && name.EndsWith(Globals.ageHierarchyName))
             {
                 //List<string> list = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
                 SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
@@ -2391,6 +2391,7 @@ namespace Gekko
         public bool missingAsZero = false;
         public bool showTime = false;
         public string code = null;
+        public bool ageHierarchy = false;
         
         public bool isNew = false;
 
@@ -2476,7 +2477,9 @@ namespace Gekko
             d.code = this.code;
             
             d.modelType = this.modelType;
-            
+
+            d.ageHierarchy = this.ageHierarchy;
+
             //d.tp = this.tp;
             d.variable = this.variable;
             d.t1 = this.t1;

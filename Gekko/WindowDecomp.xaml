@@ -12,7 +12,7 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
 
-            <!-- Template needs to completely re-writing the standard control -->
+            <!-- Template needs to completely re-write the standard control -->
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
