@@ -732,8 +732,6 @@ namespace Gekko
                         PrintDecompData(decompDatas.MAIN_data[0]);
                     }
                 }
-
-
             }
 
             //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
@@ -2551,6 +2549,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
+                //Put the chosen variable "on the l
                 ENormalizeType normalize = ENormalizeType.Lags;
                 if (op.lowLevel == ELowLevel.BothQuoAndRef)
                 {
@@ -2604,8 +2603,7 @@ namespace Gekko
             //<#universe>: universal set for elements without domain info
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
-            
-            string gekko_null = "null";            
+                       
 
             frame.AddColName(Globals.col_t);
             frame.AddColName(Globals.col_value);
@@ -2625,245 +2623,10 @@ namespace Gekko
             {
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
             }
-
-            int superN = decompDataMAINClone.Count;
-
+            
             //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
 
-            for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
-            {
-                int j = 0;
-                foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
-                {
-                    j++;
-                    int i = 0;
-                    double lhsSum = 0d;
-                    double rhsSum = 0d;
-
-                    //second time, no loop..........
-
-                    DecompDict dd = null;
-                    if (op.isRaw)
-                    {
-                        //data is not used from here, it is just to get the list of
-                        //relevant variables. For multiplier type, both if's are true,
-                        //and in that case we just use the first.
-                        dd = decompDataMAINClone[super].cellsQuo;
-                        if (op.lowLevel == ELowLevel.OnlyRef) dd = decompDataMAINClone[super].cellsRef;
-                    }                    
-                    else
-                    {
-                        if (op.lowLevel == ELowLevel.BothQuoAndRef)
-                        {
-                            dd = GetDecompDatas(decompDataMAINClone[super], EContribType.D);  //could just as well be .RD, we are only using the keys
-                        }
-                        else
-                        {
-                            dd = GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types);
-                        }
-                    }
-
-                    foreach (string dictName in dd.storage.Keys)
-                    {
-                        i++;
-
-                        string dbName = null; string varName = null; string freq = null; string[] indexes = null;
-                        string[] domains = null;
-
-                        //See #876435924365
-
-                        string lag = null;
-
-                        //there is some repeated work done here, but not really bad
-                        //problem is we prefer to do one period at a time, to sum up, adjust etc.
-
-                        string[] ss = dictName.Split('¤');
-                        string fullName = ss[0];
-                        lag = ss[1];
-                        if (lag == "[0]")
-                        {
-                            lag = null;
-                        }
-
-                        char firstChar;
-                        O.Chop(fullName, out dbName, out varName, out freq, out indexes);
-
-                        if (indexes != null) domains = new string[indexes.Length];
-
-                        if (domains != null)
-                        {
-                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
-                            //So in this case, #a and #sector would be added as columns
-                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
-                            if (iv != null)
-                            {
-                                Series ts = iv as Series;
-                                if (ts?.mmi?.parent?.meta?.domains != null)
-                                {
-                                    for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
-                                    {
-                                        domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, Globals.col_universe, ts.mmi.parent.meta.domains[ii]);
-                                    }
-                                }
-                            }
-
-                            foreach (string domain in domains)
-                            {
-                                if (domain != null)
-                                {
-                                    string setname = domain.ToLower();
-                                    if (setname == null) setname = Globals.col_universe;
-                                    frame.AddColName(setname);  //will .tolower() and ignore dublets
-                                }
-                            }
-                        }
-
-                        //See #876435924365              
-                        string bank2 = dbName;
-                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
-                        string name2 = O.UnChop(null, varName, null, indexes);
-
-                        double dLevel = double.NaN;
-                        double dLevelLag = double.NaN;
-                        double dLevelLag2 = double.NaN;
-                        double dLevelRef = double.NaN;
-                        double dLevelRefLag = double.NaN;
-                        double dLevelRefLag2 = double.NaN;
-
-                        if (true)
-                        {
-                            if (dictName.Contains(Globals.decompResidualName))
-                            {
-                                dLevel = double.NaN;
-                            }
-                            else
-                            {
-
-                                //MAybe turn this of for x-type...
-
-                                if (op.operatorLower.StartsWith("x"))
-                                {
-                                    Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
-                                    Series tsFirst = tup.Item1;
-                                    Series tsRef = tup.Item2;
-                                    dLevel = tsFirst.GetDataSimple(t2);
-                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
-                                    dLevelRef = tsRef.GetDataSimple(t2);
-                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
-                                }
-                                else
-                                {
-
-                                    if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
-                                    {
-                                        Series tsFirst = null;
-                                        tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
-                                        if (tsFirst == null)
-                                        {
-                                            new Error("Decomp #7093473984");
-                                        }
-                                        dLevel = tsFirst.GetDataSimple(t2);
-                                        dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                        dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
-                                    }
-
-                                    if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
-                                    {
-                                        Series tsRef = null;
-                                        tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
-                                        if (tsRef == null)
-                                        {
-                                            new Error("Decomp #7093473985");
-                                        }
-                                        dLevelRef = tsRef.GetDataSimple(t2);
-                                        dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                        dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
-                                    }
-                                }
-                            }
-                        }
-
-                        double d = double.NaN;
-                        double dAlternative = double.NaN;
-                        if (op.isDoubleDifQuo)  //dp
-                        {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        }
-                        else if (op.isDoubleDifRef) //rdp
-                        {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        }
-                        else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
-                        {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                        }
-                        else
-                        {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = double.NaN;
-                        }
-
-                        FrameLightRow dr = new FrameLightRow(frame);
-                        //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
-
-                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");                        
-
-                        dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
-                        dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));
-                        dr.Set(frame, Globals.col_t, new CellLight(t2.ToString()));
-                        dr.Set(frame, Globals.col_variable, new CellLight(varName));
-
-                        string lag2 = null;
-                        if (true)
-                        {
-                            if (lag != null) lag2 = lag;
-                            else lag2 = "[0]";
-                        }
-                        else
-                        {
-                            if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
-                        }
-
-                        dr.Set(frame, Globals.col_lag, new CellLight(lag2));
-
-                        if (indexes != null)
-                        {
-                            for (int ii = 0; ii < indexes.Length; ii++)
-                            {
-                                if (domains != null)
-                                {
-                                    string domain = domains[ii];
-                                    string index = indexes[ii];
-                                    if (domain != null)
-                                    {
-                                        dr.Set(frame, domain, new CellLight(index));
-                                    }
-                                    else
-                                    {
-                                        dr.Set(frame, Globals.col_universe, new CellLight(index));
-                                    }
-                                }
-                            }
-                        }
-
-                        dr.Set(frame, Globals.col_value, new CellLight(d));
-                        dr.Set(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
-                        dr.Set(frame, Globals.col_valueLevel, new CellLight(dLevel));
-                        dr.Set(frame, Globals.col_valueLevelLag, new CellLight(dLevelLag));
-                        dr.Set(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
-                        dr.Set(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
-                        dr.Set(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
-                        dr.Set(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
-
-                        frame.rows.Add(dr);
-                    }
-                }
-            }
+            DecompPivotCreateDataframe(frame, smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
 
             if (ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
             {
@@ -2916,7 +2679,7 @@ namespace Gekko
                 decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
             }
             //get the free values end
-            
+
             List<string> varnames = decompOptions2.link[parentI].varnames;
 
             bool decompHasLag = false;
@@ -2932,12 +2695,12 @@ namespace Gekko
             //Aggregation
             //Aggregation
             // ==============================================================================
-                       
+
 
             foreach (FrameLightRow row in frame.rows)
-            {                
+            {
                 ENormalizerType normalizerType = ENormalizerType.None;
-                
+
                 if (G.Equal(normalizerVariableWithIndex, row.Get(frame, Globals.col_fullVariableName).text))
                 {
                     if (row.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
@@ -2984,14 +2747,14 @@ namespace Gekko
 
                 string s1 = null;
                 foreach (string s in decompOptions2.rows)
-                {                    
+                {
                     s1 = DecompAddText(frame, row, s1, s);
                     if (s == Globals.col_variable) s1 += more;
                 }
                 if (s1 != null)
                 {
                     s1 = s1.Substring(Globals.pivotTableDelimiter.Length);
-                }               
+                }
 
                 string s2 = null;
                 foreach (string s in decompOptions2.cols)
@@ -3041,7 +2804,7 @@ namespace Gekko
                     //BEWARE
                     //BEWARE
                     td.fullVariableNames.Add(fullVariableName);
-                }            
+                }
             }
 
             rownames3.Sort(StringComparer.OrdinalIgnoreCase);
@@ -3053,7 +2816,7 @@ namespace Gekko
             List<string> colnames2 = new List<string>();
             foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames3 = colnames2;
-                        
+
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
 
             List<string> rownames = new List<string>();
@@ -3250,7 +3013,7 @@ namespace Gekko
                     if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
                     else decimals = decompOptions2.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();
-                    
+
                     if (decompOptions2.count == ECountType.N)
                     {
                         tab.SetNumber(i + 2, j + 2, n, "f16.0");
@@ -3263,8 +3026,8 @@ namespace Gekko
                         tab.Set(i + 2, j + 2, tmp2);
                     }
                     else
-                    {                        
-                        tab.SetNumber(i + 2, j + 2, d, format2);                        
+                    {
+                        tab.SetNumber(i + 2, j + 2, d, format2);
                     }
 
                     Cell c = tab.Get(i + 2, j + 2);
@@ -3303,6 +3066,243 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        private static void DecompPivotCreateDataframe(FrameLight frame, GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2)
+        {
+            int superN = decompDataMAINClone.Count;
+            for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
+            {
+                int j = 0;
+                foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                {
+                    j++;
+                    int i = 0;
+                    double lhsSum = 0d;
+                    double rhsSum = 0d;
+
+                    //second time, no loop..........
+
+                    DecompDict dd = null;
+                    if (op.isRaw)
+                    {
+                        //data is not used from here, it is just to get the list of
+                        //relevant variables. For multiplier type, both if's are true,
+                        //and in that case we just use the first.
+                        dd = decompDataMAINClone[super].cellsQuo;
+                        if (op.lowLevel == ELowLevel.OnlyRef) dd = decompDataMAINClone[super].cellsRef;
+                    }
+                    else
+                    {
+                        if (op.lowLevel == ELowLevel.BothQuoAndRef)
+                        {
+                            dd = GetDecompDatas(decompDataMAINClone[super], EContribType.D);  //could just as well be .RD, we are only using the keys
+                        }
+                        else
+                        {
+                            dd = GetDecompDatas(decompDataMAINClone[super], operatorOneOf3Types);
+                        }
+                    }
+
+                    foreach (string dictName in dd.storage.Keys)
+                    {
+                        i++;
+
+                        string dbName = null; string varName = null; string freq = null; string[] indexes = null;
+                        string[] domains = null;
+
+                        //See #876435924365
+
+                        string lag = null;
+
+                        //there is some repeated work done here, but not really bad
+                        //problem is we prefer to do one period at a time, to sum up, adjust etc.
+
+                        string[] ss = dictName.Split('¤');
+                        string fullName = ss[0];
+                        lag = ss[1];
+                        if (lag == "[0]")
+                        {
+                            lag = null;
+                        }
+
+                        char firstChar;
+                        O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+
+                        if (indexes != null) domains = new string[indexes.Length];
+
+                        if (domains != null)
+                        {
+                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                            //So in this case, #a and #sector would be added as columns
+                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                            if (iv != null)
+                            {
+                                Series ts = iv as Series;
+                                if (ts?.mmi?.parent?.meta?.domains != null)
+                                {
+                                    for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
+                                    {
+                                        domains[ii] = ConvertSetname(ts.mmi.parent.meta.domains[ii], Globals.internalSetIdentifyer, Globals.col_universe);
+                                    }
+                                }
+                            }
+
+                            foreach (string domain in domains)
+                            {
+                                if (domain != null)
+                                {
+                                    string setname = domain.ToLower();
+                                    if (setname == null) setname = Globals.col_universe;
+                                    frame.AddColName(setname);  //will .tolower() and ignore dublets
+                                }
+                            }
+                        }
+
+                        //See #876435924365              
+                        string bank2 = dbName;
+                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                        string name2 = O.UnChop(null, varName, null, indexes);
+
+                        double dLevel = double.NaN;
+                        double dLevelLag = double.NaN;
+                        double dLevelLag2 = double.NaN;
+                        double dLevelRef = double.NaN;
+                        double dLevelRefLag = double.NaN;
+                        double dLevelRefLag2 = double.NaN;
+
+
+                        if (dictName.Contains(Globals.decompResidualName))
+                        {
+                            dLevel = double.NaN;
+                        }
+                        else
+                        {
+
+                            //MAybe turn this of for x-type...
+
+                            if (op.operatorLower.StartsWith("x"))
+                            {
+                                Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+                                Series tsFirst = tup.Item1;
+                                Series tsRef = tup.Item2;
+                                dLevel = tsFirst.GetDataSimple(t2);
+                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
+                                dLevelRef = tsRef.GetDataSimple(t2);
+                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                            }
+                            else
+                            {
+
+                                if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
+                                {
+                                    Series tsFirst = null;
+                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (tsFirst == null)
+                                    {
+                                        new Error("Decomp #7093473984");
+                                    }
+                                    dLevel = tsFirst.GetDataSimple(t2);
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
+                                }
+
+                                if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+                                {
+                                    Series tsRef = null;
+                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (tsRef == null)
+                                    {
+                                        new Error("Decomp #7093473985");
+                                    }
+                                    dLevelRef = tsRef.GetDataSimple(t2);
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                                }
+                            }
+                        }
+
+                        double d = double.NaN;
+                        double dAlternative = double.NaN;
+                        if (op.isDoubleDifQuo)  //dp
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        }
+                        else if (op.isDoubleDifRef) //rdp
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2.Add(-1), dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        }
+                        else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "d", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], "rd", smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                        }
+                        else
+                        {
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone[super], op.operatorLower, smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = double.NaN;
+                        }
+
+                        FrameLightRow dr = new FrameLightRow(frame);
+                        //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
+
+                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");
+
+                        dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
+                        dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));
+                        dr.Set(frame, Globals.col_t, new CellLight(t2.ToString()));
+                        dr.Set(frame, Globals.col_variable, new CellLight(varName));
+
+                        string lag2 = null;
+                        if (true)
+                        {
+                            if (lag != null) lag2 = lag;
+                            else lag2 = "[0]";
+                        }
+                        else
+                        {
+                            if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                        }
+
+                        dr.Set(frame, Globals.col_lag, new CellLight(lag2));
+
+                        if (indexes != null)
+                        {
+                            for (int ii = 0; ii < indexes.Length; ii++)
+                            {
+                                if (domains != null)
+                                {
+                                    string domain = domains[ii];
+                                    string index = indexes[ii];
+                                    if (domain != null)
+                                    {
+                                        dr.Set(frame, domain, new CellLight(index));
+                                    }
+                                    else
+                                    {
+                                        dr.Set(frame, Globals.col_universe, new CellLight(index));
+                                    }
+                                }
+                            }
+                        }
+
+                        dr.Set(frame, Globals.col_value, new CellLight(d));
+                        dr.Set(frame, Globals.col_valueAlternative, new CellLight(dAlternative));
+                        dr.Set(frame, Globals.col_valueLevel, new CellLight(dLevel));
+                        dr.Set(frame, Globals.col_valueLevelLag, new CellLight(dLevelLag));
+                        dr.Set(frame, Globals.col_valueLevelLag2, new CellLight(dLevelLag2));
+                        dr.Set(frame, Globals.col_valueLevelRef, new CellLight(dLevelRef));
+                        dr.Set(frame, Globals.col_valueLevelRefLag, new CellLight(dLevelRefLag));
+                        dr.Set(frame, Globals.col_valueLevelRefLag2, new CellLight(dLevelRefLag2));
+
+                        frame.rows.Add(dr);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -3721,13 +3721,18 @@ namespace Gekko
             }
         }
 
-        public static string ConvertSetname(string internalSetIdentifyer, string col_universe, string domain)
+        public static string ConvertSetname(string domain, string internalSetIdentifyer, string col_universe)
         {
-            string domain2 = domain;
-            if (domain2 != null) domain2 = internalSetIdentifyer + domain2.Replace("#", "");
-            string setname = col_universe; //"<...>" so that it does not collide with a variable name
-            if (domain2 != null) setname = domain2;
-            return setname;
+            string rv = null;
+            if (domain == null || domain == "*")
+            {
+                rv = col_universe;
+            }
+            else
+            {
+                rv = internalSetIdentifyer + domain.Replace("#", "");
+            }
+            return rv;
         }
 
         public static string DecompAddText(FrameLight frame, FrameLightRow row, string s1, string s)

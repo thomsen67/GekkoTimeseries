@@ -10651,6 +10651,46 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DecompSetTypes()
+        {
+            //    var   set1   set2    time            
+            //    x     a#i            2001
+            //    y     a#j            2001            
+            //    z     a#j     b#i    2001
+            //    w     a       b#j    2001
+            //    v     a       b      2001
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model <gms> domains;");
+            I("#i = a, b;");
+            I("#j = a, b;");
+            I("x = series(1);");
+            I("y = series(1);");
+            I("z = series(2);");
+            I("w = series(2);");
+            I("v = series(2);");            
+            I("x.setdomains(('#i',));");
+            I("y.setdomains(('#j',));");
+            I("z.setdomains(('#j', '#i'));");
+            I("w.setdomains(('*', '#j'));");
+            I("time 2001 2002;");
+            I("x[a] = 1, 2;");
+            I("y[a] = 2, 3;");
+            I("z[a, b] = 3, 4;");
+            I("w[a, b] = 4, 5;");
+            I("v[a, b] = -10, -14;");
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            I("decomp3<d> x[a] from e1 endo x[a] rows vars, #i, #j, lags cols time;");
+
+        }
+
+        [TestMethod]
         public void _Test_DecompSimul1()
         {
             for (int f = 0; f < 2; f++)  //0:flushed, 1:cached

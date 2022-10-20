@@ -380,13 +380,12 @@ namespace Gekko
         }
 
         private void RefreshList2(TaskType taskType)
-        {
+        {            
             List<string> fields = frame.colnames;
             this.decompFind.decompOptions2.all.Clear();
             foreach (string s in frame.colnames)
             {
                 string s2 = G.HandleInternalIdentifyer1(s);
-                //if (s2 == "value") continue;  //no need to show value, cannot be selected anyway. Could implement count at some point.
                 this.decompFind.decompOptions2.all.Add(s2);
             }
 
@@ -427,35 +426,6 @@ namespace Gekko
                     this.decompFind.decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
                 }
             }            
-
-            //if (taskType == TaskType.Filters)
-            //{
-            //    decompOptions2.freeFilter.Clear();
-            //    foreach (string s in decompOptions2.all)
-            //    {
-            //        if (s != "t")
-            //        {
-            //        }
-            //        else
-            //        {
-            //            decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    decompOptions2.free.Clear();
-            //    foreach (string s in decompOptions2.all)
-            //    {
-            //        if (this.decompFind.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompFind.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
-            //        {
-            //        }
-            //        else
-            //        {
-            //            decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
-            //        }
-            //    }
-            //}
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
