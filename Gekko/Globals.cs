@@ -635,7 +635,7 @@ namespace Gekko
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
 
-        public const bool floatingDecompWindows = true;
+        public const bool floatingDecompWindows = false;
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();

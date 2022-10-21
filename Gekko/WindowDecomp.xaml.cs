@@ -1218,50 +1218,31 @@ namespace Gekko
 
             if (!(rightClick || dockPanel.type == GekkoTableTypes.TableContent)) return; //a pure click and shift-click (and ctrl-click that has no special meaning...) on a cells on the frozen borders does not get selected, making a mess of further selections 
 
-            if (dockPanel.type != GekkoTableTypes.TableContent)
-            {
-                if (dockPanel.type == GekkoTableTypes.Top)
+            bool flowChart = false;
+            if (flowChart)
+            {                
+                DecompOptions2 decompOptions = this.decompFind.decompOptions2;
+                string code = "sp";                
+                TextBlock textBlock = (TextBlock)border.Child;
+                string s2 = textBlock.Text.Trim();
+                string variable = "y";
+                if (MessageBox.Show("Flowchart?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    Window ww = GetWindow(dockPanel);
-                    DecompOptions decompOptions = (DecompOptions)ww.Tag;
-                    if (decompOptions.guiDecompIsRaw) return;
-
-                    string s = decompOptions.variable;  //FIXME                    
-
-                    string s5 = null;
-                    string code = decompOptions.guiDecompTransformationCode;
-                    if (code.Contains("m") || code.Contains("q"))
+                    try
                     {
-                        code = "sq";
-                        s5 = "multiplier";
+                        Program.FlowChart(variable, code, GekkoTime.FromStringToGekkoTime(s2));
                     }
-                    else
+                    catch (Exception err)
                     {
-                        code = "sp";
-                        s5 = "time-change";                        
-                    }
-
-                    TextBlock textBlock = (TextBlock)border.Child;
-                    string s2 = textBlock.Text.Trim();                    
-
-                    if (MessageBox.Show("Do you want to open a " + s5 + " flowchart for '" + s + "' for the period " + s2 + "?\nPlease note that these flowcharts are experimental. If the flowchart \nis cluttered, try to augment the cut-off value.", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            Program.FlowChart(s, code, GekkoTime.FromStringToGekkoTime(s2));
-                        }
-                        catch (Exception err)
-                        {
-                            MessageBox.Show("*** ERROR: Flowchart failed");
-                        }
-                    }
-                    else
-                    {
-                        // Do not close the window
+                        MessageBox.Show("*** ERROR: Flowchart failed");
                     }
                 }
+                else
+                {
+                    // Do not close the window
+                }
                 return;
-            }     
+            }  
 
             Grid g = (Grid)dockPanel.Parent;
             int col = (int)dockPanel.GetValue(Grid.ColumnProperty);

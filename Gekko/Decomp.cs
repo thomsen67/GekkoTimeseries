@@ -417,8 +417,7 @@ namespace Gekko
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
-
-
+                
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
                     if (MustLoadDataIntoModel())
@@ -455,7 +454,6 @@ namespace Gekko
                     }
                 }
             }
-
             
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }
@@ -1645,20 +1643,12 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
-        {
-            bool createNewWindow = windowDecomp == null;
+        {            
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompOptions2.modelType == EModelType.Unknown)
             {
                 new Error("It seems no model is loaded, cf. the MODEL command.");
-            }
-
-            if (createNewWindow)
-            {
-                windowDecomp = new WindowDecomp(decompFind);
-                decompFind.window = windowDecomp;
-            }
-            Globals.windowsDecomp2.Add(windowDecomp);
+            }         
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
@@ -1731,29 +1721,14 @@ namespace Gekko
             }
             //G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
 
-            if (createNewWindow)
+            if (windowDecomp == null)
             {
-                if (decompOptions2.type == "ASTDECOMP3")
-                {
-
-                }
-                else
-                {
-                    if (decompOptions2.name == null)
-                    {
-                        windowDecomp.Title = "Decompose expression";
-                    }
-                    else
-                    {
-                        windowDecomp.Title = "Decompose " + decompOptions2.variable + "";
-                    }
-                }
-                windowDecomp.Tag = decompOptions2;
-
+                windowDecomp = new WindowDecomp(decompFind);
+                decompFind.window = windowDecomp;
+                Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
-
                 windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
                 decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on
 
