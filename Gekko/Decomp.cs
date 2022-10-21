@@ -1705,67 +1705,71 @@ namespace Gekko
 
             if (windowDecomp == null)
             {
-                windowDecomp = new WindowDecomp(decompFind);
-                windowDecomp.decompFind.SetWindow(windowDecomp);
-                Globals.windowsDecomp2.Add(windowDecomp);
-                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-                windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;
-                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
-                decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on
-
-                if (G.IsUnitTesting() && Globals.showDecompTable == false)
-                {
-                    Globals.windowsDecomp2.Clear();
-                    windowDecomp = null;
-                }
-                else
-                {
-                    if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
-                    {
-                        //The line below removes the window from the global list of active windows.
-                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
-                    }
-                    else
-                    {
-
-
-                        //Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
-                        //thread.SetApartmentState(ApartmentState.STA);
-                        //thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                        //thread.IsBackground = true;
-                        //thread.Start(windowDecomp);
-                        //if (true)
-                        //{
-                        //    //Also see #9237532567
-                        //    //This stuff makes sure we wait for the window to open, before we move on with the code.
-                        //    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                        //    {
-                        //        System.Threading.Thread.Sleep(10);  //0.01s
-                        //        if (decompFind.decompOptions2.numberOfRecalcs > 0)
-                        //        {
-                        //            break;
-                        //        }
-                        //    }
-                        //}
-
-                        windowDecomp.ShowDialog();
-
-                        windowDecomp.Close();  //probably superfluous
-                        windowDecomp = null;  //probably superfluous
-                        if (Globals.showDecompTable)
-                        {
-                            Globals.showDecompTable = false;
-                            new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
-                        }
-                    }
-                }
+                CreateDecompWindow(decompFind);
             }
             else
             {
                 windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
             }
+        }
+
+        private static void CreateDecompWindow(DecompFind decompFind)
+        {
+            WindowDecomp windowDecomp = new WindowDecomp(decompFind);
+            windowDecomp.decompFind.SetWindow(windowDecomp);
+            Globals.windowsDecomp2.Add(windowDecomp);
+            windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+            windowDecomp.SetRadioButtons();
+            windowDecomp.isInitializing = false;
+            windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
+            decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
+            if (G.IsUnitTesting() && Globals.showDecompTable == false)
+            {
+                Globals.windowsDecomp2.Clear();
+                windowDecomp = null;
+            }
+            else
+            {
+                if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
+                {
+                    //The line below removes the window from the global list of active windows.
+                    //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                    if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                }
+                else
+                {
+
+
+                    //Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
+                    //thread.SetApartmentState(ApartmentState.STA);
+                    //thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                    //thread.IsBackground = true;
+                    //thread.Start(windowDecomp);
+                    //if (true)
+                    //{
+                    //    //Also see #9237532567
+                    //    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    //    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                    //    {
+                    //        System.Threading.Thread.Sleep(10);  //0.01s
+                    //        if (decompFind.decompOptions2.numberOfRecalcs > 0)
+                    //        {
+                    //            break;
+                    //        }
+                    //    }
+                    //}
+
+                    windowDecomp.ShowDialog();
+
+                    windowDecomp.Close();  //probably superfluous
+                    windowDecomp = null;  //probably superfluous
+                    if (Globals.showDecompTable)
+                    {
+                        Globals.showDecompTable = false;
+                        new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                    }
+                }
+            }           
         }
 
         public static void Decomp2ThreadFunction(Object o)
