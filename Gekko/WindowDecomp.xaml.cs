@@ -2218,14 +2218,22 @@ namespace Gekko
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
+            //
+            // Merge button
+            //
             DecompFind dfFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
             if (dfFind == null) return;
+            WindowFind windowFind = dfFind.window as WindowFind;
+
             DecompFind dfDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
             if (dfDecomp == null) return;
-            WindowFind windowFind = dfFind.window as WindowFind;
             WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
 
-            if (windowFind != null) windowFind.Close();
+            if (!Globals.autoCloseFindWindows)
+            {
+                if (windowFind != null) windowFind.Close();
+            }
+                                          
             this.Close();
 
             windowDecomp.Focus();
@@ -2252,7 +2260,9 @@ namespace Gekko
             dfDecomp.decompOptions2.code = code;
             windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
             Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
-        }        
+
+
+        }     
 
         
         private void checkBoxCount_Checked(object sender, RoutedEventArgs e)

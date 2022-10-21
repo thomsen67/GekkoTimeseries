@@ -1724,6 +1724,15 @@ namespace Gekko
                                 break;
                             }
                         }
+                        if (Globals.autoCloseFindWindows)
+                        {
+                            DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
+                            if (df != null)
+                            {
+                                WindowFind w = df.window as WindowFind;
+                                w.Close();
+                            }
+                        }
                     }
                 }
                 else
@@ -1762,7 +1771,7 @@ namespace Gekko
                     if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
                 }
                 else
-                {                   
+                {
 
                     if (false)
                     {
@@ -3957,7 +3966,13 @@ namespace Gekko
                     for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
                         System.Threading.Thread.Sleep(10);  //0.01s
-                        if (o.decompFind.decompOptions2.numberOfRecalcs > 0)
+                        //TODO
+                        //TODO
+                        //TODO find a way to measure that the FIND window has been "calculated".
+                        //TODO --> problem would be if a new model was loaded in the meantime...
+                        //TODO
+                        //TODO
+                        if (1 /* o.decompFind.decompOptions2.numberOfRecalcs */ > 0)
                         {
                             break;
                         }

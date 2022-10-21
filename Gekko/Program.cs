@@ -224,6 +224,7 @@ namespace Gekko
         public DecompFind SearchUpwards(EDecompFindNavigation type)
         {
             DecompFind parent = this.parent;
+            if (parent == null) return null;
             while (true)
             {
                 if (parent.type == type) return parent;
