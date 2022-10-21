@@ -3941,8 +3941,53 @@ namespace Gekko
             return found;
         }
 
-        public static string Find(O.Find o)
+        public static void Find(O.Find o)
         {
+            if (Globals.floatingDecompWindows)
+            {
+                Thread thread = new Thread(new ParameterizedThreadStart(FindHelper));
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                thread.IsBackground = true;
+                thread.Start(o);
+                if (true)
+                {
+                    //Also see #9237532567
+                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                    {
+                        System.Threading.Thread.Sleep(10);  //0.01s
+                        if (o.decompFind.decompOptions2.numberOfRecalcs > 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                FindHelper(o);
+            }
+        }
+
+        public static void FindHelper(object o2)
+        {
+            O.Find o = o2 as O.Find;
+            if (G.GetModelType() == EModelType.GAMSScalar)
+            {
+                //good
+            }
+            else if (G.GetModelType() == EModelType.Unknown)
+            {
+                new Error("It seems no model is loaded, cf. the MODEL command.");
+                return;
+            }            
+            else
+            {
+                new Error("FIND is only implemented for scalar models");
+                return;
+            }
+
             ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
             //For scalar model     
 
@@ -3961,7 +4006,7 @@ namespace Gekko
             {
                 List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
                 FindConnection(vars[0], vars2[0], modelGamsScalar);
-                return "";
+                return;
             }
 
             int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
@@ -3970,6 +4015,7 @@ namespace Gekko
             if (aNumber == -12345)
             {
                 new Error(NonFoundInModelError(variableName, modelGamsScalar));
+                return;
             }
             PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
 
@@ -3982,7 +4028,8 @@ namespace Gekko
             List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
             if (eqNumbers == null)
             {
-                new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                //new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                return;
             }
 
             List<EqHelper> eqs = new List<EqHelper>();
@@ -4067,7 +4114,6 @@ namespace Gekko
                     firstList.AddRange(precedents);
                 }
             }
-
             
             WindowFind windowFind = new WindowFind(o);
             windowFind.Title = variableName + " - " + "Gekko find";
@@ -4075,13 +4121,11 @@ namespace Gekko
             windowFind.EquationBrowserSetLabel(variableName);
             windowFind._activeEquation = firstEqName;
             windowFind._activeVariable = null;
-
             windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
             windowFind.decompFind.SetWindow(windowFind);
-
             windowFind.ShowDialog();
             
-            return null;
+            return;
         }
 
         private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)

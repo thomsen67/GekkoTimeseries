@@ -15003,28 +15003,7 @@ namespace Gekko
                 }
             }
             return type;
-        }
-
-        /// <summary>
-        /// FIND command (new decomp stuff).
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        public static void Find(O.Find o)  //returns equation name
-        {
-            if (G.GetModelType() == EModelType.Unknown)
-            {
-                new Error("It seems no model is loaded, cf. the MODEL command.");
-            }
-            else if (G.GetModelType() == EModelType.GAMSScalar)
-            {
-                Gekko.Decomp.Find(o);
-            }
-            else
-            {
-                MessageBox.Show("FIND is only implemented for scalar models");
-            }
-        }
+        }        
         
         /// <summary>
         /// RENAME command.

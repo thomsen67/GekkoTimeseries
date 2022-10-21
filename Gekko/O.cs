@@ -8099,7 +8099,7 @@ namespace Gekko
                     this.decompFind.decompOptions2.modelType = G.GetModelType();
                 }                                
                 G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);
-                Program.Find(this);
+                Decomp.Find(this);
             }
         }
 
