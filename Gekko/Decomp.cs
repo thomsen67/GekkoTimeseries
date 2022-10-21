@@ -1705,7 +1705,31 @@ namespace Gekko
 
             if (windowDecomp == null)
             {
-                CreateDecompWindow(decompFind);
+                if (Globals.floatingDecompWindows)
+                {
+                    Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                    thread.IsBackground = true;
+                    thread.Start(decompFind);
+                    if (true)
+                    {
+                        //Also see #9237532567
+                        //This stuff makes sure we wait for the window to open, before we move on with the code.
+                        for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                        {
+                            System.Threading.Thread.Sleep(10);  //0.01s
+                            if (decompFind.decompOptions2.numberOfRecalcs > 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    CreateDecompWindow(decompFind);
+                }
             }
             else
             {
@@ -1713,8 +1737,9 @@ namespace Gekko
             }
         }
 
-        private static void CreateDecompWindow(DecompFind decompFind)
+        private static void CreateDecompWindow(object o)
         {
+            DecompFind decompFind = o as DecompFind;
             WindowDecomp windowDecomp = new WindowDecomp(decompFind);
             windowDecomp.decompFind.SetWindow(windowDecomp);
             Globals.windowsDecomp2.Add(windowDecomp);
@@ -1739,34 +1764,23 @@ namespace Gekko
                 else
                 {
 
+                    
 
-                    //Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
-                    //thread.SetApartmentState(ApartmentState.STA);
-                    //thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                    //thread.IsBackground = true;
-                    //thread.Start(windowDecomp);
-                    //if (true)
-                    //{
-                    //    //Also see #9237532567
-                    //    //This stuff makes sure we wait for the window to open, before we move on with the code.
-                    //    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                    //    {
-                    //        System.Threading.Thread.Sleep(10);  //0.01s
-                    //        if (decompFind.decompOptions2.numberOfRecalcs > 0)
-                    //        {
-                    //            break;
-                    //        }
-                    //    }
-                    //}
-
-                    windowDecomp.ShowDialog();
-
-                    windowDecomp.Close();  //probably superfluous
-                    windowDecomp = null;  //probably superfluous
-                    if (Globals.showDecompTable)
+                    if (true)
                     {
-                        Globals.showDecompTable = false;
-                        new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                        windowDecomp.Show();
+                        System.Windows.Threading.Dispatcher.Run();
+                    }
+                    else
+                    {
+                        windowDecomp.ShowDialog();
+                        windowDecomp.Close();  //probably superfluous
+                        windowDecomp = null;  //probably superfluous
+                        if (Globals.showDecompTable)
+                        {
+                            Globals.showDecompTable = false;
+                            new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
+                        }
                     }
                 }
             }           
@@ -4055,7 +4069,6 @@ namespace Gekko
                     firstList.AddRange(precedents);
                 }
             }
-
 
             string rv = null;
             WindowFind windowFind = new WindowFind(o);

@@ -15023,106 +15023,11 @@ namespace Gekko
             }
             else
             {
-                //probably obsolete
-                return FindOld(o);
+                MessageBox.Show("FIND is only implemented for scalar models");
+                return null;
             }
         }
-
-        private static string FindOld(O.Find o)
-        {
-            //probably obsolete soon....!
-
-            List<string> vars = O.Restrict(o.iv, false, false, false, true);
-            string variableName = vars[0];
-
-            Globals.itemHandler = new ItemHandler();
-
-            string firstText = null;
-            List<string> firstList = new List<string>();
-            string firstEqName = null;
-
-            int lineCounter = 0;
-
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
-            {
-                string eqName = kvp.Value[0].nameGams;  //has only 1
-
-                int counter = 0;
-                foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
-                {
-                    if (eqVarsGams == null) continue;
-                    counter++;
-                    {
-                        bool found = false;
-                        foreach (string ss in eqVarsGams.equationVariables) //foreach variable (first item is name)
-                        {
-                            string[] ss2 = ss.Split('¤');
-                            string ss3 = ss2[0];
-                            if (ss2.Length > 1 && ss2[1] == "[0]")
-                            {
-                                if (G.Equal(variableName, ss3))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (found)
-                        {
-                            //List<string> yy = m3;
-                            string xx = G.ReplaceTurtle(Stringlist.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
-
-                            string bool1 = "";
-                            string bool2 = "";
-                            string tt = "tx0";
-                            if (eqName == "E_qY_tot")
-                            {
-                                bool1 = Globals.protectSymbol;
-                                bool2 = Globals.protectSymbol;
-                            }
-                            else if (eqName == "E_vCalvo")
-                            {
-                                tt = "tx0e";
-                            }
-                            else if (eqName == "E_vCalvo_tEnd")
-                            {
-                                tt = "tend";
-                            }
-
-                            //all this is obsolete anyway...?
-                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", "Black", lineCounter == 3, eqName));
-                            lineCounter++;
-
-                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-
-                            if (firstText == null)
-                            {
-                                firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                firstEqName = eqName;
-                                firstList.AddRange(eqVarsGams.equationVariables);
-                            }
-                        }
-                    }
-                }
-            }
-
-            string rv = null;
-            WindowFind eb = new WindowFind(null);
-            eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetButtons(firstEqName, firstList, null);
-            //eb.EquationBrowserSetLabel(variableName);
-            eb._activeEquation = firstEqName;
-            eb._activeVariable = null;
-            //eb._t1 = o.decompOptions2.t1;
-            //eb._t2 = o.decompOptions2.t2;
-            bool? b = eb.ShowDialog();
-            rv = eb._activeEquation;
-            if (b != true) rv = null;  //only when OK is pressed (or Enter)
-            eb.Close();
-            return rv;
-        }
-
+        
         /// <summary>
         /// RENAME command.
         /// </summary>
