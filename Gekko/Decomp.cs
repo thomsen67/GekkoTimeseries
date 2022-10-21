@@ -1698,28 +1698,10 @@ namespace Gekko
                     }
                 }
                 else if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {
-                    //GAMS scalar model
-                    //GAMS scalar model
-                    //GAMS scalar model ----> no need to do anything??
-                    //GAMS scalar model
-                    //GAMS scalar model
-                    //if (link.expressions.Count != 1) new Error("Expected 1 link expression");
-                    //if (link.expressions[0] == null)
-                    //{
-                    //    //
-                    //    // NEW GAMS SCALAR MODEL DECOMP
-                    //    //
-
-                    //    int eqNumber = modelGamsScalar.GetEqNumber(link.eqname);
-                    //    link.expressionText = link.eqname + " --> y = x [TODO]";
-                    //    link.GAMS_eqNumber = eqNumber; //Inside modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
-
-                    //}
+                {                    
                 }
                 else new Error("Model type error");
             }
-            //G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
 
             if (windowDecomp == null)
             {
