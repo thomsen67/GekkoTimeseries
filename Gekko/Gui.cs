@@ -2955,61 +2955,22 @@ namespace Gekko
         {
             try
             {
-                //close all PPLOT+UDVALG
-                List<Graph> windowsGraphTemp = new List<Graph>();
-                windowsGraphTemp.AddRange(Globals.windowsGraph);
-                Globals.ch = new CounterHelper();
-                for (int i = 0; i < windowsGraphTemp.Count; i++)
-                {
-                    if (windowsGraphTemp[i] == null) continue;
-                    CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-                }
-                List<Window1> windowsDecompTemp = new List<Window1>();
-                windowsDecompTemp.AddRange(Globals.windowsDecomp);
-                for (int i = 0; i < windowsDecompTemp.Count; i++)
-                {
-                    if (windowsDecompTemp[i] == null) continue;
-                    CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-                }
-
-                List<WindowDecomp> windowsDecompTemp2 = new List<WindowDecomp>();
-                windowsDecompTemp2.AddRange(Globals.windowsDecomp2);
-                for (int i = 0; i < windowsDecompTemp2.Count; i++)
-                {
-                    if (windowsDecompTemp2[i] == null) continue;
-                    CrossThreadStuff.CloseDecomp2(windowsDecompTemp2[i]);  //fails silently
-                }
-
-                if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
-                {
-                    G.Writeln();
-                    if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-                    if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
-                }
-                Globals.windowsGraph = new List<Graph>();
-                Globals.windowsDecomp = new List<Window1>();
-                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+                //close all PLOT+DECOMP
+                Program.CutPlot();
+                Program.CutDecomp1();
+                Program.CutDecomp2();
+                Program.CutPrint(print);
             }
             catch { }
-        }
-                
+        }        
 
         private void allPPLOTToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
                 //close all PPLOT
-                List<Graph> windowsGraphTemp = new List<Graph>();
-                windowsGraphTemp.AddRange(Globals.windowsGraph);
-                Globals.ch = new CounterHelper();
-                for (int i = 0; i < windowsGraphTemp.Count; i++)
-                {
-                    if (windowsGraphTemp[i] == null) continue;
-                    CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-                }
-                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
-                Globals.windowsGraph = new List<Graph>();
+                Program.CutPlot();
+                Program.CutPrint(true);
             }
             catch { }
         }
@@ -3018,75 +2979,14 @@ namespace Gekko
         {
             try
             {
-                //close all UDVALG
-                List<Window1> windowsDecompTemp = new List<Window1>();
-                windowsDecompTemp.AddRange(Globals.windowsDecomp);
-                Globals.ch = new CounterHelper();
-                for (int i = 0; i < windowsDecompTemp.Count; i++)
-                {
-                    if (windowsDecompTemp[i] == null) continue;
-                    CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-                }
-                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
-                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
-                Globals.windowsDecomp = new List<Window1>();
+                //Close all decomp
+                Program.CutDecomp1();
+                Program.CutDecomp2();
+                Program.CutPrint(true);
             }
             catch { }
         }
-
-        private void allPPLOTAndUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //update all PPLOT+UDVALG
-            Globals.ch = new CounterHelper();
-            foreach (Graph g in Globals.windowsGraph)
-            {
-                CrossThreadStuff.UpdateGraph(g);
-            }
-            foreach (Window1 w in Globals.windowsDecomp)
-            {
-                CrossThreadStuff.UpdateDecomp(w);
-            }
-            G.Writeln();
-            GraphUpdatePrint();
-            DecompUpdatePrint();
-        }
-
-        private void allPPLOTToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            //update all PPLOT
-            Globals.ch = new CounterHelper();
-            foreach (Graph g in Globals.windowsGraph)
-            {
-                CrossThreadStuff.UpdateGraph(g);
-            }
-            G.Writeln();
-            GraphUpdatePrint();
-        }
-
-        private void allUDVALGToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            //update all UDVALG
-            Globals.ch = new CounterHelper();
-            foreach(Window1 w in Globals.windowsDecomp)
-            {
-                CrossThreadStuff.UpdateDecomp(w);
-            }
-            G.Writeln();
-            DecompUpdatePrint();
-        }
-
-        private static void DecompUpdatePrint()
-        {
-            G.Writeln("Updated " + Globals.ch.windowsDecompUpdateCounter + " DECOMP windows");
-            if (Globals.ch.windowsDecompUpdateFailedCounter > 0) new Warning("Failed updating " + Globals.ch.windowsDecompUpdateFailedCounter + " DECOMP windows");
-        }
-
-        private static void GraphUpdatePrint()
-        {
-            G.Writeln("Updated " + Globals.ch.windowsGraphUpdateCounter + " PLOT windows");
-            if (Globals.ch.windowsGraphUpdateFailedCounter > 0) new Warning("Failed updating " + Globals.ch.windowsGraphUpdateFailedCounter + " PLOT windows");
-        }
-
+        
         private void cutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SendKeys.SendWait("^x");

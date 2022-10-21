@@ -32,24 +32,24 @@ namespace Gekko
     public class CrossThreadStuff
     {
 
-        /// <summary>
-        /// Just because of threads, calls DecompGetFuncExpressionsAndRecalc()
-        /// </summary>
-        /// <param name="o"></param>        
-        delegate void Decomp2Callback(DecompFind o); //weird delegate pattern, but it works!
-        public static void Decomp2(DecompFind o)
-        {
-            if (Gui.gui != null && Gui.gui.InvokeRequired)
-            {
-                // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
-            }
-            else
-            {
-                // It's on the same thread, no need for Invoke
-                Decomp.DecompGetFuncExpressionsAndRecalc(o, null);
-            }
-        }
+        ///// <summary>
+        ///// Just because of threads, calls DecompGetFuncExpressionsAndRecalc()
+        ///// </summary>
+        ///// <param name="o"></param>        
+        //delegate void Decomp2Callback(DecompFind o); //weird delegate pattern, but it works!
+        //public static void Decomp2(DecompFind o)
+        //{
+        //    if (Gui.gui != null && Gui.gui.InvokeRequired)
+        //    {
+        //        // It's on a different thread, so use Invoke.
+        //        Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
+        //    }
+        //    else
+        //    {
+        //        // It's on the same thread, no need for Invoke
+        //        Decomp.DecompGetFuncExpressionsAndRecalc(o, null);
+        //    }
+        //}
 
         delegate string GetInputWindowTextCallback();
         public static string GetInputWindowText()
@@ -351,6 +351,28 @@ namespace Gekko
             }
             catch { };  //fail silently
         }
+        
+        //weird delegate pattern, but it works!
+        delegate void Decomp2Callback(Object o);
+        public static void Decomp2(Object o)
+        {
+            try
+            {
+                if (Gui.gui.InvokeRequired)
+                {
+                    // It's on a different thread, so use Invoke.
+                    Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
+                }
+                else
+                {
+                    WindowDecomp windowDecomp = o as WindowDecomp;
+                    windowDecomp.ShowDialog();
+                }
+            }
+            catch (Exception e)
+            {
+            };  //fail silently
+        }
 
 
         delegate void IntellisenseCallback();
@@ -485,51 +507,51 @@ namespace Gekko
             catch { };  //fail silently
         }
 
-        //weird delegate pattern, but it works!
-        delegate void UpdateGraphCallback(Graph g);
-        public static void UpdateGraph(Graph g)
-        {
-            try
-            {
-                if (g.InvokeRequired)
-                {
-                    // It's on a different thread, so use Invoke.
-                    g.Invoke(new UpdateGraphCallback(UpdateGraph), new object[] { g });
-                }
-                else
-                {
-                    Globals.ch.windowsGraphUpdateCounter++;
-                    g.UpdateGraph();
-                }
-            }
-            catch
-            {
-                Globals.ch.windowsGraphUpdateFailedCounter++;
-            }
-        }
+        ////weird delegate pattern, but it works!
+        //delegate void UpdateGraphCallback(Graph g);
+        //public static void UpdateGraph(Graph g)
+        //{
+        //    try
+        //    {
+        //        if (g.InvokeRequired)
+        //        {
+        //            // It's on a different thread, so use Invoke.
+        //            g.Invoke(new UpdateGraphCallback(UpdateGraph), new object[] { g });
+        //        }
+        //        else
+        //        {
+        //            Globals.ch.windowsGraphUpdateCounter++;
+        //            g.UpdateGraph();
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        Globals.ch.windowsGraphUpdateFailedCounter++;
+        //    }
+        //}
 
-        //weird delegate pattern, but it works!
-        delegate void UpdateDecompCallback(Window1 w);
-        public static void UpdateDecomp(Window1 w)
-        {
-            try
-            {
-                if (!w.Dispatcher.CheckAccess())
-                {
-                    // It's on a different thread, so use Invoke.
-                    w.Dispatcher.Invoke(new UpdateDecompCallback(UpdateDecomp), new object[] { w });
-                }
-                else
-                {
-                    Globals.ch.windowsDecompUpdateCounter++;
-                    w.UpdateDecomp();
-                }
-            }
-            catch
-            {
-                Globals.ch.windowsDecompUpdateFailedCounter++;
-            }
-        }
+        ////weird delegate pattern, but it works!
+        //delegate void UpdateDecompCallback(Window1 w);
+        //public static void UpdateDecomp(Window1 w)
+        //{
+        //    try
+        //    {
+        //        if (!w.Dispatcher.CheckAccess())
+        //        {
+        //            // It's on a different thread, so use Invoke.
+        //            w.Dispatcher.Invoke(new UpdateDecompCallback(UpdateDecomp), new object[] { w });
+        //        }
+        //        else
+        //        {
+        //            Globals.ch.windowsDecompUpdateCounter++;
+        //            w.UpdateDecomp();
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        Globals.ch.windowsDecompUpdateFailedCounter++;
+        //    }
+        //}
 
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);

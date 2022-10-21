@@ -1043,41 +1043,6 @@ namespace Gekko
             this.aboutToolStripMenuItem.Text = "About...";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // updateToolStripMenuItem
-            // 
-            this.updateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.allPPLOTAndUDVALGToolStripMenuItem,
-            this.allPPLOTToolStripMenuItem1,
-            this.allUDVALGToolStripMenuItem1});
-            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
-            this.updateToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.updateToolStripMenuItem.Text = "Update";
-            this.updateToolStripMenuItem.ToolTipText = "Updates/refreshes all windows of specific type";
-            // 
-            // allPPLOTAndUDVALGToolStripMenuItem
-            // 
-            this.allPPLOTAndUDVALGToolStripMenuItem.Name = "allPPLOTAndUDVALGToolStripMenuItem";
-            this.allPPLOTAndUDVALGToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.allPPLOTAndUDVALGToolStripMenuItem.Text = "Update all PLOT+DECOMP";
-            this.allPPLOTAndUDVALGToolStripMenuItem.ToolTipText = "Updates/refreshes all PLOT and DECOMP windows";
-            this.allPPLOTAndUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTAndUDVALGToolStripMenuItem_Click);
-            // 
-            // allPPLOTToolStripMenuItem1
-            // 
-            this.allPPLOTToolStripMenuItem1.Name = "allPPLOTToolStripMenuItem1";
-            this.allPPLOTToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
-            this.allPPLOTToolStripMenuItem1.Text = "Update all PLOT";
-            this.allPPLOTToolStripMenuItem1.ToolTipText = "Updates/refreshes all PLOT windows";
-            this.allPPLOTToolStripMenuItem1.Click += new System.EventHandler(this.allPPLOTToolStripMenuItem1_Click);
-            // 
-            // allUDVALGToolStripMenuItem1
-            // 
-            this.allUDVALGToolStripMenuItem1.Name = "allUDVALGToolStripMenuItem1";
-            this.allUDVALGToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
-            this.allUDVALGToolStripMenuItem1.Text = "Update all DECOMP";
-            this.allUDVALGToolStripMenuItem1.ToolTipText = "Updates/refreshes all DECOMP windows";
-            this.allUDVALGToolStripMenuItem1.Click += new System.EventHandler(this.allUDVALGToolStripMenuItem1_Click);
-            // 
             // statusStrip1
             // 
             

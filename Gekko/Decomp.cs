@@ -9,14 +9,15 @@ using MathNet.Numerics.LinearAlgebra.Sparse.Linear;
 using MathNet.Numerics.LinearAlgebra.Sparse;
 using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
 using ProtoBuf;
+using System.Threading;
 
 namespace Gekko
-{    
+{
 
     public class DecompOperator
     {
         //remember Clone()
-                
+
         //--------------------------------------------------------------- 
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
         //--------------------------------------------------------------- 
@@ -26,7 +27,7 @@ namespace Gekko
 
         public bool isPercentageType = false; //for formatting        
         public bool isRaw = false;
-        
+
         public bool isDoubleDifQuo = false;  //codes that contain 'dp'
         public bool isDoubleDifRef = false;  //codes that contain 'rdp'
         public Decomp.ELowLevel lowLevel = Decomp.ELowLevel.Unknown; //.BothQuoAndRef --> <mp> or <xmp> type
@@ -47,7 +48,7 @@ namespace Gekko
             bool good = false;
             if (x == "x" || x == "xn")
             {
-                this.isRaw = true;                
+                this.isRaw = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
             }
             else if (x == "xr" || x == "xrn")
@@ -85,7 +86,7 @@ namespace Gekko
             // ----------------------------------------------------
             //col 2
             // ----------------------------------------------------
-                        
+
             else if (x == "d" || x == "sd")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
@@ -168,7 +169,7 @@ namespace Gekko
             // ----------------------------------------------------
 
             else if (x == "xrd")
-            {                   
+            {
                 this.isRaw = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
@@ -220,7 +221,7 @@ namespace Gekko
                 this.isPercentageType = true;
                 if (x.StartsWith("s")) isShares = true;
             }
-            
+
             // -------------------------------
 
             else
@@ -358,7 +359,7 @@ namespace Gekko
                 if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
                 else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
                 decompOptions2.name = o.name;
-                decompOptions2.isNew = true;                
+                decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, modelGamsScalar);
             }
 
@@ -416,10 +417,10 @@ namespace Gekko
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
-                
+
 
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {                    
+                {
                     if (MustLoadDataIntoModel())
                     {
                         ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
@@ -455,25 +456,8 @@ namespace Gekko
                 }
             }
 
-            if (true)
-            {
-                Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);
-            }
-            else
-            {
-                //probably so that windows can be opened without waiting for other windows closing
-                CrossThreadStuff.Decomp2(o.decompFind);
-                //Also see #9237532567
-                //This stuff makes sure we wait for the window to open, before we move on with the code.
-                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                {
-                    System.Threading.Thread.Sleep(10);  //0.01s
-                    if (decompOptions2.numberOfRecalcs > 0)
-                    {
-                        break;
-                    }
-                }
-            }            
+            
+            Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }
 
         /// <summary>
@@ -490,7 +474,7 @@ namespace Gekko
         private static void FindEquationsForEachRelevantPeriod(GekkoTime t1, GekkoTime t2, string s, string equationName, MultidimItem mmi, DecompStartHelper element, DecompOperator op, bool showErrors, ModelGamsScalar modelGamsScalar)
         {
             int deduct = op.lagGradient[0];
-            if(op.isRaw) deduct = op.lagData[0];
+            if (op.isRaw) deduct = op.lagData[0];
             foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
             {
                 int i = GekkoTime.Observations(modelGamsScalar.t0, time) - 1;
@@ -510,7 +494,7 @@ namespace Gekko
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s2);
                 if (eqNumber == -12345)
                 {
-                    if(showErrors) new Error("Could not find the equation '" + s2 + "'");
+                    if (showErrors) new Error("Could not find the equation '" + s2 + "'");
                 }
                 //int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[s2];
                 elementPeriod.eqNumber = eqNumber;
@@ -528,7 +512,7 @@ namespace Gekko
         /// <param name="time"></param>
         /// <returns></returns>
         private static string AddTimeToIndexes(string name2, List<string> indexes2, GekkoTime time)
-        {            
+        {
             indexes2.Add(time.ToString());
             string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), false);
             return s2;
@@ -552,7 +536,7 @@ namespace Gekko
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
         {
             DecompOperator op = decompOptions2.decompOperator;  // <--- remove this alias sometimes
-            GekkoTime gt1, gt2;            
+            GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
             //decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
             DateTime t0 = DateTime.Now;
@@ -627,7 +611,7 @@ namespace Gekko
                 if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
-                
+
                 if (decompOptions2.link[parentI].varnames == null)
                 {
                     decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
@@ -754,13 +738,13 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if(Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
+            if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
         }
 
         public static void DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, DecompOperator op)
-        {         
+        {
             gt1 = per1;
             gt2 = per2;
             if (op.isRaw)
@@ -820,7 +804,7 @@ namespace Gekko
                     {
                         DecompData d = new DecompData();
                         DecompInitDict(d);
-                        decompDatas.storage[ii].Add(d);                        
+                        decompDatas.storage[ii].Add(d);
                     }
                 }
                 else
@@ -879,7 +863,7 @@ namespace Gekko
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
-                
+
                 FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
@@ -937,7 +921,7 @@ namespace Gekko
 
                 decompOptions2.link.Add(link);
             }
-        }        
+        }
 
         private static void DecompMainHelperInvert(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
         {
@@ -1218,7 +1202,7 @@ namespace Gekko
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
                             txt.MoreNewLine();
-                            List<string>temp1 = endo.Keys.ToList();
+                            List<string> temp1 = endo.Keys.ToList();
                             for (int i = 0; i < temp1.Count; i++) { temp1[i] = temp1[i].Replace("¤", ""); }
                             temp1.Sort(G.CompareNaturalIgnoreCase);
                             txt.MoreAdd("There are the following " + endo.Count + " endo variables given:");
@@ -1335,7 +1319,7 @@ namespace Gekko
             double[,] effect = null;
 
             if (!op.isRaw)
-            {                
+            {
                 if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                 {
                     //nothing happens, so we can say that the effect is also zeroes...
@@ -1387,7 +1371,7 @@ namespace Gekko
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
                 int lag; string name;
-                ConvertFromTurtleName(endoReverse[row], true, out name, out lag);                
+                ConvertFromTurtleName(endoReverse[row], true, out name, out lag);
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count; col++)
@@ -1425,7 +1409,7 @@ namespace Gekko
                         Series ts2 = dd[xnewName];
                         ts2.SetData(time, effect[row, col]);
                         if (col == 0)  //just once
-                        {                            
+                        {
                             Series ts3 = dd[enewName];
                             ts3.SetData(time, 1d);
                         }
@@ -1455,7 +1439,7 @@ namespace Gekko
         }
 
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, DecompData dd, int ii, int jj)
-        {            
+        {
             MergeDecompDict(dd.cellsContribD, decompDatas.storage[ii][jj].cellsContribD);
             MergeDecompDict(dd.cellsContribDRef, decompDatas.storage[ii][jj].cellsContribDRef);
             MergeDecompDict(dd.cellsContribM, decompDatas.storage[ii][jj].cellsContribM);
@@ -1633,7 +1617,7 @@ namespace Gekko
             else if (operatorOneOf3Types == EContribType.RD) return decompData.cellsContribDRef;
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
             else
-                new Error("Wrong type");            
+                new Error("Wrong type");
             return null;
         }
 
@@ -1674,7 +1658,7 @@ namespace Gekko
                 windowDecomp = new WindowDecomp(decompFind);
                 decompFind.window = windowDecomp;
             }
-            Globals.windowsDecomp2.Add(windowDecomp);            
+            Globals.windowsDecomp2.Add(windowDecomp);
 
             //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
@@ -1746,11 +1730,11 @@ namespace Gekko
                 else new Error("Model type error");
             }
             //G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
-            
+
             if (createNewWindow)
             {
                 if (decompOptions2.type == "ASTDECOMP3")
-                {                   
+                {
 
                 }
                 else
@@ -1789,7 +1773,53 @@ namespace Gekko
                     else
                     {
                         windowDecomp.decompFind.SetWindow(windowDecomp);
-                        windowDecomp.ShowDialog();
+
+                        if (Globals.floatingDecompWindows)
+                        {
+                            if (true)
+                            {
+                                //windowDecomp.Show();
+                                Thread thread = new Thread(() =>
+                                {                                    
+                                    //windowDecomp.Show();
+                                    WindowDecomp w = new WindowDecomp(decompFind);
+                                    w.Show();
+                                    System.Windows.Threading.Dispatcher.Run();
+                                });
+                                thread.SetApartmentState(ApartmentState.STA);
+                                thread.IsBackground = true;
+                                thread.Start();
+
+
+                            }
+                            else
+                            {
+
+                                Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
+                                thread.SetApartmentState(ApartmentState.STA);
+                                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                                thread.Start(windowDecomp);
+                                if (true)
+                                {
+                                    //Also see #9237532567
+                                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                                    {
+                                        System.Threading.Thread.Sleep(10);  //0.01s
+                                        if (decompFind.decompOptions2.numberOfRecalcs > 0)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            windowDecomp.ShowDialog();
+                        }
+
                         windowDecomp.Close();  //probably superfluous
                         windowDecomp = null;  //probably superfluous
                         if (Globals.showDecompTable)
@@ -1804,6 +1834,11 @@ namespace Gekko
             {
                 windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
             }
+        }
+
+        public static void Decomp2ThreadFunction(Object o)
+        {
+            CrossThreadStuff.Decomp2(o);
         }
 
         /// <summary>
@@ -2266,7 +2301,7 @@ namespace Gekko
             DecompInitDict(d);
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            
+
             //foreach time period
             foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
             {
@@ -2513,7 +2548,7 @@ namespace Gekko
             }
 
             return d;
-        }     
+        }
 
         private static void DecompInitDict(DecompData d)
         {
@@ -2570,7 +2605,7 @@ namespace Gekko
                     //Old and bad method, make it disappear soon!
                     DecompNormalizeOLD(per1, per2, decompOptions2, parentI, decompDataMAINClone, operatorOneOf3Types);
                 }
-            }            
+            }
 
             if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             {
@@ -2592,9 +2627,9 @@ namespace Gekko
                     }
                 }
             }
-            
+
             FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
-            
+
             if (false && Globals.decompUnitCsvPivot)
             {
                 WriteDatatableTocsv(frame);
@@ -2733,7 +2768,7 @@ namespace Gekko
 
                 decompOptions2.all.Clear();
                 foreach (string s in frame.colnames)
-                {                    
+                {
                     decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
                 }
 
@@ -3057,8 +3092,8 @@ namespace Gekko
             }
 
             //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
-            
-            for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
+
+            for (int super = 0; super < superN; super++)  //Normally super = 0. Equations like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
                 int j = 0;
                 foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
@@ -3577,17 +3612,17 @@ namespace Gekko
             //
             //This is similar to ADAM-style xa = -500 * xb + 1000 * xa[-1]/xb[+1]. Here, aggregating the RHS
             //lags would only aggregate xb and xb[+1], not xa and xa[-1].
-            
+
             if (decompOptions2.link[parentI].varnames.Count != 1)
             {
                 new Error("Expected 1 variable for decomposition, got " + decompOptions2.link[parentI].varnames.Count);
             }
-            
+
             int zero = 0;
             DecompData d = decompDatasSupremeClone[zero];
             string name = decompOptions2.link[parentI].varnames[zero];
             d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
-            
+
             if (!decompOptions2.decompOperator.isRaw)
             {
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone[zero], operatorOneOf3Types)[d.lhs];
@@ -3609,13 +3644,13 @@ namespace Gekko
                     else if (operatorOneOf3Types == EContribType.M)
                     {
                         d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
-                    }                    
-                    double factor = d2 / d1;                    
+                    }
+                    double factor = d2 / d1;
                     bool found = false;
                     foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                     {
                         kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                    }                    
+                    }
                 }
             }
 
@@ -3660,7 +3695,7 @@ namespace Gekko
 
             Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
             return ts;
-        }        
+        }
 
         private static bool DecompMatchWord(string colnames3, string varnames)
         {
@@ -3673,7 +3708,7 @@ namespace Gekko
             bool orderNormalize = false;
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
-            {                
+            {
                 if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
                 {
                     orderNormalize = true;
@@ -3785,7 +3820,7 @@ namespace Gekko
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string operatorLower, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel, bool missingAsZero)
         {
-            
+
             double d = double.NaN;
 
             if (operatorLower == "d" || operatorLower == "p" || operatorLower == "sd" || operatorLower == "sp")
@@ -3803,8 +3838,8 @@ namespace Gekko
             else
             {
                 //do nothing
-            }            
-            
+            }
+
             if (missingAsZero && isScalarModel && G.isNumericalError(d)) d = 0d;
 
             return d;
@@ -3842,7 +3877,7 @@ namespace Gekko
                     }
                 }
             }
-        }            
+        }
 
         public static EquationHelper DecompEvalGekko(string variable)
         {
@@ -4019,7 +4054,7 @@ namespace Gekko
             List<EqHelper> eqsNew2 = new List<EqHelper>();
             string s = vars[0];
             string s2 = G.Chop_RemoveIndex(s);
-            List<ModelGamsEquation> m = null;  modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out m);
+            List<ModelGamsEquation> m = null; modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out m);
             if (m == null) m = new List<ModelGamsEquation>();
             foreach (EqHelper helper in eqs)
             {
@@ -4040,14 +4075,14 @@ namespace Gekko
             foreach (EqHelper helper in eqs)
             {
                 if (!helper.best) eqsNew2.Add(helper);
-            }            
-            
+            }
+
             var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqName3);
             var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqName3);
             eqsNew.AddRange(eqsNew1a);
             eqsNew.AddRange(eqsNew2a);
 
-            foreach (EqHelper helper in eqsNew )
+            foreach (EqHelper helper in eqsNew)
             {
                 lineCounter++;
                 string eqName = helper.eqName;
@@ -4058,7 +4093,7 @@ namespace Gekko
                 string bool1 = "";
                 string bool2 = "";
 
-                if(helper.best) bool1 = Globals.protectSymbol;
+                if (helper.best) bool1 = Globals.protectSymbol;
                 //bool2 = Globals.protectSymbol;
 
                 string tt = "tx0";
@@ -4075,7 +4110,7 @@ namespace Gekko
                 }
 
                 Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
-                
+
                 if (firstText == null)
                 {
                     string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
@@ -4096,7 +4131,7 @@ namespace Gekko
 
             windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
             windowFind.decompFind.SetWindow(windowFind);
-            
+
             bool? b = windowFind.ShowDialog();
             rv = windowFind._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)
@@ -4180,7 +4215,7 @@ namespace Gekko
             if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
             int a2 = modelGamsScalar.dict_FromVarNameToANumber.Get(x2);
-            if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));            
+            if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
             PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
             PeriodAndVariable pv2 = new PeriodAndVariable(t2027, a2);
@@ -4286,7 +4321,7 @@ namespace Gekko
     /// <summary>
     /// Simple helper class
     /// </summary>
-    [ProtoContract]    
+    [ProtoContract]
     public class PeriodAndVariable
     {
         [ProtoMember(1)]
@@ -4332,11 +4367,11 @@ namespace Gekko
         }
 
         public override bool Equals(object obj)
-        {                        
+        {
             PeriodAndVariable other = (PeriodAndVariable)obj;
             if (other == null) return false;
             if (this.date == other.date && this.variable == other.variable) return true;
             return false;
-        }        
+        }
     }
 }

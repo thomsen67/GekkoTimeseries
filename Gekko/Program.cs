@@ -8261,6 +8261,10 @@ namespace Gekko
             {
                 i++;
             }
+            foreach (WindowDecomp g in Globals.windowsDecomp2)
+            {
+                i++;
+            }
             CrossThreadStuff.CutButtonEnabled(i > 0);
         }
 
@@ -17688,6 +17692,53 @@ namespace Gekko
                 }
                 fileName = dataFile;
             }
+        }
+
+        public static void CutPrint(bool print)
+        {
+            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
+            {
+                G.Writeln();
+                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+            }
+        }
+
+        public static void CutDecomp2()
+        {
+            List<WindowDecomp> windowsDecompTemp2 = new List<WindowDecomp>();
+            windowsDecompTemp2.AddRange(Globals.windowsDecomp2);
+            for (int i = 0; i < windowsDecompTemp2.Count; i++)
+            {
+                if (windowsDecompTemp2[i] == null) continue;
+                CrossThreadStuff.CloseDecomp2(windowsDecompTemp2[i]);  //fails silently
+            }
+            Globals.windowsDecomp2 = new List<WindowDecomp>();
+        }
+
+        public static void CutDecomp1()
+        {
+            List<Window1> windowsDecompTemp = new List<Window1>();
+            windowsDecompTemp.AddRange(Globals.windowsDecomp);
+            for (int i = 0; i < windowsDecompTemp.Count; i++)
+            {
+                if (windowsDecompTemp[i] == null) continue;
+                CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
+            }
+            Globals.windowsDecomp = new List<Window1>();
+        }
+
+        public static void CutPlot()
+        {
+            List<Graph> windowsGraphTemp = new List<Graph>();
+            windowsGraphTemp.AddRange(Globals.windowsGraph);
+            Globals.ch = new CounterHelper();
+            for (int i = 0; i < windowsGraphTemp.Count; i++)
+            {
+                if (windowsGraphTemp[i] == null) continue;
+                CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
+            }
+            Globals.windowsGraph = new List<Graph>();
         }
 
         /// <summary>
