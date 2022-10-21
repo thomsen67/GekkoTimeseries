@@ -1762,11 +1762,9 @@ namespace Gekko
                     if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
                 }
                 else
-                {
+                {                   
 
-                    
-
-                    if (true)
+                    if (false)
                     {
                         windowDecomp.Show();
                         System.Windows.Threading.Dispatcher.Run();
@@ -4070,7 +4068,7 @@ namespace Gekko
                 }
             }
 
-            string rv = null;
+            
             WindowFind windowFind = new WindowFind(o);
             windowFind.Title = variableName + " - " + "Gekko find";
             windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
@@ -4081,12 +4079,9 @@ namespace Gekko
             windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
             windowFind.decompFind.SetWindow(windowFind);
 
-            bool? b = windowFind.ShowDialog();
-            rv = windowFind._activeEquation;
-            if (b != true) rv = null;  //only when OK is pressed (or Enter)
-            windowFind.Close();
-
-            return rv;
+            windowFind.ShowDialog();
+            
+            return null;
         }
 
         private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)

@@ -8047,7 +8047,7 @@ namespace Gekko
             //--- extra ---
 
             public GekkoTime t0 = GekkoTime.tNull;  //selected time            
-            public string rv = null; //return value
+            //public string rv = null; //return value
             public DecompFind decompFind = null;  //from a DECOMP window            
 
             //do not delete, used in dynamic code
@@ -8099,7 +8099,7 @@ namespace Gekko
                     this.decompFind.decompOptions2.modelType = G.GetModelType();
                 }                                
                 G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);
-                this.rv = Program.Find(this);
+                Program.Find(this);
             }
         }
 

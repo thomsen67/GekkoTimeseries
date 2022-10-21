@@ -15010,21 +15010,19 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static string Find(O.Find o)  //returns equation name
+        public static void Find(O.Find o)  //returns equation name
         {
             if (G.GetModelType() == EModelType.Unknown)
             {
                 new Error("It seems no model is loaded, cf. the MODEL command.");
-                return null;  //will never happen
             }
             else if (G.GetModelType() == EModelType.GAMSScalar)
             {
-                return Gekko.Decomp.Find(o);
+                Gekko.Decomp.Find(o);
             }
             else
             {
                 MessageBox.Show("FIND is only implemented for scalar models");
-                return null;
             }
         }
         
