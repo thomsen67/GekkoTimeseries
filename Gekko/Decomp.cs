@@ -1724,7 +1724,7 @@ namespace Gekko
             if (windowDecomp == null)
             {
                 windowDecomp = new WindowDecomp(decompFind);
-                decompFind.window = windowDecomp;
+                windowDecomp.decompFind.SetWindow(windowDecomp);
                 Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
@@ -1747,53 +1747,28 @@ namespace Gekko
                     }
                     else
                     {
-                        windowDecomp.decompFind.SetWindow(windowDecomp);
-
-                        if (Globals.floatingDecompWindows)
-                        {
-                            if (true)
-                            {
-                                //windowDecomp.Show();
-                                Thread thread = new Thread(() =>
-                                {                                    
-                                    //windowDecomp.Show();
-                                    WindowDecomp w = new WindowDecomp(decompFind);
-                                    w.Show();
-                                    System.Windows.Threading.Dispatcher.Run();
-                                });
-                                thread.SetApartmentState(ApartmentState.STA);
-                                thread.IsBackground = true;
-                                thread.Start();
 
 
-                            }
-                            else
-                            {
+                        //Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
+                        //thread.SetApartmentState(ApartmentState.STA);
+                        //thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                        //thread.IsBackground = true;
+                        //thread.Start(windowDecomp);
+                        //if (true)
+                        //{
+                        //    //Also see #9237532567
+                        //    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                        //    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                        //    {
+                        //        System.Threading.Thread.Sleep(10);  //0.01s
+                        //        if (decompFind.decompOptions2.numberOfRecalcs > 0)
+                        //        {
+                        //            break;
+                        //        }
+                        //    }
+                        //}
 
-                                Thread thread = new Thread(new ParameterizedThreadStart(Decomp2ThreadFunction));
-                                thread.SetApartmentState(ApartmentState.STA);
-                                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                                thread.Start(windowDecomp);
-                                if (true)
-                                {
-                                    //Also see #9237532567
-                                    //This stuff makes sure we wait for the window to open, before we move on with the code.
-                                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                                    {
-                                        System.Threading.Thread.Sleep(10);  //0.01s
-                                        if (decompFind.decompOptions2.numberOfRecalcs > 0)
-                                        {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            windowDecomp.ShowDialog();
-                        }
+                        windowDecomp.ShowDialog();
 
                         windowDecomp.Close();  //probably superfluous
                         windowDecomp = null;  //probably superfluous
