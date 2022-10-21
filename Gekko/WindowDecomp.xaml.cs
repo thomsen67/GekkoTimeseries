@@ -2224,18 +2224,23 @@ namespace Gekko
             DecompFind dfFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
             if (dfFind == null) return;
             WindowFind windowFind = dfFind.window as WindowFind;
+            if (!Globals.floatingDecompWindows)
+            {
+                if (windowFind != null) windowFind.Close();
+            }
 
             DecompFind dfDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
             if (dfDecomp == null) return;
             WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
 
-            if (!Globals.autoCloseFindWindows)
-            {
-                if (windowFind != null) windowFind.Close();
-            }
-                                          
             this.Close();
 
+            Merge(windowDecomp, dfDecomp);
+
+        }
+
+        private void Merge(WindowDecomp windowDecomp, DecompFind dfDecomp)
+        {
             windowDecomp.Focus();
             string txt = "  Merged...";
             //show message a bit, and then remove    
@@ -2260,11 +2265,8 @@ namespace Gekko
             dfDecomp.decompOptions2.code = code;
             windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
             Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
+        }
 
-
-        }     
-
-        
         private void checkBoxCount_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)

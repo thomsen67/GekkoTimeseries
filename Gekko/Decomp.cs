@@ -1724,7 +1724,7 @@ namespace Gekko
                                 break;
                             }
                         }
-                        if (Globals.autoCloseFindWindows)
+                        if (Globals.floatingDecompWindows)
                         {
                             DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
                             if (df != null)
