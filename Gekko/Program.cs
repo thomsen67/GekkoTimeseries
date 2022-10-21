@@ -174,8 +174,10 @@ namespace Gekko
     }
 
     public class DecompFind
-    {                
-    
+    {
+
+        public Thread thread = null;
+
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;

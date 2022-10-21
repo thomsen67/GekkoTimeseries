@@ -747,6 +747,6 @@ namespace Gekko
                     else Gui.gui.toolStripButton2.Enabled = false;
                 }
             }
-        }
+        }        
     }
 }

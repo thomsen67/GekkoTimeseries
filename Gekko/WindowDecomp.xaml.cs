@@ -35,7 +35,8 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gekko
 {
@@ -2231,17 +2232,20 @@ namespace Gekko
 
             DecompFind dfDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
             if (dfDecomp == null) return;
-            WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
 
             this.Close();
 
-            Merge(windowDecomp, dfDecomp);
+            (dfDecomp.window as WindowDecomp).Dispatcher.Invoke(() => { Merge(dfDecomp); });            
 
         }
 
-        private void Merge(WindowDecomp windowDecomp, DecompFind dfDecomp)
+        private void Merge(DecompFind dfDecomp)
         {
-            windowDecomp.Focus();
+
+            WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
+            
+            //windowDecomp.Focus();
+            windowDecomp.Activate();
             string txt = "  Merged...";
             //show message a bit, and then remove    
             windowDecomp.textSelect.Text = txt;
