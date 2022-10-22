@@ -2222,35 +2222,49 @@ namespace Gekko
             //
             // Merge button
             //
-            DecompFind dfFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
-            if (dfFind == null) return;
-            WindowFind windowFind = dfFind.window as WindowFind;
-            if (!Globals.floatingDecompWindows)
+            DecompFind dfParentFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
+            DecompFind dfParentDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
+            if (dfParentFind == null || dfParentDecomp == null) return;
+            WindowFind windowFindParent = dfParentFind.window as WindowFind;
+            WindowDecomp windowDecompParent = dfParentDecomp.window as WindowDecomp;
+
+            if (Globals.floatingDecompWindows)
             {
-                if (windowFind != null) windowFind.Close();
+                DecompFind parent = dfParentDecomp;
+                while (true)
+                {
+                    if (parent.type == EDecompFindNavigation.Decomp)
+                    {
+                        WindowDecomp windowDecompGrandParent = parent.window as WindowDecomp;
+                        windowDecompGrandParent.buttonSelect.IsEnabled = false;
+                    }
+                    parent = parent.parent;
+                    if (parent == null) break;
+                }
+            }
+            else
+            {
+                //if not floating, the FIND window is still open and needs to be closed.
+                //if floating, the FIND window is already closed.
+                windowFindParent.Close();
             }
 
-            DecompFind dfDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
-            if (dfDecomp == null) return;
-
+            //Close the child decomp window (= present window)
             this.Close();
 
-            (dfDecomp.window as WindowDecomp).Dispatcher.Invoke(() => { Merge(dfDecomp); });            
-
+            //Merge the child window (= present window) into the parent window.
+            //We have to use dispatcher on the parent decomp window, else it will complain that it is the wrong thread.
+            windowDecompParent.Dispatcher.Invoke(() => { Merge(dfParentDecomp); });
         }
 
         private void Merge(DecompFind dfDecomp)
         {
-
             WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
-            
-            //windowDecomp.Focus();
             windowDecomp.Activate();
             string txt = "  Merged...";
             //show message a bit, and then remove    
             windowDecomp.textSelect.Text = txt;
             Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
-
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;
             dfDecomp.decompOptions2.new_from.AddRange(thisFrom);
@@ -2392,7 +2406,7 @@ namespace Gekko
         
         public bool isNew = false;
 
-        public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
+        public int numberOfRecalcs = 0;  //is not cloned --> used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
         public List<string> variable_subelement = null;        
         

@@ -1705,6 +1705,7 @@ namespace Gekko
 
             if (windowDecomp == null)
             {
+                //new DECOMP window
                 if (Globals.floatingDecompWindows)
                 {
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
@@ -1713,27 +1714,23 @@ namespace Gekko
                     thread.IsBackground = true;
                     decompFind.thread = thread;  //stored to ease inter-thread communication
                     thread.Start(decompFind);
-                    if (true)
+
+                    //Also see #9237532567
+                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
-                        //Also see #9237532567
-                        //This stuff makes sure we wait for the window to open, before we move on with the code.
-                        for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                        System.Threading.Thread.Sleep(10);  //0.01s
+                        if (decompFind.decompOptions2.numberOfRecalcs > 0)
                         {
-                            System.Threading.Thread.Sleep(10);  //0.01s
-                            if (decompFind.decompOptions2.numberOfRecalcs > 0)
-                            {
-                                break;
-                            }
+                            break;
                         }
-                        if (Globals.floatingDecompWindows)
-                        {
-                            DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
-                            if (df != null)
-                            {
-                                WindowFind w = df.window as WindowFind;
-                                w.Close();
-                            }
-                        }
+                    }
+
+                    DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
+                    if (df != null)
+                    {
+                        WindowFind w = df.window as WindowFind;
+                        w.Close();
                     }
                 }
                 else
@@ -3955,6 +3952,7 @@ namespace Gekko
         {
             if (Globals.floatingDecompWindows)
             {
+                //Open FIND window in a new thread
                 Thread thread = new Thread(new ParameterizedThreadStart(FindHelper));
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
