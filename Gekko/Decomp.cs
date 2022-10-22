@@ -1713,7 +1713,6 @@ namespace Gekko
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
-                    decompFind.thread = thread;  //stored to ease inter-thread communication
                     thread.Start(decompFind);
 
                     //Also see #9237532567

@@ -506,74 +506,7 @@ namespace Gekko
             }
             catch { };  //fail silently
         }
-
-        //weird delegate pattern, but it works!
-        delegate void DecompMergeCallback2(WindowDecomp w);
-        public static void DecompMerge2(WindowDecomp w)
-        {
-            try
-            {
-                if (!w.Dispatcher.CheckAccess())
-                {
-                    // It's on a different thread, so use Invoke.
-                    w.Dispatcher.Invoke(new DecompMergeCallback2(DecompMerge2), new object[] { w });
-                }
-                else
-                {
-                    //w.Close();
-                    Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.MergeStuff));  //Why not just w.Close() ??
-                }
-            }
-            catch { };  //fail silently
-        }
-
-        ////weird delegate pattern, but it works!
-        //delegate void UpdateGraphCallback(Graph g);
-        //public static void UpdateGraph(Graph g)
-        //{
-        //    try
-        //    {
-        //        if (g.InvokeRequired)
-        //        {
-        //            // It's on a different thread, so use Invoke.
-        //            g.Invoke(new UpdateGraphCallback(UpdateGraph), new object[] { g });
-        //        }
-        //        else
-        //        {
-        //            Globals.ch.windowsGraphUpdateCounter++;
-        //            g.UpdateGraph();
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        Globals.ch.windowsGraphUpdateFailedCounter++;
-        //    }
-        //}
-
-        ////weird delegate pattern, but it works!
-        //delegate void UpdateDecompCallback(Window1 w);
-        //public static void UpdateDecomp(Window1 w)
-        //{
-        //    try
-        //    {
-        //        if (!w.Dispatcher.CheckAccess())
-        //        {
-        //            // It's on a different thread, so use Invoke.
-        //            w.Dispatcher.Invoke(new UpdateDecompCallback(UpdateDecomp), new object[] { w });
-        //        }
-        //        else
-        //        {
-        //            Globals.ch.windowsDecompUpdateCounter++;
-        //            w.UpdateDecomp();
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        Globals.ch.windowsDecompUpdateFailedCounter++;
-        //    }
-        //}
-
+       
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)

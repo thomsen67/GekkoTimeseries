@@ -175,9 +175,6 @@ namespace Gekko
 
     public class DecompFind
     {
-
-        public Thread thread = null;
-
         private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
@@ -186,6 +183,7 @@ namespace Gekko
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
         public ModelGamsScalar modelGamsScalar = null;
+        public bool closed = false;
 
         public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, ModelGamsScalar modelGamsScalar)
         {

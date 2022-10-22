@@ -2096,46 +2096,17 @@ namespace Gekko
             Globals.guiDecompWindowSplitterHorizontal = Math.Max(1, (int)this.splitterHorizontal.Width.Value);
             Globals.guiDecompWindowSplitterVertical = Math.Max(1, (int)this.splitterVertical.Height.Value);
 
+            this.decompFind.closed = true;
+
             try
             {
-                if (Globals.windowsDecomp2 != null && this != null) Globals.windowsDecomp2.Remove(this);
-
-                if (Globals.floatingDecompWindows)
-                {
-                    foreach (DecompFind child in decompFind.children)
-                    {
-                        //this loop means we skip the currend decomp window, so nothing is done regarding the
-                        //merge button in it (it is closing anyway).                  
-                        Walk(child);
-                    }
-                }
+                if (Globals.windowsDecomp2 != null && this != null) Globals.windowsDecomp2.Remove(this);                
             }
             catch (Exception e2)
             {
             }
-        }
-
-        public void MergeStuff()
-        {
-            this.buttonSelect.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
-        public void Walk(DecompFind node)
-        {
-            if (node == null) return;
-            if (node.type == EDecompFindNavigation.Decomp)
-            {
-                WindowDecomp window = node.window as WindowDecomp;
-                CrossThreadStuff.DecompMerge2(this);
-                //window.Dispatcher.Invoke(() => { window.buttonSelect.IsEnabled = false; window.buttonSelect.ToolTip = "Merge is disabled because the precedign DECOMP window was closed."; });                
-                return;  //cannot go deeper: only decomp-children are disabled, not grandchildren etc.
-            }            
-            foreach (DecompFind child in node.children)
-            {
-                Walk(child);
-            }
-        }
-
+        }        
+        
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             UpdateDecomp();
@@ -2257,6 +2228,11 @@ namespace Gekko
             DecompFind dfParentFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
             DecompFind dfParentDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
             if (dfParentFind == null || dfParentDecomp == null) return;
+            if (dfParentDecomp.closed)
+            {
+                MessageBox.Show("Merge not possible, because the preceding DECOMP window has been closed");
+                return;
+            }
             WindowFind windowFindParent = dfParentFind.window as WindowFind;
             WindowDecomp windowDecompParent = dfParentDecomp.window as WindowDecomp;
 
