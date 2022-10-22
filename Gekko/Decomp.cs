@@ -612,6 +612,7 @@ namespace Gekko
 
                 if (decompOptions2.link[parentI].varnames == null)
                 {
+                    //does this ever happen?
                     decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
                 }
 
@@ -2239,14 +2240,7 @@ namespace Gekko
         /// <param name="funcCounter"></param>
         /// <returns></returns>
         public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter, ModelGamsScalar modelGamsScalar)
-        {
-            // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
-            // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
-            // contributions, and if e5[2002] depends on x[2001], this will show up
-            // as x[-1] in the 2002-contribution of e5. So if we visualize rows with x[-1], x, x[+1], z, etc.
-            // and cols with 2001, 2002, 2003, etc., each atomic lowest level equation is actually present
-            // separately in these columns.
-
+        {            
             //See #kljaf89usafasdf for Gekko  model
 
             double eps = Globals.newtonSmallNumber;
@@ -3149,14 +3143,14 @@ namespace Gekko
                         double dLevelRefLag2 = double.NaN;
 
 
-                        if (dictName.Contains(Globals.decompResidualName))
+                        if (false && dictName.Contains(Globals.decompResidualName))
                         {
                             dLevel = double.NaN;
                         }
                         else
                         {
 
-                            //MAybe turn this of for x-type...
+                            //MAybe turn this off for x-type...
 
                             if (op.operatorLower.StartsWith("x"))
                             {

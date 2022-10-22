@@ -635,7 +635,7 @@ namespace Gekko
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
 
-        public const bool floatingDecompWindows = true;        
+        public const bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();
