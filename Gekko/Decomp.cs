@@ -1780,8 +1780,8 @@ namespace Gekko
                     else
                     {
                         windowDecomp.ShowDialog();
-                        windowDecomp.Close();  //probably superfluous
-                        windowDecomp = null;  //probably superfluous
+                        //windowDecomp.Close();  //probably superfluous
+                        //windowDecomp = null;  //probably superfluous
                         if (Globals.showDecompTable)
                         {
                             Globals.showDecompTable = false;

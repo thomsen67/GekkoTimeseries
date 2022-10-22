@@ -6,8 +6,7 @@ using System.Text;
 namespace Gekko
 {
     public static class Operators
-    {
-        
+    {       
 
         public static class DateVal
         {

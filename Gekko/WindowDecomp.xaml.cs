@@ -2110,7 +2110,14 @@ namespace Gekko
                     }
                 }
             }
-            catch (Exception e2) { }
+            catch (Exception e2)
+            {
+            }
+        }
+
+        public void MergeStuff()
+        {
+            this.buttonSelect.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         public void Walk(DecompFind node)
@@ -2119,7 +2126,8 @@ namespace Gekko
             if (node.type == EDecompFindNavigation.Decomp)
             {
                 WindowDecomp window = node.window as WindowDecomp;
-                window.Dispatcher.Invoke(() => { window.buttonSelect.IsEnabled = false; window.buttonSelect.ToolTip = "Merge is disabled because the precedign DECOMP window was closed."; });
+                CrossThreadStuff.DecompMerge2(this);
+                //window.Dispatcher.Invoke(() => { window.buttonSelect.IsEnabled = false; window.buttonSelect.ToolTip = "Merge is disabled because the precedign DECOMP window was closed."; });                
                 return;  //cannot go deeper: only decomp-children are disabled, not grandchildren etc.
             }            
             foreach (DecompFind child in node.children)

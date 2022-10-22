@@ -507,6 +507,27 @@ namespace Gekko
             catch { };  //fail silently
         }
 
+        //weird delegate pattern, but it works!
+        delegate void DecompMergeCallback2(WindowDecomp w);
+        public static void DecompMerge2(WindowDecomp w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new DecompMergeCallback2(DecompMerge2), new object[] { w });
+                }
+                else
+                {
+                    //w.Close();
+                    Globals.ch.windowsDecompCloseCounter++;
+                    w.Dispatcher.Invoke(new CloseDelegate(w.MergeStuff));  //Why not just w.Close() ??
+                }
+            }
+            catch { };  //fail silently
+        }
+
         ////weird delegate pattern, but it works!
         //delegate void UpdateGraphCallback(Graph g);
         //public static void UpdateGraph(Graph g)
