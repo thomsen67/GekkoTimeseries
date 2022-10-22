@@ -2099,9 +2099,33 @@ namespace Gekko
             try
             {
                 if (Globals.windowsDecomp2 != null && this != null) Globals.windowsDecomp2.Remove(this);
+
+                if (Globals.floatingDecompWindows)
+                {
+                    foreach (DecompFind child in decompFind.children)
+                    {
+                        //this loop means we skip the currend decomp window, so nothing is done regarding the
+                        //merge button in it (it is closing anyway).                  
+                        Walk(child);
+                    }
+                }
             }
-            catch { }
-            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            catch (Exception e2) { }
+        }
+
+        public void Walk(DecompFind node)
+        {
+            if (node == null) return;
+            if (node.type == EDecompFindNavigation.Decomp)
+            {
+                WindowDecomp window = node.window as WindowDecomp;
+                window.Dispatcher.Invoke(() => { window.buttonSelect.IsEnabled = false; window.buttonSelect.ToolTip = "Merge is disabled because the precedign DECOMP window was closed."; });
+                return;  //cannot go deeper: only decomp-children are disabled, not grandchildren etc.
+            }            
+            foreach (DecompFind child in node.children)
+            {
+                Walk(child);
+            }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -2230,17 +2254,7 @@ namespace Gekko
 
             if (Globals.floatingDecompWindows)
             {
-                DecompFind parent = dfParentDecomp;
-                while (true)
-                {
-                    if (parent.type == EDecompFindNavigation.Decomp)
-                    {
-                        WindowDecomp windowDecompGrandParent = parent.window as WindowDecomp;
-                        windowDecompGrandParent.buttonSelect.IsEnabled = false;
-                    }
-                    parent = parent.parent;
-                    if (parent == null) break;
-                }
+                //do nothing                
             }
             else
             {

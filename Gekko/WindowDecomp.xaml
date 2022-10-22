@@ -67,6 +67,16 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+        </Style>
+        <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type RadioButton}}">
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+        </Style>
     </Window.Resources>
 
     <Window.InputBindings>
@@ -207,7 +217,7 @@
 
             <DockPanel Grid.Row="2" Grid.Column="4">
                 <Border BorderThickness="0,1,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Opacity="0.5" IsEnabled="False" Name="radioButton5" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb"></RadioButton>
+                    <RadioButton Opacity="0.5" IsEnabled="False" Name="radioButton5" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" ToolTip="Levels as they are in databank"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="4">
@@ -313,7 +323,7 @@
 
             <DockPanel Grid.Row="2" Grid.Column="9">
                 <Border BorderThickness="0,1,3,0" BorderBrush="LightGray" CornerRadius="0,0,0,0">
-                    <RadioButton Opacity="0.5" IsEnabled="False" Name="radioButton25" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb"></RadioButton>
+                    <RadioButton Opacity="0.5" IsEnabled="False" Name="radioButton25" FontFamily="Calibri" FontSize="13"  VerticalAlignment="Center" HorizontalAlignment="Center" BorderThickness="1" Margin="5,0,0,0"  GroupName="rb" ToolTip="Levels as they are in databank"></RadioButton>
                 </Border>
             </DockPanel>
             <DockPanel Grid.Row="3" Grid.Column="9">
