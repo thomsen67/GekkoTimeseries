@@ -2536,6 +2536,11 @@ namespace Gekko
         {
             int parentI = 0;
 
+            int decimals = 0;
+            if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
+            else decimals = decompOptions2.decimalsLevel;
+            string format2 = "f16." + decimals.ToString();
+
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
                 //Put the chosen variable "on the l
@@ -2952,12 +2957,7 @@ namespace Gekko
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
                         }
-                    }
-
-                    int decimals = 0;
-                    if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
-                    else decimals = decompOptions2.decimalsLevel;
-                    string format2 = "f16." + decimals.ToString();
+                    }                    
 
                     if (decompOptions2.count == ECountType.N)
                     {
@@ -3000,7 +3000,7 @@ namespace Gekko
                 tab.Set(1, j + 2, s);
             }
 
-            if (decompOptions2.decompOperator.isPercentageType)
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.decompOperator.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
             }
@@ -3307,7 +3307,8 @@ namespace Gekko
         /// <param name="tab"></param>
         /// <param name="decompOptions2"></param>
         private static void HandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
-        {
+        {            
+            string formatSShares = "f16." + decompOptions2.decimalsPch;
             if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
             bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
             if (areVariablesOnRows)
@@ -3318,18 +3319,15 @@ namespace Gekko
                     for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                     {
                         if (i == 2)
-                        {
-                            Cell c5 = new Cell();
-                            c5.cellType = CellType.Number;
-                            c5.number = -value;
-                            tab.Set(new Coord(i, j), c5);
+                        {                            
+                            Cell c = tab.Get(i, j);
+                            c.number = -value;
                         }
                         if (decompOptions2.decompOperator.isShares)
-                        {
-                            Cell c6 = new Cell();
-                            c6.cellType = CellType.Number;
-                            c6.number = tab.Get(i, j).number / (-value) * 100d;
-                            tab.Set(new Coord(i, j), c6);
+                        {                            
+                            Cell c = tab.Get(i, j);
+                            c.number = tab.Get(i, j).number / (-value) * 100d;
+                            c.numberFormat = formatSShares;
                         }
                     }
                 }
@@ -3342,18 +3340,15 @@ namespace Gekko
                     for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                     {
                         if (j == 2)
-                        {
-                            Cell c5 = new Cell();
-                            c5.cellType = CellType.Number;
-                            c5.number = -value;
-                            tab.Set(new Coord(i, j), c5);
+                        {                            
+                            Cell c = tab.Get(i, j);
+                            c.number = -value;
                         }
                         if (decompOptions2.decompOperator.isShares)
-                        {
-                            Cell c6 = new Cell();
-                            c6.cellType = CellType.Number;
-                            c6.number = tab.Get(i, j).number / (-value) * 100d;
-                            tab.Set(new Coord(i, j), c6);
+                        {                            
+                            Cell c = tab.Get(i, j);
+                            c.number = tab.Get(i, j).number / (-value) * 100d;
+                            c.numberFormat = formatSShares;
                         }
                     }
                 }
