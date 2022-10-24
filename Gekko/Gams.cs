@@ -962,8 +962,10 @@ namespace Gekko
 
             modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
 
+            int bigN = modelGamsScalar.CountEqs(1);
+
             modelGamsScalar.precedents = new List<ModelScalarEquation>();
-            for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
+            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
                 ModelScalarEquation l = new ModelScalarEquation();
                 modelGamsScalar.precedents.Add(l);
@@ -976,7 +978,7 @@ namespace Gekko
             }
 
             //mapping from a varname to the equations it is part of                
-            for (int eqNumber = 0; eqNumber < modelGamsScalar.CountEqs(1); eqNumber++)
+            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
                 //foreach precedent variable
                 foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)

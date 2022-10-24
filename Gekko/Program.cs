@@ -2671,21 +2671,27 @@ namespace Gekko
 
             List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k, modelGamsScalar);
 
-            lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
+            try
             {
-                try
+                lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
                 {
-                    if (File.Exists(files[i])) File.Delete(files[i]);
-                }
-                catch (Exception e)
-                {
-                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
-                }
-                ProtobufWrite(x, files[i]);
-                return true;
-            }).All(_ => _);
-
-            ProtobufModelGamsScalar5b(lists);
+                    try
+                    {
+                        if (File.Exists(files[i])) File.Delete(files[i]);
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                    }
+                    ProtobufWrite(x, files[i]);
+                    return true;
+                }).All(_ => _);
+            }
+            finally
+            {
+                //makes sure stuff is always reverted into model in slot m[0], even if protobuf write fails.
+                ProtobufModelGamsScalar5b(lists);
+            }            
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)

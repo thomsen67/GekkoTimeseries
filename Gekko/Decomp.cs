@@ -3148,7 +3148,7 @@ namespace Gekko
                         double dLevelRefLag2 = double.NaN;
 
 
-                        if (false && dictName.Contains(Globals.decompResidualName))
+                        if (dictName.Contains(Globals.decompResidualName))
                         {
                             dLevel = double.NaN;
                         }
@@ -3171,7 +3171,6 @@ namespace Gekko
                             }
                             else
                             {
-
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;

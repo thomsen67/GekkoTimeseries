@@ -847,15 +847,23 @@ namespace Gekko
                     a[t][i] = data[index1 + t];
                 }
             }            
-        }        
+        }
 
         /// <summary>
         /// Equations. Type 1 = all (unrolled). Type 2 = omit time dimension. Type 3 = omit all dimensions.
+        /// Beware for type == 1 that it takes a tiny bit of time, do not use the function inside a long loop or as end in a long loop...
         /// </summary>
         /// <returns></returns>
         public int CountEqs(int type)
         {
-            if (type == 1) return this.dict_FromEqNumberToEqName.Length;
+            try
+            {
+                if (type == 1) return this.dict_FromEqNumberToEqName.Length;
+            }
+            catch (Exception e)
+            {
+
+            }
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
             {
