@@ -130,8 +130,6 @@ namespace Gekko
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter
         public static int goodBufferSizeForShaHashCode = 50000;  //some use 1200000 but 50000 seems just enough (tested --> 20% faster than using 4096 which is default)
         
-        public static bool decompSubstitute = false;
-
         public static StreamWriter sw = null;        
         
         public static List<string> unitTestsPromtingHelper = null;
@@ -157,7 +155,7 @@ namespace Gekko
         public static string internalPivotCols = "Columns";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
-
+                
         public static string windowFindStatusBarText = "Double-click to decompose equation, single-click to select";
         public static string windowDecompStatusBarText = "Double-click to find equation(s)";
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";

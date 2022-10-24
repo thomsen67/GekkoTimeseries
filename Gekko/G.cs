@@ -1821,6 +1821,15 @@ namespace Gekko
         }
 
         /// <summary>
+        /// True if the current thread is a DECOMP or FIND thread (these threads are used for DECOMP or FIND windows).
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsDecompOrFindThread()
+        {
+            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp";
+        }
+
+        /// <summary>
         /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
         /// But not tested.
         /// </summary>

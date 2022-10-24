@@ -184,6 +184,7 @@ namespace Gekko
         public List<DecompFind> children = new List<DecompFind>();
         public ModelGamsScalar modelGamsScalar = null;
         public bool closed = false;
+        public bool hasException = false;
 
         public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, ModelGamsScalar modelGamsScalar)
         {
@@ -205,15 +206,6 @@ namespace Gekko
         public void SetWindow(object window)
         {
             this.window = window;
-            if (false)
-            {
-                WindowDecomp w1 = this.window as WindowDecomp;
-                WindowFind w2 = this.window as WindowFind;
-                string s = null;
-                if (w1 != null) s += w1.decompFind.depth + " decomp depth ";
-                if (w2 != null) s += w2.decompFind.depth + " find depth ";
-                MessageBox.Show("LKJlkj   " + s);
-            }
         }     
 
         /// <summary>

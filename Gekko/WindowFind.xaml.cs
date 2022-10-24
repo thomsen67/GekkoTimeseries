@@ -318,7 +318,7 @@ namespace Gekko
                             }
                             if (ii < 0 || ii > 255)
                             {
-                                if (Globals.runningOnTTComputer) MessageBox.Show("ERROR: byte value is " + ii);
+                                if (Globals.runningOnTTComputer) MessageBox.Show("TTH: ERROR: byte value is " + ii);
                             }
                             b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
                         }

@@ -13,24 +13,6 @@ using System.Threading;
 
 namespace Gekko
 {
-    public static class Message
-    {
-        public static void Error(string s)
-        {
-            MessageBox.Show("*** ERROR: " + s);
-        }
-
-        public static void Note(string s)
-        {
-            MessageBox.Show("+++ NOTE: " + s);
-        }
-
-        public static void Writeln(string s)
-        {
-            MessageBox.Show(s);
-        }
-    }
-
     public class DecompOperator
     {
         //remember Clone()
@@ -1727,17 +1709,18 @@ namespace Gekko
                 if (Globals.floatingDecompWindows)
                 {
                     Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
+                    thread.Name = "Decomp";
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFind);
-
+                    
                     //Also see #9237532567
                     //This stuff makes sure we wait for the window to open, before we move on with the code.
                     for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
                         System.Threading.Thread.Sleep(10);  //0.01s
-                        if (decompFind.decompOptions2.numberOfRecalcs > 0)
+                        if (decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
                         {
                             break;
                         }
@@ -1761,43 +1744,40 @@ namespace Gekko
             }
         }
 
-        private static void CreateDecompWindow(object o)
+        /// <summary>
+        /// Shows the DECOMP window. Uses an object argument because it can be called from a new thread.
+        /// It really uses DecompFind as object.
+        /// </summary>
+        /// <param name="o2"></param>
+        private static void CreateDecompWindow(object o2)
         {
-            DecompFind decompFind = o as DecompFind;
-            WindowDecomp windowDecomp = new WindowDecomp(decompFind);
-            windowDecomp.decompFind.SetWindow(windowDecomp);
-            Globals.windowsDecomp2.Add(windowDecomp);
-            windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-            windowDecomp.SetRadioButtons();
-            windowDecomp.isInitializing = false;
-            windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
-            decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
-            if (G.IsUnitTesting() && Globals.showDecompTable == false)
-            {
-                Globals.windowsDecomp2.Clear();
-                windowDecomp = null;
-            }
-            else
-            {
-                if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
+            DecompFind decompFind = o2 as DecompFind;
+            try
+            {                
+                WindowDecomp windowDecomp = new WindowDecomp(decompFind);
+                windowDecomp.decompFind.SetWindow(windowDecomp);
+                Globals.windowsDecomp2.Add(windowDecomp);
+                windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                windowDecomp.SetRadioButtons();
+                windowDecomp.isInitializing = false;
+                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
+                decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
-                    //The line below removes the window from the global list of active windows.
-                    //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                    if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                    Globals.windowsDecomp2.Clear();
+                    windowDecomp = null;
                 }
                 else
                 {
-
-                    if (false)
+                    if (windowDecomp.isClosing)  //if something goes wrong, .isClosing will be true
                     {
-                        windowDecomp.Show();
-                        System.Windows.Threading.Dispatcher.Run();
+                        //The line below removes the window from the global list of active windows.
+                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
                     }
                     else
                     {
                         windowDecomp.ShowDialog();
-                        //windowDecomp.Close();  //probably superfluous
-                        //windowDecomp = null;  //probably superfluous
                         if (Globals.showDecompTable)
                         {
                             Globals.showDecompTable = false;
@@ -1805,7 +1785,16 @@ namespace Gekko
                         }
                     }
                 }
-            }           
+            }
+            catch (Exception e)
+            {
+                //we ignore the exception here, so that Gekko and other windows are not crashing.
+                if (Globals.runningOnTTComputer)
+                {
+                    MessageBox.Show(e.Message + " --decomptrace-> " + e.StackTrace);
+                }
+                decompFind.hasException = true;
+            }
         }
 
         public static void Decomp2ThreadFunction(Object o)
@@ -2817,11 +2806,11 @@ namespace Gekko
             {
                 if (rownamesFirst == null && colnamesFirst == null)
                 {
-                    MessageBox.Show("*** ERROR: Could not find row/col to put first for normalization");
+                    new Error("Could not find row/col to put first for normalization");
                 }
                 if (rownamesFirst != null && colnamesFirst != null)
                 {
-                    MessageBox.Show("*** ERROR: Both row and col are set first for normalization");
+                    new Error("Both row and col are set first for normalization");
                 }
             }
 
@@ -3964,11 +3953,13 @@ namespace Gekko
             if (Globals.floatingDecompWindows)
             {
                 //Open FIND window in a new thread
-                Thread thread = new Thread(new ParameterizedThreadStart(FindHelper));
+                Thread thread = new Thread(new ParameterizedThreadStart(CreateFindWindow));
+                thread.Name = "Find";
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                thread.IsBackground = true;
-                thread.Start(o);
+                thread.IsBackground = true;                
+                thread.Start(o);                
+
                 if (true)
                 {
                     //Also see #9237532567
@@ -3980,6 +3971,7 @@ namespace Gekko
                         //TODO
                         //TODO find a way to measure that the FIND window has been "calculated".
                         //TODO --> problem would be if a new model was loaded in the meantime...
+                        //TODO Do it same way as for decomp, also testing if it has exception
                         //TODO
                         //TODO
                         if (1 /* o.decompFind.decompOptions2.numberOfRecalcs */ > 0)
@@ -3991,180 +3983,195 @@ namespace Gekko
             }
             else
             {
-                FindHelper(o);
+                CreateFindWindow(o);
             }
         }
 
-        public static void FindHelper(object o2)
+        /// <summary>
+        /// Shows the FIND window. Uses an object argument because it can be called from a new thread.
+        /// It really uses O.Find as argument.
+        /// </summary>
+        /// <param name="o2"></param>
+        public static void CreateFindWindow(object o2)
         {
-            O.Find o = o2 as O.Find;
-            if (G.GetModelType() == EModelType.GAMSScalar)
+            try
             {
-                //good
-            }
-            else if (G.GetModelType() == EModelType.Unknown)
-            {
-                new Error("It seems no model is loaded, cf. the MODEL command.");
-                return;
-            }            
-            else
-            {
-                new Error("FIND is only implemented for scalar models");
-                return;
-            }
-
-            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
-            //For scalar model     
-
-            //Runs pretty fast, but later on check is this is necessary...            
-
-            ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
-            modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-            modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
-
-            Globals.itemHandler = new ItemHandler();  //hack
-
-            o.t0 = o.decompFind.decompOptions2.t1;  //selected time
-            List<string> vars = O.Restrict(o.iv, false, false, false, true);
-
-            if (o.iv2 != null)
-            {
-                List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
-                FindConnection(vars[0], vars2[0], modelGamsScalar);
-                return;
-            }
-
-            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
-            string variableName = vars[0]; //.Replace(" ", "");  //no blanks
-            int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
-            if (aNumber == -12345)
-            {
-                new Error(NonFoundInModelError(variableName, modelGamsScalar));
-                return;
-            }
-            PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
-
-            string firstText = null;
-            List<string> firstList = new List<string>();
-            string firstEqName = null;
-
-            int lineCounter = -1;
-            int counter2 = 0;
-            List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
-            if (eqNumbers == null)
-            {
-                //new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
-                return;
-            }
-
-            //Get a list of helper objects corresponding to each scalar equation the variable is part of
-            List<EqHelper> scalarEquations = new List<EqHelper>();
-            foreach (int eqNumber in eqNumbers)
-            {
-                string eqName = modelGamsScalar.GetEqName(eqNumber);
-                string eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.t0, false);
-                EqHelper e = new EqHelper();
-                e.eqName = eqName;
-                e.eqNameWithLag = eqNameWithLag;
-                e.eqNumber = eqNumber;
-                scalarEquations.Add(e);
-            }
-
-            List<EqHelper> eqsNew = new List<EqHelper>();
-            List<EqHelper> eqsNew1 = new List<EqHelper>();
-            List<EqHelper> eqsNew2 = new List<EqHelper>();
-            string s = vars[0];
-            string s2 = G.Chop_RemoveIndex(s);
-            List<ModelGamsEquation> foldedEquations = null;
-            //foldedEquations 
-            //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
-            modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
-            if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
-
-            // For instance, when doing FIND vtBund in MAKRO model, we have these:
-            // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
-            // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
-            // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.
-            //
-            // TODO: 
-            //
-            //
-
-            foreach (EqHelper scalarEquation in scalarEquations)
-            {
-                foreach (ModelGamsEquation foldedEquation in foldedEquations)
+                O.Find o = o2 as O.Find;
+                if (G.GetModelType() == EModelType.GAMSScalar)
                 {
-                    if (G.Equal(scalarEquation.eqNameWithLag, foldedEquation.nameGams))
-                    {
-                        scalarEquation.best = true;
-                    }
+                    //good
                 }
-            }
-
-            foreach (EqHelper helper in scalarEquations)
-            {
-                if (helper.best) eqsNew1.Add(helper);
-            }
-
-            foreach (EqHelper helper in scalarEquations)
-            {
-                if (!helper.best) eqsNew2.Add(helper);
-            }
-
-            var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqNameWithLag);
-            var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqNameWithLag);
-            eqsNew.AddRange(eqsNew1a);
-            eqsNew.AddRange(eqsNew2a);
-
-            foreach (EqHelper helper in eqsNew)
-            {
-                lineCounter++;
-                string eqName = helper.eqName;
-                string eqName3 = helper.eqNameWithLag;
-
-                List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
-
-                string bool1 = "";
-                string bool2 = "";
-
-                if (helper.best) bool1 = Globals.protectSymbol;
-                //bool2 = Globals.protectSymbol;
-
-                string tt = "tx0";
-
-                int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
-
-                string textColor = "Black";
-                if (o.decompFind.decompOptions2.new_from != null)
+                else if (G.GetModelType() == EModelType.Unknown)
                 {
-                    if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                    new Error("It seems no model is loaded, cf. the MODEL command.");
+                    return;
+                }
+                else
+                {
+                    new Error("FIND is only implemented for scalar models");
+                    return;
+                }
+
+                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                //For scalar model     
+
+                //Runs pretty fast, but later on check is this is necessary...            
+
+                ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
+                modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+
+                Globals.itemHandler = new ItemHandler();  //hack
+
+                o.t0 = o.decompFind.decompOptions2.t1;  //selected time
+                List<string> vars = O.Restrict(o.iv, false, false, false, true);
+
+                if (o.iv2 != null)
+                {
+                    List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
+                    FindConnection(vars[0], vars2[0], modelGamsScalar);
+                    return;
+                }
+
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
+                string variableName = vars[0]; //.Replace(" ", "");  //no blanks
+                int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
+                if (aNumber == -12345)
+                {
+                    new Error(NonFoundInModelError(variableName, modelGamsScalar));
+                    return;
+                }
+                PeriodAndVariable pav = new PeriodAndVariable(timeIndex, aNumber);
+
+                string firstText = null;
+                List<string> firstList = new List<string>();
+                string firstEqName = null;
+
+                int lineCounter = -1;
+                int counter2 = 0;
+                List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
+                if (eqNumbers == null)
+                {
+                    //new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                    return;
+                }
+
+                //Get a list of helper objects corresponding to each scalar equation the variable is part of
+                List<EqHelper> scalarEquations = new List<EqHelper>();
+                foreach (int eqNumber in eqNumbers)
+                {
+                    string eqName = modelGamsScalar.GetEqName(eqNumber);
+                    string eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.t0, false);
+                    EqHelper e = new EqHelper();
+                    e.eqName = eqName;
+                    e.eqNameWithLag = eqNameWithLag;
+                    e.eqNumber = eqNumber;
+                    scalarEquations.Add(e);
+                }
+
+                List<EqHelper> eqsNew = new List<EqHelper>();
+                List<EqHelper> eqsNew1 = new List<EqHelper>();
+                List<EqHelper> eqsNew2 = new List<EqHelper>();
+                string s = vars[0];
+                string s2 = G.Chop_RemoveIndex(s);
+                List<ModelGamsEquation> foldedEquations = null;
+                //foldedEquations 
+                //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
+                modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+                if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
+
+                // For instance, when doing FIND vtBund in MAKRO model, we have these:
+                // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
+                // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
+                // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.
+                //
+                // TODO: 
+                //
+                //
+
+                foreach (EqHelper scalarEquation in scalarEquations)
+                {
+                    foreach (ModelGamsEquation foldedEquation in foldedEquations)
                     {
-                        textColor = "Gray";
+                        if (G.Equal(scalarEquation.eqNameWithLag, foldedEquation.nameGams))
+                        {
+                            scalarEquation.best = true;
+                        }
                     }
                 }
 
-                Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
-
-                if (firstText == null)
+                foreach (EqHelper helper in scalarEquations)
                 {
-                    string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
-                    firstText = equationText;
-                    firstEqName = eqName;
-                    firstList.AddRange(precedents);
+                    if (helper.best) eqsNew1.Add(helper);
+                }
+
+                foreach (EqHelper helper in scalarEquations)
+                {
+                    if (!helper.best) eqsNew2.Add(helper);
+                }
+
+                var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqNameWithLag);
+                var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqNameWithLag);
+                eqsNew.AddRange(eqsNew1a);
+                eqsNew.AddRange(eqsNew2a);
+
+                foreach (EqHelper helper in eqsNew)
+                {
+                    lineCounter++;
+                    string eqName = helper.eqName;
+                    string eqName3 = helper.eqNameWithLag;
+
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+
+                    string bool1 = "";
+                    string bool2 = "";
+
+                    if (helper.best) bool1 = Globals.protectSymbol;
+                    //bool2 = Globals.protectSymbol;
+
+                    string tt = "tx0";
+
+                    int selectedRow = 0;  //can be changed...  (cf. #jk8dsfa7yauewfh)
+
+                    string textColor = "Black";
+                    if (o.decompFind.decompOptions2.new_from != null)
+                    {
+                        if (o.decompFind.decompOptions2.new_from.Contains(eqName3))
+                        {
+                            textColor = "Gray";
+                        }
+                    }
+
+                    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
+
+                    if (firstText == null)
+                    {
+                        string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+                        firstText = equationText;
+                        firstEqName = eqName;
+                        firstList.AddRange(precedents);
+                    }
+                }
+
+                WindowFind windowFind = new WindowFind(o);
+                windowFind.Title = variableName + " - " + "Gekko find";
+                windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
+                windowFind.EquationBrowserSetLabel(variableName);
+                windowFind._activeEquation = firstEqName;
+                windowFind._activeVariable = null;
+                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
+                windowFind.decompFind.SetWindow(windowFind);
+                windowFind.ShowDialog();
+                return;
+            }
+            catch (Exception e)
+            {
+                //we ignore the exception here, so that Gekko and other windows are not crashing.
+                if (Globals.runningOnTTComputer)
+                {
+                    MessageBox.Show(e.Message + " --findtrace-> " + e.StackTrace);
                 }
             }
-            
-            WindowFind windowFind = new WindowFind(o);
-            windowFind.Title = variableName + " - " + "Gekko find";
-            windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
-            windowFind.EquationBrowserSetLabel(variableName);
-            windowFind._activeEquation = firstEqName;
-            windowFind._activeVariable = null;
-            windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
-            windowFind.decompFind.SetWindow(windowFind);
-            windowFind.ShowDialog();
-            
-            return;
         }
 
         private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)
@@ -4184,7 +4191,7 @@ namespace Gekko
 
             if (!variableExists)
             {
-                error = "The variable " + G.Chop_RemoveIndex(variableName) + " does not exist in the model. You may use the INDEX command to search for variable names, or DISP '...' to search descriptions.";
+                error = "The variable '" + G.Chop_RemoveIndex(variableName) + "' does not exist in the model. You may use the INDEX command to search for variable names, or DISP '...' to search descriptions.";
                 return error;
             }
 
@@ -4192,7 +4199,7 @@ namespace Gekko
             {
                 if (variableExistsAndHasIndex)
                 {
-                    error = "The " + G.Chop_GetName(variableName) + " element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable " + G.Chop_GetName(variableName) + " does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.";
+                    error = "The '" + G.Chop_GetName(variableName) + "' element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable '" + G.Chop_GetName(variableName) + "' does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.";
                     return error;
                 }
                 else

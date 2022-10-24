@@ -248,7 +248,7 @@ namespace Gekko
             }
             else
             {
-                MessageBox.Show("*** ERROR");
+                new Error("Selection problem.");
             }
             List<GekkoTask> m = new List<GekkoTask>();
             int i2 = 0;
@@ -1236,7 +1236,7 @@ namespace Gekko
                     }
                     catch (Exception err)
                     {
-                        MessageBox.Show("*** ERROR: Flowchart failed");
+                        new Error("Flowchart failed");
                     }
                 }
                 else
@@ -1502,7 +1502,7 @@ namespace Gekko
         {
             if (c2 == null) return null;
             List<string> vars = c2.vars_hack;
-            if (vars == null) MessageBox.Show("Could not find any vars");
+            if (vars == null) new Error("Could not find any vars");
             string var = vars[0];  //#dskla8asjkdfa
             int lag; string name;
             Decomp.ConvertFromTurtleName(var, false, out name, out lag);
@@ -1746,26 +1746,19 @@ namespace Gekko
                     ClearGrid();
                     MakeGuiTable2(table, this.decompFind.decompOptions2);
                 }
-
                 return;
-
             }
             catch (Exception e)
             {                
                 if (G.IsUnitTesting())
                 {
-                    throw e;  //we want that error for unist tests!
+                    //do nothing here
                 }
                 else
-                {
-                    if (Globals.runningOnTTComputer)
-                    {
-                        MessageBox.Show(e.Message + " --trace-> " + e.StackTrace);
-                    }
-                    this.isClosing = true;
-                    MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
-                    throw e;
+                {                    
+                    this.isClosing = true;  //hmmm, is this useful at all?
                 }
+                throw e;
             }
         }       
 
@@ -2162,7 +2155,7 @@ namespace Gekko
         {
             Button button = sender as Button;
             GekkoTask task = button.DataContext as GekkoTask;            
-            MessageBox.Show("Add new row item");            
+            new Error("Add new row item");            
         }
 
         private void ListButton2_Click(object sender, RoutedEventArgs e)
@@ -2231,7 +2224,7 @@ namespace Gekko
             if (dfParentFind == null || dfParentDecomp == null) return;
             if (dfParentDecomp.closed)
             {
-                MessageBox.Show("Merge not possible, because the preceding DECOMP window has been closed");
+                new Error("Merge not possible, because the preceding DECOMP window has been closed");
                 return;
             }
             WindowFind windowFindParent = dfParentFind.window as WindowFind;
@@ -2256,32 +2249,42 @@ namespace Gekko
             windowDecompParent.Dispatcher.Invoke(() => { Merge(dfParentDecomp); });
         }
 
-        private void Merge(DecompFind dfDecomp)
+        private void Merge(DecompFind dfParentDecomp)
         {
-            WindowDecomp windowDecomp = dfDecomp.window as WindowDecomp;
-            windowDecomp.Activate();
+            DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();
+            WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
+            windowParentDecomp.Activate();
             string txt = "  Merged...";
             //show message a bit, and then remove    
-            windowDecomp.textSelect.Text = txt;
-            Program.DelayAction(3000, new Action(() => { try { windowDecomp.textSelect.Text = ""; } catch { } }));
+            windowParentDecomp.textSelect.Text = txt;
+            Program.DelayAction(3000, new Action(() => { try { windowParentDecomp.textSelect.Text = ""; } catch { } }));
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;
-            dfDecomp.decompOptions2.new_from.AddRange(thisFrom);
-            dfDecomp.decompOptions2.new_endo.AddRange(thisEndo);
+            dfParentDecomp.decompOptions2.new_from.AddRange(thisFrom);
+            dfParentDecomp.decompOptions2.new_endo.AddRange(thisEndo);
             //
             //
             // HACK HACK HACK --> move .decompDatas inside .decompFind maybe
             //
-            //
-            windowDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
+            //            
+            windowParentDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
             List<string> select = this.decompFind.decompOptions2.new_select;
-            string oldCode = dfDecomp.decompOptions2.code;
+            string oldCode = dfParentDecomp.decompOptions2.code;
             int i = oldCode.IndexOf(" from ", StringComparison.OrdinalIgnoreCase);
             string s2 = G.Substring(oldCode, 0, i - 1).Trim();
-            string code = s2 + " from " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfDecomp.decompOptions2.new_endo) + ";";
-            dfDecomp.decompOptions2.code = code;
-            windowDecomp.code.Text = dfDecomp.decompOptions2.code + Program.SetBlanks();
-            Decomp.DecompGetFuncExpressionsAndRecalc(dfDecomp, windowDecomp);
+            string newCode = s2 + " from " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_endo) + ";";
+            dfParentDecomp.decompOptions2.code = newCode;
+            windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+            try
+            {
+                Decomp.DecompGetFuncExpressionsAndRecalc(dfParentDecomp, windowParentDecomp);
+            }
+            catch
+            {
+                //reverting, so that the parent window may be ok to continue with
+                dfParentDecomp.decompOptions2 = remember; 
+                windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+            }
         }
 
         private void checkBoxCount_Checked(object sender, RoutedEventArgs e)

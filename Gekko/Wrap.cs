@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Gekko
 {
@@ -134,9 +136,10 @@ namespace Gekko
         /// </summary>
         public void Exe1(Exception e)
         {
-            if (type == EWrapType.Error && this.throwExceptionForError)
+            if (type == EWrapType.Error && this.throwExceptionForError && !G.IsDecompOrFindThread())
             {
                 //if throwExceptionForError == false, an exception is not thrown, and CrossThreadStuff.Wrap() will print the error below.
+                //if decomp or find thread, the error is thrown later on.
                 Globals.numberOfErrors++;
                 //this "stores" the error, for later pretty printing when the exception is caught (HandleRunErrors.cs)
                 //the GekkoException will be stored inside an innerException when caught later on, 
@@ -170,7 +173,9 @@ namespace Gekko
             {
                 Globals.numberOfWarnings++;
             }
-            CrossThreadStuff.Wrap(this);  //calls .Exe2()
+
+            if (G.IsDecompOrFindThread()) this.Exe2();  //keep it on its own thread
+            else CrossThreadStuff.Wrap(this);  //calls .Exe2() on the GUI thread.
         }
 
         /// <summary>
@@ -237,43 +242,89 @@ namespace Gekko
                 O.Cls("output");
             }
 
-            for (int ii = 0; ii < this.storageMain.Count; ii++)
+            if (G.IsDecompOrFindThread())
             {
-                string m = marginFirst;
-                if (ii > 0)
+                MessageBoxShow();
+                if (type == EWrapType.Error && this.throwExceptionForError)
                 {
-                    m = margin;
-                    //color = Color.Empty;
+                    throw new GekkoException();
                 }
-                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, lineWidth, color, tab, this.type, mustAlsoPrintOnScreen);
             }
-
-            if (this.storageMore[0].storage.Count > 0)
+            else
             {
 
-                Action<GAO> a = (gao) =>
+                for (int ii = 0; ii < this.storageMain.Count; ii++)
                 {
+                    string m = marginFirst;
+                    if (ii > 0)
+                    {
+                        m = margin;
+                        //color = Color.Empty;
+                    }
+                    WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, lineWidth, color, tab, this.type, mustAlsoPrintOnScreen);
+                }
+
+                if (this.storageMore[0].storage.Count > 0)
+                {
+                    Action<GAO> a = (gao) =>
+                    {
                     //-------------------------------
                     //The long explanation in output tab
                     //-------------------------------
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
-                    O.Cls("output");
-                    this.ConsolidateLines("more");
-                    for (int ii = 0; ii < this.storageMore.Count; ii++)
-                    {
-                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, lineWidth, Color.Empty, ETabs.Output, this.type, mustAlsoPrintOnScreen);
-                    }
-                };
+                        O.Cls("output");
+                        this.ConsolidateLines("more");
+                        for (int ii = 0; ii < this.storageMore.Count; ii++)
+                        {
+                            WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, lineWidth, Color.Empty, ETabs.Output, this.type, mustAlsoPrintOnScreen);
+                        }
+                    };
 
-                //---------------------------------------------------------------
-                //The link in the main tab to the explanation in the output tab
-                //---------------------------------------------------------------
+                    //---------------------------------------------------------------
+                    //The link in the main tab to the explanation in the output tab
+                    //---------------------------------------------------------------
 
-                WrapHelper(0, 2, margin, margin, "--> Info and detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, color, ETabs.Main, this.type, mustAlsoPrintOnScreen);
+                    WrapHelper(0, 2, margin, margin, "--> Info and detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, color, ETabs.Main, this.type, mustAlsoPrintOnScreen);
+                }
+
+                if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
             }
 
-            if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
+        }
 
+        /// <summary>
+        /// Show the contents of the wrapper in a MessageBox instead of in the main GUI.
+        /// </summary>
+        private void MessageBoxShow()
+        {
+            string s1 = MetaConsolidate(this.storageMain);
+            string s2= MetaConsolidate(this.storageMore);
+            if (s2 != null) s1 += "\n\n" + s2;
+            string s3 = s1 + "\n\nBeware of inconsistent content, especially if merging.";
+            MessageBox.Show(s3);
+        }
+
+        /// <summary>
+        /// Helper for MessageBoxShow(), assembling parts of wrapper as plain text.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        private string MetaConsolidate(List<WrapHelper5> x)
+        {
+            string s1 = null;
+            foreach (WrapHelper5 w in x)
+            {
+                if (w.consolidated != null) s1 += w.consolidated.Trim() + "\n\n";
+            }
+            if (s1 == null)
+            {
+            }
+            else
+            {
+                s1 = s1.Trim();
+                if (!s1.EndsWith(".")) s1 += ".";
+            }
+            return s1;
         }
 
         /// <summary>
