@@ -2119,7 +2119,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompFind.decompOptions2.decompOperator.isPercentageType)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.decompOperator.isShares)
                 {
                     this.decompFind.decompOptions2.decimalsPch++;
                 }
@@ -2135,7 +2135,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompFind.decompOptions2.decompOperator.isPercentageType)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.decompOperator.isShares)
                 {
                     this.decompFind.decompOptions2.decimalsPch--;
                     if (this.decompFind.decompOptions2.decimalsPch < 0) this.decompFind.decompOptions2.decimalsPch = 0;
