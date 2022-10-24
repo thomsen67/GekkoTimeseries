@@ -13,6 +13,23 @@ using System.Threading;
 
 namespace Gekko
 {
+    public static class Message
+    {
+        public static void Error(string s)
+        {
+            MessageBox.Show("*** ERROR: " + s);
+        }
+
+        public static void Note(string s)
+        {
+            MessageBox.Show("+++ NOTE: " + s);
+        }
+
+        public static void Writeln(string s)
+        {
+            MessageBox.Show(s);
+        }
+    }
 
     public class DecompOperator
     {
@@ -2536,14 +2553,14 @@ namespace Gekko
                 ENormalizeType normalize = ENormalizeType.Lags;
                 if (op.lowLevel == ELowLevel.BothQuoAndRef)
                 {
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize, op);
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize, op);
+                    DecompAdjust(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.D, normalize, op);
+                    DecompAdjust(per1, per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, EContribType.RD, normalize, op);
                 }
                 else
                 {
                     int deduct = 0;
                     if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;
-                    DecompNormalize(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
+                    DecompAdjust(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
                 }
             }
             else if (decompOptions2.modelType == EModelType.GAMSRaw || decompOptions2.modelType == EModelType.Gekko)  //is .Gekko even relevant here??
@@ -3302,6 +3319,7 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void HandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
         {
+            if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
             bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
             if (areVariablesOnRows)
             {
@@ -3535,7 +3553,7 @@ namespace Gekko
         /// <param name="parentI"></param>
         /// <param name="decompDatasSupremeClone"></param>
         /// <param name="operatorOneOf3Types"></param>
-        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types, ENormalizeType normalize, DecompOperator op)
+        private static void DecompAdjust(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types, ENormalizeType normalize, DecompOperator op)
         {
             // Decomp provides a linearization where the contributions sum to 0. Here we identify those
             // vars (contributions) that are moved to the LHS.
@@ -4039,16 +4057,17 @@ namespace Gekko
                 return;
             }
 
-            List<EqHelper> eqs = new List<EqHelper>();
+            //Get a list of helper objects corresponding to each scalar equation the variable is part of
+            List<EqHelper> scalarEquations = new List<EqHelper>();
             foreach (int eqNumber in eqNumbers)
             {
                 string eqName = modelGamsScalar.GetEqName(eqNumber);
-                string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
+                string eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.t0, false);
                 EqHelper e = new EqHelper();
                 e.eqName = eqName;
-                e.eqName3 = eqName3;
+                e.eqNameWithLag = eqNameWithLag;
                 e.eqNumber = eqNumber;
-                eqs.Add(e);
+                scalarEquations.Add(e);
             }
 
             List<EqHelper> eqsNew = new List<EqHelper>();
@@ -4056,31 +4075,44 @@ namespace Gekko
             List<EqHelper> eqsNew2 = new List<EqHelper>();
             string s = vars[0];
             string s2 = G.Chop_RemoveIndex(s);
-            List<ModelGamsEquation> m = null; modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out m);
-            if (m == null) m = new List<ModelGamsEquation>();
-            foreach (EqHelper helper in eqs)
+            List<ModelGamsEquation> foldedEquations = null;
+            //foldedEquations 
+            //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
+            modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+            if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
+
+            // For instance, when doing FIND vtBund in MAKRO model, we have these:
+            // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
+            // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
+            // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.
+            //
+            // TODO: 
+            //
+            //
+
+            foreach (EqHelper scalarEquation in scalarEquations)
             {
-                foreach (ModelGamsEquation mm in m)
+                foreach (ModelGamsEquation foldedEquation in foldedEquations)
                 {
-                    if (G.Equal(helper.eqName3, mm.nameGams))
+                    if (G.Equal(scalarEquation.eqNameWithLag, foldedEquation.nameGams))
                     {
-                        helper.best = true;
+                        scalarEquation.best = true;
                     }
                 }
             }
 
-            foreach (EqHelper helper in eqs)
+            foreach (EqHelper helper in scalarEquations)
             {
                 if (helper.best) eqsNew1.Add(helper);
             }
 
-            foreach (EqHelper helper in eqs)
+            foreach (EqHelper helper in scalarEquations)
             {
                 if (!helper.best) eqsNew2.Add(helper);
             }
 
-            var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqName3);
-            var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqName3);
+            var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqNameWithLag);
+            var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqNameWithLag);
             eqsNew.AddRange(eqsNew1a);
             eqsNew.AddRange(eqsNew2a);
 
@@ -4088,7 +4120,7 @@ namespace Gekko
             {
                 lineCounter++;
                 string eqName = helper.eqName;
-                string eqName3 = helper.eqName3;
+                string eqName3 = helper.eqNameWithLag;
 
                 List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
 

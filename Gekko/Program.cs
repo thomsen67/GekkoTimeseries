@@ -1190,7 +1190,7 @@ namespace Gekko
     public class EqHelper
     {
         public string eqName = null;
-        public string eqName3 = null;
+        public string eqNameWithLag = null;
         public int eqNumber = -12345;
         public bool best = false;
     }

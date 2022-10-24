@@ -40,13 +40,13 @@ using System.Threading.Tasks;
 
 namespace Gekko
 {
-       
-    
+
+
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
     public partial class WindowDecomp : Window
-    {       
+    {
 
         public enum GekkoTableTypes
         {
@@ -672,7 +672,7 @@ namespace Gekko
             {
                 ComboBoxContent = new ObservableCollection<string> { "test 1", "test 2" };
             }
-        }
+        }        
 
         public WindowDecomp(DecompFind df)
         {
@@ -688,6 +688,7 @@ namespace Gekko
             this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();            
+
             this.isInitializing = false;  //ready for clicking
 
             this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));

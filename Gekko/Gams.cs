@@ -2213,6 +2213,7 @@ namespace Gekko
 
         /// <summary>
         /// Tries to identify what is the LHS variable in the GAMS equation, and puts this into dictionaries for later retrieval by variable name or equation name.
+        /// The method reacts to option model gams dep method = lhs|eqname, and also reacts to a #dependents list.
         /// </summary>
         private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, ref bool fromList)
         {
