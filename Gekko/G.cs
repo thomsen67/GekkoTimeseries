@@ -2212,11 +2212,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper class for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// Helper class for natural file listing sorting 
+        /// (a8, a9, a10, a11 instead of a10, a11, a8, a9). Will ignore case, and
+        /// considers '_' a character. Does some internal tokenizing.
         /// </summary>
         public class NaturalComparer : IComparer<string>, IComparer
         {
-
             private StringParser mParser1;
             private StringParser mParser2;
             private NaturalComparerOptions mNaturalComparerOptions;
@@ -2297,7 +2298,7 @@ namespace Gekko
                             ParseNumericalValue();
                             return;
                         }
-                        else if (char.IsLetter(mCurChar))
+                        else if (G.IsLetterOrUnderscore(mCurChar))
                         {
                             ParseString();
                             return;
@@ -2373,9 +2374,8 @@ namespace Gekko
                     int cptLastRoman = 0;
                     do
                     {
-
                         NextChar();
-                        if (!char.IsLetter(mCurChar)) break;
+                        if (!G.IsLetterOrUnderscore(mCurChar)) break;
                     }
                     while (true);
                     mStringValue = mSource.Substring(start, mIdx - start);
@@ -2418,7 +2418,7 @@ namespace Gekko
                     }
                     else
                     {
-                        result = string.Compare(mParser1.StringValue, mParser2.StringValue);
+                        result = string.Compare(mParser1.StringValue, mParser2.StringValue, true);
                     }
                     if (result != 0)
                     {

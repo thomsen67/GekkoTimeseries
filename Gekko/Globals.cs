@@ -443,7 +443,8 @@ namespace Gekko
         public static bool fastGauss = true;  //Beware: RES command should switch the option off
                 
         public static double[] scaleNewtonValues = new double[0];
-        
+
+        public const string decompNull = "<null>";
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidthFirst = 135;

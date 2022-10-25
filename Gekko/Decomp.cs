@@ -2657,7 +2657,7 @@ namespace Gekko
                     {
                         if (i == valueI) continue;
                         string s = row.storage[i].text;
-                        if (s == null) s = "null";
+                        if (s == null) s = Globals.decompNull;  //hmmm used at all??
                         if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
                     }
                 }
@@ -2680,11 +2680,7 @@ namespace Gekko
 
                 string more = null;
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {
-                    //if (!decompHasLag && normalizerType == ENormalizerType.NormalizerWithLagOrLead)
-                    //{
-                    //    more = Globals.pivotHelper1;  //so that it is set apart
-                    //}
+                {                    
                     if (normalizerType == ENormalizerType.NormalizerWithLagOrLead) more = Globals.pivotHelper1;  //so that it is set apart
                     else if (normalizerType == ENormalizerType.Normalizer) more = Globals.pivotHelper2;
                 }
@@ -2757,15 +2753,31 @@ namespace Gekko
                 }
             }
 
-            rownames3.Sort(StringComparer.OrdinalIgnoreCase);
+            //rownames3.Sort(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < rownames3.Count; i++)
+            {
+                rownames3[i] = rownames3[i].Replace(Globals.decompNull, "________n");
+            }
             List<string> rownames2 = new List<string>();
-            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
+            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);            
             rownames3 = rownames2;
+            for (int i = 0; i < rownames3.Count; i++)
+            {
+                rownames3[i] = rownames3[i].Replace("________n", Globals.decompNull);
+            }
 
-            colnames3.Sort(StringComparer.OrdinalIgnoreCase);
+            //colnames3.Sort(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < colnames3.Count; i++)
+            {
+                colnames3[i] = colnames3[i].Replace(Globals.decompNull, "________n");
+            }
             List<string> colnames2 = new List<string>();
             foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames3 = colnames2;
+            for (int i = 0; i < colnames3.Count; i++)
+            {
+                colnames3[i] = colnames3[i].Replace("________n", Globals.decompNull);
+            }
 
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
 
@@ -3147,14 +3159,12 @@ namespace Gekko
                         double dLevelRefLag = double.NaN;
                         double dLevelRefLag2 = double.NaN;
 
-
                         if (dictName.Contains(Globals.decompResidualName))
                         {
                             dLevel = double.NaN;
                         }
                         else
                         {
-
                             //MAybe turn this off for x-type...
 
                             if (op.operatorLower.StartsWith("x"))
@@ -3253,6 +3263,7 @@ namespace Gekko
                                 {
                                     string domain = domains[ii];
                                     string index = indexes[ii];
+
                                     if (domain != null)
                                     {
                                         dr.Set(frame, domain, new CellLight(index));
@@ -3286,7 +3297,7 @@ namespace Gekko
                     CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
                     string s = c.text;
                     int i = -12345;
-                    string s2 = "null";
+                    string s2 = Globals.decompNull;  //hmmm used at all?
                     if (int.TryParse(s, out i))
                     {
                         s2 = G.GroupBy10(i);
@@ -3730,7 +3741,7 @@ namespace Gekko
             CellLight c = row.Get(frame, s);
             if (c.type == ECellLightType.None)
             {
-                s1 += Globals.pivotTableDelimiter + "null";
+                s1 += Globals.pivotTableDelimiter + Globals.decompNull;
             }
             else if (c.type == ECellLightType.String)
             {

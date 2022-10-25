@@ -11922,7 +11922,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, 99d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 119d, sharedTableDelta);
             i++;
@@ -11947,7 +11947,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -11968,7 +11968,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, 20d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -11989,7 +11989,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12017,7 +12017,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, (20d / 99d) * 100d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12050,7 +12050,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, 101d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 110d, sharedTableDelta);
             i++;
@@ -12076,7 +12076,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12097,7 +12097,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12118,7 +12118,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12146,7 +12146,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 3).number, (9d / 101d) * 100d, sharedTableDelta);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18");
@@ -12179,7 +12179,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
             i++;
@@ -12209,7 +12209,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, -2d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 9d, sharedTableDelta);
             i++;
@@ -12239,7 +12239,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
             i++;
@@ -12275,7 +12275,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | null");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null>");
             Assert.AreEqual(table.Get(i, 2).number, -2d / 101d * 100d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, 9d / 110d * 100d, sharedTableDelta);
             i++;
