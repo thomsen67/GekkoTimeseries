@@ -283,6 +283,9 @@ namespace Gekko
 
                     GekkoTime gt1, gt2;
                     DecompOperator op = decompOptionsTemp.decompOperator;
+
+                    if (!Decomp.IsOperatorOneOf3Types(op.type)) return;
+
                     Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.decompOperator);
                     DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, modelGamsScalar);
 

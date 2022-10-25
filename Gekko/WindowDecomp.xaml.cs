@@ -1486,6 +1486,11 @@ namespace Gekko
                 // ---------------------------------------
 
                 string var = HiddenVariableHelper(c2);
+                if (var == null)
+                {
+                    new Writeln(Decomp.Text1(1));
+                    return;
+                }
                 //DecompOptions2 opt = this.decompFind.decompOptions2.Clone();
                 O.Find o = new O.Find(this.decompFind);
                 List m = new List(new List<string>() { var });
@@ -1502,7 +1507,10 @@ namespace Gekko
         {
             if (c2 == null) return null;
             List<string> vars = c2.vars_hack;
-            if (vars == null) new Error("Could not find any vars");
+            if (vars == null)
+            {
+                return null;
+            }
             string var = vars[0];  //#dskla8asjkdfa
             int lag; string name;
             Decomp.ConvertFromTurtleName(var, false, out name, out lag);
@@ -1610,9 +1618,16 @@ namespace Gekko
                             {
                                 this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;                                                             
                                 string var7 = HiddenVariableHelper(c2);
-                                List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
-                                string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
-                                this.equation.Text = txt;
+                                if (var7 == null)
+                                {
+                                    this.equation.Text = "--> " + Decomp.Text1(1);
+                                }
+                                else
+                                {
+                                    List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+                                    string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
+                                    this.equation.Text = txt;
+                                }
                             }
                         }
                     }

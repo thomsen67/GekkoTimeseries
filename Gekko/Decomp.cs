@@ -1609,6 +1609,14 @@ namespace Gekko
         // Turtle name end
         // ----------------------------
 
+        public static bool IsOperatorOneOf3Types(EContribType operatorOneOf3Types)
+        {
+            if (operatorOneOf3Types == EContribType.D) return true;
+            else if (operatorOneOf3Types == EContribType.RD) return true;
+            else if (operatorOneOf3Types == EContribType.M) return true;
+            return false;
+        }
+
         public static DecompDict GetDecompDatas(DecompData decompData, EContribType operatorOneOf3Types)
         {
             if (operatorOneOf3Types == EContribType.D) return decompData.cellsContribD;
@@ -2756,27 +2764,27 @@ namespace Gekko
             //rownames3.Sort(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < rownames3.Count; i++)
             {
-                rownames3[i] = rownames3[i].Replace(Globals.decompNull, "________n");
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, "________n");
             }
             List<string> rownames2 = new List<string>();
             foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);            
             rownames3 = rownames2;
             for (int i = 0; i < rownames3.Count; i++)
             {
-                rownames3[i] = rownames3[i].Replace("________n", Globals.decompNull);
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace("________n", Globals.decompNull);
             }
 
             //colnames3.Sort(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < colnames3.Count; i++)
             {
-                colnames3[i] = colnames3[i].Replace(Globals.decompNull, "________n");
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, "________n");
             }
             List<string> colnames2 = new List<string>();
             foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames3 = colnames2;
             for (int i = 0; i < colnames3.Count; i++)
             {
-                colnames3[i] = colnames3[i].Replace("________n", Globals.decompNull);
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace("________n", Globals.decompNull);
             }
 
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
@@ -2977,9 +2985,17 @@ namespace Gekko
                     }
                     else if (decompOptions2.count == ECountType.Names)
                     {
-                        List<string> tmp = new List<string>();
-                        foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "")); //x[a]¤[-1] --> x[a][-1]
-                        string tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                        string tmp2 = null;
+                        if (fullVariableNames != null)
+                        {
+                            List<string> tmp = new List<string>();
+                            foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "")); //x[a]¤[-1] --> x[a][-1]
+                            tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
+                        }
+                        else
+                        {
+                            tmp2 = Text1(0);
+                        }
                         tab.Set(i + 2, j + 2, tmp2);
                     }
                     else
@@ -3023,6 +3039,13 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        public static string Text1(int i)
+        {
+            if (i == 0) return "";  //corresponds to a cell with count = 0
+            else if (i == 1) return "Cannot determine exact variable name, perhaps because some parts of the name is on rows, and other parts on columns. You may try rearranging via the Rows/Columns selector.";
+            else return "";
         }
 
         private static FrameLight DecompPivotCreateDataframe(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string lhs, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2)
