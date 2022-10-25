@@ -10683,7 +10683,7 @@ namespace UnitTests
 
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             I("decomp3<d> x[a] from e1 endo x[a] rows vars, #i, #j, lags cols time;");
