@@ -11066,6 +11066,10 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
             i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 1.5000d, 0.0001);
+            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 3.5000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 3.5000d, 0.0001);
@@ -11074,11 +11078,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 1.5000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 1.5000d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
@@ -11086,13 +11086,13 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-2]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
 
             // ----------------------------------------
             // subset of time period, 2001-2001, multiplier, showing lags/leads
@@ -11111,11 +11111,11 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
-            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);            
 
             // ----------------------------------------
             // subset of time period, 2002-2002, multiplier, showing lags/leads
@@ -11134,11 +11134,12 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);            
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);            
+
 
             // ----------------------------------------
             // 2002-2002, difference, showing lags/leads
@@ -11152,10 +11153,10 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 32d, 0.0001);
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(3, 2).number, 1d / 0.7d * 20d, 0.0001);
-            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "y | [-1]");
             Assert.AreEqual(table.Get(4, 2).number, 0.3d / 0.7d * 4d, 0.0001);
-            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | [-1]");
-            Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);            
         }
 
         [TestMethod]
@@ -11465,19 +11466,19 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
             i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 1.5000d, 0.0001);
+            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 3.5000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 3.5000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 1.5000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 1.5000d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
@@ -11485,13 +11486,13 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-2]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);           
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
             
 
             // ----------------------------------------
@@ -11511,11 +11512,12 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
-            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
+            
             
 
             // ----------------------------------------
@@ -11535,11 +11537,12 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
             i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
+            i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);            
+                      
 
             // ----------------------------------------
             // 2002-2002, difference, showing lags/leads
@@ -11553,10 +11556,11 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 32d, 0.0001);
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "x | g | [0]");
             Assert.AreEqual(table.Get(3, 2).number, 1d / 0.7d * 20d, 0.0001);
-            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x | y | [+1]");
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "x | y | [-1]");
             Assert.AreEqual(table.Get(4, 2).number, 0.3d / 0.7d * 4d, 0.0001);
-            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "x | y | [-1]");
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);
+            
             
 
         }

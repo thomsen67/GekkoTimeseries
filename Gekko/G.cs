@@ -2214,7 +2214,7 @@ namespace Gekko
         /// <summary>
         /// Helper class for natural file listing sorting 
         /// (a8, a9, a10, a11 instead of a10, a11, a8, a9). Will ignore case, and
-        /// considers '_' a character. Does some internal tokenizing.
+        /// considers '_' a character. Does some internal tokenizing. Numbers can start with - or +.
         /// </summary>
         public class NaturalComparer : IComparer<string>, IComparer
         {
@@ -2293,7 +2293,7 @@ namespace Gekko
                             mStringValue = null;
                             return;
                         }
-                        else if (char.IsDigit(mCurChar))
+                        else if (char.IsDigit(mCurChar) || mCurChar == '-' || mCurChar == '+')
                         {
                             ParseNumericalValue();
                             return;
@@ -2328,8 +2328,7 @@ namespace Gekko
                 private void ParseNumericalValue()
                 {
                     int start = mIdx;
-                    char NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
-                    char NumberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator[0];
+                    char NumberDecimalSeparator = '.';
                     do
                     {
                         NextChar();
@@ -2339,16 +2338,15 @@ namespace Gekko
                             do
                             {
                                 NextChar();
-                                if (!char.IsDigit(mCurChar) && mCurChar != NumberGroupSeparator)
+                                if (!char.IsDigit(mCurChar))
                                     break;
-
                             }
                             while (true);
                             break;
                         }
                         else
                         {
-                            if (!char.IsDigit(mCurChar) && mCurChar != NumberGroupSeparator)
+                            if (!char.IsDigit(mCurChar))
                                 break;
                         }
                     }
