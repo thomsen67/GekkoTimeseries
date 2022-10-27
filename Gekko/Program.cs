@@ -8642,7 +8642,7 @@ namespace Gekko
             //doLogSetEnvVarInfo(string.Format("InstallPath value of key " + rCoreKey.ToString() + ": {0}",
             // installPath == null ? "null" : installPath), logger);
             return installPath;
-        }
+        }        
 
         /// <summary>
         /// R helper method.
@@ -25662,10 +25662,11 @@ namespace Gekko
             return code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
         }
 
-        public static string GetDecompResidualName(int counter)
+        public static string GetDecompResidualName(int counter, int all)
         {
-            if (counter == 0) return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + "¤[0]";
-            else return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + "_link" + counter + "¤[0]";
+            string s = "";
+            if (all > 1) s = counter.ToString();
+            return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + s + "¤[0]";
         }
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)

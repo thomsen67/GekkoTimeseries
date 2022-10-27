@@ -582,7 +582,7 @@ namespace Gekko
                 foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
                 {
                     ii++;
-                    string residualName = Program.GetDecompResidualName(ii);
+                    string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
 
                     int jj = -1;
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
@@ -2764,27 +2764,27 @@ namespace Gekko
             //rownames3.Sort(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < rownames3.Count; i++)
             {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, "________n");
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
             List<string> rownames2 = new List<string>();
             foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);            
             rownames3 = rownames2;
             for (int i = 0; i < rownames3.Count; i++)
             {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace("________n", Globals.decompNull);
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNullName, Globals.decompNull);
             }
 
             //colnames3.Sort(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < colnames3.Count; i++)
             {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, "________n");
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
             List<string> colnames2 = new List<string>();
             foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames3 = colnames2;
             for (int i = 0; i < colnames3.Count; i++)
             {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace("________n", Globals.decompNull);
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNullName, Globals.decompNull);
             }
 
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
@@ -3190,9 +3190,11 @@ namespace Gekko
                         {
                             //MAybe turn this off for x-type...
 
+                            //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
+                            Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+
                             if (op.operatorLower.StartsWith("x"))
-                            {
-                                Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+                            {                                
                                 Series tsFirst = tup.Item1;
                                 Series tsRef = tup.Item2;
                                 dLevel = tsFirst.GetDataSimple(t2);
@@ -3207,10 +3209,11 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;
+                                    //tsFirst = tup.Item1;
                                     tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
                                     if (tsFirst == null)
                                     {
-                                        new Error("Decomp #7093473984");
+                                        new Error("Decomp internal error: could not find variable '" + dictName + "'");
                                     }
                                     dLevel = tsFirst.GetDataSimple(t2);
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
@@ -3220,10 +3223,11 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;
+                                    //tsRef = tup.Item2;
                                     tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
                                     if (tsRef == null)
                                     {
-                                        new Error("Decomp #7093473985");
+                                        new Error("Decomp internal error: could not find variable '" + dictName + "'");
                                     }
                                     dLevelRef = tsRef.GetDataSimple(t2);
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));

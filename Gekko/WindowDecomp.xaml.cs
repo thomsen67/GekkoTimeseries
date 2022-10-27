@@ -2268,7 +2268,7 @@ namespace Gekko
         {
             DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();
             WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
-            windowParentDecomp.Activate();
+            windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.
             string txt = "  Merged...";
             //show message a bit, and then remove    
             windowParentDecomp.textSelect.Text = txt;

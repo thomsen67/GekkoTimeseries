@@ -443,8 +443,7 @@ namespace Gekko
         public static bool fastGauss = true;  //Beware: RES command should switch the option off
                 
         public static double[] scaleNewtonValues = new double[0];
-
-        public const string decompNull = "<null>";
+                
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidthFirst = 135;
@@ -634,7 +633,7 @@ namespace Gekko
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
 
-        public const bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
+        public static bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();
@@ -904,7 +903,10 @@ namespace Gekko
         public static Table lastPrtOrMulprtTable = null; 
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
-        public static string decompResidualName = "a_residual__";
+        public const string decompNull = "<null>";
+        public static string decompNullName = "________a";
+        public const string decompResidual = "Residual";
+        public static string decompResidualName = "zzzzzzzzy";        
 
         public static CommandMemory commandMemory = new CommandMemory();
 
