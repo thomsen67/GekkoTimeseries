@@ -38,7 +38,9 @@ namespace Gekko
     /// Contains global variables, settings etc.
     /// </summary>
     public class Globals
-    {   
+    {
+        public static bool decompVar = false;  //default: false
+
         public const string smpl = "§¤£";  //this line must be at top
         public const string libraryDriveCheatString = "library___name___";
         public static bool HANDLE_LIBRARY = false;
@@ -632,7 +634,7 @@ namespace Gekko
         public static bool btnStopThread = false;
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
-
+        
         public static bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
         public static List<Graph> windowsGraph = new List<Graph>();

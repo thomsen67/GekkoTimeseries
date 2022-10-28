@@ -2543,7 +2543,6 @@ namespace Gekko
         public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
-
             int decimals = 0;
             if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
             else decimals = decompOptions2.decimalsLevel;
@@ -2579,6 +2578,50 @@ namespace Gekko
                 ResetRowsColsSelection(decompOptions2);
             }
 
+            DecompPivotHandleFilters(decompOptions2);
+
+            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
+
+            if (false && Globals.decompUnitCsvPivot)
+            {
+                WriteDatatableTocsv(frame);
+            }
+
+            int xlag = 0; string temp = null;
+            ConvertFromTurtleName(decompDataMAINClone[parentI].lhs, true, out temp, out xlag);
+            string normalizerVariableWithIndex = null;
+            if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
+
+            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+            DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
+
+            List<string> tempRowNames = new List<string>();
+            List<string> tempColNames = new List<string>();
+            GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames);
+
+            List<string> rownames, colnames;
+            string rownamesFirst, colnamesFirst;
+            DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst);
+
+            Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
+
+            DecompTableReorderColsRowsPostProcessing(table, rownames, colnames, decompOptions2);
+
+            if (decompOptions2.modelType == EModelType.GAMSScalar && !op.isRaw)
+            {
+                DecompTableHandleSignAndShares(table, decompOptions2);
+            }
+
+            return table;
+        }
+
+        /// <summary>
+        /// Setup filters.
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        private static void DecompPivotHandleFilters(DecompOptions2 decompOptions2)
+        {
             if (decompOptions2.filters == null)
             {
                 decompOptions2.filters = new List<FrameFilter>();
@@ -2594,250 +2637,12 @@ namespace Gekko
                     }
                 }
             }
+        }
 
-            FrameLight frame = DecompPivotCreateDataframe(smpl, per1, per2, lhs, decompDataMAINClone, decompDatas, op, operatorOneOf3Types, decompOptions2);
-
-            if (false && Globals.decompUnitCsvPivot)
-            {
-                WriteDatatableTocsv(frame);
-            }
-
-            Table tab = new Table();
-            tab.writeOnce = true;
-
-            int xlag = 0; string temp = null;
-            ConvertFromTurtleName(decompDataMAINClone[parentI].lhs, true, out temp, out xlag);
-            string normalizerVariableWithIndex = null;
-            if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
-
-            DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-            DecomposeReplaceVars(decompOptions2.filters, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
-
-            List<string> rownames3 = new List<string>();
-            List<string> colnames3 = new List<string>();
-            GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
-
-            //get the free values start
-            bool getFreeValues = false;
-            if (decompOptions2.freeValues == null)
-            {
-                decompOptions2.freeValues = new List<GekkoDictionary<string, string>>();
-                getFreeValues = true;
-            }
-            int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
-            for (int i = 0; i < frame.colnames.Count; i++)
-            {
-                decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-            }
-            //get the free values end
-
-            List<string> varnames = decompOptions2.link[parentI].varnames;
-
-            bool decompHasLag = false;
-            if (decompOptions2.rows.Contains(Globals.col_lag) || decompOptions2.cols.Contains(Globals.col_lag))
-            {
-                decompHasLag = true;
-            }
-
-            // ==============================================================================
-            //Aggregation
-            //Aggregation
-            //Aggregation into table suitable for showing
-            //Aggregation
-            //Aggregation
-            // ==============================================================================
-
-
-            foreach (FrameLightRow row in frame.rows)
-            {
-                ENormalizerType normalizerType = ENormalizerType.None;
-
-                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, Globals.col_fullVariableName).text))
-                {
-                    if (row.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
-                    else normalizerType = ENormalizerType.NormalizerWithLagOrLead;
-                }
-
-                if (getFreeValues)
-                {
-                    for (int i = 0; i < frame.colnames.Count; i++)
-                    {
-                        if (i == valueI) continue;
-                        string s = row.storage[i].text;
-                        if (s == null) s = Globals.decompNull;  //hmmm used at all??
-                        if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
-                    }
-                }
-
-                bool skip = false;
-                foreach (FrameFilter filter in decompOptions2.filters)
-                {
-                    CellLight c = row.Get(frame, filter.name);
-                    if (c.type != ECellLightType.String && c.type != ECellLightType.None) throw new GekkoException();
-                    string ss = c.text;
-                    if (c.type == ECellLightType.None || !filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
-                    {
-                        //not part of the filter, is ignored
-                        //if the row has a null value regarding the filter, the row is also ignored (for instance, if #a must be 18 and the row has #a = null, the row is ignored)
-                        skip = true;
-                        break;
-                    }
-                }
-                if (skip) continue;
-
-                string more = null;
-                if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {                    
-                    if (normalizerType == ENormalizerType.NormalizerWithLagOrLead) more = Globals.pivotHelper1;  //so that it is set apart
-                    else if (normalizerType == ENormalizerType.Normalizer) more = Globals.pivotHelper2;
-                }
-
-                string s1 = null;
-                foreach (string s in decompOptions2.rows)
-                {
-                    s1 = DecompAddText(frame, row, s1, s);
-                    if (s == Globals.col_variable) s1 += more;
-                }
-                if (s1 != null)
-                {
-                    s1 = s1.Substring(Globals.pivotTableDelimiter.Length);
-                }
-
-                string s2 = null;
-                foreach (string s in decompOptions2.cols)
-                {
-                    s2 = DecompAddText(frame, row, s2, s);
-                    if (s == Globals.col_variable) s2 += more;
-                }
-                if (s2 != null)
-                {
-                    s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
-                }
-                string key = s1 + "¤" + s2;  //row ¤ col                
-
-                if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
-                if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
-
-                double d = row.Get(frame, Globals.col_value).data;
-                double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
-                double dLevel = row.Get(frame, Globals.col_valueLevel).data;
-                double dLevelLag = row.Get(frame, Globals.col_valueLevelLag).data;
-                double dLevelLag2 = row.Get(frame, Globals.col_valueLevelLag2).data;
-                double dLevelRef = row.Get(frame, Globals.col_valueLevelRef).data;
-                double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
-                double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
-                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
-
-                decompOptions2.all.Clear();
-                foreach (string s in frame.colnames)
-                {
-                    decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
-                }
-
-                AggContainer td = null;
-                agg.TryGetValue(key, out td);
-                if (td == null)
-                {
-                    agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }));
-                }
-                else
-                {
-                    td.change += d;
-                    td.changeAlternative += dAlternative;
-                    td.level += dLevel;
-                    td.levelLag += dLevelLag;
-                    td.levelLag2 += dLevelLag2;
-                    td.levelRef += dLevelRef;
-                    td.levelRefLag += dLevelRefLag;
-                    td.levelRefLag2 += dLevelRefLag2;
-                    td.n += 1;
-                    //BEWARE
-                    //BEWARE
-                    //BEWARE Is this too time-consuming?
-                    //BEWARE
-                    //BEWARE
-                    td.fullVariableNames.Add(fullVariableName);
-                }
-            }
-
-            //rownames3.Sort(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < rownames3.Count; i++)
-            {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, Globals.decompNullName);
-            }
-            List<string> rownames2 = new List<string>();
-            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);            
-            rownames3 = rownames2;
-            for (int i = 0; i < rownames3.Count; i++)
-            {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNullName, Globals.decompNull);
-            }
-
-            //colnames3.Sort(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < colnames3.Count; i++)
-            {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, Globals.decompNullName);
-            }
-            List<string> colnames2 = new List<string>();
-            foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
-            colnames3 = colnames2;
-            for (int i = 0; i < colnames3.Count; i++)
-            {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNullName, Globals.decompNull);
-            }
-
-            bool orderNormalize = OrderNormalize(decompOptions2, varnames);
-
-            List<string> rownames = new List<string>();
-            List<string> colnames = new List<string>();
-
-            string rownamesFirst = null;
-            for (int i = 0; i < rownames3.Count; i++)
-            {
-                bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]);
-                bool b2 = rownamesFirst == null && orderNormalize && (rownames3[i] != null && rownames3[i].Contains(Globals.pivotHelper2));
-                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
-                {
-                    rownamesFirst = rownames3[i];
-                }
-                else
-                {
-                    rownames.Add(rownames3[i]);
-                }
-            }
-
-            string colnamesFirst = null;
-            for (int i = 0; i < colnames3.Count; i++)
-            {
-                bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]);
-                bool b2 = colnamesFirst == null && orderNormalize && (colnames3[i] != null && colnames3[i].Contains(Globals.pivotHelper2));
-                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
-                {
-                    colnamesFirst = colnames3[i];
-                }
-                else
-                {
-                    colnames.Add(colnames3[i]);
-                }
-            }
-
-            if (rownamesFirst != null) rownames.Insert(0, rownamesFirst);
-            if (colnamesFirst != null) colnames.Insert(0, colnamesFirst);
-            rownames3 = null;
-            colnames3 = null;
-
-            if (orderNormalize && rownamesFirst == null && colnamesFirst == null)
-            {
-                if (rownamesFirst == null && colnamesFirst == null)
-                {
-                    new Error("Could not find row/col to put first for normalization");
-                }
-                if (rownamesFirst != null && colnamesFirst != null)
-                {
-                    new Error("Both row and col are set first for normalization");
-                }
-            }
+        private static Table DecompGetTableFromAggObject(GekkoDictionary<string, AggContainer> agg, DecompOperator op, DecompOptions2 decompOptions2, string format2, List<string> rownames, List<string> colnames, string rownamesFirst, string colnamesFirst)
+        {
+            Table table = new Table();
+            table.writeOnce = true;
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -2977,11 +2782,11 @@ namespace Gekko
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
                         }
-                    }                    
+                    }
 
                     if (decompOptions2.count == ECountType.N)
                     {
-                        tab.SetNumber(i + 2, j + 2, n, "f16.0");
+                        table.SetNumber(i + 2, j + 2, n, "f16.0");
                     }
                     else if (decompOptions2.count == ECountType.Names)
                     {
@@ -2996,18 +2801,29 @@ namespace Gekko
                         {
                             tmp2 = Text1(0);
                         }
-                        tab.Set(i + 2, j + 2, tmp2);
+                        table.Set(i + 2, j + 2, tmp2);
                     }
                     else
                     {
-                        tab.SetNumber(i + 2, j + 2, d, format2);
+                        table.SetNumber(i + 2, j + 2, d, format2);
                     }
 
-                    Cell c = tab.Get(i + 2, j + 2);
+                    Cell c = table.Get(i + 2, j + 2);
                     c.vars_hack = fullVariableNames;
                 }
             }
+            return table;
+        }
 
+        /// <summary>
+        /// In order for some name bits like &lt;null> to show up first, some tricks were applied when sorting in a previous method. These tricks are resolved here.
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="rownames"></param>
+        /// <param name="colnames"></param>
+        /// <param name="decompOptions2"></param>
+        private static void DecompTableReorderColsRowsPostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2)
+        {
             for (int i = 0; i < rownames.Count; i++)
             {
                 string s = rownames[i];
@@ -3027,18 +2843,244 @@ namespace Gekko
                 }
                 tab.Set(1, j + 2, s);
             }
+        }
 
-            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.decompOperator.isShares)
+        /// <summary>
+        /// Reorder rows and cols names according to alphabetical and numerical sorting (intelligent though, chopping up into tokens). Will also put the chosen variable first.
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        /// <param name="parentI"></param>
+        /// <param name="rownames3"></param>
+        /// <param name="colnames3"></param>
+        /// <param name="rownames"></param>
+        /// <param name="colnames"></param>
+        /// <param name="rownamesFirst"></param>
+        /// <param name="colnamesFirst"></param>
+        private static void DecompPivotOrderRowsAndColumns(DecompOptions2 decompOptions2, int parentI, List<string> rownames3, List<string> colnames3, out List<string> rownames, out List<string> colnames, out string rownamesFirst, out string colnamesFirst)
+        {
+            for (int i = 0; i < rownames3.Count; i++)
             {
-                tab.Set(1, 1, "%" + "  ");
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, Globals.decompNullName);
+            }
+            List<string> rownames2 = new List<string>();
+            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
+            rownames3 = rownames2;
+            for (int i = 0; i < rownames3.Count; i++)
+            {
+                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNullName, Globals.decompNull);
             }
 
-            if (decompOptions2.modelType == EModelType.GAMSScalar && !op.isRaw)
+            for (int i = 0; i < colnames3.Count; i++)
             {
-                HandleSignAndShares(tab, decompOptions2);
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, Globals.decompNullName);
+            }
+            List<string> colnames2 = new List<string>();
+            foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
+            colnames3 = colnames2;
+            for (int i = 0; i < colnames3.Count; i++)
+            {
+                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNullName, Globals.decompNull);
             }
 
-            return tab;
+            List<string> varnames = decompOptions2.link[parentI].varnames;
+            bool orderNormalize = OrderNormalize(decompOptions2, varnames);
+
+            rownames = new List<string>();
+            colnames = new List<string>();
+            rownamesFirst = null;
+            for (int i = 0; i < rownames3.Count; i++)
+            {
+                bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]);
+                bool b2 = rownamesFirst == null && orderNormalize && (rownames3[i] != null && rownames3[i].Contains(Globals.pivotHelper2));
+                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
+                {
+                    rownamesFirst = rownames3[i];
+                }
+                else
+                {
+                    rownames.Add(rownames3[i]);
+                }
+            }
+
+            colnamesFirst = null;
+            for (int i = 0; i < colnames3.Count; i++)
+            {
+                bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]);
+                bool b2 = colnamesFirst == null && orderNormalize && (colnames3[i] != null && colnames3[i].Contains(Globals.pivotHelper2));
+                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
+                {
+                    colnamesFirst = colnames3[i];
+                }
+                else
+                {
+                    colnames.Add(colnames3[i]);
+                }
+            }
+
+            if (rownamesFirst != null) rownames.Insert(0, rownamesFirst);
+            if (colnamesFirst != null) colnames.Insert(0, colnamesFirst);
+
+            if (orderNormalize && rownamesFirst == null && colnamesFirst == null)
+            {
+                if (rownamesFirst == null && colnamesFirst == null)
+                {
+                    new Error("Could not find row/col to put first for normalization");
+                }
+                if (rownamesFirst != null && colnamesFirst != null)
+                {
+                    new Error("Both row and col are set first for normalization");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Aggregate the dataframe (with data rows and field cols) into a rows/cols pivot table for showing.
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="normalizerVariableWithIndex"></param>
+        /// <param name="tempRowNames"></param>
+        /// <param name="tempColNames"></param>
+        /// <returns></returns>
+        private static GekkoDictionary<string, AggContainer> DecompPivotAggregate(FrameLight frame, DecompOptions2 decompOptions2, string normalizerVariableWithIndex, List<string> tempRowNames, List<string> tempColNames)
+        {
+            // ==============================================================================
+            //Aggregation
+            //Aggregation
+            //Aggregation into table suitable for showing
+            //Aggregation
+            //Aggregation
+            // ==============================================================================
+            
+            GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
+            int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
+
+            //get the free values start
+            bool getFreeValues = false;
+            if (decompOptions2.freeValues == null)
+            {
+                decompOptions2.freeValues = new List<GekkoDictionary<string, string>>();
+                getFreeValues = true;
+            }
+
+            for (int i = 0; i < frame.colnames.Count; i++)
+            {
+                decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+            }
+            //get the free values end   
+
+            foreach (FrameLightRow row in frame.rows)
+            {
+                ENormalizerType normalizerType = ENormalizerType.None;
+
+                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, Globals.col_fullVariableName).text))
+                {
+                    if (row.Get(frame, Globals.col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
+                    else normalizerType = ENormalizerType.NormalizerWithLagOrLead;
+                }
+
+                if (getFreeValues)
+                {
+                    for (int i = 0; i < frame.colnames.Count; i++)
+                    {
+                        if (i == valueI) continue;
+                        string s = row.storage[i].text;
+                        if (s == null) s = Globals.decompNull;  //hmmm used at all??
+                        if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
+                    }
+                }
+
+                bool skip = false;
+                foreach (FrameFilter filter in decompOptions2.filters)
+                {
+                    CellLight c = row.Get(frame, filter.name);
+                    if (c.type != ECellLightType.String && c.type != ECellLightType.None) throw new GekkoException();
+                    string ss = c.text;
+                    if (c.type == ECellLightType.None || !filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
+                    {
+                        //not part of the filter, is ignored
+                        //if the row has a null value regarding the filter, the row is also ignored (for instance, if #a must be 18 and the row has #a = null, the row is ignored)
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) continue;
+
+                string more = null;
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    if (normalizerType == ENormalizerType.NormalizerWithLagOrLead) more = Globals.pivotHelper1;  //so that it is set apart
+                    else if (normalizerType == ENormalizerType.Normalizer) more = Globals.pivotHelper2;
+                }
+
+                string s1 = null;
+                foreach (string s in decompOptions2.rows)
+                {
+                    s1 = DecompAddText(frame, row, s1, s);
+                    if (s == Globals.col_variable) s1 += more;
+                }
+                if (s1 != null)
+                {
+                    s1 = s1.Substring(Globals.pivotTableDelimiter.Length);
+                }
+
+                string s2 = null;
+                foreach (string s in decompOptions2.cols)
+                {
+                    s2 = DecompAddText(frame, row, s2, s);
+                    if (s == Globals.col_variable) s2 += more;
+                }
+                if (s2 != null)
+                {
+                    s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
+                }
+                string key = s1 + "¤" + s2;  //row ¤ col                
+
+                if (!tempRowNames.Contains(s1, StringComparer.OrdinalIgnoreCase)) tempRowNames.Add(s1);
+                if (!tempColNames.Contains(s2, StringComparer.OrdinalIgnoreCase)) tempColNames.Add(s2);
+
+                double d = row.Get(frame, Globals.col_value).data;
+                double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
+                double dLevel = row.Get(frame, Globals.col_valueLevel).data;
+                double dLevelLag = row.Get(frame, Globals.col_valueLevelLag).data;
+                double dLevelLag2 = row.Get(frame, Globals.col_valueLevelLag2).data;
+                double dLevelRef = row.Get(frame, Globals.col_valueLevelRef).data;
+                double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
+                double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
+                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
+
+                decompOptions2.all.Clear();
+                foreach (string s in frame.colnames)
+                {
+                    decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
+                }
+
+                AggContainer td = null;
+                agg.TryGetValue(key, out td);
+                if (td == null)
+                {
+                    agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }));
+                }
+                else
+                {
+                    td.change += d;
+                    td.changeAlternative += dAlternative;
+                    td.level += dLevel;
+                    td.levelLag += dLevelLag;
+                    td.levelLag2 += dLevelLag2;
+                    td.levelRef += dLevelRef;
+                    td.levelRefLag += dLevelRefLag;
+                    td.levelRefLag2 += dLevelRefLag2;
+                    td.n += 1;
+                    //BEWARE
+                    //BEWARE
+                    //BEWARE Is this too time-consuming?
+                    //BEWARE
+                    //BEWARE
+                    td.fullVariableNames.Add(fullVariableName);
+                }
+            }
+            return agg;
         }
 
         public static string Text1(int i)
@@ -3209,8 +3251,14 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;
-                                    //tsFirst = tup.Item1;
-                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (Globals.decompVar)
+                                    {
+                                        tsFirst = tup.Item1;
+                                    }
+                                    else
+                                    {
+                                        tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    }
                                     if (tsFirst == null)
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
@@ -3223,8 +3271,14 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;
-                                    //tsRef = tup.Item2;
-                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (Globals.decompVar)
+                                    {
+                                        tsRef = tup.Item2;
+                                    }
+                                    else
+                                    {
+                                        tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    }
                                     if (tsRef == null)
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
@@ -3343,8 +3397,13 @@ namespace Gekko
         /// </summary>
         /// <param name="tab"></param>
         /// <param name="decompOptions2"></param>
-        private static void HandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
-        {            
+        private static void DecompTableHandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
+        {
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.decompOperator.isShares)
+            {
+                tab.Set(1, 1, "%" + "  ");
+            }
+
             string formatSShares = "f16." + decompOptions2.decimalsPch;
             if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
             bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);

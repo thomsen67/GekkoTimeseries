@@ -11380,7 +11380,7 @@ namespace UnitTests
             // Here, we use sets
             // -------------------------
             // x[y] = x[c] + x[g]
-            // x[c] = 0.3 * x[y][-1] + 0.3 * x[y] + 0.3 * x[y][+1]2
+            // x[c] = 0.3 * x[y][-1] + 0.3 * x[y] + 0.3 * x[y][+1]
             int i = 0;
             
             I("reset;");
@@ -12542,7 +12542,15 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompOperatorsLagResidual()
         {
-            //Good sanity test, see also agesimple3.xlxs
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO Test this with merge too. Also where the lag is not present in the first eq but stated in the second.
+            //TODO TODO TODO
+            //TODO TODO TODO
+
+            //Good sanity test
+            //Seems to give same as Gekko 2.5.x DECOMP, cf. agesimple3.gcm and agesimple3.frm.
+            //Some difference regarding how residuals are defined though, but that is ok.
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
@@ -12708,7 +12716,7 @@ namespace UnitTests
 
 
             // -----------------------------------------------------------------------
-            // <r>
+            // <xrn>
             // -----------------------------------------------------------------------            
             I("decomp3 <xrn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
