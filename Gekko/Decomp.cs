@@ -567,154 +567,152 @@ namespace Gekko
                 PrepareEquations(per1, per2, op, decompOptions2, true, modelGamsScalar);
             }
 
-            if (true)  //signals a recalc of data, not a reuse (like pch or share showing)
+            if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+            decompDatas.MAIN_data = null;
+
+            //MAYBE DO THIS BY LOOKING INSIDE DECOMPDATAS...
+            //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)                
+
+            if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
+
+            List<string> expressionTexts = new List<string>();
+            int ii = -1;
+            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
             {
-                if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
-                decompDatas.MAIN_data = null;
+                ii++;
+                string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
 
-                //MAYBE DO THIS BY LOOKING INSIDE DECOMPDATAS...
-                //when putting in raw data (cellsQuo, cellsRef), maybe put them in for the full period (fast anyway)                
-
-                if (decompDatas.storage == null || decompDatas.storage.Count == 0) InitDecompDatas(decompOptions2, decompDatas);
-
-                List<string> expressionTexts = new List<string>();
-                int ii = -1;
-                foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+                int jj = -1;
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    ii++;
-                    string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
-
-                    int jj = -1;
-                    if (decompOptions2.modelType == EModelType.GAMSScalar)
+                    foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
-                        foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                        jj++;  //will be = 0
+                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter, modelGamsScalar);
+                        DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
+                    }
+                }
+                else
+                {
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
+                    {
+                        jj++;
+                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                        DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
+                    }
+                }
+            }
+
+            if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
+            else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
+            else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
+
+            if (decompOptions2.link[parentI].varnames == null)
+            {
+                //does this ever happen?
+                decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
+            }
+
+            if (false)
+            {
+                DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+            }
+
+            bool[] used = new bool[decompDatas.storage.Count];
+            used[0] = true;  //primary equation
+
+            GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            //linking
+            //linking
+            //linking
+
+            //------------------------
+            //Example: e1: y = c + i + g  --> y - (c + i + g)
+            //         e2: c = 0.8 * y    --> c - 0.8 * y
+            //------------------------
+
+            if (decompOptions2.type == "ASTDECOMP3")
+            {
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    if (decompOptions2.dyn)
+                    {
+                        //decomp over time, resolving lags/leads                            
+
+                        if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                         {
-                            jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter, modelGamsScalar);
-                            DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op, modelGamsScalar);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op, modelGamsScalar);  //Note: refreshObjects = false!
+                        }
+                        else
+                        {
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op, modelGamsScalar);
                         }
                     }
                     else
                     {
-                        foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
+                        //decomp period by period, showing lags/leads.
+
+                        if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                         {
-                            jj++;
-                            DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
-                            DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
-                        }
-                    }
-                }
-
-                if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
-                else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
-                else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
-
-                if (decompOptions2.link[parentI].varnames == null)
-                {
-                    //does this ever happen?
-                    decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
-                }
-
-                if (false)
-                {
-                    DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
-                }
-
-                bool[] used = new bool[decompDatas.storage.Count];
-                used[0] = true;  //primary equation
-
-                GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-                //linking
-                //linking
-                //linking
-
-                //------------------------
-                //Example: e1: y = c + i + g  --> y - (c + i + g)
-                //         e2: c = 0.8 * y    --> c - 0.8 * y
-                //------------------------
-
-                if (decompOptions2.type == "ASTDECOMP3")
-                {
-                    if (decompOptions2.modelType == EModelType.GAMSScalar)
-                    {
-                        if (decompOptions2.dyn)
-                        {
-                            //decomp over time, resolving lags/leads                            
-
-                            if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
+                            bool refreshObjects = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op, modelGamsScalar);
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op, modelGamsScalar);  //Note: refreshObjects = false!
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op, modelGamsScalar);
+                                refreshObjects = false;
                             }
-                            else
+                            foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op, modelGamsScalar);
                             }
                         }
                         else
                         {
-                            //decomp period by period, showing lags/leads.
-
-                            if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
+                            int deduct = 0;
+                            //why deduct not enough??
+                            if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                            bool refreshObjects = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                             {
-                                bool refreshObjects = true;
-                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                                {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op, modelGamsScalar);
-                                    refreshObjects = false;
-                                }
-                                foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
-                                {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op, modelGamsScalar);
-                                }
-                            }
-                            else
-                            {
-                                int deduct = 0;
-                                //why deduct not enough??
-                                if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
-                                bool refreshObjects = true;
-                                foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
-                                {
-                                    DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op, modelGamsScalar);
-                                    refreshObjects = false;
-                                }
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op, modelGamsScalar);
+                                refreshObjects = false;
                             }
                         }
-                    }
-                    else
-                    {
-                        DecompMainHelperInvert(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
                     }
                 }
-
-                //At this point, all linked equations i = 1, 2, ... have been merged into
-                //the MAIN equation i = 0.    
-
-                if (false)
+                else
                 {
-                    int i = -1;
-                    foreach (List<DecompData> x in decompDatas.storage)
-                    {
-                        i++;
-                        int j = -1;
-                        foreach (DecompData y in x)
-                        {
-                            j++;
-                            new Writeln("COMBINATION =====> " + i + " " + j);
-                            PrintDecompData(y);
-                        }
-                    }
-                    if (true && decompDatas.MAIN_data != null && decompDatas.MAIN_data[0] != null)
-                    {
-                        new Writeln("...");
-                        new Writeln("...");
-                        new Writeln("MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN ");
-                        PrintDecompData(decompDatas.MAIN_data[0]);
-                    }
+                    DecompMainHelperInvert(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
                 }
             }
+
+            //At this point, all linked equations i = 1, 2, ... have been merged into
+            //the MAIN equation i = 0.    
+
+            if (false)
+            {
+                int i = -1;
+                foreach (List<DecompData> x in decompDatas.storage)
+                {
+                    i++;
+                    int j = -1;
+                    foreach (DecompData y in x)
+                    {
+                        j++;
+                        new Writeln("COMBINATION =====> " + i + " " + j);
+                        PrintDecompData(y);
+                    }
+                }
+                if (true && decompDatas.MAIN_data != null && decompDatas.MAIN_data[0] != null)
+                {
+                    new Writeln("...");
+                    new Writeln("...");
+                    new Writeln("MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN ");
+                    PrintDecompData(decompDatas.MAIN_data[0]);
+                }
+            }
+
 
             //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
             //for each uncontrolled set like #a. The main variables (MAIN_varnames) are normalized to 1.
