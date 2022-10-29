@@ -3265,13 +3265,11 @@ namespace Gekko
 
                             //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
                                                         
-                            int ZERO = 0;
-                            Tuple<Series, Series> tup = new Tuple<Series, Series>(decompDatas.MAIN_data.cellsQuo[dictName], decompDatas.MAIN_data.cellsRef[dictName]);
-                            
                             if (op.operatorLower.StartsWith("x"))
-                            {                                
-                                Series tsFirst = tup.Item1;
-                                Series tsRef = tup.Item2;
+                            {                               
+                                
+                                Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                Series tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
                                 dLevel = tsFirst.GetDataSimple(t2);
                                 dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
                                 dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
@@ -3283,15 +3281,8 @@ namespace Gekko
                             {
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
-                                    Series tsFirst = null;
-                                    if (Globals.decompVar)
-                                    {
-                                        tsFirst = tup.Item1;
-                                    }
-                                    else
-                                    {
-                                        tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
-                                    }
+                                    Series tsFirst = null;                                    
+                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
                                     if (tsFirst == null)
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
@@ -3303,15 +3294,8 @@ namespace Gekko
 
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
-                                    Series tsRef = null;
-                                    if (Globals.decompVar)
-                                    {
-                                        tsRef = tup.Item2;
-                                    }
-                                    else
-                                    {
-                                        tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
-                                    }
+                                    Series tsRef = null;                                    
+                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;                                    
                                     if (tsRef == null)
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
@@ -3698,7 +3682,7 @@ namespace Gekko
             if (!decompOptions2.decompOperator.isRaw)
             {
                 Series lhs2 = GetDecompDatas(decompDatasSupremeClone, operatorOneOf3Types)[d.lhs];
-                //bool isResidualName = name == Globals.decompResidualName;
+                
                 Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, d.lhs);
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))

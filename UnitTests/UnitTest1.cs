@@ -12575,7 +12575,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <n>
             // -----------------------------------------------------------------------
-            //ShowDecompTable();  //will show the following decomp table and then abort
+            ShowDecompTable();  //will show the following decomp table and then abort
             I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             Gekko.Table table = Globals.lastDecompTable;
             int i = 1;
