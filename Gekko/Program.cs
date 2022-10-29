@@ -600,6 +600,13 @@ namespace Gekko
     public class DecompDict
     {
         public GekkoDictionary<string, Series> storage = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+
+
+        /// <summary>
+        /// Queries DecompDict. If series not there, it is created.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public Series this[string s]
         {
             get
@@ -612,6 +619,16 @@ namespace Gekko
                 }
                 return ts;
             }
+        }
+
+        /// <summary>
+        /// Adds a series to the DecompDict.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="ts"></param>
+        public void Add(string s, Series ts)
+        {
+            this.storage.Add(s, ts);
         }
 
         public bool Remove(string s)

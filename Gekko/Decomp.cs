@@ -1359,6 +1359,14 @@ namespace Gekko
                 }
             }
 
+            //GekkoDictionary<string, string> names = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            //for (int row = 0; row < endo.Count; row++)
+            //{
+            //    for (int col = 0; col < exo.Count; col++)
+            //    {
+            //    }
+            //}
+
             for (int row = 0; row < endo.Count; row++)
             {
                 //
@@ -1389,15 +1397,8 @@ namespace Gekko
                     DecompDict dd = null;
                     if (op.isRaw)
                     {
-                        Tuple<Series, Series> tup1 = GetRealTimeseries(decompDatas, xnewName);
-                        if (tup1.Item1 != null) decompDatas.MAIN_data[ZERO].cellsQuo[xnewName].SetData(time, tup1.Item1.GetDataSimple(time));
-                        if (tup1.Item2 != null) decompDatas.MAIN_data[ZERO].cellsRef[xnewName].SetData(time, tup1.Item2.GetDataSimple(time));
-                        if (col == 0)
-                        {
-                            Tuple<Series, Series> tup2 = GetRealTimeseries(decompDatas, enewName);
-                            if (tup2.Item1 != null) decompDatas.MAIN_data[ZERO].cellsQuo[enewName].SetData(time, tup2.Item1.GetDataSimple(time));
-                            if (tup2.Item2 != null) decompDatas.MAIN_data[ZERO].cellsRef[enewName].SetData(time, tup2.Item2.GetDataSimple(time));
-                        }
+                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO);
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO);
                     }
                     else
                     {
@@ -1414,6 +1415,42 @@ namespace Gekko
             }
 
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+        }
+
+        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string xnewName, int ZERO)
+        {            
+            int lag2; string name2;
+            ConvertFromTurtleName(xnewName, true, out name2, out lag2);
+
+            if (!decompDatas.MAIN_data[ZERO].cellsQuo.ContainsKey(xnewName))
+            {
+                Series ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNull) as Series;
+                if (ts != null)
+                {
+                    ts = (ts.DeepClone(null) as Series);
+                    ts.Lag(lag2);
+                    if (ts.data.GetDataArray_ONLY_INTERNAL_USE() == null)
+                    {
+
+                    }
+                    decompDatas.MAIN_data[ZERO].cellsQuo.Add(xnewName, ts);
+                }
+            }
+
+            if (!decompDatas.MAIN_data[ZERO].cellsRef.ContainsKey(xnewName))
+            {
+                Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                if (ts != null)
+                {
+                    ts = (ts.DeepClone(null) as Series);
+                    ts.Lag(lag2);
+                    if (ts.data.GetDataArray_ONLY_INTERNAL_USE() == null)
+                    {
+
+                    }
+                    decompDatas.MAIN_data[ZERO].cellsRef.Add(xnewName, ts);
+                }
+            }
         }
 
         /// <summary>
@@ -1573,6 +1610,7 @@ namespace Gekko
 
         /// <summary>
         /// Splits something like x[a, b]¤[-1] up into -1 and x[a, b]. If no ¤, the lag is 0.
+        /// Splits at the '¤' no matter what is before. If strict==true and > one '¤', it will fail.
         /// </summary>
         /// <param name="varname"></param>
         /// <param name="lag"></param>
@@ -3231,8 +3269,12 @@ namespace Gekko
                             //MAybe turn this off for x-type...
 
                             //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
-                            Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
 
+                            //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+                                                        
+                            int ZERO = 0;
+                            Tuple<Series, Series> tup = new Tuple<Series, Series>(decompDatas.MAIN_data[ZERO].cellsQuo[dictName], decompDatas.MAIN_data[ZERO].cellsRef[dictName]);
+                            
                             if (op.operatorLower.StartsWith("x"))
                             {                                
                                 Series tsFirst = tup.Item1;

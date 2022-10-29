@@ -1988,6 +1988,18 @@ namespace Gekko
             return rv_series;
         }
 
+        /// <summary>
+        /// Lags a timeseries object a number of periods (offset &lt; 0 for lag, offset > 0 for lead).
+        /// Beware that the timeseries itself is changed, so do a .DeepClone() first if you do not
+        /// wish the lag/lead in the original timeseries (for instance if the timeseries resides in
+        /// a Databank).
+        /// </summary>
+        /// <param name="offset"></param>
+        public void Lag(int offset)
+        {
+            this.data.anchorPeriod = this.data.anchorPeriod.Add(-offset);
+        }
+
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
             if (G.IsGekkoNull(input)) return input;
