@@ -2330,6 +2330,10 @@ namespace Gekko
                 }
 
                 double y0 = double.NaN;
+                double y0a = double.NaN;
+                double y0b = double.NaN;
+                double y0c = double.NaN;
+
                 double y1 = double.NaN;
 
                 //foreach precedent variable
@@ -2376,8 +2380,8 @@ namespace Gekko
                             //work difference like <d> ... or the special <mp>
                             if (i == 0)
                             {
-                                y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                                d.cellsQuo[residualName].SetData(t, y0);
+                                y0a = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
+                                d.cellsQuo[residualName].SetData(t, y0a);
                                 y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t.Add(1), y1);
                             }
@@ -2389,7 +2393,7 @@ namespace Gekko
                                 double x0_after = x0_before + eps;
                                 modelGamsScalar.SetData(dp.date, dp.variable, false, x0_after);
                                 double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
-                                double grad = (y0_after - y0) / eps;
+                                double grad = (y0_after - y0a) / eps;
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
@@ -2417,8 +2421,8 @@ namespace Gekko
                             //ref difference like <rd> ... or the special <mp>
                             if (i == 0)
                             {
-                                y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                d.cellsRef[residualName].SetData(t, y0);
+                                y0b = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0b);
                                 y1 = modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, true, ref funcCounter);
                                 d.cellsRef[residualName].SetData(t.Add(1), y1);
                             }
@@ -2430,7 +2434,7 @@ namespace Gekko
                                 double x0_after = x0_before + eps;
                                 modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
                                 double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                double grad = (y0_after - y0) / eps;
+                                double grad = (y0_after - y0b) / eps;
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
@@ -2458,8 +2462,8 @@ namespace Gekko
                             //normal multiplier like <m>
                             if (i == 0)
                             {
-                                y0 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                d.cellsRef[residualName].SetData(t, y0);
+                                y0c = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
+                                d.cellsRef[residualName].SetData(t, y0c);
                                 y1 = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t, y1);
                             }
@@ -2471,7 +2475,7 @@ namespace Gekko
                                 double x0_after = x0_before + eps;
                                 modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
                                 double y0_after = modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true, ref funcCounter);
-                                double grad = (y0_after - y0) / eps;
+                                double grad = (y0_after - y0c) / eps;
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
