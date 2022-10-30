@@ -1426,38 +1426,41 @@ namespace Gekko
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
-        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string xnewName, int ZERO)
+        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq)
         {            
             int lag2; string name2;
-            ConvertFromTurtleName(xnewName, true, out name2, out lag2);
+            ConvertFromTurtleName(name, true, out name2, out lag2);
 
-            if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(xnewName))
+            Tuple<Series, Series> tup = null;
+            if (Program.IsDecompResidualName(name))
             {
-                Series ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNull) as Series;
-                if (ts != null)
-                {
-                    ts = (ts.DeepClone(null) as Series);
-                    ts.Lag(lag2);
-                    if (ts.data.GetDataArray_ONLY_INTERNAL_USE() == null)
-                    {
-
-                    }
-                    decompDatas.MAIN_data.cellsQuo.Add(xnewName, ts);
-                }
+                tup = GetRealTimeseries(decompDatas, name);
+                if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name)) decompDatas.MAIN_data.cellsQuo.Add(name, tup.Item1);
+                if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name)) decompDatas.MAIN_data.cellsRef.Add(name, tup.Item2);
             }
-
-            if (!decompDatas.MAIN_data.cellsRef.ContainsKey(xnewName))
+            else
             {
-                Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNull) as Series;
-                if (ts != null)
+                if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name))
                 {
-                    ts = (ts.DeepClone(null) as Series);
-                    ts.Lag(lag2);
-                    if (ts.data.GetDataArray_ONLY_INTERNAL_USE() == null)
+                    Series ts = null;
+                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNull) as Series;
+                    if (ts != null)
                     {
-
+                        ts = (ts.DeepClone(null) as Series);
+                        ts.Lag(lag2);
+                        decompDatas.MAIN_data.cellsQuo.Add(name, ts);
                     }
-                    decompDatas.MAIN_data.cellsRef.Add(xnewName, ts);
+                }
+
+                if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
+                {
+                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                    if (ts != null)
+                    {
+                        ts = (ts.DeepClone(null) as Series);
+                        ts.Lag(lag2);
+                        decompDatas.MAIN_data.cellsRef.Add(name, ts);
+                    }
                 }
             }
         }
@@ -1545,7 +1548,7 @@ namespace Gekko
                 string s = kvp.Key;
                 string[] ss = s.Split('¤');
                 string s2 = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
-                if (s2.StartsWith(Globals.decompResidualName))
+                if (Program.IsDecompResidualName(s2))
                 {
                     //TODO TODO TODO
                     //TODO TODO TODO
@@ -3266,9 +3269,21 @@ namespace Gekko
                         double dLevelRefLag = double.NaN;
                         double dLevelRefLag2 = double.NaN;
 
-                        if (dictName.Contains(Globals.decompResidualName))
+                        if (Program.IsDecompResidualName(dictName))
                         {
-                            dLevel = double.NaN;
+                            Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
+                            if (tup.Item1 != null)
+                            {
+                                dLevel = tup.Item1.GetDataSimple(t2);
+                                dLevelLag = tup.Item1.GetDataSimple(t2.Add(-1));
+                                dLevelLag2 = tup.Item1.GetDataSimple(t2.Add(-2));
+                            }
+                            if (tup.Item2 != null)
+                            {
+                                dLevelRef = tup.Item2.GetDataSimple(t2);
+                                dLevelRefLag = tup.Item2.GetDataSimple(t2.Add(-1));
+                                dLevelRefLag2 = tup.Item2.GetDataSimple(t2.Add(-2));
+                            }
                         }
                         else
                         {
@@ -3279,8 +3294,7 @@ namespace Gekko
                             //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
                                                         
                             if (op.operatorLower.StartsWith("x"))
-                            {                               
-                                
+                            {                                
                                 Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
                                 Series tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
                                 dLevel = tsFirst.GetDataSimple(t2);

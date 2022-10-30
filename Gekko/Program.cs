@@ -25686,6 +25686,11 @@ namespace Gekko
             return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + s + "¤[0]";
         }
 
+        public static bool IsDecompResidualName(string name)
+        {
+            return name.Contains(Globals.decompResidualName);
+        }
+
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {
             int iOffset = 0;
