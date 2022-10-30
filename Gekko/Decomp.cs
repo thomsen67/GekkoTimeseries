@@ -3218,11 +3218,13 @@ namespace Gekko
 
                         string[] ss = dictName.Split('¤');
                         string fullName = ss[0];
-                        lag = ss[1];
+                        lag = ss[1];                        
+                        string lag2 = lag;  //lag2 keeps [0], lag has null for this.
                         if (lag == "[0]")
                         {
                             lag = null;
                         }
+                        int iLag= int.Parse(lag2.Substring(1, lag2.Length - 2));
 
                         char firstChar;
                         O.Chop(fullName, out dbName, out varName, out freq, out indexes);
@@ -3292,20 +3294,28 @@ namespace Gekko
                             //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
 
                             //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
-                                                        
-                            if (op.operatorLower.StartsWith("x"))
+
+                            string fullNameRef = G.Chop_SetBank(fullName, "Ref");
+
+                            if (op.isRaw)
                             {                                
                                 Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
-                                Series tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
-                                dLevel = tsFirst.GetDataSimple(t2);
-                                dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
-                                dLevelRef = tsRef.GetDataSimple(t2);
-                                dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                                if (tsFirst != null)
+                                {
+                                    dLevel = tsFirst.GetDataSimple(t2);
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
+                                }
+                                Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                if (tsRef != null)
+                                {
+                                    dLevelRef = tsRef.GetDataSimple(t2);
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                                }
                             }
                             else
-                            {
+                            {                                
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;                                    
@@ -3322,7 +3332,7 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;                                    
-                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;                                    
+                                    tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
                                     if (tsRef == null)
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
@@ -3365,18 +3375,7 @@ namespace Gekko
                         dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                         dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));
                         dr.Set(frame, Globals.col_t, new CellLight(t2.ToString()));
-                        dr.Set(frame, Globals.col_variable, new CellLight(varName));
-
-                        string lag2 = null;
-                        if (true)
-                        {
-                            if (lag != null) lag2 = lag;
-                            else lag2 = "[0]";
-                        }
-                        else
-                        {
-                            if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
-                        }
+                        dr.Set(frame, Globals.col_variable, new CellLight(varName));                        
 
                         dr.Set(frame, Globals.col_lag, new CellLight(lag2));
 
