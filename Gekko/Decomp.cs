@@ -1228,6 +1228,7 @@ namespace Gekko
                             if (k == 0) eqNames.Add(eqName);
                             int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(eqName);
 
+                            List<TwoStrings> variables = new List<TwoStrings>();
                             //foreach precedent variable
                             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                             {
@@ -1235,6 +1236,18 @@ namespace Gekko
                                 int date = dp.date;
                                 string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date, modelGamsScalar.t0);
                                 string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date - GekkoTime.Observations(modelGamsScalar.t0, t) + 1);
+                                TwoStrings two = new TwoStrings(x1, x2);
+                                variables.Add(two);
+                            }                            
+                            string xx2 = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
+                            string xx1 = ConvertToTurtleName(xx2.Replace("¤[0]", ""), 0, t);
+                            variables.Add(new TwoStrings(xx1, xx2));
+
+                            //foreach precedent variable
+                            foreach (TwoStrings two in variables)
+                            {                                
+                                string x1 = two.s1;
+                                string x2 = two.s2;
 
                                 if (k == 0)
                                 {
