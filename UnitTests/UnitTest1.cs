@@ -12575,7 +12575,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <n>
             // -----------------------------------------------------------------------
-            ShowDecompTable();  //will show the following decomp table and then abort
+            //ShowDecompTable();  //will show the following decomp table and then abort
             I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             Gekko.Table table = Globals.lastDecompTable;
             int i = 1;
@@ -12610,7 +12610,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 2d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 8d, sharedTableDelta2);
 
             // -----------------------------------------------------------------------
@@ -12630,7 +12630,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 2d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 8d, sharedTableDelta2);
 
             // -----------------------------------------------------------------------
@@ -12650,7 +12650,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1.493d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -266.667d, sharedTableDelta2);
 
             // -----------------------------------------------------------------------
@@ -12670,7 +12670,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 0.749d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 2.996d, sharedTableDelta2);
 
             // -----------------------------------------------------------------------
@@ -12690,7 +12690,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 2.233d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -91.667d, sharedTableDelta2);
 
 
@@ -12711,7 +12711,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1.115d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 5.560d, sharedTableDelta2);
 
 
@@ -12732,7 +12732,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 115d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -6d, sharedTableDelta2);
 
             // -----------------------------------------------------------------------
@@ -12752,7 +12752,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 4d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -9d, sharedTableDelta2);
 
 
@@ -12773,7 +12773,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 4d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -9d, sharedTableDelta2);
 
 
@@ -12794,7 +12794,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 3.604d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -300.000d, sharedTableDelta2);
 
 
@@ -12815,7 +12815,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 1.747d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -3.930d, sharedTableDelta2);
 
 
@@ -12836,7 +12836,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 6.235d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -350.000d, sharedTableDelta2);
 
 
@@ -12857,7 +12857,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 3.068d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -4.371d, sharedTableDelta2);
 
 
@@ -12878,7 +12878,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 21d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 11d, sharedTableDelta2);
 
 
@@ -12899,7 +12899,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 21d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 11d, sharedTableDelta2);
 
 
@@ -12920,7 +12920,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 18.261d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -183.333d, sharedTableDelta2);
 
 
@@ -12941,7 +12941,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 9.502d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 4.977d, sharedTableDelta2);
 
 
@@ -12962,7 +12962,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -2.111d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 33.333d, sharedTableDelta2);
 
 
@@ -12983,7 +12983,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -0.998d, sharedTableDelta2);
             i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual");
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 6.926d, sharedTableDelta2);
 
 

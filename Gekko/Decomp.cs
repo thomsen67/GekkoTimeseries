@@ -3302,16 +3302,16 @@ namespace Gekko
                                 Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
                                 if (tsFirst != null)
                                 {
-                                    dLevel = tsFirst.GetDataSimple(t2);
-                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
+                                    dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
                                 }
                                 Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;
                                 if (tsRef != null)
                                 {
-                                    dLevelRef = tsRef.GetDataSimple(t2);
-                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                                    dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + iLag));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + iLag));
                                 }
                             }
                             else
@@ -3324,9 +3324,9 @@ namespace Gekko
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
                                     }
-                                    dLevel = tsFirst.GetDataSimple(t2);
-                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
-                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2));
+                                    dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
+                                    dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
                                 }
 
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
@@ -3337,9 +3337,9 @@ namespace Gekko
                                     {
                                         new Error("Decomp internal error: could not find variable '" + dictName + "'");
                                     }
-                                    dLevelRef = tsRef.GetDataSimple(t2);
-                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
-                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2));
+                                    dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + iLag));
+                                    dLevelRefLag2 = tsRef.GetDataSimple(t2.Add(-2 + iLag));
                                 }
                             }
                         }
