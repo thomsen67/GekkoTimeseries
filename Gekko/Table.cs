@@ -94,7 +94,9 @@ namespace Gekko
             return ttable;
         }
 
-        //returns null if not present
+        /// <summary>
+        /// Returns null if not present
+        /// </summary>
         public Cell Get(int x, int y)
         {
             Cell cell2 = null;

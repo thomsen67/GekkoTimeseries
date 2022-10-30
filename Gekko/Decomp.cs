@@ -2651,7 +2651,7 @@ namespace Gekko
 
             Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
 
-            DecompTableReorderColsRowsPostProcessing(table, rownames, colnames, decompOptions2);
+            DecompTablePostProcessing(table, rownames, colnames, decompOptions2);
 
             if (decompOptions2.modelType == EModelType.GAMSScalar && !op.isRaw)
             {
@@ -2839,7 +2839,7 @@ namespace Gekko
                         if (fullVariableNames != null)
                         {
                             List<string> tmp = new List<string>();
-                            foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "")); //x[a]¤[-1] --> x[a][-1]
+                            foreach (string s in fullVariableNames) tmp.Add(s.Replace("¤", "").Replace(Globals.decompResidualName, Globals.decompResidualName2)); //x[a]¤[-1] --> x[a][-1]
                             tmp2 = Stringlist.GetListWithCommas(tmp).Replace(", ", ",  ");  //a, b --> a,  b.
                         }
                         else
@@ -2867,14 +2867,14 @@ namespace Gekko
         /// <param name="rownames"></param>
         /// <param name="colnames"></param>
         /// <param name="decompOptions2"></param>
-        private static void DecompTableReorderColsRowsPostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2)
+        private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2)
         {
             for (int i = 0; i < rownames.Count; i++)
             {
                 string s = rownames[i];
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);
                 }
                 tab.Set(i + 2, 1, s);
             }
@@ -2884,7 +2884,7 @@ namespace Gekko
                 string s = colnames[j];
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                    if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;
                 }
                 tab.Set(1, j + 2, s);
             }

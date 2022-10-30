@@ -25682,14 +25682,14 @@ namespace Gekko
         public static string GetDecompResidualName(int counter, int all)
         {
             string s = "";
-            if (all > 1) s = counter.ToString();
+            if (all > 1) s = (counter + 1).ToString();
             return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + s + "¤[0]";
         }
 
         public static bool IsDecompResidualName(string name)
         {
             return name.Contains(Globals.decompResidualName);
-        }
+        }        
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {

@@ -1060,12 +1060,12 @@ namespace Gekko
         }
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, bool variableIsRow)
-        {            
+        {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
             {
-                w = Globals.guiTableCellWidthFirst;                
+                w = Globals.guiTableCellWidthFirst;
             }
             dockPanel.Width = w;
             dockPanel.Height = Globals.guiTableCellHeight;
@@ -1075,27 +1075,44 @@ namespace Gekko
 
             if (type == GekkoTableTypes.UpperLeft)
             {
-                textBlock.HorizontalAlignment = HorizontalAlignment.Right;                
+                textBlock.HorizontalAlignment = HorizontalAlignment.Right;
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
                 textBlock.FontFamily = new FontFamily("Calibri");
                 textBlock.FontSize = 13d;
                 textBlock.Padding = new Thickness(2, 2, 4, 3);
             }
-            else 
+            else
             {
                 if ((variableIsRow && type == GekkoTableTypes.Left) || (!variableIsRow && type == GekkoTableTypes.Top))
                 {
+
+                    //
+                    //
+                    // TODO: This is hacky. Better to look at adjacent cell content (like what happens when link is actually clicked)
+                    //       
+                    //
+                    //                    
+
+                    //TODO: offsets...
+                    //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
+                    Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
+                    string v = c.vars_hack?[0];
+
                     bool isEndogenous = false;
-                    string ss = G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator);
-                    ss = G.PrettifyTimeseriesHash(ss, true, true);
-                    if (G.Equal(Program.options.model_type, "gams"))
-                    {
-                        if (Program.HasGamsEquation(ss)) isEndogenous = true;
-                    }
-                    else
-                    {
-                        EEndoOrExo e = Program.VariableTypeEndoExo(ss);
-                        isEndogenous = e == EEndoOrExo.Endo;
+                    if (v != null)
+                    {                        
+                        if (!Program.IsDecompResidualName(v))
+                        {
+                            if (G.Equal(Program.options.model_type, "gams"))
+                            {
+                                if (Program.HasGamsEquation(v)) isEndogenous = true;
+                            }
+                            else
+                            {
+                                EEndoOrExo e = Program.VariableTypeEndoExo(v);
+                                isEndogenous = e == EEndoOrExo.Endo;
+                            }
+                        }
                     }
 
                     if (isEndogenous || s == Globals.decompText0)
@@ -1137,7 +1154,7 @@ namespace Gekko
                 if (backgroundColor == "LightYellow")
                 {
                     //overrides                
-                    dockPanel.originalBackgroundColor = Brushes.LightYellow;                    
+                    dockPanel.originalBackgroundColor = Brushes.LightYellow;
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
                 else if (backgroundColor == "LightRed")
@@ -1160,8 +1177,8 @@ namespace Gekko
             border.Child = textBlock;
             dockPanel.Children.Add(border);
             dockPanel.SetValue(Grid.ColumnProperty, j);
-            dockPanel.SetValue(Grid.RowProperty, i);            
-            g.Children.Add(dockPanel);            
+            dockPanel.SetValue(Grid.RowProperty, i);
+            g.Children.Add(dockPanel);
         }
 
        
@@ -1460,24 +1477,8 @@ namespace Gekko
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
 
-            int x = -12345;
-            int y = -12345;
-
-            Cell c = null;
-            Cell c2 = null;
-
-            if (Decomp.AreVariablesOnRows(this.decompFind.decompOptions2))
-            {
-                CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
-                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
-                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
-            }
-            else
-            {
-                CoordConversion(out x, out y, GekkoTableTypes.Top, row, col);
-                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
-                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd
-            }
+            Cell c, c2;
+            GetTwoCells(row, col, out c, out c2);
 
             if (c != null && c.cellType == CellType.Text)
             {
@@ -1495,11 +1496,31 @@ namespace Gekko
                 O.Find o = new O.Find(this.decompFind);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
-                o.Exe();               
+                o.Exe();
             }
             else
             {
                 new Error("Unexpected link error");
+            }
+        }
+
+        private void GetTwoCells(int row, int col, out Cell c, out Cell c2)
+        {
+            int x = -12345;
+            int y = -12345;
+            c = null;
+            c2 = null;
+            if (Decomp.AreVariablesOnRows(this.decompFind.decompOptions2))
+            {
+                CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
+            }
+            else
+            {
+                CoordConversion(out x, out y, GekkoTableTypes.Top, row, col);
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd
             }
         }
 

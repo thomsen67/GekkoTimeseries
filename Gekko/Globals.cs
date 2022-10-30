@@ -906,9 +906,9 @@ namespace Gekko
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
         public const string decompNull = "<null>";
-        public static string decompNullName = "________a";
-        public const string decompResidual = "Residual";
-        public static string decompResidualName = "zzzzzzzzy";        
+        public static string decompNullName = "________a";        
+        public static string decompResidualName = "zzzzzzzzy";
+        public const string decompResidualName2 = "Residual";
 
         public static CommandMemory commandMemory = new CommandMemory();
 
