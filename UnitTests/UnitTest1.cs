@@ -12969,6 +12969,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <mp>
             // -----------------------------------------------------------------------            
+            ShowDecompTable();
             I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -12976,15 +12977,19 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 6.864d, sharedTableDelta2);
+            //OK
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [-1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.936d, sharedTableDelta2);
+            //1.31
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
             Assert.AreEqual(table.Get(i, 2).number, -0.998d, sharedTableDelta2);
+            //-2.50
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 6.926d, sharedTableDelta2);
+            //3.93
 
 
         }
