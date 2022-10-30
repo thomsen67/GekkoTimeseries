@@ -12572,13 +12572,52 @@ namespace UnitTests
 
             I("time 2022 2022;");
 
+            Gekko.Table table = null;
+            int i = -12345;
+
+
+
+
+
+
+            // -----------------------------------------------------------------------
+            // <mp>
+            // -----------------------------------------------------------------------            
+            ShowDecompTable();
+            I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null> | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 6.864d, sharedTableDelta2);
+            //OK, 3.37 -  -3.49
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.936d, sharedTableDelta2);
+            //1.31 should be 0.00 -  -1.31
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, -0.998d, sharedTableDelta2);
+            //-2.50 should be -0.75 -   1.75
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 6.926d, sharedTableDelta2);
+            //3.93
+
+
+
+
+
+
+
             // -----------------------------------------------------------------------
             // <n>
             // -----------------------------------------------------------------------
             //ShowDecompTable();  //will show the following decomp table and then abort
             I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
-            Gekko.Table table = Globals.lastDecompTable;
-            int i = 1;
+            table = Globals.lastDecompTable;
+            i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null> | [0]");
@@ -12964,33 +13003,6 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 33.333d, sharedTableDelta2);
-
-
-            // -----------------------------------------------------------------------
-            // <mp>
-            // -----------------------------------------------------------------------            
-            ShowDecompTable();
-            I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
-            table = Globals.lastDecompTable;
-            i = 1;
-            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "ctot | <null> | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, 6.864d, sharedTableDelta2);
-            //OK
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.936d, sharedTableDelta2);
-            //1.31
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | 18 | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, -0.998d, sharedTableDelta2);
-            //-2.50
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | <null> | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, 6.926d, sharedTableDelta2);
-            //3.93
-
 
         }
 

@@ -633,6 +633,15 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
         {
+            if (true)
+            {
+                if (value > -5999 - 1 && value < -5999 + 1)
+                {
+
+                }
+            }
+            
+            
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
