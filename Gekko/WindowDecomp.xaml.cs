@@ -2071,22 +2071,31 @@ namespace Gekko
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
-
         
 
-        private void checkBox1_Checked(object sender, RoutedEventArgs e)
+        private void CheckBoxShares_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
             {
+                //checkBoxCount.Unchecked -= CheckBoxCount_Unchecked;
+                //checkBoxCount.IsChecked = false;  //so it does not fire
+                //checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
+
+                //checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
+                //checkBoxNames.IsChecked = false;  //so it does not fire
+                //checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+
+                //this.decompFind.decompOptions2.count = ECountType.None;
                 this.decompFind.decompOptions2.decompOperator.isShares = true;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
 
-        private void checkBox1_Unchecked(object sender, RoutedEventArgs e)
+        private void CheckBoxShares_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
+            {                
+                //this.decompFind.decompOptions2.count = ECountType.None;
                 this.decompFind.decompOptions2.decompOperator.isShares = false;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2321,7 +2330,7 @@ namespace Gekko
                 dfParentDecomp.decompOptions2 = remember; 
                 windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
             }
-        }
+        }        
 
         private void checkBoxCount_Checked(object sender, RoutedEventArgs e)
         {
@@ -2329,7 +2338,13 @@ namespace Gekko
             {
                 checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
                 checkBoxNames.IsChecked = false;  //so it does not fire
-                checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+                checkBoxNames.Unchecked += CheckBoxNames_Unchecked;                
+
+                //checkBoxShares.Unchecked -= CheckBoxShares_Unchecked;
+                //checkBoxShares.IsChecked = false;  //so it does not fire
+                //checkBoxShares.Unchecked += CheckBoxShares_Unchecked;
+
+                //this.decompFind.decompOptions2.decompOperator.isShares = false;
                 this.decompFind.decompOptions2.count = ECountType.N;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
@@ -2339,10 +2354,12 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
-                checkBoxNames.IsChecked = false;  //so it does not fire
-                checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+                //checkBoxNames.Unchecked -= CheckBoxNames_Unchecked;
+                //checkBoxNames.IsChecked = false;  //so it does not fire
+                //checkBoxNames.Unchecked += CheckBoxNames_Unchecked;
+
                 this.decompFind.decompOptions2.count = ECountType.None;
+                //this.decompFind.decompOptions2.decompOperator.isShares = false;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2354,6 +2371,12 @@ namespace Gekko
                 checkBoxCount.Unchecked -= CheckBoxCount_Unchecked;
                 checkBoxCount.IsChecked = false;  //so it does not fire
                 checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
+
+                //checkBoxShares.Unchecked -= CheckBoxShares_Unchecked;
+                //checkBoxShares.IsChecked = false;  //so it does not fire
+                //checkBoxShares.Unchecked += CheckBoxShares_Unchecked;
+
+                //this.decompFind.decompOptions2.decompOperator.isShares = false;
                 Globals.guiTableCellWidth = 3 * Globals.guiTableCellWidth;
                 try
                 {
@@ -2375,7 +2398,9 @@ namespace Gekko
                 checkBoxCount.IsChecked = false;  //so it does not fire
                 checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
                 checkBoxCount.IsChecked = false;
+
                 this.decompFind.decompOptions2.count = ECountType.None;
+                //this.decompFind.decompOptions2.decompOperator.isShares = false;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }

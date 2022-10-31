@@ -259,8 +259,9 @@ namespace Gekko
         public double levelRefLag2;
         public int n;
         public List<string> fullVariableNames;
+        public string backgroundColor;
 
-        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames)
+        public AggContainer(double change, double changeAlternative, double level, double levelLag, double levelLag2, double levelRef, double levelRefLag, double levelRefLag2, int n, List<string> fullVariableNames, string backgroundColor)
         {
             this.change = change;
             this.changeAlternative = changeAlternative;
@@ -272,6 +273,7 @@ namespace Gekko
             this.levelRefLag2 = levelRefLag2;
             this.n = n;
             this.fullVariableNames = fullVariableNames;
+            this.backgroundColor = backgroundColor;
         }
     }
 
@@ -1238,7 +1240,7 @@ namespace Gekko
                                 string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date - GekkoTime.Observations(modelGamsScalar.t0, t) + 1);
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
-                            }                            
+                            }
                             string xx2 = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
                             string xx1 = ConvertToTurtleName(xx2.Replace("¤[0]", ""), 0, t);
                             variables.Add(new TwoStrings(xx1, xx2));
@@ -2592,10 +2594,7 @@ namespace Gekko
         public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
-            int decimals = 0;
-            if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
-            else decimals = decompOptions2.decimalsLevel;
-            string format2 = "f16." + decimals.ToString();
+            string format2 = GetNumberFormat(decompOptions2);
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
@@ -2657,12 +2656,21 @@ namespace Gekko
 
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2);
 
-            if (decompOptions2.modelType == EModelType.GAMSScalar && !op.isRaw)
+            if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                DecompTableHandleSignAndShares(table, decompOptions2);
+                DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
             }
 
             return table;
+        }
+
+        private static string GetNumberFormat(DecompOptions2 decompOptions2)
+        {
+            int decimals = 0;
+            if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
+            else decimals = decompOptions2.decimalsLevel;
+            string format2 = "f16." + decimals.ToString();
+            return format2;
         }
 
         /// <summary>
@@ -2711,6 +2719,7 @@ namespace Gekko
                     double dLevelRefLag2 = 0d;
                     int n = 0;
                     List<string> fullVariableNames = null;
+                    string backgroundColor = "Transparent";
 
                     if (td != null)
                     {
@@ -2722,6 +2731,7 @@ namespace Gekko
                         dLevelRefLag2 = td.levelRefLag2;
                         n = td.n;
                         fullVariableNames = td.fullVariableNames;
+                        backgroundColor = td.backgroundColor;
 
                         // ----- first start -----------------------------------------------
                         double dFirstLevel = double.NaN;
@@ -2859,6 +2869,7 @@ namespace Gekko
 
                     Cell c = table.Get(i + 2, j + 2);
                     c.vars_hack = fullVariableNames;
+                    c.backgroundColor = backgroundColor;
                 }
             }
             return table;
@@ -3001,6 +3012,12 @@ namespace Gekko
             //Aggregation
             // ==============================================================================
             
+            decompOptions2.all.Clear();
+            foreach (string s in frame.colnames)
+            {
+                decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
+            }
+
             GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
             int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
 
@@ -3083,10 +3100,7 @@ namespace Gekko
                 {
                     s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
                 }
-                string key = s1 + "¤" + s2;  //row ¤ col                
-
-                if (!tempRowNames.Contains(s1, StringComparer.OrdinalIgnoreCase)) tempRowNames.Add(s1);
-                if (!tempColNames.Contains(s2, StringComparer.OrdinalIgnoreCase)) tempColNames.Add(s2);
+                string key = s1 + "¤" + s2;  //row ¤ col                                
 
                 double d = row.Get(frame, Globals.col_value).data;
                 double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
@@ -3097,36 +3111,43 @@ namespace Gekko
                 double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
                 double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
                 string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
+                                
+                string backgroundColor = "Transparent";
+                if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
 
-                decompOptions2.all.Clear();
-                foreach (string s in frame.colnames)
+                if (!decompOptions2.showErrors && Program.IsDecompResidualName(fullVariableName))
                 {
-                    decompOptions2.all.Add(G.HandleInternalIdentifyer1(s));
-                }
-
-                AggContainer td = null;
-                agg.TryGetValue(key, out td);
-                if (td == null)
-                {
-                    agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }));
+                    //skip residuals if errors are not shown
                 }
                 else
                 {
-                    td.change += d;
-                    td.changeAlternative += dAlternative;
-                    td.level += dLevel;
-                    td.levelLag += dLevelLag;
-                    td.levelLag2 += dLevelLag2;
-                    td.levelRef += dLevelRef;
-                    td.levelRefLag += dLevelRefLag;
-                    td.levelRefLag2 += dLevelRefLag2;
-                    td.n += 1;
-                    //BEWARE
-                    //BEWARE
-                    //BEWARE Is this too time-consuming?
-                    //BEWARE
-                    //BEWARE
-                    td.fullVariableNames.Add(fullVariableName);
+                    if (!tempRowNames.Contains(s1, StringComparer.OrdinalIgnoreCase)) tempRowNames.Add(s1);
+                    if (!tempColNames.Contains(s2, StringComparer.OrdinalIgnoreCase)) tempColNames.Add(s2);
+                    AggContainer td = null;
+                    agg.TryGetValue(key, out td);
+                    if (td == null)
+                    {
+                        agg.Add(key, new AggContainer(d, dAlternative, dLevel, dLevelLag, dLevelLag2, dLevelRef, dLevelRefLag, dLevelRefLag2, 1, new List<string>() { fullVariableName }, backgroundColor));
+                    }
+                    else
+                    {
+                        td.change += d;
+                        td.changeAlternative += dAlternative;
+                        td.level += dLevel;
+                        td.levelLag += dLevelLag;
+                        td.levelLag2 += dLevelLag2;
+                        td.levelRef += dLevelRef;
+                        td.levelRefLag += dLevelRefLag;
+                        td.levelRefLag2 += dLevelRefLag2;
+                        td.n += 1;
+                        //BEWARE
+                        //BEWARE
+                        //BEWARE Is this too time-consuming?
+                        //BEWARE
+                        //BEWARE
+                        td.fullVariableNames.Add(fullVariableName);
+                        if (backgroundColor != "Transparent") td.backgroundColor = backgroundColor;
+                    }
                 }
             }
             return agg;
@@ -3294,9 +3315,7 @@ namespace Gekko
                         else
                         {
                             //MAybe turn this off for x-type...
-
                             //a little bit of waste here, if not both series are needed for non-x decomp. But penalty must be really small.
-
                             //Tuple<Series, Series> tup = GetRealTimeseries(decompDatas, dictName);
 
                             string fullNameRef = G.Chop_SetBank(fullName, "Ref");
@@ -3444,54 +3463,116 @@ namespace Gekko
         /// </summary>
         /// <param name="tab"></param>
         /// <param name="decompOptions2"></param>
-        private static void DecompTableHandleSignAndShares(Table tab, DecompOptions2 decompOptions2)
-        {
+        private static void DecompTableHandleSignAndSharesAndErrors(Table tab, DecompOptions2 decompOptions2)
+        {            
+            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);                        
+
             if (decompOptions2.decompOperator.isPercentageType || decompOptions2.decompOperator.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
             }
 
-            string formatSShares = "f16." + decompOptions2.decimalsPch;
-            if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
-            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);
-            if (areVariablesOnRows)
+            if (decompOptions2.showErrors)
             {
-                for (int j = 2; j <= tab.GetColMaxNumber(); j++)
-                {
-                    double value = tab.Get(2, j).number;
-                    for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                int rowmax = tab.GetRowMaxNumber();  //because it changes dynamically
+                int colmax = tab.GetColMaxNumber();  //because it changes dynamically
+                if (areVariablesOnRows)
+                {                    
+                    for (int j = 2; j <= colmax; j++)
                     {
-                        if (i == 2)
-                        {                            
-                            Cell c = tab.Get(i, j);
-                            c.number = -value;
+                        if (decompOptions2.count == ECountType.N)
+                        {
+                            tab.SetNumber(rowmax + 1, j, 1, "f16.0");
                         }
-                        if (decompOptions2.decompOperator.isShares)
-                        {                            
-                            Cell c = tab.Get(i, j);
-                            c.number = tab.Get(i, j).number / (-value) * 100d;
-                            c.numberFormat = formatSShares;
+                        else if (decompOptions2.count == ECountType.Names)
+                        {
+                            tab.Set(rowmax + 1, j, "Error");
+                        }
+                        else
+                        {
+                            double sum = 0d;
+                            for (int i = 2; i <= rowmax; i++)
+                            {
+                                double value = tab.Get(i, j).number;
+                                sum += value;
+                            }
+                            tab.SetNumber(rowmax + 1, j, -sum, GetNumberFormat(decompOptions2));
+                        }
+                        tab.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
+                    }
+                    tab.Set(rowmax + 1, 1, "Error");
+                }
+                else
+                {                    
+                    for (int i = 2; i <= rowmax; i++)
+                    {
+                        if (decompOptions2.count == ECountType.N)
+                        {
+                            tab.SetNumber(i, colmax + 1, 1, "f16.0");
+                        }
+                        else if (decompOptions2.count == ECountType.Names)
+                        {
+                            tab.Set(i, colmax + 1, "Error");
+                        }
+                        else
+                        {
+                            double sum = 0d;
+                            for (int j = 2; j <= colmax; j++)
+                            {
+                                double value = tab.Get(i, j).number;
+                                sum += value;
+                            }
+                            tab.SetNumber(i, colmax + 1, -sum, GetNumberFormat(decompOptions2));                            
+                        }
+                        tab.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
+                    }
+                    tab.Set(1, colmax + 1, "Error");
+                }
+            }
+
+            if (!decompOptions2.decompOperator.isRaw)
+            {
+                string formatSShares = "f16." + decompOptions2.decimalsPch;
+                if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
+                if (areVariablesOnRows)
+                {
+                    for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                    {
+                        double value = tab.Get(2, j).number;
+                        for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                        {
+                            if (i == 2)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = -value;
+                            }
+                            if (decompOptions2.decompOperator.isShares)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = tab.Get(i, j).number / (-value) * 100d;
+                                c.numberFormat = formatSShares;
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
+                else
                 {
-                    double value = tab.Get(i, 2).number;
-                    for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                    for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                     {
-                        if (j == 2)
-                        {                            
-                            Cell c = tab.Get(i, j);
-                            c.number = -value;
-                        }
-                        if (decompOptions2.decompOperator.isShares)
-                        {                            
-                            Cell c = tab.Get(i, j);
-                            c.number = tab.Get(i, j).number / (-value) * 100d;
-                            c.numberFormat = formatSShares;
+                        double value = tab.Get(i, 2).number;
+                        for (int j = 2; j <= tab.GetColMaxNumber(); j++)
+                        {
+                            if (j == 2)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = -value;
+                            }
+                            if (decompOptions2.decompOperator.isShares)
+                            {
+                                Cell c = tab.Get(i, j);
+                                c.number = tab.Get(i, j).number / (-value) * 100d;
+                                c.numberFormat = formatSShares;
+                            }
                         }
                     }
                 }

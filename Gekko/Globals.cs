@@ -135,12 +135,7 @@ namespace Gekko
         public static StreamWriter sw = null;        
         
         public static List<string> unitTestsPromtingHelper = null;
-
-        //GUI hacks
-        public static ItemHandler itemHandler = null;  //hack regardig FIND window
-        public static string uglyHack_name;  //only for a treeview window
-        public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
-
+        
         public static bool nolog = false;      //-nolog parameter for gekko.exe
         public static bool hideGui = false;    //true for use without GUI window
         public static bool excelDna = false;  //true for use with ExcelDna solution
@@ -510,7 +505,14 @@ namespace Gekko
         public static string decompText1a = "[Difference]";
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
-                
+
+        //GUI hacks
+        public static ItemHandler itemHandler = null;  //hack regardig FIND window
+        public static string uglyHack_name;  //only for a treeview window
+        public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
+        public static string decompResidualColor = "LightYellow";
+        public static string decompErrorColor = "LightRed";
+
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 
         public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
