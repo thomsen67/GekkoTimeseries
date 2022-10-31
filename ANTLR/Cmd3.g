@@ -661,6 +661,8 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_PRTCODE;
     ASTOPT_STRING_PRESERVE;
 	ASTOPT_STRING_MISSING;
+	ASTOPT_STRING_SHARES;
+	ASTOPT_STRING_ERRORS;
     ASTOPT_STRING_PRIM;
     ASTOPT_STRING_PRN;
 	ASTOPT_STRING_MATRIX;
@@ -962,6 +964,8 @@ XLINEAFTER            = 'XLINEAFTER'               ;
 YMIRROR               = 'YMIRROR'                  ;
 YTITLE                = 'YTITLE'                   ;
 YLINE                 = 'YLINE'                    ;
+SHARES                = 'SHARES';
+ERRORS                = 'ERRORS';
 //YMAX                  = 'YMAX'                     ;
 YMAXHARD              = 'YMAXHARD'                 ;
 YMAXSOFT              = 'YMAXSOFT'                 ;
@@ -1595,6 +1599,8 @@ d.Add("Y" ,Y);
 										d.Add("YMIRROR",YMIRROR);
 										d.Add("YTITLE",YTITLE);
 										d.Add("YLINE",YLINE);
+										d.Add("SHARES",SHARES);
+										d.Add("ERRORS",ERRORS);
 										//d.Add("YMAX",YMAX);
 										d.Add("YMAXHARD",YMAXHARD);
 										d.Add("YMAXSOFT",YMAXSOFT);
@@ -2943,8 +2949,11 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
-                          | COUNT EQUAL name -> ^(ASTOPT_STRING_COUNT name)  //n | names
+                          | COUNT EQUAL name -> ^(ASTOPT_STRING_COUNT name)
+						  | NAMES EQUAL name -> ^(ASTOPT_STRING_NAMES name)
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)  //m | zero
+						  | ERRORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERRORS yesNo?)
+						  | SHARES (EQUAL yesNo)? -> ^(ASTOPT_STRING_SHARES yesNo?)
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 
@@ -4729,6 +4738,8 @@ ident2: 					Ident |
   YES|
   YLABELS|
   YLINE|
+  SHARES|
+  ERRORS|
   YMAXHARD|
   YMAXSOFT|
   YMAX|
@@ -5187,6 +5198,8 @@ ident3: 					Ident |
   YES|
   YLABELS|
   YLINE|
+  SHARES|
+  ERRORS|  
   YMAXHARD|
   YMAXSOFT|
   YMAX|

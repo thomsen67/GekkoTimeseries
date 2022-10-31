@@ -11158,7 +11158,7 @@ namespace UnitTests
             try
             {
                 I("g <2001 2002> = 40, 60;");
-                I("decomp3 <2001 2002 dyn m missing=zero> y from e1, e2 endo y, c;");
+                I("decomp3 <2001 2002 dyn m missing=zero errors> y from e1, e2 endo y, c;");
             }
             finally
             {
@@ -11232,7 +11232,7 @@ namespace UnitTests
             try
             {
                 I("g <2001 2002> = 42, 42;");
-                I("decomp3 <2002 2002 d> y from e1, e2 endo y, c rows vars, lags cols time;");
+                I("decomp3 <2002 2002 d errors> y from e1, e2 endo y, c rows vars, lags cols time;");
             }
             finally
             {
@@ -12698,7 +12698,7 @@ namespace UnitTests
             // <n>
             // -----------------------------------------------------------------------
             //ShowDecompTable();  //will show the following decomp table and then abort
-            I("decomp3 <xn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xn errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12718,7 +12718,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xd>
             // -----------------------------------------------------------------------            
-            I("decomp3 <xd> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xd errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12738,7 +12738,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <d>
             // -----------------------------------------------------------------------            
-            I("decomp3 <d> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <d errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12758,7 +12758,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xp>
             // -----------------------------------------------------------------------                        
-            I("decomp3 <xp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12778,7 +12778,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <p>
             // -----------------------------------------------------------------------                                                            
-            I("decomp3 <p> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <p errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12798,7 +12798,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xdp>
             // -----------------------------------------------------------------------                        
-            I("decomp3 <xdp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xdp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12819,7 +12819,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <dp>
             // -----------------------------------------------------------------------            
-            I("decomp3 <dp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <dp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12840,7 +12840,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrn>
             // -----------------------------------------------------------------------            
-            I("decomp3 <xrn> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xrn errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12860,7 +12860,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrd>
             // -----------------------------------------------------------------------            
-            I("decomp3 <xrd> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xrd errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12881,7 +12881,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <rd>
             // -----------------------------------------------------------------------
-            I("decomp3 <rd> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <rd errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12902,7 +12902,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrp>
             // -----------------------------------------------------------------------                        
-            I("decomp3 <xrp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xrp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12923,7 +12923,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <rp>
             // -----------------------------------------------------------------------            
-            I("decomp3 <rp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <rp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12944,7 +12944,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrdp>
             // -----------------------------------------------------------------------            
-            I("decomp3 <xrdp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xrdp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12965,7 +12965,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <rdp>
             // -----------------------------------------------------------------------
-            I("decomp3 <rdp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <rdp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -12986,7 +12986,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xm>
             // -----------------------------------------------------------------------            
-            I("decomp3 <xm> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xm errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -13007,7 +13007,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <m>
             // -----------------------------------------------------------------------            
-            I("decomp3 <m> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <m errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -13028,7 +13028,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xq>
             // -----------------------------------------------------------------------
-            I("decomp3 <xq> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xq errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -13049,7 +13049,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <q>
             // -----------------------------------------------------------------------            
-            I("decomp3 <q> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <q errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -13070,7 +13070,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xmp>
             // -----------------------------------------------------------------------
-            I("decomp3 <xmp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <xmp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
@@ -13092,7 +13092,7 @@ namespace UnitTests
             // <mp>
             // -----------------------------------------------------------------------            
             //ShowDecompTable();
-            I("decomp3 <mp> ctot from e_c endo ctot rows vars, #a, lags cols time;");
+            I("decomp3 <mp errors> ctot from e_c endo ctot rows vars, #a, lags cols time;");
             table = Globals.lastDecompTable;
             i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");

@@ -354,11 +354,13 @@ namespace Gekko
                 decompOptions2.t2 = o.t2;
                 decompOptions2.expressionOld = o.label;
                 decompOptions2.expression = o.expression;
-                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
+                decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());                
+                if (G.Equal(o.opt_shares, "yes")) decompOptions2.shares = true;
+                if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
+                if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
                 if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
-                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
-                if (G.Equal(o.opt_count, "n")) decompOptions2.count = ECountType.N;
-                else if (G.Equal(o.opt_count, "names")) decompOptions2.count = ECountType.Names;
+                if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
+                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;                
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, modelGamsScalar);

@@ -344,15 +344,17 @@
             </DockPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="2" Orientation="Horizontal">
-                <CheckBox Name="checkBoxShares" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBoxShares_Checked" Unchecked="CheckBoxShares_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Shares</CheckBox>
-                <CheckBox  x:Name="checkBoxCount" VerticalAlignment="Top" ToolTip="Show count of elements" Checked="checkBoxCount_Checked" Unchecked="CheckBoxCount_Unchecked" Margin="8,3,0,0" Content="Count" Width="60"/>
-                <CheckBox x:Name="checkBoxNames" VerticalAlignment="Center" ToolTip="Show names of elements" Margin="0,0,0,0" Content="Names" Width="60" Checked="CheckBoxNames_Checked" Unchecked="CheckBoxNames_Unchecked" />
+                <CheckBox Name="checkBoxShares" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="CheckBoxShares_Checked" Unchecked="CheckBoxShares_Unchecked" ToolTip="Show decomposition shares (&lt;shares> option), not meaningful for &quot;Raw&quot; options.">Shares</CheckBox>
+                <CheckBox  x:Name="checkBoxCount" VerticalAlignment="Top" ToolTip="Show count (&lt;count> option) of elements" Checked="checkBoxCount_Checked" Unchecked="CheckBoxCount_Unchecked" Margin="8,3,0,0" Content="Count" Width="60"/>
+                <CheckBox x:Name="checkBoxNames" VerticalAlignment="Center" ToolTip="Show names (&lt;names> option) of elements" Margin="0,0,0,0" Content="Names" Width="60" Checked="CheckBoxNames_Checked" Unchecked="CheckBoxNames_Unchecked" />
             </StackPanel>
 
-            
-            
 
-            <CheckBox Grid.Column="11" Grid.Row="3" x:Name="checkBoxErrors" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show count of elements" Margin="0,0,0,0" Content="Errors" Width="60" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
+
+            <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
+                <CheckBox x:Name="checkBoxErrors" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)" Margin="0,0,0,0" Content="Errors" Width="60" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
+                <CheckBox x:Name="checkBoxDyn" Content="Dyn" HorizontalAlignment="Left" VerticalAlignment="Center"  ToolTip="Resolve dynamic lagged/leaded variables (&lt;dyn option>)" Checked="CheckBoxDyn_Checked" Unchecked="CheckBoxDyn_Unchecked" />
+            </StackPanel>
 
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options

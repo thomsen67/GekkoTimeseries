@@ -658,6 +658,11 @@ namespace Gekko
                 checkBoxNames.IsChecked = true;
             }
 
+            if (this.decompFind.decompOptions2.dyn)
+            {
+                checkBoxDyn.IsChecked = true;
+            }
+
             if (this.decompFind.decompOptions2.showErrors)
             {
                 checkBoxErrors.IsChecked = true;
@@ -1714,26 +1719,10 @@ namespace Gekko
                 if (this.decompFind.decompOptions2.expression == null)
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
-                }                
+                }
 
-                ////string transformationCodeAugmented = null;
-                //if (this.decompFind.decompOptions2.decompOperator != null)
-                //{
-                //    //There are 4 showing options: operator, isBaseline, isRaw, isShares.
-                //    string transformationCodeAugmented = this.decompFind.decompOptions2.decompOperator.operatorLower;
-                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRef) transformationCodeAugmented = "r" + transformationCodeAugmented;
-                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
-                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
-                //    //if (this.decompFind.decompOptions2.operatorHelper.guiDecompIsRaw && this.decompFind.decompOptions2.operatorHelper.guiDecompIsShares)
-                //    //{
-                //    //    new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
-                //    //}
-                //    this.decompFind.decompOptions2.prtOptionLower = transformationCodeAugmented;
-                //}
-
-                //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
-                //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
-
+                DecompOptions2 optionsRemember = this.decompFind.decompOptions2.Clone(true);                
+                
                 SetRadioButtonsDefaults();
 
                 if(!this.isInitializing) this.windowDecompStatusBar.Text = "";
@@ -1760,14 +1749,6 @@ namespace Gekko
                 this.equation.Text = s;
                 this.code.Text = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
 
-                //
-                // NOTE:
-                //
-                //flowText.Visibility = Visibility.Collapsed;
-
-                //TODO: what is this? delete?
-                //TODO: what is this? delete?
-                //TODO: what is this? delete?
                 this.decompFind.decompOptions2.guiDecompValues = table;
 
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
@@ -1794,7 +1775,7 @@ namespace Gekko
                 {                    
                     this.isClosing = true;  //hmmm, is this useful at all?
                 }
-                throw e;
+                //throw e;
             }
         }       
 
@@ -2423,6 +2404,24 @@ namespace Gekko
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
+
+        private void CheckBoxDyn_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.dyn = true;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
+
+        private void CheckBoxDyn_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.dyn = false;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
+            }
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel
@@ -2445,16 +2444,23 @@ namespace Gekko
         //--------------------------------------------------------------- 
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOperator
         //--------------------------------------------------------------- 
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
+        public DecompOperator decompOperator = null;
         public ECountType count = ECountType.None;
         public bool showErrors = false;
-        public int decimalsLevel = 4;
-        public int decimalsPch = 2;
+        public bool shares = false;
+        public int decimalsLevel = 4;  //TODO: make selectable from syntax
+        public int decimalsPch = 2;  //TODO: make selectable from syntax
+        public bool dyn = false;
+        public bool missingAsZero = false;
+        public List<string> new_select = null;
+        public List<string> new_from = null;
+        public List<string> new_endo = null;
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
-
-        public DecompOperator decompOperator = null;
-
+        
         //FIND STUFF
         public List iv = null;
         public GekkoTime t0 = GekkoTime.tNull;
@@ -2462,7 +2468,7 @@ namespace Gekko
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
         //public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
         public EModelType modelType = EModelType.Unknown;
-        public bool missingAsZero = false;
+        
         public bool showTime = false;
         public string code = null;
         public bool ageHierarchy = false;
@@ -2478,18 +2484,9 @@ namespace Gekko
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
         
-        public GekkoTime t1 = GekkoTime.tNull;
-        public GekkoTime t2 = GekkoTime.tNull;
-
-        public bool dyn = false;
-        
         public List<string> subst = new List<string>();
 
-        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
-
-        public List<string> new_select = null;
-        public List<string> new_from = null;
-        public List<string> new_endo = null;
+        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions        
 
         //-------- tranformation end ----------------
         public int guiDecompLastClickedRow = 0;
@@ -2562,6 +2559,7 @@ namespace Gekko
             d.dyn = this.dyn;
             d.count = this.count;
             d.missingAsZero = this.missingAsZero;
+            d.shares = this.shares;
             
             d.modelHash = this.modelHash;
             d.type = this.type;

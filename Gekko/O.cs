@@ -8155,8 +8155,11 @@ namespace Gekko
             public string type = null;
             public string opt_prtcode = null;
             public string opt_dyn = null;  //yes|no
-            public string opt_count = null;  //n | names
+            public string opt_count = null;
+            public string opt_names = null;
             public string opt_missing = "m"; //m | zero
+            public string opt_errors = null;
+            public string opt_shares = null;
             public string variable = null;
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            
