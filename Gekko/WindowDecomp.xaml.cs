@@ -1697,7 +1697,6 @@ namespace Gekko
         /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(bool refresh, ModelGamsScalar modelGamsScalar)
         {
-
             int remember = Globals.guiTableCellWidth;
             try
             {
@@ -1723,6 +1722,7 @@ namespace Gekko
 
         private void RecalcCellsWithNewTypeHelper(bool refresh, ModelGamsScalar modelGamsScalar)
         {
+            if (Globals.decompNewCode) this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
             SetRadioButtonsDefaults();
 
             if (!this.isInitializing) this.windowDecompStatusBar.Text = "";

@@ -463,9 +463,7 @@ namespace Gekko
                         decompOptions2.link.Add(link);
                     }
                 }
-            }
-
-            if(Globals.decompNewCode) decompOptions2.code = decompOptions2.ToCode();
+            }            
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }
 
