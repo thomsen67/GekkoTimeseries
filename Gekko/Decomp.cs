@@ -543,15 +543,13 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <returns></returns>
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
-        {
-            DecompOperator op = decompOptions2.decompOperator;  // <--- remove this alias sometimes
+        {            
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
-            //decompOptions2.decompTablesFormat.isPercentageType = op.isPercentageType;
+            
             DateTime t0 = DateTime.Now;
-
-            //EContribType operatorOneOf3Types = DecompContribTypeHelper(op);
-            EContribType operatorOneOf3Types = op.type;
+                        
+            EContribType operatorOneOf3Types = decompOptions2.decompOperator.type;
 
             int perLag = -2;
             string lhsString = "Expression value";
@@ -576,7 +574,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                PrepareEquations(per1, per2, op, decompOptions2, true, modelGamsScalar);
+                PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
             }
 
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
@@ -600,7 +598,7 @@ namespace Gekko
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, op, residualName, ref funcCounter, modelGamsScalar);
+                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, modelGamsScalar);
                         DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                     }
                 }
@@ -609,7 +607,7 @@ namespace Gekko
                     foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;
-                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks_OLDREMOVESOON(decompOptions2.decompOperator), residualName, ref funcCounter);
                         DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                     }
                 }
@@ -652,42 +650,42 @@ namespace Gekko
                     {
                         //decomp over time, resolving lags/leads                            
 
-                        if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
+                        if (decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                         {
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, op, modelGamsScalar);
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, op, modelGamsScalar);  //Note: refreshObjects = false!
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, decompOptions2.decompOperator, modelGamsScalar);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, decompOptions2.decompOperator, modelGamsScalar);  //Note: refreshObjects = false!
                         }
                         else
                         {
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, op, modelGamsScalar);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, decompOptions2.decompOperator, modelGamsScalar);
                         }
                     }
                     else
                     {
                         //decomp period by period, showing lags/leads.
 
-                        if (op.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
+                        if (decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                         {
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, op, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
                                 refreshObjects = false;
                             }
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, op, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
                             }
                         }
                         else
                         {
                             int deduct = 0;
                             //why deduct not enough??
-                            if (op.isDoubleDifQuo || op.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
+                            if (decompOptions2.decompOperator.isDoubleDifQuo || decompOptions2.decompOperator.isDoubleDifRef) deduct = -1;  //all the data are ready, so we can calc 1 period earlier, so that a 1-period decomp actually shows something for <dp> or <rdp>
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, op, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
                                 refreshObjects = false;
                             }
                         }
@@ -737,7 +735,7 @@ namespace Gekko
             //We are cloning this, because normalization may take place when doing the table
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, op, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types);
 
             if (false)
             {
