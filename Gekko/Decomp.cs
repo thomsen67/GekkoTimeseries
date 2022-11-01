@@ -21,7 +21,6 @@ namespace Gekko
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
         //--------------------------------------------------------------- 
         public string operatorLower = null;
-        public bool isShares = false;
         //--------------------------------------------------------------- 
 
         public bool isPercentageType = false; //for formatting        
@@ -86,24 +85,22 @@ namespace Gekko
             //col 2
             // ----------------------------------------------------
 
-            else if (x == "d" || x == "sd")
+            else if (x == "d")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.D;
-                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "p" || x == "sp")
+            else if (x == "p")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.D;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "dp" || x == "sdp")
+            else if (x == "dp")
             {
                 this.isDoubleDifQuo = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyQuo;
@@ -111,7 +108,6 @@ namespace Gekko
                 this.lagGradient = new List<int>() { -2, -1 };
                 this.type = Decomp.EContribType.D;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
 
             // ----------------------------------------------------
@@ -139,27 +135,24 @@ namespace Gekko
             // ----------------------------------------------------
             //col 4
             // ----------------------------------------------------
-            else if (x == "m" || x == "sm")
+            else if (x == "m")
             {
                 this.lowLevel = Decomp.ELowLevel.Multiplier;
                 this.type = Decomp.EContribType.M;
-                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "q" || x == "sq")
+            else if (x == "q")
             {
                 this.lowLevel = Decomp.ELowLevel.Multiplier;
                 this.type = Decomp.EContribType.M;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "mp" || x == "smp")
+            else if (x == "mp")
             {
                 this.lowLevel = Decomp.ELowLevel.BothQuoAndRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.M;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
 
 
@@ -193,24 +186,22 @@ namespace Gekko
             //ref col 2
             // ----------------------------------------------------
 
-            else if (x == "rd" || x == "srd")
+            else if (x == "rd")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.RD;
-                if (x.StartsWith("s")) { isShares = true; isPercentageType = true; }
             }
-            else if (x == "rp" || x == "srp")
+            else if (x == "rp")
             {
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
                 this.type = Decomp.EContribType.RD;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
-            else if (x == "rdp" || x == "srdp")
+            else if (x == "rdp")
             {
                 this.isDoubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
@@ -218,7 +209,6 @@ namespace Gekko
                 this.lagGradient = new List<int>() { -2, -1 };
                 this.type = Decomp.EContribType.RD;
                 this.isPercentageType = true;
-                if (x.StartsWith("s")) isShares = true;
             }
 
             // -------------------------------
@@ -236,7 +226,6 @@ namespace Gekko
             rv.isPercentageType = this.isPercentageType;
             rv.operatorLower = this.operatorLower;
             rv.isRaw = this.isRaw;
-            rv.isShares = this.isShares;
             rv.isDoubleDifQuo = this.isDoubleDifQuo;
             rv.isDoubleDifRef = this.isDoubleDifRef;
             rv.lowLevel = this.lowLevel;
@@ -355,7 +344,8 @@ namespace Gekko
                 decompOptions2.expressionOld = o.label;
                 decompOptions2.expression = o.expression;
                 decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());                
-                if (G.Equal(o.opt_shares, "yes")) decompOptions2.shares = true;
+                if (G.Equal(o.opt_shares, "yes")) decompOptions2.isShares = true;                
+                if (G.Equal(o.opt_count, "yes") && G.Equal(o.opt_names, "yes")) new Error("You cannot use option <count> and <names> at the same time");
                 if (G.Equal(o.opt_count, "yes")) decompOptions2.count = ECountType.N;
                 if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
                 if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
@@ -3469,7 +3459,7 @@ namespace Gekko
         {            
             bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);                        
 
-            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.decompOperator.isShares)
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
             }
@@ -3548,7 +3538,7 @@ namespace Gekko
                                 Cell c = tab.Get(i, j);
                                 c.number = -value;
                             }
-                            if (decompOptions2.decompOperator.isShares)
+                            if (decompOptions2.isShares)
                             {
                                 Cell c = tab.Get(i, j);
                                 c.number = tab.Get(i, j).number / (-value) * 100d;
@@ -3569,7 +3559,7 @@ namespace Gekko
                                 Cell c = tab.Get(i, j);
                                 c.number = -value;
                             }
-                            if (decompOptions2.decompOperator.isShares)
+                            if (decompOptions2.isShares)
                             {
                                 Cell c = tab.Get(i, j);
                                 c.number = tab.Get(i, j).number / (-value) * 100d;

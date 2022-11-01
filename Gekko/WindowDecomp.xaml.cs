@@ -604,7 +604,7 @@ namespace Gekko
                 checkRef.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.decompOperator.isShares)
+            if (this.decompFind.decompOptions2.isShares)
             {
                 checkBoxShares.IsChecked = true;
             }
@@ -1675,13 +1675,15 @@ namespace Gekko
         /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(bool refresh, ModelGamsScalar modelGamsScalar)
         {
+
+            int remember = Globals.guiTableCellWidth;
             try
             {
                 if (this.decompFind.decompOptions2.expression == null)
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
                 }
-
+                if (this.decompFind.decompOptions2.count == ECountType.Names) Globals.guiTableCellWidth = 3 * remember;
                 RecalcCellsWithNewTypeHelper(refresh, modelGamsScalar);
                 return;
             }
@@ -1690,6 +1692,10 @@ namespace Gekko
                 if (G.IsUnitTesting()) throw;
                 this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;  
                 RecalcCellsWithNewTypeHelper(refresh, modelGamsScalar);
+            }
+            finally
+            {
+                Globals.guiTableCellWidth = remember;
             }
         }
 
@@ -1792,7 +1798,7 @@ namespace Gekko
                 radioButton30.Opacity = 0.5;
             }
 
-            if (this.decompFind.decompOptions2.decompOperator.isShares)
+            if (this.decompFind.decompOptions2.isShares)
             {
                 radioButton21.IsEnabled = false;
                 radioButton21.Opacity = 0.5;
@@ -2027,7 +2033,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator.isShares = true;
+                this.decompFind.decompOptions2.isShares = true;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2037,7 +2043,7 @@ namespace Gekko
             if (!isInitializing)
             {                
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator.isShares = false;
+                this.decompFind.decompOptions2.isShares = false;
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -2108,7 +2114,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.decompOperator.isShares)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.isShares)
                 {
                     this.decompFind.decompOptions2.decimalsPch++;
                 }
@@ -2125,7 +2131,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.decompOperator.isShares)
+                if (this.decompFind.decompOptions2.decompOperator.isPercentageType || this.decompFind.decompOptions2.isShares)
                 {
                     this.decompFind.decompOptions2.decimalsPch--;
                     if (this.decompFind.decompOptions2.decimalsPch < 0) this.decompFind.decompOptions2.decimalsPch = 0;
@@ -2310,17 +2316,9 @@ namespace Gekko
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
                 checkBoxCount.Unchecked -= CheckBoxCount_Unchecked;
                 checkBoxCount.IsChecked = false;  //so it does not fire
-                checkBoxCount.Unchecked += CheckBoxCount_Unchecked;
-                Globals.guiTableCellWidth = 3 * Globals.guiTableCellWidth;
-                try
-                {
-                    this.decompFind.decompOptions2.count = ECountType.Names;
-                    RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
-                }
-                finally
-                {
-                    Globals.guiTableCellWidth = Globals.guiTableCellWidth / 3;
-                }
+                checkBoxCount.Unchecked += CheckBoxCount_Unchecked;                
+                this.decompFind.decompOptions2.count = ECountType.Names;
+                RecalcCellsWithNewType(false, decompFind.modelGamsScalar);                
             }
         }
 
@@ -2407,7 +2405,7 @@ namespace Gekko
         public DecompOperator decompOperator = null;
         public ECountType count = ECountType.None;
         public bool showErrors = false;
-        public bool shares = false;
+        public bool isShares = false;
         public int decimalsLevel = 4;  //TODO: make selectable from syntax
         public int decimalsPch = 2;  //TODO: make selectable from syntax
         public bool dyn = false;
@@ -2517,7 +2515,7 @@ namespace Gekko
             d.dyn = this.dyn;
             d.count = this.count;
             d.missingAsZero = this.missingAsZero;
-            d.shares = this.shares;
+            d.isShares = this.isShares;
             
             d.modelHash = this.modelHash;
             d.type = this.type;
