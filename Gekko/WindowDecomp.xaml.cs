@@ -1063,6 +1063,7 @@ namespace Gekko
                     //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
                     Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
                     string v = c.vars_hack?[0];
+                    if (v == Globals.decompErrorName) v = null;
 
                     bool isEndogenous = false;
                     if (v != null)
@@ -1454,11 +1455,9 @@ namespace Gekko
 
                 string var = HiddenVariableHelper(c2);
                 if (var == null)
-                {
-                    new Writeln(Decomp.Text1(1));
-                    return;
+                {                    
+                    new Error(Decomp.Text1(1));
                 }
-                //DecompOptions2 opt = this.decompFind.decompOptions2.Clone();
                 O.Find o = new O.Find(this.decompFind);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
@@ -1605,15 +1604,38 @@ namespace Gekko
                             {
                                 this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;                                                             
                                 string var7 = HiddenVariableHelper(c2);
+
+                                int number = -12345;
+                                try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch {};
+                                if (var7 == Globals.decompResidualName) number = 0;
+                                //"Residual" --> number = 0
+                                //"Residual1" --> number = 1
+                                //"Residual2" --> number = 2
+                                //"Residual0" --> number = -12345
+                                //"Residualsomething" --> number = -12345
+
                                 if (var7 == null)
                                 {
                                     this.equation.Text = "--> " + Decomp.Text1(1);
                                 }
                                 else
                                 {
-                                    List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
-                                    string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
-                                    this.equation.Text = txt;
+                                    if (var7 == Globals.decompErrorName)
+                                    {
+                                        this.equation.Text = "Errors originating from non-linearities in the equation. For a linear equation, these errors should always be = 0.";
+                                    }
+                                    else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
+                                    {
+                                        string more = "";
+                                        if (number > 0) more = " #" + number;
+                                        this.equation.Text = "Data error in equation" + more + " (difference between left-hand and right-hand side). The data error should normally be = 0 for simulated values.";
+                                    }
+                                    else
+                                    {
+                                        List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+                                        string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
+                                        this.equation.Text = txt;
+                                    }
                                 }
                             }
                         }

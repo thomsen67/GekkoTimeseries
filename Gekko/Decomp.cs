@@ -3464,7 +3464,7 @@ namespace Gekko
                 tab.Set(1, 1, "%" + "  ");
             }
 
-            if (decompOptions2.showErrors)
+            if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
             {
                 int rowmax = tab.GetRowMaxNumber();  //because it changes dynamically
                 int colmax = tab.GetColMaxNumber();  //because it changes dynamically
@@ -3475,10 +3475,11 @@ namespace Gekko
                         if (decompOptions2.count == ECountType.N)
                         {
                             tab.SetNumber(rowmax + 1, j, 1, "f16.0");
+                            tab.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
                         }
                         else if (decompOptions2.count == ECountType.Names)
                         {
-                            tab.Set(rowmax + 1, j, "Error");
+                            tab.Set(rowmax + 1, j, Globals.decompErrorName2);
                         }
                         else
                         {
@@ -3489,10 +3490,11 @@ namespace Gekko
                                 sum += value;
                             }
                             tab.SetNumber(rowmax + 1, j, -sum, GetNumberFormat(decompOptions2));
+                            tab.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
                         }
                         tab.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
                     }
-                    tab.Set(rowmax + 1, 1, "Error");
+                    tab.Set(rowmax + 1, 1, Globals.decompErrorName2);
                 }
                 else
                 {                    
@@ -3501,10 +3503,11 @@ namespace Gekko
                         if (decompOptions2.count == ECountType.N)
                         {
                             tab.SetNumber(i, colmax + 1, 1, "f16.0");
+                            tab.Get(i, colmax).vars_hack = new List<string>() { Globals.decompErrorName };
                         }
                         else if (decompOptions2.count == ECountType.Names)
                         {
-                            tab.Set(i, colmax + 1, "Error");
+                            tab.Set(i, colmax + 1, Globals.decompErrorName2);
                         }
                         else
                         {
@@ -3514,11 +3517,12 @@ namespace Gekko
                                 double value = tab.Get(i, j).number;
                                 sum += value;
                             }
-                            tab.SetNumber(i, colmax + 1, -sum, GetNumberFormat(decompOptions2));                            
+                            tab.SetNumber(i, colmax + 1, -sum, GetNumberFormat(decompOptions2));
+                            tab.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
                         }
                         tab.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
                     }
-                    tab.Set(1, colmax + 1, "Error");
+                    tab.Set(1, colmax + 1, Globals.decompErrorName2);
                 }
             }
 

@@ -504,7 +504,7 @@ namespace Gekko
         public static string decompText1 = "[Data error]";
         public static string decompText1a = "[Difference]";
         public static string decompText2 = "[Decomp. error]";
-        public static string decompText2a = "[Right hand side]";
+        public static string decompText2a = "[Right hand side]";        
 
         //GUI hacks
         public static ItemHandler itemHandler = null;  //hack regardig FIND window
@@ -909,8 +909,10 @@ namespace Gekko
         public static bool showDecompTable = false;  //only used for unit tests
         public const string decompNull = "<null>";
         public static string decompNullName = "________a";        
-        public static string decompResidualName = "zzzzzzzzy";
+        public static string decompResidualName = "zzzzzzzzy";        
         public const string decompResidualName2 = "Residual";
+        public static string decompErrorName = "Error_78hsgds98dsfus";
+        public const string decompErrorName2 = "Error";
 
         public static CommandMemory commandMemory = new CommandMemory();
 
