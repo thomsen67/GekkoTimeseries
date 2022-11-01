@@ -17,6 +17,9 @@ namespace Gekko
     {
         //remember Clone()
 
+        //A bit stupid that the "x" is part of operatorLower whereas "r" is not.
+        //Maybe remove the "x" and use isRaw like isReference.
+
         //--------------------------------------------------------------- 
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
         //--------------------------------------------------------------- 
@@ -36,6 +39,16 @@ namespace Gekko
 
         public DecompOperator()
         {
+        }
+
+        public string ToStringCorresponding()
+        {
+            string s = this.operatorLower;
+            if (isReference)
+            {
+
+            }
+            return s;
         }
 
         public DecompOperator(string x)

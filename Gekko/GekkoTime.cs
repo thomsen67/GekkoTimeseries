@@ -1563,6 +1563,10 @@ namespace Gekko
             return slag;
         }
 
+        /// <summary>
+        /// Human-readable version.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
         {
             //========================================================================================================

@@ -2513,8 +2513,23 @@ namespace Gekko
         public List<GekkoDictionary<string, string>> freeValues = null;
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = null;
+        
+        public Data dataPattern = null;        
 
-        public Data dataPattern = null;
+        public string ToCode()
+        {
+            
+
+            string s = null;
+            s += "decomp3";
+            s += " <";
+            s += this.t1.ToString() + " " + this.t2.ToString();
+            s += " " + decompOperator.operatorLower;
+            s += ">";
+
+
+            return s;
+        }
 
         public DecompOptions2 Clone()
         {
