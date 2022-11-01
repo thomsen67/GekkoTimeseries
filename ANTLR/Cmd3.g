@@ -2949,8 +2949,8 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
-                          | COUNT EQUAL name -> ^(ASTOPT_STRING_COUNT name)
-						  | NAMES EQUAL name -> ^(ASTOPT_STRING_NAMES name)
+                          | COUNT (EQUAL yesNo)? -> ^(ASTOPT_STRING_COUNT yesNo?)
+						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)  //m | zero
 						  | ERRORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERRORS yesNo?)
 						  | SHARES (EQUAL yesNo)? -> ^(ASTOPT_STRING_SHARES yesNo?)
