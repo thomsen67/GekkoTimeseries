@@ -1914,7 +1914,9 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
+                //string r = null; if(this.decompFind.decompOptions2.decompOperator.operatorLower.Contains(StartsWith("r", StringComparison.OrdinalIgnoreCase)
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("xrn");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1924,7 +1926,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xd");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("xrd");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("xd");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1934,7 +1937,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("d");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("rd");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("d");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1944,7 +1948,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xp");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("xrp");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("xp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1954,7 +1959,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("p");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("rp");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("p");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1964,7 +1970,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xdp");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("xrdp");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("xdp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1974,7 +1981,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("dp");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("rdp");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("dp");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }
@@ -1984,7 +1992,8 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
+                if (this.decompFind.decompOptions2.decompOperator.isReference) this.decompFind.decompOptions2.decompOperator = new DecompOperator("xrn");
+                else this.decompFind.decompOptions2.decompOperator = new DecompOperator("xn");
                 RecalcCellsWithNewType(false, decompFind.modelGamsScalar);
             }
         }

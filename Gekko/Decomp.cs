@@ -25,6 +25,7 @@ namespace Gekko
 
         public bool isPercentageType = false; //for formatting        
         public bool isRaw = false;
+        public bool isReference = false;
 
         public bool isDoubleDifQuo = false;  //codes that contain 'dp'
         public bool isDoubleDifRef = false;  //codes that contain 'rdp'
@@ -52,6 +53,7 @@ namespace Gekko
             else if (x == "xr" || x == "xrn")
             {
                 this.isRaw = true;
+                this.isReference = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
             }
 
@@ -163,12 +165,14 @@ namespace Gekko
             else if (x == "xrd")
             {
                 this.isRaw = true;
+                this.isReference = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
             }
             else if (x == "xrp")
             {
                 this.isRaw = true;
+                this.isReference = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.isPercentageType = true;
@@ -176,6 +180,7 @@ namespace Gekko
             else if (x == "xrdp")
             {
                 this.isRaw = true;
+                this.isReference = true;
                 this.isDoubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
@@ -188,6 +193,7 @@ namespace Gekko
 
             else if (x == "rd")
             {
+                this.isReference = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
@@ -195,6 +201,7 @@ namespace Gekko
             }
             else if (x == "rp")
             {
+                this.isReference = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -1, 0 };
                 this.lagGradient = new List<int>() { -1, -1 };
@@ -203,6 +210,7 @@ namespace Gekko
             }
             else if (x == "rdp")
             {
+                this.isReference = true;
                 this.isDoubleDifRef = true;
                 this.lowLevel = Decomp.ELowLevel.OnlyRef;
                 this.lagData = new List<int>() { -2, 0 };
