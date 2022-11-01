@@ -179,6 +179,7 @@ namespace Gekko
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
         public DecompOptions2 decompOptions2 = null;
+        public DecompOptions2 decompOptions2Previous = null;
         public object window = null;
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
