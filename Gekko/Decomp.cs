@@ -23,7 +23,7 @@ namespace Gekko
         //--------------------------------------------------------------- 
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOptions2
         //--------------------------------------------------------------- 
-        public string operatorLower = null;
+        private string operatorLower = null;
         //--------------------------------------------------------------- 
 
         public bool isPercentageType = false; //for formatting        
@@ -41,14 +41,13 @@ namespace Gekko
         {
         }
 
-        public string ToStringCorresponding()
+        /// <summary>
+        /// Returns for instance 'xrd' or 'rd' or 'xd' or 'd'. Never contains 's'.
+        /// </summary>
+        /// <returns></returns>
+        public string OperatorLower()
         {
-            string s = this.operatorLower;
-            if (isReference)
-            {
-
-            }
-            return s;
+            return this.operatorLower;
         }
 
         public DecompOperator(string x)
@@ -357,7 +356,7 @@ namespace Gekko
             else
             {
                 decompOptions2 = new DecompOptions2();
-                decompOptions2.code = o.label + ";";
+                if (!Globals.decompNewCode) decompOptions2.code = o.label + ";";
                 decompOptions2.modelType = G.GetModelType();
                 decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
@@ -465,7 +464,8 @@ namespace Gekko
                     }
                 }
             }
-            
+
+            if(Globals.decompNewCode) decompOptions2.code = decompOptions2.ToCode();
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }
 
@@ -2771,84 +2771,84 @@ namespace Gekko
                         }
                         // ----- first end --------------------------------------------------
 
-                        if (op.operatorLower == "n" || op.operatorLower == "xn")
+                        if (op.OperatorLower() == "n" || op.OperatorLower() == "xn")
                         {
                             d = dLevel;
                         }
-                        else if (op.operatorLower == "rn" || op.operatorLower == "r" || op.operatorLower == "xrn" || op.operatorLower == "xr")
+                        else if (op.OperatorLower() == "rn" || op.OperatorLower() == "r" || op.OperatorLower() == "xrn" || op.OperatorLower() == "xr")
                         {
                             d = dLevelRef;
                         }
-                        else if (op.operatorLower == "d" || op.operatorLower == "sd")
+                        else if (op.OperatorLower() == "d" || op.OperatorLower() == "sd")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "p" || op.operatorLower == "sp")
+                        else if (op.OperatorLower() == "p" || op.OperatorLower() == "sp")
                         {
                             d = td.change / dFirstLevelLag * 100d;
                         }
-                        else if (op.operatorLower == "dp" || op.operatorLower == "sdp")
+                        else if (op.OperatorLower() == "dp" || op.OperatorLower() == "sdp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelLag2 * 100d;
                         }
-                        else if (op.operatorLower == "m" || op.operatorLower == "sm")
+                        else if (op.OperatorLower() == "m" || op.OperatorLower() == "sm")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "q" || op.operatorLower == "sq")
+                        else if (op.OperatorLower() == "q" || op.OperatorLower() == "sq")
                         {
                             d = td.change / dFirstLevelRef * 100d;
                         }
-                        else if (op.operatorLower == "mp" || op.operatorLower == "smp")
+                        else if (op.OperatorLower() == "mp" || op.OperatorLower() == "smp")
                         {
                             d = td.change / dFirstLevelLag * 100d - td.changeAlternative / dFirstLevelRefLag * 100d;
                         }
-                        else if (op.operatorLower == "xd")
+                        else if (op.OperatorLower() == "xd")
                         {
                             d = dLevel - dLevelLag;
                         }
-                        else if (op.operatorLower == "xp")
+                        else if (op.OperatorLower() == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
                         }
-                        else if (op.operatorLower == "xdp")
+                        else if (op.OperatorLower() == "xdp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelLag - dLevelLag2) / dLevelLag2 * 100d;
                         }
-                        else if (op.operatorLower == "xm")
+                        else if (op.OperatorLower() == "xm")
                         {
                             d = dLevel - dLevelRef;
                         }
-                        else if (op.operatorLower == "xq")
+                        else if (op.OperatorLower() == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
-                        else if (op.operatorLower == "xmp")
+                        else if (op.OperatorLower() == "xmp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d - (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
                         // -----------------
-                        else if (op.operatorLower == "rd" || op.operatorLower == "srd")
+                        else if (op.OperatorLower() == "rd" || op.OperatorLower() == "srd")
                         {
                             d = td.change;
                         }
-                        else if (op.operatorLower == "rp" || op.operatorLower == "srp")
+                        else if (op.OperatorLower() == "rp" || op.OperatorLower() == "srp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d;
                         }
-                        else if (op.operatorLower == "rdp" || op.operatorLower == "srdp")
+                        else if (op.OperatorLower() == "rdp" || op.OperatorLower() == "srdp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d - td.changeAlternative / dFirstLevelRefLag2 * 100d;
                         }
-                        else if (op.operatorLower == "xrd")
+                        else if (op.OperatorLower() == "xrd")
                         {
                             d = dLevelRef - dLevelRefLag;
                         }
-                        else if (op.operatorLower == "xrp")
+                        else if (op.OperatorLower() == "xrp")
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
-                        else if (op.operatorLower == "xrdp")
+                        else if (op.OperatorLower() == "xrdp")
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d - (dLevelRefLag - dLevelRefLag2) / dLevelRefLag2 * 100d;
                         }
@@ -3397,7 +3397,7 @@ namespace Gekko
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.operatorLower, smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, dictName, decompOptions2.modelType == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = double.NaN;
                         }
 
@@ -3617,7 +3617,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         private static void DecompNormalizeOLD(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, DecompData decompDatasSupremeClone, EContribType operatorOneOf3Types)
         {
-            DecompOperator op = new DecompOperator(decompOptions2.decompOperator.operatorLower);
+            DecompOperator op = new DecompOperator(decompOptions2.decompOperator.OperatorLower());
             EDecompBanks edb = DecompBanks_OLDREMOVESOON(op);
 
             bool orderNormalize = true;
@@ -3998,7 +3998,7 @@ namespace Gekko
         public static EDecompBanks DecompBanks_OLDREMOVESOON(DecompOperator op)
         {
             EDecompBanks banks = EDecompBanks.Work;
-            string operator1 = op.operatorLower;
+            string operator1 = op.OperatorLower();
             if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
             if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Multiplier;
             return banks;

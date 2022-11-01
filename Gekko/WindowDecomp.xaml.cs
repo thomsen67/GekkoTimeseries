@@ -542,59 +542,59 @@ namespace Gekko
 
         public void SetRadioButtons()
         {
-            if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xn" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrn")
+            if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xn" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xrn")
             {
                 radioButton1.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xd" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrd")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xd" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xrd")
             {
                 radioButton2.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xp" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xrp")
             {
                 radioButton4.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xdp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "xrdp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xdp" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xrdp")
             {
                 radioButton9.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xm")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xm")
             {
                 radioButton22.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xq")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xq")
             {
                 radioButton24.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "xmp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "xmp")
             {
                 radioButton29.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "n" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rn")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "n" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "rn")
             {
                 radioButton5.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "d" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rd")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "d" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "rd")
             {
                 radioButton6.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "p" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "p" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "rp")
             {
                 radioButton8.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "dp" || this.decompFind.decompOptions2.decompOperator.operatorLower == "rdp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "dp" || this.decompFind.decompOptions2.decompOperator.OperatorLower() == "rdp")
             {
                 radioButton10.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "m")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "m")
             {
                 radioButton26.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "q")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "q")
             {
                 radioButton28.IsChecked = true;
             }
-            else if (this.decompFind.decompOptions2.decompOperator.operatorLower == "mp")
+            else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "mp")
             {
                 radioButton30.IsChecked = true;
             }
@@ -2084,7 +2084,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
+                string xx = this.decompFind.decompOptions2.decompOperator.OperatorLower();
                 if (xx.StartsWith("x")) xx = "xr" + xx.Substring(1);
                 else xx = "r" + xx;
                 this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
@@ -2097,7 +2097,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
-                string xx = this.decompFind.decompOptions2.decompOperator.operatorLower;
+                string xx = this.decompFind.decompOptions2.decompOperator.OperatorLower();
                 if (xx.StartsWith("xr")) xx = "x" + xx.Substring(2);
                 else if (xx.StartsWith("r")) xx = xx.Substring(1);
                 this.decompFind.decompOptions2.decompOperator = new DecompOperator(xx);
@@ -2298,13 +2298,20 @@ namespace Gekko
             //
             //            
             windowParentDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
-            List<string> select = this.decompFind.decompOptions2.new_select;
-            string oldCode = dfParentDecomp.decompOptions2.code;
-            int i = oldCode.IndexOf(" from ", StringComparison.OrdinalIgnoreCase);
-            string s2 = G.Substring(oldCode, 0, i - 1).Trim();
-            string newCode = s2 + " from " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_endo) + ";";
-            dfParentDecomp.decompOptions2.code = newCode;
+            if (Globals.decompNewCode)
+            {
+                dfParentDecomp.decompOptions2.code = dfParentDecomp.decompOptions2.ToCode();
+            }
+            else
+            {                
+                string oldCode = dfParentDecomp.decompOptions2.code;
+                int i = oldCode.IndexOf(" from ", StringComparison.OrdinalIgnoreCase);
+                string s2 = G.Substring(oldCode, 0, i - 1).Trim();
+                string newCode = s2 + " from " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_endo) + ";";
+                dfParentDecomp.decompOptions2.code = newCode;
+            }
             windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+
             try
             {
                 Decomp.DecompGetFuncExpressionsAndRecalc(dfParentDecomp, windowParentDecomp);
@@ -2514,20 +2521,54 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = null;
         
-        public Data dataPattern = null;        
+        public Data dataPattern = null;
 
+        /// <summary>
+        /// Obtain the object as code like "decomp3 &lt;2010 2020> x from e1 endo x;"
+        /// </summary>
+        /// <returns></returns>
         public string ToCode()
         {
-            
-
             string s = null;
             s += "decomp3";
             s += " <";
             s += this.t1.ToString() + " " + this.t2.ToString();
-            s += " " + decompOperator.operatorLower;
+            s += " " + decompOperator.OperatorLower();
+            if (this.isShares) s += " shares";
+            if (this.count == ECountType.N) s += " count";
+            if (this.count == ECountType.Names) s += " names";
+            if (this.showErrors) s += " errors";
+            if (this.dyn) s += " dyn";
+            if (this.missingAsZero) s += " missing=zero";
             s += ">";
+            s += " " + Stringlist.GetListWithCommas(this.new_select);
+            s += " from";
+            s += " " + Stringlist.GetListWithCommas(this.new_from);
+            s += " endo";
+            s += " " + Stringlist.GetListWithCommas(this.new_endo);
+            
+            if (this.rows.Count > 0)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x in this.rows)
+                {
+                    temp.Add(G.HandleInternalIdentifyer1(x));
+                }
+                s += " rows";
+                s += " " + Stringlist.GetListWithCommas(temp);
+            }
+            if (this.cols.Count > 0)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x in this.cols)
+                {
+                    temp.Add(G.HandleInternalIdentifyer1(x));
+                }
+                s += " cols";
+                s += " " + Stringlist.GetListWithCommas(temp);
+            }
 
-
+            s += ";";
             return s;
         }
 

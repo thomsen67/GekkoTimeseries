@@ -913,6 +913,7 @@ namespace Gekko
         public const string decompResidualName2 = "Residual";
         public static string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
+        public const bool decompNewCode = true;
 
         public static CommandMemory commandMemory = new CommandMemory();
 

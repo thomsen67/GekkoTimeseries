@@ -145,7 +145,7 @@ namespace Gekko
             string eqName = G.Chop_DimensionRemoveLast(fullName);
 
             O.Decomp2 decomp = new O.Decomp2();
-            decomp.opt_prtcode = this.decompFind.decompOptions2.decompOperator.operatorLower;
+            decomp.opt_prtcode = this.decompFind.decompOptions2.decompOperator.OperatorLower();
             decomp.t1 = this.decompFind.decompOptions2.t1;
             decomp.t2 = this.decompFind.decompOptions2.t2;
             string varName = this.decompFind.decompOptions2.iv.list[0].ConvertToString();
