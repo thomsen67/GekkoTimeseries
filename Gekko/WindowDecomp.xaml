@@ -426,7 +426,7 @@
                     </TabItem>
                     <TabItem Header="Code">
                         <ScrollViewer Background="LightYellow">
-                            <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
+                            <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10"></RichTextBox>
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>

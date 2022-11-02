@@ -1205,9 +1205,23 @@ namespace Gekko
         public bool best = false;
     }
 
-        /// <summary>
-        /// Simple helper class, obsolete??
-        /// </summary>
+    /// <summary>
+    /// Used in RichTextBox
+    /// </summary>
+    public class StringAndColor
+    {
+        public string s = null;
+        public System.Windows.Media.Color color = System.Windows.Media.Colors.Black;
+        public StringAndColor(string s, System.Windows.Media.Color color)
+        {
+            this.s = s;
+            this.color = color;
+        }
+    }
+
+    // <summary>
+    // Simple helper class
+    // </summary>
     public class TwoStrings
     {
         public string s1 = null;
@@ -6319,7 +6333,7 @@ namespace Gekko
             readInfo.startPerResultingBank = readInfo.startPerInFile;
             readInfo.endPerResultingBank = readInfo.endPerInFile;
 
-        }
+        }        
 
         /// <summary>
         /// Helper method for the ReadPx() method
@@ -9699,7 +9713,7 @@ namespace Gekko
                 rv += s2 + G.NL;
             }
             return rv;
-        }
+        }        
 
         /// <summary>
         /// Get name, label, source, unit, etc. for a timeseries (will also get lines from external varlist.dat file if present: these lines are shown right after name)

@@ -378,6 +378,10 @@ namespace Gekko
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
             if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
+            if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
+            {
+                ResetRowsColsSelection(decompOptions2);
+            }
 
             decompOptions2.type = o.type;
 
@@ -2628,11 +2632,6 @@ namespace Gekko
                     //Old and bad method, make it disappear soon!
                     DecompNormalizeOLD(per1, per2, decompOptions2, parentI, decompDataMAINClone, operatorOneOf3Types);
                 }
-            }
-
-            if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
-            {
-                ResetRowsColsSelection(decompOptions2);
             }
 
             DecompPivotHandleFilters(decompOptions2);

@@ -1743,7 +1743,8 @@ namespace Gekko
                 s = Model.GetEquationTextFoldedNonScalar(this.decompFind.decompOptions2.modelType, this.decompFind.decompOptions2.link);
             }
             this.equation.Text = s;
-            this.code.Text = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
+            //this.code.contText = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
+            SetText(this.code, this.decompFind.decompOptions2.code + Program.SetBlanks(), Colors.Red);
 
             this.decompFind.decompOptions2.guiDecompValues = table;
 
@@ -1760,7 +1761,7 @@ namespace Gekko
                 MakeGuiTable2(table, this.decompFind.decompOptions2);
             }
         }
-
+        
         private void SetRadioButtonsDefaults()
         {
             if (true)
@@ -2278,6 +2279,35 @@ namespace Gekko
             windowDecompParent.Dispatcher.Invoke(() => { Merge(dfParentDecomp); });
         }
 
+        /// <summary>
+        /// Set RichText
+        /// </summary>
+        /// <param name="myRichTextBox"></param>
+        /// <param name="s"></param>
+        /// <param name="color"></param>
+        public static void SetText(RichTextBox myRichTextBox, string s, Color color)
+        {
+            StringAndColor sac = new StringAndColor(s, color);
+            SetText(myRichTextBox, new List<StringAndColor> { sac });
+        }
+
+        /// <summary>
+        /// Set RichText
+        /// </summary>
+        /// <param name="myRichTextBox"></param>
+        /// <param name="input"></param>
+        public static void SetText(RichTextBox myRichTextBox, List<StringAndColor> input)
+        {
+            myRichTextBox.Document.Blocks.Clear();
+            foreach (StringAndColor sc in input)
+            {
+                var paragraph = new Paragraph();
+                var run = new Run(sc.s) { Foreground = new SolidColorBrush(sc.color) };
+                paragraph.Inlines.Add(run);
+                myRichTextBox.Document.Blocks.Add(paragraph);
+            }
+        }
+
         private void Merge(DecompFind dfParentDecomp)
         {
             dfParentDecomp.decompOptions2Previous = dfParentDecomp.decompOptions2.Clone();
@@ -2310,7 +2340,8 @@ namespace Gekko
                 string newCode = s2 + " from " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_endo) + ";";
                 dfParentDecomp.decompOptions2.code = newCode;
             }
-            windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+            //windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+            SetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code + Program.SetBlanks(), Colors.Red);
 
             try
             {
@@ -2320,7 +2351,8 @@ namespace Gekko
             {
                 //reverting, so that the parent window may be ok to continue with
                 dfParentDecomp.decompOptions2 = remember; 
-                windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+                //windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
+                SetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code + Program.SetBlanks(), Colors.Red);
             }
         }        
 
