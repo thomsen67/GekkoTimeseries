@@ -2992,7 +2992,7 @@ namespace Gekko
             {
                 if (rownamesFirst == null && colnamesFirst == null)
                 {
-                    new Error("Could not find row/col to put first for normalization");
+                    new Error("Could not find variable field in order to construct pivot table (in a later Gekko version, this may be legal).");
                 }
                 if (rownamesFirst != null && colnamesFirst != null)
                 {
