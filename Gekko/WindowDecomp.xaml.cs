@@ -2485,35 +2485,34 @@ namespace Gekko
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         //--------------------------------------------------------------- 
-        
-        //FIND STUFF
+                
         public List iv = null;
-        public GekkoTime t0 = GekkoTime.tNull;
-
-        //public List<List<PeriodAndVariable>> precedentsScalar = null;
-        //public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
-        public EModelType modelType = EModelType.Unknown;
-        
+        public GekkoTime t0 = GekkoTime.tNull;        
+        public EModelType modelType = EModelType.Unknown;        
         public bool showTime = false;
         public Rich code = null;
-        public bool ageHierarchy = false;
-        
+        public bool ageHierarchy = false;        
         public bool isNew = false;
-
         public int numberOfRecalcs = 0;  //is not cloned --> used to pause main thread until the DECOMP window has calculated.
-        public string variable = null;
-        public List<string> variable_subelement = null;        
-        
+        public string variable = null;        
         public string expressionOld = null;  //only != null for expressions
-        public Func<GekkoSmpl, IVariable> expression = null;
-        public List<Dictionary<string, string>> precedents;  //only != null for expressions
-        public string type;  //not used yet (UDVALG or DECOMP)
-        
+        public Func<GekkoSmpl, IVariable> expression = null;        
+        public string type;  //not used yet (UDVALG or DECOMP)        
         public List<string> subst = new List<string>();
+        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions   
+        public Data dataPattern = null;
+        public string dream = null;  //experimental
+        public List<Link> link = new List<Link>();
+        public List<List<string>> where = new List<List<string>>();
+        public List<List<string>> group = new List<List<string>>();
+        //internal stuff for Rows/Colums
+        public List<string> all = new List<string>();
+        public ObservableCollection<string> free = new ObservableCollection<string>();
+        public List<GekkoDictionary<string, string>> freeValues = new List<GekkoDictionary<string, string>>();
+        public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
+        public List<FrameFilter> filters = new List<FrameFilter>();
 
-        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions        
-
-        //-------- tranformation end ----------------
+        //-------- No clone for this ----------------
         public int guiDecompLastClickedRow = 0;
         public int guiDecompLastClickedCol = 0;
         public int guiDecompSelectedColMin = 0;
@@ -2526,34 +2525,8 @@ namespace Gekko
         public Table guiDecompValues = new Table();
         public LocalBanks localBanks = null;
         public string modelHash = null;
+        //-------- GUI stuff end ----------------        
         
-        public string dream = null;  //experimental
-                
-        public bool hasCalculatedQuo = false;
-        public bool hasCalculatedRef = false;
-
-        public List<string> vars2 = null;
-
-        public List<Link> link = new List<Link>();
-        public List<List<string>> where = new List<List<string>>();
-        public List<List<string>> group = new List<List<string>>();
-        
-        // --------- used for dropdown lists in gui
-
-        //TODO
-        //TODO
-        //TODO Clone!!!!! ???
-        //TODO
-        //TODO
-
-        public List<string> all = new List<string>();
-        public ObservableCollection<string> free = new ObservableCollection<string>();
-        public List<GekkoDictionary<string, string>> freeValues = null;
-        public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
-        public List<FrameFilter> filters = new List<FrameFilter>();
-        
-        public Data dataPattern = null;
-
         /// <summary>
         /// Obtain the object as code like "decomp3 &lt;2010 2020> x from e1 endo x;"
         /// </summary>
@@ -2604,6 +2577,10 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Clone, including Rows/Columns selection
+        /// </summary>
+        /// <returns></returns>
         public DecompOptions2 Clone()
         {
             return Clone(true);
@@ -2693,6 +2670,33 @@ namespace Gekko
                     tempRows.Add(s);
                 }
                 d.rows = tempRows;
+
+                d.all.AddRange(this.all);
+                foreach (string s in this.free)
+                {
+                    d.free.Add(s);
+                }
+                foreach (GekkoDictionary<string, string> x in this.freeValues)
+                {
+                    GekkoDictionary<string, string> xx = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (KeyValuePair<string, string> kvp in x)
+                    {
+                        xx.Add(kvp.Key, kvp.Value);
+                    }
+                    d.freeValues.Add(xx);
+                }
+                foreach (string s in this.freeFilter)
+                {
+                    d.freeFilter.Add(s);
+                }
+                foreach (FrameFilter ff in this.filters)
+                {
+                    FrameFilter ff2 = new FrameFilter();
+                    ff2.active = ff.active;
+                    ff2.name = ff.name;
+                    ff2.selected.AddRange(ff.selected);
+                    d.filters.Add(ff2);
+                }
             }
             else
             {
