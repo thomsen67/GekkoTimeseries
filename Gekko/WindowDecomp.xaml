@@ -20,7 +20,7 @@
                             <!-- Then responsible for the content. In our case it did not really need, because it is set Path -->
                             <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             <!-- Our Path. Shows a cross -->
-                            <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove" Width="13" Height="11" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="LightGray"  Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
+                            <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove field" Width="13" Height="11" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="LightGray"  Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
                         </Grid>
 
                         <!-- Trigger fires on the property -->
@@ -433,7 +433,7 @@
 
             </Grid>
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-            <ListView Grid.Column="2" Name="listView" HorizontalAlignment="Left" 
+            <ListView Grid.Column="2" Name="listViewRowsColsFilters" HorizontalAlignment="Left" 
                       MaxWidth="300"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"       
@@ -448,7 +448,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <DockPanel>
-                            <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />
+                            <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" ToolTip="Besides selecting, you may drag-and-drop fields between Rows/Columns." />
                             <TextBlock Text="   " HorizontalAlignment="Left" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <StackPanel Width="25" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding Pivot_ButtonVisible3}" >

@@ -156,10 +156,10 @@ namespace Gekko
         public static string windowFindStatusBarText = "Double-click to decompose equation, single-click to select";
         public static string windowDecompStatusBarText = "Double-click to find equation(s)";
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";
-
-        public const string col_t = internalColumnIdentifyer + "t";
-        public const string col_variable = Globals.internalColumnIdentifyer + "variable";
-        public const string col_lag = Globals.internalColumnIdentifyer + "lag";
+                
+        public const string col_variable = Globals.internalColumnIdentifyer + "vars";
+        public const string col_lag = Globals.internalColumnIdentifyer + "lags";
+        public const string col_t = internalColumnIdentifyer + "time";
         public const string col_universe = Globals.internalColumnIdentifyer + "universe";
         public const string col_value = Globals.internalColumnIdentifyer + "value";
         public const string col_valueAlternative = Globals.internalColumnIdentifyer + "valueAlternative";

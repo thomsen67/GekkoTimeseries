@@ -6,6 +6,6 @@
              xmlns:local="clr-namespace:Gekko"
              mc:Ignorable="d" Height="116.775" Width="391.333">
     <Canvas Margin="0,0,400.333,352.667">
-        <TextBox Text="Here, sorting etc. of the rows/colums will be possible" Canvas.Left="57" Canvas.Top="33"/>
+        <TextBox Text="Hello" Canvas.Left="57" Canvas.Top="33"/>
     </Canvas>
 </Window>

@@ -99,7 +99,7 @@ namespace Gekko
             bool isTree = false;
             if (task.Pivot_TaskType == TaskType.Filters) isTree = true;
 
-            if (isTree)
+            if (false && isTree)
             {
                 WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
                 w.ShowDialog();
@@ -145,8 +145,15 @@ namespace Gekko
             }
             else
             {
-                WindowDecompSortEtc w = new WindowDecompSortEtc();
-                w.ShowDialog();
+                if (false)
+                {
+                    WindowDecompSortEtc w = new WindowDecompSortEtc();
+                    w.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("In a later Gekko version, sorting and filtering etc. of the pivot rows/colums will be possible here.");
+                }
             }
         }
 
@@ -390,21 +397,20 @@ namespace Gekko
             taskList = new ObservableCollection<GekkoTask>();
             RefreshList();
 
-            this.listView.ItemsSource = taskList;
+            this.listViewRowsColsFilters.ItemsSource = taskList;
 
             // This is all that you need to do, in order to use the ListViewDragManager.
-            this.dragMgr = new ListViewDragDropManager<GekkoTask>(this.listView);
-            this.dragMgr.ListView = this.listView;
+            this.dragMgr = new ListViewDragDropManager<GekkoTask>(this.listViewRowsColsFilters);
+            this.dragMgr.ListView = this.listViewRowsColsFilters;
             this.dragMgr.ShowDragAdorner = true;
-            this.dragMgr.DragAdornerOpacity = 0.5d;  //so that e.g. "Work" can still be seen underneath
-            this.listView.ItemContainerStyle = this.FindResource("ItemContStyle") as Style;
-
+            this.dragMgr.DragAdornerOpacity = 0.5d;  //so that something can still be seen underneath
+            this.listViewRowsColsFilters.ItemContainerStyle = this.FindResource("ItemContStyle") as Style;
             this.dragMgr.ProcessDrop += DragAndDrop;
 
             // Hook up events on both ListViews to that we can drag-drop
             // items between them.
-            this.listView.DragEnter += OnListViewDragEnter;
-            this.listView.Drop += OnListViewDrop;
+            this.listViewRowsColsFilters.DragEnter += OnListViewDragEnter;
+            this.listViewRowsColsFilters.Drop += OnListViewDrop;
         }
 
         void OnListViewDragEnter(object sender, DragEventArgs e)
@@ -418,11 +424,9 @@ namespace Gekko
                 return;
 
             GekkoTask task = e.Data.GetData(typeof(GekkoTask)) as GekkoTask;
-            if (sender == this.listView)
+            if (sender == this.listViewRowsColsFilters)
             {
-                if (this.dragMgr.IsDragInProgress)
-                    return;
-
+                if (this.dragMgr.IsDragInProgress) return;
                 // An item was dragged from the bottom ListView into the top ListView
                 // so remove that item from the bottom ListView.
                 //(this.listView2.ItemsSource as ObservableCollection<Task>).Remove( task );
@@ -431,13 +435,11 @@ namespace Gekko
             {
                 //if( this.dragMgr2.IsDragInProgress )
                 //    return;
-
                 //// An item was dragged from the top ListView into the bottom ListView
                 //// so remove that item from the top ListView.
                 //(this.listView.ItemsSource as ObservableCollection<Task>).Remove( task );
             }
         }
-
 
         void DragAndDrop(object sender, ProcessDropEventArgs<GekkoTask> e)
         {
@@ -472,7 +474,12 @@ namespace Gekko
                             break;
                         }                        
                     }
-                    if (type == TaskType.None) throw new GekkoException(); //check can be removed at some point
+                    if (type == TaskType.None || type == TaskType.Filters)
+                    {
+                        this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
+                        MessageBox.Show("Illegal Rows/Columns/Filters drag");
+                        return;
+                    }
 
                     e.ItemsSource[e.OldIndex].Pivot_TaskType = type;
                     if(type!=TaskType.Filters) e.ItemsSource[e.OldIndex].Pivot_ButtonVisible3 = "Collapse";                    
@@ -527,10 +534,13 @@ namespace Gekko
                 else if (state == 2 && task.Pivot_TaskType == TaskType.Cols) this.decompFind.decompOptions2.cols.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
                 else if (state == 3 && task.Pivot_TaskType == TaskType.Filters)
                 {
-                    FrameFilter ff = new FrameFilter();
-                    ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);
-                    ff.selected = new List<string>(); foreach (string s in task.pivot_filterSelected) ff.selected.Add(s);
-                    this.decompFind.decompOptions2.filters.Add(ff);
+                    if (true)
+                    {
+                        FrameFilter ff = new FrameFilter();
+                        ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);
+                        ff.selected = new List<string>(); foreach (string s in task.pivot_filterSelected) ff.selected.Add(s);
+                        this.decompFind.decompOptions2.filters.Add(ff);
+                    }
                 }
             }
         }
@@ -1622,7 +1632,7 @@ namespace Gekko
                                 {
                                     if (var7 == Globals.decompErrorName)
                                     {
-                                        this.equation.Text = "Errors originating from non-linearities in the equation. For a linear equation, these errors should always be = 0.";
+                                        this.equation.Text = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors should be = 0). If the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
@@ -2540,7 +2550,7 @@ namespace Gekko
         public ObservableCollection<string> free = new ObservableCollection<string>();
         public List<GekkoDictionary<string, string>> freeValues = null;
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
-        public List<FrameFilter> filters = null;
+        public List<FrameFilter> filters = new List<FrameFilter>();
         
         public Data dataPattern = null;
 
