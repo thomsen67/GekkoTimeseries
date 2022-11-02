@@ -1722,7 +1722,7 @@ namespace Gekko
 
         private void RecalcCellsWithNewTypeHelper(bool refresh, ModelGamsScalar modelGamsScalar)
         {
-            if (Globals.decompNewCode) this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
+            this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
             SetRadioButtonsDefaults();
 
             if (!this.isInitializing) this.windowDecompStatusBar.Text = "";
@@ -1744,7 +1744,7 @@ namespace Gekko
             }
             this.equation.Text = s;
             //this.code.contText = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
-            SetText(this.code, this.decompFind.decompOptions2.code + Program.SetBlanks(), Colors.Red);
+            RichSetText(this.code, this.decompFind.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
             this.decompFind.decompOptions2.guiDecompValues = table;
 
@@ -2280,31 +2280,30 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Set RichText
+        /// Adds RichText after first clearing.
         /// </summary>
-        /// <param name="myRichTextBox"></param>
-        /// <param name="s"></param>
-        /// <param name="color"></param>
-        public static void SetText(RichTextBox myRichTextBox, string s, Color color)
+        /// <param name="text"></param>
+        /// <param name="input"></param>
+        public static void RichSetText(RichTextBox text, Rich input)
         {
-            StringAndColor sac = new StringAndColor(s, color);
-            SetText(myRichTextBox, new List<StringAndColor> { sac });
+            text.Document.Blocks.Clear();
+            RichAddText(text, input);
         }
 
         /// <summary>
-        /// Set RichText
+        /// Adds RichText
         /// </summary>
         /// <param name="myRichTextBox"></param>
         /// <param name="input"></param>
-        public static void SetText(RichTextBox myRichTextBox, List<StringAndColor> input)
+        public static void RichAddText(RichTextBox text, Rich input)
         {
-            myRichTextBox.Document.Blocks.Clear();
-            foreach (StringAndColor sc in input)
+            foreach (StringAndColor sc in input.Get())
             {
-                var paragraph = new Paragraph();
-                var run = new Run(sc.s) { Foreground = new SolidColorBrush(sc.color) };
-                paragraph.Inlines.Add(run);
-                myRichTextBox.Document.Blocks.Add(paragraph);
+                TextRange rangeOfText1 = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd);
+                rangeOfText1.Text = sc.s;
+                rangeOfText1.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(sc.color));
+                //if (sc.color != Colors.Black) rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                //else rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
             }
         }
 
@@ -2328,20 +2327,10 @@ namespace Gekko
             //
             //            
             windowParentDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
-            if (Globals.decompNewCode)
-            {
-                dfParentDecomp.decompOptions2.code = dfParentDecomp.decompOptions2.ToCode();
-            }
-            else
-            {                
-                string oldCode = dfParentDecomp.decompOptions2.code;
-                int i = oldCode.IndexOf(" from ", StringComparison.OrdinalIgnoreCase);
-                string s2 = G.Substring(oldCode, 0, i - 1).Trim();
-                string newCode = s2 + " from " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_from) + " endo " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.new_endo) + ";";
-                dfParentDecomp.decompOptions2.code = newCode;
-            }
-            //windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
-            SetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code + Program.SetBlanks(), Colors.Red);
+            
+            dfParentDecomp.decompOptions2.code = dfParentDecomp.decompOptions2.ToCode();
+                        
+            //RichSetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
             try
             {
@@ -2352,7 +2341,7 @@ namespace Gekko
                 //reverting, so that the parent window may be ok to continue with
                 dfParentDecomp.decompOptions2 = remember; 
                 //windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
-                SetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code + Program.SetBlanks(), Colors.Red);
+                //RichSetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
             }
         }        
 
@@ -2496,7 +2485,7 @@ namespace Gekko
         public EModelType modelType = EModelType.Unknown;
         
         public bool showTime = false;
-        public string code = null;
+        public Rich code = null;
         public bool ageHierarchy = false;
         
         public bool isNew = false;
@@ -2559,25 +2548,26 @@ namespace Gekko
         /// Obtain the object as code like "decomp3 &lt;2010 2020> x from e1 endo x;"
         /// </summary>
         /// <returns></returns>
-        public string ToCode()
+        public Rich ToCode()
         {
-            string s = null;
-            s += "decomp3";
-            s += " <";
-            s += this.t1.ToString() + " " + this.t2.ToString();
-            s += " " + decompOperator.OperatorLower();
-            if (this.isShares) s += " shares";
-            if (this.count == ECountType.N) s += " count";
-            if (this.count == ECountType.Names) s += " names";
-            if (this.showErrors) s += " errors";
-            if (this.dyn) s += " dyn";
-            if (this.missingAsZero) s += " missing=zero";
-            s += ">";
-            s += " " + Stringlist.GetListWithCommas(this.new_select);
-            s += " from";
-            s += " " + Stringlist.GetListWithCommas(this.new_from);
-            s += " endo";
-            s += " " + Stringlist.GetListWithCommas(this.new_endo);
+            Color color = Colors.Blue;
+            Rich s = new Rich();
+            s.Add("decomp3", color);
+            s.Add(" <", color);
+            s.Add(this.t1.ToString() + " " + this.t2.ToString());
+            s.Add(" " + decompOperator.OperatorLower());
+            if (this.isShares) s.Add(" shares");
+            if (this.count == ECountType.N) s.Add(" count");
+            if (this.count == ECountType.Names) s.Add(" names");
+            if (this.showErrors) s.Add(" errors");
+            if (this.dyn) s.Add(" dyn");
+            if (this.missingAsZero) s.Add(" missing=zero");
+            s.Add(">", color);
+            s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
+            s.Add(" from", color);
+            s.Add(" " + Stringlist.GetListWithCommas(this.new_from));
+            s.Add(" endo", color);
+            s.Add(" " + Stringlist.GetListWithCommas(this.new_endo));
             
             if (this.rows.Count > 0)
             {
@@ -2586,8 +2576,8 @@ namespace Gekko
                 {
                     temp.Add(G.HandleInternalIdentifyer1(x));
                 }
-                s += " rows";
-                s += " " + Stringlist.GetListWithCommas(temp);
+                s.Add(" rows", color);
+                s.Add(" " + Stringlist.GetListWithCommas(temp));
             }
             if (this.cols.Count > 0)
             {
@@ -2596,11 +2586,11 @@ namespace Gekko
                 {
                     temp.Add(G.HandleInternalIdentifyer1(x));
                 }
-                s += " cols";
-                s += " " + Stringlist.GetListWithCommas(temp);
+                s.Add(" cols", color);
+                s.Add(" " + Stringlist.GetListWithCommas(temp));
             }
 
-            s += ";";
+            s.Add(";");
             return s;
         }
 
@@ -2620,7 +2610,7 @@ namespace Gekko
             d.decimalsPch = this.decimalsPch;
             d.showErrors = this.showErrors;
 
-            d.code = this.code;
+            d.code = this.code.Clone();
             
             d.modelType = this.modelType;
 

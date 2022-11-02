@@ -166,7 +166,7 @@ namespace Gekko
             // HACK, <m> is hard-coded below
             //
             //
-            decomp.decompFind.decompOptions2.code = "decomp3 <m> " + varName + " from " + eqName + " endo " + varName + ";";
+            //decomp.decompFind.decompOptions2.code = "decomp3 <m> " + varName + " from " + eqName + " endo " + varName + ";";
 
             decomp.Exe();
         }

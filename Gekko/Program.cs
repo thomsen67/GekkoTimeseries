@@ -1205,6 +1205,79 @@ namespace Gekko
         public bool best = false;
     }
 
+    public class Rich
+    {
+        private List<StringAndColor> storage = new List<StringAndColor>();
+
+        public Rich() { }
+
+        public Rich(List<StringAndColor> x)
+        {
+            this.storage = x;
+        }
+
+        /// <summary>
+        /// Add new black block.
+        /// </summary>
+        /// <param name="s"></param>
+        public void Add(string s)
+        {
+            Add(s, System.Windows.Media.Colors.Black);
+        }
+
+        /// <summary>
+        /// Add something that does not persist. Returns new cloned + augmented object.
+        /// </summary>
+        /// <param name="s"></param>
+        public Rich AddTemporarily(string s)
+        {
+            Rich r = this.Clone();
+            r.Add(s);
+            return r;            
+        }
+
+        /// <summary>
+        /// Add new black block.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="color"></param>
+        public void Add(string s, System.Windows.Media.Color color)
+        {
+            this.storage.Add(new StringAndColor(s, color));
+        }
+
+        /// <summary>
+        /// Get internal object.
+        /// </summary>
+        /// <returns></returns>
+        public List<StringAndColor> Get()
+        {
+            return this.storage;
+        }
+
+        /// <summary>
+        /// Cloned copy.
+        /// </summary>
+        /// <returns></returns>
+        public Rich Clone()
+        {
+            Rich r = new Rich();
+            r.storage = new List<StringAndColor>();
+            r.storage.AddRange(this.storage);
+            return r;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (StringAndColor sac in this.storage)
+            {
+                sb.Append(sac.s);
+            }
+            return sb.ToString();
+        }
+    }
+
     /// <summary>
     /// Used in RichTextBox
     /// </summary>

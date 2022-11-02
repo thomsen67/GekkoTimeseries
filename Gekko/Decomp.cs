@@ -356,7 +356,7 @@ namespace Gekko
             else
             {
                 decompOptions2 = new DecompOptions2();
-                if (!Globals.decompNewCode) decompOptions2.code = o.label + ";";
+                //if (!Globals.decompNewCode) decompOptions2.code = o.label + ";";
                 decompOptions2.modelType = G.GetModelType();
                 decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
