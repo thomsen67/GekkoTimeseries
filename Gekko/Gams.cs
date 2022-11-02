@@ -897,20 +897,10 @@ namespace Gekko
 
             dt1 = DateTime.Now;
 
-            List<string> gamsFoldedModel = new List<string>();
-            if (input.ffh_rawModel != null)
-            {
-                using (FileStream fs = Program.WaitForFileStream(input.ffh_rawModel.realPathAndFileName, input.ffh_rawModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
-                using (StreamReader sr = new StreamReader(fs))
-                {
-                    string line = null;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        gamsFoldedModel.Add(line);
-                    }
-                }
-            }
-
+            //The method below handles ANSI, but labels are not fetched here yetl.           
+            string text = Program.GetTextFromFileWithWait(input.ffh_rawModel.realPathAndFileName);
+            List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
+            
             IVariable nestedListOfDependents_opt_dep = null;
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
@@ -3584,11 +3574,12 @@ namespace Gekko
                     //varType = 4: ALIAS
                     for (int i = 1; i < int.MaxValue; i++)
                     {
-
                         gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
 
                         string label = null; int records = -12345; int userInfo = -12345;
                         gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
+
+
 
                         if (gdxDimensions == -1)
                         {

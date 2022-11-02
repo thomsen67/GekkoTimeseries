@@ -149,7 +149,7 @@ namespace Gekko
         public const string internalColumnIdentifyer = "gekkopivot__";
         public const string internalSetIdentifyer = "gekkoset__";
         public static string internalPivotRows = "Rows";
-        public static string internalPivotCols = "Columns";
+        public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
                 

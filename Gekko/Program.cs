@@ -13509,7 +13509,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets a text file as a C# string. Handles UTF8/ANSI encoding.
+        /// Gets a text file as a string. Handles UTF8/ANSI encoding.
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
@@ -13519,7 +13519,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets a text file as a C# string. Can handle UTF8/ANSI encoding, too. If convertAnyAnsiToUtf8 == false, it will run a bit faster, 
+        /// Gets a text file as a string. Can handle UTF8/ANSI encoding, too. If convertAnyAnsiToUtf8 == false, it will run a bit faster, 
         /// but if the file IS in ANSI format, there will be funny characters. See also FindFile()
         /// </summary>
         /// <param name="filenameMaybeWithoutPath"></param>

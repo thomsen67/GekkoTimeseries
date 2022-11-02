@@ -474,7 +474,7 @@ namespace Gekko
                     if (type == TaskType.None || type == TaskType.Filters)
                     {
                         //this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
-                        MessageBox.Show("Illegal Rows/Columns/Filters drag");
+                        MessageBox.Show("Illegal Rows/Cols/Filters drag");
                         return;
                     }
 

@@ -3164,7 +3164,7 @@ namespace Gekko
         public static string Text1(int i)
         {
             if (i == 0) return "";  //corresponds to a cell with count = 0
-            else if (i == 1) return "Cannot determine exact variable name, perhaps because some parts of the name is on rows, and other parts on columns. You may try rearranging via the Rows/Columns selector.";
+            else if (i == 1) return "Cannot determine exact variable name, perhaps because some parts of the name is on rows, and other parts on columns. You may try rearranging via the Rows/Cols selector.";
             else return "";
         }
 
