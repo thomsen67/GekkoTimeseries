@@ -2463,7 +2463,7 @@ namespace Gekko
 
     public class DecompOptions2
     {
-        //remember Clone()
+        //remember Clone()        
 
         //--------------------------------------------------------------- 
         //----- These GUI elements are controllable from Gekko syntax -------- cf. #8yuads79afyghr in DecompOperator
@@ -2595,13 +2595,13 @@ namespace Gekko
             //clones relevant parts for new window
             DecompOptions2 d = new DecompOptions2();
 
-            d.decompOperator = this.decompOperator.Clone();
+            if (this.decompOperator != null) d.decompOperator = this.decompOperator.Clone();
                         
             d.decimalsLevel = this.decimalsLevel;
             d.decimalsPch = this.decimalsPch;
             d.showErrors = this.showErrors;
 
-            d.code = this.code.Clone();
+            if (this.code != null) d.code = this.code.Clone();
             
             d.modelType = this.modelType;
 
