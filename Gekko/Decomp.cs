@@ -4425,9 +4425,6 @@ namespace Gekko
         {
             //Speed-up: doing flood-fill from the endpoint and make them meet?
 
-            // ===> something fishy about some dict_...., where we need to remove blanks first.
-            // ===> fix that, so the dict is never called directly.
-
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
             // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
@@ -4486,7 +4483,7 @@ namespace Gekko
                     label = ts.meta.label;
                 }
                 catch { };
-                temp.Add(f.pv.ToString() + " (" + label + ")");
+                temp.Add(f.pv.ToStringPretty(modelGamsScalar) + " (" + label + ")");
                 if (f.eq != -12345)
                 {
                     temp.Add("--> " + modelGamsScalar.dict_FromEqNumberToEqName[f.eq] + " --> ");
@@ -4498,25 +4495,29 @@ namespace Gekko
 
             //string eqName3 = G.Chop_DimensionSetLag(eqName, o.t0, false);
 
-
-            using (Writeln txt = new Writeln("  ", int.MaxValue, System.Drawing.Color.Empty, false, ETabs.Main))
+            string txt = null;
+                        
+            foreach (string s2 in temp)
             {
-                txt.MainAdd("--------------------- connection --------------------- ");
-                txt.MainNewLine();
-                foreach (string s2 in temp)
-                {
-                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
-                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    //string s3 = s2.Replace("[2025]", "[-2]").Replace("[2026]", "[-1]").Replace("[2027]", "").Replace("[2028]", "[+1]").Replace("[2029]", "[+2]");
-                    txt.MainAdd(s2);
-                    txt.MainNewLine();
-                }
-                txt.MainAdd("------------------------------------------------------ ");
-                txt.MainNewLine();
-            }
+                // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
+                // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                //string s3 = s2.Replace("[2025]", "[-2]").Replace("[2026]", "[-1]").Replace("[2027]", "").Replace("[2028]", "[+1]").Replace("[2029]", "[+2]");
+                txt += s2 + G.NL + G.NL;
+            }            
+
+            WindowMessageBox w = new WindowMessageBox();
+            w.Height = 500;
+            w.Width = 800;
+            w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;            
+            w.textBox1.Text = txt;
+            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+            w.textBox1.FontSize = 11;
+            w.ShowDialog();
         }
 
         public enum ENormalizerType
@@ -4578,7 +4579,7 @@ namespace Gekko
             return tup;
         }
 
-        private string ToStringPretty(ModelGamsScalar modelGamsScalar)
+        public string ToStringPretty(ModelGamsScalar modelGamsScalar)
         {
             Tuple<string, GekkoTime> xx = this.GetVariableAndPeriod(modelGamsScalar);
             return xx.Item1 + "[" + xx.Item2.ToString() + "]";

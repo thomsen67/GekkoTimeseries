@@ -9,10 +9,10 @@
     </StackPanel>-->
     <DockPanel>
         <Grid  DockPanel.Dock="Bottom" Height="35" Background="WhiteSmoke">
-        <Button Name="button1" Width="75" ToolTip="Returns/aborts from all command files" IsDefault="True" Click="button1_Click" HorizontalAlignment="Right" Margin="0,6,9,7" IsCancel="True">OK</Button>
-        <Button Name="button2" Width="75" ToolTip="For syntax errors: tries to parse and run the command file again" Click="button2_Click" HorizontalAlignment="Right" Margin="0,6,90,7">Copy text</Button>
+        <Button Name="button1" Width="75" IsDefault="True" Click="button1_Click" HorizontalAlignment="Right" Margin="0,6,9,7" IsCancel="True">OK</Button>
+        <Button Name="button2" Width="75" Click="button2_Click" HorizontalAlignment="Right" Margin="0,6,90,7">Copy text</Button>
          </Grid>
-        <TextBox Name="textBox1" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutoWordSelection="True" FontFamily="Calibri" FontSize="13" />
+        <TextBox Name="textBox1" Padding="10, 10, 10, 10" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutoWordSelection="True" FontFamily="Calibri" FontSize="13" />
         
         <!--<Button Canvas.Left="88" Canvas.Top="103" Height="23" Name="button3" Width="75" ToolTip="Jumps to next command in the command file, skipping the problematic line" Click="button3_Click">Skip line</Button>-->
 
