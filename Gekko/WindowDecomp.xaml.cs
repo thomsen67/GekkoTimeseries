@@ -1635,7 +1635,7 @@ namespace Gekko
                                     {
                                         string more = "";
                                         if (number > 0) more = " #" + number;
-                                        this.equation.Text = "Data error in equation" + more + " (difference between left-hand and right-hand side). The data error should normally be = 0 for simulated values.";
+                                        this.equation.Text = "Data residual in equation" + more + " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
                                     }
                                     else
                                     {

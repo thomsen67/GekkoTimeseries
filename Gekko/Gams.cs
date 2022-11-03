@@ -900,7 +900,7 @@ namespace Gekko
             //The method below handles ANSI, but labels are not fetched here yetl.           
             string text = Program.GetTextFromFileWithWait(input.ffh_rawModel.realPathAndFileName);
             List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
-            
+
             IVariable nestedListOfDependents_opt_dep = null;
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
@@ -913,11 +913,11 @@ namespace Gekko
             ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
             // -----
             modelGamsScalar.modelGams = g;
-            // -------------- these can evaluate an equation ---------
+            // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
             modelGamsScalar.a = a;
             modelGamsScalar.r = r;
-
+            // ------------------------------------------------------
             modelGamsScalar.bb = bb;
             modelGamsScalar.cc = cc;
             modelGamsScalar.dd = dd;
@@ -934,7 +934,6 @@ namespace Gekko
             modelGamsScalar.t0 = helper.t0;
             modelGamsScalar.t1 = helper.t1;
             modelGamsScalar.t2 = helper.t2;
-
             // -------------- helpers dictionaries ---------
             modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
             modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;  //dict
@@ -945,53 +944,12 @@ namespace Gekko
             modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
             modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;  //dict ... used at all???
             modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
-
             // -------------- raw codelines ---------
             modelGamsScalar.csCodeLines = csCodeLines;
-            //modelGamsScalar.gamsFoldedModel = gamsFoldedModel;  //not used?
 
-            modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
 
-            int bigN = modelGamsScalar.CountEqs(1);
-
-            modelGamsScalar.precedents = new List<ModelScalarEquation>();
-            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
-            {
-                ModelScalarEquation l = new ModelScalarEquation();
-                modelGamsScalar.precedents.Add(l);
-                //foreach precedent variable
-                for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                {
-                    PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                    if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
-                }
-            }
-
-            //mapping from a varname to the equations it is part of                
-            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
-            {
-                //foreach precedent variable
-                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
-                {
-                    //for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                    //{
-                    //PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                    List<int> eqsHere = null;
-                    modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
-                    if (eqsHere == null)
-                    {
-                        modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
-                    }
-                    else
-                    {
-                        if (eqsHere.Contains(eqNumber))
-                        {
-                            new Error("Strange!");
-                        }
-                        eqsHere.Add(eqNumber);
-                    }
-                }
-            }
+            
+            CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -1025,6 +983,47 @@ namespace Gekko
             }
 
             return modelGamsScalar;
+        }
+
+        private static void CalculatePrecedentsAndDependents(ModelGamsScalar modelGamsScalar, int bigN)
+        {
+            modelGamsScalar.precedents = new List<ModelScalarEquation>();
+            modelGamsScalar.dependents = new GekkoDictionary<PeriodAndVariable, List<int>>();
+
+            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
+            {
+                ModelScalarEquation l = new ModelScalarEquation();
+                modelGamsScalar.precedents.Add(l);
+                //foreach precedent variable
+                for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
+                {
+                    PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
+                    if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
+                }
+            }
+
+            //mapping from a varname to the equations it is part of                
+            for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
+            {
+                //foreach precedent variable
+                foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
+                {
+                    List<int> eqsHere = null;
+                    modelGamsScalar.dependents.TryGetValue(dp, out eqsHere);
+                    if (eqsHere == null)
+                    {
+                        modelGamsScalar.dependents.Add(dp, new List<int>() { eqNumber });
+                    }
+                    else
+                    {
+                        if (eqsHere.Contains(eqNumber))
+                        {
+                            new Error("Strange!");
+                        }
+                        eqsHere.Add(eqNumber);
+                    }
+                }
+            }
         }
 
         /// <summary>

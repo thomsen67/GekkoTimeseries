@@ -11496,12 +11496,11 @@ namespace UnitTests
         {
             // See _Test_DecompSimul4()
             // Here, we use sets
-            // -------------------------
-            // x[y] = x[c] + x[g]
-            // x[c] = 0.3 * x[y][-1] + 0.3 * x[y] + 0.3 * x[y][+1]
+
             int i = 0;
-            
-            I("reset;");
+
+            I("flush();");
+            I("reset;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("model <gms> simul4.zip;");
             // ----------------            
