@@ -611,14 +611,14 @@ namespace Gekko
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionary(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionary(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
                 }
             }           
             
@@ -661,109 +661,21 @@ namespace Gekko
             StringBuilder eqLine = null;
 
             //read unrolled equations line by line
-            //f1f2
-            using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledModel.realPathAndFileName, settings.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
-            using (StreamReader sr = new StreamReader(fs))
+            //f1f2            
+            if (settings.scalarMemoryModelProducedByGekko)
             {
-                string line = null;
-                while ((line = sr.ReadLine()) != null)
+                StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.equations).ToString())));
+                ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref status, ref substatus, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
+            }
+            else
+            {
+                using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledModel.realPathAndFileName, settings.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    if (status == 0)
-                    {
-                        if (line.StartsWith("e1.."))
-                        {
-                            eqLine = new StringBuilder(line);
-                            if (line.EndsWith(";"))
-                            {
-                                semis++;
-                                int hits2 = helper.known;
-                                tokensLast = HandleEqLine(eqLine, tokensLast, helper);
-                                if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
-                                eqLine = new StringBuilder();
-                            }
-                            status = 1;
-                        }
-                        else
-                        {
-                            //start.Add(line);
-                            if (line.StartsWith("* Equation counts"))
-                            {
-                                substatus = 1;
-                            }
-                            else if (line.StartsWith("* Variable counts"))
-                            {
-                                substatus = 2;
-                            }
-                            if (substatus == 1)
-                            {
-                                string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (string sx in ss)
-                                {
-                                    if (G.IsInteger(sx))
-                                    {
-                                        eqCounts = int.Parse(sx);
-                                        substatus = 0;
-                                        break;
-                                    }
-                                }
-                            }
-                            else if (substatus == 2)
-                            {
-                                string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (string sx in ss)
-                                {
-                                    if (G.IsInteger(sx))
-                                    {
-                                        varCounts = int.Parse(sx);
-                                        substatus = 0;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else if (status == 1)
-                    {
-                        if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase))
-                        {
-                            values.Add(line);
-                            status = 2;
-                        }
-                        else
-                        {
-                            if (line.EndsWith(";"))
-                            {
-                                semis++;
-                                eqLine.Append(line);
-                                int hits2 = helper.known;
-                                tokensLast = HandleEqLine(eqLine, tokensLast, helper);
-                                if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
-                                eqLine = new StringBuilder();
-                            }
-                            else
-                            {
-                                eqLine.Append(line);
-                            }
-                        }
-                    }
-                    else if (status == 2)
-                    {
-                        if (line.ToLower().StartsWith("model ")) //model m / all /;
-                        {
-                            end.Add(line);
-                            status = 3;
-                        }
-                        else
-                        {
-                            values.Add(line);
-                        }
-                    }
-                    else
-                    {
-                        end.Add(line);
-                    }
+                    ReadGamsScalarModelEquationsLines(helper, split2, ref tokensLast, values, end, ref status, ref substatus, ref eqCounts, ref varCounts, ref semis, csCodeLines, ref eqLine, sr);
                 }
             }
+            
             if (Globals.runningOnTTComputer) new Writeln("TTH: GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
             dt1 = DateTime.Now;
 
@@ -913,7 +825,109 @@ namespace Gekko
             return modelGamsScalar;
         }
 
-        private static void ReadScalarModelEquationsDictionary(EqLineHelper helper, string[] split2, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
+        private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int status, ref int substatus, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
+        {
+            string line = null;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (status == 0)
+                {
+                    if (line.StartsWith("e1.."))
+                    {
+                        eqLine = new StringBuilder(line);
+                        if (line.EndsWith(";"))
+                        {
+                            semis++;
+                            int hits2 = helper.known;
+                            tokensLast = HandleEqLine(eqLine, tokensLast, helper);
+                            if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
+                            eqLine = new StringBuilder();
+                        }
+                        status = 1;
+                    }
+                    else
+                    {
+                        //start.Add(line);
+                        if (line.StartsWith("* Equation counts"))
+                        {
+                            substatus = 1;
+                        }
+                        else if (line.StartsWith("* Variable counts"))
+                        {
+                            substatus = 2;
+                        }
+                        if (substatus == 1)
+                        {
+                            string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string sx in ss)
+                            {
+                                if (G.IsInteger(sx))
+                                {
+                                    eqCounts = int.Parse(sx);
+                                    substatus = 0;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (substatus == 2)
+                        {
+                            string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string sx in ss)
+                            {
+                                if (G.IsInteger(sx))
+                                {
+                                    varCounts = int.Parse(sx);
+                                    substatus = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (status == 1)
+                {
+                    if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase))
+                    {
+                        values.Add(line);
+                        status = 2;
+                    }
+                    else
+                    {
+                        if (line.EndsWith(";"))
+                        {
+                            semis++;
+                            eqLine.Append(line);
+                            int hits2 = helper.known;
+                            tokensLast = HandleEqLine(eqLine, tokensLast, helper);
+                            if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
+                            eqLine = new StringBuilder();
+                        }
+                        else
+                        {
+                            eqLine.Append(line);
+                        }
+                    }
+                }
+                else if (status == 2)
+                {
+                    if (line.ToLower().StartsWith("model ")) //model m / all /;
+                    {
+                        end.Add(line);
+                        status = 3;
+                    }
+                    else
+                    {
+                        values.Add(line);
+                    }
+                }
+                else
+                {
+                    end.Add(line);
+                }
+            }
+        }
+
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
         {
             string line = null;
             while ((line = sr.ReadLine()) != null)

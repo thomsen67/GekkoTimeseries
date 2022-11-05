@@ -16627,13 +16627,17 @@ namespace Gekko
                         for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
                         List<string> dictionaryEqs = new List<string>();  //0-based
 
+                        equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
+                        equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
                         int n = -1;
                         foreach (EquationHelper eh in Program.model.modelGekko.equations)
                         {
                             n++;
-                            equations.Add("e" + (n + 1) + " ..  " + eh.scalar_csCodeLhs + " - (" + eh.scalar_csCodeRhs + ");");
+                            equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " - (" + eh.scalar_csCodeRhs + ");");
                             dictionaryEqs.Add("  e" + (n + 1) + "  " + "e_" + eh.lhs + "(" + t0 + ")");
                         }
+                        equations.Add("* set non-default bounds");
+                        equations.Add("Model m / all /;");
 
                         n = -1;
                         foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)

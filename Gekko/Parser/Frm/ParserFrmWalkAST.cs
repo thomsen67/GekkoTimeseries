@@ -1765,10 +1765,20 @@ namespace Gekko.Parser.Frm
             public void Append(string s, EEmitType which)
             {  //0: all, 1: nonhuman, 2: human
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.computerReadable)
-                {
+                {                    
                     shortVersion.Append(s);
                     longVersion.Append(s);
-                    scalarVersion.Append(s);
+                    string s2 = s;
+                    if (s.EndsWith("d"))
+                    {
+                        //remove "d" if number
+                        //a bit hacky, but speed penalty should not be large.
+                        string s3 = s2.Substring(0, s2.Length - 1);
+                        double v;
+                        bool b = double.TryParse(s3, out v);
+                        if (b) s2 = s3;
+                    }
+                    scalarVersion.Append(s2);
                 }
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
                 {
