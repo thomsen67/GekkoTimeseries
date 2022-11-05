@@ -1630,8 +1630,8 @@ namespace Gekko.Parser.Frm
             {
                 //ATypeData dataA = model.varsAType[variable];
                 ATypeData dataA = null; model.varsAType.TryGetValue(variable, out dataA);
-
                 //lag is -1 for fY(-1). It is positive for leads.
+                //f1f2
 
                 if (dataA == null)
                 {
@@ -1664,7 +1664,6 @@ namespace Gekko.Parser.Frm
                 }
 
                 string input = variable + Globals.lagIndicator + lag;
-                //BTypeData data = (BTypeData)model.varsBType[input];
                 BTypeData data = null; model.varsBType.TryGetValue(input, out data);
                 if (data == null)
                 {
@@ -1696,6 +1695,9 @@ namespace Gekko.Parser.Frm
                     wh2.leftHandSideBNumber = data.bNumber;
                     wh2.leftHandSideCsCodeGauss.Append("b[" + data.bNumber + "]");
                     wh2.leftHandSideCsCodeJacobi.Append("c[" + data.bNumber + "]");
+                    wh2.scalar_leftHandSideA.Append("x" + wh2.scalar_dictionaryAVars.Count);
+                    wh2.scalar_dictionaryAVars.Add("a[" + data.aNumber + "," + data.lag + "]");
+                    //f1f2
 
                 }
                 else
@@ -1715,6 +1717,8 @@ namespace Gekko.Parser.Frm
 
                     //This is probably so that equations can be GENR'ed
                     LongVersionAndHumanVersion(wh2, variable, lag);
+                    //f1f2
+                    wh2.scalar_rightHandSideA.Append("a[" + data.aNumber + "," + data.lag + "]");
                 }
             }      
             else
@@ -1735,6 +1739,10 @@ namespace Gekko.Parser.Frm
             public StringBuilder leftHandSideCsCodeGauss = new StringBuilder();  // b[117]
             public StringBuilder leftHandSideCsCodeJacobi = new StringBuilder();  // c[117]
             public StringBuilder leftHandSideHumanReadable = new StringBuilder();  //fy
+            public StringBuilder scalar_leftHandSideA = new StringBuilder();  //x1, x2, ...
+            public StringBuilder scalar_rightHandSideA = new StringBuilder();  //x1, x2, ..
+            public List<string> scalar_dictionaryAVars = new List<string>();
+            public List<string> scalar_dictionaryAEqs = new List<string>();
             public int leftHandSideBNumber = -12345;  //only used for model
             public List<string> allReferencedTimeSeriesOrListsWork = new List<string>();  //only used for expressions in cmd
             public List<string> allReferencedTimeSeriesOrListsBase = new List<string>();  //only used for expressions in cmd

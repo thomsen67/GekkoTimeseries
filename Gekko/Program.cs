@@ -168,7 +168,7 @@ namespace Gekko
     public class Flood
     {
         public int color = -12345;
-        public PeriodAndVariable pv = null;
+        public PeriodAndVariable pv = null; 
         public int eq = -12345;
         public Flood parent = null;
     }

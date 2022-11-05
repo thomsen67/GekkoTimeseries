@@ -571,6 +571,11 @@ namespace Gekko
             name = start;
         }
 
+        /// <summary>
+        /// Read a scalar model. For each model line, it calls HandleEqLine().
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static ModelGamsScalar ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
@@ -602,14 +607,13 @@ namespace Gekko
 
             string[] split = new string[] { ".fx", ".l", "=", ";" };
             string[] split2 = new string[] { " " };
-
-            //string s2 = Program.GetTextFromFileWithWait(file2);
-            //List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
+                        
             int status2 = 0;
             int substatus2 = 0;
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
 
+            //read dictionary            
             using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledNames.realPathAndFileName, input.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
@@ -734,6 +738,9 @@ namespace Gekko
 
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
+
+            //read unrolled equations line by line
+            //f1f2
             using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledModel.realPathAndFileName, input.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
@@ -1134,6 +1141,7 @@ namespace Gekko
         {
             //Remember: the human readable code is derived from this, so beware if changes are made,
             //cf. #af931klljaf89efw.
+            //f1f2
             helper.Clear();
             int more = 2;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqLine.ToString(), more);  //1 empty "" token

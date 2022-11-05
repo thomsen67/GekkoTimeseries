@@ -1708,6 +1708,15 @@ namespace Gekko
             return hasIssuedSeedWarning;
         }
 
+        /// <summary>
+        /// Creates a [,] array with variables x periods.
+        /// </summary>
+        /// <param name="tStart0"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="work"></param>
+        /// <param name="obsWithLags"></param>
+        /// <param name="a"></param>
+        /// <param name="NAN"></param>
         public static void FromDatabankToA(GekkoTime tStart0, GekkoTime tEnd, Databank work, int obsWithLags, double[,] a, double[] NAN)
         {
             foreach (ATypeData atd in Program.model.modelGekko.varsAType.Values)
@@ -1731,7 +1740,6 @@ namespace Gekko
                     {
                         //should not be possible: should have been caught in SimCheckFirstPeriodForMissingStuff()
                         new Error("Internal Gekko error #874439849");
-                        //throw new GekkoException();
                     }
                 }
                 else
