@@ -518,7 +518,7 @@ namespace Gekko
         public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
 
         //not protobuffed
-        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
+        public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;
 
         [ProtoMember(2)]
         public IntArray[] bbTemp = null; //because protobuf does not support jagged arrays
@@ -708,19 +708,19 @@ namespace Gekko
         /// if calling it in a tight loop.
         /// </summary>
         /// <param name="i"></param>
-        public double Eval(int i, bool isRef, ref int funcCounter)
+        public double Eval(int i, bool isRef, int t, ref int funcCounter)
         {
-
+            //f1f2
             //NOTE: this.functions() can return a sum (with illegals signal).
             funcCounter++;
             if (isRef)
             {
-                this.functions[this.ee[i]](i, this.r_ref, this.a_ref, this.cc, this.bb, this.dd);
+                this.functions[this.ee[i]](i, this.r_ref, this.a_ref, this.cc, this.bb, this.dd, t);
                 return this.r_ref[i];
             }
             else
             {
-                this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);
+                this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd, t);
                 return this.r[i];
             }
         }    

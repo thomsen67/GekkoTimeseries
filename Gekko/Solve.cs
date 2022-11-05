@@ -744,7 +744,7 @@ namespace Gekko
                     for (int j2 = 0; j2 < rep2; j2++)
                     {
                         //This must run fast, else see PredictScalarModel()
-                        Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = modelGamsScalar.functions;
+                        Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
                         double[][] a = modelGamsScalar.a;
                         double[] r = modelGamsScalar.r;
                         int[][] bb = modelGamsScalar.bb;
@@ -754,7 +754,7 @@ namespace Gekko
 
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
-                            functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
+                            functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
                                                                     //double x = r[i];                              
 
                         }

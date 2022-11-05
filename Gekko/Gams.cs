@@ -28,7 +28,7 @@ namespace Gekko
     public static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {   
         
-        private static void Compile5(List<string> eqsCs, Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)
+        private static void Compile5(List<string> eqsCs, Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions)
         {
             //NOTE: for each processor, about 2000 eqs max, else sub-chunk!
 
@@ -56,12 +56,12 @@ namespace Gekko
                     code.AppendLine("{");
                     code.AppendLine("public class Equations");
                     code.AppendLine("{");
-
-                    code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)");
+                    //f1f2
+                    code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions)");
                     code.AppendLine("{");
                     for (int i = chunk.int1; i < chunk.int2; i++)
                     {
-                        code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd) =>");
+                        code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd, t) =>");
                         code.AppendLine("{"); //start dynamic function
                         code.AppendLine("int[] b = bb[i];");
                         code.AppendLine("int[] d = dd[i];");
@@ -94,20 +94,15 @@ namespace Gekko
                         new Error("Compilation failed");
                     }
                     Assembly assembly = cr.CompiledAssembly;
-
-                    //if (Globals.runningOnTTComputer) new Writeln("TTH: Compile finished: " + G.Seconds(dt1));
-
                     DateTime dt2 = DateTime.Now;
                     Object[] o = new Object[1] { functions };
-                    assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
-                                                                                                                              //if (Globals.runningOnTTComputer) new Writeln("TTH: Loading funcs took: " + G.Seconds(dt2));
-                                                                                                                              //if (Globals.runningOnTTComputer) new Writeln("TTH: Chunk " + chunk.int1 + "-" + chunk.int2);
+                    assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                                                                                                                                                  
                 }
                 return 0;
             }, _ => { });
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Complete Compile5 --> : " + G.Seconds(dt0));
-        }
+        }        
 
         /// <summary>
         /// Splits up equations (by int number 0...n-1) in the number of threads, 
@@ -889,7 +884,7 @@ namespace Gekko
             //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
 
             double[] r = G.CreateNaN(eqCounts2);
-            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];
+            Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], int, double>[helper.unique];
             double[][] a = helper.a;
             int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
             double[] cc = helper.c.ToArray();
@@ -1285,7 +1280,7 @@ namespace Gekko
 
                     bool seenBefore = false;
                     
-                    HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]][b[" + ii2 + "]]");
+                    HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]+t][b[" + ii2 + "]]");
                                         
                     if (!seenBefore)
                     {
@@ -1745,7 +1740,7 @@ namespace Gekko
                 modelGamsScalar.r = G.CreateNaN(modelGamsScalar.CountEqs(1));                
 
                 //Loading of Func<>s
-                modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[modelGamsScalar.unique];
+                modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], int, double>[modelGamsScalar.unique];
                 Compile5(modelGamsScalar.csCodeLines, modelGamsScalar.functions);                                
             }
             else
