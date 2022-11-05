@@ -16633,7 +16633,7 @@ namespace Gekko
                         foreach (EquationHelper eh in Program.model.modelGekko.equations)
                         {
                             n++;
-                            equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " - (" + eh.scalar_csCodeRhs + ");");
+                            equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
                             dictionaryEqs.Add("  e" + (n + 1) + "  " + "e_" + eh.lhs + "(" + t0 + ")");
                         }
                         equations.Add("* set non-default bounds");
@@ -16663,7 +16663,7 @@ namespace Gekko
                     string e = Stringlist.ExtractTextFromLines(equations).ToString();
                     string d = Stringlist.ExtractTextFromLines(dictionary).ToString();
 
-                    Program.model = new Model();                    
+                    //Program.model = new Model();                    
                     GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
                     settings.scalarMemoryModelProducedByGekko = true;
 

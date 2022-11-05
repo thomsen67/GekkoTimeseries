@@ -101,7 +101,8 @@ namespace Gekko
             }, _ => { });
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Complete Compile5 --> : " + G.Seconds(dt0));
-        }        
+        }
+
 
         /// <summary>
         /// Splits up equations (by int number 0...n-1) in the number of threads, 
@@ -737,16 +738,19 @@ namespace Gekko
 
             dt1 = DateTime.Now;
 
-            //The method below handles ANSI, but labels are not fetched here yetl.           
-            string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
-            List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
+            //The method below handles ANSI, but labels are not fetched here yet.   
 
-            IVariable nestedListOfDependents_opt_dep = null;
-            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
-            GekkoDictionary<string, string> dependents = tup.Item1;
-            ModelGams g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);
-
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+            ModelGams g = null;
+            if (!settings.scalarMemoryModelProducedByGekko)
+            {
+                string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
+                List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
+                IVariable nestedListOfDependents_opt_dep = null;
+                Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
+                GekkoDictionary<string, string> dependents = tup.Item1;
+                g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+            }
 
             dt1 = DateTime.Now;
 
@@ -786,8 +790,6 @@ namespace Gekko
             modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
             // -------------- raw codelines ---------
             modelGamsScalar.csCodeLines = csCodeLines;
-
-
             
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
 
