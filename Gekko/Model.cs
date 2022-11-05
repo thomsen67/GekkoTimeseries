@@ -709,8 +709,7 @@ namespace Gekko
         /// </summary>
         /// <param name="i"></param>
         public double Eval(int i, bool isRef, int t, ref int funcCounter)
-        {
-            //f1f2
+        {            
             //NOTE: this.functions() can return a sum (with illegals signal).
             funcCounter++;
             if (isRef)

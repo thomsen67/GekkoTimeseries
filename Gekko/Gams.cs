@@ -56,7 +56,6 @@ namespace Gekko
                     code.AppendLine("{");
                     code.AppendLine("public class Equations");
                     code.AppendLine("{");
-                    //f1f2
                     code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions)");
                     code.AppendLine("{");
                     for (int i = chunk.int1; i < chunk.int2; i++)
@@ -569,9 +568,9 @@ namespace Gekko
         /// <summary>
         /// Read a scalar model. For each model line, it calls HandleEqLine().
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="settings"></param>
         /// <returns></returns>
-        public static ModelGamsScalar ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
+        public static ModelGamsScalar ReadGamsScalarModelEquations(GAMSScalarModelSettings settings)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -607,95 +606,22 @@ namespace Gekko
             int substatus2 = 0;
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
-
-            //read dictionary            
-            using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledNames.realPathAndFileName, input.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
-            using (StreamReader sr = new StreamReader(fs))
+            
+            //read dictionary                        
+            if (settings.scalarMemoryModelProducedByGekko)
             {
-                string line = null;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (line.Trim() == "") continue;
-                    if (line.ToLower().Contains("equation counts"))
-                    {
-                        substatus2 = 1;
-                    }
-                    else if (line.ToLower().Contains("variable counts"))
-                    {
-                        substatus2 = 2;
-                    }
-
-                    if (substatus2 == 1)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string sx in ss)
-                        {
-                            if (G.IsInteger(sx))
-                            {
-                                eqCounts2 = int.Parse(sx);
-                                substatus2 = 0;
-                                helper.dict_FromEqNumberToEqName = new string[eqCounts2];
-                                helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
-                                break;
-                            }
-                        }
-                    }
-                    else if (substatus2 == 2)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string sx in ss)
-                        {
-                            if (G.IsInteger(sx))
-                            {
-                                varCounts2 = int.Parse(sx);
-                                substatus2 = 0;
-                                helper.dict_FromVarNumberToVarName = new string[varCounts2];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (line.ToLower().StartsWith("equations "))
-                    {
-                        status2 = 1;
-                        continue;
-                    }
-                    else if (line.ToLower().StartsWith("variables "))
-                    {
-                        status2 = 2;
-                        continue;
-                    }
-                    if (status2 == 1)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
-                        string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
-                        string eqName = ss2;
-                        int idx = ss2.IndexOf("[");
-                        if (idx >= 0) eqName = ss2.Substring(0, idx);
-                        helper.dict_FromEqNumberToEqName[n] = ss2;
-                        helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow                        
-                        helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count());
-                        helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
-                    }
-                    else if (status2 == 2)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
-                        string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
-                        helper.dict_FromVarNumberToVarName[n] = ss2;
-                        helper.dict_FromVarNameToVarNumber.Add(ss2, n);
-                        string name = null;
-                        GekkoTime time = GekkoTime.tNull;
-                        string resultingFullName = null;
-                        List<string> notUsed = null;
-                        ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);
-                        if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
-                        if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
-                        helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count());
-                    }
-                }
+                StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
+                ReadScalarModelEquationsDictionary(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
             }
+            else
+            {
+                using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+                using (TextReader sr = new StreamReader(fs))
+                {
+                    ReadScalarModelEquationsDictionary(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                }
+            }           
+            
 
             helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count()];
             foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber.GetDictionaryForIteration())
@@ -736,7 +662,7 @@ namespace Gekko
 
             //read unrolled equations line by line
             //f1f2
-            using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledModel.realPathAndFileName, input.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledModel.realPathAndFileName, settings.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 string line = null;
@@ -900,7 +826,7 @@ namespace Gekko
             dt1 = DateTime.Now;
 
             //The method below handles ANSI, but labels are not fetched here yetl.           
-            string text = Program.GetTextFromFileWithWait(input.ffh_rawModel.realPathAndFileName);
+            string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
             List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
 
             IVariable nestedListOfDependents_opt_dep = null;
@@ -959,13 +885,13 @@ namespace Gekko
                 {
                     string varName = modelGamsScalar.GetVarNameA(kvp.Key.variable);
                     GekkoTime t = modelGamsScalar.FromTimeIntegerToGekkoTime(kvp.Key.date);
-                    string s = varName + "[" + t.ToString() + "] = ";
+                    string s7 = varName + "[" + t.ToString() + "] = ";
                     foreach (int i in kvp.Value)
                     {
                         string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
-                        s += eqName + ", ";
+                        s7 += eqName + ", ";
                     }
-                    new Writeln(s);
+                    new Writeln(s7);
                 }
             }
 
@@ -985,6 +911,93 @@ namespace Gekko
             }
 
             return modelGamsScalar;
+        }
+
+        private static void ReadScalarModelEquationsDictionary(EqLineHelper helper, string[] split2, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
+        {
+            string line = null;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (line.Trim() == "") continue;
+                if (line.ToLower().Contains("equation counts"))
+                {
+                    substatus2 = 1;
+                }
+                else if (line.ToLower().Contains("variable counts"))
+                {
+                    substatus2 = 2;
+                }
+
+                if (substatus2 == 1)
+                {
+                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string sx in ss)
+                    {
+                        if (G.IsInteger(sx))
+                        {
+                            eqCounts2 = int.Parse(sx);
+                            substatus2 = 0;
+                            helper.dict_FromEqNumberToEqName = new string[eqCounts2];
+                            helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
+                            break;
+                        }
+                    }
+                }
+                else if (substatus2 == 2)
+                {
+                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string sx in ss)
+                    {
+                        if (G.IsInteger(sx))
+                        {
+                            varCounts2 = int.Parse(sx);
+                            substatus2 = 0;
+                            helper.dict_FromVarNumberToVarName = new string[varCounts2];
+                            break;
+                        }
+                    }
+                }
+
+                if (line.ToLower().StartsWith("equations "))
+                {
+                    status2 = 1;
+                    continue;
+                }
+                else if (line.ToLower().StartsWith("variables "))
+                {
+                    status2 = 2;
+                    continue;
+                }
+                if (status2 == 1)
+                {
+                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                    int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                    string eqName = ss2;
+                    int idx = ss2.IndexOf("[");
+                    if (idx >= 0) eqName = ss2.Substring(0, idx);
+                    helper.dict_FromEqNumberToEqName[n] = ss2;
+                    helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow                        
+                    helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count());
+                    helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
+                }
+                else if (status2 == 2)
+                {
+                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                    int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                    helper.dict_FromVarNumberToVarName[n] = ss2;
+                    helper.dict_FromVarNameToVarNumber.Add(ss2, n);
+                    string name = null;
+                    GekkoTime time = GekkoTime.tNull;
+                    string resultingFullName = null;
+                    List<string> notUsed = null;
+                    ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);
+                    if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
+                    if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
+                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count());
+                }
+            }
         }
 
         private static void CalculatePrecedentsAndDependents(ModelGamsScalar modelGamsScalar, int bigN)

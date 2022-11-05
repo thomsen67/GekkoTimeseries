@@ -39,6 +39,7 @@ namespace Gekko.Parser.Frm
                 wh2.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideCsCodeJacobi = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideHumanReadable = new StringBuilder(); //clearing it for each equation
+                wh2.scalar_leftHandSideA = new StringBuilder(); //clearing it for each equation
                 ParserFrmWalkASTEquation(eh, eh.equationsNodeRoot, 0, wh2, Program.model.modelGekko, 0, true); //last arg is lag
 
                 if (Globals.printAST) AST2(eh.equationsNodeRoot, 0);
@@ -52,6 +53,9 @@ namespace Gekko.Parser.Frm
                 eh.csCodeLhsJacobi = wh2.leftHandSideCsCodeJacobi.ToString();
                 eh.csCodeLhsHuman = wh2.leftHandSideHumanReadable.ToString();
                 eh.bNumberLhs = wh2.leftHandSideBNumber;
+
+                eh.scalar_csCodeLhs = wh2.scalar_leftHandSideA.ToString();
+                eh.scalar_csCodeRhs = wh2.rightHandSideCsCode.scalarVersion.ToString();
             }
 
             //move reverted equations, and compact the others (and renumber them).
@@ -839,7 +843,7 @@ namespace Gekko.Parser.Frm
                     eh.precedentsWithLagIndicator = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     eh.equationCode = wh2.frmlCode;
                     //left-hand side (e.g. "b[123] =") below
-                    printVariableAsBType(eh, wh2, model, wh2.variableOrFunctionIndicator, 0, true, false, isModel, false, null, null);  //no lag //true=leftside //no named bank
+                    PrintVariableAsBType(eh, wh2, model, wh2.variableOrFunctionIndicator, 0, true, false, isModel, false, null, null);  //no lag //true=leftside //no named bank
                     //wh2.rightHandSideCsCode.Append(" = ");  //added manually later on
                     wh2.rhs = equationNode.GetChild(0);
                     ASTNodeSimple rhs = wh2.rhs;
@@ -1363,7 +1367,7 @@ namespace Gekko.Parser.Frm
 
         private static void EmitCsDoVariableStuff(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, bool isModel, string variable3, int lag, bool isBaseBank, string absoluteTime, string namedBank)
         {
-            printVariableAsBType(eh, wh2, model, variable3, lag, false, false, isModel, isBaseBank, absoluteTime, namedBank); //false=rightside
+            PrintVariableAsBType(eh, wh2, model, variable3, lag, false, false, isModel, isBaseBank, absoluteTime, namedBank); //false=rightside
             //doing model frml
             string atSign = "";
             if (isBaseBank) atSign = "@";  //this way, fY lagged from basebank becomes "@fy¤-1". Used only when doing PRT or GENR statements, not for models.
@@ -1613,7 +1617,7 @@ namespace Gekko.Parser.Frm
             return;
         }
 
-        private static void printVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
+        private static void PrintVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
         {
             if (EquationIsNotRunAtAll(eh))
             {
@@ -1631,7 +1635,6 @@ namespace Gekko.Parser.Frm
                 //ATypeData dataA = model.varsAType[variable];
                 ATypeData dataA = null; model.varsAType.TryGetValue(variable, out dataA);
                 //lag is -1 for fY(-1). It is positive for leads.
-                //f1f2
 
                 if (dataA == null)
                 {
@@ -1695,10 +1698,7 @@ namespace Gekko.Parser.Frm
                     wh2.leftHandSideBNumber = data.bNumber;
                     wh2.leftHandSideCsCodeGauss.Append("b[" + data.bNumber + "]");
                     wh2.leftHandSideCsCodeJacobi.Append("c[" + data.bNumber + "]");
-                    wh2.scalar_leftHandSideA.Append("x" + wh2.scalar_dictionaryAVars.Count);
-                    wh2.scalar_dictionaryAVars.Add("a[" + data.aNumber + "," + data.lag + "]");
-                    //f1f2
-
+                    wh2.scalar_leftHandSideA.Append("x" + (data.bNumber + 1));
                 }
                 else
                 {
@@ -1717,8 +1717,7 @@ namespace Gekko.Parser.Frm
 
                     //This is probably so that equations can be GENR'ed
                     LongVersionAndHumanVersion(wh2, variable, lag);
-                    //f1f2
-                    wh2.scalar_rightHandSideA.Append("a[" + data.aNumber + "," + data.lag + "]");
+                    wh2.rightHandSideCsCode.scalarVersion.Append("x" + (data.bNumber + 1));
                 }
             }      
             else
@@ -1735,14 +1734,11 @@ namespace Gekko.Parser.Frm
 
         public class WalkerHelper2
         {
-            public StringBuilder2 rightHandSideCsCode = new StringBuilder2(); 
+            public StringBuilder2 rightHandSideCsCode = new StringBuilder2(); //also contains scalar x1, x2 etc.
             public StringBuilder leftHandSideCsCodeGauss = new StringBuilder();  // b[117]
             public StringBuilder leftHandSideCsCodeJacobi = new StringBuilder();  // c[117]
             public StringBuilder leftHandSideHumanReadable = new StringBuilder();  //fy
             public StringBuilder scalar_leftHandSideA = new StringBuilder();  //x1, x2, ...
-            public StringBuilder scalar_rightHandSideA = new StringBuilder();  //x1, x2, ..
-            public List<string> scalar_dictionaryAVars = new List<string>();
-            public List<string> scalar_dictionaryAEqs = new List<string>();
             public int leftHandSideBNumber = -12345;  //only used for model
             public List<string> allReferencedTimeSeriesOrListsWork = new List<string>();  //only used for expressions in cmd
             public List<string> allReferencedTimeSeriesOrListsBase = new List<string>();  //only used for expressions in cmd
@@ -1759,6 +1755,7 @@ namespace Gekko.Parser.Frm
             public StringBuilder shortVersion = new StringBuilder();
             public StringBuilder longVersion = new StringBuilder();
             public StringBuilder humanVersion = new StringBuilder();
+            public StringBuilder scalarVersion = new StringBuilder();
 
             public void Append(string s)
             {
@@ -1771,6 +1768,7 @@ namespace Gekko.Parser.Frm
                 {
                     shortVersion.Append(s);
                     longVersion.Append(s);
+                    scalarVersion.Append(s);
                 }
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
                 {
@@ -1789,6 +1787,7 @@ namespace Gekko.Parser.Frm
                 {
                     shortVersion.AppendLine(s);
                     longVersion.AppendLine(s);
+                    scalarVersion.AppendLine(s);
                 }
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
                 {
@@ -1796,8 +1795,5 @@ namespace Gekko.Parser.Frm
                 }
             }
         }
-
-
-
     }
 }

@@ -1407,7 +1407,12 @@ namespace Gekko
         [ProtoMember(28)]
         public int largestLag = 0; //always 0 or positive        
         [ProtoMember(29)]
-        public int largestLead = 0; //always 0 or positive         
+        public int largestLead = 0; //always 0 or positive   
+
+        [ProtoMember(30)]
+        public string scalar_csCodeLhs = "";
+        [ProtoMember(31)]
+        public string scalar_csCodeRhs = "";
 
         public List<Func<GekkoSmpl, IVariable>> expressions = null; //do not protobuf this
         public Action<string, GekkoTime> predictAction = null; //do not protobuf this
@@ -16610,6 +16615,62 @@ namespace Gekko
                 //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
                 //  takes some time. It also writes out actual C# code to be used later on when compiling.
                 Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
+
+                if (true)
+                {
+                    List<string> equations = new List<string>();
+                    List<string> dictionary = new List<string>();
+
+                    for (int t0 = 2000; t0 <= 2000; t0++)
+                    {   
+                        List<string> dictionaryNames = new List<string>();  //0-based
+                        for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
+                        List<string> dictionaryEqs = new List<string>();  //0-based
+
+                        int n = -1;
+                        foreach (EquationHelper eh in Program.model.modelGekko.equations)
+                        {
+                            n++;
+                            equations.Add("e" + (n + 1) + " ..  " + eh.scalar_csCodeLhs + " - (" + eh.scalar_csCodeRhs + ");");
+                            dictionaryEqs.Add("  e" + (n + 1) + "  " + "e_" + eh.lhs + "(" + t0 + ")");
+                        }
+
+                        n = -1;
+                        foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
+                        {
+                            n++;
+                            string s = kvp.Key;
+                            string variable = null; int lag = 0;
+                            G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
+                            dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0 + lag) + ")";
+                        }
+
+                        dictionary.Add("Equation counts " + dictionaryEqs.Count);
+                        dictionary.Add("");
+                        dictionary.Add("Variable counts " + dictionaryNames.Count);
+                        dictionary.Add("");
+                        dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
+                        dictionary.AddRange(dictionaryEqs);
+                        dictionary.Add("");
+                        dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
+                        dictionary.AddRange(dictionaryNames);
+                        dictionary.Add("");
+                    }
+                    string e = Stringlist.ExtractTextFromLines(equations).ToString();
+                    string d = Stringlist.ExtractTextFromLines(dictionary).ToString();
+
+                    Program.model = new Model();                    
+                    GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
+                    settings.scalarMemoryModelProducedByGekko = true;
+
+                    settings.equations = equations;
+                    settings.dictionary = dictionary;
+
+                    ModelGamsScalar modelGamsScalar = GamsModel.ReadGamsScalarModelEquations(settings);
+                    Program.model.modelGamsScalar = modelGamsScalar;
+
+                }
+
                 Program.GuiSetModelName();
                 if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
                 {
@@ -32076,24 +32137,21 @@ namespace Gekko
     public class GAMSScalarModelSettings
     {
         // --- these can be loaded from ModelInfo.json file
+        public bool scalarMemoryModelProducedByGekko = false;
+        // ---------- read from file ----------------
         public string zipFilePathAndName = null;  //the file that contains it all
         public FindFileHelper ffh_unrolledModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
         public FindFileHelper ffh_unrolledNames = null; //Translation of x1, x2, x3, ... into "normal" variables
-        public FindFileHelper ffh_rawModel = null; //non-unrolled equations
-        public FindFileHelper ffh_referenceData = null; //Baseline/reference scenario
-        public FindFileHelper ffh_multiplierData = null; //Shock/multiplier scenario (optional)
+        public FindFileHelper ffh_rawModel = null; //non-unrolled equations        
         public string unrolledModel = null; //raw filename without path
         public string unrolledNames = null; //raw filename without path
-        public string rawModel = null; //raw filename without path
-        public string referenceData = null; //raw filename without path
-        public string multiplierData = null; //raw filename without path
-        // ------
-        //public bool testForZeroResiduals = false;        
-        //public GekkoTime time0 = GekkoTime.tNull;
-        //public int rep1 = 1;
-        //public int rep2 = 1;
+        public string rawModel = null; //raw filename without path        
+        // ---------- read from memory ----------------
+        public List<string> equations = null;
+        public List<string> dictionary = null;
+
     }
-    
+
     public class Speed
     {
         public static void Run()
