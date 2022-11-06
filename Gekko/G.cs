@@ -4241,16 +4241,25 @@ namespace Gekko
         /// If no model is defined, it returns .Unknown.
         /// </summary>
         /// <returns></returns>
-        public static EModelType GetModelType()
+        public static EModelType GetModelType(bool decomp)
         {
             //TODO: encapsulate this better. Now, if we have both Program.model.modelGams and 
             //      Program.model.modelGamsScalar, it will return .GAMSScalar. This is fine, since
             //      sometimes the scalar model contains a .GAMSRaw model, too.
-            if (Program.model == null) return EModelType.Unknown;
-            else if (Program.model.modelGekko != null) return EModelType.Gekko;            
-            else if (Program.model.modelGams != null) return EModelType.GAMSRaw;
-            else if (Program.model.modelGamsScalar != null) return EModelType.GAMSScalar;
-            else return EModelType.Unknown;
+            EModelType rv = EModelType.Unknown;
+            if (Program.model == null) rv = EModelType.Unknown;
+            else if (Program.model.modelGekko != null) rv = EModelType.Gekko;
+            else if (Program.model.modelGams != null) rv = EModelType.GAMSRaw;
+            else if (Program.model.modelGamsScalar != null) rv = EModelType.GAMSScalar;
+
+            if (decomp && Program.model.modelGamsScalar != null) rv = rv = EModelType.GAMSScalar;
+
+            return rv;
+        }
+
+        public static EModelType GetModelType()
+        {
+            return GetModelType(false);
         }
 
         /// <summary>
@@ -4269,7 +4278,7 @@ namespace Gekko
             }
             file.Write("");
             return;
-        }        
+        }
 
         /// <summary>
         /// Overload
