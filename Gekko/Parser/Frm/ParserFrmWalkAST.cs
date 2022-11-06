@@ -1765,9 +1765,12 @@ namespace Gekko.Parser.Frm
             public void Append(string s, EEmitType which)
             {  //0: all, 1: nonhuman, 2: human
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.computerReadable)
-                {                    
+                {
                     shortVersion.Append(s);
                     longVersion.Append(s);
+
+                    //The following is hacky. 
+                    //Should be dealt with properly, but is probably not dangerous at all.
                     string s2 = s;
                     if (s.EndsWith("d"))
                     {
@@ -1778,7 +1781,13 @@ namespace Gekko.Parser.Frm
                         bool b = double.TryParse(s3, out v);
                         if (b) s2 = s3;
                     }
-                    scalarVersion.Append(s2);
+
+                    if (s2.StartsWith("O."))
+                    {
+                        s2 = s2.Substring(2);
+                    }
+
+                    scalarVersion.Append(s2);                    
                 }
                 if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
                 {

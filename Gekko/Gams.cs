@@ -1361,6 +1361,7 @@ namespace Gekko
                 else if (G.Equal(th1.s, "max")) s = "M.Max";
                 else if (G.Equal(th1.s, "min")) s = "M.Min";
                 else if (G.Equal(th1.s, "power")) s = "M.Power";
+                else if (G.Equal(th1.s, "pow")) s = "M.Power";  //pow() happens when a .frm model produces GAMS equations
                 else if (G.Equal(th1.s, "sqr")) s = "M.Sqr";
                 else if (G.Equal(th1.s, "sqrt")) s = "M.Sqrt";
                 else if (G.Equal(th1.s, "tanh")) s = "M.Tanh";
