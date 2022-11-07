@@ -10791,7 +10791,7 @@ namespace Gekko
                     }
                     if (Program.model.modelGams.equationsByVarname != null)
                     {
-                        ModelGamsEquation found = GamsModel.DecompEvalGams(null, decompOptions.variable);
+                        ModelGamsEquation found = GamsModel.DecompEvalGams(null, decompOptions.variable, Program.model);
                         decompOptions.expression = found.expressions[0];
                         decompOptions.expressionOld = found.lhs + " = " + found.rhs;
                     }
@@ -14600,7 +14600,7 @@ namespace Gekko
                 G.Writeln();
             }
             
-            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex);
+            List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
             
             if (G.IsUnitTesting())
             {
@@ -15000,7 +15000,7 @@ namespace Gekko
                 if (token.type == ETokenType.Word)
                 {
                     //List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
-                    List<ModelGamsEquation> e3 = GamsModel.GetGamsEquationsByVarname(token.s);
+                    List<ModelGamsEquation> e3 = GamsModel.GetGamsEquationsByVarname(token.s, model);
 
                     if (e3 != null)
                     {

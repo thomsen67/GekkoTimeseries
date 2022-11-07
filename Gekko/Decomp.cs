@@ -1759,7 +1759,7 @@ namespace Gekko
                         //
                         // NEW GAMS MODEL DECOMP
                         //
-                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames);  //if link.eqname != null, link.varnames[0] is not used at all
+                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames, decompFind.model);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }

@@ -1460,7 +1460,7 @@ namespace Gekko
             else
             {
                 model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
-                if (Globals.runningOnTTComputer) Sniff2();
+                if (Globals.runningOnTTComputer) Sniff2(model);
 
                 DateTime t1 = DateTime.Now;
 
@@ -1471,7 +1471,7 @@ namespace Gekko
                     // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    Program.ProtobufWrite(Program.model.modelGams, pathAndFilename);
+                    Program.ProtobufWrite(model.modelGams, pathAndFilename);
                     G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                 }
                 catch (Exception e)
@@ -2291,13 +2291,13 @@ namespace Gekko
         /// <param name="eqname"></param>
         /// <param name="varname"></param>
         /// <returns></returns>
-        public static ModelGamsEquation DecompEvalGams(string eqname, string varname)
+        public static ModelGamsEquation DecompEvalGams(string eqname, string varname, Model model)
         {
             List<ModelGamsEquation> eqs = null;
             ModelGamsEquation found = null;
             if (eqname != null)
             {
-                eqs = GetGamsEquationsByEqname(eqname);
+                eqs = GetGamsEquationsByEqname(eqname, model);
                 if (eqs == null || eqs.Count == 0)
                 {
                     new Error("Equation '" + eqname + "' was not found");
@@ -2311,7 +2311,7 @@ namespace Gekko
             }
             else
             {
-                eqs = GetGamsEquationsByVarname(varname);
+                eqs = GetGamsEquationsByVarname(varname, model);
                 if (eqs == null || eqs.Count == 0)
                 {
                     new Error("Variable '" + varname + "' was not found");
@@ -2344,7 +2344,7 @@ namespace Gekko
             return found;
         }
 
-        private static void Sniff2()
+        private static void Sniff2(Model model)
         {
             DateTime dt = DateTime.Now;
             double ms1 = 0;
@@ -2357,7 +2357,7 @@ namespace Gekko
             int counterError1 = 0;
             int counterError2 = 0;
 
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
             {
                 //if (counterA > 6) break;
                 if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
@@ -2453,25 +2453,24 @@ namespace Gekko
             G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
         }
 
-        private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable)
+        private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable, Model model)
         {            
-            if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
+            if (model.modelGams.equationsByEqname == null || model.modelGams.equationsByEqname.Count == 0)
             {
                 new Error("No GAMS equations found");
                 //throw new GekkoException();
             }
-            List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
+            List<ModelGamsEquation> eqs = null; model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
         }
 
-        public static List<ModelGamsEquation> GetGamsEquationsByVarname(string variable)
+        public static List<ModelGamsEquation> GetGamsEquationsByVarname(string variable, Model model)
         {
-            if (Program.model.modelGams.equationsByVarname == null || Program.model.modelGams.equationsByVarname.Count == 0)
+            if (model.modelGams.equationsByVarname == null || model.modelGams.equationsByVarname.Count == 0)
             {
                 new Error("No GAMS equations found");
-                //throw new GekkoException();
             }
-            List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
+            List<ModelGamsEquation> eqs = null; model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
             return eqs;
         }
 
