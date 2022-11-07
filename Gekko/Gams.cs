@@ -1420,66 +1420,71 @@ namespace Gekko
 
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
-            string dependentsHash = tup.Item2.ToString();
-            string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
 
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+            //
+            // Should #dependents list be reflected in hash ?????
+            //
 
-            if (Program.options.model_cache == true)
-            {
-                if (File.Exists(mdlFileNameAndPath))
-                {
-                    try
-                    {
-                        DateTime dt1 = DateTime.Now;                        
-                        modelGams = Program.ProtobufRead<ModelGams>(mdlFileNameAndPath);
-                        model.loadedFromCacheFile = true;
-                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                    }
-                    catch (Exception e)
-                    {
-                        if (G.IsUnitTesting())
-                        {
-                            throw;
-                        }
-                        else
-                        {
-                            //do nothing, we then have to parse the file
-                            model.loadedFromCacheFile = false;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                model.loadedFromCacheFile = false;
-            }
+            //string dependentsHash = tup.Item2.ToString();
+            //string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
 
-            if (model.loadedFromCacheFile)
-            {
-                //do nothing, also no writing of .mdl file of course
-            }
-            else
+            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+
+            //if (Program.options.model_cache == true)
+            //{
+            //    if (File.Exists(mdlFileNameAndPath))
+            //    {
+            //        try
+            //        {
+            //            DateTime dt1 = DateTime.Now;                        
+            //            modelGams = Program.ProtobufRead<ModelGams>(mdlFileNameAndPath);
+            //            model.loadedFromCacheFile = true;
+            //            G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            if (G.IsUnitTesting())
+            //            {
+            //                throw;
+            //            }
+            //            else
+            //            {
+            //                //do nothing, we then have to parse the file
+            //                model.loadedFromCacheFile = false;
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    model.loadedFromCacheFile = false;
+            //}
+
+            //if (model.loadedFromCacheFile)
+            //{
+            //    //do nothing, also no writing of .mdl file of course
+            //}
+            //else
             {
                 model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
                 if (Globals.runningOnTTComputer) Sniff2(model);
 
                 DateTime t1 = DateTime.Now;
 
-                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                {
-                    DateTime dt1 = DateTime.Now;
+                //try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                //{
+                //    DateTime dt1 = DateTime.Now;
                                         
-                    // ----- SERIALIZE
-                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    Program.ProtobufWrite(model.modelGams, pathAndFilename);
-                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                }
-                catch (Exception e)
-                {
-                    //do nothing, not the end of the world if it fails
-                }
+                //    // ----- SERIALIZE
+                //    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+                //    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                //    Program.ProtobufWrite(model.modelGams, pathAndFilename);
+                //    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                //}
+                //catch (Exception e)
+                //{
+                //    //do nothing, not the end of the world if it fails
+                //}
             }
             return model;
         }
@@ -1507,137 +1512,82 @@ namespace Gekko
             input.zipFilePathAndName = fileName;
 
             DateTime t2 = DateTime.Now;
-            string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);
 
-            //these objects typically get overridden soon            
+            model = ReadGAMSScalarModel2(o, folders, model, input);
 
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+            //string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);            
 
-            if (Program.options.model_cache == true)
-            {
-                try
-                {
-                    //TODO 
-                    //TODO 
-                    //TODO do something about ms here
-                    //TODO 
-                    //TODO 
-                    double hashMs = 0d;
-                    DateTime t0 = DateTime.Now;
-                    Model modelTemp = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
-                    timeLoadCache = "cache: " + G.Seconds(t0);
+            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
+
+            //if (Program.options.model_cache == true)
+            //{
+            //    try
+            //    {
+            //        //TODO 
+            //        //TODO 
+            //        //TODO do something about ms here
+            //        //TODO 
+            //        //TODO 
+            //        double hashMs = 0d;
+            //        DateTime t0 = DateTime.Now;
+            //        Model modelTemp = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
+            //        timeLoadCache = "cache: " + G.Seconds(t0);
                     
-                    if (modelTemp == null)
-                    {
-                        model.modelGamsScalar = new ModelGamsScalar(model);
-                        model.loadedFromCacheFile = false;
-                    }
-                    else
-                    {
-                        model = modelTemp;
-                        if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
-                        DateTime t1 = DateTime.Now;
-                        GAMSScalarModelHelper(true, model.modelGamsScalar);
-                        model.loadedFromCacheFile = true;
-                        timeCompile = "compile: " + G.Seconds(t1);
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (G.IsUnitTesting())
-                    {
-                        throw;
-                    }
-                    else
-                    {
-                        //do nothing, we then have to parse the file
-                        model.loadedFromCacheFile = false;
-                    }
-                }
-            }
-            else
-            {
-                model.loadedFromCacheFile = false;
-            }
+            //        if (modelTemp == null)
+            //        {
+            //            model.modelGamsScalar = new ModelGamsScalar(model);
+            //            model.loadedFromCacheFile = false;
+            //        }
+            //        else
+            //        {
+            //            model = modelTemp;
+            //            if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
+            //            DateTime t1 = DateTime.Now;
+            //            if (model.type == EModelType.GAMSScalar) GAMSScalarModelHelper(true, model.modelGamsScalar);
+            //            model.loadedFromCacheFile = true;
+            //            timeCompile = "compile: " + G.Seconds(t1);
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        if (G.IsUnitTesting())
+            //        {
+            //            throw;
+            //        }
+            //        else
+            //        {
+            //            //do nothing, we then have to parse the file
+            //            model.loadedFromCacheFile = false;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    model.loadedFromCacheFile = false;
+            //}
 
-            if (model.loadedFromCacheFile)
-            {
-                //no writing of .mdl file of course                
-            }
-            else
-            {
-                //if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");
-                FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, o.p);
-                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
-                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                Dictionary<string, object> jsonTree = null;
-                try
-                {
-                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
-                }
-                catch (Exception e)
-                {
-                    using (Error txt = new Error())
-                    {
-                        txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
-                        txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
-                        txt.MoreNewLine();
-                        txt.MoreAdd("The technical error message is the following: " + e.Message);
-                    }
-                }                
+            //if (model.loadedFromCacheFile)
+            //{
+            //    //no writing of .mdl file of course                
+            //}
+            //else
+            //{
+            //    model = ReadGAMSScalarModel2(o, folders, model, input);
 
-                DateTime t3 = DateTime.Now;
-
-                try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
-                if (input.unrolledModel == null)
-                {
-                    new Error("JSON: setting unrolledModel not found");
-                }
-                else
-                {
-                    input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
-                }
-
-                try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
-                if (input.unrolledNames == null)
-                {
-                    new Error("JSON: setting unrolledNames not found");
-                }
-                else
-                {
-                    input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
-                }
-
-                try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }
-                if (input.rawModel == null)
-                {
-                    //ignore
-                }
-                else
-                {
-                    input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, o.p);
-                }
-
-                if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
-
-                model = ReadGamsScalarModelEquations(input, model);
-
-                DateTime t1 = DateTime.Now;
-
-                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                {
-                    DateTime dt1 = DateTime.Now;
-                    GAMSScalarModelHelper(false, model.modelGamsScalar);
-                    //TODO
-                    //TODO what about last argument ms?
-                    //TODO
-                    Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, model);
-                }
-                catch (Exception e)
-                {
-                    //do nothing, not the end of the world if it fails
-                }
-            }
+            //    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+            //    {
+            //        DateTime dt1 = DateTime.Now;
+            //        if (model.type == EModelType.GAMSScalar) GAMSScalarModelHelper(false, model.modelGamsScalar);
+            //        //TODO
+            //        //TODO what about last argument ms?
+            //        //TODO
+            //        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, model);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        //do nothing, not the end of the world if it fails
+            //    }
+            //}
 
             Table tab = new Table();
 
@@ -1708,11 +1658,73 @@ namespace Gekko
             
         }
 
+        private static Model ReadGAMSScalarModel2(O.Model o, List<string> folders, Model model, GAMSScalarModelSettings input)
+        {
+            //if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");
+            FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, o.p);
+            string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
+            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            Dictionary<string, object> jsonTree = null;
+            try
+            {
+                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+            }
+            catch (Exception e)
+            {
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
+                    txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
+                    txt.MoreNewLine();
+                    txt.MoreAdd("The technical error message is the following: " + e.Message);
+                }
+            }
+
+            DateTime t3 = DateTime.Now;
+
+            try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
+            if (input.unrolledModel == null)
+            {
+                new Error("JSON: setting unrolledModel not found");
+            }
+            else
+            {
+                input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
+            }
+
+            try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
+            if (input.unrolledNames == null)
+            {
+                new Error("JSON: setting unrolledNames not found");
+            }
+            else
+            {
+                input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
+            }
+
+            try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }
+            if (input.rawModel == null)
+            {
+                //ignore
+            }
+            else
+            {
+                input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, o.p);
+            }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
+
+            model = ReadGamsScalarModelEquations(input, model);
+
+            DateTime t1 = DateTime.Now;
+            return model;
+        }
+
         /// <summary>
         /// Inflate/deflate objects that mitigate the problem that protobuf does not support jagged arrays.
         /// </summary>
         /// <param name="deserialize"></param>
-        private static void GAMSScalarModelHelper(bool deserialize, ModelGamsScalar modelGamsScalar)
+        public static void GAMSScalarModelHelper(bool deserialize, ModelGamsScalar modelGamsScalar)
         {
             if (deserialize)
             {

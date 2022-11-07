@@ -2884,7 +2884,7 @@ namespace Gekko
         /// <summary>
         /// Reads model protobuf files in parallel.
         /// </summary>
-        public static Model ReadParallelModel(string fileName, string hash)
+        public static Model ReadParallelModel(string hash)
         {
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -16607,29 +16607,133 @@ namespace Gekko
                 }
             }
 
-            EModelType modelType = EModelType.Gekko;
-            if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
-            
-            if (modelType == EModelType.Gekko)
+
+
+
+
+
+
+
+
+
+
+
+
+
+            string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName);
+
+            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
+
+            if (Program.options.model_cache == true)
             {
-                Model model = new Model();
-                string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
-                ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);                
+                try
+                {
+                    //TODO 
+                    //TODO 
+                    //TODO do something about ms here
+                    //TODO 
+                    //TODO 
+                    double hashMs = 0d;
+                    DateTime t0 = DateTime.Now;
+                    Model modelTemp = Program.ReadParallelModel(modelHash);                    
+
+                    if (modelTemp == null)
+                    {
+                        //model.modelGamsScalar = new ModelGamsScalar(model);
+                        model.loadedFromCacheFile = false;
+                    }
+                    else
+                    {
+                        model = modelTemp;
+                        if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
+                        DateTime t1 = DateTime.Now;
+                        if (model.type == EModelType.GAMSScalar)GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
+                        model.loadedFromCacheFile = true;
+                        //timeCompile = "compile: " + G.Seconds(t1);
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (G.IsUnitTesting())
+                    {
+                        throw;
+                    }
+                    else
+                    {
+                        //do nothing, we then have to parse the file
+                        model.loadedFromCacheFile = false;
+                    }
+                }
             }
-            else if (modelType == EModelType.GAMSRaw)
-            {                
-                string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-                Model model = GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);                
-                Program.model = model;
+            else
+            {
+                model.loadedFromCacheFile = false;
             }
-            else if (modelType == EModelType.GAMSScalar)
-            {                
-                Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                                
-                if (false) GamsModel.GAMSParser();
-                if (false) GamsModel.GamsGMO();
-                Program.model = model;
+
+            if (model.loadedFromCacheFile)
+            {
+                //no writing of .mdl file of course                
             }
-            else new Error("No model defined");
+            else
+            {
+                EModelType modelType = EModelType.Gekko;
+                if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
+
+                if (modelType == EModelType.Gekko)
+                {
+                    Model model = new Model();
+                    string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
+                    ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
+                }
+                else if (modelType == EModelType.GAMSRaw)
+                {
+                    string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
+                    Model model = GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);
+                    Program.model = model;
+                }
+                else if (modelType == EModelType.GAMSScalar)
+                {
+                    Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                    if (false) GamsModel.GAMSParser();
+                    if (false) GamsModel.GamsGMO();
+                    Program.model = model;
+                }
+                else new Error("No model defined");
+
+                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                {
+                    DateTime dt1 = DateTime.Now;
+                    if (model.type == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
+                    //TODO
+                    //TODO what about last argument ms?
+                    //TODO
+                    Program.WriteParallelModel(Program.options.system_threads, ffh.realPathAndFileName, modelHash, 0, model);
+                }
+                catch (Exception e)
+                {
+                    //do nothing, not the end of the world if it fails
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
         }
         
         /// <summary>
@@ -16644,19 +16748,20 @@ namespace Gekko
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + Globals.cacheExtensionModel;
 
-            if (Program.options.model_cache == true)
-            {
-                if (File.Exists(mdlFileNameAndPath))
-                {
-                    ParserFrmGetProtobuf(fileNamePretty, mdlFileNameAndPath);
-                }
-            }
-            else
-            {
-                model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile = false;
-            }
+            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + Globals.cacheExtensionModel;
+
+            //if (Program.options.model_cache == true)
+            //{
+            //    if (File.Exists(mdlFileNameAndPath))
+            //    {
+            //        ParserFrmGetProtobuf(fileNamePretty, mdlFileNameAndPath);
+            //    }
+            //}
+            //else
+            //{
+            //    model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile = false;
+            //}
 
             model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
             model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
@@ -16665,12 +16770,12 @@ namespace Gekko
             model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
 
             string parsingSeconds = null;
-            if (Program.model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile)
-            {
-                //Needs to load lists into Program.list, and varlist too
-                GuiSetModelName();
-            }
-            else
+            //if (Program.model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile)
+            //{
+            //    //Needs to load lists into Program.list, and varlist too
+            //    GuiSetModelName();
+            //}
+            //else
             {
                 DateTime t1 = DateTime.Now;
                 //ParseModel() is reasonably fast. But needs only to be run when new model is called.
