@@ -333,7 +333,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompStart(O.Decomp2 o)
         {
-            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+            Model model = Program.model;
 
             //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
             //  eval might help.
@@ -372,7 +372,7 @@ namespace Gekko
                 if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;                
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
-                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, modelGamsScalar);
+                o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);
             }
 
             if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
@@ -437,9 +437,9 @@ namespace Gekko
                 {
                     if (MustLoadDataIntoModel())
                     {
-                        ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
-                        modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-                        modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                        ModelGamsScalar.FlushAAndRArrays(model.modelGamsScalar);
+                        model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                        model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
                     }
                 }
                 else
@@ -543,7 +543,7 @@ namespace Gekko
         /// <param name="refresh"></param>
         /// <param name="decompDatas"></param>
         /// <returns></returns>
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, ModelGamsScalar modelGamsScalar)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, Model model)
         {            
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
@@ -575,7 +575,7 @@ namespace Gekko
 
             if (decompOptions2.modelType == EModelType.GAMSScalar)
             {
-                PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, modelGamsScalar);
+                PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, model.modelGamsScalar);
             }
 
             if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
@@ -599,7 +599,7 @@ namespace Gekko
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, modelGamsScalar);
+                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, model);
                         DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                     }
                 }
@@ -653,12 +653,12 @@ namespace Gekko
 
                         if (decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef)  //<mp>
                         {
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, decompOptions2.decompOperator, modelGamsScalar);
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, decompOptions2.decompOperator, modelGamsScalar);  //Note: refreshObjects = false!
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.D, parentI, true, decompOptions2.decompOperator, model.modelGamsScalar);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, EContribType.RD, parentI, false, decompOptions2.decompOperator, model.modelGamsScalar);  //Note: refreshObjects = false!
                         }
                         else
                         {
-                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, decompOptions2.decompOperator, modelGamsScalar);
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true, decompOptions2.decompOperator, model.modelGamsScalar);
                         }
                     }
                     else
@@ -670,12 +670,12 @@ namespace Gekko
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.D, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
                                 refreshObjects = false;
                             }
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, EContribType.RD, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
                             }
                         }
                         else
@@ -686,7 +686,7 @@ namespace Gekko
                             bool refreshObjects = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2))
                             {
-                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, modelGamsScalar);
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects, decompOptions2.decompOperator, model.modelGamsScalar);
                                 refreshObjects = false;
                             }
                         }
@@ -1807,7 +1807,7 @@ namespace Gekko
             }
             else
             {
-                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
+                windowDecomp.RecalcCellsWithNewType(true, decompFind.model);
             }
         }
 
@@ -1827,7 +1827,7 @@ namespace Gekko
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
-                windowDecomp.RecalcCellsWithNewType(true, decompFind.modelGamsScalar);
+                windowDecomp.RecalcCellsWithNewType(true, decompFind.model);
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
@@ -2311,8 +2311,10 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter, ModelGamsScalar modelGamsScalar)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper dsh, DecompOperator op, string residualName, ref int funcCounter, Model model)
         {
+            ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+
             const int tZero = 0;
             
             //See #kljaf89usafasdf for Gekko  model
@@ -4205,11 +4207,12 @@ namespace Gekko
                     return;
                 }
 
-                ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+                Model model = Program.model;
+                ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
                 //For scalar model     
 
                 //Runs pretty fast, but later on check is this is necessary...            
-
+                                
                 ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
                 modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                 modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
@@ -4348,11 +4351,11 @@ namespace Gekko
 
                 WindowFind windowFind = new WindowFind(o);
                 windowFind.Title = variableName + " - " + "Gekko find";
-                windowFind.EquationBrowserSetButtons(firstEqName, firstList, modelGamsScalar);
+                windowFind.EquationBrowserSetButtons(firstEqName, firstList, model);
                 windowFind.EquationBrowserSetLabel(variableName);
                 windowFind._activeEquation = firstEqName;
                 windowFind._activeVariable = null;
-                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, modelGamsScalar);
+                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
                 return;

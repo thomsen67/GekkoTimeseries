@@ -183,22 +183,22 @@ namespace Gekko
         public object window = null;
         public DecompFind parent = null;
         public List<DecompFind> children = new List<DecompFind>();
-        public ModelGamsScalar modelGamsScalar = null;
+        public Model model = null;
         public bool closed = false;
         public bool hasException = false;
 
-        public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, ModelGamsScalar modelGamsScalar)
+        public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, Model model)
         {
             this.type = type;
             this.depth = depth;
             this.decompOptions2 = decompOptions2;
             this.window = window;  //either WindowDecomp or WindowFind
-            this.modelGamsScalar = modelGamsScalar;
+            this.model = model;
         }
 
-        public DecompFind CreateChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window, ModelGamsScalar modelGamsScalar)
+        public DecompFind CreateChild(DecompOptions2 decompOptions2, EDecompFindNavigation type, object window, Model model)
         {
-            DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window, modelGamsScalar);
+            DecompFind child = new DecompFind(type, this.depth + 1, decompOptions2, window, model);
             child.parent = this;
             this.children.Add(child);
             return child;
@@ -2370,14 +2370,14 @@ namespace Gekko
         /// <param name="flood"></param>
         /// <param name="color"></param>
         /// <param name="colors"></param>
-        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done, ModelGamsScalar modelGamsScalar)
+        public static List<Flood> Flood1Color(Flood flood, Flood floodEnd, Dictionary<PeriodAndVariable, Flood> colors, out bool done, ModelGamsScalar model)
         {
             done = false;
             List<Flood> rv = new List<Flood>();
-            List<int> eqs = modelGamsScalar.dependents[flood.pv];
+            List<int> eqs = model.dependents[flood.pv];
             foreach (int eq in eqs)
             {                
-                ModelScalarEquation eqs2 = modelGamsScalar.precedents[eq];
+                ModelScalarEquation eqs2 = model.precedents[eq];
                 foreach (PeriodAndVariable pv2 in eqs2.vars)
                 {   
                     //new Writeln("equation " + eqName + " containing variable " + pv.GetVariableAndPeriod().Item1 + " in " + pv.GetVariableAndPeriod().Item2.ToString());

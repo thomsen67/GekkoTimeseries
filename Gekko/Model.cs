@@ -142,7 +142,7 @@ namespace Gekko
         /// Helper, for the DECOMP window not the FIND window.
         /// </summary>
         /// <returns></returns>
-        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
+        public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0, Model model)
         {
             string s;
             List<string> eqNames = new List<string>();
@@ -151,7 +151,7 @@ namespace Gekko
                 //eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, t0.ToString(), false));
             }
-            s = Model.GetEquationText(eqNames, showTime, t0, modelGamsScalar);
+            s = Model.GetEquationText(eqNames, showTime, t0, model);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
@@ -163,14 +163,14 @@ namespace Gekko
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
+        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0, Model model)
         {            
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, modelGamsScalar);
+            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, model.modelGamsScalar);
 
             string s2 = null;
             int i = -1;
@@ -178,7 +178,7 @@ namespace Gekko
             {
                 i++;
                 if (i > 0) s2 += G.NL;
-                s2 += modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
+                s2 += model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
             string rv = two.s1 + G.NL + "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL + "-------------- GAMS --------------" + G.NL + G.NL + two.s2;
             return rv;

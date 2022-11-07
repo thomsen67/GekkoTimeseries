@@ -61,7 +61,7 @@ namespace Gekko
             //viewModel.YourCommand.Execute(null);
             if (e.Key == Key.Return)
             {
-                CallDecomp(this._activeEquation, decompFind.modelGamsScalar);
+                CallDecomp(this._activeEquation, decompFind.model);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Gekko
         public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
         {
             this._activeVariable = null;
-            this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
+            this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.model);
         }
 
         public void OnVariableButtonEnter(object sender, MouseEventArgs e)
@@ -118,7 +118,7 @@ namespace Gekko
             }
             else
             {
-                this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
+                this.EquationBrowserSetEquation(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.model);
             }
         }
 
@@ -137,10 +137,10 @@ namespace Gekko
             //}
             FrameworkElement fe = e.OriginalSource as FrameworkElement;
             EquationListItem item = fe.DataContext as EquationListItem;            
-            CallDecomp(item.fullName, decompFind.modelGamsScalar);
+            CallDecomp(item.fullName, decompFind.model);
         }
 
-        private void CallDecomp(string fullName, ModelGamsScalar modelGamsScalar)
+        private void CallDecomp(string fullName, Model model)
         {
             string eqName = G.Chop_DimensionRemoveLast(fullName);
 
@@ -157,7 +157,7 @@ namespace Gekko
             List endo = new List(new List<string>() { varName });
             decomp.endo = new List<IVariable>() { endo };
             decomp.name = new ScalarString(eqName);            
-            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, modelGamsScalar);
+            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, model);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
 
@@ -174,7 +174,7 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.model);
             this._activeEquation = item.fullName;
         }
 
@@ -183,7 +183,7 @@ namespace Gekko
             this.windowFindStatusBar.Text = Globals.windowFindStatusBarText;
             ListViewItem x = sender as ListViewItem;
             EquationListItem item = x.Content as EquationListItem;
-            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
+            this.EquationBrowserSetButtons(item.fullName, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.model);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
@@ -191,21 +191,21 @@ namespace Gekko
             this.windowFindStatusBar.Text = "";
             bool showTime = false;
             GekkoTime t0 = this.decompFind.decompOptions2.t1;
-            this.EquationBrowserSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.modelGamsScalar);
+            this.EquationBrowserSetButtons(_activeEquation, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t0, decompFind.model);
             this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
-        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
+        private void EquationBrowserSetButtons(string eqName, bool showTime, GekkoTime t0, Model model)
         {
-            this.EquationBrowserSetEquation(eqName, showTime, t0, modelGamsScalar);
-            int eqNumber = modelGamsScalar.GetEqNumber(eqName);
-            List<string> precedents = modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
-            this.EquationBrowserSetButtons(eqName, precedents, modelGamsScalar);
+            this.EquationBrowserSetEquation(eqName, showTime, t0, model);
+            int eqNumber = model.modelGamsScalar.GetEqNumber(eqName);
+            List<string> precedents = model.modelGamsScalar.GetPrecedentsNames(eqNumber, showTime, t0);
+            this.EquationBrowserSetButtons(eqName, precedents, model);
         }
 
-        public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0, ModelGamsScalar modelGamsScalar)
+        public void EquationBrowserSetEquation(string eq, bool showTime, GekkoTime t0, Model model)
         {
-            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0, modelGamsScalar);
+            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0, model);
             this.windowEquationBrowserLabel.Text = s;
         }
 
@@ -227,7 +227,7 @@ namespace Gekko
             this.windowEquationBrowserLabel.Text = s7;
         }
 
-        public void EquationBrowserSetButtons(string eqName, List<string> firstList, ModelGamsScalar modelGamsScalar)
+        public void EquationBrowserSetButtons(string eqName, List<string> firstList, Model model)
         {
             EquationBrowserSetButtons1(eqName, firstList);
             //Dispatching the color update
@@ -237,7 +237,7 @@ namespace Gekko
             //or we could wait 0.5 second before any coloring?
             if (true)
             {
-                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtonsColors(eqName, modelGamsScalar)), System.Windows.Threading.DispatcherPriority.Background);
+                this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtonsColors(eqName, model)), System.Windows.Threading.DispatcherPriority.Background);
             }
             try
             {
@@ -250,7 +250,7 @@ namespace Gekko
 
         }
 
-        public void EquationBrowserSetEquationButtonsColors(string eqName, ModelGamsScalar modelGamsScalar)
+        public void EquationBrowserSetEquationButtonsColors(string eqName, Model model)
         {
             try
             {
@@ -269,7 +269,7 @@ namespace Gekko
                     //decompOptionsTemp.link.Add(new Link());
 
                     decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
-                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false, modelGamsScalar);
+                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]
                     //HMMMM [0]
@@ -287,7 +287,7 @@ namespace Gekko
                     if (!Decomp.IsOperatorOneOf3Types(op.type)) return;
 
                     Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.t0, this.decompFind.decompOptions2.t0, decompOptionsTemp.decompOperator);
-                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, modelGamsScalar);
+                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, model);
 
                     double max = 0d;
 
