@@ -1077,7 +1077,7 @@ namespace Gekko
                     {
                         if (!Program.IsDecompResidualName(v))
                         {
-                            if (decompFind.model.modelType == EModelType.GAMSRaw || decompFind.model.modelType == EModelType.GAMSScalar)
+                            if (decompFind.model.type == EModelType.GAMSRaw || decompFind.model.type == EModelType.GAMSScalar)
                             {
                                 if (Program.HasGamsEquation(v)) isEndogenous = true;
                             }

@@ -1183,7 +1183,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
 
-                    if (model.modelType == EModelType.Gekko)
+                    if (model.type == EModelType.Gekko)
                     {
                         simModeVariables.Add(s);
                     }
@@ -1277,7 +1277,7 @@ namespace Gekko
                 }
             }
 
-            if (model.modelType == EModelType.Gekko)
+            if (model.type == EModelType.Gekko)
             {
                 if (type) Program.Endo(simModeVariables);
                 else Program.Exo(simModeVariables);
@@ -1930,7 +1930,7 @@ namespace Gekko
         /// </summary>
         public static void Unfix(Gekko.Model model)
         {
-            if (model.modelType == EModelType.GAMSRaw || model.modelType == EModelType.GAMSScalar)
+            if (model.type == EModelType.GAMSRaw || model.type == EModelType.GAMSScalar)
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");

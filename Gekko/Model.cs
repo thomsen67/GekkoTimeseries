@@ -106,16 +106,13 @@ namespace Gekko
 
     [ProtoContract]
     public class Model
-    {
-        [ProtoMember(1)]
+    {        
         public ModelGekko modelGekko = null;
-        [ProtoMember(2)]
         public ModelGams modelGams = null;
-        [ProtoMember(3)]
         public ModelGamsScalar modelGamsScalar = null;
         
         [ProtoMember(4)]
-        public EModelType modelType = EModelType.Unknown;  //sets main type
+        public EModelType type = EModelType.Unknown;  //beware that such fields must be transported manually after protobuf:  //#lkja90adsfkj
 
         public bool loadedFromCacheFile = false;  //not protobuffed
 

@@ -2701,13 +2701,15 @@ namespace Gekko
                 mm.AddRange(m);
             }
 
+            mm.Add(model);
+
             if (model.modelGams == null) mm.Add(new ModelNull());
             else mm.Add(model.modelGams);
 
             if (model.modelGekko == null) mm.Add(new ModelNull());
             else mm.Add(model.modelGekko);
 
-            if (mm.Count != k + 3) new Error("Hov");
+            if (mm.Count != k + 4) new Error("Hov");
 
             return mm;
         }        
@@ -2737,14 +2739,16 @@ namespace Gekko
             }
 
             model.modelGamsScalar = mm[0] as ModelGamsScalar; //becomes = null if ModelNull object
-            model.modelGams = mm[k + 1] as ModelGams; //becomes = null if ModelNull object            
-            model.modelGekko = mm[k + 2] as ModelGekko; //becomes = null if ModelNull object            
+            Model modelTemp = mm[k + 1] as Model;  //used for .type only
+            model.modelGams = mm[k + 2] as ModelGams; //becomes = null if ModelNull object            
+            model.modelGekko = mm[k + 3] as ModelGekko; //becomes = null if ModelNull object              
 
             //these .parent fields are probably always = null, 
             //and even if not, this is safe to do:
             if (model.modelGamsScalar != null) model.modelGamsScalar.parent = model;
             if (model.modelGams != null) model.modelGams.parent = model;
             if (model.modelGekko != null) model.modelGekko.parent = model;
+            model.type = modelTemp.type; //#lkja90adsfkj
 
             return model;
         }
@@ -2885,8 +2889,6 @@ namespace Gekko
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
             DateTime t = DateTime.Now;
-            //hash = Program.GetMD5Hash(null, fileName);
-            //hashMs = (DateTime.Now - t).TotalMilliseconds;
 
             List<string> files = new List<string>();
             List<object> lists = new List<object>();
@@ -14224,7 +14226,7 @@ namespace Gekko
                         bank = ts.GetParentDatabank().name;
                     }
 
-                    if (Program.model.modelType == EModelType.GAMSRaw || Program.model.modelType == EModelType.GAMSScalar)
+                    if (Program.model.type == EModelType.GAMSRaw || Program.model.type == EModelType.GAMSScalar)
                     {
                         DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
                     }
@@ -16612,20 +16614,17 @@ namespace Gekko
             {
                 Model model = new Model();
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
-                ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
-                model.modelType = EModelType.Gekko;
+                ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);                
             }
             else if (modelType == EModelType.GAMSRaw)
             {                
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-                Model model = GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);
-                model.modelType = EModelType.GAMSRaw;
+                Model model = GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);                
                 Program.model = model;
             }
             else if (modelType == EModelType.GAMSScalar)
             {                
-                Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                
-                model.modelType = EModelType.GAMSScalar;
+                Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                                
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();
                 Program.model = model;
@@ -16638,6 +16637,7 @@ namespace Gekko
         /// </summary>
         private static void ReadGekkoModel(Model model, string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
+            model.type = EModelType.Gekko;
             //TODO: keep the old version, so model command can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
             modelGekko.modelInfo.fileName = fileNamePretty;

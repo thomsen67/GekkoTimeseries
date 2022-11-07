@@ -4238,7 +4238,7 @@ namespace Gekko
 
         public static EModelType GetModelType()
         {
-            return Program.model.modelType;
+            return Program.model.type;
         }
 
         /// <summary>
