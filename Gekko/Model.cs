@@ -103,6 +103,7 @@ namespace Gekko
         public ModelGekko modelGekko = null;
         public ModelGams modelGams = null;
         public ModelGamsScalar modelGamsScalar = null;
+        public bool loadedFromCacheFile = false;
 
         /// <summary>
         /// This gets folded equations from GAMS code scalar model. See also how to get unfolded equations: #jseds78hsd33.
@@ -207,9 +208,9 @@ namespace Gekko
     {
         //[ProtoMember(1)]  --> we don't serialize this: takes only about 0.7 sec to recreate for dec09 (gauss simulation) when it is missing. Reading from file, unzipping .dll files will eat up a lot of that
         public Model2 m2 = new Model2();
-        
+
         [ProtoMember(2)]
-        public ModelInfo modelInfo = new ModelInfo();  //contains just statistics regarding number of exo, endo etc. Nothing serious here.
+        public ModelInfo modelInfo = null; //contains just statistics regarding number of exo, endo etc. Nothing serious here.
                 
         //TODO: This is superflous for tempModel used for GENR statemens
         public Model2Cache m2cache = new Model2Cache();        
@@ -329,9 +330,14 @@ namespace Gekko
         [ProtoMember(31)]
         public string runAfter = null;
 
-        public ModelGekko()
-        { 
-        }   
+        [ProtoMember(32)]
+        public Model parent = null;
+
+        public ModelGekko(Model parent)
+        {
+            this.parent = parent;
+            parent.modelGekko = this;
+        }
     }
 
     [ProtoContract]
@@ -398,6 +404,9 @@ namespace Gekko
         public string fileName;
         [ProtoMember(16)]
         public ModelListHelper modelListHelper = null;
+        [ProtoMember(17)]
+        public ModelGekko parent = null;
+
         //-------------------------------------------------------------------------------------------
         //Do not save the following in protofile! (they will be created even if there is a cache hit)
         public string info;
@@ -408,8 +417,12 @@ namespace Gekko
         //public string signatureFoundInFileHeader;
         public string signatureTrue;
         public string varlistStatus;
-        public string lastCompileDuration;
-        public bool loadedFromMdlFile;
+        public string lastCompileDuration;        
+
+        public ModelInfo(ModelGekko model)
+        {
+            this.parent = model;
+        }
 
         public void Print()
         {
@@ -495,7 +508,7 @@ namespace Gekko
             }
             
             string cache = "";
-            if (this.loadedFromMdlFile) cache = " (model loaded from cache file)";
+            if (this.parent.parent.loadedFromCacheFile) cache = " (model loaded from cache file)";
             G.Writeln("Model statement ended succesfully with no errors in " + timeUsedTotal + extra + cache);
         }
     }
@@ -503,19 +516,24 @@ namespace Gekko
     [ProtoContract]
     public class ModelGams
     {
-        [ProtoMember(1)]
-        public ModelInfoGams modelInfo = new ModelInfoGams();
+        
         [ProtoMember(2)]
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(3)]
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
+        [ProtoMember(4)]
+        public Model parent = null;
+
+        public ModelGams(Model model)
+        {
+            this.parent = model;
+            model.modelGams = this;
+        }
     }
 
     [ProtoContract]
     public class ModelGamsScalar
-    {
-        [ProtoMember(1)]
-        public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
+    {        
 
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;
@@ -642,13 +660,19 @@ namespace Gekko
         /// </summary>
         [ProtoMember(27)]
         public List<ModelScalarEquation> precedents = null;
+        
+        [ProtoMember(28)]
+        public Model parent = null;
 
-        //[ProtoMember(28)]
-        //public ModelGams modelGams = null;
+        // =============================================
+        // =============================================
+        // =============================================
 
-        // =============================================
-        // =============================================
-        // =============================================
+        public ModelGamsScalar(Model model)
+        {
+            this.parent = model;
+            model.modelGamsScalar = this;
+        }
 
         public int GetEqNumber(string eqName)
         {
@@ -1181,19 +1205,7 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public List<PeriodAndVariable> vars = new List<PeriodAndVariable>();
-    }
-
-    [ProtoContract]
-    public class ModelInfoGamsScalar
-    {
-        public bool loadedFromMdlFile = false;  //do not protobuf
-    }
-
-    [ProtoContract]
-    public class ModelInfoGams
-    {
-        public bool loadedFromMdlFile = false;  //do not protobuf
-    }
+    }    
 
     [ProtoContract]
     public class ModelGamsEquation

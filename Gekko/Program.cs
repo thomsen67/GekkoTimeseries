@@ -2643,119 +2643,63 @@ namespace Gekko
 
         }
 
-        public static List<ModelGamsScalar> ProtobufModelGamsScalar5a(int n, ModelGamsScalar modelGamsScalar)
+        public static List<object> ProtobufModelGamsScalar5a(int n, ModelGamsScalar modelGamsScalar)
         {            
             if (n != 5) new Error("Hov");
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
             for (int i = 1; i <= n + 1; i++)
             {
-                m.Add(new ModelGamsScalar());
+                m.Add(new ModelGamsScalar(null));
             }
-            m[0] = modelGamsScalar;
-            m[1] = new ModelGamsScalar();
-            m[1].precedents = m[0].precedents;
-            m[0].precedents = null;
-            m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
-            m[0].dict_FromEqNumberToEqChunkNumber = null;
-            m[1].ee = m[0].ee;
-            m[0].ee = null;
-            m[2] = new ModelGamsScalar();
-            m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
-            m[0].dict_FromEqNameToEqNumber = null;
-            m[2].aTemp = m[0].aTemp;
-            m[0].aTemp = null;
-            m[2].csCodeLines = m[0].csCodeLines;
-            m[0].csCodeLines = null;
-            m[3] = new ModelGamsScalar();
-            m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
-            m[0].dict_FromVarNameToVarNumber = null;
-            m[3].ddTemp = m[0].ddTemp;
-            m[0].ddTemp = null;
-            m[3].cc = m[0].cc;
-            m[0].cc = null;
-            m[4] = new ModelGamsScalar();
-            m[4].dependents = m[0].dependents;
-            m[0].dependents = null;
-            m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
-            m[0].dict_FromVarNumberToVarName = null;
-            m[5] = new ModelGamsScalar();
-            m[5].bbTemp = m[0].bbTemp;
-            m[0].bbTemp = null;
-            m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
-            m[0].dict_FromEqNumberToEqName = null;            
-            return m;
+            if (modelGamsScalar != null)
+            {
+
+                m[0] = modelGamsScalar;
+                m[1] = new ModelGamsScalar(null);
+                m[1].precedents = m[0].precedents;
+                m[0].precedents = null;
+                m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
+                m[0].dict_FromEqNumberToEqChunkNumber = null;
+                m[1].ee = m[0].ee;
+                m[0].ee = null;
+                m[2] = new ModelGamsScalar(null);
+                m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
+                m[0].dict_FromEqNameToEqNumber = null;
+                m[2].aTemp = m[0].aTemp;
+                m[0].aTemp = null;
+                m[2].csCodeLines = m[0].csCodeLines;
+                m[0].csCodeLines = null;
+                m[3] = new ModelGamsScalar(null);
+                m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
+                m[0].dict_FromVarNameToVarNumber = null;
+                m[3].ddTemp = m[0].ddTemp;
+                m[0].ddTemp = null;
+                m[3].cc = m[0].cc;
+                m[0].cc = null;
+                m[4] = new ModelGamsScalar(null);
+                m[4].dependents = m[0].dependents;
+                m[0].dependents = null;
+                m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
+                m[0].dict_FromVarNumberToVarName = null;
+                m[5] = new ModelGamsScalar(null);
+                m[5].bbTemp = m[0].bbTemp;
+                m[0].bbTemp = null;
+                m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
+                m[0].dict_FromEqNumberToEqName = null;
+            }
+
+            List<object> mm = new List<object>();
+            mm.AddRange(m);
+
+            return mm;
         }        
 
-        public static ModelGamsScalar ProtobufModelGamsScalar5b(List<ModelGamsScalar>m)
+        public static Model ProtobufModelGamsScalar5b(int k, List<object>mm)
         {
-            m[0].precedents = m[1].precedents;
-            m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
-            m[0].ee = m[1].ee;
-            m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
-            m[0].aTemp = m[2].aTemp;
-            m[0].csCodeLines = m[2].csCodeLines;
-            m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
-            m[0].ddTemp = m[3].ddTemp;
-            m[0].cc = m[3].cc;
-            m[0].dependents = m[4].dependents;
-            m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
-            m[0].bbTemp = m[5].bbTemp;
-            m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
-            return m[0];
-        }
-
-
-        public static void ProtobufModelGamsScalar1(List<string> files)
-        {
-            int n = 5;
+            Model model = new Model();
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
-            for (int i = 1; i <= n; i++)
-            {
-                m.Add(new ModelGamsScalar());
-            }
-            m[0] = Program.model.modelGamsScalar;
-            m[1] = new ModelGamsScalar();
-            m[1].precedents = m[0].precedents;
-            m[0].precedents = null;
-            m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
-            m[0].dict_FromEqNumberToEqChunkNumber = null;
-            m[1].ee = m[0].ee;
-            m[0].ee = null;
-            m[2] = new ModelGamsScalar();
-            m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
-            m[0].dict_FromEqNameToEqNumber = null;
-            m[2].aTemp = m[0].aTemp;
-            m[0].aTemp = null;
-            m[2].csCodeLines = m[0].csCodeLines;
-            m[0].csCodeLines = null;
-            m[3] = new ModelGamsScalar();
-            m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
-            m[0].dict_FromVarNameToVarNumber = null;
-            m[3].ddTemp = m[0].ddTemp;
-            m[0].ddTemp = null;
-            m[3].cc = m[0].cc;
-            m[0].cc = null;
-            m[4] = new ModelGamsScalar();
-            m[4].dependents = m[0].dependents;
-            m[0].dependents = null;
-            m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
-            m[0].dict_FromVarNumberToVarName = null;
-            m[5] = new ModelGamsScalar();
-            m[5].bbTemp = m[0].bbTemp;
-            m[0].bbTemp = null;
-            m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
-            m[0].dict_FromEqNumberToEqName = null;
-            for (int i = 0; i <= n; i++)
-            {
-                Program.ProtobufWrite(m[i], files[i]);
-            }
+            for (int i = 0; i <= k; i++) m.Add(mm[i] as ModelGamsScalar);
 
-            // --- after protobuf write
-
-            for (int i = 0; i <= n; i++)
-            {
-                m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);
-            }
             m[0].precedents = m[1].precedents;
             m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
             m[0].ee = m[1].ee;
@@ -2769,17 +2713,92 @@ namespace Gekko
             m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
             m[0].bbTemp = m[5].bbTemp;
             m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
-            Program.model.modelGamsScalar = m[0];
+
+            model.modelGamsScalar = m[0];
+
+            model.modelGams = mm[k + 1] as ModelGams;
+            model.modelGekko = mm[k + 2] as ModelGekko;
+
+            return model;
         }
 
-        public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, ModelGamsScalar modelGamsScalar)
+
+        //public static void ProtobufModelGamsScalar1(List<string> files)
+        //{
+        //    int n = 5;
+        //    List<ModelGamsScalar> m = new List<ModelGamsScalar>();
+        //    for (int i = 1; i <= n; i++)
+        //    {
+        //        m.Add(new ModelGamsScalar());
+        //    }
+        //    m[0] = Program.model.modelGamsScalar;
+        //    m[1] = new ModelGamsScalar();
+        //    m[1].precedents = m[0].precedents;
+        //    m[0].precedents = null;
+        //    m[1].dict_FromEqNumberToEqChunkNumber = m[0].dict_FromEqNumberToEqChunkNumber;
+        //    m[0].dict_FromEqNumberToEqChunkNumber = null;
+        //    m[1].ee = m[0].ee;
+        //    m[0].ee = null;
+        //    m[2] = new ModelGamsScalar();
+        //    m[2].dict_FromEqNameToEqNumber = m[0].dict_FromEqNameToEqNumber;
+        //    m[0].dict_FromEqNameToEqNumber = null;
+        //    m[2].aTemp = m[0].aTemp;
+        //    m[0].aTemp = null;
+        //    m[2].csCodeLines = m[0].csCodeLines;
+        //    m[0].csCodeLines = null;
+        //    m[3] = new ModelGamsScalar();
+        //    m[3].dict_FromVarNameToVarNumber = m[0].dict_FromVarNameToVarNumber;
+        //    m[0].dict_FromVarNameToVarNumber = null;
+        //    m[3].ddTemp = m[0].ddTemp;
+        //    m[0].ddTemp = null;
+        //    m[3].cc = m[0].cc;
+        //    m[0].cc = null;
+        //    m[4] = new ModelGamsScalar();
+        //    m[4].dependents = m[0].dependents;
+        //    m[0].dependents = null;
+        //    m[4].dict_FromVarNumberToVarName = m[0].dict_FromVarNumberToVarName;
+        //    m[0].dict_FromVarNumberToVarName = null;
+        //    m[5] = new ModelGamsScalar();
+        //    m[5].bbTemp = m[0].bbTemp;
+        //    m[0].bbTemp = null;
+        //    m[5].dict_FromEqNumberToEqName = m[0].dict_FromEqNumberToEqName;
+        //    m[0].dict_FromEqNumberToEqName = null;
+        //    for (int i = 0; i <= n; i++)
+        //    {
+        //        Program.ProtobufWrite(m[i], files[i]);
+        //    }
+
+        //    // --- after protobuf write
+
+        //    for (int i = 0; i <= n; i++)
+        //    {
+        //        m[i] = Program.ProtobufRead<ModelGamsScalar>(files[i]);
+        //    }
+        //    m[0].precedents = m[1].precedents;
+        //    m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
+        //    m[0].ee = m[1].ee;
+        //    m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
+        //    m[0].aTemp = m[2].aTemp;
+        //    m[0].csCodeLines = m[2].csCodeLines;
+        //    m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
+        //    m[0].ddTemp = m[3].ddTemp;
+        //    m[0].cc = m[3].cc;
+        //    m[0].dependents = m[4].dependents;
+        //    m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
+        //    m[0].bbTemp = m[5].bbTemp;
+        //    m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
+        //    Program.model.modelGamsScalar = m[0];
+        //}
+
+        public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, Model model)
         {
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
             List<string> files = GetSplitCacheFileNames(k + 1, inputFileName, "model", ref hash);
 
-            List<ModelGamsScalar> lists = ProtobufModelGamsScalar5a(k, modelGamsScalar);
+            List<object> lists = ProtobufModelGamsScalar5a(k, model.modelGamsScalar);
+
 
             try
             {
@@ -2800,7 +2819,7 @@ namespace Gekko
             finally
             {
                 //makes sure stuff is always reverted into model in slot m[0], even if protobuf write fails.
-                ProtobufModelGamsScalar5b(lists);
+                ProtobufModelGamsScalar5b(Program.options.system_threads, lists);
             }            
 
             List<string> sfiles = new List<string>();
@@ -2819,7 +2838,7 @@ namespace Gekko
         /// <summary>
         /// Reads model protobuf files in parallel.
         /// </summary>
-        public static ModelGamsScalar ReadParallelModel(string fileName, string hash)
+        public static Model ReadParallelModel(string fileName, string hash)
         {
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -2828,7 +2847,7 @@ namespace Gekko
             //hashMs = (DateTime.Now - t).TotalMilliseconds;
 
             List<string> files = new List<string>();
-            List<ModelGamsScalar> lists = new List<ModelGamsScalar>();
+            List<object> lists = new List<object>();
 
             string part2 = Globals.gekkoVersion + "_" + "model" + "_" + hash + "_";
             int k = ValidateFileNames(part2);
@@ -2837,7 +2856,7 @@ namespace Gekko
             for (int i = 0; i < k; i++)
             {
                 files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);
-                lists.Add(new ModelGamsScalar());
+                lists.Add(new ModelGamsScalar(null));
             }
 
             //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
@@ -2868,7 +2887,7 @@ namespace Gekko
                 }, _ => { });
             }
             
-            return ProtobufModelGamsScalar5b(lists);
+            return ProtobufModelGamsScalar5b(Program.options.system_threads, lists);
         }
 
         public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
@@ -16543,21 +16562,23 @@ namespace Gekko
             EModelType modelType = EModelType.Gekko;
             if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
 
+            Model model = new Model();
+
             if (modelType == EModelType.Gekko)
             {
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
-                ReadGekkoModel(ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
+                ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
                 Program.options.model_type = "default";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSRaw)
             {
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-                GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);
+                GamsModel.ReadGamsRawModel(model, textInputRaw, ffh.realPathAndFileName, o);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSScalar)
             {                
-                Program.model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                Program.model = GamsModel.ReadGAMSScalarModel(model, o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();
@@ -16568,12 +16589,11 @@ namespace Gekko
         /// <summary>
         /// Read a Gekko model from .frm file.
         /// </summary>
-        private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
+        private static void ReadGekkoModel(Model model, string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
-            Program.model = new Model();
-            Program.model.modelGekko = new ModelGekko();
-            Program.model.modelGekko.modelInfo.fileName = fileNamePretty;
+            ModelGekko modelGekko = new ModelGekko(model);
+            modelGekko.modelInfo.fileName = fileNamePretty;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
@@ -16588,17 +16608,17 @@ namespace Gekko
             }
             else
             {
-                Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
+                model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile = false;
             }
 
-            Program.model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
-            Program.model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
-            Program.model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
-            Program.model.modelGekko.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
-            Program.model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
+            model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
+            model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
+            model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
+            model.modelGekko.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
+            model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
 
             string parsingSeconds = null;
-            if (Program.model.modelGekko.modelInfo.loadedFromMdlFile)
+            if (Program.model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile)
             {
                 //Needs to load lists into Program.list, and varlist too
                 GuiSetModelName();
@@ -16669,15 +16689,15 @@ namespace Gekko
                     settings.equations = equations;
                     settings.dictionary = dictionary;
 
-                    Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings);
-                    Program.model.modelGamsScalar = modelTemp.modelGamsScalar;
+                    Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
+                    model.modelGamsScalar = modelTemp.modelGamsScalar;
 
                 }
 
                 Program.GuiSetModelName();
-                if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
+                if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
                 {
-                    new Error("There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables");
+                    new Error("There is a lead [+" + model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest lead elsewhere in the model [+" + model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables");
 
                     //throw new GekkoException();
                 }
@@ -16690,18 +16710,18 @@ namespace Gekko
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
             {
-                Program.model.modelGekko.runBefore = modelCommentsHelper.cutout_runbefore;
+                model.modelGekko.runBefore = modelCommentsHelper.cutout_runbefore;
             }
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runafter))
             {
-                Program.model.modelGekko.runAfter = modelCommentsHelper.cutout_runafter;
+                model.modelGekko.runAfter = modelCommentsHelper.cutout_runafter;
             }
 
-            Program.model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
-            Program.model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
+            model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
+            model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
-            Program.model.modelGekko.modelInfo.Print();
+            model.modelGekko.modelInfo.Print();
         }
 
         /// <summary>
@@ -16809,8 +16829,8 @@ namespace Gekko
                 //=============================================
 
                 G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                Program.model.modelGekko.modelInfo.loadedFromMdlFile = true;
-                Program.model.modelGekko.modelInfo.fileName = fileNamePretty;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                model.loadedFromCacheFile = true;
+                model.modelGekko.modelInfo.fileName = fileNamePretty;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
             }
             catch (Exception e)
             {
@@ -16821,7 +16841,7 @@ namespace Gekko
                 else
                 {
                     //do nothing, we then have to parse the file
-                    Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
+                    model.loadedFromCacheFile = false;
                 }
             }
         }
