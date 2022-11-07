@@ -16647,7 +16647,19 @@ namespace Gekko
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         DateTime t1 = DateTime.Now;
-                        if (model.type == EModelType.GAMSScalar)GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
+                        if (model.type == EModelType.GAMSScalar)
+                        {
+                            GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
+                        }
+                        else if (model.type == EModelType.Gekko)
+                        {
+                            GetListsFromModelListHelper();
+                            //=============================================
+                            //FOR SAFETY: see mail from TKD 5/3 2013
+                            Program.model.modelGekko.simulateResults = new double[10];
+                            //=============================================                                                        
+                            model.modelGekko.modelInfo.fileName = ffh.prettyPathAndFileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                        }
                         model.loadedFromCacheFile = true;
                         //timeCompile = "compile: " + G.Seconds(t1);
                     }
@@ -16964,42 +16976,42 @@ namespace Gekko
             }
         }
 
-        /// <summary>
-        /// Load a cached model from an internal protobuf file.
-        /// </summary>
-        /// <param name="fileNamePretty"></param>
-        /// <param name="mdlFileNameAndPath"></param>
-        private static void ParserFrmGetProtobuf(string fileNamePretty, string mdlFileNameAndPath)
-        {
-            try
-            {
-                DateTime dt1 = DateTime.Now;
-                Program.model.modelGekko = ProtobufRead<ModelGekko>(mdlFileNameAndPath);
+        ///// <summary>
+        ///// Load a cached model from an internal protobuf file.
+        ///// </summary>
+        ///// <param name="fileNamePretty"></param>
+        ///// <param name="mdlFileNameAndPath"></param>
+        //private static void ParserFrmGetProtobuf(string fileNamePretty, string mdlFileNameAndPath)
+        //{
+        //    try
+        //    {
+        //        DateTime dt1 = DateTime.Now;
+        //        Program.model.modelGekko = ProtobufRead<ModelGekko>(mdlFileNameAndPath);
 
-                GetListsFromModelListHelper();
+        //        GetListsFromModelListHelper();
 
-                //=============================================
-                //FOR SAFETY: see mail from TKD 5/3 2013
-                Program.model.modelGekko.simulateResults = new double[10];
-                //=============================================
+        //        //=============================================
+        //        //FOR SAFETY: see mail from TKD 5/3 2013
+        //        Program.model.modelGekko.simulateResults = new double[10];
+        //        //=============================================
 
-                G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                model.loadedFromCacheFile = true;
-                model.modelGekko.modelInfo.fileName = fileNamePretty;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
-            }
-            catch (Exception e)
-            {
-                if (G.IsUnitTesting())
-                {
-                    throw;
-                }
-                else
-                {
-                    //do nothing, we then have to parse the file
-                    model.loadedFromCacheFile = false;
-                }
-            }
-        }
+        //        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+        //        model.loadedFromCacheFile = true;
+        //        model.modelGekko.modelInfo.fileName = fileNamePretty;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (G.IsUnitTesting())
+        //        {
+        //            throw;
+        //        }
+        //        else
+        //        {
+        //            //do nothing, we then have to parse the file
+        //            model.loadedFromCacheFile = false;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Helper for equation browser GUI window (FIND)
