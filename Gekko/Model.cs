@@ -98,10 +98,20 @@ namespace Gekko
         
     }
 
+    [ProtoContract]
+    public class ModelNull
+    {
+        //just used to signal that one of modelGamsScalar, modelGams or modelGekko is = null.
+    }
+
+    [ProtoContract]
     public class Model
     {
+        [ProtoMember(1)]
         public ModelGekko modelGekko = null;
+        [ProtoMember(2)]
         public ModelGams modelGams = null;
+        [ProtoMember(3)]
         public ModelGamsScalar modelGamsScalar = null;
         public bool loadedFromCacheFile = false;
 
@@ -329,14 +339,22 @@ namespace Gekko
 
         [ProtoMember(31)]
         public string runAfter = null;
+                
+        public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
-        [ProtoMember(32)]
-        public Model parent = null;
+        /// <summary>
+        /// Only for protobuf, use ModelGekko(Model...).
+        /// </summary>
+        private ModelGekko() { }
 
+        /// <summary>
+        /// Use this, do not use ModelGekko()
+        /// </summary>
+        /// <param name="parent"></param>
         public ModelGekko(Model parent)
         {
             this.parent = parent;
-            parent.modelGekko = this;
+            if(parent!=null) parent.modelGekko = this;            
         }
     }
 
@@ -521,13 +539,22 @@ namespace Gekko
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(3)]
         public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
-        [ProtoMember(4)]
-        public Model parent = null;
+        
+        public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
+        /// <summary>
+        /// Only for protobuf, use ModelGams(Model...).
+        /// </summary>
+        private ModelGams() { }
+
+        /// <summary>
+        /// Use this, do not use ModelGams()
+        /// </summary>
+        /// <param name="model"></param>
         public ModelGams(Model model)
         {
-            this.parent = model;
-            model.modelGams = this;
+            this.parent = model;            
+            if (model != null) model.modelGams = this;
         }
     }
 
@@ -641,10 +668,7 @@ namespace Gekko
 
         [ProtoMember(23)]
         public List<string> csCodeLines = null; //C# source code
-
-        [ProtoMember(24)]
-        public List<string> gamsFoldedModel = null;  //in GAMS format
-
+        
         /// <summary>
         /// Points a period-and-variable to the unfolded equations it is part of. This could
         /// be a bit faster and use a bit less ram if PeriodAndVariable was a long and by using
@@ -660,18 +684,26 @@ namespace Gekko
         /// </summary>
         [ProtoMember(27)]
         public List<ModelScalarEquation> precedents = null;
-        
-        [ProtoMember(28)]
-        public Model parent = null;
+                
+        public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
         // =============================================
         // =============================================
         // =============================================
 
+        /// <summary>
+        /// Only for protobuf, use ModelGamsScalar(Model...).
+        /// </summary>
+        private ModelGamsScalar() { }
+
+        /// <summary>
+        /// Use this, do not use ModelGamsScalar()
+        /// </summary>
+        /// <param name="model"></param>
         public ModelGamsScalar(Model model)
         {
             this.parent = model;
-            model.modelGamsScalar = this;
+            if (model != null) model.modelGamsScalar = this;
         }
 
         public int GetEqNumber(string eqName)

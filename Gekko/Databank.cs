@@ -371,11 +371,10 @@ namespace Gekko
         public EBankType BankType()
         {
             return EBankType.Normal;
-        }
-        
+        }        
 
         public string GetFileNameWithPath()
-        {
+        {            
             return this.fileNameWithPathPretty;  //has no filename
         }
 

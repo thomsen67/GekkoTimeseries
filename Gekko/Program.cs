@@ -2643,18 +2643,22 @@ namespace Gekko
 
         }
 
-        public static List<object> ProtobufModelGamsScalar5a(int n, ModelGamsScalar modelGamsScalar)
+        public static List<object> ProtobufModelGamsScalar5a(int k, Model model)
         {            
-            if (n != 5) new Error("Hov");
-            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
-            for (int i = 1; i <= n + 1; i++)
-            {
-                m.Add(new ModelGamsScalar(null));
-            }
-            if (modelGamsScalar != null)
-            {
+            if (k != 5) new Error("Hov");
 
-                m[0] = modelGamsScalar;
+            List<ModelGamsScalar> m = new List<ModelGamsScalar>();
+            List<object> mm = new List<object>();
+
+            if (model.modelGamsScalar == null)
+            {
+                
+            }            
+            else 
+            {
+                for (int i = 0; i <= k; i++) m.Add(new ModelGamsScalar(null));
+
+                m[0] = model.modelGamsScalar;
                 m[1] = new ModelGamsScalar(null);
                 m[1].precedents = m[0].precedents;
                 m[0].precedents = null;
@@ -2688,36 +2692,59 @@ namespace Gekko
                 m[0].dict_FromEqNumberToEqName = null;
             }
 
-            List<object> mm = new List<object>();
-            mm.AddRange(m);
+            if (model.modelGamsScalar == null)
+            {
+                for (int i = 0; i <= k; i++) if (model.modelGamsScalar == null) mm.Add(new ModelNull());                
+            }
+            else
+            {
+                mm.AddRange(m);
+            }
+
+            if (model.modelGams == null) mm.Add(new ModelNull());
+            else mm.Add(model.modelGams);
+
+            if (model.modelGekko == null) mm.Add(new ModelNull());
+            else mm.Add(model.modelGekko);
+
+            if (mm.Count != k + 3) new Error("Hov");
 
             return mm;
         }        
 
         public static Model ProtobufModelGamsScalar5b(int k, List<object>mm)
         {
+            if (k != 5) new Error("Hov");
             Model model = new Model();
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
             for (int i = 0; i <= k; i++) m.Add(mm[i] as ModelGamsScalar);
 
-            m[0].precedents = m[1].precedents;
-            m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
-            m[0].ee = m[1].ee;
-            m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
-            m[0].aTemp = m[2].aTemp;
-            m[0].csCodeLines = m[2].csCodeLines;
-            m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
-            m[0].ddTemp = m[3].ddTemp;
-            m[0].cc = m[3].cc;
-            m[0].dependents = m[4].dependents;
-            m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
-            m[0].bbTemp = m[5].bbTemp;
-            m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
+            if (m[0] != null)
+            {
+                m[0].precedents = m[1].precedents;
+                m[0].dict_FromEqNumberToEqChunkNumber = m[1].dict_FromEqNumberToEqChunkNumber;
+                m[0].ee = m[1].ee;
+                m[0].dict_FromEqNameToEqNumber = m[2].dict_FromEqNameToEqNumber;
+                m[0].aTemp = m[2].aTemp;
+                m[0].csCodeLines = m[2].csCodeLines;
+                m[0].dict_FromVarNameToVarNumber = m[3].dict_FromVarNameToVarNumber;
+                m[0].ddTemp = m[3].ddTemp;
+                m[0].cc = m[3].cc;
+                m[0].dependents = m[4].dependents;
+                m[0].dict_FromVarNumberToVarName = m[4].dict_FromVarNumberToVarName;
+                m[0].bbTemp = m[5].bbTemp;
+                m[0].dict_FromEqNumberToEqName = m[5].dict_FromEqNumberToEqName;
+            }
 
-            model.modelGamsScalar = m[0];
+            model.modelGamsScalar = mm[0] as ModelGamsScalar; //becomes = null if ModelNull object
+            model.modelGams = mm[k + 1] as ModelGams; //becomes = null if ModelNull object            
+            model.modelGekko = mm[k + 2] as ModelGekko; //becomes = null if ModelNull object            
 
-            model.modelGams = mm[k + 1] as ModelGams;
-            model.modelGekko = mm[k + 2] as ModelGekko;
+            //these .parent fields are probably always = null, 
+            //and even if not, this is safe to do:
+            if (model.modelGamsScalar != null) model.modelGamsScalar.parent = model;
+            if (model.modelGams != null) model.modelGams.parent = model;
+            if (model.modelGekko != null) model.modelGekko.parent = model;
 
             return model;
         }
@@ -2793,12 +2820,23 @@ namespace Gekko
         public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, Model model)
         {
             DateTime t = DateTime.Now;
+            
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
-            List<string> files = GetSplitCacheFileNames(k + 1, inputFileName, "model", ref hash);
+            List<string> files = GetSplitCacheFileNames(k + 1 + 2, inputFileName, "model", ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
+            List<object> lists = ProtobufModelGamsScalar5a(k, model);
 
-            List<object> lists = ProtobufModelGamsScalar5a(k, model.modelGamsScalar);
+            //for (int i = 0; i < lists.Count; i++)
+            //{
+            //    try
+            //    {
+            //        ProtobufWrite(lists[i], files[i]);
+            //    }
+            //    catch (Exception e)
+            //    {
 
+            //    }
+            //}
 
             try
             {
@@ -2815,6 +2853,10 @@ namespace Gekko
                     ProtobufWrite(x, files[i]);
                     return true;
                 }).All(_ => _);
+            }
+            catch (Exception e)
+            {
+                throw;
             }
             finally
             {
@@ -2881,7 +2923,11 @@ namespace Gekko
                     //About double speed on TT pc, compared to no parallel  
                     int i = (int)index;
                     string fileName2 = files[i];
-                    ModelGamsScalar o = ProtobufRead<ModelGamsScalar>(fileName2);
+
+                    object o = null;
+                    if (i <= Program.options.system_threads) o = ProtobufRead<ModelGamsScalar>(fileName2);
+                    else if (i == Program.options.system_threads + 1) o = ProtobufRead<ModelGams>(fileName2);
+                    else if (i == Program.options.system_threads + 2) o = ProtobufRead<ModelGekko>(fileName2);
                     lists[i] = o;
                     return 0;
                 }, _ => { });
