@@ -1928,8 +1928,9 @@ namespace Gekko
         /// <summary>
         /// UNFIX command.
         /// </summary>
-        public static void Unfix(Gekko.Model model)
+        public static void Unfix()
         {
+            Gekko.Model model = Program.model;
             if (model.type == EModelType.GAMSRaw || model.type == EModelType.GAMSScalar)
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
