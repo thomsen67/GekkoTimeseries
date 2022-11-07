@@ -14224,7 +14224,7 @@ namespace Gekko
                         bank = ts.GetParentDatabank().name;
                     }
 
-                    if (G.Equal(Program.options.model_type, "gams"))
+                    if (Program.model.modelType == EModelType.GAMSRaw || Program.model.modelType == EModelType.GAMSScalar)
                     {
                         DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
                     }
@@ -16607,27 +16607,28 @@ namespace Gekko
 
             EModelType modelType = EModelType.Gekko;
             if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
-
-            Model model = new Model();
-
+            
             if (modelType == EModelType.Gekko)
             {
+                Model model = new Model();
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
                 ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
-                Program.options.model_type = "default";  //will not be set if something crashes above
+                model.modelType = EModelType.Gekko;
             }
             else if (modelType == EModelType.GAMSRaw)
-            {
+            {                
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-                GamsModel.ReadGamsRawModel(model, textInputRaw, ffh.realPathAndFileName, o);
-                Program.options.model_type = "gams";  //will not be set if something crashes above
+                Model model = GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);
+                model.modelType = EModelType.GAMSRaw;
+                Program.model = model;
             }
             else if (modelType == EModelType.GAMSScalar)
             {                
-                Program.model = GamsModel.ReadGAMSScalarModel(model, o, folders, ffh.realPathAndFileName);
-                Program.options.model_type = "gams";  //will not be set if something crashes above
+                Model model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                
+                model.modelType = EModelType.GAMSScalar;
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();
+                Program.model = model;
             }
             else new Error("No model defined");
         }

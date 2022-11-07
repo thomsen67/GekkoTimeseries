@@ -113,7 +113,11 @@ namespace Gekko
         public ModelGams modelGams = null;
         [ProtoMember(3)]
         public ModelGamsScalar modelGamsScalar = null;
-        public bool loadedFromCacheFile = false;
+        
+        [ProtoMember(4)]
+        public EModelType modelType = EModelType.Unknown;  //sets main type
+
+        public bool loadedFromCacheFile = false;  //not protobuffed
 
         /// <summary>
         /// This gets folded equations from GAMS code scalar model. See also how to get unfolded equations: #jseds78hsd33.

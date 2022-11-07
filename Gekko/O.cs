@@ -1122,8 +1122,7 @@ namespace Gekko
         /// <param name="helper"></param>
         /// <param name="type"></param>
         public static void HandleEndoExo(GekkoTimes global, List<HandleEndoHelper> helper, bool type)
-        {
-
+        {            
             if (type)
             {
                 Globals.endo = new HandleEndoHelper2();
@@ -1136,14 +1135,14 @@ namespace Gekko
                 Globals.exo.global = global;
                 Globals.exo.helper = helper;
             }
-            SetEndoExo(type);
+            SetEndoExo(type, Program.model);
         }
 
         /// <summary>
         /// Helper method for ENDO/EXO
         /// </summary>
         /// <param name="type"></param>
-        public static void SetEndoExo(bool type)
+        public static void SetEndoExo(bool type, Gekko.Model model)
         {
 
             Databank databank = Program.databanks.GetFirst();
@@ -1184,12 +1183,13 @@ namespace Gekko
                         //throw new GekkoException();
                     }
 
-                    if (!G.Equal(Program.options.model_type, "gams"))
+                    if (model.modelType == EModelType.Gekko)
                     {
                         simModeVariables.Add(s);
                     }
                     else
                     {
+                        //gamsRaw or gamsScalar
 
                         List<List<string>> ss = new List<List<string>>();
 
@@ -1277,7 +1277,7 @@ namespace Gekko
                 }
             }
 
-            if (!G.Equal(Program.options.model_type, "gams"))
+            if (model.modelType == EModelType.Gekko)
             {
                 if (type) Program.Endo(simModeVariables);
                 else Program.Exo(simModeVariables);
@@ -1928,16 +1928,16 @@ namespace Gekko
         /// <summary>
         /// UNFIX command.
         /// </summary>
-        public static void Unfix()  //formerly ClearGoals()
+        public static void Unfix(Gekko.Model model)
         {
-            if (G.Equal(Program.options.model_type, "gams"))
+            if (model.modelType == EModelType.GAMSRaw || model.modelType == EModelType.GAMSScalar)
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");
             }
             else
             {
-                if (G.GetModelType() == EModelType.Gekko)
+                if (Program.model.modelGekko != null)
                 {
                     if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
                     {

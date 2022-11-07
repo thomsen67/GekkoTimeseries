@@ -1074,10 +1074,10 @@ namespace Gekko
 
                     bool isEndogenous = false;
                     if (v != null)
-                    {                        
+                    {
                         if (!Program.IsDecompResidualName(v))
                         {
-                            if (G.Equal(Program.options.model_type, "gams"))
+                            if (decompFind.model.modelType == EModelType.GAMSRaw || decompFind.model.modelType == EModelType.GAMSScalar)
                             {
                                 if (Program.HasGamsEquation(v)) isEndogenous = true;
                             }

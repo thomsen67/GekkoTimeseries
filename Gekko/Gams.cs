@@ -1412,8 +1412,9 @@ namespace Gekko
         /// <summary>
         /// Read a raw GAMS model from a .gms/.gmy model. Deals with possible cached version etc. See also ReadGamsScalarModel().
         /// </summary>
-        public static void ReadGamsRawModel(Model model, string textInputRaw, string fileName, O.Model o)
-        {            
+        public static Model ReadGamsRawModel(string textInputRaw, string fileName, O.Model o)
+        {
+            Model model = new Model();
             ModelGams modelGams = new ModelGams(model);
 
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
@@ -1478,19 +1479,22 @@ namespace Gekko
                 {
                     //do nothing, not the end of the world if it fails
                 }
-            }            
+            }
+            return model;
         }
 
         /// <summary>
         /// Read/load a GAMS scalar model from a suitable zip file. See also ReadGamsRawModel().
         /// </summary>
-        public static Model ReadGAMSScalarModel(Model model, O.Model o, List<string> folders, string fileName)
+        public static Model ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
         {
             //TODO TODO TODO
             //TODO TODO TODO
             //TODO TODO TODO in a session, maybe look at file sizes and dates/times for the zip, like done for libraries
             //TODO TODO TODO
             //TODO TODO TODO
+
+            Model model = new Model();
                         
             DateTime t = DateTime.Now;
             
@@ -2458,7 +2462,6 @@ namespace Gekko
             if (model.modelGams.equationsByEqname == null || model.modelGams.equationsByEqname.Count == 0)
             {
                 new Error("No GAMS equations found");
-                //throw new GekkoException();
             }
             List<ModelGamsEquation> eqs = null; model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;

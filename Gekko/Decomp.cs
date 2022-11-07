@@ -356,7 +356,7 @@ namespace Gekko
             else
             {
                 decompOptions2 = new DecompOptions2();
-                decompOptions2.modelType = G.GetModelType(true);
+                decompOptions2.modelType = G.GetModelType();
                 decompOptions2.showErrors = false; //
                 decompOptions2.t1 = o.t1;
                 decompOptions2.t2 = o.t2;
@@ -1714,6 +1714,7 @@ namespace Gekko
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompOptions2.modelType == EModelType.Unknown)
             {
+                //Model m = decompFind.model;
                 new Error("It seems no model is loaded, cf. the MODEL command.");
             }         
 
@@ -4192,11 +4193,11 @@ namespace Gekko
             try
             {
                 O.Find o = o2 as O.Find;
-                if (G.GetModelType(true) == EModelType.GAMSScalar)
+                if (G.GetModelType() == EModelType.GAMSScalar)
                 {
                     //good
                 }
-                else if (G.GetModelType(true) == EModelType.Unknown)
+                else if (G.GetModelType() == EModelType.Unknown)
                 {
                     new Error("It seems no model is loaded, cf. the MODEL command.");
                     return;
