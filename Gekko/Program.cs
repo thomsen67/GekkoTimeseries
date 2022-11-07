@@ -16680,10 +16680,9 @@ namespace Gekko
                 if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
 
                 if (modelType == EModelType.Gekko)
-                {
-                    Model model = new Model();
+                {                    
                     string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
-                    ReadGekkoModel(model, ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
+                    ReadGekkoModel(ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
                 }
                 else if (modelType == EModelType.GAMSRaw)
                 {
@@ -16739,11 +16738,15 @@ namespace Gekko
         /// <summary>
         /// Read a Gekko model from .frm file.
         /// </summary>
-        private static void ReadGekkoModel(Model model, string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
+        private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
+            Model model = new Model();
+            Program.model = model;
+
             model.type = EModelType.Gekko;
             //TODO: keep the old version, so model command can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
+            modelGekko.modelInfo = new ModelInfo(modelGekko);
             modelGekko.modelInfo.fileName = fileNamePretty;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
@@ -16873,7 +16876,7 @@ namespace Gekko
             model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
             model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
-            model.modelGekko.modelInfo.Print();
+            model.modelGekko.modelInfo.Print();            
         }
 
         /// <summary>
