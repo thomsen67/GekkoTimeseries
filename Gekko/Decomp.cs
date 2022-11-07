@@ -4273,7 +4273,7 @@ namespace Gekko
                 List<ModelGamsEquation> foldedEquations = null;
                 //foldedEquations 
                 //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
-                modelGamsScalar.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+                model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
                 if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
 
                 // For instance, when doing FIND vtBund in MAKRO model, we have these:

@@ -254,7 +254,7 @@ namespace Gekko
         {
             try
             {
-                if (G.GetModelType() == EModelType.GAMSScalar)
+                if (model.modelGamsScalar != null)
                 {
 
                     string residualName = "residual___";
@@ -329,7 +329,7 @@ namespace Gekko
                 }
                 else if (G.GetModelType() == EModelType.GAMSRaw)
                 {
-                    List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
+                    List<ModelGamsEquation> equations = model.modelGams.equationsByEqname[eqName];
                     ModelGamsEquation equation = equations[0]; //always only 1
 
                     {

@@ -571,7 +571,7 @@ namespace Gekko
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public static ModelGamsScalar ReadGamsScalarModelEquations(GAMSScalarModelSettings settings)
+        public static Model ReadGamsScalarModelEquations(GAMSScalarModelSettings settings)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -621,8 +621,7 @@ namespace Gekko
                 {
                     ReadScalarModelEquationsDictionaryLines(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
                 }
-            }           
-            
+            }            
 
             helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count()];
             foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber.GetDictionaryForIteration())
@@ -740,7 +739,7 @@ namespace Gekko
 
             //The method below handles ANSI, but labels are not fetched here yet.   
 
-            ModelGams g = null;
+            ModelGams modelGams = null;
             if (!settings.scalarMemoryModelProducedByGekko)
             {
                 string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
@@ -748,15 +747,14 @@ namespace Gekko
                 IVariable nestedListOfDependents_opt_dep = null;
                 Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
                 GekkoDictionary<string, string> dependents = tup.Item1;
-                g = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);
+                modelGams = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true);
                 if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
             }
 
             dt1 = DateTime.Now;
 
             ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
-            // -----
-            modelGamsScalar.modelGams = g;
+                        
             // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
             modelGamsScalar.a = a;
@@ -809,7 +807,6 @@ namespace Gekko
                 }
             }
 
-
             if (Globals.runningOnTTComputer) new Writeln("TTH: Precedents/dependents: " + G.Seconds(dt1));
 
             if (Globals.runningOnTTComputer)
@@ -824,7 +821,11 @@ namespace Gekko
                 }
             }
 
-            return modelGamsScalar;
+            Model model = new Model();
+            model.modelGams = modelGams;
+            model.modelGamsScalar = modelGamsScalar;
+
+            return model;
         }
 
         private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int status, ref int substatus, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
@@ -1489,13 +1490,15 @@ namespace Gekko
         /// <summary>
         /// Read/load a GAMS scalar model from a suitable zip file. See also ReadGamsRawModel().
         /// </summary>
-        public static ModelGamsScalar ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
+        public static Model ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
         {
             //TODO TODO TODO
             //TODO TODO TODO
             //TODO TODO TODO in a session, maybe look at file sizes and dates/times for the zip, like done for libraries
             //TODO TODO TODO
             //TODO TODO TODO
+
+            Model model = new Model();
 
             DateTime t = DateTime.Now;
             
@@ -1508,9 +1511,7 @@ namespace Gekko
             DateTime t2 = DateTime.Now;
             string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);
 
-            //these objects typically get overridden soon
-            
-            ModelGamsScalar modelGamsScalar = new ModelGamsScalar();
+            //these objects typically get overridden soon            
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
 
@@ -1518,44 +1519,27 @@ namespace Gekko
             {
                 try
                 {
-                    if (Globals.modelParallelProtobuf)
+                    //TODO 
+                    //TODO 
+                    //TODO do something about ms here
+                    //TODO 
+                    //TODO 
+                    double hashMs = 0d;
+                    DateTime t0 = DateTime.Now;
+                    model.modelGamsScalar = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
+                    timeLoadCache = "cache: " + G.Seconds(t0);
+                    if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
+                    if (model.modelGamsScalar == null)
                     {
-                        //TODO 
-                        //TODO 
-                        //TODO do something about ms here
-                        //TODO 
-                        //TODO 
-                        double hashMs = 0d;
-                        DateTime t0 = DateTime.Now;
-                        modelGamsScalar = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
-                        timeLoadCache = "cache: " + G.Seconds(t0);
-                        if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
-                        if (modelGamsScalar == null)
-                        {
-                            modelGamsScalar = new ModelGamsScalar();
-                            modelGamsScalar.modelInfo.loadedFromMdlFile = false;
-                        }
-                        else
-                        {
-                            DateTime t1 = DateTime.Now;                            
-                            GAMSScalarModelHelper(true, modelGamsScalar);
-                            modelGamsScalar.modelInfo.loadedFromMdlFile = true;
-                            timeCompile = "compile: " + G.Seconds(t1);
-                        }
+                        model.modelGamsScalar = new ModelGamsScalar();
+                        model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                     }
                     else
                     {
-                        if (File.Exists(mdlFileNameAndPath))
-                        {
-                            DateTime dt1 = DateTime.Now;
-                            DateTime t0 = DateTime.Now;
-                            modelGamsScalar = Program.ProtobufRead<ModelGamsScalar>(mdlFileNameAndPath);
-                            timeLoadCache = "deflate: " + G.Seconds(t0);
-                            modelGamsScalar.modelInfo.loadedFromMdlFile = true;
-                            DateTime t1 = DateTime.Now;
-                            GAMSScalarModelHelper(true, modelGamsScalar);
-                            timeCompile = "compile: " + G.Seconds(t1);
-                        }
+                        DateTime t1 = DateTime.Now;
+                        GAMSScalarModelHelper(true, model.modelGamsScalar);
+                        model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                        timeCompile = "compile: " + G.Seconds(t1);
                     }
                 }
                 catch (Exception e)
@@ -1567,16 +1551,16 @@ namespace Gekko
                     else
                     {
                         //do nothing, we then have to parse the file
-                        modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                        model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
                     }
                 }
             }
             else
             {
-                modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
             }
 
-            if (modelGamsScalar.modelInfo.loadedFromMdlFile)
+            if (model.modelGamsScalar.modelInfo.loadedFromMdlFile)
             {
                 //no writing of .mdl file of course                
             }
@@ -1636,30 +1620,18 @@ namespace Gekko
 
                 if(Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
 
-                modelGamsScalar = ReadGamsScalarModelEquations(input);
+                model = ReadGamsScalarModelEquations(input);
 
                 DateTime t1 = DateTime.Now;
 
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-                    GAMSScalarModelHelper(false, modelGamsScalar);
-
-                    if (Globals.modelParallelProtobuf)
-                    {
-                        //TODO
-                        //TODO what about last argument ms?
-                        //TODO
-                        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, modelGamsScalar);
-                    }
-                    else
-                    {
-                        // ----- SERIALIZE
-                        string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                        Program.ProtobufWrite(modelGamsScalar, pathAndFilename);
-                        if (Globals.runningOnTTComputer) new Writeln("TTH: Created model cache file in " + G.Seconds(dt1));
-                    }
+                    GAMSScalarModelHelper(false, model.modelGamsScalar);
+                    //TODO
+                    //TODO what about last argument ms?
+                    //TODO
+                    Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, model.modelGamsScalar);
                 }
                 catch (Exception e)
                 {
@@ -1678,7 +1650,7 @@ namespace Gekko
             tab.CurRow.SetText(1, "Model   : " + input.zipFilePathAndName);
             tab.CurRow.Next();
 
-            tab.CurRow.SetText(1, "Periods : " + modelGamsScalar.t1.ToString() + "-" + modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2) + " periods");
+            tab.CurRow.SetText(1, "Periods : " + model.modelGamsScalar.t1.ToString() + "-" + model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(model.modelGamsScalar.t1, model.modelGamsScalar.t2) + " periods");
             //tab.CurRow.Next();                        
 
             //tab.CurRow.SetText(1, "Lags      : Largest lag = " + 0 + ", largest lead = " + 0);
@@ -1687,18 +1659,18 @@ namespace Gekko
             //tab.CurRow.SetText(1, "Periods         = " + modelGamsScalar.t1.ToString() + "-" + modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2) + " periods");
             //tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All eqs         = " + modelGamsScalar.CountEqs(1) + " (all dimensions)");
+            tab.CurRow.SetText(1, "All eqs         = " + model.modelGamsScalar.CountEqs(1) + " (all dimensions)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eqs per period  = " + modelGamsScalar.CountEqs(2) + " (no time dimension)");
+            tab.CurRow.SetText(1, "Eqs per period  = " + model.modelGamsScalar.CountEqs(2) + " (no time dimension)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eq names        = " + modelGamsScalar.CountEqs(3) + " (no dimensions)");
+            tab.CurRow.SetText(1, "Eq names        = " + model.modelGamsScalar.CountEqs(3) + " (no dimensions)");
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All vars        = " + modelGamsScalar.CountVars(1) + " (all dimensions)");
+            tab.CurRow.SetText(1, "All vars        = " + model.modelGamsScalar.CountVars(1) + " (all dimensions)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Vars per period = " + modelGamsScalar.CountVars(2) + " (no time dimension)");
+            tab.CurRow.SetText(1, "Vars per period = " + model.modelGamsScalar.CountVars(2) + " (no time dimension)");
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Var names       = " + modelGamsScalar.CountVars(3) + " (no dimensions)");
+            tab.CurRow.SetText(1, "Var names       = " + model.modelGamsScalar.CountVars(3) + " (no dimensions)");
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.SetLeftBorder(1);
             tab.CurRow.SetRightBorder(1);
@@ -1715,7 +1687,7 @@ namespace Gekko
                         txt.MainAdd(s);
                         txt.MainNewLineTight();
                     }
-                    if (modelGamsScalar.modelInfo.loadedFromMdlFile)
+                    if (model.modelGamsScalar.modelInfo.loadedFromMdlFile)
                     {
                         txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
                     }
@@ -1731,7 +1703,8 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
             }
-            return modelGamsScalar;
+            
+            return model;
             
         }
 

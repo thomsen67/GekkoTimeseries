@@ -16557,8 +16557,7 @@ namespace Gekko
             }
             else if (modelType == EModelType.GAMSScalar)
             {                
-                Program.model = new Model();
-                Program.model.modelGamsScalar = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
+                Program.model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();
@@ -16670,8 +16669,8 @@ namespace Gekko
                     settings.equations = equations;
                     settings.dictionary = dictionary;
 
-                    ModelGamsScalar modelGamsScalar = GamsModel.ReadGamsScalarModelEquations(settings);
-                    Program.model.modelGamsScalar = modelGamsScalar;
+                    Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings);
+                    Program.model.modelGamsScalar = modelTemp.modelGamsScalar;
 
                 }
 

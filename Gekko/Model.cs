@@ -109,7 +109,7 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames, ModelGamsScalar modelGamsScalar)
+        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames, Model model)
         {
             string rv = "";
             StringBuilder sb1 = new StringBuilder();
@@ -119,7 +119,7 @@ namespace Gekko
             foreach (string eqName in eqNames)
             {
                 i++;                
-                List<ModelGamsEquation> temp = null; modelGamsScalar.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
+                List<ModelGamsEquation> temp = null; model.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
                 if (temp == null) continue;
                 foreach (ModelGamsEquation eq in temp)
                 {                    
@@ -170,7 +170,7 @@ namespace Gekko
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, model.modelGamsScalar);
+            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, model);
 
             string s2 = null;
             int i = -1;
@@ -643,8 +643,8 @@ namespace Gekko
         [ProtoMember(27)]
         public List<ModelScalarEquation> precedents = null;
 
-        [ProtoMember(28)]
-        public ModelGams modelGams = null;
+        //[ProtoMember(28)]
+        //public ModelGams modelGams = null;
 
         // =============================================
         // =============================================
