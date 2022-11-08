@@ -13642,7 +13642,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void +()
+        public void _Test_FunctionLocalTime_AndSomeBlock()
         {
             // ============================================ 
             // ============================================

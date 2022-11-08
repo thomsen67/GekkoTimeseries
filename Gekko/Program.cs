@@ -16870,7 +16870,7 @@ namespace Gekko
                 }
                 parsingSeconds = G.Seconds(t1);
                 Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
-                Parser.Frm.ParserFrmCompileAST.ParserFrmMakeProtobuf();
+                //Parser.Frm.ParserFrmCompileAST.ParserFrmMakeProtobuf();
             }
 
             Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper, p);

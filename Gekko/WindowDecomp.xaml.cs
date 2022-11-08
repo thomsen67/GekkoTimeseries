@@ -1415,13 +1415,13 @@ namespace Gekko
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
                 string s = null;
-                if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
+                if (this.decompFind.model.type == EModelType.GAMSScalar)
                 {
                     s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, this.decompFind.model);
                 }
                 else
                 {
-                    s = Model.GetEquationTextFoldedNonScalar(this.decompFind.decompOptions2.modelType, this.decompFind.decompOptions2.link);
+                    s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.type, this.decompFind.decompOptions2.link);
                 }
                 equation.Text = s;
             }
@@ -1651,13 +1651,13 @@ namespace Gekko
                 else
                 {
                     string s = null;
-                    if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
+                    if (this.decompFind.model.type == EModelType.GAMSScalar)
                     {
                         s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, this.decompFind.model);
                     }
                     else
                     {
-                        s = Model.GetEquationTextFoldedNonScalar(this.decompFind.decompOptions2.modelType, this.decompFind.decompOptions2.link);
+                        s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.type, this.decompFind.decompOptions2.link);
                     }
                     equation.Text = s;
                 }
@@ -1743,13 +1743,13 @@ namespace Gekko
             Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, refresh, ref this.decompDatas, model);
 
             string s = null;
-            if (this.decompFind.decompOptions2.modelType == EModelType.GAMSScalar)
+            if (this.decompFind.model.type == EModelType.GAMSScalar)
             {
                 s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);
             }
             else
             {
-                s = Model.GetEquationTextFoldedNonScalar(this.decompFind.decompOptions2.modelType, this.decompFind.decompOptions2.link);
+                s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.type, this.decompFind.decompOptions2.link);
             }
             this.equation.Text = s;
             //this.code.contText = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
@@ -2487,7 +2487,7 @@ namespace Gekko
                 
         public List iv = null;
         public GekkoTime t0 = GekkoTime.tNull;        
-        public EModelType modelType = EModelType.Unknown;        
+        //public EModelType modelType = EModelType.Unknown;        
         public bool showTime = false;
         public Rich code = null;
         public bool ageHierarchy = false;        
@@ -2603,7 +2603,7 @@ namespace Gekko
 
             if (this.code != null) d.code = this.code.Clone();
             
-            d.modelType = this.modelType;
+            //d.modelType = this.modelType;
 
             d.ageHierarchy = this.ageHierarchy;
 

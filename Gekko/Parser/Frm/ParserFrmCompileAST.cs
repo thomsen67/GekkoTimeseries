@@ -74,28 +74,28 @@ namespace Gekko.Parser.Frm
             if (newM2) Program.model.modelGekko.m2cache.lru.Add(cacheKey, Program.model.modelGekko.m2);
         }
 
-        public static void ParserFrmMakeProtobuf()
-        {
-            try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-            {
-                DateTime dt1 = DateTime.Now;
+        //public static void ParserFrmMakeProtobuf()
+        //{
+        //    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+        //    {
+        //        DateTime dt1 = DateTime.Now;
 
-                PutListsIntoModelListHelper();
-                // ----- SERIALIZE
-                //string outputPath = Globals.localTempFilesLocation;
-                //DeleteFolder(outputPath);
-                //Directory.CreateDirectory(outputPath);
-                string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + Globals.cacheExtensionModel;
-                string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;                
-                Program.ProtobufWrite(Program.model.modelGekko, pathAndFilename);
-                //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
-                G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-            }
-            catch (Exception e)
-            {
-                //do nothing, not the end of the world if it fails
-            }
-        }
+        //        PutListsIntoModelListHelper();
+        //        // ----- SERIALIZE
+        //        //string outputPath = Globals.localTempFilesLocation;
+        //        //DeleteFolder(outputPath);
+        //        //Directory.CreateDirectory(outputPath);
+        //        string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + Globals.cacheExtensionModel;
+        //        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;                
+        //        Program.ProtobufWrite(Program.model.modelGekko, pathAndFilename);
+        //        //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
+        //        G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        //do nothing, not the end of the world if it fails
+        //    }
+        //}
 
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)
         {

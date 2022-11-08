@@ -8097,7 +8097,7 @@ namespace Gekko
                     {
                         this.decompFind.decompOptions2.decompOperator = new DecompOperator(this.opt_prtcode.ToLower());
                     }
-                    this.decompFind.decompOptions2.modelType = G.GetModelType();
+                    //this.decompFind.model.type = G.GetModelType();
                 }                                
                 G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);
                 Decomp.Find(this);
