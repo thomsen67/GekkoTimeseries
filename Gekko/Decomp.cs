@@ -4192,24 +4192,19 @@ namespace Gekko
         {
             try
             {
-                O.Find o = o2 as O.Find;
-                if (G.GetModelType() == EModelType.GAMSScalar)
-                {
-                    //good
-                }
-                else if (G.GetModelType() == EModelType.Unknown)
-                {
-                    new Error("It seems no model is loaded, cf. the MODEL command.");
-                    return;
-                }
-                else
-                {
-                    new Error("FIND is only implemented for scalar models");
-                    return;
-                }
+                O.Find o = o2 as O.Find;                
 
                 Model model = Program.model;
+                if (model == null)
+                {
+                    new Error("It seems no model is loaded, cf. the MODEL command.");
+                }                    
                 ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
+                if (modelGamsScalar == null)
+                {
+                    new Error("FIND is only implemented for scalar models");
+                }
+
                 //For scalar model     
 
                 //Runs pretty fast, but later on check is this is necessary...            

@@ -327,7 +327,7 @@ namespace Gekko
                         }
                     }
                 }
-                else if (G.GetModelType() == EModelType.GAMSRaw)
+                else if (model.type == EModelType.GAMSRaw)
                 {
                     List<ModelGamsEquation> equations = model.modelGams.equationsByEqname[eqName];
                     ModelGamsEquation equation = equations[0]; //always only 1
