@@ -490,13 +490,14 @@ namespace Gekko
             GekkoTime gt2 = t2;
             if (modelGamsScalar.is2000Model)
             {
-                gt1 = new GekkoTime(t1.freq, 2000, 1);
-                gt2 = new GekkoTime(t1.freq, 2000, 1);
+                gt1 = new GekkoTime(t1.freq, Globals.decomp2000, 1);
+                gt2 = new GekkoTime(t1.freq, Globals.decomp2000, 1);
             }
 
             foreach (GekkoTime time in new GekkoTimeIterator(gt1, gt2))
             {
                 int i = GekkoTime.Observations(modelGamsScalar.t0, time) - 1;
+                if (modelGamsScalar.is2000Model) i = 0;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
                     if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + modelGamsScalar.GamsModelDefinedString() + ".");
@@ -875,10 +876,10 @@ namespace Gekko
                     element.indexes = mmi;
                     element.fullName = element.name + element.indexes.GetName();
                     int periods = GekkoTime.Observations(modelGamsScalar.t0, modelGamsScalar.t2);
+                    if (modelGamsScalar.is2000Model) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
-
                 FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
@@ -2328,7 +2329,7 @@ namespace Gekko
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
-            const int tZero = 0;
+            int tZero = 0;
             
             //See #kljaf89usafasdf for Gekko  model
 
@@ -2350,10 +2351,16 @@ namespace Gekko
                 // TODO TODO TODO
                 // TODO TODO TODO
                 // TODO TODO TODO
-
+                
                 int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
-
-                string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+                GekkoTime tTemp = t;
+                if (modelGamsScalar.is2000Model)
+                {
+                    timeIndex = 0;
+                    tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
+                    tZero = GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), t) - 1;
+                }                
+                string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
                 if (eqNumber == -12345)
                 {

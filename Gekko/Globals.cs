@@ -79,7 +79,7 @@ namespace Gekko
 
         public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)
         public const string cacheExtensionModel = ".mdl";  //used for models
-
+        
         public const string globalLibraryString = "Global";
         public const string localLibraryString = "Local";  //--> maybe used later
         public const string gekkoLibraryString = "Gekko";  //--> maybe used later
@@ -504,7 +504,8 @@ namespace Gekko
         public static string decompText1 = "[Data error]";
         public static string decompText1a = "[Difference]";
         public static string decompText2 = "[Decomp. error]";
-        public static string decompText2a = "[Right hand side]";        
+        public static string decompText2a = "[Right hand side]";
+        public const int decomp2000 = 2000;
 
         //GUI hacks
         public static ItemHandler itemHandler = null;  //hack regardig FIND window
