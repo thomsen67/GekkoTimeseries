@@ -506,6 +506,8 @@ namespace Gekko
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
         public const int decomp2000 = 2000;
+        public const int decompHackt1= 1980;
+        public const int decompHackt2 = 2060;
 
         //GUI hacks
         public static ItemHandler itemHandler = null;  //hack regardig FIND window

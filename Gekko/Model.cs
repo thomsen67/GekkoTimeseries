@@ -790,15 +790,17 @@ namespace Gekko
             }
             else
             {
-                if (Globals.runningOnTTComputer)
-                {
-                    int[] b = bb[i];
-                    int[] d = dd[i];
-                    double[] c = cc;
-                    if (i == 0) r[i] = a[b[0] + t][b[1]] - ((a[b[2] + t][b[3]]) + (a[b[4] + t][b[5]]));
-                    if (i == 1) r[i] = a[b[0] + t][b[1]] - ((((((c[d[0]]) * (a[b[2] + t][b[3]])) + ((c[d[1]]) * (a[b[4] + t][b[5]]))) + ((c[d[2]]) * (a[b[6] + t][b[7]]))) + ((c[d[3]]) * (M.Power((a[b[8] + t][b[9]]), (a[b[10] + t][b[11]]))))) + ((c[d[4]]) * (M.Power((a[b[12] + t][b[13]]), (a[b[14] + t][b[15]])))));
-                    new Error("STOP HER");
-                }
+                //if (Globals.runningOnTTComputer)
+                //{
+                //    // y[2002] = 536 (year before 504)
+                //    // if t0 = 1999, we should ask a[3][...]
+                //    int[] b = bb[i];
+                //    int[] d = dd[i];
+                //    double[] c = cc;
+                //    if (i == 0) r[i] = a[b[0] + t][b[1]] - ((a[b[2] + t][b[3]]) + (a[b[4] + t][b[5]]));
+                //    if (i == 1) r[i] = a[b[0] + t][b[1]] - ((((((c[d[0]]) * (a[b[2] + t][b[3]])) + ((c[d[1]]) * (a[b[4] + t][b[5]]))) + ((c[d[2]]) * (a[b[6] + t][b[7]]))) + ((c[d[3]]) * (M.Power((a[b[8] + t][b[9]]), (a[b[10] + t][b[11]]))))) + ((c[d[4]]) * (M.Power((a[b[12] + t][b[13]]), (a[b[14] + t][b[15]])))));
+                //    new Error("STOP HER");
+                //}
                 this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd, t);
                 return this.r[i];
             }
@@ -811,15 +813,15 @@ namespace Gekko
         /// <param name="variable"></param>
         /// <param name="isRef"></param>
         /// <returns></returns>
-        public double GetData(int period, int variable, bool isRef)
+        public double GetData(int period, int t, int variable, bool isRef)
         {
             if (isRef)
             {
-                return this.a_ref[period][variable];
+                return this.a_ref[period + t][variable];
             }
             else
             {
-                return this.a[period][variable];
+                return this.a[period + t][variable];
             }
         }
 
@@ -830,15 +832,15 @@ namespace Gekko
         /// <param name="variable"></param>
         /// <param name="isRef"></param>
         /// <param name="value"></param>
-        public void SetData(int period, int variable, bool isRef, double value)
+        public void SetData(int period, int t, int variable, bool isRef, double value)
         {
             if (isRef)
             {
-                this.a_ref[period][variable] = value;
+                this.a_ref[period + t][variable] = value;
             }
             else
             {
-                this.a[period][variable] = value;
+                this.a[period + t][variable] = value;
             }
         }
 
@@ -873,7 +875,17 @@ namespace Gekko
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
 
-            int n = GekkoTime.Observations(this.t0, this.t2);
+            GekkoTime tStart = this.t0;
+            GekkoTime tEnd = this.t2;
+            if (this.is2000Model)
+            {
+                tStart = new GekkoTime(EFreq.A, Globals.decompHackt1, 1);
+                tEnd = new GekkoTime(EFreq.A, Globals.decompHackt2, 1);
+                if (isRef) this.a_ref = null;
+                else this.a = null;
+            }
+
+            int n = GekkoTime.Observations(tStart, tEnd);
             double[][] a = null;
             if (isRef) a = this.a_ref;
             else a = this.a;
@@ -920,7 +932,7 @@ namespace Gekko
                 // NB: beware of OPTION series data missing, if it is set.
                 int index1 = -12345;
                 int index2 = -12345;                
-                double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, this.t0, this.t2);
+                double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);
                 for (int t = 0; t < n; t++)
                 {
                     a[t][i] = data[index1 + t];
@@ -934,15 +946,8 @@ namespace Gekko
         /// </summary>
         /// <returns></returns>
         public int CountEqs(int type)
-        {
-            try
-            {
-                if (type == 1) return this.dict_FromEqNumberToEqName.Length;
-            }
-            catch (Exception e)
-            {
-
-            }
+        {            
+            if (type == 1) return this.dict_FromEqNumberToEqName.Length;            
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
             {
@@ -1004,9 +1009,17 @@ namespace Gekko
         /// <returns></returns>
         public void FromAToDatabankScalarModel(Databank db, bool isRef)
         {
+            GekkoTime tStart = this.t0;
+            GekkoTime tEnd = this.t2;
+            if (this.is2000Model)
+            {
+                tStart = new GekkoTime(EFreq.A, Globals.decompHackt1, 1);
+                tEnd = new GekkoTime(EFreq.A, Globals.decompHackt2, 1);
+            }
+
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
-            int n = GekkoTime.Observations(this.t0, this.t2);
+            int n = GekkoTime.Observations(tStart, tEnd);
             double[][] a = null;
             if (isRef) a = this.a_ref;
             else a = this.a;
@@ -1021,7 +1034,7 @@ namespace Gekko
                 // NB: beware of OPTION series data missing, if it is set.
                 int index1 = -12345;
                 int index2 = -12345;                
-                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, this.t0, this.t2);
+                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tStart, tEnd);
                 for (int t = 0; t < n; t++)
                 {
                     data[index1 + t] = a[t][i];
