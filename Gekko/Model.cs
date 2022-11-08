@@ -117,6 +117,18 @@ namespace Gekko
         public bool loadedFromCacheFile = false;  //not protobuffed
 
         /// <summary>
+        /// This is not always the same as .type, which is the "born" type.
+        /// </summary>
+        /// <returns></returns>
+        public EModelType DecompType()
+        {
+            if (this.modelGamsScalar != null) return EModelType.GAMSScalar;
+            if (this.modelGams != null) return EModelType.GAMSRaw;
+            if (this.modelGekko != null) return EModelType.Gekko;
+            return EModelType.Unknown;
+        }
+
+        /// <summary>
         /// This gets folded equations from GAMS code scalar model. See also how to get unfolded equations: #jseds78hsd33.
         /// </summary>
         /// <param name="decompOptions"></param>
@@ -561,7 +573,9 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGamsScalar
-    {        
+    {
+        [ProtoMember(1)]
+        public bool is2000Model = false;  //only defined for 2000, other periods use offsets
 
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;

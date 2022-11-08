@@ -419,7 +419,7 @@ namespace Gekko
                 decompOptions2.link.Add(temp);
             }
 
-            if (decompOptions2.type == "ASTDECOMP3" || model.type == EModelType.GAMSScalar)
+            if (decompOptions2.type == "ASTDECOMP3" || model.DecompType() == EModelType.GAMSScalar)
             {
                 //Here, for scalar we need to assemble the equations like this:
                 // e1[a, 2001], e1[a, 2001], e1[b, 2002], e1[b, 2002], e2[x, 2001], e2[x, 2001], e2[y, 2002], e2[y, 2002]
@@ -433,7 +433,7 @@ namespace Gekko
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
                 
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     if (MustLoadDataIntoModel())
                     {
@@ -485,7 +485,16 @@ namespace Gekko
         {
             int deduct = op.lagGradient[0];
             if (op.isRaw) deduct = op.lagData[0];
-            foreach (GekkoTime time in new GekkoTimeIterator(t1.Add(deduct), t2))
+
+            GekkoTime gt1 = t1.Add(deduct);
+            GekkoTime gt2 = t2;
+            if (modelGamsScalar.is2000Model)
+            {
+                gt1 = new GekkoTime(t1.freq, 2000, 1);
+                gt2 = new GekkoTime(t1.freq, 2000, 1);
+            }
+
+            foreach (GekkoTime time in new GekkoTimeIterator(gt1, gt2))
             {
                 int i = GekkoTime.Observations(modelGamsScalar.t0, time) - 1;
                 if (i < 0 || i > element.periods.Length - 1)
@@ -573,7 +582,7 @@ namespace Gekko
             int funcCounter = 0;
             //G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
 
-            if (model.type == EModelType.GAMSScalar)
+            if (model.DecompType() == EModelType.GAMSScalar)
             {
                 PrepareEquations(per1, per2, decompOptions2.decompOperator, decompOptions2, true, model.modelGamsScalar);
             }
@@ -594,7 +603,7 @@ namespace Gekko
                 string residualName = Program.GetDecompResidualName(ii, decompOptions2.link.Count);
 
                 int jj = -1;
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
@@ -645,7 +654,7 @@ namespace Gekko
 
             if (decompOptions2.type == "ASTDECOMP3")
             {
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     if (decompOptions2.dyn)
                     {
@@ -804,7 +813,7 @@ namespace Gekko
             {
                 ii++;
                 decompDatas.storage.Add(new List<DecompData>());
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
@@ -1126,7 +1135,7 @@ namespace Gekko
                     {
                         //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
                         //see also #sf94lkjsdjæ
-                        if (model.type == EModelType.GAMSScalar || effect[i, j] != 0d)
+                        if (model.DecompType() == EModelType.GAMSScalar || effect[i, j] != 0d)
                         {
                             foreach (KeyValuePair<string, int> kvp in exo)
                             {
@@ -1712,7 +1721,7 @@ namespace Gekko
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
         {            
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
-            if (decompFind.model.type == EModelType.Unknown)
+            if (decompFind.model.DecompType() == EModelType.Unknown)
             {
                 //Model m = decompFind.model;
                 new Error("It seems no model is loaded, cf. the MODEL command.");
@@ -1724,7 +1733,31 @@ namespace Gekko
             {
                 count++;
 
-                if (decompFind.model.type == EModelType.Gekko)
+                EModelType type = decompFind.model.DecompType();
+
+                if (type == EModelType.GAMSScalar)
+                {
+                    //do nothing
+                }
+                else if (type == EModelType.GAMSRaw)
+                {
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
+                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    if (link.expressions[0] == null)
+                    {
+                        //
+                        // NEW GAMS MODEL DECOMP
+                        //
+                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames, decompFind.model);  //if link.eqname != null, link.varnames[0] is not used at all
+                        link.expressions = found.expressions;
+                        link.expressionText = found.lhs + " = " + found.rhs;
+                    }
+                }
+                else if (type == EModelType.Gekko)
                 {
                     //Gekko model
                     //Gekko model
@@ -1746,27 +1779,6 @@ namespace Gekko
                     {
                         new Error("Expected 1 link expression");
                     }
-                }
-                else if (decompFind.model.type == EModelType.GAMSRaw)
-                {
-                    //GAMS model
-                    //GAMS model
-                    //GAMS model
-                    //GAMS model
-                    //GAMS model
-                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
-                    if (link.expressions[0] == null)
-                    {
-                        //
-                        // NEW GAMS MODEL DECOMP
-                        //
-                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames, decompFind.model);  //if link.eqname != null, link.varnames[0] is not used at all
-                        link.expressions = found.expressions;
-                        link.expressionText = found.lhs + " = " + found.rhs;
-                    }
-                }
-                else if (decompFind.model.type == EModelType.GAMSScalar)
-                {                    
                 }
                 else new Error("Model type error");
             }
@@ -2613,7 +2625,7 @@ namespace Gekko
             int parentI = 0;
             string format2 = GetNumberFormat(decompOptions2);
 
-            if (model.type == EModelType.GAMSScalar)
+            if (model.DecompType() == EModelType.GAMSScalar)
             {
                 //Put the chosen variable "on the l
                 ENormalizeType normalize = ENormalizeType.Lags;
@@ -2629,7 +2641,7 @@ namespace Gekko
                     DecompAdjust(per1.Add(deduct), per2, decompOptions2, parentI, decompDataMAINClone, decompDatas, operatorOneOf3Types, normalize, op);
                 }
             }
-            else if (model.type == EModelType.GAMSRaw || model.type == EModelType.Gekko)  //is .Gekko even relevant here??
+            else if (model.DecompType() == EModelType.GAMSRaw || model.DecompType() == EModelType.Gekko)  //is .Gekko even relevant here??
             {
                 if (!op.isRaw)
                 {
@@ -2668,7 +2680,7 @@ namespace Gekko
 
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
-            if (model.type == EModelType.GAMSScalar)
+            if (model.DecompType() == EModelType.GAMSScalar)
             {
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
             }
@@ -2899,7 +2911,7 @@ namespace Gekko
             for (int i = 0; i < rownames.Count; i++)
             {
                 string s = rownames[i];
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);
                 }
@@ -2909,7 +2921,7 @@ namespace Gekko
             for (int j = 0; j < colnames.Count; j++)
             {
                 string s = colnames[j];
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;
                 }
@@ -2964,7 +2976,7 @@ namespace Gekko
             {
                 bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames);
                 bool b2 = rownamesFirst == null && orderNormalize && (rownames3[i] != null && rownames3[i].Contains(Globals.pivotHelper2));
-                if ((model.type != EModelType.GAMSScalar && b1) || (model.type == EModelType.GAMSScalar && b2))
+                if ((model.DecompType() != EModelType.GAMSScalar && b1) || (model.DecompType() == EModelType.GAMSScalar && b2))
                 {
                     rownamesFirst = rownames3[i];
                 }
@@ -2979,7 +2991,7 @@ namespace Gekko
             {
                 bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames);
                 bool b2 = colnamesFirst == null && orderNormalize && (colnames3[i] != null && colnames3[i].Contains(Globals.pivotHelper2));
-                if ((model.type != EModelType.GAMSScalar && b1) || (model.type == EModelType.GAMSScalar && b2))
+                if ((model.DecompType() != EModelType.GAMSScalar && b1) || (model.DecompType() == EModelType.GAMSScalar && b2))
                 {
                     colnamesFirst = colnames3[i];
                 }
@@ -3085,7 +3097,7 @@ namespace Gekko
                 if (skip) continue;
 
                 string more = null;
-                if (model.type == EModelType.GAMSScalar)
+                if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     if (normalizerType == ENormalizerType.NormalizerWithLagOrLead) more = Globals.pivotHelper1;  //so that it is set apart
                     else if (normalizerType == ENormalizerType.Normalizer) more = Globals.pivotHelper2;
@@ -3383,22 +3395,22 @@ namespace Gekko
                         double dAlternative = double.NaN;
                         if (op.isDoubleDifQuo)  //dp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2.Add(-1), dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2.Add(-1), dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.isDoubleDifRef) //rdp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2.Add(-1), dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2.Add(-1), dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else if (op.lowLevel == ELowLevel.BothQuoAndRef) //mp
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
-                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "d", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            dAlternative = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, "rd", smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                         }
                         else
                         {
-                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, dictName, model.type == EModelType.GAMSScalar, decompOptions2.missingAsZero);
+                            d = DecomposePutIntoTable2HelperOperators(decompDataMAINClone, op.OperatorLower(), smpl, lhs, t2, dictName, model.DecompType() == EModelType.GAMSScalar, decompOptions2.missingAsZero);
                             dAlternative = double.NaN;
                         }
 

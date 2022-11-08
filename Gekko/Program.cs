@@ -16858,7 +16858,7 @@ namespace Gekko
 
                     Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
                     model.modelGamsScalar = modelTemp.modelGamsScalar;
-
+                    model.modelGamsScalar.is2000Model = true;
                 }
 
                 Program.GuiSetModelName();
