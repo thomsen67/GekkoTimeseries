@@ -1237,7 +1237,7 @@ namespace Gekko
                 {
                     ii++;
                     int jj = -1;
-                    foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                    foreach (DecompStartHelper eqPeriods in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;
                         DecompDict dd = null;
@@ -1248,7 +1248,14 @@ namespace Gekko
                             row++;
 
                             //see also #as7f3læaf9
-                            string eqName = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+                            GekkoTime tTemp = t;
+                            int add = 0;
+                            if (modelGamsScalar.is2000Model)
+                            {
+                                tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
+                                add = 2;  //why oh why??
+                            }
+                            string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                             if (k == 0) eqNames.Add(eqName);
                             int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(eqName);
 
@@ -1258,8 +1265,8 @@ namespace Gekko
                             {
                                 string varName = modelGamsScalar.GetVarNameA(dp.variable);
                                 int date = dp.date;
-                                string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date, modelGamsScalar.t0);
-                                string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date - GekkoTime.Observations(modelGamsScalar.t0, t) + 1);
+                                string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.t0);
+                                string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add - GekkoTime.Observations(modelGamsScalar.t0, t) + 1);
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -2361,6 +2368,7 @@ namespace Gekko
                 if (modelGamsScalar.is2000Model)
                 {
                     timeIndex1 = 0;
+                    timeIndex2 = 1;  //why?
                     ONE1 = 0;
                     ONE2 = 1;
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);

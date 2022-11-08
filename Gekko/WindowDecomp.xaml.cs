@@ -1742,10 +1742,13 @@ namespace Gekko
 
             Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, refresh, ref this.decompDatas, model);
 
-            string s = null;
+            string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
             {
-                s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);
+                if (!decompFind.model.modelGamsScalar.is2000Model)
+                {
+                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);
+                }
             }
             else
             {
