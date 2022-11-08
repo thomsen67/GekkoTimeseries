@@ -10558,7 +10558,61 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
                 Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
             }
-        }        
+        }
+
+        [TestMethod]
+        public void _Test_DecompFrmToScalar1()
+        {
+            Gekko.Table table = null;
+
+            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
+            
+            I("flush();");
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model decomp1.frm;");
+            I("y <2000 2003> = 500, 499, 531, 540;");
+            I("c <2001 2002> = 459, 471;");
+            I("g <2001 2002> = 40, 60;");
+            I("clone;");  //ref
+            I("y <2000 2003> = 500, 504, 536, 540;");
+            I("y[2001] += 1;"); //residual
+            I("y[2002] += 2;"); //residual
+            I("c <2001 2002> = 462, 474;");
+            I("g <2001 2002> = 42, 62;");
+
+            // --------------- <d> ----------------------------------
+
+            I("decomp3 <2002 2002 m> y from e_y endo y;");            
+            table = Globals.lastDecompTable;
+            int i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 7.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 3.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 2.0000d, 0.0001);
+
+            // --------------- <m> ----------------------------------
+
+            I("decomp3 <2002 2002 d> y from e_y endo y;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 33.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 12.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 20.0000d, 0.0001);
+        }
 
         private static int Helper_residual2(Gekko.Table table, int j, int i, double reduce)
         {
