@@ -10564,9 +10564,10 @@ namespace UnitTests
         public void _Test_DecompFrmToScalar1()
         {
             Gekko.Table table = null;
+            int i = -12345;
 
             //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
-            
+
             I("flush();");
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
@@ -10581,11 +10582,65 @@ namespace UnitTests
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
 
-            // --------------- <d> ----------------------------------
+            // --------------- c<m> ----------------------------------
 
-            I("decomp3 <2002 2002 m> y from e_y endo y;");            
+            //ShowDecompTable();
+
+            I("decomp3 <2002 2002 errors m> c from e_c endo c;");
             table = Globals.lastDecompTable;
-            int i = 1;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 3.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 1.8000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 2.1000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, -0.9000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Error");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+
+            // --------------- c<d> ----------------------------------
+
+            I("decomp3 <2002 2002 errors d> c from e_c endo c;");
+            table = Globals.lastDecompTable;
+            i = 1;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 12.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 1.5000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 9.9000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.6000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Error");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+
+
+
+            // --------------- y<m> ----------------------------------
+
+            I("decomp3 <2002 2002 m> y from e_y endo y;");
+            table = Globals.lastDecompTable;
+            i = 1;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
@@ -10597,7 +10652,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 2.0000d, 0.0001);
 
-            // --------------- <m> ----------------------------------
+            // --------------- y<d> ----------------------------------
 
             I("decomp3 <2002 2002 d> y from e_y endo y;");
             table = Globals.lastDecompTable;
@@ -10612,6 +10667,12 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 20.0000d, 0.0001);
+
+
+            //// --------------- <d> ----------------------------------
+
+
+
         }
 
         private static int Helper_residual2(Gekko.Table table, int j, int i, double reduce)
