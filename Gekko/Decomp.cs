@@ -2371,8 +2371,8 @@ namespace Gekko
                     ONE1 = 1;
                     //t0-2000 +  t-1980
                     tZero = (GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), modelGamsScalar.t0) - 1) + (GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1);
-                    // -(t0-2000)
-                    timeIndex2 = -(GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), modelGamsScalar.t0) - 1);
+                    // (t0-2000)
+                    timeIndex2 = (GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), modelGamsScalar.t0) - 1);
                 }                
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
@@ -2416,7 +2416,7 @@ namespace Gekko
                         }
                         double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, true);
                         double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, false);
-                        int lag2 = dp.date - timeIndex2;
+                        int lag2 = dp.date + timeIndex2;
                         string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
@@ -2451,7 +2451,7 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (!G.isNumericalError(grad))
                                 {
-                                    int lag2 = dp.date - timeIndex2;
+                                    int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
@@ -2492,7 +2492,7 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (!G.isNumericalError(grad))
                                 {
-                                    int lag2 = dp.date - timeIndex2;
+                                    int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
@@ -2533,7 +2533,7 @@ namespace Gekko
                                 //see also #sf94lkjsdjæ
                                 if (!G.isNumericalError(grad))
                                 {
-                                    int lag2 = dp.date - timeIndex2;
+                                    int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
                                     d.cellsQuo[name].SetData(t, x1);
