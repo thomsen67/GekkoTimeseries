@@ -2368,7 +2368,7 @@ namespace Gekko
                 {
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
                     timeIndex1 = 0;
-                    ONE1 = 1;
+                    ONE1 = 1; ;
                     // timeIndex2 = (t0-2000)
                     timeIndex2 = (GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), modelGamsScalar.t0) - 1);
                     //t-1980 + timeIndex2
