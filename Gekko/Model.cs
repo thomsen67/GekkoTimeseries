@@ -112,12 +112,26 @@ namespace Gekko
         public ModelGamsScalar modelGamsScalar = null;
         
         [ProtoMember(4)]
-        public EModelType type = EModelType.Unknown;  //beware that such fields must be transported manually after protobuf:  //#lkja90adsfkj
+        private EModelType type = EModelType.Unknown;  //beware that such extra fields must be transported manually after parallel protobuf:  //#lkja90adsfkj
 
         public bool loadedFromCacheFile = false;  //not protobuffed
 
         /// <summary>
-        /// This is not always the same as .type, which is the "born" type.
+        /// Where did the model come from? This is not always the same as DecompType().
+        /// </summary>
+        /// <returns></returns>
+        public EModelType GetModelSourceType()
+        {
+            return this.type;
+        }
+
+        public void SetModelSourceType(EModelType type)
+        {
+            this.type = type;
+        }
+
+        /// <summary>
+        /// Type used for decomp. This is not always the same as ModelSourceType(), which is the "born" type.
         /// </summary>
         /// <returns></returns>
         public EModelType DecompType()
@@ -138,22 +152,24 @@ namespace Gekko
             string rv = "";
             StringBuilder sb1 = new StringBuilder();
             StringBuilder sb2 = new StringBuilder();
-
-            int i = -1;
-            foreach (string eqName in eqNames)
+            if (model.modelGams != null)
             {
-                i++;                
-                List<ModelGamsEquation> temp = null; model.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
-                if (temp == null) continue;
-                foreach (ModelGamsEquation eq in temp)
-                {                    
-                    if (i > 0) sb1.AppendLine();
-                    sb1.AppendLine(eq.lhs + " = " + eq.rhs + ";");
-                    if (!G.NullOrBlanks(eq.conditionals)) sb1.AppendLine("with $-condition: " + eq.conditionals);                    
+                int i = -1;
+                foreach (string eqName in eqNames)
+                {
+                    i++;
+                    List<ModelGamsEquation> temp = null; model.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
+                    if (temp == null) continue;
+                    foreach (ModelGamsEquation eq in temp)
+                    {
+                        if (i > 0) sb1.AppendLine();
+                        sb1.AppendLine(eq.lhs + " = " + eq.rhs + ";");
+                        if (!G.NullOrBlanks(eq.conditionals)) sb1.AppendLine("with $-condition: " + eq.conditionals);
 
-                    if (i > 0) sb2.AppendLine();
-                    sb2.AppendLine(eq.lhsGams + " =E= " + eq.rhsGams + ";");
-                    if (!G.NullOrBlanks(eq.conditionalsGams)) sb2.AppendLine("with $-condition: " + eq.conditionalsGams);                    
+                        if (i > 0) sb2.AppendLine();
+                        sb2.AppendLine(eq.lhsGams + " =E= " + eq.rhsGams + ";");
+                        if (!G.NullOrBlanks(eq.conditionalsGams)) sb2.AppendLine("with $-condition: " + eq.conditionalsGams);
+                    }
                 }
             }
 

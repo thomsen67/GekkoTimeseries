@@ -489,7 +489,7 @@ namespace Gekko
 
                     bool isEndogenous = false;
 
-                    if (Program.model.type == EModelType.GAMSRaw || Program.model.type == EModelType.GAMSScalar)
+                    if (Program.model.GetModelSourceType() == EModelType.GAMSRaw || Program.model.GetModelSourceType() == EModelType.GAMSScalar)
                     {
                         if (Program.HasGamsEquation(ss)) isEndogenous = true;
                     }

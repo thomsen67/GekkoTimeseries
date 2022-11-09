@@ -4222,7 +4222,7 @@ namespace Gekko
         /// <returns>Output string</returns>
         public static string GetUpperLowerCase(string var)
         {
-            if (G.GetModelType()==EModelType.Gekko && Program.model.modelGekko.varsAType != null)
+            if (G.GetModelSourceType()==EModelType.Gekko && Program.model.modelGekko.varsAType != null)
             {
                 //a Gekko model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
@@ -4236,9 +4236,14 @@ namespace Gekko
             return var;
         }
 
-        public static EModelType GetModelType()
+        /// <summary>
+        /// Where did the model come from? This is not always the same as DecompType().
+        /// Operates on global loaded model.
+        /// </summary>
+        /// <returns></returns>
+        public static EModelType GetModelSourceType()
         {
-            return Program.model.type;
+            return Program.model.GetModelSourceType();
         }
 
         /// <summary>

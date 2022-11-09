@@ -2748,7 +2748,7 @@ namespace Gekko
             if (model.modelGamsScalar != null) model.modelGamsScalar.parent = model;
             if (model.modelGams != null) model.modelGams.parent = model;
             if (model.modelGekko != null) model.modelGekko.parent = model;
-            model.type = modelTemp.type; //#lkja90adsfkj
+            model.SetModelSourceType(modelTemp.GetModelSourceType()); //#lkja90adsfkj
 
             return model;
         }
@@ -10847,7 +10847,7 @@ namespace Gekko
                 else
                 {
 
-                    if (G.GetModelType() != EModelType.Gekko)
+                    if (G.GetModelSourceType() != EModelType.Gekko)
                     {
                         new Error("DECOMP: A Gekko model is not loaded, cf. the MODEL command.");
                         //throw new GekkoException();
@@ -11086,7 +11086,7 @@ namespace Gekko
 
                 string leftSideVariable = G.GetUpperLowerCase(var2);
 
-                if (G.GetModelType() != EModelType.Gekko)
+                if (G.GetModelSourceType() != EModelType.Gekko)
                 {
                     new Error("DECOMP: There does not seem to be any Gekko model defined");
                     //throw new GekkoException();
@@ -14226,7 +14226,7 @@ namespace Gekko
                         bank = ts.GetParentDatabank().name;
                     }
 
-                    if (Program.model.type == EModelType.GAMSRaw || Program.model.type == EModelType.GAMSScalar)
+                    if (Program.model.GetModelSourceType() == EModelType.GAMSRaw || Program.model.GetModelSourceType() == EModelType.GAMSScalar)
                     {
                         DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
                     }
@@ -14353,7 +14353,7 @@ namespace Gekko
 
                 if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
 
-                if (G.GetModelType() == EModelType.Gekko)
+                if (G.GetModelSourceType() == EModelType.Gekko)
                 {
                     DispHelperShowNormalEquation(showDetailed, varnameWithoutFreq);
                 }
@@ -14574,7 +14574,7 @@ namespace Gekko
                 DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);                
             }
 
-            if (G.GetModelType() == EModelType.GAMSScalar)
+            if (G.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 //we try to fetch equation names
             }
@@ -14597,7 +14597,7 @@ namespace Gekko
             //TODO TODO
             //TODO TODO
             //TODO TODO
-            if (G.GetModelType() == EModelType.GAMSScalar) return true;
+            if (G.GetModelSourceType() == EModelType.GAMSScalar) return true;
             return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
         }
 
@@ -15165,7 +15165,7 @@ namespace Gekko
             string var = G.Chop_RemoveFreq(varnameMaybeWithFreq);
             EEndoOrExo type = EEndoOrExo.Unknown;
             if (var == null) return type;
-            if (G.GetModelType() == EModelType.Gekko)
+            if (G.GetModelSourceType() == EModelType.Gekko)
             {
                 //checks if left-hand var in model. So this ignores exo/endo commands.
                 //so the E and X only describes the model equations as they are
@@ -16291,7 +16291,7 @@ namespace Gekko
         /// <param name="vars2"></param>
         public static void Endo(List<string> vars2)
         {
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("No Gekko model is defined for endogenization");
                 //throw new GekkoException();
@@ -16330,7 +16330,7 @@ namespace Gekko
         public static void PrintEndoExoLists()
         {
             G.Writeln();
-            if ((G.GetModelType() != EModelType.Gekko) || Program.model.modelGekko.endogenized == null || Program.model.modelGekko.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
+            if ((G.GetModelSourceType() != EModelType.Gekko) || Program.model.modelGekko.endogenized == null || Program.model.modelGekko.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
             else
             {
                 if (Program.model.modelGekko.endogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.endogenized.Count + " endogenized var: ");
@@ -16341,7 +16341,7 @@ namespace Gekko
                 G.PrintListWithCommas(temp1, false);
             }
             //G.Writeln();
-            if ((G.GetModelType() != EModelType.Gekko) || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
+            if ((G.GetModelSourceType() != EModelType.Gekko) || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
             else
             {
                 if (Program.model.modelGekko.exogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.exogenized.Count + " exogenized var: ");
@@ -16362,7 +16362,7 @@ namespace Gekko
         public static void Exo(List<string> vars2)
         {
             //TODO: check that manipulated vars exist in model -- no: model may be re-read etc.
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("No Gekko model is defined for exogenization");
                 //throw new GekkoException();
@@ -16400,7 +16400,7 @@ namespace Gekko
         /// <param name="list2"></param>
         public static void Info(GekkoTime tStart, GekkoTime tEnd, List list2)
         {
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("DIP<info> command requires a Gekko model -- seems no model is defined");
                 //throw new GekkoException();
@@ -16647,11 +16647,11 @@ namespace Gekko
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         DateTime t1 = DateTime.Now;
-                        if (model.type == EModelType.GAMSScalar)
+                        if (model.GetModelSourceType() == EModelType.GAMSScalar)
                         {
                             GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
                         }
-                        else if (model.type == EModelType.Gekko)
+                        else if (model.GetModelSourceType() == EModelType.Gekko)
                         {
                             GetListsFromModelListHelper();
                             //=============================================
@@ -16714,7 +16714,7 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-                    if (model.type == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
+                    if (model.GetModelSourceType() == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
                     //TODO
                     //TODO what about last argument ms?
                     //TODO
@@ -16755,7 +16755,7 @@ namespace Gekko
             Model model = new Model();
             Program.model = model;
 
-            model.type = EModelType.Gekko;
+            model.SetModelSourceType(EModelType.Gekko);
             //TODO: keep the old version, so model command can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
             modelGekko.modelInfo = new ModelInfo(modelGekko);
@@ -17983,7 +17983,7 @@ namespace Gekko
         /// </summary>
         public static void Trimvars()
         {
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("No Gekko model is defined for trimming, cf. MODEL command.");
                 //throw new GekkoException();
@@ -18062,7 +18062,7 @@ namespace Gekko
                 all = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             }
 
-            if ((G.GetModelType() != EModelType.Gekko) || replace)
+            if ((G.GetModelSourceType() != EModelType.Gekko) || replace)
             {
             }
             else
@@ -18229,7 +18229,7 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln("------------------------ Report: Find missing data -------------------------------");
                 G.Writeln();
-                if (G.GetModelType() != EModelType.Gekko)
+                if (G.GetModelSourceType() != EModelType.Gekko)
                 {
                     G.Writeln();
                     G.Writeln("No Gekko model seems to be loaded -- result cannot be split into exogenous, endogenous etc. variables");
@@ -18296,7 +18296,7 @@ namespace Gekko
         /// <param name="t2"></param>
         public static void Itershow(List<string> vars, GekkoTime t1, GekkoTime t2)
         {
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("No Gekko model seems to be defined, see MODEL command.");
                 //throw new GekkoException();
@@ -19925,7 +19925,7 @@ namespace Gekko
             date.InnerText = now;
             root.AppendChild(date);
 
-            if (G.GetModelType() == EModelType.Gekko && !isCloseCommand)
+            if (G.GetModelSourceType() == EModelType.Gekko && !isCloseCommand)
             {
                 //We do not want to put model info into XML if it is a CLOSE command triggering the bank write, for
                 //instance after a OPEN<edit>, etc. This is mode=data and something else.
@@ -28932,7 +28932,7 @@ namespace Gekko
         /// </summary>
         public static void CompareModelDatabankVarlist()
         {
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("No Gekko model seems to be loaded, cf. the MODEL statement. The comparison could not be performed.");
             }

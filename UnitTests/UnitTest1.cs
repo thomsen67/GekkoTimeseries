@@ -11119,6 +11119,7 @@ namespace UnitTests
             Assert.AreEqual(0d, y1_tjek, sharedDelta);
             Assert.AreEqual(0d, y2_tjek, sharedDelta);
 
+            I("flush();");
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("model <gms> simul2.zip;");

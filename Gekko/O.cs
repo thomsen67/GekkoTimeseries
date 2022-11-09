@@ -1183,7 +1183,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
 
-                    if (model.type == EModelType.Gekko)
+                    if (model.GetModelSourceType() == EModelType.Gekko)
                     {
                         simModeVariables.Add(s);
                     }
@@ -1277,7 +1277,7 @@ namespace Gekko
                 }
             }
 
-            if (model.type == EModelType.Gekko)
+            if (model.GetModelSourceType() == EModelType.Gekko)
             {
                 if (type) Program.Endo(simModeVariables);
                 else Program.Exo(simModeVariables);
@@ -1931,7 +1931,7 @@ namespace Gekko
         public static void Unfix()
         {
             Gekko.Model model = Program.model;
-            if (model.type == EModelType.GAMSRaw || model.type == EModelType.GAMSScalar)
+            if (model.GetModelSourceType() == EModelType.GAMSRaw || model.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");
@@ -2452,7 +2452,7 @@ namespace Gekko
         public static void Sign()
         {
             StringBuilder sb = new StringBuilder();
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("It seems no Gekko model is defined. See MODEL command.");
                 //throw new GekkoException();
@@ -6886,7 +6886,7 @@ namespace Gekko
                         //isSimple can never be true with READ ... TO ...
                         //Do not do this with READ<first> or READ<ref>, only with READ.                    
                         Program.MulbkClone();
-                        if (G.GetModelType() == EModelType.Gekko && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
+                        if (G.GetModelSourceType() == EModelType.Gekko && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
                         {
                             //only in sim or mixed mode, if a model is existing
                             CreateMissingModelVariables();
@@ -7920,7 +7920,7 @@ namespace Gekko
                 G.CheckLegalPeriod(this.t1, this.t2);
                 List<string> vars = O.Restrict(this.iv, false, false, false, false);
 
-                if (G.GetModelType() != EModelType.Gekko)
+                if (G.GetModelSourceType() != EModelType.Gekko)
                 {
                     new Error("PREDICT does not work without a Gekko model (cf. MODEL)");
                     //throw new GekkoException();

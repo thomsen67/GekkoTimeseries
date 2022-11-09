@@ -726,7 +726,7 @@ namespace Gekko
 
         public static void Sim(O.Sim o)
         {
-            if (G.GetModelType() == EModelType.GAMSScalar)
+            if (G.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
 
@@ -778,12 +778,12 @@ namespace Gekko
                 return;
             }
 
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {                
                 new Error("No Gekko model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
             }
 
-            if (G.GetModelType() == EModelType.Gekko && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
+            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 using (Error e = new Error())
                 {
@@ -850,7 +850,7 @@ namespace Gekko
 
             Globals.simCounter = 0;
             //ErrorIfDatabanksSwapped();
-            if (G.GetModelType() != EModelType.Gekko)
+            if (G.GetModelSourceType() != EModelType.Gekko)
             {
                 new Error("It seems no Gekko model is defined -- simulation cannot be performed");
                 //throw new GekkoException();
@@ -914,7 +914,7 @@ namespace Gekko
             ECompiledModelType modelType = GetModelTypeFromOptions(so);  //6 types, including Reverted (for EFTER command)
 
             //only used with ANTLR
-            if ((G.GetModelType() != EModelType.Gekko) || Program.model.modelGekko.equations.Count == 0)
+            if ((G.GetModelSourceType() != EModelType.Gekko) || Program.model.modelGekko.equations.Count == 0)
             {
                 new Error("It seems no Gekko model is defined: did you forget a MODEL statement?");
                 //throw new GekkoException();

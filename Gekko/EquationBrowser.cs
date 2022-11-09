@@ -956,7 +956,7 @@ namespace Gekko
         private static void BrowserDependents(string varnameMaybeWithFreq, StringBuilder sb, ref string jName, ref bool jNameAutoGen)
         {
             string varnameWithoutFreq = G.Chop_RemoveFreq(varnameMaybeWithFreq);
-            if (G.GetModelType() == EModelType.Gekko)
+            if (G.GetModelSourceType() == EModelType.Gekko)
             {
                 List<string> list = new List<string>();
                 if (Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
