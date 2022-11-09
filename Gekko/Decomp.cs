@@ -2367,12 +2367,14 @@ namespace Gekko
                 GekkoTime tTemp = t;
                 if (modelGamsScalar.is2000Model)
                 {
-                    timeIndex1 = 0;
-                    timeIndex2 = 1;  //why?
-                    ONE1 = 0;
+                    timeIndex1 = 0;  // //why?   tZero=21, x=2, t0=2000, t = 2002                  
+                    ONE1 = 0;        //       tZero=21, x=3, t0=1999
                     ONE2 = 1;
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
-                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1 - 1;  //why?                    
+                    int x = GekkoTime.Observations(modelGamsScalar.t0, t) - 1;
+                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1 - 1 - (x - 3);  //why?
+                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), modelGamsScalar.t0) - 1 + 2;
+                    timeIndex2 = 1 + (x - 3);
                 }                
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
