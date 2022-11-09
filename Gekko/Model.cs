@@ -790,17 +790,19 @@ namespace Gekko
             }
             else
             {
-                if (false)
-                {
-                    // y[2002] = 536 (year before 504)
-                    // if t0 = 1999, we should ask a[3][...]
-                    int[] b = bb[i];
-                    int[] d = dd[i];
-                    double[] c = cc;
-                    if (i == 0) r[i] = a[b[0] + t][b[1]] - ((a[b[2] + t][b[3]]) + (a[b[4] + t][b[5]]));
-                    if (i == 1) r[i] = a[b[0] + t][b[1]] - ((((((c[d[0]]) * (a[b[2] + t][b[3]])) + ((c[d[1]]) * (a[b[4] + t][b[5]]))) + ((c[d[2]]) * (a[b[6] + t][b[7]]))) + ((c[d[3]]) * (M.Power((a[b[8] + t][b[9]]), (a[b[10] + t][b[11]]))))) + ((c[d[4]]) * (M.Power((a[b[12] + t][b[13]]), (a[b[14] + t][b[15]])))));
-                    new Error("STOP HER");
-                }
+                //if (i == i + 1 - 0)
+                //{
+                //    // y[2002] = 536 (year before 504)
+                //    // if t0 = 1999, we should ask a[3][...]
+                //    int[] b = bb[i];
+                //    int[] d = dd[i];
+                //    double[] c = cc;
+                //    double ylag = a[b[2] + t][b[3]];
+                //    double y = a[b[4] + t][b[5]];
+                //    double ylead = a[b[6] + t][b[7]];
+                //    if (i == 0) r[i] = a[b[0] + t][b[1]] - ((a[b[2] + t][b[3]]) + (a[b[4] + t][b[5]]));                    
+                //    if (i == 1) r[i] = a[b[0] + t][b[1]] - ((((((c[d[0]]) * (a[b[2] + t][b[3]])) + ((c[d[1]]) * (a[b[4] + t][b[5]]))) + ((c[d[2]]) * (a[b[6] + t][b[7]])))));                    
+                //}
                 this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd, t);
                 return this.r[i];
             }

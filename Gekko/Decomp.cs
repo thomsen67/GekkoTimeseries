@@ -2372,9 +2372,15 @@ namespace Gekko
                     ONE2 = 1;
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
                     int x = GekkoTime.Observations(modelGamsScalar.t0, t) - 1;
-                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1 - 1 - (x - 3);  //why?
+                    //tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1 - 1 - (x - 3);  //why?
                     tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), modelGamsScalar.t0) - 1 + 2;
                     timeIndex2 = 1 + (x - 3);
+                    int lag = 0;
+
+                    if (op.OperatorLower() == "d") lag = 1;
+
+                    tZero = tZero - lag;
+                    timeIndex2 = timeIndex2 + lag;
                 }                
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
