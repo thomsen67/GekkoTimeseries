@@ -2337,8 +2337,7 @@ namespace Gekko
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
             int tZero = 0;
-            int ONE1 = 1;
-            int ONE2 = 0;
+            int ONE1 = 0;
             
             //See #kljaf89usafasdf for Gekko  model
 
@@ -2368,19 +2367,10 @@ namespace Gekko
                 if (modelGamsScalar.is2000Model)
                 {
                     timeIndex1 = 0;  // //why?   tZero=21, x=2, t0=2000, t = 2002                  
-                    ONE1 = 0;        //       tZero=21, x=3, t0=1999
-                    ONE2 = 1;
+                    ONE1 = 1;        //       tZero=21, x=3, t0=1999
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
-                    int x = GekkoTime.Observations(modelGamsScalar.t0, t) - 1;
-                    //tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1 - 1 - (x - 3);  //why?
-                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), modelGamsScalar.t0) - 1 + 2;
-                    timeIndex2 = 1 + (x - 3);
-                    int lag = 0;
-
-                    if (op.OperatorLower() == "d") lag = 1;
-
-                    tZero = tZero - lag;
-                    timeIndex2 = timeIndex2 + lag;
+                    tZero = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), modelGamsScalar.t0) - 1 - (GekkoTime.Observations(gt1, new GekkoTime(t.freq, 2002, 1)) - 1) + 2;
+                    timeIndex2 = (GekkoTime.Observations(modelGamsScalar.t0, t) - 1) + (GekkoTime.Observations(gt1, new GekkoTime(t.freq, 2002, 1)) - 1) - 2;
                 }                
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
@@ -2442,7 +2432,7 @@ namespace Gekko
                             {
                                 y0a = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t, y0a);
-                                y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + ONE1].eqNumber, false, tZero + ONE2, ref funcCounter);
+                                y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE1)].eqNumber, false, tZero + ONE1, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t.Add(1), y1);
                             }
                             double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, false);
@@ -2483,7 +2473,7 @@ namespace Gekko
                             {
                                 y0b = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, true, tZero, ref funcCounter);
                                 d.cellsRef[residualName].SetData(t, y0b);
-                                y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + ONE1].eqNumber, true, tZero + ONE2, ref funcCounter);
+                                y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE1)].eqNumber, true, tZero + ONE1, ref funcCounter);
                                 d.cellsRef[residualName].SetData(t.Add(1), y1);
                             }
                             double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, true);
