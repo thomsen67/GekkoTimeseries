@@ -495,8 +495,9 @@ namespace Gekko
             }
 
             foreach (GekkoTime time in new GekkoTimeIterator(gt1, gt2))
-            {
-                int i = GekkoTime.Observations(modelGamsScalar.t0, time) - 1;
+            {                
+                int i = time.Subtract(modelGamsScalar.tBasis);
+
                 if (modelGamsScalar.is2000Model) i = 0;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
@@ -875,7 +876,7 @@ namespace Gekko
                     element.name = equationName;
                     element.indexes = mmi;
                     element.fullName = element.name + element.indexes.GetName();
-                    int periods = GekkoTime.Observations(modelGamsScalar.t0, modelGamsScalar.t2);
+                    int periods = GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2);
                     if (modelGamsScalar.is2000Model) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
@@ -1253,7 +1254,7 @@ namespace Gekko
                             if (modelGamsScalar.is2000Model)
                             {
                                 tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
-                                add = GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decomp2000, 1), t) - 1;
+                                add = t.Subtract(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
                             }
                             string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                             if (k == 0) eqNames.Add(eqName);
@@ -1265,8 +1266,8 @@ namespace Gekko
                             {
                                 string varName = modelGamsScalar.GetVarNameA(dp.variable);
                                 int date = dp.date;
-                                string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.t0);
-                                string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add - GekkoTime.Observations(modelGamsScalar.t0, t) + 1);
+                                string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.tBasis);
+                                string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add - t.Subtract(modelGamsScalar.tBasis));
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -2207,7 +2208,7 @@ namespace Gekko
                                                     //before shock (y0) in the year considered (t2)
                                                     //If it does evaluate, but there is no effect, it is skipped too.
 
-                                                    int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                                                                        
+                                                    int lag = -t2.Subtract(t1);  //x[-1] --> lag = -1                                                                                        
                                                     string lag2 = null;
                                                     if (lag >= 1)
                                                     {
@@ -2369,10 +2370,10 @@ namespace Gekko
                     tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
                     timeIndex1 = 0;
                     ONE = 1; ;
-                    // timeIndex2 = (t0-2000)
-                    timeIndex2 = (GekkoTime.Observations(new GekkoTime(t.freq, Globals.decomp2000, 1), modelGamsScalar.t0) - 1);
+                    // timeIndex2 = (tBasis-2000)
+                    timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(t.freq, Globals.decomp2000, 1));
                     //t-1980 + timeIndex2
-                    tZero = (GekkoTime.Observations(new GekkoTime(EFreq.A, Globals.decompHackt1, 1), t) - 1) + timeIndex2;                    
+                    tZero = t.Subtract(new GekkoTime(EFreq.A, Globals.decompHackt1, 1)) + timeIndex2;
                 }                
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
@@ -4277,7 +4278,7 @@ namespace Gekko
                 List<int> eqNumbers = null; modelGamsScalar.dependents.TryGetValue(pav, out eqNumbers);
                 if (eqNumbers == null)
                 {
-                    //new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
+                    new Error("Could not find " + variableName + "[" + modelGamsScalar.FromTimeIntegerToGekkoTime(pav.date).ToString() + "] as an endogenous variable. " + modelGamsScalar.GamsModelDefinedString() + ".");
                     return;
                 }
 

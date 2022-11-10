@@ -5669,7 +5669,7 @@ namespace Gekko
             {
                 if (dates.t1Annual.StrictlyLargerThan(first))
                 {
-                    offset = GekkoTime.Observations(first, dates.t1Annual) - 1;
+                    offset = dates.t1Annual.Subtract(first);
                     firstRv = dates.t1Annual;
                 }
                 if (dates.t2Annual.StrictlySmallerThan(last))
@@ -5681,7 +5681,7 @@ namespace Gekko
             {
                 if (dates.t1Quarterly.StrictlyLargerThan(first))
                 {
-                    offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
+                    offset = dates.t1Quarterly.Subtract(first);
                     firstRv = dates.t1Quarterly;
                 }
                 if (dates.t2Quarterly.StrictlySmallerThan(last))
@@ -5693,7 +5693,7 @@ namespace Gekko
             {
                 if (dates.t1Monthly.StrictlyLargerThan(first))
                 {
-                    offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
+                    offset = dates.t1Monthly.Subtract(first);
                     firstRv = dates.t1Monthly;
                 }
                 if (dates.t2Monthly.StrictlySmallerThan(last))
@@ -7106,7 +7106,7 @@ namespace Gekko
                             GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true);
                             if (!gt_before.IsNull())
                             {
-                                int gap = GekkoTime.Observations(gt_before, gt) - 1;  //1 if consequtive
+                                int gap = gt.Subtract(gt_before);  //1 if consequtive
                                 if (gap < 1)
                                 {
                                     new Error("It seems the date '" + date_before + "' is not before the following date: '" + date + "'");
@@ -13820,7 +13820,7 @@ namespace Gekko
                             GekkoTime t2 = gt;
                             double z1 = rhs.GetDataSimple(t1);
                             double z2 = rhs.GetDataSimple(t2);
-                            double n = GekkoTime.Observations(t1, t2) - 1;
+                            double n = t2.Subtract(t1);
                             if (method == ESmoothTypes.Geometric)
                             {
                                 if (z1 <= 0d || z2 <= 0d)
@@ -18462,7 +18462,7 @@ namespace Gekko
                     }
                     else
                     {
-                        int dif = GekkoTime.Observations(gtLag, gt) - 1;
+                        int dif = gt.Subtract(gtLag);
                         if (dif > 1)  //period 2000:2001 is 2 obs for example (both start and end counting)
                         {
                             //Actually this dif check should not be necessary, but the problem is that the
@@ -25851,7 +25851,7 @@ namespace Gekko
                                                 double y0_double = y_series.GetData(smpl, t2);
                                                 double y1_double = y1_series.GetData(smpl, t2);
                                                 double grad = (y1_double - y0_double) / eps;
-                                                int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                            
+                                                int lag = -t2.Subtract(t1);  //x[-1] --> lag = -1                                            
                                                 string name = G.Chop_RemoveFreq(dp.s, per1.freq);
 
                                                 if (lag != 0)

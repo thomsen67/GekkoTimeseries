@@ -659,7 +659,7 @@ namespace Gekko
         /// Later on, t0 may become smaller than t1.
         /// </summary>
         [ProtoMember(11)]
-        public GekkoTime t0 = GekkoTime.tNull;
+        public GekkoTime tBasis = GekkoTime.tNull;
 
         /// <summary>
         /// First observed period in scalar model (at the moment equal to t0).
@@ -880,7 +880,7 @@ namespace Gekko
         /// <returns></returns>
         public int FromGekkoTimeToTimeInteger(GekkoTime t)
         {
-            return GekkoTime.Observations(this.t0, t) - 1;
+            return t.Subtract(this.tBasis);
         }
 
         /// <summary>
@@ -890,7 +890,7 @@ namespace Gekko
         /// <returns></returns>
         public GekkoTime FromTimeIntegerToGekkoTime(int t)
         {
-            return this.t0.Add(t);
+            return this.tBasis.Add(t);
         }
 
         /// <summary>
@@ -904,7 +904,7 @@ namespace Gekko
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
 
-            GekkoTime tStart = this.t0;
+            GekkoTime tStart = this.t1;
             GekkoTime tEnd = this.t2;
             if (this.is2000Model)
             {
@@ -1038,7 +1038,7 @@ namespace Gekko
         /// <returns></returns>
         public void FromAToDatabankScalarModel(Databank db, bool isRef)
         {
-            GekkoTime tStart = this.t0;
+            GekkoTime tStart = this.t1;
             GekkoTime tEnd = this.t2;
             if (this.is2000Model)
             {
@@ -1293,7 +1293,7 @@ namespace Gekko
 
         public string GamsModelDefinedString()
         {
-            return "GAMS model is defined over the period " + this.t0.ToString() + " to " + this.t2.ToString();
+            return "GAMS model is defined over the period " + this.t1.ToString() + " to " + this.t2.ToString();
         }
 
     }

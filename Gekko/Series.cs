@@ -1211,7 +1211,7 @@ namespace Gekko
             else if (anchorPeriod.freq == EFreq.W || anchorPeriod.freq == EFreq.D)
             {
                 //this cannot be fast, converts implicitly to C# DateTime
-                int dif = GekkoTime.Observations(anchorPeriod, gt) - 1;
+                int dif = gt.Subtract(anchorPeriod);
                 rv = anchorPeriodPositionInArray + dif;
             }
             else

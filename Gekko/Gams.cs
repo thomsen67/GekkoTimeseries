@@ -309,7 +309,7 @@ namespace Gekko
 
                             if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
                             if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
-                            int i1 = (GekkoTime.Observations(wh.time0, time) - 1);
+                            int i1 = time.Subtract(wh.time0);
                             int i2 = wh.dictA.Count;
                             if (!wh.dictA.ContainsKey(resultingFullName))
                             {
@@ -649,7 +649,7 @@ namespace Gekko
             int varCounts = -12345;
             int semis = 0;
 
-            helper.t0 = helper.t1;  //could perhaps lag this later on... ?
+            helper.tBasis = helper.t1;  //could perhaps lag this later on... ?
             helper.t3 = helper.t2;  //could perhaps lead this later on... ?
             int periods = GekkoTime.Observations(helper.t1, helper.t2);
             helper.a = new double[periods][];
@@ -700,7 +700,7 @@ namespace Gekko
                 List<string> notUsed = null;
                 ExtractTimeDimension(inputName, true, ref name, ref t, ref outputName, out notUsed);
                 int aNumber = helper.dict_FromVarNameToANumber.Get(outputName);
-                int i1 = GekkoTime.Observations(helper.t0, t) - 1;
+                int i1 = t.Subtract(helper.tBasis);
                 int i2 = aNumber;
                 double d;
                 if (ss[1].Trim() == "")
@@ -773,7 +773,7 @@ namespace Gekko
             // Note that GAMS equation periods are not very useful.
             // In principle, e1[2020] .. may designate an equation with
             // variables from 2025, so there are no guarantees.
-            modelGamsScalar.t0 = helper.t0;
+            modelGamsScalar.tBasis = helper.tBasis;
             modelGamsScalar.t1 = helper.t1;
             modelGamsScalar.t2 = helper.t2;
             // -------------- helpers dictionaries ---------
@@ -1297,8 +1297,8 @@ namespace Gekko
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
                     List<string> notUsed = null;
-                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);                    
-                    int i1 = (GekkoTime.Observations(helper.t0, time) - 1);
+                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);
+                    int i1 = time.Subtract(helper.tBasis);
                     int i2 = helper.dict_FromVarNameToANumber.Get(resultingFullName);
                                         
                     int ii1 = helper.endo.Count;
@@ -4746,7 +4746,7 @@ namespace Gekko
 
         //public List<List<PeriodAndVariable>> precedentsScalar = new List<List<PeriodAndVariable>>();
 
-        public GekkoTime t0 = GekkoTime.tNull;
+        public GekkoTime tBasis = GekkoTime.tNull;
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
         public GekkoTime t3 = GekkoTime.tNull;

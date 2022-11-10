@@ -1213,7 +1213,7 @@ namespace Gekko
                         int bNumber = bNumberPointers[shock.varNumber];
                         nftDelta = Program.model.modelGekko.bVariance[bNumber] / 100d;
                         if (nftDelta == 0d || G.isNumericalError(nftDelta)) nftDelta = 1d;  //could be refined, perhaps looking at the level of the variable
-                        aTemp[shock.varNumber, GekkoTime.Observations(tStart, shock.gt) - 1 - largestLag] += nftDelta;
+                        aTemp[shock.varNumber, shock.gt.Subtract(tStart) - largestLag] += nftDelta;
                     }
 
                     SolveForwardLooking.SetTerminalType(terminal);
@@ -1221,7 +1221,7 @@ namespace Gekko
                     int tInt = -largestLag - 1;
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd.Add(-horizon2)))  //horizon2 is deducted. Is 0 for non-stacked models.
                     {
-                        int distanceToEnd = GekkoTime.Observations(t, tEnd) - 1;  //0 if last period, 1 if second-last, and so on
+                        int distanceToEnd = tEnd.Subtract(t);  //0 if last period, 1 if second-last, and so on
                         Program.model.modelGekko.simulateResults[7] = distanceToEnd;
 
                         if (Program.options.solve_print_details && Globals.runningOnTTComputer)
@@ -1432,8 +1432,8 @@ namespace Gekko
                                 if (shock2.isFirstBaseline) continue;  //the first one is skipped
                                 counterI++;
                                 int var = shock2.varNumber;
-                                double v1 = aFinalResultFromShockLoop[shock2.varNumber, GekkoTime.Observations(tStart, shock2.gt) - 1 - largestLag];
-                                double v2 = aTemp[shock2.varNumber, GekkoTime.Observations(tStart, shock2.gt) - 1 - largestLag];
+                                double v1 = aFinalResultFromShockLoop[shock2.varNumber, shock2.gt.Subtract(tStart) - largestLag];
+                                double v2 = aTemp[shock2.varNumber, shock2.gt.Subtract(tStart) - largestLag];
                                 double jac = (v2 - v1) / nftDelta;
                                 //Remember that the DUMP matrices #ft_1 etc. are transposed relative to this!
                                 helper.jacobi[counterJ - 1, counterI - 1] = jac;

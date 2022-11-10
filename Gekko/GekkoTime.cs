@@ -801,7 +801,17 @@ namespace Gekko
             {
                 new Error("Freq convertion problem"); return DateTime.MinValue;
             }            
-        }        
+        }
+
+        /// <summary>
+        /// Subtract a t, returns integer. For annual freq, the subtraction corresponds to "normal" integer subtraction, for instance 2020 with subtract 2015 is = 5.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public int Subtract(GekkoTime t)
+        {
+            return Observations(t, this) - 1;
+        }
 
         /// <summary>
         /// Finds the number of observations that a time range t1 to t2 spans. If t1 = 2020 and t2 = 2022, it will return 3. So note that it is the difference + 1.
@@ -822,7 +832,7 @@ namespace Gekko
 
             if (t1.freq != t2.freq)
             {
-                new Error("Frequency mismatch in observations(): " + t1.freq.Pretty() + " vs. " + t2.freq.Pretty());                
+                new Error("Frequency mismatch in observations(): " + t1.freq.Pretty() + " vs. " + t2.freq.Pretty());
             }
 
             if ((t1.IsNull() && !t2.IsNull()) || ((!t1.IsNull() && t2.IsNull())))
@@ -1556,7 +1566,7 @@ namespace Gekko
         /// <returns></returns>
         public static string GetLagString(GekkoTime t0, GekkoTime t)
         {
-            int lag = GekkoTime.Observations(t0, t) - 1;
+            int lag = t.Subtract(t0);
             string slag = null;
             if (lag < 0) slag = lag.ToString();
             if (lag > 0) slag = "+" + lag.ToString();
@@ -1644,7 +1654,7 @@ namespace Gekko
             if (t0.freq != desiredFreq)
             {
                 FreqHelper freqHelper = null;
-                int offset = GekkoTime.Observations(t0, t1) - 1; //lag before conversion
+                int offset = t1.Subtract(t0); //lag before conversion
                 if (offset > 0)  //cannot be negative
                 {
                     freqHelper = new FreqHelper();  //This object is not created if were are not using flexible freqs
