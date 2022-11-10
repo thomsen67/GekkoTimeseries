@@ -805,6 +805,7 @@ namespace Gekko
 
         /// <summary>
         /// Subtract a t, returns integer. For annual freq, the subtraction corresponds to "normal" integer subtraction, for instance 2020 with subtract 2015 is = 5.
+        /// The method Observations() is very similar.
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
@@ -816,6 +817,7 @@ namespace Gekko
         /// <summary>
         /// Finds the number of observations that a time range t1 to t2 spans. If t1 = 2020 and t2 = 2022, it will return 3. So note that it is the difference + 1.
         /// The method *can* return 0 or a negative number! If both GekkoTimes are null, 0 is returned. If one but not the other is null, an error is issued.
+        /// The method Subtract() is very similar.
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
