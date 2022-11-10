@@ -2828,18 +2828,6 @@ namespace Gekko
             List<string> files = GetSplitCacheFileNames(k + Globals.systemTthreadsExtra + 1, inputFileName, "model", ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
             List<object> lists = ProtobufModelGamsScalar5a(k, model);
 
-            //for (int i = 0; i < lists.Count; i++)
-            //{
-            //    try
-            //    {
-            //        ProtobufWrite(lists[i], files[i]);
-            //    }
-            //    catch (Exception e)
-            //    {
-
-            //    }
-            //}
-
             try
             {
                 lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
@@ -2923,10 +2911,18 @@ namespace Gekko
                     //About double speed on TT pc, compared to no parallel  
                     int i = (int)index;                    
                     object o = null;
-                    if (i <= Program.options.system_threads) o = ProtobufRead<ModelGamsScalar>(files[i]);
-                    else if (i == Program.options.system_threads + 1) o = ProtobufRead<ModelCommon>(files[i]);
-                    else if (i == Program.options.system_threads + 2) o = ProtobufRead<ModelGams>(files[i]);
-                    else if (i == Program.options.system_threads + 3) o = ProtobufRead<ModelGekko>(files[i]);
+                    if (new FileInfo(files[i]).Length == 0)
+                    {
+                        //happens when the slot is occupied with a ModelNull() object, which has zero contents.
+                        o = new ModelNull();
+                    }
+                    else
+                    {
+                        if (i <= Program.options.system_threads) o = ProtobufRead<ModelGamsScalar>(files[i]);
+                        else if (i == Program.options.system_threads + 1) o = ProtobufRead<ModelCommon>(files[i]);
+                        else if (i == Program.options.system_threads + 2) o = ProtobufRead<ModelGams>(files[i]);
+                        else if (i == Program.options.system_threads + 3) o = ProtobufRead<ModelGekko>(files[i]);
+                    }
                     lists[i] = o;
                     return 0;
                 }, _ => { });
@@ -16644,13 +16640,13 @@ namespace Gekko
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         DateTime t1 = DateTime.Now;
-                        if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+                        if (model.modelGamsScalar != null)
                         {
                             GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
                         }
-                        else if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                        else if (model.modelGekko != null)
                         {
-                            GetListsFromModelListHelper();
+                            GetListsFromModelListHelper(model.modelGekko);
                             //=============================================
                             //FOR SAFETY: see mail from TKD 5/3 2013
                             Program.model.modelGekko.simulateResults = new double[10];
@@ -16711,37 +16707,15 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-                    if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
-                    //TODO
-                    //TODO what about last argument ms?
-                    //TODO
+                    if (model.modelGamsScalar != null) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);                    
+                    //TODO what about last argument ms?                    
                     Program.WriteParallelModel(Program.options.system_threads, ffh.realPathAndFileName, modelHash, 0, model);
                 }
                 catch (Exception e)
                 {
                     //do nothing, not the end of the world if it fails
                 }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
+            }            
         }
         
         /// <summary>
@@ -17167,7 +17141,7 @@ namespace Gekko
         /// <summary>
         /// Helper method when loading a model from a cached internal protobuf file (getting model lists back in).
         /// </summary>
-        private static void GetListsFromModelListHelper()
+        private static void GetListsFromModelListHelper(ModelGekko modelGekko)
         {
             string[] lists = new string[] { "all", "endo", "exo", "exod", "exodjz", "exoj", "exotrue", "exoz" };
             foreach (string s in lists)
@@ -17175,31 +17149,31 @@ namespace Gekko
                 if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetGlobal().RemoveIVariable(Globals.symbolCollection + s);
             }
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.all.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.all.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.endo.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.endo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exo.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exod.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exod.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exodjz.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exodjz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoj.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exoj.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exotrue.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exotrue.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
+            if (modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List());
 
-            Program.model.modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
+            modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
         /// <summary>

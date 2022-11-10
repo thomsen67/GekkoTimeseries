@@ -9154,6 +9154,17 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _ProtocufNullObjectSize()
+        {                        
+            string path = Globals.ttPath2 + @"\regres\temp\protobuf_hdasf87fayd.data";
+            ModelNull mn = new ModelNull();
+            Program.ProtobufWrite(mn, path);
+            ModelNull mn2 = Program.ProtobufRead<ModelNull>(path);
+            Assert.IsTrue(mn2 != null);
+            Assert.IsTrue((new FileInfo(path)).Length == 0);
+        }
+
+        [TestMethod]
         public void _Test_FunctionCondit()
         {
             I("RESET;");
@@ -10830,7 +10841,7 @@ namespace UnitTests
         {
             for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
             {
-                if (f == 0) Program.Flush();  //is probably done anyway before each test
+                if (f == 0) Program.Flush();
                 for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
                 {
                     //
