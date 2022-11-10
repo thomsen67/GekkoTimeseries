@@ -2645,19 +2645,24 @@ namespace Gekko
 
         public static List<object> ProtobufModelGamsScalar5a(int k, Model model)
         {            
-            if (k != 5) new Error("Hov");
+            if (k != 5) new Error("Hov");            
 
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
             List<object> mm = new List<object>();
 
+            for (int i = 0; i <= k + Globals.systemTthreadsExtra; i++)  //0..8 inclusive
+            {
+                m.Add(null);
+                mm.Add(null);
+            }            
+
             if (model.modelGamsScalar == null)
             {
-                
+                //keep the nulls
             }            
             else 
             {
-                for (int i = 0; i <= k; i++) m.Add(new ModelGamsScalar(null));
-
+                //In these, [1]-[5] are large, [0] is small. Later on, [6]-[8] are small, too.
                 m[0] = model.modelGamsScalar;
                 m[1] = new ModelGamsScalar(null);
                 m[1].precedents = m[0].precedents;
@@ -2692,24 +2697,17 @@ namespace Gekko
                 m[0].dict_FromEqNumberToEqName = null;
             }
 
-            if (model.modelGamsScalar == null)
+            for (int i = 0; i <= k + Globals.systemTthreadsExtra; i++)
             {
-                for (int i = 0; i <= k; i++) if (model.modelGamsScalar == null) mm.Add(new ModelNull());                
-            }
-            else
-            {
-                mm.AddRange(m);
+                if (m[i] != null) mm[i] = m[i];
+                else mm[i] = new ModelNull();
             }
 
-            mm.Add(model);
+            mm[6] = model;
+            if (model.modelGams != null) mm[7] = model.modelGams;
+            if (model.modelGekko != null) mm[8] = model.modelGekko;
 
-            if (model.modelGams == null) mm.Add(new ModelNull());
-            else mm.Add(model.modelGams);
-
-            if (model.modelGekko == null) mm.Add(new ModelNull());
-            else mm.Add(model.modelGekko);
-
-            if (mm.Count != k + 4) new Error("Hov");
+            if (mm.Count != k + Globals.systemTthreadsExtra + 1) new Error("Hov");
 
             return mm;
         }        
@@ -2717,6 +2715,7 @@ namespace Gekko
         public static Model ProtobufModelGamsScalar5b(int k, List<object>mm)
         {
             if (k != 5) new Error("Hov");
+            if (mm.Count != k + Globals.systemTthreadsExtra + 1) new Error("Hov");
             Model model = new Model();
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
             for (int i = 0; i <= k; i++) m.Add(mm[i] as ModelGamsScalar);
@@ -2827,7 +2826,7 @@ namespace Gekko
             
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
-            List<string> files = GetSplitCacheFileNames(k + 1 + 2, inputFileName, "model", ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
+            List<string> files = GetSplitCacheFileNames(k + Globals.systemTthreadsExtra + 1, inputFileName, "model", ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
             List<object> lists = ProtobufModelGamsScalar5a(k, model);
 
             //for (int i = 0; i < lists.Count; i++)

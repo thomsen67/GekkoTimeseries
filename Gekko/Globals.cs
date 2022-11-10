@@ -639,7 +639,9 @@ namespace Gekko
         public static bool btnStopThread = false;
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
-        
+
+        public const int systemTthreadsExtra= 3;
+
         public static bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
         public static List<Graph> windowsGraph = new List<Graph>();
