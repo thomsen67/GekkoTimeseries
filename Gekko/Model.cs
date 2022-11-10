@@ -100,9 +100,9 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelNull
-    {
+    {        
         //just used to signal that one of modelGamsScalar, modelGams or modelGekko is = null.
-        //its size will be 0, and this fact is used.
+        //its size will be 0, and this fact is used. See test, #ddgfcs78yusdj
     }
 
     [ProtoContract]

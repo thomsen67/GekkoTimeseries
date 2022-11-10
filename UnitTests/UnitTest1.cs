@@ -9161,7 +9161,7 @@ namespace UnitTests
             Program.ProtobufWrite(mn, path);
             ModelNull mn2 = Program.ProtobufRead<ModelNull>(path);
             Assert.IsTrue(mn2 != null);
-            Assert.IsTrue((new FileInfo(path)).Length == 0);
+            Assert.IsTrue((new FileInfo(path)).Length == 0); //cf. #ddgfcs78yusdj
         }
 
         [TestMethod]
@@ -10839,6 +10839,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompSimul1()
         {
+            //Tests both scalar model and raw gams model
+            //Also test cache
+
             for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
             {
                 if (f == 0) Program.Flush();
