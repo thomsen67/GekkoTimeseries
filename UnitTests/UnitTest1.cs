@@ -12839,9 +12839,9 @@ namespace UnitTests
 
             for (int f = 0; f < 2; f++)
             {
+                if (f == 0) I("flush();");  //only flush 1 time in all
                 for (int m = 0; m < 2; m++)
-                {
-                    if (f == 0) I("flush();");
+                {                    
                     I("reset;");
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                     if (m == 0)

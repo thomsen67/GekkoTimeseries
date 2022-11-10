@@ -106,29 +106,12 @@ namespace Gekko
 
     [ProtoContract]
     public class Model
-    {        
+    {
+        //Do not add fields here, in that case use ModelCommon classe.
+        public ModelCommon modelCommon = new ModelCommon();
         public ModelGekko modelGekko = null;
         public ModelGams modelGams = null;
-        public ModelGamsScalar modelGamsScalar = null;
-        
-        [ProtoMember(4)]
-        private EModelType type = EModelType.Unknown;  //beware that such extra fields must be transported manually after parallel protobuf:  //#lkja90adsfkj
-
-        public bool loadedFromCacheFile = false;  //not protobuffed
-
-        /// <summary>
-        /// Where did the model come from? This is not always the same as DecompType().
-        /// </summary>
-        /// <returns></returns>
-        public EModelType GetModelSourceType()
-        {
-            return this.type;
-        }
-
-        public void SetModelSourceType(EModelType type)
-        {
-            this.type = type;
-        }
+        public ModelGamsScalar modelGamsScalar = null;                
 
         /// <summary>
         /// Type used for decomp. This is not always the same as ModelSourceType(), which is the "born" type.
@@ -555,7 +538,7 @@ namespace Gekko
             }
             
             string cache = "";
-            if (this.parent.parent.loadedFromCacheFile) cache = " (model loaded from cache file)";
+            if (this.parent.parent.modelCommon.loadedFromCacheFile) cache = " (model loaded from cache file)";
             G.Writeln("Model statement ended succesfully with no errors in " + timeUsedTotal + extra + cache);
         }
     }
@@ -584,6 +567,33 @@ namespace Gekko
         {
             this.parent = model;            
             if (model != null) model.modelGams = this;
+        }
+    }
+
+    /// <summary>
+    /// Common stuff for models
+    /// </summary>
+    [ProtoContract]
+    public class ModelCommon
+    {
+        [ProtoMember(1)]
+        private EModelType type = EModelType.Unknown;
+
+        //not protobuffed
+        public bool loadedFromCacheFile = false;  //not protobuffed
+
+        /// <summary>
+        /// Where did the model come from? This is not always the same as DecompType().
+        /// </summary>
+        /// <returns></returns>
+        public EModelType GetModelSourceType()
+        {
+            return this.type;
+        }
+
+        public void SetModelSourceType(EModelType type)
+        {
+            this.type = type;
         }
     }
 

@@ -4243,7 +4243,7 @@ namespace Gekko
         /// <returns></returns>
         public static EModelType GetModelSourceType()
         {
-            return Program.model.GetModelSourceType();
+            return Program.model.modelCommon.GetModelSourceType();
         }
 
         /// <summary>

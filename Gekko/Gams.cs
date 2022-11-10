@@ -1415,7 +1415,7 @@ namespace Gekko
         public static Model ReadGamsRawModel(string textInputRaw, string fileName, O.Model o)
         {
             Model model = new Model();
-            model.SetModelSourceType(EModelType.GAMSRaw);
+            model.modelCommon.SetModelSourceType(EModelType.GAMSRaw);
             ModelGams modelGams = new ModelGams(model);
 
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
@@ -1501,7 +1501,7 @@ namespace Gekko
             //TODO TODO TODO
 
             Model model = new Model();
-            model.SetModelSourceType(EModelType.GAMSScalar);
+            model.modelCommon.SetModelSourceType(EModelType.GAMSScalar);
                         
             DateTime t = DateTime.Now;
             
@@ -1637,7 +1637,7 @@ namespace Gekko
                         txt.MainAdd(s);
                         txt.MainNewLineTight();
                     }
-                    if (model.loadedFromCacheFile)
+                    if (model.modelCommon.loadedFromCacheFile)
                     {
                         txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
                     }

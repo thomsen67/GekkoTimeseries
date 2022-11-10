@@ -1183,7 +1183,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
 
-                    if (model.GetModelSourceType() == EModelType.Gekko)
+                    if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                     {
                         simModeVariables.Add(s);
                     }
@@ -1277,7 +1277,7 @@ namespace Gekko
                 }
             }
 
-            if (model.GetModelSourceType() == EModelType.Gekko)
+            if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
             {
                 if (type) Program.Endo(simModeVariables);
                 else Program.Exo(simModeVariables);
@@ -1931,7 +1931,7 @@ namespace Gekko
         public static void Unfix()
         {
             Gekko.Model model = Program.model;
-            if (model.GetModelSourceType() == EModelType.GAMSRaw || model.GetModelSourceType() == EModelType.GAMSScalar)
+            if (model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw || model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");

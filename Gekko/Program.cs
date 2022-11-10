@@ -2703,7 +2703,7 @@ namespace Gekko
                 else mm[i] = new ModelNull();
             }
 
-            mm[6] = model;
+            mm[6] = model.modelCommon;  //can never be null
             if (model.modelGams != null) mm[7] = model.modelGams;
             if (model.modelGekko != null) mm[8] = model.modelGekko;
 
@@ -2738,7 +2738,7 @@ namespace Gekko
             }
 
             model.modelGamsScalar = mm[0] as ModelGamsScalar; //becomes = null if ModelNull object
-            Model modelTemp = mm[k + 1] as Model;  //used for .type only
+            model.modelCommon = mm[k + 1] as ModelCommon;  //used for .type only
             model.modelGams = mm[k + 2] as ModelGams; //becomes = null if ModelNull object            
             model.modelGekko = mm[k + 3] as ModelGekko; //becomes = null if ModelNull object              
 
@@ -2747,7 +2747,6 @@ namespace Gekko
             if (model.modelGamsScalar != null) model.modelGamsScalar.parent = model;
             if (model.modelGams != null) model.modelGams.parent = model;
             if (model.modelGekko != null) model.modelGekko.parent = model;
-            model.SetModelSourceType(modelTemp.GetModelSourceType()); //#lkja90adsfkj
 
             return model;
         }
@@ -2881,9 +2880,9 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Reads model protobuf files in parallel.
+        /// Reads model protobuf files in parallel. Will return null if there is nothing found in cache.
         /// </summary>
-        public static Model ReadParallelModel(string hash)
+        public static Model ReadParallelModelMaybe(string hash)
         {
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -2922,13 +2921,12 @@ namespace Gekko
                 {
                     //See https://github.com/protobuf-net/protobuf-net/issues/668
                     //About double speed on TT pc, compared to no parallel  
-                    int i = (int)index;
-                    string fileName2 = files[i];
-
+                    int i = (int)index;                    
                     object o = null;
-                    if (i <= Program.options.system_threads) o = ProtobufRead<ModelGamsScalar>(fileName2);
-                    else if (i == Program.options.system_threads + 1) o = ProtobufRead<ModelGams>(fileName2);
-                    else if (i == Program.options.system_threads + 2) o = ProtobufRead<ModelGekko>(fileName2);
+                    if (i <= Program.options.system_threads) o = ProtobufRead<ModelGamsScalar>(files[i]);
+                    else if (i == Program.options.system_threads + 1) o = ProtobufRead<ModelCommon>(files[i]);
+                    else if (i == Program.options.system_threads + 2) o = ProtobufRead<ModelGams>(files[i]);
+                    else if (i == Program.options.system_threads + 3) o = ProtobufRead<ModelGekko>(files[i]);
                     lists[i] = o;
                     return 0;
                 }, _ => { });
@@ -14225,7 +14223,7 @@ namespace Gekko
                         bank = ts.GetParentDatabank().name;
                     }
 
-                    if (Program.model.GetModelSourceType() == EModelType.GAMSRaw || Program.model.GetModelSourceType() == EModelType.GAMSScalar)
+                    if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw || Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                     {
                         DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
                     }
@@ -16634,23 +16632,23 @@ namespace Gekko
                     //TODO 
                     double hashMs = 0d;
                     DateTime t0 = DateTime.Now;
-                    Model modelTemp = Program.ReadParallelModel(modelHash);                    
+                    Model modelTemp = Program.ReadParallelModelMaybe(modelHash);                    
 
                     if (modelTemp == null)
                     {
                         //model.modelGamsScalar = new ModelGamsScalar(model);
-                        model.loadedFromCacheFile = false;
+                        model.modelCommon.loadedFromCacheFile = false;
                     }
                     else
                     {
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
                         DateTime t1 = DateTime.Now;
-                        if (model.GetModelSourceType() == EModelType.GAMSScalar)
+                        if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                         {
                             GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
                         }
-                        else if (model.GetModelSourceType() == EModelType.Gekko)
+                        else if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                         {
                             GetListsFromModelListHelper();
                             //=============================================
@@ -16659,7 +16657,7 @@ namespace Gekko
                             //=============================================                                                        
                             model.modelGekko.modelInfo.fileName = ffh.prettyPathAndFileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                         }
-                        model.loadedFromCacheFile = true;
+                        model.modelCommon.loadedFromCacheFile = true;
                         //timeCompile = "compile: " + G.Seconds(t1);
                     }
                 }
@@ -16672,16 +16670,16 @@ namespace Gekko
                     else
                     {
                         //do nothing, we then have to parse the file
-                        model.loadedFromCacheFile = false;
+                        model.modelCommon.loadedFromCacheFile = false;
                     }
                 }
             }
             else
             {
-                model.loadedFromCacheFile = false;
+                model.modelCommon.loadedFromCacheFile = false;
             }
 
-            if (model.loadedFromCacheFile)
+            if (model.modelCommon.loadedFromCacheFile)
             {
                 //no writing of .mdl file of course                
             }
@@ -16713,7 +16711,7 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
-                    if (model.GetModelSourceType() == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
+                    if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
                     //TODO
                     //TODO what about last argument ms?
                     //TODO
@@ -16754,7 +16752,7 @@ namespace Gekko
             Model model = new Model();
             Program.model = model;
 
-            model.SetModelSourceType(EModelType.Gekko);
+            model.modelCommon.SetModelSourceType(EModelType.Gekko);
             //TODO: keep the old version, so model command can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
             modelGekko.modelInfo = new ModelInfo(modelGekko);
