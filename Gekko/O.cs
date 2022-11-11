@@ -8047,7 +8047,7 @@ namespace Gekko
 
             //--- extra ---
 
-            public GekkoTime t0 = GekkoTime.tNull;  //selected time            
+            public GekkoTime tSelected = GekkoTime.tNull;  //selected time            
             //public string rv = null; //return value
             public DecompFind decompFind = null;  //from a DECOMP window            
 

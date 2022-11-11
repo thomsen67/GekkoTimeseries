@@ -38,7 +38,7 @@ namespace Gekko
             this.decompFind = o.decompFind;
 
             //HACKY:
-            if (this.decompFind.decompOptions2.t0.IsNull()) this.decompFind.decompOptions2.t0 = o.t0;
+            if (this.decompFind.decompOptions2.t0.IsNull()) this.decompFind.decompOptions2.t0 = o.tSelected;
             if (this.decompFind.decompOptions2.t1.IsNull()) this.decompFind.decompOptions2.t1 = o.t1;
             if (this.decompFind.decompOptions2.t2.IsNull()) this.decompFind.decompOptions2.t2 = o.t2;
             this.decompFind.decompOptions2.iv = o.iv;

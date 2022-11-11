@@ -4249,7 +4249,7 @@ namespace Gekko
 
                 Globals.itemHandler = new ItemHandler();  //hack
 
-                o.t0 = o.decompFind.decompOptions2.t1;  //selected time
+                o.tSelected = o.decompFind.decompOptions2.t1;  //selected time
                 List<string> vars = O.Restrict(o.iv, false, false, false, true);
 
                 if (o.iv2 != null)
@@ -4259,7 +4259,15 @@ namespace Gekko
                     return;
                 }
 
-                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.t0);
+                int timeIndex = 0;  //for 
+                if (modelGamsScalar.is2000Model)
+                {
+                    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
+                }
+                else
+                {
+                    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.tSelected);
+                }
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
                 if (aNumber == -12345)
@@ -4287,7 +4295,15 @@ namespace Gekko
                 foreach (int eqNumber in eqNumbers)
                 {
                     string eqName = modelGamsScalar.GetEqName(eqNumber);
-                    string eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.t0, false);
+                    string eqNameWithLag = null;
+                    if (modelGamsScalar.is2000Model)
+                    {
+                        eqNameWithLag = G.Chop_DimensionSetLag(eqName, new GekkoTime(EFreq.A, Globals.decomp2000, 1), false);
+                    }
+                    else
+                    {
+                        eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.tSelected, false);
+                    }
                     EqHelper e = new EqHelper();
                     e.eqName = eqName;
                     e.eqNameWithLag = eqNameWithLag;
@@ -4300,20 +4316,27 @@ namespace Gekko
                 List<EqHelper> eqsNew2 = new List<EqHelper>();
                 string s = vars[0];
                 string s2 = G.Chop_RemoveIndex(s);
+
                 List<ModelGamsEquation> foldedEquations = null;
                 //foldedEquations 
                 //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
-                model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+                if (model.modelGekko != null)
+                {
+                    ModelGamsEquation e = null;
+                    int eqNumber = model.modelGamsScalar.dict_FromEqNameToEqNumber.Get("e_fy[2000]");
+                    // -------> do something so e_fy is first
+                }
+                else if (model.modelGams != null)
+                {
+                    model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
+                }
                 if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
 
                 // For instance, when doing FIND vtBund in MAKRO model, we have these:
                 // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
                 // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
                 // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.
-                //
-                // TODO: 
-                //
-                //
+                                
 
                 foreach (EqHelper scalarEquation in scalarEquations)
                 {
@@ -4347,7 +4370,7 @@ namespace Gekko
                     string eqName = helper.eqName;
                     string eqName3 = helper.eqNameWithLag;
 
-                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+                    List<string> precedents = modelGamsScalar.GetPrecedentsNames(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.tSelected);
 
                     string bool1 = "";
                     string bool2 = "";
@@ -4372,7 +4395,7 @@ namespace Gekko
 
                     if (firstText == null)
                     {
-                        string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.t0);
+                        string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.tSelected);
                         firstText = equationText;
                         firstEqName = eqName;
                         firstList.AddRange(precedents);
@@ -4385,7 +4408,7 @@ namespace Gekko
                 windowFind.EquationBrowserSetLabel(variableName);
                 windowFind._activeEquation = firstEqName;
                 windowFind._activeVariable = null;
-                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.t0, model);
+                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.tSelected, model);
                 windowFind.decompFind.SetWindow(windowFind);
                 windowFind.ShowDialog();
                 return;

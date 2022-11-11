@@ -32210,7 +32210,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload.
+        /// Overload, removes blanks from input string.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
