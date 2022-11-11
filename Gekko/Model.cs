@@ -793,7 +793,9 @@ namespace Gekko
                 }
                 else
                 {
-                    name2 = G.Chop_DimensionAddLag(tup.Item1, t0, tup.Item2, false);
+                    GekkoTime tTemp = t0;
+                    if (this.is2000Model) tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
+                    name2 = G.Chop_DimensionAddLag(tup.Item1, tTemp, tup.Item2, false);
                 }
                 precedents.Add(name2);
             }

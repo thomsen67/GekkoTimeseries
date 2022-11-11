@@ -14582,16 +14582,20 @@ namespace Gekko
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
-        public static bool HasGamsEquation(string var)
+        public static bool HasGamsEquation(string var, Model model)
         {
             if (var == null) return false;
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO
-            if (G.GetModelSourceType() == EModelType.GAMSScalar) return true;
             return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
+        }
+
+        /// <summary>
+        /// Overload, global model.
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
+        public static bool HasGamsEquation(string var)
+        {
+            return HasGamsEquation(var, Program.model);
         }
 
         /// <summary>
@@ -14640,9 +14644,9 @@ namespace Gekko
                 }
                 G.Writeln();
             }
-            
+
             List<ModelGamsEquation> eqs = GamsModel.GetGamsEquationsByVarname(varnameWithoutFreqAndIndex, model);
-            
+
             if (G.IsUnitTesting())
             {
                 Globals.unitTestDependents = new List<string>();

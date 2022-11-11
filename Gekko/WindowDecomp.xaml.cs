@@ -1077,14 +1077,22 @@ namespace Gekko
                     {
                         if (!Program.IsDecompResidualName(v))
                         {
-                            if (decompFind.model.DecompType() == EModelType.GAMSRaw || decompFind.model.DecompType() == EModelType.GAMSScalar)
+                            if (decompFind.model.DecompType() == EModelType.GAMSScalar)
+                            {
+                                isEndogenous = true;
+                            }
+                            else if (decompFind.model.DecompType() == EModelType.GAMSRaw)
                             {
                                 if (Program.HasGamsEquation(v)) isEndogenous = true;
                             }
-                            else
+                            if (decompFind.model.DecompType() == EModelType.Gekko)
                             {
                                 EEndoOrExo e = Program.VariableTypeEndoExo(v);
                                 isEndogenous = e == EEndoOrExo.Endo;
+                            }
+                            else
+                            {
+                                //strange...
                             }
                         }
                     }
@@ -1755,7 +1763,6 @@ namespace Gekko
                 s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
             }
             this.equation.Text = s;
-            //this.code.contText = this.decompFind.decompOptions2.code + Program.SetBlanks();  //blanks hack, also used elsewhere
             RichSetText(this.code, this.decompFind.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
             this.decompFind.decompOptions2.guiDecompValues = table;
