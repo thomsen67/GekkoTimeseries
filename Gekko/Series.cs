@@ -905,7 +905,6 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #2");
-                //throw new GekkoException();
             }
             this.SetDirty(true); //we have to mark dirty manually
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);

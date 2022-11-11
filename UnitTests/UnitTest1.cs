@@ -11147,6 +11147,17 @@ namespace UnitTests
             I("y <2000 2003> = 500, 504, 536, 540;");
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
+                        
+            I("find <2002 2002> y;");            
+            Assert.AreEqual(Globals.itemHandler.Items[0].Name, "e1");
+            Assert.AreEqual(Globals.itemHandler.Items[0].Dep, Globals.protectSymbol);
+            Assert.AreEqual(Globals.itemHandler.Items[0].Vars, "y, c, g");
+            Assert.AreEqual(Globals.itemHandler.Items[1].Name, "e2[-1]");
+            Assert.AreEqual(Globals.itemHandler.Items[1].Dep, "");
+            Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-2], y[-1], y, c[-1]");
+            Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2");
+            Assert.AreEqual(Globals.itemHandler.Items[2].Dep, "");
+            Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-1], y, y[+1], c");
 
             Gekko.Table table = null;                       
 
@@ -11429,21 +11440,10 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_DecompSimul5()
-        {
-            // CHEATING
-            // CHEATING
-            // CHEATING
-            // CHEATING we only run f < 1, not f < 2 (to save time)
-            // CHEATING
-            // CHEATING
-            // CHEATING
-            // CHEATING
-
-            for (int f = 0; f < 1; f++)  //0:flushed, 1:cached
+        {            
+            for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
             {
-                if (f == 0) Program.Flush();  //is probably done anyway before each test
-                //for f == 1, this probably runs ok fast because of caching
-                //and it is a good cache test.
+                if (f == 0) Program.Flush();
                 
                 //
                 // Test of big MAKRO model
@@ -11457,9 +11457,16 @@ namespace UnitTests
                 I("READ <gdx ref> makro.zip\\makro0.gdx;");
                 I("#a = seq(0, 101).strings();");
                 I("#a0100 = seq(0, 100).strings();");
-                //ModelGamsScalar.FlushAAndRArrays();
-                //modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-                //modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+
+                if (false)
+                {
+                    //fails for unknown reasons ("thread error")
+                    //perhaps memory?
+                    I("find vtBund;");
+                    List<EquationListItem> items = Globals.itemHandler.Items;
+                    EquationListItem item0 = items[0];
+                    Assert.AreEqual(items[0].Dep, Globals.protectSymbol);
+                }
 
                 Gekko.Table table = null;
 

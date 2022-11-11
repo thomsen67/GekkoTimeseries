@@ -4317,7 +4317,8 @@ namespace Gekko
                 string s = vars[0];
                 string s2 = G.Chop_RemoveIndex(s);
 
-                List<ModelGamsEquation> foldedEquations = null;
+                List<string> eqNames = new List<string>();
+                
                 //foldedEquations 
                 //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
                 if (model.modelGekko != null)
@@ -4328,21 +4329,27 @@ namespace Gekko
                 }
                 else if (model.modelGams != null)
                 {
+                    List<ModelGamsEquation> foldedEquations = null;
                     model.modelGams.equationsByVarname.TryGetValue(s2, out foldedEquations);
-                }
-                if (foldedEquations == null) foldedEquations = new List<ModelGamsEquation>();
+                    if (foldedEquations != null)
+                    {
+                        foreach (ModelGamsEquation foldedEquation in foldedEquations)
+                        {
+                            eqNames.Add(foldedEquation.nameGams);
+                        }
+                    }
+                }                
 
                 // For instance, when doing FIND vtBund in MAKRO model, we have these:
                 // - scalarEquation.eqNameWithLag = E_vtHhx_tot, E_vtKilde, E_ftBund_tot, E_vtBund_tot
                 // - foldedEquation.nameGams      = E_vtBund, E_ftBund_tot, E_vtBund_tot
-                // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.
-                                
+                // ---> this gives two hits: E_ftBund_tot and E_vtBund_tot.                                
 
                 foreach (EqHelper scalarEquation in scalarEquations)
                 {
-                    foreach (ModelGamsEquation foldedEquation in foldedEquations)
+                    foreach (string eq in eqNames)
                     {
-                        if (G.Equal(scalarEquation.eqNameWithLag, foldedEquation.nameGams))
+                        if (G.Equal(scalarEquation.eqNameWithLag, eq))
                         {
                             scalarEquation.best = true;
                         }
@@ -4391,6 +4398,8 @@ namespace Gekko
                         }
                     }
 
+                    //This is where the contents of each GUI line is set
+                    //Hack that it is a global variable...
                     Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
 
                     if (firstText == null)
@@ -4402,15 +4411,23 @@ namespace Gekko
                     }
                 }
 
-                WindowFind windowFind = new WindowFind(o);
-                windowFind.Title = variableName + " - " + "Gekko find";
-                windowFind.EquationBrowserSetButtons(firstEqName, firstList, model);
-                windowFind.EquationBrowserSetLabel(variableName);
-                windowFind._activeEquation = firstEqName;
-                windowFind._activeVariable = null;
-                windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.tSelected, model);
-                windowFind.decompFind.SetWindow(windowFind);
-                windowFind.ShowDialog();
+                if (G.IsUnitTesting())
+                {
+                    //do nothing. Unit tests can look at Globals.itemHandler.
+                }
+                else
+                {
+
+                    WindowFind windowFind = new WindowFind(o);
+                    windowFind.Title = variableName + " - " + "Gekko find";
+                    windowFind.EquationBrowserSetButtons(firstEqName, firstList, model);
+                    windowFind.EquationBrowserSetLabel(variableName);
+                    windowFind._activeEquation = firstEqName;
+                    windowFind._activeVariable = null;
+                    windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.tSelected, model);
+                    windowFind.decompFind.SetWindow(windowFind);
+                    windowFind.ShowDialog();
+                }
                 return;
             }
             catch (Exception e)
