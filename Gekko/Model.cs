@@ -156,6 +156,16 @@ namespace Gekko
                     }
                 }
             }
+            else if (model.modelGekko != null)
+            {
+                foreach (string eqName in eqNames)
+                {
+                    string s = null;
+                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(eqName.Substring(Globals.gekkoEquationPrefix.Length));
+                    if (eh != null) s = eh.equationText + G.NL;
+                    sb1.Append(s);
+                }
+            }
 
             TwoStrings two = new TwoStrings(sb1.ToString(), sb2.ToString());
 
@@ -172,7 +182,6 @@ namespace Gekko
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
             {
-                //eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].name, t0.ToString()));
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, t0.ToString(), false));
             }
             s = Model.GetEquationText(eqNames, showTime, t0, model);
@@ -204,7 +213,10 @@ namespace Gekko
                 if (i > 0) s2 += G.NL;
                 s2 += model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
-            string rv = two.s1 + G.NL + "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL + "-------------- GAMS --------------" + G.NL + G.NL + two.s2;
+            string rv = null;
+            rv += two.s1 + G.NL;
+            rv += "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL;
+            rv += "-------------- GAMS --------------" + G.NL + G.NL + two.s2 + G.NL;
             return rv;
         }
 
@@ -792,14 +804,24 @@ namespace Gekko
                     name2 = G.Chop_DimensionAddLast(tup.Item1, tup.Item2.ToString());
                 }
                 else
-                {
-                    GekkoTime tTemp = t0;
-                    if (this.is2000Model) tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
-                    name2 = G.Chop_DimensionAddLag(tup.Item1, tTemp, tup.Item2, false);
+                {                    
+                    name2 = G.Chop_DimensionAddLag(tup.Item1, this.Maybe2000GekkoTime(t0), tup.Item2, false);
                 }
                 precedents.Add(name2);
             }
             return precedents;
+        }
+
+        /// <summary>
+        /// For a 2000-model, we need to use 2000 as the period.
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <returns></returns>
+        public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
+        {
+            GekkoTime tTemp = t0;
+            if (this.is2000Model) tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
+            return tTemp;
         }
 
         /// <summary>
@@ -1185,8 +1207,11 @@ namespace Gekko
             int i = this.dict_FromEqNameToEqNumber.Get(name);            
             if (i == -12345)
             {
-                return "...scalar equation '" + name + "' could not be found...";
+                return "...equation '" + name + "' could not be found...";
             }
+            //
+            What about Maybe2000GekkoTime(), and maybe merge the called method into this.
+            //
             return this.GetEquationTextUnfolded(i, showTime, t0);
         }
 
@@ -1203,10 +1228,11 @@ namespace Gekko
         {
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
+
             int ii = this.ee[eq];
             string ss = this.csCodeLines[ii];
             StringBuilder sb = new StringBuilder();
-            int more = 15;
+            int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
                         
             for (int i = tokens.Count() - more - 1; i >= 1; i--)
@@ -1249,24 +1275,24 @@ namespace Gekko
                     tokens[i].leftblanks = 1;
                     tokens[i + 1].leftblanks = 1;
                 }
-
-                if (tokens[i].s == "a" && tokens[i + 1].s == "[" && tokens[i + 2].s == "b" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]" && tokens[i + 7].s == "[" && tokens[i + 8].s == "b" && tokens[i + 9].s == "[" && tokens[i + 11].s == "]" && tokens[i + 12].s == "]")
+                
+                if (tokens[i].s == "a" && tokens[i + 1].s == "[" && tokens[i + 2].s == "b" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "+" && tokens[i + 7].s == "t" && tokens[i + 8].s == "]" && tokens[i + 9].s == "[" && tokens[i + 10].s == "b" && tokens[i + 11].s == "[" && tokens[i + 13].s == "]" && tokens[i + 14].s == "]")
                 {
                     int i1 = this.bb[eq][int.Parse(tokens[i + 4].s)];
-                    int i2 = this.bb[eq][int.Parse(tokens[i + 10].s)];
+                    int i2 = this.bb[eq][int.Parse(tokens[i + 12].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
                     string varname = this.GetVarNameA(i2);
                     string varname2 = null;
                     if (showTime)
                     {
-                        varname2 = G.Chop_DimensionAddLast( varname, gt.ToString());
+                        varname2 = G.Chop_DimensionAddLast(varname, gt.ToString());
                     }
                     else
                     {
-                        varname2 = G.Chop_DimensionAddLag(varname, t0, gt, false);
+                        varname2 = G.Chop_DimensionAddLag(varname, this.Maybe2000GekkoTime(t0), gt, false);
                     }
                     sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
-                    i += 12;
+                    i += 14;
                 }
                 else if (tokens[i].s == "c" && tokens[i + 1].s == "[" && tokens[i + 2].s == "d" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]")
                 {

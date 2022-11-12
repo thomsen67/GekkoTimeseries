@@ -3876,6 +3876,10 @@ namespace Gekko
         /// <param name="rest"></param>
         public static void ChopIndexer(string s, out string name, out string rest)
         {
+            if (s == null)
+            {
+
+            }
             name = s.Trim();
             string[] ss = s.Split('[');
             rest = null;

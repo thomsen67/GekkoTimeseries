@@ -515,6 +515,7 @@ namespace Gekko
         public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
         public static string decompResidualColor = "LightYellow";
         public static string decompErrorColor = "LightRed";
+        public const string gekkoEquationPrefix = "e_";
 
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 

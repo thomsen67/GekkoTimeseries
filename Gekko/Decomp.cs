@@ -4279,7 +4279,6 @@ namespace Gekko
 
                 string firstText = null;
                 List<string> firstList = new List<string>();
-                string firstEqName = null;
 
                 int lineCounter = -1;
                 int counter2 = 0;
@@ -4400,15 +4399,7 @@ namespace Gekko
 
                     //This is where the contents of each GUI line is set
                     //Hack that it is a global variable...
-                    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));
-
-                    if (firstText == null)
-                    {
-                        string equationText = modelGamsScalar.GetEquationTextUnfolded(helper.eqNumber, o.decompFind.decompOptions2.showTime, o.tSelected);
-                        firstText = equationText;
-                        firstEqName = eqName;
-                        firstList.AddRange(precedents);
-                    }
+                    Globals.itemHandler.Add(new EquationListItem(eqName3, " " /*counter2 + " of " + 17*/ , bool1, bool2, tt, Stringlist.GetListWithCommas(precedents, true), "Black", textColor, lineCounter == selectedRow, eqName));                                        
                 }
 
                 if (G.IsUnitTesting())
@@ -4417,14 +4408,14 @@ namespace Gekko
                 }
                 else
                 {
-
+                    string firstEqName2 = eqsNew[0].eqName;
                     WindowFind windowFind = new WindowFind(o);
                     windowFind.Title = variableName + " - " + "Gekko find";
-                    windowFind.EquationBrowserSetButtons(firstEqName, firstList, model);
-                    windowFind.EquationBrowserSetLabel(variableName);
-                    windowFind._activeEquation = firstEqName;
+                    windowFind.FindSetButtons(firstEqName2, firstList, model);
+                    windowFind.FindSetLabel(variableName);
+                    windowFind._activeEquation = firstEqName2;
                     windowFind._activeVariable = null;
-                    windowFind.EquationBrowserSetEquation(firstEqName, o.decompFind.decompOptions2.showTime, o.tSelected, model);
+                    windowFind.FindSetEquation(firstEqName2, o.decompFind.decompOptions2.showTime, o.tSelected, model);
                     windowFind.decompFind.SetWindow(windowFind);
                     windowFind.ShowDialog();
                 }

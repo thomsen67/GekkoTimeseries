@@ -174,8 +174,7 @@ namespace Gekko
     }
 
     public class DecompFind
-    {
-        private GekkoTime t0 = GekkoTime.tNull;  //for FIND?
+    {        
         public int depth = 0;
         public EDecompFindNavigation type = EDecompFindNavigation.Unknown;
         public DecompOptions2 decompOptions2 = null;
@@ -16795,7 +16794,7 @@ namespace Gekko
                         {
                             n++;
                             equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
-                            dictionaryEqs.Add("  e" + (n + 1) + "  " + "e_" + eh.lhs + "(" + t0 + ")");
+                            dictionaryEqs.Add("  e" + (n + 1) + "  " + Globals.gekkoEquationPrefix + eh.lhs + "(" + t0 + ")");
                         }
                         equations.Add("* set non-default bounds");
                         equations.Add("Model m / all /;");

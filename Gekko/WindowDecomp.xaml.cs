@@ -1752,11 +1752,8 @@ namespace Gekko
 
             string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
-            {
-                if (!decompFind.model.modelGamsScalar.is2000Model)
-                {
-                    s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);
-                }
+            {                
+                s = Model.GetEquationTextHelper(this.decompFind.decompOptions2.link, this.decompFind.decompOptions2.showTime, this.decompFind.decompOptions2.t1, model);                
             }
             else
             {
@@ -2496,8 +2493,7 @@ namespace Gekko
         //--------------------------------------------------------------- 
                 
         public List iv = null;
-        public GekkoTime t0 = GekkoTime.tNull;        
-        //public EModelType modelType = EModelType.Unknown;        
+        public GekkoTime tSelected = GekkoTime.tNull;
         public bool showTime = false;
         public Rich code = null;
         public bool ageHierarchy = false;        
