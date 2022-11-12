@@ -1368,13 +1368,13 @@ namespace Gekko
         [ProtoMember(10)]
         public string csCodeRhsLongVersion = "";
         [ProtoMember(11)]
-        public string csCodeRhsHumanVersion = "";
+        public string codeRhsHumanVersion = "";
         [ProtoMember(12)]
         public string csCodeLhsGauss = "";
         [ProtoMember(13)]
         public string csCodeLhsJacobi = "";
         [ProtoMember(14)]
-        public string csCodeLhsHuman = "";
+        public string codeLhsHumanVersion = "";
         [ProtoMember(15)]
         public int bNumberLhs = -12345;
         [ProtoMember(16)]
@@ -14445,15 +14445,10 @@ namespace Gekko
                 }
 
                 G.Writeln("------------------------------------------------------------------------------------------");
-                string rhs = found.csCodeRhsHumanVersion;
-                rhs = rhs.Replace("\r\n", "");
-                //rhs = rhs.Replace("[", "(");
-                //rhs = rhs.Replace("]", ")");
-                rhs = rhs.Replace("[0]", "");
-
+                
                 if (showDetailed)
                 {
-                    G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
+                    G.Writeln(Program.GetHumanReadableDetailedEquation(found) + ";");
                 }
                 else
                 {
@@ -14461,6 +14456,21 @@ namespace Gekko
                     G.Writeln();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets an equation like "phk = exp(phk[-1]) * (...) * (1 + JRphk)", with functions like dlog() etc. resolved.
+        /// This code is produced by the .frm parser, but in contrast to the equations used by C#, there
+        /// are no (or few) superfluous parentheses. These are set intelligently while parsing, but for 
+        /// computer C# use, a lot of parentheses are kept for safety. So worst case, the equations produced
+        /// here may be wrong, but the logic is probably ok.
+        /// Output does not end with a ";".
+        /// </summary>
+        /// <param name="eh"></param>
+        /// <returns></returns>
+        public static string GetHumanReadableDetailedEquation(EquationHelper eh)
+        {
+            return eh.codeLhsHumanVersion.Trim().Replace("[0]", "") + " = " + eh.codeRhsHumanVersion.Trim().Replace("[0]", "");
         }
 
         /// <summary>
@@ -16775,65 +16785,8 @@ namespace Gekko
                 //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
                 //  takes some time. It also writes out actual C# code to be used later on when compiling.
                 Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
-
-                if (true)
-                {
-                    List<string> equations = new List<string>();
-                    List<string> dictionary = new List<string>();
-
-                    for (int t0 = 2000; t0 <= 2000; t0++)
-                    {   
-                        List<string> dictionaryNames = new List<string>();  //0-based
-                        for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
-                        List<string> dictionaryEqs = new List<string>();  //0-based
-
-                        equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
-                        equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
-                        int n = -1;
-                        foreach (EquationHelper eh in Program.model.modelGekko.equations)
-                        {
-                            n++;
-                            equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
-                            dictionaryEqs.Add("  e" + (n + 1) + "  " + Globals.gekkoEquationPrefix + eh.lhs + "(" + t0 + ")");
-                        }
-                        equations.Add("* set non-default bounds");
-                        equations.Add("Model m / all /;");
-
-                        n = -1;
-                        foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
-                        {
-                            n++;
-                            string s = kvp.Key;
-                            string variable = null; int lag = 0;
-                            G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
-                            dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0 + lag) + ")";
-                        }
-
-                        dictionary.Add("Equation counts " + dictionaryEqs.Count);
-                        dictionary.Add("");
-                        dictionary.Add("Variable counts " + dictionaryNames.Count);
-                        dictionary.Add("");
-                        dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
-                        dictionary.AddRange(dictionaryEqs);
-                        dictionary.Add("");
-                        dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
-                        dictionary.AddRange(dictionaryNames);
-                        dictionary.Add("");
-                    }
-                    string e = Stringlist.ExtractTextFromLines(equations).ToString();
-                    string d = Stringlist.ExtractTextFromLines(dictionary).ToString();
-
-                    //Program.model = new Model();                    
-                    GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
-                    settings.scalarMemoryModelProducedByGekko = true;
-
-                    settings.equations = equations;
-                    settings.dictionary = dictionary;
-
-                    Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
-                    model.modelGamsScalar = modelTemp.modelGamsScalar;
-                    model.modelGamsScalar.is2000Model = true;
-                }
+                
+                WriteGamsScalarModel(model);                
 
                 Program.GuiSetModelName();
                 if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
@@ -16863,6 +16816,71 @@ namespace Gekko
             model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
             model.modelGekko.modelInfo.Print();            
+        }
+
+        /// <summary>
+        /// Write a scalar-2000 model suitable for DECOMP. Input is a Gekko model.        
+        /// </summary>
+        /// <param name="model"></param>
+        private static void WriteGamsScalarModel(Model model)
+        {
+            /// See #jseds78hsd33.
+            List<string> equations = new List<string>();
+            List<string> dictionary = new List<string>();
+
+            for (int t0 = Globals.decomp2000; t0 <= Globals.decomp2000; t0++)
+            {
+                List<string> dictionaryNames = new List<string>();  //0-based
+                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
+                List<string> dictionaryEqs = new List<string>();  //0-based
+
+                equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
+                equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
+                
+                int n = -1;
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
+                {
+                    n++;
+                    equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
+                    dictionaryEqs.Add("  e" + (n + 1) + "  " + Globals.gekkoEquationPrefix + eh.lhs + "(" + t0 + ")");
+                }
+                equations.Add("* set non-default bounds");
+                equations.Add("Model m / all /;");
+
+                n = -1;
+                foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
+                {
+                    n++;
+                    string s = kvp.Key;
+                    string variable = null; int lag = 0;
+                    G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
+                    dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0 + lag) + ")";
+                }
+
+                dictionary.Add("Equation counts " + dictionaryEqs.Count);
+                dictionary.Add("");
+                dictionary.Add("Variable counts " + dictionaryNames.Count);
+                dictionary.Add("");
+                dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
+                dictionary.AddRange(dictionaryEqs);
+                dictionary.Add("");
+                dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
+                dictionary.AddRange(dictionaryNames);
+                dictionary.Add("");
+            }
+            string e = Stringlist.ExtractTextFromLines(equations).ToString();
+            string d = Stringlist.ExtractTextFromLines(dictionary).ToString();
+
+            //Program.model = new Model();                    
+            GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
+            settings.scalarMemoryModelProducedByGekko = true;
+
+            settings.equations = equations;
+            settings.dictionary = dictionary;
+
+            Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
+            model.modelGamsScalar = modelTemp.modelGamsScalar;
+            model.modelGamsScalar.is2000Model = true;
         }
 
         /// <summary>

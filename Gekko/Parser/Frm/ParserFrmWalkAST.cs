@@ -47,11 +47,11 @@ namespace Gekko.Parser.Frm
                 //TODO: could be nice to also have it human readable, by calling PrintVariable...() with humanReadable=true
                 eh.csCodeRhs = wh2.rightHandSideCsCode.shortVersion.ToString();
                 eh.csCodeRhsLongVersion = wh2.rightHandSideCsCode.longVersion.ToString();
-                eh.csCodeRhsHumanVersion = wh2.rightHandSideCsCode.humanVersion.ToString();
+                eh.codeRhsHumanVersion = wh2.rightHandSideCsCode.humanVersion.ToString();
 
                 eh.csCodeLhsGauss = wh2.leftHandSideCsCodeGauss.ToString();
                 eh.csCodeLhsJacobi = wh2.leftHandSideCsCodeJacobi.ToString();
-                eh.csCodeLhsHuman = wh2.leftHandSideHumanReadable.ToString();
+                eh.codeLhsHumanVersion = wh2.leftHandSideHumanReadable.ToString();
                 eh.bNumberLhs = wh2.leftHandSideBNumber;
 
                 eh.scalar_csCodeLhs = wh2.scalar_leftHandSideA.ToString();
@@ -257,7 +257,7 @@ namespace Gekko.Parser.Frm
                             }
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("O.Log(", EEmitType.computerReadable);
-                            wh2.rightHandSideCsCode.Append("Log(", EEmitType.humanReadable);
+                            wh2.rightHandSideCsCode.Append("log(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
                         else if (G.Equal(function, "exp"))
@@ -268,7 +268,7 @@ namespace Gekko.Parser.Frm
                             }
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("O.Exp(", EEmitType.computerReadable);
-                            wh2.rightHandSideCsCode.Append("Exp(", EEmitType.humanReadable);
+                            wh2.rightHandSideCsCode.Append("exp(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
                         else if (G.Equal(function, "abs"))
@@ -279,7 +279,7 @@ namespace Gekko.Parser.Frm
                             }
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("O.Abs(", EEmitType.computerReadable);
-                            wh2.rightHandSideCsCode.Append("Abs(", EEmitType.humanReadable);
+                            wh2.rightHandSideCsCode.Append("abs(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
                         else if (G.Equal(function, "min"))
@@ -290,7 +290,7 @@ namespace Gekko.Parser.Frm
                             }
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("O.Min(", EEmitType.computerReadable);
-                            wh2.rightHandSideCsCode.Append("Min(", EEmitType.humanReadable);
+                            wh2.rightHandSideCsCode.Append("min(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
                         else if (G.Equal(function, "max"))
@@ -301,7 +301,7 @@ namespace Gekko.Parser.Frm
                             }
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("O.Max(", EEmitType.computerReadable);
-                            wh2.rightHandSideCsCode.Append("Max(", EEmitType.humanReadable);
+                            wh2.rightHandSideCsCode.Append("max(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
                         else if (G.Equal(function, "dlog") || G.Equal(function, "dlogy"))
@@ -1584,7 +1584,7 @@ namespace Gekko.Parser.Frm
         private static void HandlePowFunction(EquationHelper eh, ASTNodeSimple equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel, bool function)
         {
             wh2.rightHandSideCsCode.Append("O.Pow(", EEmitType.computerReadable);
-            wh2.rightHandSideCsCode.Append("Pow(", EEmitType.humanReadable);
+            wh2.rightHandSideCsCode.Append("pow(", EEmitType.humanReadable);
             int start = 0;
             int end = 1;
             if (function)

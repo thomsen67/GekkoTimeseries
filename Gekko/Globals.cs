@@ -879,6 +879,13 @@ namespace Gekko
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
+        //maybe use red...  blue, red, green, darkyelloworange?
+        public static System.Windows.Media.Color RainbowParenthesis1 = System.Windows.Media.Color.FromArgb(255, 129, 165, 239);
+        public static System.Windows.Media.Color RainbowParenthesis2 = System.Windows.Media.Color.FromArgb(255, 255, 175, 52);
+        public static System.Windows.Media.Color RainbowParenthesis3 = System.Windows.Media.Color.FromArgb(255, 92, 145, 47);
+        public static System.Windows.Media.Color RainbowParenthesis4 = System.Windows.Media.Color.FromArgb(255, 223, 132, 162);
+        public static System.Windows.Media.Color RainbowLag = System.Windows.Media.Color.FromArgb(255, 88, 88, 88);
+        public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);
 
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static int decompFontSize = 13;

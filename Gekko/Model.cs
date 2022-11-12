@@ -127,22 +127,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This gets folded equations from GAMS code scalar model. See also how to get unfolded equations: #jseds78hsd33.
+        /// This gets folded equations from GAMS code scalar model.
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
-        public static TwoStrings GetEquationTextFoldedScalar(List<string>eqNames, Model model)
+        public TwoStrings GetEquationTextFoldedScalar(List<string>eqNames)
         {
+            //See also how to get unfolded equations: #jseds78hsd33.
             string rv = "";
             StringBuilder sb1 = new StringBuilder();
             StringBuilder sb2 = new StringBuilder();
-            if (model.modelGams != null)
+            if (this.modelGams != null)
             {
                 int i = -1;
                 foreach (string eqName in eqNames)
                 {
                     i++;
-                    List<ModelGamsEquation> temp = null; model.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
+                    List<ModelGamsEquation> temp = null; this.modelGams.equationsByEqname.TryGetValue(eqName, out temp);
                     if (temp == null) continue;
                     foreach (ModelGamsEquation eq in temp)
                     {
@@ -156,21 +157,24 @@ namespace Gekko
                     }
                 }
             }
-            else if (model.modelGekko != null)
+            else if (this.modelGekko != null)
             {
                 foreach (string eqName in eqNames)
                 {
-                    string s = null;
+                    string s1 = null;
                     EquationHelper eh = Program.FindEquationByMeansOfVariableName(eqName.Substring(Globals.gekkoEquationPrefix.Length));
-                    if (eh != null) s = eh.equationText + G.NL;
-                    sb1.Append(s);
+                    if (eh != null) s1 = eh.equationText + G.NL;
+                    sb1.Append(s1);
+                    string s2 = null;
+                    if (eh != null) s2 = Program.GetHumanReadableDetailedEquation(eh) + ";" + G.NL;
+                    sb2.Append(s2);
                 }
             }
 
             TwoStrings two = new TwoStrings(sb1.ToString(), sb2.ToString());
 
             return two;
-        }
+        }        
 
         /// <summary>
         /// Helper, for the DECOMP window not the FIND window.
@@ -205,7 +209,7 @@ namespace Gekko
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, this);
+            TwoStrings two = this.GetEquationTextFoldedScalar(eqs2);
 
             string s2 = null;
             int i = -1;
@@ -216,19 +220,29 @@ namespace Gekko
                 s2 += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
             string rv = null;
-            rv += two.s1 + G.NL;
-            rv += "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL;
-            rv += "-------------- GAMS --------------" + G.NL + G.NL + two.s2 + G.NL;
+            if (this.modelGams != null)
+            {
+                rv += two.s1 + G.NL;
+                rv += "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL;
+                rv += "-------------- GAMS --------------" + G.NL + G.NL + two.s2 + G.NL;
+            }
+            else if (this.modelGekko != null)
+            {
+                rv += two.s1 + G.NL;
+                rv += "------------- detailed -------------" + G.NL + G.NL + two.s2 + G.NL;
+                if (false && Globals.runningOnTTComputer) rv += "------------- TTH: detailed2 -------------" + G.NL + G.NL + s2 + G.NL;
+            }
             return rv;
         }
 
         /// <summary>
-        /// This gets folded equations from GAMS code nonscalar model. See also how to get unfolded equations: #jseds78hsd33.
+        /// This gets folded equations from GAMS code nonscalar model.
         /// </summary>
         /// <param name="decompOptions"></param>
         /// <returns></returns>
         public static string GetEquationTextFoldedNonScalar(EModelType modelType, List<Link> links)
         {
+            //See also how to get unfolded equations: #jseds78hsd33.
             string rv = "";
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
@@ -1203,15 +1217,24 @@ namespace Gekko
         /// Uses equationChunks list, which is only about 1% of full scalar model size.
         /// The result uses the C# code (modified a bit), where stuff like a[b[0]][b[1]] and
         /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full scalar model in human-readable form (up to 1 mio eqs),
-        /// a lot of RAM is saved. See also folded equations: #jseds78hsd33.
-        /// See #jseds78hsd33.
+        /// a lot of RAM is saved.
         /// </summary>
         /// <param name="eq"></param>
         /// <returns></returns>
         public string GetEquationTextUnfolded(string name, bool showTime, GekkoTime t0)
         {
+            //See also #jseds78hsd33.
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
+
+            // --------------- NOTE ----------------------
+            // with .is2000Model, this CAN actually produce
+            // resonable "frn" kind of equation syntax.
+            // But it will suffer from parentheses, so better
+            // to use the "human" code produced by the .frm
+            // model parser, which is designed to avoid the
+            // superfluous parentheses.
+            // -------------------------------------------
 
             int eq = this.dict_FromEqNameToEqNumber.Get(name);
             if (eq == -12345)
@@ -1227,30 +1250,62 @@ namespace Gekko
             StringBuilder sb = new StringBuilder();
             int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
-                        
-            for (int i = tokens.Count() - more - 1; i >= 1; i--)
+
+            if (this.is2000Model)
             {
-                //handle translation of "-y + x1 =E 2" into "-y + x1 - (0)", where () represents RHS
-                //which is always constant  
-                if (tokens[i].s == ";" && tokens[i - 1].s == ")")
+                //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
+
+                for (int i = 0; i < tokens.Count() - more - 1; i++)
                 {
-                    tokens[i].s = "";
-                    tokens[i - 1].s = "";
-                    for (int j = i - 1; j >= 1; j--)
+                    //remove last (;
+                    if (tokens[i].s == ")" && tokens[i + 1].s == ";")
                     {
-                        if (tokens[j].s == "(" && tokens[j - 1].s == "-")
+                        tokens[i].s = "";
+                        tokens[i + 1].s = "";
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < tokens.Count() - more - 1; i++)
+                {
+                    //find first "-("
+                    if (tokens[i].s == "-" && tokens[i + 1].s == "(")
+                    {
+                        tokens[i].s = "";
+                        tokens[i + 1].s = "=";
+                        tokens[i + 1].leftblanks = 1;
+                        tokens[i + 2].leftblanks = 1;
+                        goto Lbl1a;
+                    }
+                }
+            Lbl1a:;
+            }
+            else
+            {
+                //look backwards to find first "-("
+                for (int i = tokens.Count() - more - 1; i >= 1; i--)
+                {
+                    //handle translation of "-x1 + x2 - (2);" into "-x1 + x2 = 2" , where () represents RHS
+                    //which is always constant  
+                    if (tokens[i].s == ";" && tokens[i - 1].s == ")")
+                    {
+                        tokens[i].s = "";
+                        tokens[i - 1].s = "";
+                        for (int j = i - 1; j >= 1; j--)
                         {
-                            tokens[j].s = "";
-                            tokens[j - 1].s = "=";
-                            tokens[j].leftblanks = 1;
-                            tokens[j - 1].leftblanks = 1;
-                            goto Lbl1;
+                            if (tokens[j].s == "(" && tokens[j - 1].s == "-")
+                            {
+                                tokens[j].s = "";
+                                tokens[j - 1].s = "=";
+                                tokens[j].leftblanks = 1;
+                                tokens[j - 1].leftblanks = 1;
+                                goto Lbl1b;
+                            }
                         }
                     }
                 }
-            }
-
-        Lbl1:;
+            Lbl1b:;
+            }        
 
             bool start = false;
             for (int i = 0; i < tokens.Count() - more; i++)
