@@ -4264,15 +4264,18 @@ namespace Gekko
                     return;
                 }
 
-                int timeIndex = 0;  //for 
-                if (modelGamsScalar.is2000Model)
-                {
-                    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
-                }
-                else
-                {
-                    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.tSelected);
-                }
+                //int timeIndex = 0;  //for 
+                //if (modelGamsScalar.is2000Model)
+                //{
+                //    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
+                //}
+                //else
+                //{
+                //    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.tSelected);
+                //}
+
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
+
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
                 if (aNumber == -12345)
