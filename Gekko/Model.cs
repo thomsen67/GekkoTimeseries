@@ -178,11 +178,13 @@ namespace Gekko
         /// <returns></returns>
         public static string GetEquationTextHelper(List<Link>links, bool showTime, GekkoTime t0, Model model)
         {
-            string s;
+            GekkoTime tUsedHere = t0;
+            if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(t0);
+            string s = null;
             List<string> eqNames = new List<string>();
             foreach (Link link in links)
             {
-                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, t0.ToString(), false));
+                eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), false));
             }
             s = Model.GetEquationText(eqNames, showTime, t0, model);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
@@ -1208,10 +1210,7 @@ namespace Gekko
             if (i == -12345)
             {
                 return "...equation '" + name + "' could not be found...";
-            }
-            //
-            What about Maybe2000GekkoTime(), and maybe merge the called method into this.
-            //
+            }            
             return this.GetEquationTextUnfolded(i, showTime, t0);
         }
 
@@ -1228,6 +1227,9 @@ namespace Gekko
         {
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
+
+            //Beware of this: for a scalar-2000 model, time basis is always 2000.
+            GekkoTime tUsedHere = this.Maybe2000GekkoTime(t0);
 
             int ii = this.ee[eq];
             string ss = this.csCodeLines[ii];
@@ -1289,7 +1291,7 @@ namespace Gekko
                     }
                     else
                     {
-                        varname2 = G.Chop_DimensionAddLag(varname, this.Maybe2000GekkoTime(t0), gt, false);
+                        varname2 = G.Chop_DimensionAddLag(varname, tUsedHere, gt, false);
                     }
                     sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
                     i += 14;

@@ -1251,11 +1251,16 @@ namespace Gekko
                             //see also #as7f3læaf9
                             GekkoTime tTemp = t;
                             int add = 0;
-                            if (modelGamsScalar.is2000Model)
-                            {
-                                tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
-                                add = t.Subtract(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
-                            }
+                                                        
+                            //if (modelGamsScalar.is2000Model)
+                            //{
+                            //    tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
+                            //    add = t.Subtract(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
+                            //}
+
+                            tTemp = modelGamsScalar.Maybe2000GekkoTime(t);
+                            add = t.Subtract(tTemp);
+
                             string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                             if (k == 0) eqNames.Add(eqName);
                             int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(eqName);
@@ -4294,15 +4299,8 @@ namespace Gekko
                 foreach (int eqNumber in eqNumbers)
                 {
                     string eqName = modelGamsScalar.GetEqName(eqNumber);
-                    string eqNameWithLag = null;
-                    if (modelGamsScalar.is2000Model)
-                    {
-                        eqNameWithLag = G.Chop_DimensionSetLag(eqName, new GekkoTime(EFreq.A, Globals.decomp2000, 1), false);
-                    }
-                    else
-                    {
-                        eqNameWithLag = G.Chop_DimensionSetLag(eqName, o.tSelected, false);
-                    }
+                    string eqNameWithLag = null;                    
+                    eqNameWithLag = G.Chop_DimensionSetLag(eqName, modelGamsScalar.Maybe2000GekkoTime(o.tSelected), false);                    
                     EqHelper e = new EqHelper();
                     e.eqName = eqName;
                     e.eqNameWithLag = eqNameWithLag;
