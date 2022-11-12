@@ -2343,7 +2343,7 @@ namespace Gekko
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
             int tZero = 0;
-            int ONE = 0;
+            int ONE = 0; //some of the queries below asks for an eval of a leaded [+1] period, therefore this variable, which is used for scalar-2000 models.
             
             //See #kljaf89usafasdf for Gekko  model
 
@@ -2368,19 +2368,15 @@ namespace Gekko
                 
                 int timeIndex1 = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
                 int timeIndex2 = -timeIndex1;
-
-                GekkoTime tTemp = t;
+                                
                 if (modelGamsScalar.is2000Model)
                 {
-                    tTemp = new GekkoTime(t.freq, Globals.decomp2000, 1);
-                    timeIndex1 = 0;
-                    ONE = 1; ;
-                    // timeIndex2 = (tBasis-2000)
+                    ONE = 1;
+                    timeIndex1 = 0;                    
                     timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(t.freq, Globals.decomp2000, 1));
-                    //t-1980 + timeIndex2
                     tZero = t.Subtract(new GekkoTime(EFreq.A, Globals.decompHackt1, 1)) + timeIndex2;
-                }                
-                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
+                }
+                string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t));
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
                 if (eqNumber == -12345)
                 {

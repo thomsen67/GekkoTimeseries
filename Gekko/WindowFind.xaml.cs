@@ -205,7 +205,7 @@ namespace Gekko
 
         public void FindSetEquation(string eq, bool showTime, GekkoTime t0, Model model)
         {
-            string s = Model.GetEquationText(new List<string>() { eq }, showTime, t0, model);
+            string s = model.GetEquationText(new List<string>() { eq }, showTime, t0);
             this.windowEquationBrowserLabel.Text = s;
         }
 

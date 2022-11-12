@@ -186,26 +186,26 @@ namespace Gekko
             {
                 eqNames.Add(G.Chop_DimensionAddLast(link.GAMS_dsh[0].fullName, tUsedHere.ToString(), false));
             }
-            s = Model.GetEquationText(eqNames, showTime, t0, model);
+            s = model.GetEquationText(eqNames, showTime, t0);
             s += Program.SetBlanks();  //hack so that the yellow box always has enough width, also if the text is not wide and there are few years. The hack seems to work nicely so that the box glues horizontally to the splitter.
             return s;
         }
 
         /// <summary>
-        /// The central equation text method for scalar models. Gets equation text from both folded and unfolded equations.
+        /// The central equation text method. Gets equation text from both folded and unfolded equations.
         /// </summary>
         /// <param name="eq"></param>
         /// <param name="showTime"></param>
         /// <param name="t0"></param>
         /// <returns></returns>
-        public static string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0, Model model)
+        public string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
         {            
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
             {
                 eqs2.Add(G.Chop_RemoveIndex(s));
             }
-            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, model);
+            TwoStrings two = Model.GetEquationTextFoldedScalar(eqs2, this);
 
             string s2 = null;
             int i = -1;
@@ -213,7 +213,7 @@ namespace Gekko
             {
                 i++;
                 if (i > 0) s2 += G.NL;
-                s2 += model.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
+                s2 += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
             string rv = null;
             rv += two.s1 + G.NL;
@@ -1199,34 +1199,25 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets human-readable equation text corresponding to (folded) equation name (string input).
-        /// See #jseds78hsd33.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public string GetEquationTextUnfolded(string name, bool showTime, GekkoTime t0)
-        {
-            int i = this.dict_FromEqNameToEqNumber.Get(name);            
-            if (i == -12345)
-            {
-                return "...equation '" + name + "' could not be found...";
-            }            
-            return this.GetEquationTextUnfolded(i, showTime, t0);
-        }
-
-        /// <summary>
-        /// Gets human-readable equation text corresponding to (unfolded) equation number.
+        /// Gets human-readable equation text corresponding to (unfolded) equation name.
         /// Uses equationChunks list, which is only about 1% of full scalar model size.
         /// The result uses the C# code (modified a bit), where stuff like a[b[0]][b[1]] and
         /// c[d[0]] is replaced with "real" variable[period]. By avoiding storing the full scalar model in human-readable form (up to 1 mio eqs),
         /// a lot of RAM is saved. See also folded equations: #jseds78hsd33.
+        /// See #jseds78hsd33.
         /// </summary>
         /// <param name="eq"></param>
         /// <returns></returns>
-        public string GetEquationTextUnfolded(int eq, bool showTime, GekkoTime t0)
+        public string GetEquationTextUnfolded(string name, bool showTime, GekkoTime t0)
         {
             //Remember: this code is dependent upon the exact format of 
             //the C# code used for the functions. Cf. #af931klljaf89efw.
+
+            int eq = this.dict_FromEqNameToEqNumber.Get(name);
+            if (eq == -12345)
+            {
+                return "...equation '" + name + "' could not be found...";
+            }
 
             //Beware of this: for a scalar-2000 model, time basis is always 2000.
             GekkoTime tUsedHere = this.Maybe2000GekkoTime(t0);
