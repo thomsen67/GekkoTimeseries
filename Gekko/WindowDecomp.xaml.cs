@@ -679,7 +679,17 @@ namespace Gekko
             if (this.decompFind.decompOptions2.showErrors)
             {
                 checkBoxErrors.IsChecked = true;
-            }            
+            }
+
+            if (this.decompFind.decompOptions2.sort)
+            {
+                checkBoxSort.IsChecked = true;
+            }
+
+            if (!double.IsNaN(this.decompFind.decompOptions2.prune))
+            {
+                this.NumValue = (int)this.decompFind.decompOptions2.prune;
+            }
         }
 
         public class ViewModel
@@ -2627,7 +2637,7 @@ namespace Gekko
             if (this.dyn) s.Add(" dyn");
             if (this.missingAsZero) s.Add(" missing=zero");
             if (this.sort) s.Add(" sort");
-            if (!double.IsNaN(this.prune)) s.Add(" prune=" + this.prune);
+            if (!double.IsNaN(this.prune) && prune > 0d && prune <= 100d) s.Add(" prune=" + this.prune);
             s.Add(">", color);
             s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
             s.Add(" from", color);
