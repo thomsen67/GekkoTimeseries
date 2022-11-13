@@ -2313,13 +2313,29 @@ namespace Gekko
         /// <param name="input"></param>
         public static void RichAddText(RichTextBox text, Rich input)
         {
-            foreach (StringAndColor sc in input.Get())
+            if (true)
             {
-                TextRange rangeOfText1 = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd);
-                rangeOfText1.Text = sc.s;
-                rangeOfText1.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(sc.color));
-                //if (sc.color != Colors.Black) rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
-                //else rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
+                foreach (StringAndColor sc in input.Get())
+                {
+                    Paragraph paragraph = new Paragraph();
+                    var run = new Run(sc.s)
+                    {
+                        Foreground = Brushes.Red
+                    };
+                    paragraph.Inlines.Add(run);
+                    text.Document.Blocks.Add(paragraph);
+                }
+            }
+            else
+            {
+                foreach (StringAndColor sc in input.Get())
+                {
+                    TextRange rangeOfText1 = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd);
+                    rangeOfText1.Text = sc.s;
+                    rangeOfText1.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(sc.color));
+                    //if (sc.color != Colors.Black) rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                    //else rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
+                }
             }
         }
 

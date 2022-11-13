@@ -4430,8 +4430,26 @@ namespace Gekko
 
         public static Rich GetColoredEquations(string s)
         {
+            int more = 20;
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(s, more);            
+
+            //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
+
             Rich r = new Rich();
-            r.Add(s);
+            //r.Add(s);
+            //return r;
+
+            for (int i = 0; i < tokens.Count() - more - 1; i++)
+            {
+                if (tokens[i].type == ETokenType.Number)
+                {
+                    r.Add(tokens[i].ToString(), Globals.RainbowNumber);
+                }
+                else
+                {
+                    r.Add(tokens[i].ToString());
+                }
+            }
             return r;
         }
 
