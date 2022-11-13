@@ -879,7 +879,7 @@ namespace Gekko
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
-        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 252, 238); //yellow bar is 253, 245, 176 --> therefore we deduct a bit from G too.
+        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 255, 238); //lighter LightYellow, which corresponds to the Residual1, Residual2, etc. color in decomp sheet
 
         public static List<System.Windows.Media.Color> RainbowParentheses = new List<System.Windows.Media.Color>() { System.Windows.Media.Colors.Blue, System.Windows.Media.Colors.Red, System.Windows.Media.Colors.Green, System.Windows.Media.Colors.Magenta, System.Windows.Media.Colors.Orange, System.Windows.Media.Colors.Gray };
         public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);        

@@ -2133,6 +2133,14 @@ namespace Gekko
             }
         }
 
+        private void checkBoxMZero_Checked(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void checkBoxMZero_Unchecked(object sender, RoutedEventArgs e)
+        {
+        }
+
         private void checkBox2_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)

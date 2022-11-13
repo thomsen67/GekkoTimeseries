@@ -361,7 +361,10 @@
             <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options
             </TextBlock>
-            <CheckBox Grid.Column="11" Grid.Row="1" Name="checkRef" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options)" Content="Ref databank values" Margin="0,3,6.333,3"></CheckBox>
+            <StackPanel Grid.Column="11" Grid.Row="1" Orientation="Horizontal">
+              <CheckBox Name="checkRef" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBox2_Checked" Unchecked="checkBox2_Unchecked" ToolTip="Use data from reference databank (only for time-change options)" Content="Ref" Margin="0,3,6.333,3"></CheckBox>
+                <CheckBox Name="checkMZero" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="checkBoxMZero_Checked" Unchecked="checkBoxMZero_Unchecked" ToolTip="Treat missing values as zeroes" Content="M = 0" Margin="0,3,6.333,3"></CheckBox>
+            </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
                 <TextBlock Name="textBlock2" Text="Decimals:" Margin="0,0,0,0" Grid.RowSpan="2" ToolTip="Change number of decimals" />
@@ -371,8 +374,8 @@
 
             <Grid Grid.Column="11" Grid.Row="5" Height="23"  VerticalAlignment="Top">
                 <TextBox Width=" 30" x:Name="txtNum" x:FieldModifier="private" Text="0" TextChanged="txtNum_TextChanged" Margin="3,2,13,3" />
-                <Button x:Name="cmdUp" x:FieldModifier="private" FontSize="7" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Width="10" Click="cmdUp_Click" Margin="33,2,1,13" />
-                <Button x:Name="cmdDown" x:FieldModifier="private" FontSize="7" BorderThickness="0" Padding="0,-1,0,0" Content="▼" Width="10" Click="cmdDown_Click" Margin="33,12,1,3" />
+                <Button x:Name="cmdUp" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Width="10" Click="cmdUp_Click" Margin="33,2,1,13" />
+                <Button x:Name="cmdDown" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▼" Width="10" Click="cmdDown_Click" Margin="33,12,1,3" />
             </Grid>
 
             <Button Name="button1" Visibility="Collapsed" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Height="22" Opacity="0.8" Content="Refresh">
