@@ -342,7 +342,7 @@ namespace Gekko
             //that contribute.
 
             //See source code documentation
-
+            
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
 
@@ -369,7 +369,16 @@ namespace Gekko
                 if (G.Equal(o.opt_names, "yes")) decompOptions2.count = ECountType.Names;
                 if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
                 if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
-                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;                
+                if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
+                if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
+                if (!double.IsNaN(o.opt_prune))
+                {
+                    if (o.opt_prune < 0d || o.opt_prune > 100d)
+                    {
+                        new Error("Option <prune=...> must be between 0 and 100 (inclusive). The value is " + o.opt_prune + ".");
+                    }
+                    decompOptions2.prune = o.opt_prune;
+                }
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
                 o.decompFind = new DecompFind(EDecompFindNavigation.Decomp, 0, decompOptions2, null, model);

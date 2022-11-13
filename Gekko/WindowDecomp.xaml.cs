@@ -2461,12 +2461,28 @@ namespace Gekko
             }
         }
 
+        private void CheckBoxSort_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.sort = true;
+                RecalcCellsWithNewType(false, decompFind.model);
+            }
+        }
+
+        private void CheckBoxSort_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.sort = false;
+                RecalcCellsWithNewType(false, decompFind.model);
+            }
+        }
 
         private void CheckBoxErrors_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                //this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
+            {                
                 this.decompFind.decompOptions2.showErrors = true;
                 RecalcCellsWithNewType(false, decompFind.model);
             }
@@ -2533,6 +2549,8 @@ namespace Gekko
         public int decimalsPch = 2;  //TODO: make selectable from syntax
         public bool dyn = false;
         public bool missingAsZero = false;
+        public bool sort = false;
+        public double prune = double.NaN;  //between 0 and 100.
         public List<string> new_select = null;
         public List<string> new_from = null;
         public List<string> new_endo = null;
@@ -2598,6 +2616,8 @@ namespace Gekko
             if (this.showErrors) s.Add(" errors");
             if (this.dyn) s.Add(" dyn");
             if (this.missingAsZero) s.Add(" missing=zero");
+            if (this.sort) s.Add(" sort");
+            if (!double.IsNaN(this.prune)) s.Add(" prune=" + this.prune);
             s.Add(">", color);
             s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
             s.Add(" from", color);
@@ -2670,6 +2690,8 @@ namespace Gekko
             d.count = this.count;
             d.missingAsZero = this.missingAsZero;
             d.isShares = this.isShares;
+            d.sort = this.sort;
+            d.prune = this.prune;
             
             d.modelHash = this.modelHash;
             d.type = this.type;
