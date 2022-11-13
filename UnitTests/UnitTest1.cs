@@ -158,8 +158,7 @@ namespace UnitTests
             Globals.globalPeriodStart = new GekkoTime(EFreq.A, 2000, 1);
             Globals.globalPeriodEnd = new GekkoTime(EFreq.A, 2010, 1);
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
-            Program.InitUfunctionsAndArithmeticsAndMore();
-            
+            Program.InitUfunctionsAndArithmeticsAndMore();            
         }
 
         // Use ClassCleanup to run code after all tests in a class have run
@@ -10835,6 +10834,27 @@ namespace UnitTests
             I("decomp3<d> x[a] from e1 endo x[a] rows vars, #i, #j, lags cols time;");
 
         }
+
+        [TestMethod]
+        public void _Test_DecompQ()
+        {
+            //-----------------------------------------------------------
+            //----------------- testing quarterly model -----------------            
+            //-----------------------------------------------------------
+            
+            //frml _i y = c + i + g(-1);
+            //frml _gjrd c = 0.4 * y + 0.4 * y(-1);
+
+            I("RESET;");
+            I("OPTION freq q;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
+            I("model lilleq;");
+            I("read lilleq;");
+            I("time 2000q1 2001q1;");
+            ShowDecompTable();  //will show the following decomp table and then abort
+            I("decomp3 y from e_y endo y;");
+        }
+
 
         [TestMethod]
         public void _Test_DecompSimul1()
@@ -27785,20 +27805,24 @@ print(df2)
         public void _Test_ModelJul05()
         {
             //-----------------------------------------------------------
-            //----------------- testing jul05 ---------------------------
+            //----------------- testing jul05, including cachc ----------
             //-----------------------------------------------------------
 
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("RUN jul05.gcm;");
-            double[] limits = new double[3];
-            limits[0] = 0.001d; //%
-            limits[1] = 0.001d; //%
-            limits[2] = 30d; //abs
-            CheckDatabankSample(limits, 2000, 2079, true);
-            I("OPTION solve method newton;");
-            I("SIM<2006 2079>;");
-            CheckDatabankSample(limits, 2000, 2079, true);
+            for (int f = 0; f < 2; f++)
+            {
+                if (f == 0) I("flush();");
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
+                I("RUN jul05.gcm;");
+                double[] limits = new double[3];
+                limits[0] = 0.001d; //%
+                limits[1] = 0.001d; //%
+                limits[2] = 30d; //abs
+                CheckDatabankSample(limits, 2000, 2079, true);
+                I("OPTION solve method newton;");
+                I("SIM<2006 2079>;");
+                CheckDatabankSample(limits, 2000, 2079, true);
+            }
         }
 
         [TestMethod]

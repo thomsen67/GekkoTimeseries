@@ -466,8 +466,6 @@ namespace Gekko
         public string fileName;
         [ProtoMember(16)]
         public ModelListHelper modelListHelper = null;
-        [ProtoMember(17)]
-        public ModelGekko parent = null;
 
         //-------------------------------------------------------------------------------------------
         //Do not save the following in protofile! (they will be created even if there is a cache hit)
@@ -481,12 +479,11 @@ namespace Gekko
         public string varlistStatus;
         public string lastCompileDuration;        
 
-        public ModelInfo(ModelGekko model)
-        {
-            this.parent = model;
+        public ModelInfo()
+        {            
         }
 
-        public void Print()
+        public void Print(ModelCommon modelCommon)
         {
 
             string extra = "";
@@ -570,7 +567,7 @@ namespace Gekko
             }
             
             string cache = "";
-            if (this.parent.parent.modelCommon.loadedFromCacheFile) cache = " (model loaded from cache file)";
+            if (modelCommon.loadedFromCacheFile) cache = " (model loaded from cache file)";
             G.Writeln("Model statement ended succesfully with no errors in " + timeUsedTotal + extra + cache);
         }
     }

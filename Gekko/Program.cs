@@ -3113,7 +3113,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    //Hmmm: this will not show if Error(), and it does not even stop Gekko (probably because of threads).
+                    //Hmmm: this will not abort if Error()
                     new Warning("Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
                     throw;
                 }
@@ -16747,7 +16747,7 @@ namespace Gekko
             model.modelCommon.SetModelSourceType(EModelType.Gekko);
             //TODO: keep the old version, so model command can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
-            modelGekko.modelInfo = new ModelInfo(modelGekko);
+            modelGekko.modelInfo = new ModelInfo();
             modelGekko.modelInfo.fileName = fileNamePretty;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
@@ -16820,7 +16820,7 @@ namespace Gekko
             model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
             model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
-            model.modelGekko.modelInfo.Print();            
+            model.modelGekko.modelInfo.Print(model.modelCommon);            
         }
 
         /// <summary>
@@ -19734,7 +19734,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    //Hmmm: this will not show if Error(), and it does not even stop Gekko (probably because of threads).
+                    //Hmmm: this will not abort if Error()
                     new Warning("Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
                     throw;
                 }
