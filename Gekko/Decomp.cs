@@ -437,8 +437,14 @@ namespace Gekko
                 {
                     if (MustLoadDataIntoModel())
                     {
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        
                         ModelGamsScalar.FlushAAndRArrays(model.modelGamsScalar);
-                        model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                        model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);                        
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
                     }
                 }
@@ -1682,6 +1688,7 @@ namespace Gekko
                 }
                 else if (ss.Length == 2)
                 {
+                    //qwerty, do something for Q and M...
                     lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
                     name = ss[0];
                 }

@@ -1003,7 +1003,7 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelperScalarModel(db, name, true);
+                Series ts = DatabankAHelperScalarModel(db, name, true, isRef);
 
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
@@ -1107,7 +1107,7 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelperScalarModel(db, name, false);
+                Series ts = DatabankAHelperScalarModel(db, name, false, isRef);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
                 // NB: beware of OPTION series data missing, if it is set.
@@ -1128,10 +1128,13 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="fromDatabankToA"></param>
         /// <returns></returns>
-        private Series DatabankAHelperScalarModel(Databank db, string name, bool fromDatabankToA)
+        private Series DatabankAHelperScalarModel(Databank db, string name, bool fromDatabankToA, bool isRef)
         {
+            string firstRef = "first-position";
+            if (isRef) firstRef = "reference";
+
             //See also #asf87aufkdh where similar loading is done regarding reading gdx files  
-            string freq = G.ConvertFreq(Program.options.freq);
+            EFreq freq = this.parent.modelCommon.GetFreq();
             List<string> dims = G.Chop_GetIndex(name);
             string varNameWithFreqAndIndexes = G.Chop_AddFreq(name, freq);
             string varNameWithFreq = G.Chop_GetNameAndFreq(varNameWithFreqAndIndexes);
@@ -1147,7 +1150,7 @@ namespace Gekko
                 if (fromDatabankToA)
                 {
                     //only reading
-                    if (!db.ContainsIVariable(varNameWithFreq)) new Error("Could not find array-series '" + varNameWithFreq + "'.");
+                    if (!db.ContainsIVariable(varNameWithFreq)) new Error("Could not find array-series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
                     ats = (Series)db.GetIVariable(varNameWithFreq);
                 }
                 else
@@ -1156,7 +1159,7 @@ namespace Gekko
                     if (!db.ContainsIVariable(varNameWithFreq))
                     {
                         string[] domains = new string[gekkoDimensions];
-                        ats = new Series(G.ConvertFreq(freq), varNameWithFreq);
+                        ats = new Series(freq, varNameWithFreq);
                         ats.meta.domains = domains;
                         ats.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
                         db.AddIVariable(ats.name, ats);
@@ -1171,8 +1174,8 @@ namespace Gekko
                 IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                 if (iv == null)
                 {
-                    if (fromDatabankToA) new Error("In array-series '" + varNameWithFreq + "', could not find sub-series '" + varNameWithFreqAndIndexes + "'");
-                    ts = new Series(ESeriesType.Normal, G.ConvertFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + freq);
+                    if (fromDatabankToA) new Error("In array-series '" + varNameWithFreq + "' in the " + firstRef + " databank, could not find sub-series '" + varNameWithFreqAndIndexes + "'");
+                    ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
                     ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                 }
                 else
@@ -1189,8 +1192,8 @@ namespace Gekko
                 }
                 else
                 {
-                    if (fromDatabankToA) new Error("Could not find series '" + varNameWithFreq + "'.");
-                    ts = new Series(G.ConvertFreq(freq), varNameWithFreq);
+                    if (fromDatabankToA) new Error("Could not find series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
+                    ts = new Series(freq, varNameWithFreq);
                     db.AddIVariable(ts.name, ts);
                 }                
             }

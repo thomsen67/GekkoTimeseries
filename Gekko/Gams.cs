@@ -531,16 +531,20 @@ namespace Gekko
                 for (int j = 0; j < ss.Length; j++)
                 {
                     string s = ss[j].Trim();
-                    if (G.IsInteger(s))
+
+                    GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
+                    bool good = true;
+                    if (tt.IsNull()) good = false;
+                    if (tt.super < 1900 || tt.super > 4000) good = false;
+                    if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
+
+                    if (good)
                     {
-                        int2 = int.Parse(s);
-                        if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
-                        {
-                            //Time is in this index
-                            if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
-                            time = new GekkoTime(EFreq.A, int2, 1);
-                        }
+                        //Time is in this index
+                        if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
+                        time = tt;
                     }
+
                     if (time.IsNull())
                     {
                         fullName.Add(s);
@@ -660,8 +664,7 @@ namespace Gekko
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
 
-            //read unrolled equations line by line
-            //f1f2            
+            //read unrolled equations line by line            
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.equations).ToString())));
@@ -1161,8 +1164,7 @@ namespace Gekko
         private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper)
         {
             //Remember: the human readable code is derived from this, so beware if changes are made,
-            //cf. #af931klljaf89efw.
-            //f1f2
+            //cf. #af931klljaf89efw.            
             helper.Clear();
             int more = 2;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqLine.ToString(), more);  //1 empty "" token

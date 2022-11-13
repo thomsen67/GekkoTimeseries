@@ -10852,10 +10852,14 @@ namespace UnitTests
                 I("OPTION freq q;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
                 I("model lilleq;");
-                I("read lilleq;");
-                I("time 2000q1 2001q1;");
+                I("read <first> lilleq;");                
+                I("jrc <1999 2001> = 0;");
+                I("dc <1999 2001> = 0;");
+                I("zc  <1999 2001> = 0;");
+                I("clone;");
+                I("time 2000q1 2009q4;");
                 ShowDecompTable();  //will show the following decomp table and then abort
-                I("decomp3 y from e_y endo y;");
+                I("decomp3 <d> y from e_y endo y;");
             }
         }
 
