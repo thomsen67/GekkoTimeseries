@@ -624,7 +624,7 @@ namespace Gekko
         public EFreq GetFreq()
         {
             EFreq freq = EFreq.None;
-            if (this.subPeriods == 1) freq = EFreq.A;
+            if (this.subPeriods == -12345 || this.subPeriods == 1) freq = EFreq.A;
             else if (this.subPeriods == 4) freq = EFreq.Q;
             else if (this.subPeriods == 12) freq = EFreq.M;
             return freq;
