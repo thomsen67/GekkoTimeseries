@@ -3107,7 +3107,16 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(fileName2, null, GekkoFileReadOrWrite.Read))
             {
                 RuntimeTypeModel serializer = RuntimeTypeModel.Create();
-                o = Serializer.Deserialize<T>(fs);
+                try
+                {
+                    o = Serializer.Deserialize<T>(fs);
+                }
+                catch (Exception e)
+                {
+                    //Hmmm: this will not show if Error(), and it does not even stop Gekko (probably because of threads).
+                    new Warning("Technical problem while reading protobuffer file '" + fileName2 + "'. Message: " + e.Message);
+                    throw;
+                }
             }
             return o;
         }
@@ -19726,7 +19735,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     //Hmmm: this will not show if Error(), and it does not even stop Gekko (probably because of threads).
-                    MessageBox.Show("Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
+                    new Warning("Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
                     throw;
                 }
             }
