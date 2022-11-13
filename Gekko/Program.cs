@@ -2837,7 +2837,14 @@ namespace Gekko
                     {
                         new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
                     }
-                    ProtobufWrite(x, files[i]);
+                    try
+                    {
+                        ProtobufWrite(x, files[i]);
+                    }
+                    catch (Exception e)
+                    {
+                        throw;
+                    }
                     return true;
                 }).All(_ => _);
             }
@@ -13698,11 +13705,15 @@ namespace Gekko
                         //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
                         //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
                         hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                        //
+                        // TODO: here we should be able to add different kinds of currying depending upon relevant state.
+                        //       Maybe make a string with all that state, hash it, and append it.
+                        //       Perhaps ok if our hash has double length. For now, normally just 1 or 2 characters added (1/4/12)
+                        hash += O.CurrentSubperiods();
                     }
                 }
             }
             else new Error("Wrong call");
-
             if (Globals.runningOnTTComputer) new Writeln("TTH: MD5 took " + G.Seconds(t0));
             return hash;
         }        
@@ -16610,20 +16621,7 @@ namespace Gekko
                     e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                 }
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                                                           
             string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName);
 
             //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
@@ -19727,7 +19725,9 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    new Error("Technical problem while writing protobuffer file. Message: " + e.Message);
+                    //Hmmm: this will not show if Error(), and it does not even stop Gekko (probably because of threads).
+                    MessageBox.Show("Technical problem while writing protobuffer file '" + pathAndFilename2 + "'. Message: " + e.Message);
+                    throw;
                 }
             }
         }

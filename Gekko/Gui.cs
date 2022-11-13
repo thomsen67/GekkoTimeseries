@@ -1733,10 +1733,14 @@ namespace Gekko
                 Program.PrintExceptionAndFinishThread(e2, p);
                 if (!Globals.applicationIsInProcessOfAborting)
                 {
-                    Globals.guiTimer.Stop();  //otherwise it will blink on
-                    Gui.gui.toolStripStatusLabel3a.Text = " ";
-                    toolStripStatusLabel3.Image = red;
-                    toolStripButton3.Enabled = false;
+                    try
+                    {
+                        Globals.guiTimer.Stop();  //otherwise it will blink on
+                        Gui.gui.toolStripStatusLabel3a.Text = " ";
+                        toolStripStatusLabel3.Image = red;
+                        toolStripButton3.Enabled = false;
+                    }
+                    catch { } //the above code has caused the whole of Gekko to crash because of "between threads" issues.
                 }
                 Program.GekkoExceptionCleanup(p);
             }

@@ -783,13 +783,18 @@ namespace Gekko
                 new Error("No Gekko model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
             }
 
+            if (Program.model.modelGekko == null)
+            {
+                new Error("Unexpected error regarding the Gekko model, perhaps due to a caching issue. Try using 'flush();' before your MODEL statement.");
+            }
+
             if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("The Gekko model was not compiled/loaded with the current frequency.");
-                    e.MainAdd("This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
-                    e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement.");
+                    e.MainAdd("The loaded Gekko model has " + Program.model.modelGekko.subPeriods + " per year, whereas there are currently " + O.CurrentSubperiods() + " subperiods per year (given the current frequency).");
+                    e.MainAdd("This problem applies to the pchy(), dify(), diffy(), dlogy() functions which depend upon the number of subperiods inside a year. Please put");
+                    e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement to solve the issue.");
                 }
             }
 
