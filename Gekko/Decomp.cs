@@ -1443,7 +1443,6 @@ namespace Gekko
                     string enewName = ConvertToTurtleName(ename, 0);
                     int xlag = xtime.Subtract(etime);
                     GekkoTime time = etime;
-                    if (time.freq != EFreq.A) MessageBox.Show("!!!!xx");
 
                     string xnewName = ConvertToTurtleName(xname, xlag);
 
