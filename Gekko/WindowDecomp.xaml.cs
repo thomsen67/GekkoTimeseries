@@ -86,6 +86,8 @@ namespace Gekko
             {
                 _numValue = value;
                 txtNum.Text = value.ToString();
+                //this.decompFind.decompOptions2.prune = _numValue;
+                //RecalcCellsWithNewType(false, decompFind.model);
             }
         }
 
@@ -106,7 +108,15 @@ namespace Gekko
                 return;
             }
 
-            if (!int.TryParse(txtNum.Text.Trim(), out _numValue))
+            if (int.TryParse(txtNum.Text.Trim(), out _numValue))
+            {
+                if (!isInitializing)
+                {
+                    this.decompFind.decompOptions2.prune = _numValue;
+                    RecalcCellsWithNewType(false, decompFind.model);
+                }
+            }
+            else
             {
                 txtNum.Text = _numValue.ToString();
             }
