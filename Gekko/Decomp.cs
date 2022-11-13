@@ -1426,23 +1426,23 @@ namespace Gekko
                 // The period of the variable is not checked/matched at all (only the name), 
                 // but that is perhaps not
                 // necessary, since the period has already been filtered by the DECOMP time period.
-                int lag; string name;
-                ConvertFromTurtleName(endoReverse[row], true, out name, out lag);
+                GekkoTime gtNotUsed; string name;
+                ConvertFromTurtleName(endoReverse[row], true, out name, out gtNotUsed);
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
                 for (int col = 0; col < exo.Count; col++)
                 {
                     string endoName = endoReverse[row];
-                    int etime; string ename;
+                    GekkoTime etime; string ename;
                     ConvertFromTurtleName(endoName, true, out ename, out etime);
 
                     string exoName = exoReverse[col];
-                    int xtime; string xname;
+                    GekkoTime xtime; string xname;
                     ConvertFromTurtleName(exoName, true, out xname, out xtime);
 
                     string enewName = ConvertToTurtleName(ename, 0);
-                    int xlag = xtime - etime;
-                    GekkoTime time = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), etime, 1);
+                    int xlag = xtime.Subtract(etime);
+                    GekkoTime time = etime;
                     if (time.freq != EFreq.A) MessageBox.Show("!!!!xx");
 
                     string xnewName = ConvertToTurtleName(xname, xlag);
@@ -1663,8 +1663,43 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Splits something like x[a, b]¤[1999q3] up into 1999q3 and x[a, b]. If no ¤, an error is issued.
+        /// Splits at the '¤' no matter what is before. If strict==true and > one '¤', it will fail.
+        /// See overload for lags like x[-1].
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <param name="gt"></param>
+        /// <param name="name"></param>
+        public static void ConvertFromTurtleName(string varname, bool strict, out string name, out GekkoTime gt)
+        {
+            gt = GekkoTime.tNull;
+            name = null;
+            if (varname == null)
+            {
+                //do nothing
+            }
+            else
+            {
+                string[] ss = varname.Split('¤');
+                if (strict && ss.Length != 2) new Error("Turtle error");
+                if (ss.Length == 1)
+                {
+                    new Error("Turtle error");
+                }
+                else if (ss.Length == 2)
+                {
+                    //qwerty, do something for Q and M...
+                    gt = GekkoTime.FromStringToGekkoTime(ss[1].Substring(1, ss[1].Length - 2));
+                    name = ss[0];
+                }
+                else new Error("Turtle error");
+            }
+        }
+
+        /// <summary>
         /// Splits something like x[a, b]¤[-1] up into -1 and x[a, b]. If no ¤, the lag is 0.
         /// Splits at the '¤' no matter what is before. If strict==true and > one '¤', it will fail.
+        /// See overload for periods like x[1999q3].
         /// </summary>
         /// <param name="varname"></param>
         /// <param name="lag"></param>
@@ -1687,14 +1722,15 @@ namespace Gekko
                     name = varname;
                 }
                 else if (ss.Length == 2)
-                {
-                    //qwerty, do something for Q and M...
+                {                    
                     lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
                     name = ss[0];
                 }
                 else new Error("Turtle error");
             }
         }
+
+
 
         // ----------------------------
         // Turtle name end
