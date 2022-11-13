@@ -533,7 +533,8 @@ namespace Gekko
                     string s = ss[j].Trim();
 
                     GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
-                    bool good = true;                    
+                    bool good = true;  
+                    //This would be easier if time was known to be always last...
                     if (tt.IsNull()) good = false;
                     if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
                     if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
