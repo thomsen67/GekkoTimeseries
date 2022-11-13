@@ -2235,12 +2235,12 @@ namespace Gekko
                     else if (i == 4)
                     {
                         //2.5 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, false), null);
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, false), null, null);
                     }
                     else if (i == 5)
                     {
                         //7 x time for i == 3
-                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, true), null);
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file1, true), null, null);
                     }
                     else if (i == 6)
                     {
@@ -2249,7 +2249,7 @@ namespace Gekko
                     }
                     else if (i == 7)
                     {
-                        string s = Program.GetMD5Hash(null, file1);
+                        string s = Program.GetMD5Hash(null, file1, null);
                     }
                     else if (i == 8)
                     {
@@ -2819,10 +2819,11 @@ namespace Gekko
         public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, Model model)
         {
             DateTime t = DateTime.Now;
-            
+
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
-            List<string> files = GetSplitCacheFileNames(k + Globals.systemTthreadsExtra + 1, inputFileName, "model", ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
+            string salt = O.CurrentSubperiods().ToString();
+            List<string> files = GetSplitCacheFileNames(k + Globals.systemTthreadsExtra + 1, inputFileName, "model", salt, ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
             List<object> lists = ProtobufModelGamsScalar5a(k, model);
 
             try
@@ -2856,21 +2857,21 @@ namespace Gekko
             {
                 //makes sure stuff is always reverted into model in slot m[0], even if protobuf write fails.
                 ProtobufModelGamsScalar5b(Program.options.system_threads, lists);
-            }            
+            }
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
             {
                 sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
             }
-            if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));            
+            if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
 
             double milliseconds = (DateTime.Now - t).TotalMilliseconds;
             milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
             string s = G.SecondsFormat(milliseconds);
             if (print) new Writeln("TTH: WriteParallelModel: " + s);
         }
-
+        
         /// <summary>
         /// Reads model protobuf files in parallel. Will return null if there is nothing found in cache.
         /// </summary>
@@ -2940,7 +2941,7 @@ namespace Gekko
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             
-            List<string> files = GetSplitCacheFileNames(k, fileName, "data", ref hash);
+            List<string> files = GetSplitCacheFileNames(k, fileName, "data", null, ref hash);
 
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
@@ -2992,13 +2993,13 @@ namespace Gekko
         /// <param name="type"></param>
         /// <param name="hash"></param>
         /// <returns></returns>
-        private static List<string> GetSplitCacheFileNames(int k, string inputFileNameUsedForHash, string type, ref string hash)
+        private static List<string> GetSplitCacheFileNames(int k, string inputFileNameUsedForHash, string type, string salt, ref string hash)
         {
             if (hash == null)
             {
                 //never happens? When an unseen file is encountered, ReadParallel will have computed the hash to see if it is known.
                 //so this is just for double safety.
-                hash = Program.GetMD5Hash(null, inputFileNameUsedForHash);
+                hash = Program.GetMD5Hash(null, inputFileNameUsedForHash, salt);
             }
 
             List<string> files = new List<string>();
@@ -3041,7 +3042,7 @@ namespace Gekko
             year1 = int.MaxValue;
             year2 = int.MinValue;
             DateTime t = DateTime.Now;
-            hash = Program.GetMD5Hash(null, fileName);
+            hash = Program.GetMD5Hash(null, fileName, null);
             hashMs = (DateTime.Now - t).TotalMilliseconds;
 
             List<string> files = new List<string>();
@@ -4196,7 +4197,7 @@ namespace Gekko
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
                         {
-                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null);
+                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null, null);
                         }
                     }
                 }
@@ -4506,7 +4507,7 @@ namespace Gekko
                         if (category2_fileExists && !category1_alreadyOpen)
                         {
                             if (hash != null) databank.fileHash = hash; //typically the MD5 has already been done on the copylocal temp file
-                            else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath), null);
+                            else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath), null, null);
                         }
                     }
                 }
@@ -12021,7 +12022,7 @@ namespace Gekko
             //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
             sb.AppendLine("SubPeriods: " + O.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.modelGekko.subPeriods
 
-            string trueHash = Program.GetMD5Hash(sb.ToString(), null);  //Pretty unlikely that two different .frm files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(sb.ToString(), null, null);  //Pretty unlikely that two different .frm files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             G.WritelnGray("HASH: " + trueHash);
 
@@ -13663,12 +13664,13 @@ namespace Gekko
         /// Re (a): Symbols '=', '+' and '/' in the MD5 are replaced, so MD5 here is not completely standard.
         /// Re (b): Symbol '-' in the MD5 is removed.
         /// Note that (b) is much faster on a file than first getting the file as a string.
+        /// You can add salt, for instance if you need to adjust for some state like current frequency.
         /// The two versions are kept in 1 method to keep them together. Probably the internals are identical?
         /// Look at this for Gekko 4.0.
         /// </summary>
         /// <param name="inputText"></param>
         /// <returns></returns>
-        public static string GetMD5Hash(string inputText, string fileNameWithPath)
+        public static string GetMD5Hash(string inputText, string fileNameWithPath, string salt)
         {            
             if (inputText != null && fileNameWithPath != null) new Error("Wrong call"); //one of them must be null
 
@@ -13713,17 +13715,13 @@ namespace Gekko
                         byte[] hash2 = md5Instance.ComputeHash(stream);
                         //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
                         //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
-                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
-                        //
-                        // TODO: here we should be able to add different kinds of currying depending upon relevant state.
-                        //       Maybe make a string with all that state, hash it, and append it.
-                        //       Perhaps ok if our hash has double length. For now, normally just 1 or 2 characters added (1/4/12)
-                        hash += O.CurrentSubperiods();
+                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");                        
                     }
                 }
             }
             else new Error("Wrong call");
             if (Globals.runningOnTTComputer) new Writeln("TTH: MD5 took " + G.Seconds(t0));
+            hash += salt;
             return hash;
         }        
 
@@ -16630,8 +16628,9 @@ namespace Gekko
                     e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                 }
             }
-                                                                           
-            string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName);
+
+            //salted with subpers, so will end with "1" for annual, "4" for quarterly.
+            string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, O.CurrentSubperiods().ToString());
 
             //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
 
@@ -16733,7 +16732,11 @@ namespace Gekko
                 {
                     //do nothing, not the end of the world if it fails
                 }
-            }            
+            }
+
+            //if not put here, info will not be printed when loading from cache
+            if (model.modelGekko != null) model.modelGekko.modelInfo.Print(model.modelCommon);
+
         }
         
         /// <summary>
@@ -16742,6 +16745,8 @@ namespace Gekko
         private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             Model model = new Model();
+            model.modelCommon.subPeriods = O.CurrentSubperiods();
+
             Program.model = model;
 
             model.modelCommon.SetModelSourceType(EModelType.Gekko);
@@ -16818,9 +16823,7 @@ namespace Gekko
             }
 
             model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
-            model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
-
-            model.modelGekko.modelInfo.Print(model.modelCommon);            
+            model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);            
         }
 
         /// <summary>
@@ -21359,7 +21362,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath), null);
+                    string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath), null, null);
                     if (!(trueFileHash == removed.fileHash))
                     {
                         MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' seems to have changed since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");

@@ -373,10 +373,7 @@ namespace Gekko
 
         public GekkoTime lastSimPer1 = GekkoTime.tNull;
         public GekkoTime lastSimPer2 = GekkoTime.tNull;
-        public string lastSimStamp = null;
-
-        [ProtoMember(29)]
-        public int subPeriods = -12345;  //1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
+        public string lastSimStamp = null;        
 
         [ProtoMember(30)]
         public string runBefore = null;
@@ -607,6 +604,9 @@ namespace Gekko
     {
         [ProtoMember(1)]
         private EModelType type = EModelType.Unknown;
+
+        [ProtoMember(2)]
+        public int subPeriods = -12345;  //Used for .modelGekko. Is = 1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
 
         //not protobuffed
         public bool loadedFromCacheFile = false;  //not protobuffed

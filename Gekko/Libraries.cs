@@ -489,7 +489,7 @@ namespace Gekko
 
                     string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
                     string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
-                    string libHash = Program.GetMD5Hash(ss, null); //Pretty unlikely that two different libs could produce the same hash.
+                    string libHash = Program.GetMD5Hash(ss, null, null); //Pretty unlikely that two different libs could produce the same hash.
                     libHash = libHash.Trim();  //probably not necessary
                     string libFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Globals.cacheExtension;
                     bool loadedFromProtobuf = false;

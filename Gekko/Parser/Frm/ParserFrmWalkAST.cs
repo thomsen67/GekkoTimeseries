@@ -310,7 +310,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(function, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -369,7 +369,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(function, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -480,7 +480,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(function, "dify") || G.Equal(function, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -882,7 +882,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(wh2.leftSideFunction, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("*", true);
                             ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
@@ -903,7 +903,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(wh2.leftSideFunction, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("*", true);
                             ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
@@ -928,7 +928,7 @@ namespace Gekko.Parser.Frm
                             if (G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("+", true);
                             ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);

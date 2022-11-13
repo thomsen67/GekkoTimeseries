@@ -3413,7 +3413,7 @@ namespace Gekko
 
         private static string GetModelHashGams(List<string> lines)
         {
-            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString(), null); //Pretty unlikely that two different gams files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString(), null, null); //Pretty unlikely that two different gams files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             return trueHash;
         }
