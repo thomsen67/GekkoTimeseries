@@ -490,8 +490,8 @@ namespace Gekko
             GekkoTime gt2 = t2;
             if (modelGamsScalar.is2000Model)
             {
-                gt1 = new GekkoTime(t1.freq, Globals.decomp2000, 1);
-                gt2 = new GekkoTime(t1.freq, Globals.decomp2000, 1);
+                gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+                gt2 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             }
 
             foreach (GekkoTime time in new GekkoTimeIterator(gt1, gt2))
@@ -1436,7 +1436,9 @@ namespace Gekko
 
                     string enewName = ConvertToTurtleName(ename, 0);
                     int xlag = xtime - etime;
-                    GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
+                    GekkoTime time = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), etime, 1);
+                    if (time.freq != EFreq.A) MessageBox.Show("!!!!xx");
+
                     string xnewName = ConvertToTurtleName(xname, xlag);
 
                     int ZERO = 0;
@@ -2373,8 +2375,8 @@ namespace Gekko
                 {
                     ONE = 1;
                     timeIndex1 = 0;                    
-                    timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(t.freq, Globals.decomp2000, 1));
-                    tZero = t.Subtract(new GekkoTime(EFreq.A, Globals.decompHackt1, 1)) + timeIndex2;
+                    timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(model.modelCommon.GetFreq(), Globals.decomp2000, 1));
+                    tZero = t.Subtract(new GekkoTime(model.modelCommon.GetFreq(), Globals.decompHackt1, 1)) + timeIndex2;
                 }
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t));
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);

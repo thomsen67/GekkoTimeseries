@@ -605,6 +605,7 @@ namespace Gekko
         [ProtoMember(1)]
         private EModelType type = EModelType.Unknown;
 
+        //See also GetFreq()
         [ProtoMember(2)]
         public int subPeriods = -12345;  //Used for .modelGekko. Is = 1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
 
@@ -618,6 +619,15 @@ namespace Gekko
         public EModelType GetModelSourceType()
         {
             return this.type;
+        }
+
+        public EFreq GetFreq()
+        {
+            EFreq freq = EFreq.None;
+            if (this.subPeriods == 1) freq = EFreq.A;
+            else if (this.subPeriods == 4) freq = EFreq.Q;
+            else if (this.subPeriods == 12) freq = EFreq.M;
+            return freq;
         }
 
         public void SetModelSourceType(EModelType type)
@@ -836,7 +846,7 @@ namespace Gekko
         public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
         {
             GekkoTime tTemp = t0;
-            if (this.is2000Model) tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
+            if (this.is2000Model) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             return tTemp;
         }
 
@@ -948,8 +958,8 @@ namespace Gekko
             GekkoTime tEnd = this.t2;
             if (this.is2000Model)
             {
-                tStart = new GekkoTime(EFreq.A, Globals.decompHackt1, 1);
-                tEnd = new GekkoTime(EFreq.A, Globals.decompHackt2, 1);
+                tStart = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt1, 1);
+                tEnd = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt2, 1);
                 if (isRef) this.a_ref = null;
                 else this.a = null;
             }
@@ -1082,8 +1092,8 @@ namespace Gekko
             GekkoTime tEnd = this.t2;
             if (this.is2000Model)
             {
-                tStart = new GekkoTime(EFreq.A, Globals.decompHackt1, 1);
-                tEnd = new GekkoTime(EFreq.A, Globals.decompHackt2, 1);
+                tStart = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt1, 1);
+                tEnd = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt2, 1);
             }
 
             //Beware of OPTION series data missing, if it is set.

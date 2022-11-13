@@ -16836,46 +16836,46 @@ namespace Gekko
             List<string> equations = new List<string>();
             List<string> dictionary = new List<string>();
 
-            for (int t0 = Globals.decomp2000; t0 <= Globals.decomp2000; t0++)
+            List<string> dictionaryNames = new List<string>();  //0-based
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
+            List<string> dictionaryEqs = new List<string>();  //0-based
+
+            equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
+            equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
+
+            GekkoTime t0 = new GekkoTime(model.modelCommon.GetFreq(), Globals.decomp2000, 1);
+
+            int n = -1;
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
-                List<string> dictionaryNames = new List<string>();  //0-based
-                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++) dictionaryNames.Add(null);
-                List<string> dictionaryEqs = new List<string>();  //0-based
-
-                equations.Add("* Equation counts " + Program.model.modelGekko.equations.Count);
-                equations.Add("* Variable counts " + Program.model.modelGekko.varsBType.Count);
-                
-                int n = -1;
-                foreach (EquationHelper eh in Program.model.modelGekko.equations)
-                {
-                    n++;
-                    equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
-                    dictionaryEqs.Add("  e" + (n + 1) + "  " + Globals.gekkoEquationPrefix + eh.lhs + "(" + t0 + ")");
-                }
-                equations.Add("* set non-default bounds");
-                equations.Add("Model m / all /;");
-
-                n = -1;
-                foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
-                {
-                    n++;
-                    string s = kvp.Key;
-                    string variable = null; int lag = 0;
-                    G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
-                    dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0 + lag) + ")";
-                }
-
-                dictionary.Add("Equation counts " + dictionaryEqs.Count);
-                dictionary.Add("");
-                dictionary.Add("Variable counts " + dictionaryNames.Count);
-                dictionary.Add("");
-                dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
-                dictionary.AddRange(dictionaryEqs);
-                dictionary.Add("");
-                dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
-                dictionary.AddRange(dictionaryNames);
-                dictionary.Add("");
+                n++;
+                equations.Add("e" + (n + 1) + "..  " + eh.scalar_csCodeLhs + " =E= " + eh.scalar_csCodeRhs + ";");
+                dictionaryEqs.Add("  e" + (n + 1) + "  " + Globals.gekkoEquationPrefix + eh.lhs + "(" + t0.ToString() + ")");
             }
+            equations.Add("* set non-default bounds");
+            equations.Add("Model m / all /;");
+
+            n = -1;
+            foreach (KeyValuePair<string, BTypeData> kvp in Program.model.modelGekko.varsBType)
+            {
+                n++;
+                string s = kvp.Key;
+                string variable = null; int lag = 0;
+                G.ExtractVariableAndLag(kvp.Key, out variable, out lag);
+                dictionaryNames[kvp.Value.bNumber] = "  x" + (n + 1) + "  " + variable + "(" + (t0.Add(lag).ToString()) + ")";
+            }
+
+            dictionary.Add("Equation counts " + dictionaryEqs.Count);
+            dictionary.Add("");
+            dictionary.Add("Variable counts " + dictionaryNames.Count);
+            dictionary.Add("");
+            dictionary.Add("Equations " + "1" + " to " + dictionaryEqs.Count);
+            dictionary.AddRange(dictionaryEqs);
+            dictionary.Add("");
+            dictionary.Add("Variables " + "1" + " to " + dictionaryNames.Count);
+            dictionary.AddRange(dictionaryNames);
+            dictionary.Add("");
+
             string e = Stringlist.ExtractTextFromLines(equations).ToString();
             string d = Stringlist.ExtractTextFromLines(dictionary).ToString();
 
