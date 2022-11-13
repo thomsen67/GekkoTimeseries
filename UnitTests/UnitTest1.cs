@@ -10836,7 +10836,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompQ()
+        public void _Test_DecompQuarterly()
         {
             //-----------------------------------------------------------
             //----------------- testing quarterly model -----------------            
@@ -10856,10 +10856,25 @@ namespace UnitTests
                 I("jrc <1999 2001> = 0;");
                 I("dc <1999 2001> = 0;");
                 I("zc  <1999 2001> = 0;");
+                I("time 2000q1 2000q4;");
+                I("sim;");
                 I("clone;");
-                I("time 2000q1 2009q4;");
-                ShowDecompTable();  //will show the following decomp table and then abort
-                I("decomp3 <d> y from e_y endo y;");
+                I("g += 10;");
+                I("sim;");
+                
+                //ShowDecompTable();  //will show the following decomp table and then abort
+                I("decomp3 <m> y from e_y endo y;");
+
+                                //TODO: better test!!
+                //TODO: better test!!
+                //TODO: better test!!
+                //TODO: better test!!
+                //TODO: better test!!
+                Gekko.Table table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2000q2");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | [0]");
+                Assert.AreEqual(table.Get(2, 3).number, 16.6667d, 0.0001);
+
             }
         }
 
