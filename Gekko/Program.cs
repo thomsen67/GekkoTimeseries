@@ -1208,12 +1208,10 @@ namespace Gekko
     {
         private List<StringAndColor> storage = new List<StringAndColor>();
 
-        public Rich() { }
-
-        public Rich(List<StringAndColor> x)
-        {
-            this.storage = x;
-        }
+        /// <summary>
+        /// Make the object, and afterwards use .Add etc.
+        /// </summary>
+        public Rich() { }        
 
         /// <summary>
         /// Add new black block.

@@ -206,7 +206,7 @@ namespace Gekko
         public void FindSetEquation(string eq, bool showTime, GekkoTime t0, Model model)
         {
             string s = model.GetEquationText(new List<string>() { eq }, showTime, t0);
-            this.windowEquationBrowserLabel.Text = s;
+            WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s));
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
@@ -224,7 +224,7 @@ namespace Gekko
         {
             List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
-            this.windowEquationBrowserLabel.Text = s7; 
+            WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s7));
         }
 
         public void FindSetButtons(string eqName, List<string> firstList, Model model)

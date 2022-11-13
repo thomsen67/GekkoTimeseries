@@ -4428,6 +4428,13 @@ namespace Gekko
             }
         }
 
+        public static Rich GetColoredEquations(string s)
+        {
+            Rich r = new Rich();
+            r.Add(s);
+            return r;
+        }
+
         private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)
         {
             bool variableExists = false;

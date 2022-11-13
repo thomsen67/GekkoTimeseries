@@ -1431,7 +1431,7 @@ namespace Gekko
                 {
                     s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
                 }
-                equation.Text = s;
+                RichSetText(equation, Decomp.GetColoredEquations(s));
             }
         }        
 
@@ -1562,57 +1562,57 @@ namespace Gekko
                             if (G.Equal(var2, Globals.decompText0))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {
-                                    this.equation.Text = "This value corresponds to evaluating the expression.";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This value corresponds to evaluating the expression."));
                                 }
                                 else
-                                {
-                                    this.equation.Text = "This value corresponds to evaluating the right-hand side of the equation.";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This value corresponds to evaluating the right-hand side of the equation."));
                                 }
                             }
                             else if (G.Equal(var2, Globals.decompText1))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {
-                                    this.equation.Text = "This difference is always 0 for expressions.";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference is always 0 for expressions."));
                                 }
                                 else
                                 {
-                                    this.equation.Text = "This difference is the databank value minus the result of evaluating the right-hand side of the equation.";
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference is the databank value minus the result of evaluating the right-hand side of the equation."));                                    
                                 }
                             }
                             else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
                                 {
-                                    this.equation.Text = "This difference between the two rows above is always 0 for expressions.";
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference between the two rows above is always 0 for expressions."));                                    
                                 }
                                 else
-                                {
-                                    this.equation.Text = "This difference is the databank value minus the result of evaluating the right-hand side of the equation.";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference is the databank value minus the result of evaluating the right-hand side of the equation."));
                                 }
 
                             }
                             else if (G.Equal(var2, Globals.decompText2))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {
-                                    this.equation.Text = "This value is the result of evaluating the expression minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero).";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This value is the result of evaluating the expression minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero)."));
                                 }
                                 else
                                 {
-                                    this.equation.Text = "This value is the result of evaluating the right-hand side of the equation minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero).";
+                                    RichSetText(equation, Decomp.GetColoredEquations("This value is the result of evaluating the right-hand side of the equation minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero)."));
                                 }
                             }
                             else if (G.Equal(var2, Globals.decompText2a))  //raw
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {
-                                    this.equation.Text = "These values correspond to evaluating the expression (always equal to the row above for expressions).";
+                                {                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("These values correspond to evaluating the expression (always equal to the row above for expressions)."));
                                 }
                                 else
-                                {
-                                    this.equation.Text = "These values correspond to evaluating the right-hand side of the equation.";
+                                {                                 
+                                    RichSetText(equation, Decomp.GetColoredEquations("These values correspond to evaluating the right-hand side of the equation."));
                                 }
                             }
                             else
@@ -1631,25 +1631,25 @@ namespace Gekko
 
                                 if (var7 == null)
                                 {
-                                    this.equation.Text = "--> " + Decomp.Text1(1);
+                                    RichSetText(equation, Decomp.GetColoredEquations("--> " + Decomp.Text1(1)));
                                 }
                                 else
                                 {
                                     if (var7 == Globals.decompErrorName)
-                                    {
-                                        this.equation.Text = "Errors originating from possible non-linearities in the equation (for a linear equation, these errors should be = 0). If the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows.";
+                                    {                                    
+                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors should be = 0). If the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
                                         string more = "";
                                         if (number > 0) more = " #" + number;
-                                        this.equation.Text = "Data residual in equation" + more + " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values.";
+                                        RichSetText(equation, Decomp.GetColoredEquations("Data residual in equation" + more + " (difference between left-hand and right-hand side). The data residual should normally be = 0 for simulated values."));
                                     }
                                     else
                                     {
                                         List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
-                                        string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
-                                        this.equation.Text = txt;
+                                        string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();                                        
+                                        RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }
                                 }
                             }
@@ -1666,8 +1666,8 @@ namespace Gekko
                     else
                     {
                         s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
-                    }
-                    equation.Text = s;
+                    }                    
+                    RichSetText(equation, Decomp.GetColoredEquations(s));
                 }
             }
         }
@@ -1758,8 +1758,8 @@ namespace Gekko
             else
             {
                 s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
-            }
-            this.equation.Text = s;
+            }            
+            RichSetText(equation, Decomp.GetColoredEquations(s));
             RichSetText(this.code, this.decompFind.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
             this.decompFind.decompOptions2.guiDecompValues = table;

@@ -69,7 +69,13 @@
             </ListView>
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
             <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
-                <TextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
+                <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
+                    <RichTextBox.Resources>
+                        <Style TargetType="{x:Type Paragraph}">
+                            <Setter Property="Margin" Value="0" />
+                        </Style>
+                    </RichTextBox.Resources>
+                </RichTextBox>
             </ScrollViewer>
             <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" />
             <ScrollViewer Grid.Row="4" HorizontalAlignment="Stretch">

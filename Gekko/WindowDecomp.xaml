@@ -423,12 +423,24 @@
                 <TabControl Grid.Row="2"  Margin="0, 5, 0, 0">
                     <TabItem Header="Equations">
                         <ScrollViewer Background="LightYellow">
-                            <TextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="Wrap"></TextBox>
+                            <RichTextBox  Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
+                                <RichTextBox.Resources>
+                                    <Style TargetType="{x:Type Paragraph}">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                </RichTextBox.Resources>
+                            </RichTextBox>
                         </ScrollViewer>
                     </TabItem>
                     <TabItem Header="Code">
                         <ScrollViewer Background="LightYellow">
-                            <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10"></RichTextBox>
+                            <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="code"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
+                                <RichTextBox.Resources>
+                                    <Style TargetType="{x:Type Paragraph}">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                </RichTextBox.Resources>
+                            </RichTextBox>
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
