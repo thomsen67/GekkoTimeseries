@@ -85,7 +85,7 @@ namespace Gekko
             set
             {
                 _numValue = value;
-                txtNum.Text = value.ToString() + "%";
+                txtNum.Text = value.ToString();
             }
         }
 
@@ -106,9 +106,9 @@ namespace Gekko
                 return;
             }
 
-            if (!int.TryParse(txtNum.Text.Trim().Substring(0, txtNum.Text.Trim().Length - 1), out _numValue))
+            if (!int.TryParse(txtNum.Text.Trim(), out _numValue))
             {
-                txtNum.Text = _numValue.ToString() + "%";
+                txtNum.Text = _numValue.ToString();
             }
         }        
 
