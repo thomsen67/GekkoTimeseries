@@ -4415,8 +4415,11 @@ namespace Gekko
                     if (!helper.best) eqsNew2.Add(helper);
                 }
 
-                var eqsNew1a = eqsNew1.OrderByDescending(x => x.eqNameWithLag);
-                var eqsNew2a = eqsNew2.OrderByDescending(x => x.eqNameWithLag);
+                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
+                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
+                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
+                var eqsNew1a = eqsNew1.OrderBy(x => x.eqNameWithLag);
+                var eqsNew2a = eqsNew2.OrderBy(x => x.eqNameWithLag);
                 eqsNew.AddRange(eqsNew1a);
                 eqsNew.AddRange(eqsNew2a);
 

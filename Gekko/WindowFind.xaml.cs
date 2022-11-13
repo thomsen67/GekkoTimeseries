@@ -161,14 +161,7 @@ namespace Gekko
             decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, model);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
-
-            //
-            //
-            // HACK, <m> is hard-coded below
-            //
-            //
-            //decomp.decompFind.decompOptions2.code = "decomp3 <m> " + varName + " from " + eqName + " endo " + varName + ";";
-
+            
             decomp.Exe();
         }
 
@@ -240,15 +233,6 @@ namespace Gekko
             {
                 this.Dispatcher.BeginInvoke(new Action(() => FindSetEquationButtonsColors(eqName, model)), System.Windows.Threading.DispatcherPriority.Background);
             }
-            try
-            {
-
-            }
-            catch
-            {
-
-            }
-
         }
 
         public void FindSetEquationButtonsColors(string eqName, Model model)
@@ -431,8 +415,6 @@ namespace Gekko
                 this.windowEquationBrowserButtons.Children.Add(b);
                 _buttons.Add(ss5, b);
             }
-
-
         }
     }
 
