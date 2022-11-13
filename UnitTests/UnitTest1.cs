@@ -10841,18 +10841,22 @@ namespace UnitTests
             //-----------------------------------------------------------
             //----------------- testing quarterly model -----------------            
             //-----------------------------------------------------------
-            
+
             //frml _i y = c + i + g(-1);
             //frml _gjrd c = 0.4 * y + 0.4 * y(-1);
 
-            I("RESET;");
-            I("OPTION freq q;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
-            I("model lilleq;");
-            I("read lilleq;");
-            I("time 2000q1 2001q1;");
-            ShowDecompTable();  //will show the following decomp table and then abort
-            I("decomp3 y from e_y endo y;");
+            for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
+            {
+                if (f == 0) I("flush();");
+                I("RESET;");
+                I("OPTION freq q;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
+                I("model lilleq;");
+                I("read lilleq;");
+                I("time 2000q1 2001q1;");
+                ShowDecompTable();  //will show the following decomp table and then abort
+                I("decomp3 y from e_y endo y;");
+            }
         }
 
 
