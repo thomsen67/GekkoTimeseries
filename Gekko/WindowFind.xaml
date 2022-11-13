@@ -68,7 +68,7 @@
                 </ListView.View>                
             </ListView>
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-            <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
+            <ScrollViewer Name="scrollViewerFind" Grid.Row="2" HorizontalAlignment="Stretch" >
                 <RichTextBox Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10">
                     <RichTextBox.Resources>
                         <Style TargetType="{x:Type Paragraph}">

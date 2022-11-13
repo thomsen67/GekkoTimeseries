@@ -76,6 +76,39 @@ namespace Gekko
         ListViewDragDropManager<GekkoTask> dragMgr;
         
         public string uglyHack_name = null;
+        
+        private int _numValue = 0;
+
+        public int NumValue
+        {
+            get { return _numValue; }
+            set
+            {
+                _numValue = value;
+                txtNum.Text = value.ToString();
+            }
+        }
+
+        private void cmdUp_Click(object sender, RoutedEventArgs e)
+        {
+            NumValue++;
+        }
+
+        private void cmdDown_Click(object sender, RoutedEventArgs e)
+        {
+            NumValue--;
+        }
+
+        private void txtNum_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (txtNum == null)
+            {
+                return;
+            }
+
+            if (!int.TryParse(txtNum.Text, out _numValue))
+                txtNum.Text = _numValue.ToString();
+        }
 
         public ObservableCollection<GekkoTask> taskList
         {
@@ -660,7 +693,11 @@ namespace Gekko
 
             this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
-            InitializeComponent();            
+
+            InitializeComponent();
+            txtNum.Text = _numValue.ToString();
+            this.scrollViewerDecomp1.Background = new SolidColorBrush(Globals.LightYellow);
+            this.scrollViewerDecomp2.Background = new SolidColorBrush(Globals.LightYellow);
 
             this.isInitializing = false;  //ready for clicking
 
@@ -2307,36 +2344,21 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Adds RichText
+        /// Adds a Rich object to a RichTextBox, possibly colored.
         /// </summary>
         /// <param name="myRichTextBox"></param>
         /// <param name="input"></param>
         public static void RichAddText(RichTextBox text, Rich input)
         {
-            if (true)
+            Paragraph paragraph = new Paragraph();
+            foreach (StringAndColor sc in input.Get())
             {
-                foreach (StringAndColor sc in input.Get())
-                {
-                    Paragraph paragraph = new Paragraph();
-                    var run = new Run(sc.s)
-                    {
-                        Foreground = Brushes.Red
-                    };
-                    paragraph.Inlines.Add(run);
-                    text.Document.Blocks.Add(paragraph);
-                }
+                Run run = new Run(sc.s) { Foreground = new SolidColorBrush(sc.color) };
+                paragraph.Inlines.Add(run);
+                //if (sc.color != Colors.Black) rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                //else rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
             }
-            else
-            {
-                foreach (StringAndColor sc in input.Get())
-                {
-                    TextRange rangeOfText1 = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd);
-                    rangeOfText1.Text = sc.s;
-                    rangeOfText1.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(sc.color));
-                    //if (sc.color != Colors.Black) rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
-                    //else rangeOfText1.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
-                }
-            }
+            text.Document.Blocks.Add(paragraph);
         }
 
         private void Merge(DecompFind dfParentDecomp)

@@ -34,7 +34,7 @@ namespace Gekko
         //public DecompOptions2 decompOptions2 = null;
 
         public WindowFind(O.Find o)
-        {            
+        {
             this.decompFind = o.decompFind;
 
             //HACKY:
@@ -45,6 +45,7 @@ namespace Gekko
             if (o.opt_prtcode != null) this.decompFind.decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
                         
             InitializeComponent();
+            this.scrollViewerFind.Background = new SolidColorBrush(Globals.LightYellow);
             this.windowEquationBrowserListView.Focus();
             //
             //

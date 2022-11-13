@@ -4431,19 +4431,46 @@ namespace Gekko
         public static Rich GetColoredEquations(string s)
         {
             int more = 20;
-            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(s, more);            
-
-            //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
-
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(s, more);
+            
             Rich r = new Rich();
-            //r.Add(s);
-            //return r;
+
+            int n = Globals.RainbowParentheses.Count;
+            int depth = 0;
 
             for (int i = 0; i < tokens.Count() - more - 1; i++)
             {
-                if (tokens[i].type == ETokenType.Number)
+                //replace for instance x(-1) with x[-1]
+                if (i > 0 && (tokens[i - 1].type == ETokenType.Word || tokens[i - 1].s == "]") && tokens[i].leftblanks == 0 && tokens[i].s == "(" && (tokens[i + 1].s == "-" || tokens[i + 1].s == "+") && G.IsInteger(tokens[i + 2].s) && tokens[i + 3].s == ")")
+                {
+                    tokens[i].s = "[";
+                    tokens[i + 3].s = "]";
+                    i += 3;
+                }
+            }
+
+            for (int i = 0; i < tokens.Count() - more - 1; i++)
+            {
+
+                if (i > 0 && (tokens[i - 1].type == ETokenType.Word || tokens[i - 1].s == "]") && tokens[i].leftblanks == 0 && tokens[i].s == "[" && (tokens[i + 1].s == "-" || tokens[i + 1].s == "+") && G.IsInteger(tokens[i + 2].s) && tokens[i + 3].s == "]")
+                {
+                    string x = tokens[i].ToString() + tokens[i + 1].ToString() + tokens[i + 2].ToString() + tokens[i + 3].ToString();
+                    r.Add(x, Globals.RainbowNumber);
+                    i += 3;
+                }
+                else if (tokens[i].type == ETokenType.Number || tokens[i].type == ETokenType.QuotedString)
                 {
                     r.Add(tokens[i].ToString(), Globals.RainbowNumber);
+                }
+                else if (tokens[i].s == "(" || tokens[i].s == "[" || tokens[i].s == "{")
+                {
+                    r.Add(tokens[i].ToString(), Globals.RainbowParentheses[DepthHelper(depth, n)]);
+                    depth++;
+                }
+                else if (tokens[i].s == ")" || tokens[i].s == "]" || tokens[i].s == "}")
+                {
+                    depth--;
+                    r.Add(tokens[i].ToString(), Globals.RainbowParentheses[DepthHelper(depth, n)]);
                 }
                 else
                 {
@@ -4451,6 +4478,14 @@ namespace Gekko
                 }
             }
             return r;
+        }
+
+        private static int DepthHelper(int depth, int n)
+        {
+            int i = depth % n;
+            if (i < 0) i = 0;
+            if (i >= n) i = n - 1;
+            return i;
         }
 
         private static string NonFoundInModelError(string variableName, ModelGamsScalar modelGamsScalar)

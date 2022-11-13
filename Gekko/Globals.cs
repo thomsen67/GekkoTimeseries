@@ -46,13 +46,13 @@ namespace Gekko
         public static bool HANDLE_LIBRARY = false;
         public const string tempFileStart = "tempfile";
         public const string tempFileEnd = ".tmp";
-        public const string zip = ".zip";        
-        
+        public const string zip = ".zip";
+
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
         public static bool collapseFlexOverride = false; //must always be false
-        
+
         // -------------------------------------------------
         // pink stuff start
         // -------------------------------------------------
@@ -79,7 +79,7 @@ namespace Gekko
 
         public const string cacheExtension = ".cache";  //used for libraries and databanks (models have .mdl)
         public const string cacheExtensionModel = ".mdl";  //used for models
-        
+
         public const string globalLibraryString = "Global";
         public const string localLibraryString = "Local";  //--> maybe used later
         public const string gekkoLibraryString = "Gekko";  //--> maybe used later
@@ -127,15 +127,15 @@ namespace Gekko
         public static int tempVarIndexCounter = 0;
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
         public static string localTempFilesLocationGnuplot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot";
-        
+
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter
         public static int goodBufferSizeForShaHashCode = 50000;  //some use 1200000 but 50000 seems just enough (tested --> 20% faster than using 4096 which is default)
-        
-        public static StreamWriter sw = null;        
-        
+
+        public static StreamWriter sw = null;
+
         public static List<string> unitTestsPromtingHelper = null;
-        
+
         public static bool nolog = false;      //-nolog parameter for gekko.exe
         public static bool hideGui = false;    //true for use without GUI window
         public static bool excelDna = false;  //true for use with ExcelDna solution
@@ -152,11 +152,11 @@ namespace Gekko
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
-                
+
         public static string windowFindStatusBarText = "Double-click to decompose equation, single-click to select";
         public static string windowDecompStatusBarText = "Double-click to find equation(s)";
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";
-                
+
         public const string col_variable = Globals.internalColumnIdentifyer + "vars";
         public const string col_lag = Globals.internalColumnIdentifyer + "lags";
         public const string col_t = internalColumnIdentifyer + "time";
@@ -197,8 +197,8 @@ namespace Gekko
 
         public static string equationCodeY = "y";
         public static string equationCodeT = "t";
-        public static string equationCodeP = "p";        
-                
+        public static string equationCodeP = "p";
+
         public static string ageHierarchyDivider = "..";
         public static string ageHierarchyName = "a10";
         public static string ageName = "a";
@@ -208,14 +208,14 @@ namespace Gekko
 
         public static bool eliminateConcatenator = true;
 
-        public static bool modeIntendedWarning = false;        
+        public static bool modeIntendedWarning = false;
 
         public static string blockHelper = "<[time]>";
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" } };
 
-        public static string errorHelper = null;        
+        public static string errorHelper = null;
 
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
@@ -247,17 +247,17 @@ namespace Gekko
 
         public static string serviceMessage = "[service message]";
         public static string serviceMessageTruncated = "[further service messages truncated]";
-        
+
         public static Dictionary<string, string> parentheses = new Dictionary<string, string> { { "(", ")" }, { "[", "]" }, { "{", "}" } };
         public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
-        
+
         public static string splitStart = "//[[commandStart]]";
         public static string splitBit = "//[[command";
         public static string splitSpecial = "//[[commandSpecial]]";
         public static string splitEnd = "//[[commandEnd]]";
 
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
-        
+
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
@@ -265,11 +265,11 @@ namespace Gekko
         /// BEWARE: This is used in dynamic C# code, no rename please! Or change the dynamic code...
         /// </summary>
         public static Dictionary<int, Func<GraphHelper, string>> printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
-        
+
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
 
-        public const string procedure = "procedure___";        
+        public const string procedure = "procedure___";
 
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
 
@@ -284,7 +284,7 @@ namespace Gekko
 
         public static string protobufFileName = "databank.bin";
         public static string protobufFileName2 = "databank.data"; //In Gekko 2.2 it might be wise to change to for instance databank.data, this setting is only for reading, and it tests Program.options.databank_file_gbk_internal too
-        
+
         public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;
 
@@ -301,7 +301,7 @@ namespace Gekko
         public static List<string> unitTestDependents = null;
 
         public const string stringConversionNote = "NOTE: You can use a string %s as a variable name with {%s}";
-        
+
         public const string Work = "Work";
         public const string Ref = "Ref";
         public const string First = "First";
@@ -338,10 +338,10 @@ namespace Gekko
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";
-        
+
         public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
-        
+
         public static List<Action<string, GekkoTime>> predictActions = null;
 
         public static string functionTP1Cs = Globals.smpl + ", p";
@@ -356,7 +356,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
-        
+
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
 
@@ -366,7 +366,7 @@ namespace Gekko
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
         public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.smpl + ".HasError()) O.TryNewSmpl(" + Globals.smpl + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
-        
+
         //Seems this is used
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
         //public static Parser.Gek.ParserGekCreateAST.EParserType syntaxType = Parser.Gek.ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;  //used in Cmd3.g        
@@ -376,7 +376,7 @@ namespace Gekko
         public static int freqASubperiods = 1;
         public static int freqQSubperiods = 4;
         public static int freqMSubperiods = 12;
-        
+
         public static bool databanksAsProtobuffers = true;
 
         //See also #80927435209843
@@ -387,12 +387,12 @@ namespace Gekko
         public static bool unitTestIntegration = false;
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";
         public static List<ToFrom> unitTestCopyHelper = null;
-        public static bool unitTestCopyHelper2 = false;        
+        public static bool unitTestCopyHelper2 = false;
 
         public static bool alwaysEnablcPackForSimulation = false;  //if true, packing of non-failing simulations is easy (but this costs time)
         public static UndoSim undoSim = null;
         public static PackSim packSim = null;
-                
+
         // ----
         //This is used for OPTION intellisense
         public static string xbool = "bool";
@@ -408,7 +408,7 @@ namespace Gekko
         // ----
         public static List<List<string>> listSyntaxAlias = new List<List<string>>();
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
-        
+
         public const string symbolTurtle = "___";
 
         public const string symbolBankColon = ":";
@@ -438,9 +438,9 @@ namespace Gekko
         public static bool useMAsDefaultOperatorInFindWindow = true;  //use <m> as default      
 
         public static bool fastGauss = true;  //Beware: RES command should switch the option off
-                
+
         public static double[] scaleNewtonValues = new double[0];
-                
+
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidthFirst = 135;
@@ -449,7 +449,7 @@ namespace Gekko
 
         public static double pruneDecomp = 0.10d;
         public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?
-        
+
         public const string freelists = "|||";
         public static bool fixWildcardLabel = true;  //keep this variable, it points to something to bugfix
         public static string wildcardText = "wildcard";
@@ -489,7 +489,7 @@ namespace Gekko
 
         public static bool pipe2 = false;
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
-        
+
         public static int guiTextPaddingLeft = 6;
         public static int guiTextPaddingVertical = 6;
 
@@ -506,7 +506,7 @@ namespace Gekko
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
         public const int decomp2000 = 2000;  //must be 2000, TODO handle frequencies
-        public const int decompHackt1= 1980; //can be anything, TODO handle frequencies
+        public const int decompHackt1 = 1980; //can be anything, TODO handle frequencies
         public const int decompHackt2 = 2100; //can be anything, TODO handle frequencies
 
         //GUI hacks
@@ -521,7 +521,7 @@ namespace Gekko
 
         public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
         public static string gekkoVersion = "";
-        
+
         public static double invertRelativeConvergence = 0.0001d;  //old val=0.003d
         public static double invertAbsoluteConvergence = 1.0e-8d;
         public static int invertIterations = 500;  //old val=1000000
@@ -543,9 +543,9 @@ namespace Gekko
         public static GekkoTime dispLastDispEnd;  //kind of a hack        
         public static bool guiHomeMainEnabled = false;
         public static bool guiHomeMenuEnabled = false;
-                
+
         public static double jacobiDeltaProbe = 1.0e-4; //1.0 e-4 stepsize for gradient computation        
-        
+
         public static bool solveUseStrictCrits = true;
 
         public static List<string> checkoff = new List<string>();
@@ -568,7 +568,7 @@ namespace Gekko
         public static string tableOption = "";
 
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
-        
+
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
 
         public static string[] convergenceCheckVariables = new string[1];
@@ -584,7 +584,7 @@ namespace Gekko
         /// A lag like fY(-2.000000004) --> fY(-2), to avoid rounding errors
         /// </summary>
         public static double toleranceRegardingBrokenLagsOrLeads = 0.000001;
-        
+
         public static UserSettings userSettings = new UserSettings();
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace Gekko
         /// Used for kind of an internal hack
         /// </summary>
         public static int disableRationButtons = 0;
-        
+
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
 
@@ -612,7 +612,7 @@ namespace Gekko
         public static string expressionText = null;
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
-                
+
         public static char parserErrorSeparator = '¤';  //5 places: (1) model lex, (2) model syntax, (3) gcm lex, (4) gcm syntax, (5) run-time error
         public static char parserErrorSeparator2 = '*';  //in filenames like file1.gcm*13, this means that there is a line offset of 13 lines (used in libraries lazy loading)
 
@@ -623,8 +623,8 @@ namespace Gekko
         public const char freqIndicator = '!';  //see also #09832752                
 
         public static string protectSymbol = "\u2714";
-                
-        public static bool doNotSaveUserSettings = false; 
+
+        public static bool doNotSaveUserSettings = false;
 
         public const string ols1 = "OLS estimation";
         public const string ols2 = "Dep. variable = ";
@@ -635,13 +635,13 @@ namespace Gekko
 
         public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
         public static string compilerOptions64 = "/optimize /platform:x64";
-        
+
         public static bool btnStartThread = false;
         public static bool btnStopThread = false;
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
 
-        public const int systemTthreadsExtra= 3;
+        public const int systemTthreadsExtra = 3;
 
         public static bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
@@ -649,7 +649,7 @@ namespace Gekko
         public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static CounterHelper ch = new CounterHelper();
-        
+
         public static string helpStartPage = "introduction";
 
         public static List<string> leftSideFunctions = new List<string>() {
@@ -721,7 +721,7 @@ namespace Gekko
             "PLOT",
             "PROCEDURE",
             "PRT",
-            "PREDICT",            
+            "PREDICT",
             "R_RUN",
             "PYTHON_RUN",
             "REBASE",
@@ -758,7 +758,7 @@ namespace Gekko
 
         public static List<string> extraNames = new List<string>() { "P", "PRI", "PRINT", "SER" };
         public static List<string> commandNames = Program.Add2Lists(Globals.helpTopics, Globals.extraNames);  //must be after the two lists
-        
+
         public static Dictionary<string, string> createdVariables = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
         public static WindowRunStatus windowRunStatus = null;
@@ -796,8 +796,8 @@ namespace Gekko
 
         public static string gekkoExeParameters = null;
 
-        public static bool runningOnTTComputer = false;        
-        
+        public static bool runningOnTTComputer = false;
+
         public static bool prettyTextTableRendering = false;  //see http://www.unicode.org/charts/PDF/U2500.pdf
 
         public static int numberOfErrors = 0;
@@ -810,12 +810,12 @@ namespace Gekko
         public static string lastDynamicCsCode = null;  //if it does not compile (internal error)
 
         public static int lockedCounter = 0;
-        
+
         public static bool printAST = false;  //for debugging, gets true when "ast" is typed at command prompt        
 
         public static Excel.Application objApp = null;  //used for the Excel PIA interface (not used much anymore, after EPPlus).
         public static int excelLastThreadID = int.MinValue;
-                
+
         public static int waitFileTotalTime = 600;             //600 s = 10 min
         public static int waitFileGap = 2;
 
@@ -826,14 +826,14 @@ namespace Gekko
         public static string autoExecCmdFileName = "gekko.ini";
 
         public static string detectedRPath = null;
-        public static string detectedPythonPath = null;        
+        public static string detectedPythonPath = null;
 
         public static int endOfLinePositionWhenLastEnterPressed = -12345;
         public static int startOfLinePositionWhenLastEnterPressed = -12345;
-        
+
         public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens                
 
-        public static bool printGrayLinesForDebugging = false;        
+        public static bool printGrayLinesForDebugging = false;
 
         public static bool noini = false;
 
@@ -879,13 +879,10 @@ namespace Gekko
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
-        //maybe use red...  blue, red, green, darkyelloworange?
-        public static System.Windows.Media.Color RainbowParenthesis1 = System.Windows.Media.Color.FromArgb(255, 129, 165, 239);
-        public static System.Windows.Media.Color RainbowParenthesis2 = System.Windows.Media.Color.FromArgb(255, 255, 175, 52);
-        public static System.Windows.Media.Color RainbowParenthesis3 = System.Windows.Media.Color.FromArgb(255, 92, 145, 47);
-        public static System.Windows.Media.Color RainbowParenthesis4 = System.Windows.Media.Color.FromArgb(255, 223, 132, 162);
-        public static System.Windows.Media.Color RainbowLag = System.Windows.Media.Color.FromArgb(255, 88, 88, 88);
-        public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);
+        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 252, 238); //yellow bar is 253, 245, 176 --> therefore we deduct a bit from G too.
+
+        public static List<System.Windows.Media.Color> RainbowParentheses = new List<System.Windows.Media.Color>() { System.Windows.Media.Colors.Blue, System.Windows.Media.Colors.Red, System.Windows.Media.Colors.Green, System.Windows.Media.Colors.Magenta, System.Windows.Media.Colors.Orange, System.Windows.Media.Colors.Gray };
+        public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);        
 
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static int decompFontSize = 13;
