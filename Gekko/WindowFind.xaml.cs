@@ -224,7 +224,7 @@ namespace Gekko
         {
             List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
-            this.windowEquationBrowserLabel.Text = s7;
+            this.windowEquationBrowserLabel.Text = s7; 
         }
 
         public void FindSetButtons(string eqName, List<string> firstList, Model model)
