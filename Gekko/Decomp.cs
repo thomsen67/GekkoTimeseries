@@ -13,6 +13,17 @@ using System.Threading;
 
 namespace Gekko
 {
+    public class SortHelper
+    {        
+        public int position = -12345;
+        public double value = double.NaN;
+        public string name = null;
+        public override string ToString()
+        {
+            return position + " --- " + value + " ---name--- " + name;
+        }
+    }
+
     public class DecompOperator
     {
         //remember Clone()
@@ -2764,9 +2775,11 @@ namespace Gekko
             if (model.DecompType() == EModelType.GAMSScalar)
             {
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
-            }            
+            }
 
-            return table;
+            Table table2 = DecompTableHandleSortAndPrune(table, decompOptions2);
+
+            return table2;
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
@@ -2970,10 +2983,11 @@ namespace Gekko
                     else
                     {
                         table.SetNumber(i + 2, j + 2, d, format2);
-                    }
+                    }                    
 
                     Cell c = table.Get(i + 2, j + 2);
                     c.vars_hack = fullVariableNames;
+                    c.value_hack = d;  //stored for sort and prune later on
                     c.backgroundColor = backgroundColor;
                 }
             }
@@ -3595,6 +3609,94 @@ namespace Gekko
             }
 
             return frame;
+        }
+
+        /// <summary>
+        /// Sorting and pruning. Uses .value_hack of each cell, which stores value no matter what is shown in cell.
+        /// </summary>
+        /// <param name="table1"></param>
+        /// <param name="decompOptions2"></param>
+        private static Table DecompTableHandleSortAndPrune(Table table1, DecompOptions2 decompOptions2)
+        {
+            if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return table1;  //fast return 
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
+            if (rowsOrCols == ERowsCols.None) return table1; //fast return 
+
+            List<SortHelper> sortHelper = new List<SortHelper>();
+
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+
+                for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore periods and first data row                   
+                {
+                    string name2 = table1.Get(i, 2).vars_hack[0];
+                    if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    double max = 0d;
+                    for (int j = 2; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        Cell c1 = table1.Get(i, j);
+                        Cell c2 = table1.Get(2, j);
+                        double d = c1.value_hack / c2.value_hack * 100d;
+                        if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
+                    }
+                    sortHelper.Add(new SortHelper() { position = i, value = max, name = name2 });
+                }
+            }
+
+            //maybe prune
+            List<SortHelper> sortHelper2 = new List<SortHelper>();
+            if (!(double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d))
+            {
+                foreach (SortHelper sh in sortHelper)
+                {
+                    if (sh.value >= decompOptions2.prune) sortHelper2.Add(sh);
+                }
+            }
+
+            //Maybe sort
+            List<SortHelper> sortHelper3 = new List<SortHelper>();
+            if (decompOptions2.sort)
+            {
+                sortHelper3.AddRange(sortHelper2.OrderByDescending(x => x.value));
+            }
+            else
+            {
+                sortHelper3.AddRange(sortHelper2);
+            }
+
+            Table table2 = new Table();
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                //copy the first two rows (dates row and row containing selected/dependent variable)
+                int two = 2;
+                for (int i = 1; i <= two; i++)
+                {
+                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        table2.Set(new Coord(i, j), table1.Get(i, j));
+                    }
+                }
+                int i1 = 2;
+                foreach (SortHelper sh in sortHelper3)
+                {
+                    i1++;
+                    int i2 = sh.position;
+                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                    {                        
+                        table2.Set(new Coord(i1, j), table1.Get(i2, j));
+                    }
+                }
+                if (decompOptions2.showErrors)
+                {
+                    //get the last line with the errors
+                    for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                    {
+                        table2.Set(new Coord(sortHelper3.Count + two + 1, j), table1.Get(table1.GetRowMaxNumber(), j));
+                    }
+                }
+            }
+            return table2;
+
         }
 
         /// <summary>
