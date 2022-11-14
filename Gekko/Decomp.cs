@@ -4372,8 +4372,11 @@ namespace Gekko
                 //this dictionary uses 'option model gams dep method = lhs|eqname', and also a possible #dependents list.
                 if (model.modelGekko != null)
                 {
-                    ModelGamsEquation e = null;
-                    int eqNumber = model.modelGamsScalar.dict_FromEqNameToEqNumber.Get("e_fy[2000]");
+                    //ModelGamsEquation e = null;
+                    //int eqNumber = model.modelGamsScalar.dict_FromEqNameToEqNumber.Get("e_fy[2000]");
+                    //GekkoTime gt = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+                    //eqNames.Add("e_" + s2 + "[" + gt.ToString() + "]");
+                    eqNames.Add("e_" + s2);
                     // -------> do something so e_fy is first
                 }
                 else if (model.modelGams != null)
