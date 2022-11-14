@@ -756,10 +756,8 @@ namespace Gekko
             //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]" with values as timeseries.
             //This example is split into y, #a, 1, t, value --> so we get a dataframe row like this:
             //eq=0, variable=y, #a = 19, lag=1, t=2010, 1.2345
-            //We clone the data first, before calling DecompPivotToTable(), because they may be normalized etc. 
-
-            //The decompDataMAINClone is a list, but ought to be 1 object (fix some time)
-            //We are cloning this, because normalization may take place when doing the table
+            //We clone the data first, before calling DecompPivotToTable(), because they may be normalized etc.                         
+            //We are cloning decompDataMAINClone this, because normalization may take place when doing the table
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
             Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
@@ -4417,12 +4415,9 @@ namespace Gekko
                 {
                     if (!helper.best) eqsNew2.Add(helper);
                 }
-
-                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
-                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
-                //!!! TODO TODO  use somehow .Sort(G.CompareNaturalIgnoreCase);
-                var eqsNew1a = eqsNew1.OrderBy(x => x.eqNameWithLag);
-                var eqsNew2a = eqsNew2.OrderBy(x => x.eqNameWithLag);
+                
+                var eqsNew1a = eqsNew1.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
+                var eqsNew2a = eqsNew2.OrderBy(x => x.eqNameWithLag, new G.NaturalComparer(G.NaturalComparerOptions.Default));
                 eqsNew.AddRange(eqsNew1a);
                 eqsNew.AddRange(eqsNew2a);
 
