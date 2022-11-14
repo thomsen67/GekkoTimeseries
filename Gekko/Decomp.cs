@@ -298,6 +298,13 @@ namespace Gekko
             M
         }
 
+        public enum ERowsCols
+        {
+            Rows,
+            Cols,
+            None
+        }
+
         public enum ELowLevel
         {
             Unknown,
@@ -813,11 +820,12 @@ namespace Gekko
             PrintDecompDict(y.cellsContribM);
         }
 
-        public static bool AreVariablesOnRows(DecompOptions2 decompOptions)
+        public static ERowsCols VariablesOnRowsOrCols(DecompOptions2 decompOptions)
         {
-            bool variableIsRow = false;
-            if (decompOptions.rows.Contains(Globals.col_variable)) variableIsRow = true;
-            return variableIsRow;
+            ERowsCols rv = ERowsCols.None;
+            if (decompOptions.rows.Contains(Globals.col_variable)) rv = ERowsCols.Rows;
+            else if (decompOptions.cols.Contains(Globals.col_variable)) rv = ERowsCols.Cols;
+            return rv;
         }
 
         private static void InitDecompDatas(DecompOptions2 decompOptions2, DecompDatas decompDatas, Model model)
@@ -2746,8 +2754,7 @@ namespace Gekko
             List<string> tempColNames = new List<string>();
             GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
 
-            List<string> rownames, colnames;
-            string rownamesFirst, colnamesFirst;
+            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
             DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
             Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
@@ -2757,7 +2764,7 @@ namespace Gekko
             if (model.DecompType() == EModelType.GAMSScalar)
             {
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
-            }
+            }            
 
             return table;
         }
@@ -3008,37 +3015,72 @@ namespace Gekko
         /// </summary>
         /// <param name="decompOptions2"></param>
         /// <param name="parentI"></param>
-        /// <param name="rownames3"></param>
-        /// <param name="colnames3"></param>
+        /// <param name="rownamesInput"></param>
+        /// <param name="colnamesInput"></param>
         /// <param name="rownames"></param>
         /// <param name="colnames"></param>
         /// <param name="rownamesFirst"></param>
         /// <param name="colnamesFirst"></param>
-        private static void DecompPivotOrderRowsAndColumns(DecompOptions2 decompOptions2, int parentI, List<string> rownames3, List<string> colnames3, out List<string> rownames, out List<string> colnames, out string rownamesFirst, out string colnamesFirst, Model model)
+        private static void DecompPivotOrderRowsAndColumns(DecompOptions2 decompOptions2, int parentI, List<string> rownamesInput, List<string> colnamesInput, out List<string> rownames, out List<string> colnames, out string rownamesFirst, out string colnamesFirst, Model model)
         {
-            for (int i = 0; i < rownames3.Count; i++)
+            bool sort = decompOptions2.sort;
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
+
+            //------------------------------------------------
+            //ROWS -------------------------------------------
+            //------------------------------------------------
+
+            for (int i = 0; i < rownamesInput.Count; i++)
             {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNull, Globals.decompNullName);
+                if (rownamesInput[i] != null) rownamesInput[i] = rownamesInput[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
-            List<string> rownames2 = new List<string>();
-            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
-            rownames3 = rownames2;
-            for (int i = 0; i < rownames3.Count; i++)
+            List<string> rownamesTemp = new List<string>();
+            if (sort && rowsOrCols == ERowsCols.Rows)
             {
-                if (rownames3[i] != null) rownames3[i] = rownames3[i].Replace(Globals.decompNullName, Globals.decompNull);
+                //sort rows by values
+            }
+            else
+            {
+                foreach (var rowname in rownamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
+                {
+                    rownamesTemp.Add(rowname);
+                }
+            }
+            rownamesInput = rownamesTemp;
+            for (int i = 0; i < rownamesInput.Count; i++)
+            {
+                if (rownamesInput[i] != null) rownamesInput[i] = rownamesInput[i].Replace(Globals.decompNullName, Globals.decompNull);
             }
 
-            for (int i = 0; i < colnames3.Count; i++)
+            //------------------------------------------------
+            //COLS -------------------------------------------
+            //------------------------------------------------
+
+            for (int i = 0; i < colnamesInput.Count; i++)
             {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNull, Globals.decompNullName);
+                if (colnamesInput[i] != null) colnamesInput[i] = colnamesInput[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
-            List<string> colnames2 = new List<string>();
-            foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
-            colnames3 = colnames2;
-            for (int i = 0; i < colnames3.Count; i++)
+            List<string> colnamesTemp = new List<string>();
+            if (sort && rowsOrCols == ERowsCols.Cols)
             {
-                if (colnames3[i] != null) colnames3[i] = colnames3[i].Replace(Globals.decompNullName, Globals.decompNull);
+                //sort cols by values
             }
+            else
+            {
+                foreach (var colname in colnamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
+                {
+                    colnamesTemp.Add(colname);
+                }
+            }
+            colnamesInput = colnamesTemp;
+            for (int i = 0; i < colnamesInput.Count; i++)
+            {
+                if (colnamesInput[i] != null) colnamesInput[i] = colnamesInput[i].Replace(Globals.decompNullName, Globals.decompNull);
+            }
+
+            // --------------------------------------------------------------------
+            // Handle first row/col, putting the selected variable there
+            // --------------------------------------------------------------------
 
             string varnames = decompOptions2.link[parentI].varnames;
             bool orderNormalize = true;
@@ -3046,32 +3088,32 @@ namespace Gekko
             rownames = new List<string>();
             colnames = new List<string>();
             rownamesFirst = null;
-            for (int i = 0; i < rownames3.Count; i++)
+            for (int i = 0; i < rownamesInput.Count; i++)
             {
-                bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames);
-                bool b2 = rownamesFirst == null && orderNormalize && (rownames3[i] != null && rownames3[i].Contains(Globals.pivotHelper2));
+                bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownamesInput[i], varnames);
+                bool b2 = rownamesFirst == null && orderNormalize && (rownamesInput[i] != null && rownamesInput[i].Contains(Globals.pivotHelper2));
                 if ((model.DecompType() != EModelType.GAMSScalar && b1) || (model.DecompType() == EModelType.GAMSScalar && b2))
                 {
-                    rownamesFirst = rownames3[i];
+                    rownamesFirst = rownamesInput[i];
                 }
                 else
                 {
-                    rownames.Add(rownames3[i]);
+                    rownames.Add(rownamesInput[i]);
                 }
             }
 
             colnamesFirst = null;
-            for (int i = 0; i < colnames3.Count; i++)
+            for (int i = 0; i < colnamesInput.Count; i++)
             {
-                bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames);
-                bool b2 = colnamesFirst == null && orderNormalize && (colnames3[i] != null && colnames3[i].Contains(Globals.pivotHelper2));
+                bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnamesInput[i], varnames);
+                bool b2 = colnamesFirst == null && orderNormalize && (colnamesInput[i] != null && colnamesInput[i].Contains(Globals.pivotHelper2));
                 if ((model.DecompType() != EModelType.GAMSScalar && b1) || (model.DecompType() == EModelType.GAMSScalar && b2))
                 {
-                    colnamesFirst = colnames3[i];
+                    colnamesFirst = colnamesInput[i];
                 }
                 else
                 {
-                    colnames.Add(colnames3[i]);
+                    colnames.Add(colnamesInput[i]);
                 }
             }
 
@@ -3563,18 +3605,22 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void DecompTableHandleSignAndSharesAndErrors(Table tab, DecompOptions2 decompOptions2)
         {            
-            bool areVariablesOnRows = AreVariablesOnRows(decompOptions2);                        
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);                        
 
             if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
             }
 
+            //
+            // ERRORS
+            //
+            //Set error row/column, as a sum of rows 2 and on. Also sets count/names on that row/col.
             if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
             {
-                int rowmax = tab.GetRowMaxNumber();  //because it changes dynamically
-                int colmax = tab.GetColMaxNumber();  //because it changes dynamically
-                if (areVariablesOnRows)
+                int rowmax = tab.GetRowMaxNumber();  //because it changes dynamically later on
+                int colmax = tab.GetColMaxNumber();  //because it changes dynamically later on
+                if (rowsOrCols == ERowsCols.Rows)
                 {                    
                     for (int j = 2; j <= colmax; j++)
                     {
@@ -3602,7 +3648,7 @@ namespace Gekko
                     }
                     tab.Set(rowmax + 1, 1, Globals.decompErrorName2);
                 }
-                else
+                else if (rowsOrCols == ERowsCols.Cols)
                 {                    
                     for (int i = 2; i <= rowmax; i++)
                     {
@@ -3630,13 +3676,22 @@ namespace Gekko
                     }
                     tab.Set(1, colmax + 1, Globals.decompErrorName2);
                 }
+                else
+                {
+                    //do nothing, no errors shown
+                }
             }
 
+            //
+            // SIGN AND SHARES
+            //
+            //change sign on row/col 2 (dependent var), and calcuate share values for rows/cols 2 and on.
+            //no adding of rows/columns.
             if (!decompOptions2.decompOperator.isRaw)
             {
                 string formatSShares = "f16." + decompOptions2.decimalsPch;
                 if (decompOptions2.count == ECountType.N || decompOptions2.count == ECountType.Names) return;
-                if (areVariablesOnRows)
+                if (rowsOrCols == ERowsCols.Rows)
                 {
                     for (int j = 2; j <= tab.GetColMaxNumber(); j++)
                     {
@@ -3657,7 +3712,7 @@ namespace Gekko
                         }
                     }
                 }
-                else
+                else if (rowsOrCols == ERowsCols.Cols)
                 {
                     for (int i = 2; i <= tab.GetRowMaxNumber(); i++)
                     {
@@ -3678,8 +3733,16 @@ namespace Gekko
                         }
                     }
                 }
+                else
+                {
+                    //Do nothing: no special handling of the first row/col, and no 
+                    //shares calculation.
+                    //Should the values change sign? Sign is probably pretty arbitray, and
+                    //the cells sum up to zero (?)
+                }
             }
         }
+
 
         /// <summary>
         /// Set back to vars and lags on rows, and time on cols

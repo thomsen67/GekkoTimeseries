@@ -934,7 +934,7 @@ namespace Gekko
             int startCol = 0;
             int endCol = 0;
 
-            bool variablesAreOnRows = Decomp.AreVariablesOnRows(decompOptions);
+            Decomp.ERowsCols variablesAreOnRows = Decomp.VariablesOnRowsOrCols(decompOptions);
 
             if (type == GekkoTableTypes.TableContent)
             {
@@ -1091,7 +1091,7 @@ namespace Gekko
             Clipboard.SetDataObject(s);
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, bool variableIsRow)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1115,7 +1115,7 @@ namespace Gekko
             }
             else
             {
-                if ((variableIsRow && type == GekkoTableTypes.Left) || (!variableIsRow && type == GekkoTableTypes.Top))
+                if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
 
                     //
@@ -1162,13 +1162,17 @@ namespace Gekko
                         textBlock.MouseLeave += Mouse_Leave;
                         textBlock.MouseDown += Mouse_Down;
                         textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
-                        if (variableIsRow)
+                        if (isRowOrCol == Decomp.ERowsCols.Rows)
                         {
                             if (i == 0) textBlock.FontWeight = FontWeights.Bold;
                         }
-                        else
+                        else if (isRowOrCol == Decomp.ERowsCols.Cols)
                         {
                             if (j == 0) textBlock.FontWeight = FontWeights.Bold;
+                        }
+                        else
+                        {
+                            //no boldness, since there are no chosen vars.
                         }
                     }
                 }
@@ -1543,23 +1547,35 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Used for links in table (clickable variales).
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="c"></param>
+        /// <param name="c2"></param>
         private void GetTwoCells(int row, int col, out Cell c, out Cell c2)
         {
             int x = -12345;
             int y = -12345;
             c = null;
             c2 = null;
-            if (Decomp.AreVariablesOnRows(this.decompFind.decompOptions2))
+            if (Decomp.VariablesOnRowsOrCols(this.decompFind.decompOptions2) == Decomp.ERowsCols.Rows)
             {
                 CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
                 c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
                 c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd
             }
-            else
+            else if (Decomp.VariablesOnRowsOrCols(this.decompFind.decompOptions2) == Decomp.ERowsCols.Cols)
             {
                 CoordConversion(out x, out y, GekkoTableTypes.Top, row, col);
                 c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
                 c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd
+            }
+            else
+            {
+                //there are no links.
+                //do nothing, return null
             }
         }
 
@@ -1594,22 +1610,26 @@ namespace Gekko
             }
             else
             {
-                bool variablesOnRows = Decomp.AreVariablesOnRows(decompFind.decompOptions2);
+                Decomp.ERowsCols rowOrCol = Decomp.VariablesOnRowsOrCols(decompFind.decompOptions2);
 
                 Cell c = null;
                 Cell c2 = null;
 
                 c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
-                if (variablesOnRows)
+                if (rowOrCol == Decomp.ERowsCols.Rows)
                 {
                     c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd                
                 }
-                else
+                else if (rowOrCol == Decomp.ERowsCols.Cols)
                 {
                     c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x + 1, y); //#7098asfuydasfd                
                 }
+                else
+                {
+                    //do nothing
+                }
 
-                if ((variablesOnRows && dockPanel.type == GekkoTableTypes.Left) || (!variablesOnRows && dockPanel.type == GekkoTableTypes.Top))
+                if ((rowOrCol == Decomp.ERowsCols.Rows && dockPanel.type == GekkoTableTypes.Left) || (rowOrCol == Decomp.ERowsCols.Cols && dockPanel.type == GekkoTableTypes.Top))
                 {
                     if (c != null)
                     {
@@ -1621,33 +1641,33 @@ namespace Gekko
                             if (G.Equal(var2, Globals.decompText0))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("This value corresponds to evaluating the expression."));
                                 }
                                 else
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("This value corresponds to evaluating the right-hand side of the equation."));
                                 }
                             }
                             else if (G.Equal(var2, Globals.decompText1))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("This difference is always 0 for expressions."));
                                 }
                                 else
                                 {
-                                    RichSetText(equation, Decomp.GetColoredEquations("This difference is the databank value minus the result of evaluating the right-hand side of the equation."));                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference is the databank value minus the result of evaluating the right-hand side of the equation."));
                                 }
                             }
                             else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
                                 {
-                                    RichSetText(equation, Decomp.GetColoredEquations("This difference between the two rows above is always 0 for expressions."));                                    
+                                    RichSetText(equation, Decomp.GetColoredEquations("This difference between the two rows above is always 0 for expressions."));
                                 }
                                 else
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("This difference is the databank value minus the result of evaluating the right-hand side of the equation."));
                                 }
 
@@ -1655,7 +1675,7 @@ namespace Gekko
                             else if (G.Equal(var2, Globals.decompText2))
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("This value is the result of evaluating the expression minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero)."));
                                 }
                                 else
@@ -1666,21 +1686,21 @@ namespace Gekko
                             else if (G.Equal(var2, Globals.decompText2a))  //raw
                             {
                                 if (this.decompFind.decompOptions2.expressionOld != null)
-                                {                                    
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("These values correspond to evaluating the expression (always equal to the row above for expressions)."));
                                 }
                                 else
-                                {                                 
+                                {
                                     RichSetText(equation, Decomp.GetColoredEquations("These values correspond to evaluating the right-hand side of the equation."));
                                 }
                             }
                             else
                             {
-                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;                                                             
+                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;
                                 string var7 = HiddenVariableHelper(c2);
 
                                 int number = -12345;
-                                try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch {};
+                                try { number = int.Parse(var7.Substring(Globals.decompResidualName.Length)); } catch { };
                                 if (var7 == Globals.decompResidualName) number = 0;
                                 //"Residual" --> number = 0
                                 //"Residual1" --> number = 1
@@ -1695,7 +1715,7 @@ namespace Gekko
                                 else
                                 {
                                     if (var7 == Globals.decompErrorName)
-                                    {                                    
+                                    {
                                         RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors should be = 0). If the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
@@ -1707,7 +1727,7 @@ namespace Gekko
                                     else
                                     {
                                         List<string> ss = Program.GetVariableExplanation(G.Chop_RemoveFreq(var7), var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
-                                        string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();                                        
+                                        string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                         RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }
                                 }
@@ -1725,7 +1745,7 @@ namespace Gekko
                     else
                     {
                         s = Model.GetEquationTextFoldedNonScalar(this.decompFind.model.DecompType(), this.decompFind.decompOptions2.link);
-                    }                    
+                    }
                     RichSetText(equation, Decomp.GetColoredEquations(s));
                 }
             }

@@ -44,10 +44,9 @@ namespace Gekko
         public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---        
         public bool databank_create_auto = true;
-        public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache non-gbk databank files for faster (re)read.
+        public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache databank files for faster (re)read.
         public bool databank_file_copylocal = true;
-        public bool databank_file_gbk_compress = true;
-        public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
+        public bool databank_file_gbk_compress = true;        
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
         // ---
@@ -310,7 +309,6 @@ namespace Gekko
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
             Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);
-            Add("DATABANK FILE GBK VERSION", Globals.xval2String);            
             Add("DATABANK SEARCH", Globals.xbool);
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);

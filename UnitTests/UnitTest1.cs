@@ -11195,12 +11195,12 @@ namespace UnitTests
             Assert.AreEqual(Globals.itemHandler.Items[0].Name, "e1");
             Assert.AreEqual(Globals.itemHandler.Items[0].Dep, Globals.protectSymbol);
             Assert.AreEqual(Globals.itemHandler.Items[0].Vars, "y, c, g");
-            Assert.AreEqual(Globals.itemHandler.Items[1].Name, "e2[-1]");
+            Assert.AreEqual(Globals.itemHandler.Items[1].Name, "e2");
             Assert.AreEqual(Globals.itemHandler.Items[1].Dep, "");
-            Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-2], y[-1], y, c[-1]");
-            Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2");
+            Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-1], y, y[+1], c");
+            Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2[-1]");
             Assert.AreEqual(Globals.itemHandler.Items[2].Dep, "");
-            Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-1], y, y[+1], c");
+            Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");            
 
             Gekko.Table table = null;                       
 
