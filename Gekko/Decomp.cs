@@ -3628,8 +3628,7 @@ namespace Gekko
 
             if (rowsOrCols == ERowsCols.Rows)
             {
-
-                for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore periods and first data row                   
+                for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
                     string name2 = table1.Get(i, 2).vars_hack[0];
                     if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
@@ -3643,7 +3642,26 @@ namespace Gekko
                     }
                     sortHelper.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
-            }            
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
+                {
+                    string name2 = table1.Get(2, j).vars_hack[0];
+                    if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    double max = 0d;
+                    for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        Cell c1 = table1.Get(i, j);
+                        Cell c2 = table1.Get(i, 2);
+                        double d = c1.value_hack / c2.value_hack * 100d;
+                        if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
+                    }
+                    sortHelper.Add(new SortHelper() { position = j, value = max, name = name2 });
+                }
+            }
+
+            // ------------------- the following is common for rows vs cols START ------------------------
 
             //maybe prune
             List<SortHelper> sortHelper2 = new List<SortHelper>();
@@ -3661,8 +3679,8 @@ namespace Gekko
             int pruneCount = sortHelper.Count - sortHelper2.Count;
             if (pruneCount > 0)
             {
-                string x = "rows";
-                if (rowsOrCols == ERowsCols.Cols) x = "cols";
+                string x = "row" + G.S(pruneCount);
+                if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(pruneCount);
                 prune = pruneCount + " " + x + " pruned";
             }
 
@@ -3677,10 +3695,12 @@ namespace Gekko
                 sortHelper3.AddRange(sortHelper2);
             }
 
+            // ------------------- the preceding is common for rows vs cols END ------------------------
+
             Table table2 = new Table();
             if (rowsOrCols == ERowsCols.Rows)
             {
-                //copy the first two rows (dates row and row containing selected/dependent variable)
+                //copy the first two rows 
                 int two = 2;
                 for (int i = 1; i <= two; i++)
                 {
@@ -3701,10 +3721,40 @@ namespace Gekko
                 }
                 if (decompOptions2.showErrors)
                 {
-                    //get the last line with the errors
+                    //get the last row with the errors
                     for (int j = 1; j <= table1.GetColMaxNumber(); j++)
                     {
                         table2.Set(new Coord(sortHelper3.Count + two + 1, j), table1.Get(table1.GetRowMaxNumber(), j));
+                    }
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                //copy the first two cols
+                int two = 2;
+                for (int j = 1; j <= two; j++)
+                {
+                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        table2.Set(new Coord(i, j), table1.Get(i, j));
+                    }
+                }
+                int j1 = 2;
+                foreach (SortHelper sh in sortHelper3)
+                {
+                    j1++;
+                    int j2 = sh.position;
+                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        table2.Set(new Coord(i, j1), table1.Get(i, j2));
+                    }
+                }
+                if (decompOptions2.showErrors)
+                {
+                    //get the last col with the errors
+                    for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+                    {
+                        table2.Set(new Coord(i, sortHelper3.Count + two + 1), table1.Get(i, table1.GetColMaxNumber()));
                     }
                 }
             }

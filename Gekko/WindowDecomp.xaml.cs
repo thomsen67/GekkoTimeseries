@@ -69,9 +69,7 @@ namespace Gekko
         public bool isInitializing = false; //a bit hacky, to handle radiobutton1 firing a clicked event when initializing
         
         public Grid _grid = null;
-
-        //public StatusBar _status = null;
-        //public TextBlock _statusText = null;
+                
         private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
         ListViewDragDropManager<GekkoTask> dragMgr;
         
@@ -86,21 +84,24 @@ namespace Gekko
             {
                 _numValue = value;
                 txtNum.Text = value.ToString();
-                //this.decompFind.decompOptions2.prune = _numValue;
-                //RecalcCellsWithNewType(false, decompFind.model);
             }
         }
 
         private void cmdUp_Click(object sender, RoutedEventArgs e)
         {
-            NumValue++;
+            if (NumValue < 100) NumValue++;
         }
 
         private void cmdDown_Click(object sender, RoutedEventArgs e)
         {
-            NumValue--;
+            if (NumValue > 0) NumValue--;
         }
 
+        /// <summary>
+        /// Invalid input is ignored. It accepts "", which is interpreted as 0.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void txtNum_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (txtNum == null)
@@ -108,11 +109,25 @@ namespace Gekko
                 return;
             }
 
-            if (int.TryParse(txtNum.Text.Trim(), out _numValue))
+            string s = txtNum.Text.Trim();
+            int i = 0;
+            bool b = false;
+            if (s == null || s == "")
+            {
+                b = true;
+                i = 0;
+            }
+            else
+            {
+                b = int.TryParse(s, out i);
+            }
+
+            if (b && i >= 0 && i <= 100)
             {
                 if (!isInitializing)
                 {
-                    this.decompFind.decompOptions2.prune = _numValue;
+                    this.decompFind.decompOptions2.prune = i;
+                    _numValue = i;
                     RecalcCellsWithNewType(false, decompFind.model);
                 }
             }

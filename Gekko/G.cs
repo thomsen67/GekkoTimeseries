@@ -566,11 +566,11 @@ namespace Gekko
         /// <summary>
         /// Helper method for plural "s", like 0 elefants, 1 elefant, 2 elefants, 3 elefants.
         /// </summary>
-        /// <param name="chars"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
-        public static string S(int chars)
+        public static string S(int count)
         {
-            if (chars == 1) return "";
+            if (count == 1) return "";
             else return "s";
         }
 
