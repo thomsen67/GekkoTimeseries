@@ -11191,7 +11191,8 @@ namespace UnitTests
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
                         
-            I("find <2002 2002> y;");            
+            I("find <2002 2002> y;");
+            Thread.Sleep(1000);  //seems it otherwise may progress too fast 
             Assert.AreEqual(Globals.itemHandler.Items[0].Name, "e1");
             Assert.AreEqual(Globals.itemHandler.Items[0].Dep, Globals.protectSymbol);
             Assert.AreEqual(Globals.itemHandler.Items[0].Vars, "y, c, g");
@@ -13411,6 +13412,17 @@ namespace UnitTests
         {
             Program.Flush();  //wipe out existing models
 
+            //The following syntax is invalid, which is tested.
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            FAIL("MODEL < gms dep = 1 > model2.gmy;");
+            FAIL("MODEL < gms dep = ('a', 'b') > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), 'b') > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('a', 'b')) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('a',)) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), (1, 'x')) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('x', 1)) > model2.gmy;");
+
             // ------------------------------------------------------------
             // default model, the "right" vars are first on the lhs
             // ------------------------------------------------------------
@@ -13553,15 +13565,6 @@ namespace UnitTests
 
             // ----------------------------
 
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
-            FAIL("MODEL < gms dep = 1 > model2.gmy;");
-            FAIL("MODEL < gms dep = ('a', 'b') > model2.gmy;");
-            FAIL("MODEL < gms dep = (('a', 'b'), 'b') > model2.gmy;");
-            FAIL("MODEL < gms dep = (('a', 'b'), ('a', 'b')) > model2.gmy;");
-            FAIL("MODEL < gms dep = (('a', 'b'), ('a',)) > model2.gmy;");
-            FAIL("MODEL < gms dep = (('a', 'b'), (1, 'x')) > model2.gmy;");
-            FAIL("MODEL < gms dep = (('a', 'b'), ('x', 1)) > model2.gmy;");
 
         }
 
