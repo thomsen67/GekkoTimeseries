@@ -3049,18 +3049,12 @@ namespace Gekko
                 if (rownamesInput[i] != null) rownamesInput[i] = rownamesInput[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
             List<string> rownamesTemp = new List<string>();
-            if (sort && rowsOrCols == ERowsCols.Rows)
+
+            foreach (var rowname in rownamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
             {
-                //sort rows by values
-                
+                rownamesTemp.Add(rowname);
             }
-            else
-            {
-                foreach (var rowname in rownamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
-                {
-                    rownamesTemp.Add(rowname);
-                }
-            }
+            
             rownamesInput = rownamesTemp;
             for (int i = 0; i < rownamesInput.Count; i++)
             {
@@ -3076,17 +3070,12 @@ namespace Gekko
                 if (colnamesInput[i] != null) colnamesInput[i] = colnamesInput[i].Replace(Globals.decompNull, Globals.decompNullName);
             }
             List<string> colnamesTemp = new List<string>();
-            if (sort && rowsOrCols == ERowsCols.Cols)
+
+            foreach (var colname in colnamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
             {
-                //sort cols by values
+                colnamesTemp.Add(colname);
             }
-            else
-            {
-                foreach (var colname in colnamesInput.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)))
-                {
-                    colnamesTemp.Add(colname);
-                }
-            }
+            
             colnamesInput = colnamesTemp;
             for (int i = 0; i < colnamesInput.Count; i++)
             {
@@ -3652,6 +3641,10 @@ namespace Gekko
                 {
                     if (sh.value >= decompOptions2.prune) sortHelper2.Add(sh);
                 }
+            }
+            else
+            {
+                sortHelper2.AddRange(sortHelper);
             }
 
             //Maybe sort
