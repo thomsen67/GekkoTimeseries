@@ -3052,6 +3052,7 @@ namespace Gekko
             if (sort && rowsOrCols == ERowsCols.Rows)
             {
                 //sort rows by values
+                
             }
             else
             {
