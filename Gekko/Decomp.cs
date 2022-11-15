@@ -13,6 +13,17 @@ using System.Threading;
 
 namespace Gekko
 {
+    public class DecompOutput
+    {
+        public Table table = null;
+        public string prune = null;
+        public DecompOutput(Table table, string prune)
+        {
+            this.table = table;
+            this.prune = prune;
+        }
+    }
+
     public class SortHelper
     {        
         public int position = -12345;
@@ -587,7 +598,7 @@ namespace Gekko
         /// <param name="refresh"></param>
         /// <param name="decompDatas"></param>
         /// <returns></returns>
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, Model model)
+        public static DecompOutput DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, Model model)
         {            
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
@@ -778,7 +789,7 @@ namespace Gekko
             //We are cloning decompDataMAINClone this, because normalization may take place when doing the table
             DecompData decompDataMAINClone = decompDatas.MAIN_data.DeepClone();
 
-            Table table = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
+            DecompOutput decompOutput = Decomp.DecompPivotToTable(per1, per2, decompDataMAINClone, decompDatas, decompOptions2.decompOperator, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, operatorOneOf3Types, model);
 
             if (false)
             {
@@ -788,7 +799,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
-            return table;
+            return decompOutput;
         }
 
         public static void DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, DecompOperator op)
@@ -2713,7 +2724,7 @@ namespace Gekko
         /// <param name="operatorOneOf3Types"></param>
         /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types, Model model)
+        public static DecompOutput DecompPivotToTable(GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DecompOperator op, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, EContribType operatorOneOf3Types, Model model)
         {
             int parentI = 0;
             string format2 = GetNumberFormat(decompOptions2);
@@ -2777,9 +2788,9 @@ namespace Gekko
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
             }
 
-            Table table2 = DecompTableHandleSortAndPrune(table, decompOptions2);
+            DecompOutput decompOutput2 = DecompTableHandleSortAndPrune(table, decompOptions2);
 
-            return table2;
+            return decompOutput2;
         }
 
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
@@ -3606,11 +3617,12 @@ namespace Gekko
         /// </summary>
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
-        private static Table DecompTableHandleSortAndPrune(Table table1, DecompOptions2 decompOptions2)
+        private static DecompOutput DecompTableHandleSortAndPrune(Table table1, DecompOptions2 decompOptions2)
         {
-            if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return table1;  //fast return 
+            string prune = null;
+            if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return new DecompOutput(table1, prune);  //fast return 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
-            if (rowsOrCols == ERowsCols.None) return table1; //fast return 
+            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, prune); //fast return 
 
             List<SortHelper> sortHelper = new List<SortHelper>();
 
@@ -3631,7 +3643,7 @@ namespace Gekko
                     }
                     sortHelper.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
-            }
+            }            
 
             //maybe prune
             List<SortHelper> sortHelper2 = new List<SortHelper>();
@@ -3645,6 +3657,13 @@ namespace Gekko
             else
             {
                 sortHelper2.AddRange(sortHelper);
+            }
+            int pruneCount = sortHelper.Count - sortHelper2.Count;
+            if (pruneCount > 0)
+            {
+                string x = "rows";
+                if (rowsOrCols == ERowsCols.Cols) x = "cols";
+                prune = pruneCount + " " + x + " pruned";
             }
 
             //Maybe sort
@@ -3689,8 +3708,9 @@ namespace Gekko
                     }
                 }
             }
-            return table2;
 
+            DecompOutput decompOutput = new DecompOutput(table2, prune);
+            return decompOutput;
         }
 
         /// <summary>

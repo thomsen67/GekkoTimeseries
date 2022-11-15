@@ -971,7 +971,6 @@ namespace Gekko
                 endCol = 1;
             }
 
-
             for (int i = startRow; i <= endRow; i++)
             {
                 for (int j = startCol; j <= endCol; j++)
@@ -1827,7 +1826,8 @@ namespace Gekko
             GekkoTime per2 = this.decompFind.decompOptions2.t2;
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
 
-            Table table = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, refresh, ref this.decompDatas, model);
+            DecompOutput decompOutput = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, refresh, ref this.decompDatas, model);
+            textBlockPrune.Text = decompOutput.prune;
 
             string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
@@ -1841,11 +1841,11 @@ namespace Gekko
             RichSetText(equation, Decomp.GetColoredEquations(s));
             RichSetText(this.code, this.decompFind.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
-            this.decompFind.decompOptions2.guiDecompValues = table;
+            this.decompFind.decompOptions2.guiDecompValues = decompOutput.table;
 
             if (G.IsUnitTesting() && Globals.showDecompTable == false)
             {
-                Globals.lastDecompTable = table;
+                Globals.lastDecompTable = decompOutput.table;
             }
             else
             {
@@ -1853,7 +1853,7 @@ namespace Gekko
                 if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + " more)";
                 if (this.decompFind.window != null) (this.decompFind.window as WindowDecomp).Title = this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
                 ClearGrid();
-                MakeGuiTable2(table, this.decompFind.decompOptions2);
+                MakeGuiTable2(decompOutput.table, this.decompFind.decompOptions2);
             }
         }
         
@@ -1967,28 +1967,16 @@ namespace Gekko
             this.gridUpperLeft.Children.Clear();
         }
 
-        //private void MakeTable(Table table, DecompOptions decompOptions)
-        //{            
-        //    CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);            
-        //    PutTableIntoGrid(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);            
-        //    CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
-        //    PutTableIntoGrid(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
-        //    CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
-        //    PutTableIntoGrid(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
-        //    CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
-        //    PutTableIntoGrid(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);            
-        //}
-
         private void MakeGuiTable2(Table table, DecompOptions2 decompOptions)
         {
-            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
-            PutTableIntoGrid2(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
-            CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
-            PutTableIntoGrid2(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
-            CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
-            PutTableIntoGrid2(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
             CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
             PutTableIntoGrid2(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);
+            CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
+            PutTableIntoGrid2(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
+            CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
+            PutTableIntoGrid2(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
+            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
+            PutTableIntoGrid2(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
         }
 
         private string FindEquationText(DecompOptions decompOptions)
