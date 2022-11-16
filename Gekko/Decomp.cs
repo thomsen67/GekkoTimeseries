@@ -17,10 +17,12 @@ namespace Gekko
     {
         public Table table = null;
         public string prune = null;
-        public DecompOutput(Table table, string prune)
+        public List<double> red = null;
+        public DecompOutput(Table table, string prune, List<double> red)
         {
             this.table = table;
             this.prune = prune;
+            this.red = red;
         }
     }
 
@@ -3618,20 +3620,27 @@ namespace Gekko
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
         private static DecompOutput DecompTableHandleSortAndPrune(Table table1, DecompOptions2 decompOptions2)
-        {
-            string prune = null;
-            if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return new DecompOutput(table1, prune);  //fast return 
+        {            
+            //if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return new DecompOutput(table1, null, null);  //fast return 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
-            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, prune); //fast return 
+            if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
+
+            string prune = null;
+            List<double> red = new List<double>();
 
             List<SortHelper> sortHelper = new List<SortHelper>();
 
             if (rowsOrCols == ERowsCols.Rows)
-            {
+            {                
                 for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
-                    string name2 = table1.Get(i, 2).vars_hack[0];
-                    if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    Cell c5 = table1.Get(i, 2);
+                    string name2 = null;
+                    if (c5 != null)
+                    {
+                        name2 = c5.vars_hack[0];
+                        if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    }
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -3647,8 +3656,13 @@ namespace Gekko
             {
                 for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
                 {
-                    string name2 = table1.Get(2, j).vars_hack[0];
-                    if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    Cell c5 = table1.Get(2, j);
+                    string name2 = null;
+                    if (c5 != null)
+                    {
+                        name2 = c5.vars_hack[0];
+                        if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
+                    }                    
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
@@ -3759,7 +3773,46 @@ namespace Gekko
                 }
             }
 
-            DecompOutput decompOutput = new DecompOutput(table2, prune);
+            if (rowsOrCols == ERowsCols.Rows)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    double target = table2.Get(2, j).value_hack;
+                    double sum = 0d;
+                    for (int i = 3; i <= table2.GetRowMaxNumber(); i++)  //ignore first 2 rows
+                    {
+                        double x = table2.Get(i, j).value_hack;
+                        if (double.IsNaN(x)) x = 0d;
+                        sum += -x;  //will have opposite sign compared to row 2
+                    }
+                    //sum and 
+                    double error = 1 - sum / target;  //value 0 for same number.
+                    if (sum == 0d && target == 0d) error = 0d;
+                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
+                    red.Add(error);  //one for each period
+                }
+            }
+            else if (rowsOrCols == ERowsCols.Cols)
+            {
+                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+                {
+                    double target = table2.Get(i, 2).value_hack;
+                    double sum = 0d;
+                    for (int j = 3; j <= table2.GetColMaxNumber(); j++)  //ignore first 2 cols
+                    {
+                        double x = table2.Get(i, j).value_hack;
+                        if (double.IsNaN(x)) x = 0d;
+                        sum += -x;  //will have opposite sign compared to row 2
+                    }
+                    //sum and 
+                    double errorPct = 1 - sum / target;  //value 0 for same number.
+                    if (sum == 0d && target == 0d) errorPct = 0d;
+                    else if (target == 0d || double.IsNaN(target)) errorPct = 1000000d; //just some large number
+                    red.Add(errorPct);  //one for each period
+                }
+            }
+
+            DecompOutput decompOutput = new DecompOutput(table2, prune, red);
             return decompOutput;
         }
 

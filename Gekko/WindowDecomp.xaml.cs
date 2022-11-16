@@ -810,15 +810,15 @@ namespace Gekko
             this.Loaded += WindowDecomp_Loaded;
         }
 
-        private void CreateGridRowsAndColumns(Grid g, Table table, GekkoTableTypes type)
+        private void CreateGridRowsAndColumns(Grid g, DecompOutput decompOutput, GekkoTableTypes type)
         {
             if (type == GekkoTableTypes.TableContent)
             {
-                for (int i = 1 + this.frozenRows; i <= table.GetRowMaxNumber(); i++)
+                for (int i = 1 + this.frozenRows; i <= decompOutput.table.GetRowMaxNumber(); i++)
                 {
                     g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 }
-                for (int j = 1 + this.frozenCols; j <= table.GetColMaxNumber(); j++)
+                for (int j = 1 + this.frozenCols; j <= decompOutput.table.GetColMaxNumber(); j++)
                 {
                     g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });
                 }
@@ -832,14 +832,14 @@ namespace Gekko
                 {
                     g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 }
-                for (int j = 1 + this.frozenCols; j <= table.GetColMaxNumber(); j++)
+                for (int j = 1 + this.frozenCols; j <= decompOutput.table.GetColMaxNumber(); j++)
                 {
                     g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidth) });
                 }
             }
             else if (type == GekkoTableTypes.Left)
             {
-                for (int i = 1 + frozenRows; i <= table.GetRowMaxNumber(); i++)
+                for (int i = 1 + frozenRows; i <= decompOutput.table.GetRowMaxNumber(); i++)
                 {
                     g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 }
@@ -940,7 +940,7 @@ namespace Gekko
         //    }
         //}
 
-        private void PutTableIntoGrid2(Grid g, Table table, GekkoTableTypes type, DecompOptions2 decompOptions)
+        private void PutTableIntoGrid2(Grid g, DecompOutput decompOutput, GekkoTableTypes type, DecompOptions2 decompOptions)
         {
             int offsetRow = 0;
             int offsetCol = 0;
@@ -955,8 +955,8 @@ namespace Gekko
             {
                 startRow = this.frozenRows + 1;
                 startCol = this.frozenCols + 1;
-                endRow = table.GetRowMaxNumber();
-                endCol = table.GetColMaxNumber();
+                endRow = decompOutput.table.GetRowMaxNumber();
+                endCol = decompOutput.table.GetColMaxNumber();
                 offsetRow = this.frozenRows;
                 offsetCol = this.frozenCols;
             }
@@ -965,7 +965,7 @@ namespace Gekko
                 startRow = 1;
                 startCol = frozenCols + 1;
                 endRow = this.frozenRows;
-                endCol = table.GetColMaxNumber();
+                endCol = decompOutput.table.GetColMaxNumber();
                 offsetRow = 0;
                 offsetCol = frozenCols;
             }
@@ -973,7 +973,7 @@ namespace Gekko
             {
                 startRow = frozenRows + 1;
                 startCol = 1;
-                endRow = table.GetRowMaxNumber();
+                endRow = decompOutput.table.GetRowMaxNumber();
                 endCol = this.frozenCols;
                 offsetRow = frozenRows;
                 offsetCol = 0;
@@ -990,10 +990,10 @@ namespace Gekko
             {
                 for (int j = startCol; j <= endCol; j++)
                 {
-                    Cell c = table.Get(i, j);
+                    Cell c = decompOutput.table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red);  //transparent
                         continue;
                     }
                     string s = "";
@@ -1017,7 +1017,7 @@ namespace Gekko
 
                     if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red);
                 }
             }
         }        
@@ -1105,14 +1105,14 @@ namespace Gekko
             Clipboard.SetDataObject(s);
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red)
         {
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
             {
                 w = Globals.guiTableCellWidthFirst;
-            }
+            }            
             dockPanel.Width = w;
             dockPanel.Height = Globals.guiTableCellHeight;
             var border = new Border();
@@ -1133,7 +1133,7 @@ namespace Gekko
                 {
 
                     //
-                    //
+                    // LINKS etc.
                     // TODO: This is hacky. Better to look at adjacent cell content (like what happens when link is actually clicked)
                     //       
                     //
@@ -1238,9 +1238,41 @@ namespace Gekko
             dockPanel.SetValue(Grid.ColumnProperty, j);
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
-        }
 
-       
+            if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
+            {
+                int ij = 0;
+                if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
+                else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
+                Rectangle r = new Rectangle();
+                r.Width = 5;
+                r.Height = 5;
+                SolidColorBrush mySolidColorBrush = new SolidColorBrush();
+                double x = 0d;
+                byte y = 0;
+                if (red != null)
+                {
+                    double d = Math.Abs((double)red[ij]);
+                    if (d < 0d) d = 0d;
+                    if (d > 1d) d = 1d;
+                    double threshold = 0.20;
+                    double z = 1 / threshold * d;
+                    if (z < 0d) z = 0d;
+                    if (z > 1d) z = 1d;
+                    x = z * 255d;
+                    y = (byte)x;
+                    if (y < 0) y = 0;
+                    if (y > 255) y = 255;
+                }
+                mySolidColorBrush.Color = Color.FromArgb(y, 255, 0, 0);
+                r.Fill = mySolidColorBrush;
+                r.HorizontalAlignment = HorizontalAlignment.Right;
+                r.Margin = new Thickness(0, 0, 7, 0);
+                r.SetValue(Grid.ColumnProperty, j);
+                r.SetValue(Grid.RowProperty, i);
+                g.Children.Add(r);
+            }
+        }       
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)
         {
@@ -1868,7 +1900,7 @@ namespace Gekko
                 if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + " more)";
                 if (this.decompFind.window != null) (this.decompFind.window as WindowDecomp).Title = this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
                 ClearGrid();
-                MakeGuiTable2(decompOutput.table, this.decompFind.decompOptions2);
+                MakeGuiTable2(decompOutput, this.decompFind.decompOptions2);
             }
         }
         
@@ -1982,16 +2014,16 @@ namespace Gekko
             this.gridUpperLeft.Children.Clear();
         }
 
-        private void MakeGuiTable2(Table table, DecompOptions2 decompOptions)
+        private void MakeGuiTable2(DecompOutput decompOutput, DecompOptions2 decompOptions)
         {
-            CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
-            PutTableIntoGrid2(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);
-            CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
-            PutTableIntoGrid2(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
-            CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
-            PutTableIntoGrid2(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
-            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
-            PutTableIntoGrid2(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
+            CreateGridRowsAndColumns(this.gridUpperLeft, decompOutput, GekkoTableTypes.UpperLeft);
+            PutTableIntoGrid2(this.gridUpperLeft, decompOutput, GekkoTableTypes.UpperLeft, decompOptions);
+            CreateGridRowsAndColumns(this.grid1Top, decompOutput, GekkoTableTypes.Top);
+            PutTableIntoGrid2(this.grid1Top, decompOutput, GekkoTableTypes.Top, decompOptions);
+            CreateGridRowsAndColumns(this.grid1Left, decompOutput, GekkoTableTypes.Left);
+            PutTableIntoGrid2(this.grid1Left, decompOutput, GekkoTableTypes.Left, decompOptions);
+            CreateGridRowsAndColumns(this.grid1, decompOutput, GekkoTableTypes.TableContent);
+            PutTableIntoGrid2(this.grid1, decompOutput, GekkoTableTypes.TableContent, decompOptions);
         }
 
         private string FindEquationText(DecompOptions decompOptions)

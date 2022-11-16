@@ -416,7 +416,7 @@
                                 </Grid>
                             </Border>
                             <Border x:Name="frezenBorder2" Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
-                                <Grid Background="Yellow" Name="grid1Top">
+                                <Grid Name="grid1Top" Background="White">
                                 </Grid>
                             </Border>
                             <Border Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" 
