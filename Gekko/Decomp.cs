@@ -3634,13 +3634,10 @@ namespace Gekko
             {                
                 for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
+
                     Cell c5 = table1.Get(i, 2);
-                    string name2 = null;
-                    if (c5 != null)
-                    {
-                        name2 = c5.vars_hack[0];
-                        if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
-                    }
+                    string name2 = c5?.vars_hack?[0];
+                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and prune                                        
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -3657,12 +3654,8 @@ namespace Gekko
                 for (int j = 3; j <= table1.GetColMaxNumber(); j++)  //ignore first two cols                 
                 {
                     Cell c5 = table1.Get(2, j);
-                    string name2 = null;
-                    if (c5 != null)
-                    {
-                        name2 = c5.vars_hack[0];
-                        if (name2 == Globals.decompErrorName) continue; //we always keep the error last no matter sort and prune
-                    }                    
+                    string name2 = c5?.vars_hack?[0];
+                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and prune                    
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
@@ -3773,6 +3766,8 @@ namespace Gekko
                 }
             }
 
+            // --------------------- table2 is now sorted and pruned (errors are always present last).
+
             if (rowsOrCols == ERowsCols.Rows)
             {
                 for (int j = 2; j <= table2.GetColMaxNumber(); j++)
@@ -3781,11 +3776,12 @@ namespace Gekko
                     double sum = 0d;
                     for (int i = 3; i <= table2.GetRowMaxNumber(); i++)  //ignore first 2 rows
                     {
-                        double x = table2.Get(i, j).value_hack;
+                        Cell c = table2.Get(i, j);
+                        double d = c.number;
+                        double x = c.value_hack;
                         if (double.IsNaN(x)) x = 0d;
                         sum += -x;  //will have opposite sign compared to row 2
-                    }
-                    //sum and 
+                    }                                        
                     double error = 1 - sum / target;  //value 0 for same number.
                     if (sum == 0d && target == 0d) error = 0d;
                     else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
@@ -3800,15 +3796,17 @@ namespace Gekko
                     double sum = 0d;
                     for (int j = 3; j <= table2.GetColMaxNumber(); j++)  //ignore first 2 cols
                     {
-                        double x = table2.Get(i, j).value_hack;
+                        Cell c = table2.Get(i, j);
+                        double d = c.number;
+                        double x = c.value_hack;
                         if (double.IsNaN(x)) x = 0d;
                         sum += -x;  //will have opposite sign compared to row 2
                     }
                     //sum and 
-                    double errorPct = 1 - sum / target;  //value 0 for same number.
-                    if (sum == 0d && target == 0d) errorPct = 0d;
-                    else if (target == 0d || double.IsNaN(target)) errorPct = 1000000d; //just some large number
-                    red.Add(errorPct);  //one for each period
+                    double error = 1 - sum / target;  //value 0 for same number.
+                    if (sum == 0d && target == 0d) error = 0d;
+                    else if (target == 0d || double.IsNaN(target)) error = 1000000d; //just some large number
+                    red.Add(error);  //one for each period
                 }
             }
 
@@ -3816,6 +3814,7 @@ namespace Gekko
             return decompOutput;
         }
 
+        
         /// <summary>
         /// At this point, decomp rows sum to 0, so we change the sign of the first row, so the rest sum
         /// to the first. Also, percentages can be set, so first row is 100%. Also works for columns.
@@ -3862,6 +3861,7 @@ namespace Gekko
                             }
                             tab.SetNumber(rowmax + 1, j, -sum, GetNumberFormat(decompOptions2));
                             tab.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
+                            tab.Get(rowmax + 1, j).value_hack = -sum;  //used later on for red square
                         }
                         tab.Get(rowmax + 1, j).backgroundColor = Globals.decompErrorColor;
                     }
@@ -3890,6 +3890,7 @@ namespace Gekko
                             }
                             tab.SetNumber(i, colmax + 1, -sum, GetNumberFormat(decompOptions2));
                             tab.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
+                            tab.Get(i, colmax + 1).value_hack = -sum;  //used later on for red square
                         }
                         tab.Get(i, colmax + 1).backgroundColor = Globals.decompErrorColor;
                     }

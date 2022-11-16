@@ -22999,8 +22999,7 @@ namespace Gekko
 
         public static double RoundToSignificantDigits(this double d, int digits)
         {
-            if (d == 0)
-                return 0;
+            if (d == 0) return 0;
             return RoundDecimals2(d, digits);
         }
 
