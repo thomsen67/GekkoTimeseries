@@ -1107,11 +1107,12 @@ namespace Gekko
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)
         {
-            double threshold1 = 0.05; 
-            double threshold2 = 0.10; 
-            double threshold3 = 0.15; 
-            double threshold4 = 0.20; 
-            double threshold5 = 0.25;             
+            List<double> thresholds = new List<double>();
+            thresholds.Add(0.05);
+            thresholds.Add(0.15);
+            thresholds.Add(0.25);
+            thresholds.Add(0.35);
+            thresholds.Add(0.50); //must be 5 of them
 
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1247,11 +1248,11 @@ namespace Gekko
 
             if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
             {
-                SetRedSquare(g, i, j, type, isRowOrCol, red, threshold1, threshold2, threshold3, threshold4, threshold5);
+                SetRedSquare(g, i, j, type, isRowOrCol, red, thresholds);
             }
         }
 
-        private static void SetRedSquare(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, double threshold1, double threshold2, double threshold3, double threshold4, double threshold5)
+        private static void SetRedSquare(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, List<double> thresholds)
         {
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
@@ -1266,20 +1267,20 @@ namespace Gekko
                 int dust = 10;
                 Color c1 = Color.FromRgb((byte)(255 - dust), (byte)(255 - dust), (byte)(0 + dust));
                 Color c2 = Color.FromRgb((byte)(255 - dust), (byte)(0 + dust), (byte)(0 + dust));
-                if (d <= threshold1) { /* do nothing */ }
-                else if (d > threshold1 && d <= threshold2) brush.Color = c1;
-                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.75d * (double)c1.R + 0.25d * (double)c2.R), 251, 0);
-                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.50d * (double)c1.R + 0.50d * (double)c2.R), 251, 0);
-                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.25d * (double)c1.R + 0.75d * (double)c2.R), 251, 0);
+                if (d <= thresholds[0]) { /* do nothing */ }
+                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = c1;
+                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = Color.FromRgb((byte)(0.75d * (double)c1.R + 0.25d * (double)c2.R), (byte)(0.75d * (double)c1.G + 0.25d * (double)c2.G), (byte)(0.75d * (double)c1.B + 0.25d * (double)c2.B));
+                else if (d > thresholds[2] && d <= thresholds[3]) brush.Color = Color.FromRgb((byte)(0.50d * (double)c1.R + 0.50d * (double)c2.R), (byte)(0.50d * (double)c1.G + 0.50d * (double)c2.G), (byte)(0.50d * (double)c1.B + 0.50d * (double)c2.B));
+                else if (d > thresholds[3] && d <= thresholds[4]) brush.Color = Color.FromRgb((byte)(0.25d * (double)c1.R + 0.75d * (double)c2.R), (byte)(0.25d * (double)c1.G + 0.75d * (double)c2.G), (byte)(0.25d * (double)c1.B + 0.75d * (double)c2.B));
                 else brush.Color = c2;
             }
 
-            Rectangle r = new Rectangle();
-            r.Width = 8;
-            r.Height = 8;
+            Ellipse r = new Ellipse();
+            r.Width = 9;
+            r.Height = 9;
             r.Fill = brush;
             r.HorizontalAlignment = HorizontalAlignment.Right;
-            if (d > threshold1)
+            if (d > thresholds[0])
             {
                 //border
                 r.Stroke = new SolidColorBrush(Colors.LightGray);
@@ -1288,14 +1289,14 @@ namespace Gekko
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
-            dp.Margin = new Thickness(0, 0, 7, 0);
+            dp.Margin = new Thickness(0, 0, 9, 0);
             dp.SetValue(Grid.ColumnProperty, j);
             dp.SetValue(Grid.RowProperty, i);
             dp.Children.Add(r);
             dp.HorizontalAlignment = HorizontalAlignment.Right;
             string xx = "row";
             if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
-            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (red[ij] * 100d).ToString("0.00") + "%";
+            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (red[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox and/or set 'Prune%' = 0.";
             g.Children.Add(dp);
         }
 
@@ -1964,12 +1965,34 @@ namespace Gekko
                 radioButton10.IsEnabled = true;
                 radioButton10.Opacity = 1.0;
                 //---
+
                 checkBoxShares.IsEnabled = true;
                 checkBoxShares.Opacity = 1.0;
+
                 checkRef.IsEnabled = true;
                 checkRef.Opacity = 1.0;
-                //flowText.Opacity = 0.5;
-                //flowText.Visibility = Visibility.Visible;
+
+                checkBoxDyn.IsEnabled = true;
+                checkBoxDyn.Opacity = 1.0;
+
+                checkBoxCount.IsEnabled = true;
+                checkBoxCount.Opacity = 1.0;
+
+                checkMZero.IsEnabled = true;
+                checkMZero.Opacity = 1.0;
+
+                checkBoxErrors.IsEnabled = true;
+                checkBoxErrors.Opacity = 1.0;
+
+                checkBoxSort.IsEnabled = true;
+                checkBoxSort.Opacity = 1.0;
+
+                txtNum.IsEnabled = true;
+                txtNum.Opacity = 1.0;
+                cmdUp.IsEnabled = true;
+                cmdUp.Opacity = 1.0;
+                cmdDown.IsEnabled = true;
+                cmdDown.Opacity = 1.0;
             }
 
             if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
@@ -2013,7 +2036,6 @@ namespace Gekko
             {
                 checkBoxShares.IsEnabled = false;  //shares
                 checkBoxShares.Opacity = 0.5;
-                //flowText.Visibility = Visibility.Collapsed;
             }
             
             if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.Multiplier)
@@ -2489,11 +2511,27 @@ namespace Gekko
             //
             // HACK HACK HACK --> move .decompDatas inside .decompFind maybe
             //
-            //            
+            //
+
+            List<string> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
+            List<string> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
+            List<string> varsNew = varsThis.Except(varsParent).ToList();
+            List<string> varsNew2 = new List<string>();
+            var temp = varsNew.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default));
+            varsNew = new List<string>(); varsNew.AddRange(temp);
+
+            //TODO
+            //TODO
+            //TODO Put the list in a tooltip, and make a note "Last merge: 'c' removed, 2 new vars added shown in green" [OK].
+            //TODO When doing GUI, look 1 col to the right and see if vars_hack contains somehing from varsNew.
+            //TODO if so, mark the cell name green.
+            //TODO Ungreen when [OK] is clicked. Any window that is merged TO must first be ungreened.
+
+
             windowParentDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
-            
+
             dfParentDecomp.decompOptions2.code = dfParentDecomp.decompOptions2.ToCode();
-                        
+
             //RichSetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
 
             try
@@ -2503,11 +2541,23 @@ namespace Gekko
             catch
             {
                 //reverting, so that the parent window may be ok to continue with
-                dfParentDecomp.decompOptions2 = remember; 
-                //windowParentDecomp.code.Text = dfParentDecomp.decompOptions2.code + Program.SetBlanks();
-                //RichSetText(windowParentDecomp.code, dfParentDecomp.decompOptions2.code.AddTemporarily(Program.SetBlanks()));
+                dfParentDecomp.decompOptions2 = remember;
             }
-        }        
+            
+
+
+        }
+
+        private List<string> GetDecompedVariables(DecompDatas decompDatas, DecompOptions2 decompOptions2)
+        {
+            List<string> vars = new List<string>();
+            DecompDict dd = Decomp.GetDecompDatas(decompDatas.MAIN_data, decompOptions2.decompOperator.type);
+            foreach (KeyValuePair<string, Series> kvp in dd.storage)
+            {
+                vars.Add(kvp.Key);
+            }
+            return vars;
+        }
 
         private void checkBoxCount_Checked(object sender, RoutedEventArgs e)
         {
