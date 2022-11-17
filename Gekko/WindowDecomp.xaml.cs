@@ -993,7 +993,7 @@ namespace Gekko
                     Cell c = decompOutput.table.Get(i, j);
                     if (c == null)
                     {
-                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red);  //transparent
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);  //transparent
                         continue;
                     }
                     string s = "";
@@ -1017,7 +1017,7 @@ namespace Gekko
 
                     if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
 
-                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red);
+                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);
                 }
             }
         }        
@@ -1105,7 +1105,7 @@ namespace Gekko
             Clipboard.SetDataObject(s);
         }
 
-        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red)
+        private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)
         {
             double threshold1 = 0.05; 
             double threshold2 = 0.10; 
@@ -1245,50 +1245,59 @@ namespace Gekko
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
 
-            if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
-            {                
-                int ij = 0;
-                if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
-                else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
-                Rectangle r = new Rectangle();
-                r.Width = 7;
-                r.Height = 7;
-                SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-                double x = 0d;
-                byte y = 0;
-                if (red != null)
-                {
-                    double d = Math.Abs((double)red[ij]);
-                    if (d < 0d) d = 0d; if (d > 1d) d = 1d;
-
-                    if (d <= threshold1) { /* do nothing */ }
-                    else if (d > threshold1 && d <= threshold2) mySolidColorBrush.Color = Color.FromRgb(255, 255, 0);
-                    else if (d > threshold2 && d <= threshold3) mySolidColorBrush.Color = Color.FromRgb(255, 191, 0);
-                    else if (d > threshold3 && d <= threshold4) mySolidColorBrush.Color = Color.FromRgb(255, 127, 0);
-                    else if (d > threshold4 && d <= threshold5) mySolidColorBrush.Color = Color.FromRgb(255, 64, 0);
-                    else mySolidColorBrush.Color = Color.FromRgb(255, 0, 0);
-                }
-                r.Fill = mySolidColorBrush;
-                r.HorizontalAlignment = HorizontalAlignment.Right;
-
-                
-                DockPanel dp = new DockPanel();
-                dp.Width = 10; dp.Height = 10;
-                dp.Margin = new Thickness(0, 0, 7, 0);
-                dp.SetValue(Grid.ColumnProperty, j);
-                dp.SetValue(Grid.RowProperty, i);
-                dp.Children.Add(r);
-                dp.HorizontalAlignment = HorizontalAlignment.Right;
-                string xx = "row";
-                if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "cols";
-                dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the sum of the rest of the " + xx + "s is = " + (red[ij] * 100d).ToString("0.00") + "%";
-                Border border2 = new Border();
-                border2.BorderBrush = new SolidColorBrush(Colors.LightGray);
-                border.BorderThickness = new Thickness(2);
-                border2.Child = dp;
-                g.Children.Add(border);
+            if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
+            {
+                SetRedSquare(g, i, j, type, isRowOrCol, red, threshold1, threshold2, threshold3, threshold4, threshold5);
             }
-        }       
+        }
+
+        private static void SetRedSquare(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, double threshold1, double threshold2, double threshold3, double threshold4, double threshold5)
+        {
+            int ij = 0;
+            if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
+            else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
+
+            SolidColorBrush brush = new SolidColorBrush();
+            double d = 0;
+            if (red != null)
+            {
+                d = Math.Abs((double)red[ij]);
+                if (d < 0d) d = 0d; if (d > 1d) d = 1d;
+                int dust = 10;
+                Color c1 = Color.FromRgb((byte)(255 - dust), (byte)(255 - dust), (byte)(0 + dust));
+                Color c2 = Color.FromRgb((byte)(255 - dust), (byte)(0 + dust), (byte)(0 + dust));
+                if (d <= threshold1) { /* do nothing */ }
+                else if (d > threshold1 && d <= threshold2) brush.Color = c1;
+                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.75d * (double)c1.R + 0.25d * (double)c2.R), 251, 0);
+                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.50d * (double)c1.R + 0.50d * (double)c2.R), 251, 0);
+                else if (d > threshold1 && d <= threshold2) brush.Color = Color.FromRgb((byte)(0.25d * (double)c1.R + 0.75d * (double)c2.R), 251, 0);
+                else brush.Color = c2;
+            }
+
+            Rectangle r = new Rectangle();
+            r.Width = 8;
+            r.Height = 8;
+            r.Fill = brush;
+            r.HorizontalAlignment = HorizontalAlignment.Right;
+            if (d > threshold1)
+            {
+                //border
+                r.Stroke = new SolidColorBrush(Colors.LightGray);
+                r.StrokeThickness = 1;
+            }
+
+            DockPanel dp = new DockPanel();
+            dp.Width = 15; dp.Height = 15;
+            dp.Margin = new Thickness(0, 0, 7, 0);
+            dp.SetValue(Grid.ColumnProperty, j);
+            dp.SetValue(Grid.RowProperty, i);
+            dp.Children.Add(r);
+            dp.HorizontalAlignment = HorizontalAlignment.Right;
+            string xx = "row";
+            if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
+            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (red[ij] * 100d).ToString("0.00") + "%";
+            g.Children.Add(dp);
+        }
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)
         {
