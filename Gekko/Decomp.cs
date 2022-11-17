@@ -1819,12 +1819,10 @@ namespace Gekko
         {            
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompFind.model.DecompType() == EModelType.Unknown)
-            {
-                //Model m = decompFind.model;
+            {                
                 new Error("It seems no model is loaded, cf. the MODEL command.");
             }         
-
-            //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
+                        
             int count = -1;
             foreach (Link link in decompOptions2.link)
             {
