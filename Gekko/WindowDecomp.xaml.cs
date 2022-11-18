@@ -854,92 +854,7 @@ namespace Gekko
                 g.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Globals.guiTableCellWidthFirst) });
             }
         }
-
-        //private void PutTableIntoGrid(Grid g, Table table, GekkoTableTypes type, DecompOptions decompOptions)
-        //{
-        //    bool varsIsOnRows = false;
-
-        //    int offsetRow = 0;
-        //    int offsetCol = 0;
-        //    int startRow = 0;
-        //    int endRow = 0;
-        //    int startCol = 0;
-        //    int endCol = 0;            
-
-        //    if (type == GekkoTableTypes.TableContent)
-        //    {
-        //        startRow = this.frozenRows + 1;
-        //        startCol = this.frozenCols + 1;
-        //        endRow = table.GetRowMaxNumber();
-        //        endCol = table.GetColMaxNumber();
-        //        offsetRow = this.frozenRows;
-        //        offsetCol = this.frozenCols;
-        //    }
-        //    else if (type == GekkoTableTypes.Top)
-        //    {
-        //        startRow = 1;
-        //        startCol = frozenCols + 1;
-        //        endRow = this.frozenRows;
-        //        endCol = table.GetColMaxNumber();
-        //        offsetRow = 0;
-        //        offsetCol = frozenCols;
-        //    }
-        //    else if (type == GekkoTableTypes.Left)
-        //    {
-        //        startRow = frozenRows + 1;
-        //        startCol = 1;
-        //        endRow = table.GetRowMaxNumber();
-        //        endCol = this.frozenCols;
-        //        offsetRow = frozenRows;
-        //        offsetCol = 0;
-        //    }
-        //    else if (type == GekkoTableTypes.UpperLeft)
-        //    {
-        //        startRow = 1;
-        //        endRow = 1;
-        //        startCol = 1;
-        //        endCol = 1;                
-        //    }
-
-        //    if (true)
-        //    {
-        //        for (int i = startRow; i <= endRow; i++)
-        //        {
-        //            for (int j = startCol; j <= endCol; j++)
-        //            {
-        //                Cell c = table.Get(i, j);
-        //                if (c == null)
-        //                {
-        //                    AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
-        //                    continue;
-        //                }
-        //                string s = "";
-        //                bool leftAlign = false;
-
-        //                string ss = c.numberFormat;
-        //                string[] sss = ss.Split('.');
-        //                string ssss = sss[sss.Length - 1];
-        //                int xx = int.Parse(ssss);
-
-        //                if (c.cellType == CellType.Text)
-        //                {
-        //                    s = c.CellText.TextData[0];
-        //                    leftAlign = true;
-        //                }
-        //                else if (c.cellType == CellType.Number)
-        //                {
-        //                    s = G.UpdprtFormat(c.number, xx, false);
-        //                }
-        //                else if (c.cellType == CellType.Date) s = c.date;
-
-        //                if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
-
-        //                AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
-        //            }
-        //        }
-        //    }
-        //}
-
+        
         private void PutTableIntoGrid2(Grid g, DecompOutput decompOutput, GekkoTableTypes type, DecompOptions2 decompOptions)
         {
             int offsetRow = 0;
@@ -1014,8 +929,6 @@ namespace Gekko
                         s = G.UpdprtFormat(c.number, xx, false);
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
-
-                    if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
 
                     AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);
                 }
@@ -1136,6 +1049,7 @@ namespace Gekko
             }
             else
             {
+                bool isGreen = false;
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
 
@@ -1151,6 +1065,11 @@ namespace Gekko
                     Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
                     string v = c.vars_hack?[0];
                     if (v == Globals.decompErrorName) v = null;
+
+                    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
+                    {
+                        isGreen = true;
+                    }
 
                     bool isEndogenous = false;
                     if (v != null)
@@ -1211,7 +1130,12 @@ namespace Gekko
                 dockPanel.MouseEnter += Cell_Enter;
                 dockPanel.MouseLeave += Cell_Leave;
 
-                if (type == GekkoTableTypes.TableContent)
+                if (isGreen)
+                {
+                    //new merged variable
+                    dockPanel.Background = new SolidColorBrush(Colors.LightGreen);
+                }
+                else if (type == GekkoTableTypes.TableContent)
                 {
                     dockPanel.Background = Brushes.White;
                 }
@@ -1227,12 +1151,6 @@ namespace Gekko
                 {
                     //overrides                                    
                     dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightRed);
-                    dockPanel.Background = dockPanel.originalBackgroundColor;
-                }
-                else if (backgroundColor == "Linen")
-                {
-                    //overrides                
-                    dockPanel.originalBackgroundColor = Brushes.Ivory;
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
 
@@ -1289,7 +1207,7 @@ namespace Gekko
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
-            dp.Margin = new Thickness(0, 0, 9, 0);
+            dp.Margin = new Thickness(0, 0, 6, 0);
             dp.SetValue(Grid.ColumnProperty, j);
             dp.SetValue(Grid.RowProperty, i);
             dp.Children.Add(r);
@@ -2497,12 +2415,7 @@ namespace Gekko
         {
             //dfParentDecomp.decompOptions2Previous = dfParentDecomp.decompOptions2.Clone();
             DecompOptions2 remember = dfParentDecomp.decompOptions2.Clone();
-            WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
-            windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.
-            string txt = "  Merged...";
-            //show message a bit, and then remove    
-            windowParentDecomp.textSelect.Text = txt;
-            Program.DelayAction(3000, new Action(() => { try { windowParentDecomp.textSelect.Text = ""; } catch { } }));
+            
             List<string> thisFrom = this.decompFind.decompOptions2.new_from;
             List<string> thisEndo = this.decompFind.decompOptions2.new_endo;
             dfParentDecomp.decompOptions2.new_from.AddRange(thisFrom);
@@ -2513,12 +2426,33 @@ namespace Gekko
             //
             //
 
+            WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
+            
             List<string> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
             List<string> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
             List<string> varsNew = varsThis.Except(varsParent).ToList();
-            List<string> varsNew2 = new List<string>();
             var temp = varsNew.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default));
             varsNew = new List<string>(); varsNew.AddRange(temp);
+            List<string> varsNew2 = new List<string>();
+            foreach (string s in varsNew)
+            {
+                //TODO: there must be a method for this...
+                varsNew2.Add(s.Replace("Work:", "").Replace("¤[0]", ""));  //keep the ¤ for lags
+            }
+            dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
+            windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
+            string txt = "Merged " + thisFrom.Count + " equation" + G.S(thisFrom.Count) + " via " + this.decompFind.decompOptions2.new_select[0] + ", introducing " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + ": " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.mergeNewVariables) + ". The new variables are marked green.";
+            //show message a bit, and then remove    
+
+            if (false)
+            {
+                windowParentDecomp.textSelect.Text = txt;
+                Program.DelayAction(5000, new Action(() => { try { windowParentDecomp.textSelect.Text = ""; } catch { } }));
+            }
+            else
+            {
+                MessageBox.Show(txt);
+            }
 
             //TODO
             //TODO
@@ -2732,6 +2666,7 @@ namespace Gekko
         public List<GekkoDictionary<string, string>> freeValues = new List<GekkoDictionary<string, string>>();
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = new List<FrameFilter>();
+        public List<string> mergeNewVariables = null;  //do clone for this
 
         //-------- No clone for this ----------------
         public int guiDecompLastClickedRow = 0;

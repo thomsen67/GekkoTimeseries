@@ -369,9 +369,7 @@ namespace Gekko
                         {
                             s = G.UpdprtFormat(c.number, xx, false);
                         }
-                        else if (c.cellType == CellType.Date) s = c.date;
-
-                        if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
+                        else if (c.cellType == CellType.Date) s = c.date;                        
 
                         AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
                     }
@@ -539,13 +537,7 @@ namespace Gekko
                     //overrides                                    
                     dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightRed);
                     dockPanel.Background = dockPanel.originalBackgroundColor;
-                }
-                else if (backgroundColor == "Linen")
-                {
-                    //overrides                
-                    dockPanel.originalBackgroundColor = Brushes.Ivory;
-                    dockPanel.Background = dockPanel.originalBackgroundColor;
-                }
+                }                
 
                 SetDefaultBorder(border);
                 SetBorderThickness(g, i, j, border);
@@ -1899,10 +1891,7 @@ namespace Gekko
         //public bool isCalledFromDecompWindow = true;
         public LocalBanks localBanks = null;
         public string modelHash = null;
-        //public int decimals = 4;
         
-        public string dream = null;  //experimental
-
         public DecompData decompTables = null;
         public bool hasCalculatedQuo = false;
         public bool hasCalculatedRef = false;
@@ -1934,8 +1923,6 @@ namespace Gekko
             d.guiDecompIsBaseline = this.guiDecompIsBaseline;
             d.guiDecompTransformationCode = this.guiDecompTransformationCode;
             d.modelHash = this.modelHash;
-            
-            d.dream = this.dream;
 
             d.isSort = this.isSort;
             d.isSubst = this.isSubst;
