@@ -2508,9 +2508,14 @@ namespace Gekko
         {
             //System.Diagnostics.Process.Start(e.Uri.ToString());            
             //windowParentDecomp.textMerge.Inlines.Clear();
+            TextBlock tb = ((Hyperlink)sender).Parent as TextBlock;
+            var v1 = tb.Parent;
+            StackPanel tb = ((Hyperlink)sender).Parent as TextBlock;
+            tb.Text = "";
             try
             {
-                CrossThreadStuff.MergeButtonOk(this);
+                //CrossThreadStuff.MergeButtonOk(this);
+                this.decompDatas = null;
             }
             catch (Exception ex)
             {
