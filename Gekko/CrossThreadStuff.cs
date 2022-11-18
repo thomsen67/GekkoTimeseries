@@ -236,10 +236,7 @@ namespace Gekko
             {
 
                 if (G.Equal(Program.options.interface_mode, "sim"))
-                {
-                    //double r = 191; double g = 221; double b = 162; double alpha = 0.00d;
-                    //a little more fresh color
-                    //double r = 191; double g = 231; double b = 157; double alpha = 0.00d;
+                {                    
                     double r = 191; double g = 234; double b = 154; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
@@ -249,9 +246,7 @@ namespace Gekko
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
                 else if (G.Equal(Program.options.interface_mode, "mixed"))
-                {
-                    //double r = 255; double g = 232; double b = 166; double alpha = 0.20d;
-                    //double r = 251; double g = 229; double b = 58; double alpha = 0.60d;
+                {                    
                     double r = 253; double g = 245; double b = 176; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }

@@ -1056,8 +1056,7 @@ namespace Gekko
                 textBlock.Padding = new Thickness(2, 2, 4, 3);
             }
             else
-            {
-                bool isBlue = false;
+            {                
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
 
@@ -1163,7 +1162,7 @@ namespace Gekko
                 else if (backgroundColor == Globals.decompResidualColor)
                 {
                     //overrides                
-                    dockPanel.originalBackgroundColor = Brushes.LightYellow;
+                    dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightYellow);
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
                 else if (backgroundColor == Globals.decompErrorColor)

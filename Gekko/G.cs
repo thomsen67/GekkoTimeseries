@@ -564,6 +564,30 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Lighter color: factor=0 is no change, factor=1 is pure white. See also Darker()
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
+        public static System.Windows.Media.Color Lighter(System.Windows.Media.Color color, double factor)
+        {
+            System.Windows.Media.Color rv = System.Windows.Media.Color.FromArgb(255, (byte)((double)color.R + factor * (255d - (double)color.R)), (byte)((double)color.G + factor * (255d - (double)color.G)), (byte)((double)color.B + factor * (255d - (double)color.B)));
+            return rv;
+        }
+
+        /// <summary>
+        /// Darker color: factor=0 is no change, factor=1 is pure black. See also Darker()
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
+        public static System.Windows.Media.Color Darker(System.Windows.Media.Color color, double factor)
+        {
+            System.Windows.Media.Color rv = System.Windows.Media.Color.FromArgb(255, (byte)((1 - factor) * color.R), (byte)((1 - factor) * color.G), (byte)((1 - factor) * color.B));
+            return rv;
+        }
+
+        /// <summary>
         /// Helper method for plural "s", like 0 elefants, 1 elefant, 2 elefants, 3 elefants.
         /// </summary>
         /// <param name="count"></param>
