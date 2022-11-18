@@ -121,17 +121,16 @@
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
-                <Button Name="buttonSelect" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50"  Opacity="0.8" Content="Merge" Click="ButtonSelect_Click"  Height="22" Margin="11,0,0,0" VerticalAlignment="Top">
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Horizontal">
+                <Button Name="buttonMerge" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50"  Opacity="0.8" Content="Merge" Click="buttonMerge_Click"  Height="22" Margin="11,0,0,0" VerticalAlignment="Top">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-
-                <TextBox Name="textSelect" VerticalAlignment="Center" BorderThickness="0,0,0,0" Foreground="Gray">
-                </TextBox>
+                <TextBox Name="textMerge" Width="100" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" BorderThickness="0,0,0,0"/>
+                <Button Name ="buttonMergeHide">Hide</Button>
             </StackPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="3">

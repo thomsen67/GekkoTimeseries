@@ -732,15 +732,19 @@ namespace Gekko
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
 
             InitializeComponent();
+
+            this.textMerge.Visibility = Visibility.Collapsed;
+            this.buttonMergeHide.Visibility = Visibility.Collapsed;
+
             txtNum.Text = _numValue.ToString();
             this.scrollViewerDecomp1.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
             this.scrollViewerDecomp2.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
 
             this.isInitializing = false;  //ready for clicking
 
-            //this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
-            this.buttonSelect.Background = new SolidColorBrush(Globals.GekkoModeBlue);
-            if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Collapsed;
+            //this.buttonMerge.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
+            this.buttonMerge.Background = new SolidColorBrush(Globals.GekkoModeBlue);
+            if (this.decompFind.depth < 2) this.buttonMerge.Visibility = Visibility.Collapsed;
 
             DataContext = new ViewModel();  //MVVM style
 
@@ -2364,7 +2368,7 @@ namespace Gekko
         //    }
         //}
 
-        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        private void buttonMerge_Click(object sender, RoutedEventArgs e)
         {
             //
             // Merge button
@@ -2459,18 +2463,11 @@ namespace Gekko
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
-            string txt = "Merged " + thisFrom.Count + " equation" + G.S(thisFrom.Count) + " via " + this.decompFind.decompOptions2.new_select[0] + ", introducing " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + ": " + Stringlist.GetListWithCommas(dfParentDecomp.decompOptions2.mergeNewVariables) + ". The new variables are marked green.";
-            //show message a bit, and then remove    
-
-            if (false)
-            {
-                windowParentDecomp.textSelect.Text = txt;
-                Program.DelayAction(5000, new Action(() => { try { windowParentDecomp.textSelect.Text = ""; } catch { } }));
-            }
-            else
-            {
-                MessageBox.Show(txt);
-            }
+            string txt = "Removed '" + this.decompFind.decompOptions2.new_select[0] + "', addinged " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " (marked blue)";
+                        
+            windowParentDecomp.textMerge.Visibility = Visibility.Visible;
+            windowParentDecomp.textMerge.Text = txt;
+            windowParentDecomp.buttonMergeHide.Visibility = Visibility.Visible;
 
             //TODO
             //TODO
