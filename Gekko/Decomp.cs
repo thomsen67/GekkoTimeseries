@@ -4403,7 +4403,6 @@ namespace Gekko
             if (found == null)
             {
                 new Error("DECOMP: Could not find variable '" + variable + "' as left-hand side in model");
-                //throw new GekkoException();
             }
             string[] ss = found.equationText.Split('=');
 

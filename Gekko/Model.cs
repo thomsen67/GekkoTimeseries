@@ -163,10 +163,10 @@ namespace Gekko
                 {
                     string s1 = null;
                     EquationHelper eh = Program.FindEquationByMeansOfVariableName(eqName.Substring(Globals.gekkoEquationPrefix.Length));
-                    if (eh != null) s1 = eh.equationText + G.NL;
+                    if (eh != null) s1 = eh.equationText + G.NL + G.NL;
                     sb1.Append(s1);
                     string s2 = null;
-                    if (eh != null) s2 = Program.GetHumanReadableDetailedEquation(eh) + ";" + G.NL;
+                    if (eh != null) s2 = Program.GetHumanReadableDetailedEquation(eh) + ";" + G.NL + G.NL;
                     sb2.Append(s2);
                 }
             }
@@ -231,8 +231,8 @@ namespace Gekko
             }
             else if (this.modelGekko != null)
             {
-                rv += two.s1 + G.NL;
-                rv += "------------- detailed -------------" + G.NL + G.NL + two.s2 + G.NL;
+                rv += two.s1;
+                rv += "------------- detailed -------------" + G.NL + G.NL + two.s2;
                 if (false && Globals.runningOnTTComputer) rv += "------------- TTH: detailed2 -------------" + G.NL + G.NL + s2 + G.NL;
             }
             return rv;

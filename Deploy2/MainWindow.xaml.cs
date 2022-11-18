@@ -274,15 +274,7 @@ namespace Deploy2
 
         private void button7_Click(object sender, RoutedEventArgs e)
         {
-            int ii = 0;
-
-            //string file = @"c:\Thomas\Gekko\GekkoCS\ANTLR\Cmd2.g";
-            //string s = GetTextFromFileWithWait(file);
-            //using (FileStream temp = Program.WaitForFileStream(file + "_", Program.GekkoFileReadOrWrite.Write))
-            //using (StreamWriter tempFs = G.GekkoStreamWriter(temp))
-            //{
-            //    tempFs.Write(s);
-            //}
+            int ii = 0;            
 
             string[] sss = textBox13.Text.Trim().ToUpper().Split(',');
 
