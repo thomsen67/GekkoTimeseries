@@ -590,17 +590,7 @@ namespace Gekko
         /// matrix inversion etc. Calls DecompLowLevel() a lot, where gradients etc. are calculated.
         /// The table returned is a pivot table.
         /// </summary>
-        /// <param name="smpl"></param>
-        /// <param name="per1"></param>
-        /// <param name="per2"></param>
-        /// <param name="operator1"></param>
-        /// <param name="isShares"></param>
-        /// <param name="decompOptions2"></param>
-        /// <param name="frame"></param>
-        /// <param name="refresh"></param>
-        /// <param name="decompDatas"></param>
-        /// <returns></returns>
-        public static DecompOutput DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, bool refresh, ref DecompDatas decompDatas, Model model)
+        public static DecompOutput DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, ref DecompDatas decompDatas, Model model)
         {            
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
@@ -1915,7 +1905,7 @@ namespace Gekko
             }
             else
             {
-                windowDecomp.RecalcCellsWithNewType(true, decompFind.model);
+                windowDecomp.RecalcCellsWithNewType(decompFind.model);
             }
         }
 
@@ -1935,7 +1925,7 @@ namespace Gekko
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
                 windowDecomp.isInitializing = false;
-                windowDecomp.RecalcCellsWithNewType(true, decompFind.model);
+                windowDecomp.RecalcCellsWithNewType(decompFind.model);
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
                 {

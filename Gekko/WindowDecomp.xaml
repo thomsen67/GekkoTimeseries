@@ -129,8 +129,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <TextBox Name="textMerge" Width="100" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" BorderThickness="0,0,0,0"/>
-                <Button Name ="buttonMergeHide">Hide</Button>
+                <TextBlock Name="textMerge" Width="100" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" />
             </StackPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="3">
