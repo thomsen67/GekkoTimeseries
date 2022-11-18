@@ -45,7 +45,7 @@ namespace Gekko
             if (o.opt_prtcode != null) this.decompFind.decompOptions2.decompOperator = new DecompOperator(o.opt_prtcode.ToLower());
                         
             InitializeComponent();
-            this.scrollViewerFind.Background = new SolidColorBrush(Globals.LightYellow);
+            this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
             this.windowEquationBrowserListView.Focus();
             //
             //

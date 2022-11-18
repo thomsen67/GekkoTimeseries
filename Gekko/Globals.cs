@@ -879,10 +879,11 @@ namespace Gekko
         public static System.Drawing.Color LightBlueWord = System.Drawing.Color.FromArgb(74, 130, 189);  //as auto-tables in Word                
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
-        public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
-        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 255, 246); //equation text and residual1/2 etc.         
-        public static System.Windows.Media.Color LightBlue = System.Windows.Media.Color.FromArgb(255, 245, 247, 250);
-
+        public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);        
+        public static System.Windows.Media.Color GekkoModeYellow = System.Windows.Media.Color.FromArgb(255, 253, 245, 176);
+        public static System.Windows.Media.Color GekkoModeGreen = System.Windows.Media.Color.FromArgb(255, 191, 234, 154);
+        public static System.Windows.Media.Color GekkoModeBlue = System.Windows.Media.Color.FromArgb(255, 191, 205, 219);        
+        
         public static List<System.Windows.Media.Color> RainbowParentheses = new List<System.Windows.Media.Color>() { System.Windows.Media.Colors.Blue, System.Windows.Media.Colors.Red, System.Windows.Media.Colors.Orange, System.Windows.Media.Colors.LimeGreen, System.Windows.Media.Colors.DarkGray };
         public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);        
 

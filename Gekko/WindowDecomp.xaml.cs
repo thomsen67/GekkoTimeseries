@@ -733,13 +733,13 @@ namespace Gekko
 
             InitializeComponent();
             txtNum.Text = _numValue.ToString();
-            this.scrollViewerDecomp1.Background = new SolidColorBrush(Globals.LightYellow);
-            this.scrollViewerDecomp2.Background = new SolidColorBrush(Globals.LightYellow);
+            this.scrollViewerDecomp1.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
+            this.scrollViewerDecomp2.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
 
             this.isInitializing = false;  //ready for clicking
 
             //this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
-            this.buttonSelect.Background = new SolidColorBrush(Globals.LightBlue);
+            this.buttonSelect.Background = new SolidColorBrush(Globals.GekkoModeBlue);
             if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Collapsed;
 
             DataContext = new ViewModel();  //MVVM style
@@ -1156,13 +1156,13 @@ namespace Gekko
                 if (backgroundColor == Globals.decompBlueColor)
                 {
                     //overrides                
-                    dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightBlue);
+                    dockPanel.originalBackgroundColor = new SolidColorBrush(G.Lighter(Globals.GekkoModeBlue, 0.80));
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
                 else if (backgroundColor == Globals.decompResidualColor)
                 {
                     //overrides                
-                    dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightYellow);
+                    dockPanel.originalBackgroundColor = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.80));
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
                 else if (backgroundColor == Globals.decompErrorColor)
@@ -1184,11 +1184,11 @@ namespace Gekko
 
             if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
             {
-                SetRedSquare(g, i, j, type, isRowOrCol, red, thresholds);
+                SetRedCircle(g, i, j, type, isRowOrCol, red, thresholds);
             }
         }
 
-        private static void SetRedSquare(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, List<double> thresholds)
+        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, List<double> thresholds)
         {
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
@@ -1225,7 +1225,7 @@ namespace Gekko
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
-            dp.Margin = new Thickness(0, 0, 6, 0);
+            dp.Margin = new Thickness(0, 0, 4, 0);
             dp.SetValue(Grid.ColumnProperty, j);
             dp.SetValue(Grid.RowProperty, i);
             dp.Children.Add(r);

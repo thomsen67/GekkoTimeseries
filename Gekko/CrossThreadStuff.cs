@@ -237,18 +237,15 @@ namespace Gekko
 
                 if (G.Equal(Program.options.interface_mode, "sim"))
                 {                    
-                    double r = 191; double g = 234; double b = 154; double alpha = 0.00d;
-                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
+                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb(Globals.GekkoModeGreen.R, Globals.GekkoModeGreen.G, Globals.GekkoModeGreen.B);
                 }
                 else if (G.Equal(Program.options.interface_mode, "data"))
                 {
-                    double r = 191; double g = 205; double b = 219; double alpha = 0.00d;
-                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
+                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb(Globals.GekkoModeBlue.R, Globals.GekkoModeBlue.G, Globals.GekkoModeBlue.B);
                 }
                 else if (G.Equal(Program.options.interface_mode, "mixed"))
-                {                    
-                    double r = 253; double g = 245; double b = 176; double alpha = 0.00d;
-                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
+                {
+                    Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb(Globals.GekkoModeYellow.R, Globals.GekkoModeYellow.G, Globals.GekkoModeYellow.B);
                 }
                 else Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
 
