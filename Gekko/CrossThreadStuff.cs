@@ -25,31 +25,26 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 
 namespace Gekko
 {
     public class CrossThreadStuff
     {
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+        // --------------------------------------------------------------------------
+        // Works differently in WinForms and WPF. We show WinForms first, then WPF.
+        // --------------------------------------------------------------------------
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+        // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 
-        ///// <summary>
-        ///// Just because of threads, calls DecompGetFuncExpressionsAndRecalc()
-        ///// </summary>
-        ///// <param name="o"></param>        
-        //delegate void Decomp2Callback(DecompFind o); //weird delegate pattern, but it works!
-        //public static void Decomp2(DecompFind o)
-        //{
-        //    if (Gui.gui != null && Gui.gui.InvokeRequired)
-        //    {
-        //        // It's on a different thread, so use Invoke.
-        //        Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
-        //    }
-        //    else
-        //    {
-        //        // It's on the same thread, no need for Invoke
-        //        Decomp.DecompGetFuncExpressionsAndRecalc(o, null);
-        //    }
-        //}
+        // ======================================
+        //            WinForms start
+        // ======================================
 
         delegate string GetInputWindowTextCallback();
         public static string GetInputWindowText()
@@ -436,7 +431,7 @@ namespace Gekko
                 O.SetChecked();
             }
         }
-
+        
         //weird delegate pattern, but it works!
         delegate void CloseGraphCallback(Graph g);
         public static void CloseGraph(Graph g)
@@ -457,48 +452,6 @@ namespace Gekko
             catch {  };  //fail silently
         }
 
-        //weird delegate pattern, but it works!
-        delegate void CloseDecompCallback(Window1 w);
-        public static void CloseDecomp(Window1 w)
-        {
-            try
-            {
-                if (!w.Dispatcher.CheckAccess())
-                {
-                    // It's on a different thread, so use Invoke.
-                    w.Dispatcher.Invoke(new CloseDecompCallback(CloseDecomp), new object[] { w });
-                }
-                else
-                {
-                    //w.Close();
-                    Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
-                }
-            }
-            catch { };  //fail silently
-        }
-
-        //weird delegate pattern, but it works!
-        delegate void CloseDecompCallback2(WindowDecomp w);
-        public static void CloseDecomp2(WindowDecomp w)
-        {
-            try
-            {
-                if (!w.Dispatcher.CheckAccess())
-                {
-                    // It's on a different thread, so use Invoke.
-                    w.Dispatcher.Invoke(new CloseDecompCallback2(CloseDecomp2), new object[] { w });
-                }
-                else
-                {
-                    //w.Close();
-                    Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
-                }
-            }
-            catch { };  //fail silently
-        }
-       
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)
@@ -584,7 +537,8 @@ namespace Gekko
                                 RunRemoteFile(remoteFile);
 
                             }
-                            else {
+                            else
+                            {
 
                                 Globals.remoteExists = 1;
 
@@ -641,7 +595,7 @@ namespace Gekko
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new RestartMenuBrowserCallback(RestartMenuBrowser), new object[] {});
+                Gui.gui.Invoke(new RestartMenuBrowserCallback(RestartMenuBrowser), new object[] { });
             }
             else
             {
@@ -693,6 +647,94 @@ namespace Gekko
                     else Gui.gui.toolStripButton2.Enabled = false;
                 }
             }
-        }        
+        }
+
+        // ======================================
+        //            WinForms end
+        // ======================================
+
+        // ======================================
+        //            WPF start
+        // ======================================
+
+        
+        //weird delegate pattern, but it works!
+        delegate void MergeButtonOkCallback(WindowDecomp w);
+        public static void MergeButtonOk(WindowDecomp w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new MergeButtonOkCallback(MergeButtonOk), new object[] { w });
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("HEJSA");
+                    //w.textMerge.Text = "";
+                    //w.textMerge.Visibility = Visibility.Collapsed;
+                    //w.decompFind.decompOptions2.mergeNewVariables = null;
+                    //w.RecalcCellsWithNewType(w.decompFind.model);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            } 
+        }
+
+
+        //weird delegate pattern, but it works!
+        delegate void CloseDecompCallback(Window1 w);
+        public static void CloseDecomp(Window1 w)
+        {
+            //Soon obsolete
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new CloseDecompCallback(CloseDecomp), new object[] { w });
+                }
+                else
+                {
+                    //w.Close();
+                    Globals.ch.windowsDecompCloseCounter++;
+                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
+                }
+            }
+            catch { };  //fail silently
+        }
+
+        //weird delegate pattern, but it works!
+        delegate void CloseDecompCallback2(WindowDecomp w);
+        public static void CloseDecomp2(WindowDecomp w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new CloseDecompCallback2(CloseDecomp2), new object[] { w });
+                }
+                else
+                {
+                    ////w.Close();
+                    //Globals.ch.windowsDecompCloseCounter++;
+                    //w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
+                    
+                    Globals.ch.windowsDecompCloseCounter++;
+                    w.Close();
+                }
+            }
+            catch { };  //fail silently
+        }
+
+        // ======================================
+        //            WPF start
+        // ======================================
+
+        
     }
 }

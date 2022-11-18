@@ -2508,11 +2508,14 @@ namespace Gekko
         {
             //System.Diagnostics.Process.Start(e.Uri.ToString());            
             //windowParentDecomp.textMerge.Inlines.Clear();
-            Model model = this.decompFind.model;
-            this.textMerge.Text = "";
-            this.textMerge.Visibility = Visibility.Collapsed;
-            this.decompFind.decompOptions2.mergeNewVariables = null;
-            RecalcCellsWithNewType(model);
+            try
+            {
+                CrossThreadStuff.MergeButtonOk(this);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         private List<string> GetDecompedVariables(DecompDatas decompDatas, DecompOptions2 decompOptions2)
