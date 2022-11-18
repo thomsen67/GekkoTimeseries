@@ -738,7 +738,8 @@ namespace Gekko
 
             this.isInitializing = false;  //ready for clicking
 
-            this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
+            //this.buttonSelect.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
+            this.buttonSelect.Background = new SolidColorBrush(Globals.LightBlue);
             if (this.decompFind.depth < 2) this.buttonSelect.Visibility = Visibility.Collapsed;
 
             DataContext = new ViewModel();  //MVVM style
@@ -929,6 +930,13 @@ namespace Gekko
                         s = G.UpdprtFormat(c.number, xx, false);
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
+                                        
+                    string v = c.vars_hack?[0];
+                    if (v == Globals.decompErrorName) v = null;
+                    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
+                    {
+                        c.backgroundColor = Globals.decompBlueColor;
+                    }
 
                     AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor, variablesAreOnRows, decompOutput.red, decompOptions.decompOperator);
                 }
@@ -1049,7 +1057,7 @@ namespace Gekko
             }
             else
             {
-                bool isGreen = false;
+                bool isBlue = false;
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
 
@@ -1065,11 +1073,10 @@ namespace Gekko
                     Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
                     string v = c.vars_hack?[0];
                     if (v == Globals.decompErrorName) v = null;
-
-                    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
-                    {
-                        isGreen = true;
-                    }
+                    //if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
+                    //{
+                    //    isBlue = true;
+                    //}
 
                     bool isEndogenous = false;
                     if (v != null)
@@ -1117,6 +1124,17 @@ namespace Gekko
                     }
                 }
 
+                //if (type == GekkoTableTypes.TableContent)
+                //{
+                //    Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i, j);
+                //    string v = c.vars_hack?[0];
+                //    if (v == Globals.decompErrorName) v = null;
+                //    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
+                //    {
+                //        isBlue = true;
+                //    }
+                //}
+
                 textBlock.HorizontalAlignment = HorizontalAlignment.Right;
                 if (leftAlign) textBlock.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
@@ -1130,24 +1148,25 @@ namespace Gekko
                 dockPanel.MouseEnter += Cell_Enter;
                 dockPanel.MouseLeave += Cell_Leave;
 
-                if (isGreen)
-                {
-                    //new merged variable
-                    dockPanel.Background = new SolidColorBrush(Colors.LightGreen);
-                }
-                else if (type == GekkoTableTypes.TableContent)
+                if (type == GekkoTableTypes.TableContent)
                 {
                     dockPanel.Background = Brushes.White;
                 }
                 else dockPanel.Background = new SolidColorBrush(Globals.LightGray);
 
-                if (backgroundColor == "LightYellow")
+                if (backgroundColor == Globals.decompBlueColor)
+                {
+                    //overrides                
+                    dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightBlue);
+                    dockPanel.Background = dockPanel.originalBackgroundColor;
+                }
+                else if (backgroundColor == Globals.decompResidualColor)
                 {
                     //overrides                
                     dockPanel.originalBackgroundColor = Brushes.LightYellow;
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
-                else if (backgroundColor == "LightRed")
+                else if (backgroundColor == Globals.decompErrorColor)
                 {
                     //overrides                                    
                     dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightRed);

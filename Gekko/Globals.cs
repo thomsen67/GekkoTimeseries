@@ -515,6 +515,7 @@ namespace Gekko
         public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
         public static string decompResidualColor = "LightYellow";
         public static string decompErrorColor = "LightRed";
+        public static string decompBlueColor = "LightBlue";
         public const string gekkoEquationPrefix = "e_";
 
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
@@ -879,7 +880,10 @@ namespace Gekko
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
-        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 255, 238); //lighter LightYellow, which corresponds to the Residual1, Residual2, etc. color in decomp sheet
+        //public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 255, 238); //lighter LightYellow, which corresponds to the Residual1, Residual2, etc. color in decomp sheet
+        public static System.Windows.Media.Color LightYellow = System.Windows.Media.Color.FromArgb(255, 255, 255, 246); //lighter LightYellow, which corresponds to the Residual1, Residual2, etc. color in decomp sheet
+        //public static System.Windows.Media.Color LightBlue = System.Windows.Media.Color.FromArgb(255, 235, 239, 246);
+        public static System.Windows.Media.Color LightBlue = System.Windows.Media.Color.FromArgb(255, 245, 247, 250);
 
         public static List<System.Windows.Media.Color> RainbowParentheses = new List<System.Windows.Media.Color>() { System.Windows.Media.Colors.Blue, System.Windows.Media.Colors.Red, System.Windows.Media.Colors.Orange, System.Windows.Media.Colors.LimeGreen, System.Windows.Media.Colors.DarkGray };
         public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);        
