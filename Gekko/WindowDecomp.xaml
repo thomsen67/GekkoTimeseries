@@ -121,15 +121,15 @@
                 <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares with lagged values in the same databank">Time-change</TextBlock>
             </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Horizontal">
-                <Button Name="buttonMerge" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50"  Opacity="0.8" Content="Merge" Click="buttonMerge_Click"  Height="22" Margin="11,0,0,0" VerticalAlignment="Top">
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" HorizontalAlignment="Left" Orientation="Vertical">
+                <Button Name="buttonMerge" Background="Transparent" BorderThickness="2" ClipToBounds="False" ToolTip="Merge results into the preceding DECOMP window"  Width="50"  Opacity="0.8" Content="Merge" Click="buttonMerge_Click"  Height="22" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <TextBlock Name="textMerge" Width="100" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" />
+                <TextBlock Name="textMerge" Width="155" FontFamily="Courier New" FontSize="10.6" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,5,0,0"/>
             </StackPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="3">

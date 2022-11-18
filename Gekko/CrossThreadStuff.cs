@@ -667,16 +667,13 @@ namespace Gekko
                 if (!w.Dispatcher.CheckAccess())
                 {
                     // It's on a different thread, so use Invoke.
-                    //w.Dispatcher.Invoke(new MergeButtonOkCallback(MergeButtonOk), new object[] { w });
-                    w.Dispatcher.Invoke(() => MergeButtonOk(w));
+                    w.Dispatcher.Invoke(new MergeButtonOkCallback(MergeButtonOk), new object[] { w });                    
                 }
                 else
-                {
-                    System.Windows.Forms.MessageBox.Show("HEJSA");
-                    //w.textMerge.Text = "";
-                    //w.textMerge.Visibility = Visibility.Collapsed;
-                    //w.decompFind.decompOptions2.mergeNewVariables = null;
-                    //w.RecalcCellsWithNewType(w.decompFind.model);
+                {                    
+                    w.textMerge.Text = "";                    
+                    w.decompFind.decompOptions2.mergeNewVariables = null;
+                    w.RecalcCellsWithNewType(w.decompFind.model);
                 }
             }
             catch (Exception e)

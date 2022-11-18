@@ -1229,7 +1229,7 @@ namespace Gekko
 
             DockPanel dp = new DockPanel();
             dp.Width = 15; dp.Height = 15;
-            dp.Margin = new Thickness(0, 0, 4, 0);
+            dp.Margin = new Thickness(0, 0, 6, 0);
             dp.SetValue(Grid.ColumnProperty, j);
             dp.SetValue(Grid.RowProperty, i);
             dp.Children.Add(r);
@@ -2463,19 +2463,21 @@ namespace Gekko
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
-            string txt = "'" + this.decompFind.decompOptions2.new_select[0] + "' replaced with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + ". ";
-            
+            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " (";
+            //string txt = "Replaced '" + this.decompFind.decompOptions2.new_select[0] + "' (";
             windowParentDecomp.textMerge.Visibility = Visibility.Visible;            
-
             windowParentDecomp.textMerge.Inlines.Clear();
             windowParentDecomp.textMerge.Inlines.Add(txt);
             Hyperlink hyperLink = new Hyperlink()
             {
                 NavigateUri = new Uri("http://www.t-t.dk/gekko")
             };
-            hyperLink.Inlines.Add("Ok");
+            hyperLink.Inlines.Add("hide");
             hyperLink.RequestNavigate += Hyperlink_RequestNavigate;
             windowParentDecomp.textMerge.Inlines.Add(hyperLink);
+            windowParentDecomp.textMerge.Inlines.Add(")");
+            windowParentDecomp.textMerge.Foreground = new SolidColorBrush(Colors.Gray);
+            windowParentDecomp.textMerge.ToolTip = "Replaced variable '" + this.decompFind.decompOptions2.new_select[0] + "' with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + Environment.NewLine + " (the new variables are blue-colored)";
 
             //windowParentDecomp.buttonMergeHide.Visibility = Visibility.Visible;
 
@@ -2506,21 +2508,21 @@ namespace Gekko
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            //System.Diagnostics.Process.Start(e.Uri.ToString());            
-            //windowParentDecomp.textMerge.Inlines.Clear();
-            TextBlock tb = ((Hyperlink)sender).Parent as TextBlock;
-            var v1 = tb.Parent;
-            StackPanel tb = ((Hyperlink)sender).Parent as TextBlock;
-            tb.Text = "";
-            try
-            {
-                //CrossThreadStuff.MergeButtonOk(this);
-                this.decompDatas = null;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            //HACK HACK HACK
+            //For some really annoying reason, CrossThreadStuff.MergeButtonOk() does not work
+            //So we walk upwards, which is brittle. Better perhaps to do a walker method, is
+            //this does not already exist...
+            //HACK HACK HACK
+
+            TextBlock x1 = ((Hyperlink)sender).Parent as TextBlock;
+            StackPanel x2 = x1.Parent as StackPanel;
+            Grid x3 = x2.Parent as Grid;
+            DockPanel x4 = x3.Parent as DockPanel;
+            WindowDecomp x5 = x4.Parent as WindowDecomp;
+
+            x1.Text = "";
+            x5.decompFind.decompOptions2.mergeNewVariables = null;
+            x5.RecalcCellsWithNewType(x5.decompFind.model);            
         }
 
         private List<string> GetDecompedVariables(DecompDatas decompDatas, DecompOptions2 decompOptions2)
