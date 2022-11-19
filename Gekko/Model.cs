@@ -1029,19 +1029,15 @@ namespace Gekko
             if (type == 1) return this.dict_FromEqNumberToEqName.Length;            
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
-            {
-                string equationName = null;
-                string resultingFullName = null;
-                List<string> notUsed2 = null;
-                GekkoTime notUsed1 = GekkoTime.tNull;
-                GamsModel.ExtractTimeDimension(s2, false, ref equationName, ref notUsed1, ref resultingFullName, out notUsed2);
+            {                
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(s2, false);
                 if (type == 2)
                 {
-                    if (!temp.ContainsKey(resultingFullName)) temp.Add(resultingFullName, 0);
+                    if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
                 }
                 else if (type == 3)
                 {
-                    if (!temp.ContainsKey(equationName)) temp.Add(equationName, 0);
+                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
                 }
                 else new Error("Unexpected");
             }
@@ -1066,13 +1062,9 @@ namespace Gekko
             {
                 GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                 foreach (string s2 in this.dict_FromVarNumberToVarName)
-                {
-                    string name = null;
-                    string resultingFullName = null;
-                    List<string> notUsed2 = null;
-                    GekkoTime trash = GekkoTime.tNull;
-                    GamsModel.ExtractTimeDimension(s2, false, ref name, ref trash, ref resultingFullName, out notUsed2);
-                    if (!temp.ContainsKey(name)) temp.Add(name, 0);
+                {                    
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(s2, false);
+                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
                 }
                 return temp.Count;
             }

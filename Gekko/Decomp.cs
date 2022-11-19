@@ -887,28 +887,25 @@ namespace Gekko
             foreach (string s in decompOptions2.new_from)
             {
                 //For each equation stated
-                string equationName = null;
-                string resultingFullName = null;
-                List<string> indexes = null;
                 //Actually there is no time extracted below: the s string hos no time element
                 GekkoTime trash = GekkoTime.tNull;
-                GamsModel.ExtractTimeDimension(s, false, ref equationName, ref trash, ref resultingFullName, out indexes);
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(s, false);
 
                 Dictionary<MultidimItem, DecompStartHelper> elements = null;
-                equations.TryGetValue(equationName, out elements);
+                equations.TryGetValue(helper.name, out elements);
                 if (elements == null)
                 {
                     elements = new Dictionary<MultidimItem, DecompStartHelper>();
-                    equations.Add(equationName, elements);
+                    equations.Add(helper.name, elements);
                 }
 
-                MultidimItem mmi = new MultidimItem(indexes.ToArray());
+                MultidimItem mmi = new MultidimItem(helper.indexes.ToArray());
                 DecompStartHelper element = null;
                 elements.TryGetValue(mmi, out element);
                 if (element == null)
                 {
                     element = new DecompStartHelper();
-                    element.name = equationName;
+                    element.name = helper.name;
                     element.indexes = mmi;
                     element.fullName = element.name + element.indexes.GetName();
                     int periods = GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2);
@@ -916,7 +913,7 @@ namespace Gekko
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
-                FindEquationsForEachRelevantPeriod(per1, per2, s, equationName, mmi, element, operator1, showErrors, modelGamsScalar);
+                FindEquationsForEachRelevantPeriod(per1, per2, s, helper.name, mmi, element, operator1, showErrors, modelGamsScalar);
             }
 
             int counter = -1;
