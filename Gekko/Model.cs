@@ -1030,7 +1030,7 @@ namespace Gekko
             GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s2 in this.dict_FromEqNumberToEqName)
             {                
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
                 if (type == 2)
                 {
                     if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
@@ -1063,7 +1063,7 @@ namespace Gekko
                 GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                 foreach (string s2 in this.dict_FromVarNumberToVarName)
                 {                    
-                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
                     if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
                 }
                 return temp.Count;

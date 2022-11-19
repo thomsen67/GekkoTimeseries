@@ -889,7 +889,7 @@ namespace Gekko
                 //For each equation stated
                 //Actually there is no time extracted below: the s string hos no time element
                 GekkoTime trash = GekkoTime.tNull;
-                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(EExtractTimeDimension.Full, s, false);
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.Full, s, false);
 
                 Dictionary<MultidimItem, DecompStartHelper> elements = null;
                 equations.TryGetValue(helper.name, out elements);
