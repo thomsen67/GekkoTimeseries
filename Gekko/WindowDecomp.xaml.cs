@@ -119,7 +119,14 @@ namespace Gekko
             }
             else
             {
-                b = int.TryParse(s, out i);
+                if (s.StartsWith("00"))
+                {
+                    //do not accept, b will be = false
+                }
+                else
+                {
+                    b = int.TryParse(s, out i);
+                }
             }
 
             if (b && i >= 0 && i <= 100)
@@ -2463,7 +2470,7 @@ namespace Gekko
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
-            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " (";
+            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " [";
             //string txt = "Replaced '" + this.decompFind.decompOptions2.new_select[0] + "' (";
             windowParentDecomp.textMerge.Visibility = Visibility.Visible;            
             windowParentDecomp.textMerge.Inlines.Clear();
@@ -2472,12 +2479,12 @@ namespace Gekko
             {
                 NavigateUri = new Uri("http://www.t-t.dk/gekko")
             };
-            hyperLink.Inlines.Add("hide");
+            hyperLink.Inlines.Add("ok");
             hyperLink.RequestNavigate += Hyperlink_RequestNavigate;
             windowParentDecomp.textMerge.Inlines.Add(hyperLink);
-            windowParentDecomp.textMerge.Inlines.Add(")");
-            windowParentDecomp.textMerge.Foreground = new SolidColorBrush(Colors.Gray);
-            windowParentDecomp.textMerge.ToolTip = "Replaced variable '" + this.decompFind.decompOptions2.new_select[0] + "' with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + Environment.NewLine + " (the new variables are blue-colored)";
+            windowParentDecomp.textMerge.Inlines.Add("]");
+            //windowParentDecomp.textMerge.Foreground = new SolidColorBrush(Colors.Gray);
+            windowParentDecomp.textMerge.ToolTip = "Replaced variable '" + this.decompFind.decompOptions2.new_select[0] + "' with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + Environment.NewLine + " (blue-colored). Click 'ok' to remove coloring.";
 
             //windowParentDecomp.buttonMergeHide.Visibility = Visibility.Visible;
 
