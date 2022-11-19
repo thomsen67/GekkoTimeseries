@@ -25,6 +25,12 @@ using System.Security.Cryptography;
 namespace Gekko
 {
 
+    public enum EExtractTimeDimension
+    {
+        Full,
+        NoIndexListOfStrings
+    }
+
     public class ExtractTimeDimensionHelper
     {
         public string name = null;
@@ -309,7 +315,7 @@ namespace Gekko
                                 varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
                             }
                             
-                            ExtractTimeDimensionHelper helper = ExtractTimeDimension(varname2, true);
+                            ExtractTimeDimensionHelper helper = ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, varname2, true);
                             if (wh.time1.IsNull() || (helper.time.StrictlySmallerThan(wh.time1))) wh.time1 = helper.time;
                             if (wh.time2.IsNull() || (helper.time.StrictlyLargerThan(wh.time2))) wh.time2 = helper.time;
                             int i1 = helper.time.Subtract(wh.time0);
@@ -519,30 +525,12 @@ namespace Gekko
         /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
         /// For a name without blanks and year time last, like "x[i,j,2025]", the method can return resultingFullName and time much faster (with name and indexes both = null).
         /// </summary>
-        public static ExtractTimeDimensionHelper ExtractTimeDimension(string varname, bool errorIfTimeNotFound)
+        public static ExtractTimeDimensionHelper ExtractTimeDimension(EExtractTimeDimension settings, string varname, bool errorIfTimeNotFound)
         {
             ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
-
-            bool simple = false;
-            if (false && varname.Length > 6)
-            {
-                int end = varname.Length - 1;
-                string s = G.Substring(varname, end - 4, end - 1);
-                int i9 = G.IntParse(s);
-                if (i9 != -12345 && !char.IsDigit(varname[end - 5]))
-                {
-                    simple = true;
-                    helper.time = new GekkoTime(EFreq.A, i9, 1);
-                    if (varname[end - 5] == '[')
-                    {
-                        helper.resultingFullName = G.Substring(varname, 0, end - 6);
-                    }
-                    else
-                    {
-                        helper.resultingFullName = G.Substring(varname, 0, end - 6) + "]";
-                    }
-                }
-            }
+            
+            //fast chop up of stuff like x[a,b,2022], with no blanks.
+            bool simple = ExtractTimeDimensionHelper2(settings, varname, helper);
 
             if (simple)
             {
@@ -550,7 +538,6 @@ namespace Gekko
             }
             else
             {
-
                 List<string> fullName = new List<string>();
                 string start = null;
                 int i = varname.IndexOf('[');
@@ -607,6 +594,46 @@ namespace Gekko
             }
 
             return helper;
+        }
+
+        private static bool ExtractTimeDimensionHelper2(EExtractTimeDimension settings, string input, ExtractTimeDimensionHelper helper)
+        {
+            //input like "x[a,b,2022]"
+            bool simple = false;
+            int end = input.Length - 1;
+            if (input[end] != ']') return simple;
+            if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
+            string s = G.Substring(input, end - 4, end - 1);
+            int i9 = G.IntParse(s);
+            if (i9 == -12345 || char.IsDigit(input[end - 5])) return simple;
+            helper.time = new GekkoTime(EFreq.A, i9, 1);
+            if (input[end - 5] == '[')
+            {
+                //input like "x[2022]"
+                //.resultingFullName --> "x"
+                //.name --> "x"
+                simple = true;
+                helper.resultingFullName = G.Substring(input, 0, end - 6);
+                helper.name = helper.resultingFullName;
+                if (settings == EExtractTimeDimension.Full) helper.indexes = new List<string>();
+            }
+            else
+            {
+                //input like "x[a,b,2022]"
+                //.resultingFullName --> "x[a,b]"
+                //.name --> "x"
+                simple = true;
+                helper.resultingFullName = G.Substring(input, 0, end - 6) + "]";
+                int idx = input.IndexOf('[');
+                helper.name = G.Substring(input, 0, idx - 1);
+                if (settings == EExtractTimeDimension.Full)
+                {                    
+                    string s2 = G.Substring(input, idx + 1, end - 1);                    
+                    helper.indexes = s2.Split(',').ToList();
+                }
+            }
+
+            return simple;
         }
 
         /// <summary>
@@ -736,7 +763,7 @@ namespace Gekko
                 string[] ss = line.Split(split, StringSplitOptions.None);
                 int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
                 string inputName = helper.dict_FromVarNumberToVarName[id];                
-                ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(inputName, true);
+                ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
                 int aNumber = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
                 int i1 = helper2.time.Subtract(helper.tBasis);
                 int i2 = aNumber;
@@ -1040,7 +1067,7 @@ namespace Gekko
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     helper.dict_FromVarNumberToVarName[n] = ss2;
                     helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);                    
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(ss2, true);                 
+                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, ss2, true);                 
                     if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
                     if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
@@ -1327,7 +1354,7 @@ namespace Gekko
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
                     string varname = helper.dict_FromVarNumberToVarName[number];                    
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(varname, true);
+                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(EExtractTimeDimension.NoIndexListOfStrings, varname, true);
                     int i1 = helper2.time.Subtract(helper.tBasis);
                     int i2 = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
                                         
