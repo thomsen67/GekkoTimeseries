@@ -301,12 +301,11 @@ namespace Gekko
                                 varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
                             }
 
-                            string name = null;
+                            string notUsed1 = null;
                             GekkoTime time = GekkoTime.tNull;
                             string resultingFullName = null;
-                            List<string> notUsed = null;
-                            ExtractTimeDimension(varname2, true, ref name, ref time, ref resultingFullName, out notUsed);
-
+                            List<string> notUsed2 = null;
+                            ExtractTimeDimension(varname2, true, ref notUsed1, ref time, ref resultingFullName, out notUsed2);
                             if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
                             if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
                             int i1 = time.Subtract(wh.time0);
@@ -514,62 +513,95 @@ namespace Gekko
 
         /// <summary>
         /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
+        /// For a name without blanks and year time last, like "x[i,j,2025]", the method can return resultingFullName and time much faster (with name and indexes both = null).
         /// </summary>
         public static void ExtractTimeDimension(string varname, bool errorIfTimeNotFound, ref string name, ref GekkoTime time, ref string resultingFullName, out List<string>indexes)
         {
-            List<string> fullName = new List<string>();
-            string start = null;
-            int i = varname.IndexOf('[');
-            if (i >= 1)
+
+            //Must be able to return 1 to 4 of above.
+
+            bool simple = false;
+            if (false && varname.Length > 6)
             {
-                //with index (...)                                    
-                start = varname.Substring(0, i).Trim();
-                string rest = varname.Substring(i).Trim();
-                string rest2 = rest.Substring(1, rest.Length - 2);
-                string[] ss = rest2.Split(',');
-                int int2 = -12345;                
-                for (int j = 0; j < ss.Length; j++)
+                int end = varname.Length - 1;
+                string s = G.Substring(varname, end - 4, end - 1);
+                int i9 = G.IntParse(s);
+                if (i9 != -12345 && !char.IsDigit(varname[end - 5]))
                 {
-                    string s = ss[j].Trim();
-
-                    GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
-                    bool good = true;  
-                    //This would be easier if time was known to be always last...
-                    if (tt.IsNull()) good = false;
-                    if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
-                    if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
-                    if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
-
-                    if (good)
+                    simple = true;
+                    time = new GekkoTime(EFreq.A, i9, 1);
+                    if (varname[end - 5] == '[')
                     {
-                        //Time is in this index
-                        if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
-                        time = tt;
-                    }
-
-                    if (time.IsNull())
-                    {
-                        fullName.Add(s);
+                        resultingFullName = G.Substring(varname, 0, end - 6);
                     }
                     else
                     {
-                        //not part of indexes
+                        resultingFullName = G.Substring(varname, 0, end - 6) + "]";
                     }
                 }
+            }
 
-                if (errorIfTimeNotFound && time.IsNull()) new Error("Unexpected");
-                if (fullName.Count == 0) resultingFullName = start;  //avoid an empty "x[]" name.
-                else resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+            if (simple)
+            {
+                indexes = null;
             }
             else
             {
-                //without index
-                if (errorIfTimeNotFound) new Error("Unexpected");
-                start = varname;
-                resultingFullName = varname;
+
+                List<string> fullName = new List<string>();
+                string start = null;
+                int i = varname.IndexOf('[');
+                if (i >= 1)
+                {
+                    //with index (...)                                    
+                    start = varname.Substring(0, i).Trim();
+                    string rest = varname.Substring(i).Trim();
+                    string rest2 = rest.Substring(1, rest.Length - 2);
+                    string[] ss = rest2.Split(',');
+                    int int2 = -12345;
+                    for (int j = 0; j < ss.Length; j++)
+                    {
+                        string s = ss[j].Trim();
+
+                        GekkoTime tt = GekkoTime.FromStringToGekkoTime(s, false, false);  //no error
+                        bool good = true;
+                        //This would be easier if time was known to be always last...
+                        if (tt.IsNull()) good = false;
+                        if (s.Length < 4) good = false; //avoid the 18 in x[18, 2020q2] is a hit.
+                        if (tt.super < 1900 || tt.super > 4000) good = false; //sensible?
+                        if (!(tt.freq == EFreq.A || tt.freq == EFreq.Q || tt.freq == EFreq.M)) good = false;
+
+                        if (good)
+                        {
+                            //Time is in this index
+                            if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname + "'");
+                            time = tt;
+                        }
+
+                        if (time.IsNull())
+                        {
+                            fullName.Add(s);
+                        }
+                        else
+                        {
+                            //not part of indexes
+                        }
+                    }
+
+                    if (errorIfTimeNotFound && time.IsNull()) new Error("Unexpected");
+                    if (fullName.Count == 0) resultingFullName = start;  //avoid an empty "x[]" name.
+                    else resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+                }
+                else
+                {
+                    //without index
+                    if (errorIfTimeNotFound) new Error("Unexpected");
+                    start = varname;
+                    resultingFullName = varname;
+                }
+                indexes = fullName;
+                name = start;
             }
-            indexes = fullName;
-            name = start;
         }
 
         /// <summary>
@@ -699,11 +731,11 @@ namespace Gekko
                 string[] ss = line.Split(split, StringSplitOptions.None);
                 int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
                 string inputName = helper.dict_FromVarNumberToVarName[id];
-                string name = null;
+                string notUsed1 = null;
                 GekkoTime t = GekkoTime.tNull;
                 string outputName = null;
-                List<string> notUsed = null;
-                ExtractTimeDimension(inputName, true, ref name, ref t, ref outputName, out notUsed);
+                List<string> notUsed2 = null;
+                ExtractTimeDimension(inputName, true, ref notUsed1, ref t, ref outputName, out notUsed2);
                 int aNumber = helper.dict_FromVarNameToANumber.Get(outputName);
                 int i1 = t.Subtract(helper.tBasis);
                 int i2 = aNumber;
@@ -1007,39 +1039,13 @@ namespace Gekko
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     helper.dict_FromVarNumberToVarName[n] = ss2;
                     helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);
-                    string name = null;
+                    string notUsed1 = null;
                     GekkoTime time = GekkoTime.tNull;
-                    string resultingFullName = null;
-
-                    bool simple = false;
-                    if (ss2.Length > 6)
-                    {
-                        int end = ss2.Length - 1;
-                        string s = G.Substring(ss2, end - 4, end - 1);
-                        int i = G.IntParse(s);
-                        if (i != -12345 && !char.IsDigit(ss2[end - 5]))
-                        {
-                            simple = true;
-                            time = new GekkoTime(EFreq.A, i, 1);
-                            if (ss2[end - 5] == '[')
-                            {
-                                resultingFullName = G.Substring(ss2, 0, end - 6);
-                            }
-                            else
-                            {
-                                resultingFullName = G.Substring(ss2, 0, end - 6) + "]";
-                            }
-                        }
-                    }
-
-                    if (!simple)
-                    {
-                        List<string> notUsed = null;
-                        ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);                 
-                    }
-
-                    if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
-                    if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
+                    string resultingFullName = null;                    
+                    List<string> notUsed2 = null;
+                    ExtractTimeDimension(ss2, true, ref notUsed1, ref time, ref resultingFullName, out notUsed2);                 
+                    if (helper.t1.IsNull() || time.StrictlySmallerThan(helper.t1)) helper.t1 = time;
+                    if (helper.t2.IsNull() || time.StrictlyLargerThan(helper.t2)) helper.t2 = time;
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
                 }
             }
@@ -1324,11 +1330,11 @@ namespace Gekko
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
                     string varname = helper.dict_FromVarNumberToVarName[number];
-                    string name = null;
+                    string notUsed1 = null;
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
-                    List<string> notUsed = null;
-                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);
+                    List<string> notUsed2 = null;
+                    ExtractTimeDimension(varname, true, ref notUsed1, ref time, ref resultingFullName, out notUsed2);
                     int i1 = time.Subtract(helper.tBasis);
                     int i2 = helper.dict_FromVarNameToANumber.Get(resultingFullName);
                                         

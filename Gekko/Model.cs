@@ -1032,9 +1032,9 @@ namespace Gekko
             {
                 string equationName = null;
                 string resultingFullName = null;
-                List<string> indexes = null;
-                GekkoTime trash = GekkoTime.tNull;
-                GamsModel.ExtractTimeDimension(s2, false, ref equationName, ref trash, ref resultingFullName, out indexes);
+                List<string> notUsed2 = null;
+                GekkoTime notUsed1 = GekkoTime.tNull;
+                GamsModel.ExtractTimeDimension(s2, false, ref equationName, ref notUsed1, ref resultingFullName, out notUsed2);
                 if (type == 2)
                 {
                     if (!temp.ContainsKey(resultingFullName)) temp.Add(resultingFullName, 0);
@@ -1069,9 +1069,9 @@ namespace Gekko
                 {
                     string name = null;
                     string resultingFullName = null;
-                    List<string> indexes = null;
+                    List<string> notUsed2 = null;
                     GekkoTime trash = GekkoTime.tNull;
-                    GamsModel.ExtractTimeDimension(s2, false, ref name, ref trash, ref resultingFullName, out indexes);
+                    GamsModel.ExtractTimeDimension(s2, false, ref name, ref trash, ref resultingFullName, out notUsed2);
                     if (!temp.ContainsKey(name)) temp.Add(name, 0);
                 }
                 return temp.Count;
