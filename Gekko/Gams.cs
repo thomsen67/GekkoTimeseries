@@ -513,7 +513,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// From a varname like x(i,j,2025) it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
+        /// From a varname like x[i,j,2025] it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
         /// </summary>
         public static void ExtractTimeDimension(string varname, bool errorIfTimeNotFound, ref string name, ref GekkoTime time, ref string resultingFullName, out List<string>indexes)
         {
@@ -933,6 +933,7 @@ namespace Gekko
 
         private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
         {
+            bool b = false;
             string line = null;
             while ((line = sr.ReadLine()) != null)
             {
@@ -995,8 +996,8 @@ namespace Gekko
                     int idx = ss2.IndexOf("[");
                     if (idx >= 0) eqName = ss2.Substring(0, idx);
                     helper.dict_FromEqNumberToEqName[n] = ss2;
-                    helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow                        
-                    helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count());
+                    helper.dict_FromEqNameToEqNumber.Add(ss2, n, b);  //filling this out could be postponed until decomp if loading is slow                        
+                    helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count(), b);
                     helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
                 }
                 else if (status2 == 2)
@@ -1005,15 +1006,41 @@ namespace Gekko
                     int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     helper.dict_FromVarNumberToVarName[n] = ss2;
-                    helper.dict_FromVarNameToVarNumber.Add(ss2, n);
+                    helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);
                     string name = null;
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
-                    List<string> notUsed = null;
-                    ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);
+
+                    bool simple = false;
+                    if (ss2.Length > 6)
+                    {
+                        int end = ss2.Length - 1;
+                        string s = G.Substring(ss2, end - 4, end - 1);
+                        int i = G.IntParse(s);
+                        if (i != -12345 && !char.IsDigit(ss2[end - 5]))
+                        {
+                            simple = true;
+                            time = new GekkoTime(EFreq.A, i, 1);
+                            if (ss2[end - 5] == '[')
+                            {
+                                resultingFullName = G.Substring(ss2, 0, end - 6);
+                            }
+                            else
+                            {
+                                resultingFullName = G.Substring(ss2, 0, end - 6) + "]";
+                            }
+                        }
+                    }
+
+                    if (!simple)
+                    {
+                        List<string> notUsed = null;
+                        ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);                 
+                    }
+
                     if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
                     if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
-                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count());
+                    helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
                 }
             }
         }

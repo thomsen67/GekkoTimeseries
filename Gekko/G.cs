@@ -130,7 +130,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Parse a string into an integer
+        /// Fast parse of a simple string into an integer. Strings like '123', '007', no minus, delimiters. ...
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -1855,16 +1855,31 @@ namespace Gekko
 
         /// <summary>
         /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
-        /// But not tested.
+        /// But not tested. Pretty fast return if input has no blanks (the input string is returned).
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static string ReplaceBlanks(string s)
         {
+            bool hit = false; //maybe using this is a bit faster?
+            foreach (char c in s)
+            {
+                if (c == ' ')
+                {
+                    hit = true;
+                    break;
+                }
+            }
+
+            if (!hit) return s;  //fast without object construction if no blanks in input
+            
             StringBuilder sb = new StringBuilder(s.Length);
             foreach (char c in s)
             {
-                if (c != ' ') sb.Append(c);
+                if (c != ' ')
+                {                    
+                    sb.Append(c);
+                }
             }
             return sb.ToString();
         }
