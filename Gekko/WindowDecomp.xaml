@@ -129,7 +129,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <TextBlock Name="textMerge" FontSize="11" Width="112" Foreground="Gray" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" Margin="15,1,0,0"/>
+                <TextBlock Name="textMerge" FontSize="11" Width="105" Foreground="Gray" Height="450" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,1,0,0"/>
             </StackPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="3">

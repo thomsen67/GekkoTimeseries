@@ -1041,10 +1041,8 @@ namespace Gekko
         {
             List<double> thresholds = new List<double>();
             thresholds.Add(0.05);
-            thresholds.Add(0.15);
-            thresholds.Add(0.25);
-            thresholds.Add(0.35);
-            thresholds.Add(0.50); //must be 5 of them
+            thresholds.Add(0.20);
+            thresholds.Add(0.50); //must be 3 of them
 
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
@@ -1197,9 +1195,9 @@ namespace Gekko
             {
                 SetRedCircle(g, i, j, type, isRowOrCol, red, thresholds);
             }
-        }
+        }        
 
-        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> red, List<double> thresholds)
+        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues, List<double> thresholds)
         {
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
@@ -1207,19 +1205,19 @@ namespace Gekko
 
             SolidColorBrush brush = new SolidColorBrush();
             double d = 0;
-            if (red != null)
+            if (errorValues != null)
             {
-                d = Math.Abs((double)red[ij]);
+                d = Math.Abs((double)errorValues[ij]);
                 if (d < 0d) d = 0d; if (d > 1d) d = 1d;
-                int dust = 10;
-                Color c1 = Color.FromRgb((byte)(255 - dust), (byte)(255 - dust), (byte)(0 + dust));
-                Color c2 = Color.FromRgb((byte)(255 - dust), (byte)(0 + dust), (byte)(0 + dust));
+
+                Color yellow = Color.FromRgb(255, 255, 0);
+                Color orange = Color.FromRgb(255, 221, 20);
+                Color red = Color.FromRgb(255, 0, 0);
+
                 if (d <= thresholds[0]) { /* do nothing */ }
-                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = c1;
-                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = Color.FromRgb((byte)(0.75d * (double)c1.R + 0.25d * (double)c2.R), (byte)(0.75d * (double)c1.G + 0.25d * (double)c2.G), (byte)(0.75d * (double)c1.B + 0.25d * (double)c2.B));
-                else if (d > thresholds[2] && d <= thresholds[3]) brush.Color = Color.FromRgb((byte)(0.50d * (double)c1.R + 0.50d * (double)c2.R), (byte)(0.50d * (double)c1.G + 0.50d * (double)c2.G), (byte)(0.50d * (double)c1.B + 0.50d * (double)c2.B));
-                else if (d > thresholds[3] && d <= thresholds[4]) brush.Color = Color.FromRgb((byte)(0.25d * (double)c1.R + 0.75d * (double)c2.R), (byte)(0.25d * (double)c1.G + 0.75d * (double)c2.G), (byte)(0.25d * (double)c1.B + 0.75d * (double)c2.B));
-                else brush.Color = c2;
+                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = yellow;
+                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = orange;
+                else if (d > thresholds[2]) brush.Color = red;
             }
 
             Ellipse r = new Ellipse();
@@ -1230,7 +1228,7 @@ namespace Gekko
             if (d > thresholds[0])
             {
                 //border
-                r.Stroke = new SolidColorBrush(Colors.LightGray);
+                r.Stroke = new SolidColorBrush(Colors.Gray);
                 r.StrokeThickness = 1;
             }
 
@@ -1243,7 +1241,7 @@ namespace Gekko
             dp.HorizontalAlignment = HorizontalAlignment.Right;
             string xx = "row";
             if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
-            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (red[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox and/or set 'Prune%' = 0.";
+            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox and/or set 'Prune%' = 0.";
             g.Children.Add(dp);
         }
 
@@ -2470,8 +2468,10 @@ namespace Gekko
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
-            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " [";
-            //string txt = "Replaced '" + this.decompFind.decompOptions2.new_select[0] + "' (";
+
+            //can be up to around 30 chars with GUI looking too bad...
+            string variable = this.decompFind.decompOptions2.new_select[0];
+            string txt = dfParentDecomp.decompOptions2.mergeNewVariables.Count + " var" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + " replaced" + Environment.NewLine + G.Chop_RemoveIndex(variable) + ". [";            
             windowParentDecomp.textMerge.Visibility = Visibility.Visible;            
             windowParentDecomp.textMerge.Inlines.Clear();
             windowParentDecomp.textMerge.Inlines.Add(txt);
@@ -2484,7 +2484,7 @@ namespace Gekko
             windowParentDecomp.textMerge.Inlines.Add(hyperLink);
             windowParentDecomp.textMerge.Inlines.Add("]");
             //windowParentDecomp.textMerge.Foreground = new SolidColorBrush(Colors.Gray);
-            windowParentDecomp.textMerge.ToolTip = "Replaced variable '" + this.decompFind.decompOptions2.new_select[0] + "' with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + Environment.NewLine + " (blue-colored). Click 'ok' to remove coloring.";
+            windowParentDecomp.textMerge.ToolTip = "Replaced variable " + variable + " with " + dfParentDecomp.decompOptions2.mergeNewVariables.Count + " new variable" + G.S(dfParentDecomp.decompOptions2.mergeNewVariables.Count) + Environment.NewLine + " (blue-colored). Click 'ok' to remove coloring.";
 
             //windowParentDecomp.buttonMergeHide.Visibility = Visibility.Visible;
 
