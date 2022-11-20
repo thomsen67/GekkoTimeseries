@@ -16738,7 +16738,7 @@ namespace Gekko
             if (model.modelGekko != null) model.modelGekko.modelInfo.Print(model.modelCommon);
 
         }
-        
+
         /// <summary>
         /// Read a Gekko model from .frm file.
         /// </summary>
@@ -16779,37 +16779,28 @@ namespace Gekko
             model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
 
             string parsingSeconds = null;
-            //if (Program.model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile)
-            //{
-            //    //Needs to load lists into Program.list, and varlist too
-            //    GuiSetModelName();
-            //}
-            //else
+
+
+            DateTime t1 = DateTime.Now;
+            //ParseModel() is reasonably fast. But needs only to be run when new model is called.
+            //[[1]]
+            GekkoDictionary<string, string> vals = Parser.Frm.ParserFrmCreateAST.ParserFrmCreateASTHelper(textInput, fileName);
+            //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
+            //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
+            //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
+            //  takes some time. It also writes out actual C# code to be used later on when compiling.
+            Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
+
+            WriteGamsScalarModel(model); //in principle this could be done before first DECOMP. But then we would need to get that into protobuf, and WriteGamsScalarModel() is pretty fast.
+
+            Program.GuiSetModelName();
+            if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
             {
-                DateTime t1 = DateTime.Now;
-                //ParseModel() is reasonably fast. But needs only to be run when new model is called.
-                //[[1]]
-                GekkoDictionary<string, string> vals = Parser.Frm.ParserFrmCreateAST.ParserFrmCreateASTHelper(textInput, fileName);
-                //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
-                //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
-                //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
-                //  takes some time. It also writes out actual C# code to be used later on when compiling.
-                Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
-                
-                WriteGamsScalarModel(model); //in principle this could be done before first DECOMP. But then we would need to get that into protobuf, and WriteGamsScalarModel() is pretty fast.
-
-                Program.GuiSetModelName();
-                if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
-                {
-                    new Error("There is a lead [+" + model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest lead elsewhere in the model [+" + model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables");
-
-                    //throw new GekkoException();
-                }
-                parsingSeconds = G.Seconds(t1);
-                Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
-                //Parser.Frm.ParserFrmCompileAST.ParserFrmMakeProtobuf();
+                new Error("There is a lead [+" + model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest lead elsewhere in the model [+" + model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables");                
             }
-
+            parsingSeconds = G.Seconds(t1);
+            Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
+            
             Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper, p);
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
@@ -16823,7 +16814,7 @@ namespace Gekko
             }
 
             model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
-            model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);            
+            model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
         }
 
         /// <summary>

@@ -1213,17 +1213,12 @@ namespace Gekko
                 d = Math.Abs((double)errorValues[ij]);
                 if (d < 0d) d = 0d; if (d > 1d) d = 1d;
 
-                //d = delete;
-
-                Color yellow = Color.FromRgb(255, 255, 0);
-                Color orange = Color.FromRgb(255, 201, 20);
-                Color red = Color.FromRgb(255, 0, 0);
+                //d = delete;                
 
                 if (d <= thresholds[0]) { /* do nothing */ }
-                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = yellow;
-                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = orange;
-                else if (d > thresholds[2]) brush.Color = red;
-
+                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = Globals.yellow;
+                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = Globals.orange;
+                else if (d > thresholds[2]) brush.Color = Globals.red;
 
                 //delete += 0.20;
             }
@@ -2742,14 +2737,14 @@ namespace Gekko
         //-------- GUI stuff end ----------------        
         
         /// <summary>
-        /// Obtain the object as code like "decomp3 &lt;2010 2020> x from e1 endo x;"
+        /// Obtain the object as code like "decomp &lt;2010 2020> x from e1 endo x;"
         /// </summary>
         /// <returns></returns>
         public Rich ToCode()
         {
             Color color = Colors.Blue;
             Rich s = new Rich();
-            s.Add("decomp3", color);
+            s.Add("decomp", color);
             s.Add(" <", color);
             s.Add(this.t1.ToString() + " " + this.t2.ToString());
             s.Add(" " + decompOperator.OperatorLower());
