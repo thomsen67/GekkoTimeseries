@@ -1039,11 +1039,7 @@ namespace Gekko
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)
         {
-            List<double> thresholds = new List<double>();
-            thresholds.Add(0.05);
-            thresholds.Add(0.20);
-            thresholds.Add(0.50); //must be 3 of them
-
+            
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
@@ -1193,12 +1189,19 @@ namespace Gekko
 
             if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
             {
-                SetRedCircle(g, i, j, type, isRowOrCol, red, thresholds);
+                SetRedCircle(g, i, j, type, isRowOrCol, red);
             }
-        }        
+        }
 
-        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues, List<double> thresholds)
+        public static double delete = 0.15;
+
+        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues)
         {
+            List<double> thresholds = new List<double>();
+            thresholds.Add(0.05);
+            thresholds.Add(0.20);
+            thresholds.Add(0.35); //must be 3 of them
+
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
             else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
@@ -1210,14 +1213,19 @@ namespace Gekko
                 d = Math.Abs((double)errorValues[ij]);
                 if (d < 0d) d = 0d; if (d > 1d) d = 1d;
 
+                d = delete;
+
                 Color yellow = Color.FromRgb(255, 255, 0);
-                Color orange = Color.FromRgb(255, 221, 20);
+                Color orange = Color.FromRgb(255, 201, 20);
                 Color red = Color.FromRgb(255, 0, 0);
 
                 if (d <= thresholds[0]) { /* do nothing */ }
                 else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = yellow;
                 else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = orange;
                 else if (d > thresholds[2]) brush.Color = red;
+
+
+                delete += 0.20;
             }
 
             Ellipse r = new Ellipse();
