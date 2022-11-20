@@ -725,7 +725,7 @@ namespace Gekko
         }
 
         public static void Sim(O.Sim o)
-        {
+        {            
             if (G.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;

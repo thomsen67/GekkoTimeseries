@@ -1193,7 +1193,7 @@ namespace Gekko
             }
         }
 
-        public static double delete = 0.15;
+        //public static double delete = 0.15;
 
         private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues)
         {
@@ -1213,7 +1213,7 @@ namespace Gekko
                 d = Math.Abs((double)errorValues[ij]);
                 if (d < 0d) d = 0d; if (d > 1d) d = 1d;
 
-                d = delete;
+                //d = delete;
 
                 Color yellow = Color.FromRgb(255, 255, 0);
                 Color orange = Color.FromRgb(255, 201, 20);
@@ -1225,7 +1225,7 @@ namespace Gekko
                 else if (d > thresholds[2]) brush.Color = red;
 
 
-                delete += 0.20;
+                //delete += 0.20;
             }
 
             Ellipse r = new Ellipse();

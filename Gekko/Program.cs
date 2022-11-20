@@ -16796,7 +16796,7 @@ namespace Gekko
                 //  takes some time. It also writes out actual C# code to be used later on when compiling.
                 Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
                 
-                WriteGamsScalarModel(model);                
+                WriteGamsScalarModel(model); //in principle this could be done before first DECOMP. But then we would need to get that into protobuf, and WriteGamsScalarModel() is pretty fast.
 
                 Program.GuiSetModelName();
                 if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
@@ -16832,6 +16832,9 @@ namespace Gekko
         /// <param name="model"></param>
         private static void WriteGamsScalarModel(Model model)
         {
+            DateTime dt0 = DateTime.Now;
+            new Writeln("Start scalar");
+            
             /// See #jseds78hsd33.
             List<string> equations = new List<string>();
             List<string> dictionary = new List<string>();
@@ -16888,7 +16891,9 @@ namespace Gekko
 
             Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
             model.modelGamsScalar = modelTemp.modelGamsScalar;
-            model.modelGamsScalar.is2000Model = true;
+            model.modelGamsScalar.is2000Model = true;            
+
+            new Writeln("TTH: Scalar model production: " + G.Seconds(dt0));
         }
 
         /// <summary>

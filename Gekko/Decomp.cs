@@ -366,6 +366,19 @@ namespace Gekko
         {
             Model model = Program.model;
 
+            if (o.from.Count == 0)
+            {
+                O.Find find = new O.Find();
+                find.t1 = o.t1;
+                find.t2 = o.t2;
+                find.opt_prtcode = o.opt_prtcode;
+                //find.iv = new List();
+                //foreach (IVariable iv in o.select) find.iv.Add(iv);
+                find.iv = o.select[0] as List;
+                find.Exe();
+                return;
+            }
+
             //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
             //  eval might help.
             //In an equation like y[#a] = x[#a] + 5, there will be 100 equations if #a is 1..100. For each of these, lags are tried. So

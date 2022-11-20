@@ -337,7 +337,8 @@ namespace Gekko.Parser.Gek
                             Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
                             string translated = Translate_2_4_to_3_0.Translate(code, info);
                             bool is3_0 = ParserGekCreateAST.IsValid3_0Syntax(translated);
-                            if (is2_4)
+                            bool equal = code.ToLower().Replace(" ", "") == translated.ToLower().Replace(" ", ""); //ignore case and whitespace
+                            if (is2_4 && !equal)
                             {
                                 using (Note txt = new Note())
                                 {
@@ -349,7 +350,7 @@ namespace Gekko.Parser.Gek
                                         txt.MoreAdd(translated);
                                     }
                                     else
-                                    {                                        
+                                    {
                                         txt.MoreAdd("The in-built {a{translator¤translate.htm}a} tried to translate the statement, but could not produce valid 3.x code.");
                                         txt.MoreNewLine();
                                         txt.MoreAdd("The translated code is the following (the code is invalid but may provide some hints):");

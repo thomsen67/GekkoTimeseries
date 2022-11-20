@@ -2586,9 +2586,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | create               SEMICOLON!
 						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!						  
-						  | decomp2a             SEMICOLON! //cannot join these
-						  | decomp2b             SEMICOLON! //cannot join these
-                          | decomp3a             SEMICOLON! //cannot join these						  
+						  | decomp2              SEMICOLON!						  						  
 						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -2907,17 +2905,19 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-decomp:						
-DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
+decomp2:						
+DECOMP2 decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
 | DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
 ;
 decompExpression:           expression;
 
 // --------------
 
-decomp2a:                 	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar1          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
-decomp2b:                   DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar2          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
-decomp3a:                 	DECOMP3 decompOpt1? decompVar1Simple decompFrom decompEndo decompWhere? decompGroup? decompRows? decompCols?          -> ^({token("ASTDECOMP3¤"+($decomp3a.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom) ^(ASTDECOMPENDO decompEndo)  ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+//decomp2a:                 	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar1          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+//decomp2b:                   DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar2          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom decompEndo decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom) ^(ASTDECOMPENDO decompEndo)  ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
+                          | DECOMP decompOpt1? decompVar1Simple                                                                           -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    )
+                          ;
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
 seqOfBankvarnamesAlias: seqOfBankvarnames;
