@@ -14066,10 +14066,10 @@ namespace Gekko
 
                 //bool differentFreq = false;
 
-                if (Program.model.modelGekko.modelInfo.varlist != null && Program.model.modelGekko.modelInfo.varlist.Count > 0)
+                if (Program.model?.modelGekko?.modelInfo?.varlist != null && Program.model.modelGekko.modelInfo.varlist.Count > 0)
                 {
                     List<string> explanation = new List<string>();
-                    if (Program.model.modelGekko.modelInfo.varlist == null) return;
+                    if (Program.model?.modelGekko?.modelInfo?.varlist == null) return;
 
                     foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
                     {
@@ -28934,7 +28934,7 @@ namespace Gekko
             int dublets = 0;
             Dictionary<string, int> varlistDublets = new Dictionary<string, int>();
             CaseInsensitiveHashtable varlist = new CaseInsensitiveHashtable();
-            if (Program.model.modelGekko.modelInfo.varlist != null)
+            if (Program.model?.modelGekko?.modelInfo?.varlist != null)
             {
                 foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
                 {
