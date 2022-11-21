@@ -463,6 +463,8 @@ namespace Gekko
         public string fileName;
         [ProtoMember(16)]
         public ModelListHelper modelListHelper = null;
+        [ProtoMember(17)]
+        public List<Program.Item> varlist = null;
 
         //-------------------------------------------------------------------------------------------
         //Do not save the following in protofile! (they will be created even if there is a cache hit)

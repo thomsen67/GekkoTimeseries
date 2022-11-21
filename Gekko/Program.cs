@@ -1619,10 +1619,10 @@ namespace Gekko
         /// </summary>
         public static Dictionary<string, Table> tables = new Dictionary<string, Table>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// The Gekko variable list for models.
-        /// </summary>
-        public static List<Item> unfoldedVariableList = null;  //the unfolded variable list
+        ///// <summary>
+        ///// The Gekko variable list for models.
+        ///// </summary>
+        //public static List<Item> unfoldedVariableList = null;  //the unfolded variable list
 
         /// <summary>
         /// Helper for the GUI browser (DISP command)
@@ -14066,12 +14066,12 @@ namespace Gekko
 
                 //bool differentFreq = false;
 
-                if (Program.unfoldedVariableList != null && Program.unfoldedVariableList.Count > 0)
+                if (Program.model.modelGekko.modelInfo.varlist != null && Program.model.modelGekko.modelInfo.varlist.Count > 0)
                 {
                     List<string> explanation = new List<string>();
-                    if (Program.unfoldedVariableList == null) return;
+                    if (Program.model.modelGekko.modelInfo.varlist == null) return;
 
-                    foreach (Program.Item item in Program.unfoldedVariableList)
+                    foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
                     {
                         string ss = "";
                         if (item.explanation.Count > 0) ss = item.explanation[0];
@@ -15153,8 +15153,8 @@ namespace Gekko
         public static List<string> GetVariableExplanationFromExternalFile(string var)
         {
             List<string> explanation = new List<string>();
-            if (Program.unfoldedVariableList == null) return explanation;
-            foreach (Program.Item item in Program.unfoldedVariableList)
+            if (Program.model?.modelGekko?.modelInfo?.varlist == null) return explanation;
+            foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
             {
                 if (G.Equal(var, item.variable))
                 {
@@ -16780,7 +16780,6 @@ namespace Gekko
 
             string parsingSeconds = null;
 
-
             DateTime t1 = DateTime.Now;
             //ParseModel() is reasonably fast. But needs only to be run when new model is called.
             //[[1]]
@@ -16801,7 +16800,7 @@ namespace Gekko
             parsingSeconds = G.Seconds(t1);
             Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
             
-            Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper, p);
+            Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper, model, p);
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
             {
@@ -21105,7 +21104,6 @@ namespace Gekko
             Globals.printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
 
             Program.model = new Model();
-            Program.unfoldedVariableList = null;
 
             Globals.modelFileName = "";
             GuiSetModelName();
@@ -26654,7 +26652,7 @@ namespace Gekko
             return name2;
         }
 
-        static public string UnfoldVariableList(StringReader file)
+        static public string UnfoldVariableList(StringReader file, Model model)
         {
             // var line can be delimited by spaces or ";", spacing is irrelevant
             // description lines are all following lines (typically 4)
@@ -26764,7 +26762,7 @@ namespace Gekko
             {
                 s = longList.Count + " var labels read";
             }
-            Program.unfoldedVariableList = longList;
+            model.modelGekko.modelInfo.varlist = longList;
             return s;
         }
 
@@ -28936,9 +28934,9 @@ namespace Gekko
             int dublets = 0;
             Dictionary<string, int> varlistDublets = new Dictionary<string, int>();
             CaseInsensitiveHashtable varlist = new CaseInsensitiveHashtable();
-            if (Program.unfoldedVariableList != null)
+            if (Program.model.modelGekko.modelInfo.varlist != null)
             {
-                foreach (Program.Item item in Program.unfoldedVariableList)
+                foreach (Program.Item item in Program.model.modelGekko.modelInfo.varlist)
                 {
                     string varName = item.variable;
                     if (varlist.ContainsKey(varName))
@@ -30658,16 +30656,23 @@ namespace Gekko
             if (endPerInFile != int.MinValue) i2 = endPerInFile.ToString();
         }
 
+        [ProtoContract]
         public class OneList
         {
+            [ProtoMember(1)]
             public string indexName;
+            [ProtoMember(2)]
             public List<string> indexItems;
         }
 
+        [ProtoContract]
         public class Item
         {
+            [ProtoMember(1)]
             public string variable = "";
+            [ProtoMember(2)]
             public List<OneList> listOfLists;
+            [ProtoMember(3)]
             public List<string> explanation = new List<string>();
         }
 

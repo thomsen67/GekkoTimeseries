@@ -934,7 +934,7 @@ namespace Gekko.Parser.Frm
             }
         }
 
-        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper, P p)
+        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper, Model model, P p)
         {
             StringBuilder varList = null;
 
@@ -962,7 +962,7 @@ namespace Gekko.Parser.Frm
 
             if (varList != null && varList.Length > 0)
             {
-                string s = Program.UnfoldVariableList(new StringReader(varList.ToString()));
+                string s = Program.UnfoldVariableList(new StringReader(varList.ToString()), model);
                 if (foundInFrm)
                 {
                     if (s != null) s = s + " (found inside .frm file)";

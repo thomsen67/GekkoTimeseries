@@ -95,14 +95,19 @@ namespace Gekko.Parser.Gek
                     }
                 }
 
-                if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
-
-                if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
-
-                if (G.Equal(firstWord.s, "for") || G.Equal(firstWord.s, "if") || G.Equal(firstWord.s, "block") || G.Equal(firstWord.s, "function") || G.Equal(firstWord.s, "procedure"))
+                bool hasSigil = statement.tokens?[0].s == Globals.symbolScalar.ToString() || statement.tokens?[0].s == Globals.symbolCollection.ToString();
+                if (!hasSigil)
                 {
-                    s7 += "end;";
+                    if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+
+                    if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
+
+                    if (G.Equal(firstWord.s, "for") || G.Equal(firstWord.s, "if") || G.Equal(firstWord.s, "block") || G.Equal(firstWord.s, "function") || G.Equal(firstWord.s, "procedure"))
+                    {
+                        s7 += "end;";
+                    }
                 }
+
                 ph7.commandsText = s7;
                 ph7.syntaxType = statement.type;
 
@@ -481,7 +486,7 @@ namespace Gekko.Parser.Gek
                 int col2 = i + 1;
                 if (statementLine[i] == '£')
                 {
-                    
+                    //#jmzss7iukjsd
                     string nextLegalChar = null;  //used for ANTLR messages themselves
                     for (int ii = i + 1; ii < statementLine.Length; ii++)
                     {
