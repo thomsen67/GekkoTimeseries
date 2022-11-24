@@ -3696,7 +3696,11 @@ namespace Gekko
                                     else
                                     {
                                         //must be xls or xlsx, and not #n/a or the like
-                                        new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ". The cell type is text string, expected a numerical value.");
+                                        using (Error txt = new Error())
+                                        {
+                                            txt.MainAdd("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. ");
+                                            txt.MoreAdd(ExcelTypeError());
+                                        }
                                     }
                                 }
                             }
@@ -5080,7 +5084,11 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. The cell type is text string, expected a numerical value.");
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. ");
+                        txt.MoreAdd(ExcelTypeError());
+                    }
                 }
             }
             else if (cell.type == ECellLightType.Double)
@@ -5092,6 +5100,11 @@ namespace Gekko
                 new Error("Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
             }
             return v;
+        }
+
+        private static string ExcelTypeError()
+        {
+            return "The cell type is text/string, expected a numerical value. Such problems can typically be fixed by changing the type/format of the cell(s) in Excel. Gekko does not try to autoconvert a string like for instance '1.2345' into a value, because this could introduce hard-to find bugs. Note: when the cell type is correctly set as a numerical value, Gekko does not care about the layout choice of decimal separator symbols etc. (the value is acquired from a binary Excel representation).";
         }
 
 
@@ -13743,7 +13756,7 @@ namespace Gekko
                 Globals.datopgek_errors.Add("Running this command file: " + fileName);
             }
 
-            RunHelper(o);
+            RunHelper(o, fileName);
         }
 
         /// <summary>
@@ -13912,9 +13925,9 @@ namespace Gekko
         /// Helper for Run(). Will search for .gcm (RUN) file in OPTION folder command|command1|command2.
         /// </summary>
         /// <param name="o"></param>
-        public static void RunHelper(O.Run o)
+        public static void RunHelper(O.Run o, string fileName)
         {
-            string s = o.fileName;
+            string s = fileName;
             s = G.StripQuotes(s);
             s = G.AddExtension(s, "." + Globals.extensionCommand);
 

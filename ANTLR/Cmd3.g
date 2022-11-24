@@ -2267,7 +2267,6 @@ mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
 mapItem:                    assignmentMap2 -> ^(ASTMAPITEM assignmentMap2);
 
-//listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
 function:                   libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)

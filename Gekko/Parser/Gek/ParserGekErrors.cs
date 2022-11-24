@@ -369,7 +369,7 @@ namespace Gekko.Parser.Gek
                         }
                         catch { };
 
-                        if (Globals.runningOnTTComputer) new Writeln("--> TYPE: " + statement.type);
+                        if (Globals.runningOnTTComputer) new Writeln("TTH --> TYPE: " + statement.type);
 
                         if (CountErrors(statement.errorDictionary) != CountErrors(originalErrors))
                         {
@@ -410,7 +410,7 @@ namespace Gekko.Parser.Gek
         private static string HandleGlueSymbols(Statement statement, string statementLine, string statementLine2, StringBuilder statementLine3)
         {
             List<string> glues1 = new List<string>() { Globals.symbolGlueChar2, Globals.symbolGlueChar3, Globals.symbolGlueChar4, Globals.symbolGlueChar5, Globals.symbolGlueChar6, Globals.symbolGlueChar7, Globals.symbolGlueChar1.ToString()};            
-            int[] glue = new int[statementLine.Length];  //1 means it is being removed
+            //int[] glue = new int[statementLine.Length];  //1 means it is being removed
             int collapse = 0;
             for (int i = 0; i < statementLine.Length; i++)
             {
@@ -485,35 +485,21 @@ namespace Gekko.Parser.Gek
             {
                 int col2 = i + 1;
                 if (statementLine[i] == '£')
-                {
-                    //#jmzss7iukjsd
-                    string nextLegalChar = null;  //used for ANTLR messages themselves
-                    for (int ii = i + 1; ii < statementLine.Length; ii++)
-                    {
-                        if (statementLine[ii] != '£' && statementLine[ii] != ' ')
-                        {
-                            nextLegalChar = statementLine[ii].ToString();
-                            break;
-                        }
-                    }
+                {                   
 
-                    //move pointers 1 pos to the left
+                    //for instance, the statement "#¨m = list¨('a',);"
+                    //has "¨" in pos 2 and 11 (string starts at 1).
+                    //errorDict has 100..0011, so only an error at the last "¨"
+                    //when we meet the first "¨" at col2=2, all errors with col >= 3 should be moved 1 to the left.
+                    //when we meet the ssecont "¨" at col2=11, all errors with col >= 12 should be moved 1 to the left.
+                    //So move them when col >= col2+1, that is, no move when col < col2+1.
+
+                    //move pointers 1 pos to the left 
                     foreach (KeyValuePair<long, ErrorHelper> kvp in errorDict2)
                     {
                         int ln = (int)(kvp.Key / (long)1e9);
                         int col = (int)(kvp.Key % (long)1e9);
-                        if (col < col2) continue;  //only move after '£'
-
-                        if (nextLegalChar != null)
-                        {
-                            for (int j = 0; j < kvp.Value.errors.Count; j++)
-                            {
-                                if (kvp.Value.errors[j].Contains("'¨'"))
-                                {
-                                    kvp.Value.errors[j] = kvp.Value.errors[j].Replace("'¨'", "'" + nextLegalChar + "'");
-                                }
-                            }
-                        }
+                        if (col < col2 + 1) continue;  //only move after '£'                        
                         kvp.Value.offset -= 1;
                     }
                 }
@@ -522,12 +508,37 @@ namespace Gekko.Parser.Gek
                     sb.Append(statementLine[i]);
                 }
             }
-
-            //if (CountErrors(statement.errorDictionary) != CountErrors(errorDict2)) new Error("Hov");
-
+            
             statement.errorDictionary = errorDict2;
             statementLine = sb.ToString();
             statement.text = statementLine;
+
+            //Replace any '¨' in the error text with a suitable character from the statement line (first non-blank character after the '¨').
+            foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
+            {
+                for (int i = 0; i < kvp.Value.errors.Count; i++)
+                {
+                    if (kvp.Value.errors[i].Contains("¨"))
+                    {
+                        int col = (int)(kvp.Key % (long)1e9);
+                        col += kvp.Value.offset;
+                        if (col < statementLine.Length)
+                        {
+                            char c = '¨';
+                            for (int ii = col - 1; ii < statementLine.Length; ii++)
+                            {
+                                if (statementLine[ii] != ' ')
+                                {
+                                    c = statementLine[ii];
+                                    break;
+                                }
+                            }                            
+                            kvp.Value.errors[i] = kvp.Value.errors[i].Replace("'¨'", "'" + c + "'");
+                        }
+                    }
+                }                
+            }
+
             return statementLine;
         }
 
