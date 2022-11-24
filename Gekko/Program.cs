@@ -3696,7 +3696,7 @@ namespace Gekko
                                     else
                                     {
                                         //must be xls or xlsx, and not #n/a or the like
-                                        new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ". This cell is text: expected numeric value.");
+                                        new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ". The cell type is text string, expected a numerical value.");
                                     }
                                 }
                             }
@@ -5080,7 +5080,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'");
+                    new Error("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. The cell type is text string, expected a numerical value.");
                 }
             }
             else if (cell.type == ECellLightType.Double)
@@ -5090,7 +5090,6 @@ namespace Gekko
             else
             {
                 new Error("Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
-                //throw new GekkoException();
             }
             return v;
         }
