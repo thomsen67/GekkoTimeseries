@@ -39,15 +39,22 @@ namespace Gekko
             {
                 ;
                 O.TypeCheck_val(forloop_xe7dke6cj_1, 0);
-
                 C0(smpl, p, ref forloop_xe7dke6cj_1);
 
             };
 
             //[[commandEnd]]0
 
-
-
+            //IVariable forloop_xe7dke6cj_9 = null;
+            //int counter10 = 0;
+            //bool years11 = O.LoopYears("string", O.ELoopType.List, O.FlattenIVariablesSeqFor(true, new List(new List<IVariable> {new ScalarString("a"), null, new ScalarString("b"), null})), null);
+            //for (O.IterateStart(years11, O.ELoopType.List, ref forloop_xe7dke6cj_9, O.FlattenIVariablesSeqFor(true, new List(new List<IVariable> {new ScalarString("a"), null, new ScalarString("b"), null}))); 
+            //O.IterateContinue(years11, O.ELoopType.List, forloop_xe7dke6cj_9, O.FlattenIVariablesSeqFor(true, new List(new List<IVariable> {new ScalarString("a"), null, new ScalarString("b"), null})), null, null, ref counter10);
+            //O.IterateStep(years11, O.ELoopType.List, ref forloop_xe7dke6cj_9, O.FlattenIVariablesSeqFor(true, new List(new List<IVariable> { new ScalarString("a"), null, new ScalarString("b"), null })), null, counter10))
+            //{
+            //    ;
+            //    O.TypeCheck_string(forloop_xe7dke6cj_9, 0);
+            //};
         }
     }
 }

@@ -196,7 +196,7 @@ namespace Gekko
         {
 
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-            new Error("You are trying to extract a numerical value from STRING '" + this.string2 + "'. A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in that case you must use {%s} instead of %s."); return double.NaN;
+            new Error("You are trying to extract a numerical value from string '" + this.string2 + "'. A string s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in that case you must use {%s} instead of %s."); return double.NaN;
 
 
             //throw new GekkoException();
@@ -367,7 +367,7 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            new Error("You cannot use an indexer [] on a STRING"); return;
+            new Error("You cannot use an indexer [] on a string"); return;
             //throw new GekkoException();
         }
 

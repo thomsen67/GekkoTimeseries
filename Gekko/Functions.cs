@@ -1244,7 +1244,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Expected argument 1 in series() to be VAL or STRING");
+                        new Error("Expected argument 1 in series() to be value or string");
                         //throw new GekkoException();
                     }
                 }
@@ -1259,7 +1259,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("series() with 2 arguments must have STRING as first argument");
+                        new Error("series() with 2 arguments must have string as first argument");
                         //throw new GekkoException();
                     }
                 }
@@ -1291,7 +1291,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Expected argument 1 in timeless() to be VAL or STRING");
+                        new Error("Expected argument 1 in timeless() to be value or string");
                         //throw new GekkoException();
                     }
                 }
@@ -1306,7 +1306,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("timeless() with 2 arguments must have STRING as first argument");
+                        new Error("timeless() with 2 arguments must have string as first argument");
                         //throw new GekkoException();
                     }
                 }
@@ -4288,7 +4288,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Series)
             {
-                new Error("Cannot convert a SERIES to a STRING");
+                new Error("Cannot convert a SERIES to a string");
                 //throw new GekkoException();
             }
             return new ScalarString(s);
@@ -4377,12 +4377,12 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.List)
             {
-                new Error("Cannot convert a LIST to a DATE");
+                new Error("Cannot convert a LIST to a date");
                 //throw new GekkoException();
             }
             else if (x.Type() == EVariableType.Series)
             {
-                new Error("Cannot convert a SERIES to a DATE");
+                new Error("Cannot convert a SERIES to a date");
                 //throw new GekkoException();
             }
             return new ScalarDate(d);
@@ -4405,7 +4405,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Cannot only convert annual or undated DATE to VAL");
+                    new Error("Cannot only convert annual or undated date to value");
                     //throw new GekkoException();
                 }
             }
@@ -4416,7 +4416,7 @@ namespace Gekko
             }
             else if (x1.Type() == EVariableType.List)
             {
-                new Error("Cannot convert a LIST to a VAL");
+                new Error("Cannot convert a LIST to a value");
                 //throw new GekkoException();
             }
             else if (x1.Type() == EVariableType.Series)
@@ -4428,7 +4428,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Cannot convert a non-timeless SERIES to a VAL");
+                    new Error("Cannot convert a non-timeless SERIES to a value");
                     //throw new GekkoException();
                 }
             }

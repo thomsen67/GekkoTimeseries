@@ -39,7 +39,7 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Could not convert the date " + this.date + " directly into a STRING. You may try the string() conversion function."); return null;
+            new Error("Could not convert the date " + this.date + " directly into a string. You may try the string() conversion function."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
@@ -51,7 +51,7 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            new Error("You are trying to convert/use the date " + this.date + " as a STRING item in a list. In LIST commands, you must for example use '2015q3' instead of 2015q3. If you are using a DATE scalar %d, you may try to use string(%d) instead."); return null;
+            new Error("You are trying to convert/use the date " + this.date + " as a string item in a list. In LIST commands, you must for example use '2015q3' instead of 2015q3. If you are using a date scalar %d, you may try to use string(%d) instead."); return null;
 
 
             //throw new GekkoException();
@@ -64,7 +64,7 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] index1)
         {
-            new Error("Cannot use []-indexer on DATE"); return null;
+            new Error("Cannot use []-indexer on date"); return null;
             //throw new GekkoException();
         }
 
@@ -114,7 +114,7 @@ namespace Gekko
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            new Error("Type error regarding concat and DATE"); return null;
+            new Error("Type error regarding concat and date"); return null;
             //throw new GekkoException();
         }
 
@@ -144,25 +144,25 @@ namespace Gekko
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
-            new Error("%x*%y (multiply) is not allowed if %x is a DATE scalar."); return null;
+            new Error("%x*%y (multiply) is not allowed if %x is a date scalar."); return null;
             //throw new GekkoException();
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            new Error("%x/%y (divide) is not allowed if %x is a DATE scalar."); return null;
+            new Error("%x/%y (divide) is not allowed if %x is a date scalar."); return null;
             //throw new GekkoException();
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            new Error("%x^%y or %x**%y (power) is not allowed if %x is a DATE scalar."); return null;
+            new Error("%x^%y or %x**%y (power) is not allowed if %x is a date scalar."); return null;
             //throw new GekkoException();
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            new Error("You cannot use an indexer [] on a DATE"); return;
+            new Error("You cannot use an indexer [] on a date"); return;
             //throw new GekkoException();
         }
 

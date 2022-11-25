@@ -859,8 +859,20 @@ namespace Gekko
         /// <returns></returns>
         public static List FlattenIVariablesSeqFor(bool isNaked, IVariable iv)
         {
+            //maybe calling this method is not necessary at all, maybe just calling
+            //FlattenIVariablesSeq() is good enough. Consider this for Gekko 4.0.
+
             List m = FlattenIVariablesSeq(isNaked, iv);
-            m = Restrict2(m, true, false, true, true);  //no sigils
+            //at this point, the list is probably either all strings or all numbers, cannot be dates or anything else.
+            bool allNumbers = IsListAllNumbers(m, 1); //SLACK: double work since this has already been tested in FlattenIVariablesSeq() method. Make the latter method output that as a bool in Gekko 4.0, so it can be used. Right now too dangerous because of dynamic code. For string lists, the method probably returns fast, so not too much to worry about.
+            if (allNumbers)
+            {
+                //no restriction
+            }
+            else
+            {
+                m = Restrict2(m, true, false, true, true);  //no sigils, but is it at all possible to have sigils here?
+            }
             return m;
         }
 
@@ -879,7 +891,6 @@ namespace Gekko
                 if (m == null)
                 {
                     new Error("Naked list internal error");
-                    //throw new GekkoException();
                 }
                 bool hasLlist = false;
                 for (int i = 0; i < m.list.Count; i += 2)
@@ -901,7 +912,6 @@ namespace Gekko
                             if (m.list[i + 1] != null)
                             {
                                 new Error("Rep not allowed for list inside naked list");
-                                //throw new GekkoException();
                             }
                             foreach (IVariable x in (m.list[i] as List).list)
                             {
@@ -952,8 +962,6 @@ namespace Gekko
                     if (i > 0 && m.list[i - 1].Type() != m.list[i].Type())
                     {
                         new Error("Naked list elements #" + ((i - 1) + 1) + " and #" + (i + 1) + " have different type. Naked lists do not allow this, to avoid confusion. Please use a normal list definition.");
-
-                        //throw new GekkoException();
                     }
                     ScalarString child_string = m.list[i] as ScalarString;  //should always be so
                     if (child_string != null)
@@ -982,7 +990,6 @@ namespace Gekko
                 if (m.list[i].Type() != EVariableType.Val && m.list[i].Type() != EVariableType.String)
                 {
                     new Error("Naked lists only support val or string types");
-                    //throw new GekkoException();
                 }
                 if (m.list[i].Type() == EVariableType.Val) continue;
                 if (m.list[i].Type() == EVariableType.String)
@@ -990,7 +997,6 @@ namespace Gekko
                     string ss = (m.list[i] as ScalarString).string2.Trim();
                     double d; if (double.TryParse(ss, out d))
                     {
-
                         if (!ss.Contains("."))
                         {
                             if (G.IsInteger(ss, true, true))
@@ -1601,7 +1607,7 @@ namespace Gekko
                     ScalarVal max_val = max as ScalarVal;
                     if (max_val == null)
                     {
-                        new Error("Expected max value to be VAL type, you may try the val() function");
+                        new Error("Expected max value to be value type, you may try the val() function");
                         //throw new GekkoException();
                     }
                     ScalarVal step_val = null;
@@ -1609,7 +1615,7 @@ namespace Gekko
                     else step_val = step as ScalarVal;
                     if (step_val == null)
                     {
-                        new Error("Expected step value to be VAL type, you may try the val() function");
+                        new Error("Expected step value to be value type, you may try the val() function");
                         //throw new GekkoException();
                     }
                     if (step_val.val > 0)
@@ -1639,7 +1645,7 @@ namespace Gekko
                         }
                         else
                         {
-                            new Error("Expected max value to be DATE type, you may try the date() function");
+                            new Error("Expected max value to be date type, you may try the date() function");
                             //throw new GekkoException();
                         }
                     }
@@ -1652,7 +1658,7 @@ namespace Gekko
                     else step_val = step as ScalarVal;
                     if (step_val == null)
                     {
-                        new Error("Expected step value to be VAL type, you may try the val() function");
+                        new Error("Expected step value to be value type, you may try the val() function");
                         //throw new GekkoException();
                     }
                     int step_int = O.ConvertToInt(step_val);
@@ -3106,6 +3112,7 @@ namespace Gekko
 
         /// <summary>
         /// Looks at a list of variables (naked list) and restricts their types or indexes. Returns a Gekko List.
+        /// The list is untouched, so why is this not a void method? Perhaps because of dynamic code...
         /// </summary>
         /// <param name="m"></param>
         /// <param name="allowBank"></param>
@@ -5948,7 +5955,7 @@ namespace Gekko
                     ScalarVal mi_val = m.list[0] as ScalarVal;
                     if (mi_val == null)
                     {
-                        new Error("Expected item 1 in LIST to be VAL type");
+                        new Error("Expected item 1 in LIST to be value type");
                         //throw new GekkoException();
                     }
                     return new ScalarVal(mi_val.val);
@@ -5963,7 +5970,7 @@ namespace Gekko
                         ScalarVal mi_val = m.list[counter] as ScalarVal;
                         if (mi_val == null)
                         {
-                            new Error("Expected item " + (counter + 1) + " in LIST to be VAL type");
+                            new Error("Expected item " + (counter + 1) + " in LIST to be value type");
                             //throw new GekkoException();
                         }
                         rv_series.SetData(t, mi_val.val);
@@ -6113,7 +6120,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Matrix element is not VAL or MATRIX");
+                        new Error("Matrix element is not value or MATRIX");
                         //throw new GekkoException();
                     }
                     dimsR[i, j] = rows;

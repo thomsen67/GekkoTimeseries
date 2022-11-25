@@ -236,12 +236,12 @@ namespace Gekko
         
         public double GetValOLD(GekkoSmpl t)
         {
-            new Error("Type mismatch: you are trying to extract a VAL from a list. Maybe you need an []-indexer on the list, for instance #mylist[2]?"); return double.NaN;
+            new Error("Type mismatch: you are trying to extract a value from a list. Maybe you need an []-indexer on the list, for instance #mylist[2]?"); return double.NaN;
         }
 
         public double GetVal(GekkoTime t)
         {
-            new Error("Type mismatch: you are trying to extract a VAL from a list."); return double.NaN;
+            new Error("Type mismatch: you are trying to extract a value from a list."); return double.NaN;
         }
 
         public double ConvertToVal()
@@ -251,12 +251,12 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Trying to convert a LIST into a STRING."); return null;
+            new Error("Trying to convert a list into a string."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            new Error("Type mismatch: you are trying to extract a DATE from a list."); return GekkoTime.tNull;
+            new Error("Type mismatch: you are trying to extract a date from a list."); return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()
@@ -462,7 +462,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Expected indexer type VAL on LIST object (left-hand side)");
+                new Error("Expected indexer type value on list object (left-hand side)");
             }
         }
 
