@@ -2316,6 +2316,14 @@ expressionOrNothing:        expression -> expression
 // ------------------- naked list, used in assignment and FOR -------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+//BEWARE!!:                   Before considering to allow for instance "a, #i, b, {#i}, c, %s, d, {%s}" in a naked list,
+//                            consider (besides the confusion) the problem with FOR. Now we can write "FOR string %s = #m",
+//							  but if #i is allowed in a naked list, %s will then loop over 1 element, namely '#m'.
+//							  The thing is that in "FOR string %s = #m", the RHS is not a 1-element naked list, but an 
+//							  assignment type, and if "FOR string %s = ('a', 'b')" is legal, so should "FOR string %s = #m" be.
+//							  All in all, the confusion from allowing #i and %s in a naked list is probably not worth it.
+//							  And if your really need a list of #i1, #i2, #i3, either use ('#i1', '#i2', '#i3'), or use
+//							  #m = i1, i2, i3 and then prepend the #, for instance PRT #{#m}.
 nakedList:					  seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTNAKEDLIST seqItemNaked+)
                             | seqItemNaked COMMA2 -> ^(ASTNAKEDLIST seqItemNaked)							
 							  ;
@@ -2673,6 +2681,7 @@ assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignme
 assignment:                 assignmentTypeNotEmpty question -> ASTASSIGNMENTQUESTION assignmentTypeNotEmpty
 
 				          | assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER 
+						  | assignmentType leftSideSingleton EQUAL seqItemNaked -> ^(ASTLEFTSIDE leftSideSingleton?) ^(ASTNAKEDLIST seqItemNaked) ^(ASTPLACEHOLDER) assignmentType ASTPLACEHOLDER
 						  | assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
@@ -2688,7 +2697,6 @@ assignment:                 assignmentTypeNotEmpty question -> ASTASSIGNMENTQUES
 						  | assignmentType seriesOpt1? leftSide HATEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2
 						  | assignmentType seriesOpt1? leftSide hashEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2  
 						  | assignmentType seriesOpt1? leftSide hashEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2
-
 						  
 						  | assignmentType leftSide seriesOpt1 EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
 						  | assignmentType leftSide seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
@@ -2714,8 +2722,16 @@ assignment:                 assignmentTypeNotEmpty question -> ASTASSIGNMENTQUES
                             
 							//handle dlog(x) = ... etc. Nakedlist not allowed here, only expression.
 						  | assignmentType seriesOpt1? ident leftParenGlue leftSide RIGHTPAREN EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER						  
-						  | assignmentType ident leftParenGlue leftSide RIGHTPAREN seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER						  						  						  
+						  | assignmentType ident leftParenGlue leftSide RIGHTPAREN seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER						  						  						                            
 						    ;
+
+// ---------------------- singleton start ------------------------------
+leftSideSingleton:          listFile | bankvarnameSingleton;
+bankvarnameSingleton:       bankColon? varnameSingleton -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER bankColon?) varnameSingleton);
+varnameSingleton:           sigilSingleton name -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigilSingleton) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER))					  
+                          | sigilSingleton leftParen cname rightParen -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigilSingleton) ^(ASTPLACEHOLDER cname) ^(ASTPLACEHOLDER));
+sigilSingleton:             HASH GLUE -> ASTHASH;
+// ---------------------- singleton end --------------------------------
 
 							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 or dlog(#m.ts) = ... just fine which is enough.
 assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType				                         
@@ -3079,8 +3095,14 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 
 forHelper2:                 forLhs expression TO expression2 (BY expression3)? -> ^(ASTFORTYPE1 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
                           | forLhs nakedList -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER nakedList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
-                          | forLhs expression -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+						  | forLhsSingleton seqItemNaked -> ^(ASTFORTYPE2 forLhsSingleton ^(ASTPLACEHOLDER ^(ASTNAKEDLIST seqItemNaked)) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | forLhs expression -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))						  
                             ;
+
+// ------------------- singleton start ----------------------------------
+forLhsSingleton:            typeSingleton svarname EQUAL -> ^(ASTPLACEHOLDER typeSingleton) ^(ASTPLACEHOLDER svarname);
+typeSingleton:              VAL | STRING2; // | DATE;  //date is actually not legal, but this will provide better error message.
+// ------------------- singleton end ------------------------------------
 
 forLhs:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTPLACEHOLDER svarname);
                           

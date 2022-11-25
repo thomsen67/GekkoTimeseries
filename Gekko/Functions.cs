@@ -3607,7 +3607,6 @@ namespace Gekko
             if (decimals < 0)
             {
                 new Error("number of decimals in round() must be positive");
-                //throw new GekkoException();
             }
 
             if (x1.Type() == EVariableType.Val)
@@ -4452,8 +4451,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Could not convert STRING '" + s + "' to VAL");
-                    //throw new GekkoException();
+                    new Error("Could not convert string '" + s + "' into a value");
                 }
             }
 

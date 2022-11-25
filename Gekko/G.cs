@@ -4033,7 +4033,6 @@ namespace Gekko
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 new Error("Could not convert " + value + " into integer");
-                //throw new GekkoException();
             }
             return rounded;
         }
@@ -4088,7 +4087,6 @@ namespace Gekko
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 new Error("Could not convert " + value + " into 64-bit integer");
-                //throw new GekkoException();
             }
             return rounded;
         }

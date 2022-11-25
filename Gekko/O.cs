@@ -2832,8 +2832,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("Could not convert '" + value + "' into a VAL");
-                    //throw new GekkoException();
+                    new Error("Could not convert '" + value + "' into a value");
                 }
             }
             else if (G.Equal(type, "string"))
@@ -2846,8 +2845,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("Could not convert '" + value + "' into a STRING");
-                    //throw new GekkoException();
+                    new Error("Could not convert '" + value + "' into a string");
                 }
             }
             else if (G.Equal(type, "name"))
@@ -2860,8 +2858,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("Could not convert '" + value + "' into a NAME");
-                    //throw new GekkoException();
+                    new Error("Could not convert '" + value + "' into a name");
                 }
             }
             else if (G.Equal(type, "date"))
@@ -2874,8 +2871,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("Could not convert '" + value + "' into a DATE");
-                    //throw new GekkoException();
+                    new Error("Could not convert '" + value + "' into a date");
                 }
             }
 
