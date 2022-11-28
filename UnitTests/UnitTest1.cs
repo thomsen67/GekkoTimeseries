@@ -10843,8 +10843,17 @@ namespace UnitTests
             I("option freq q;");
             I("model mona.mar22.frm;");
             I("read monadata;");
-            ShowDecompTable();  //will show the following decomp table and then abort
-            I("decomp fy from e_fy endo fy;");
+            //ShowDecompTable();  //will show the following decomp table and then abort
+            I("decomp <2020q1 2020q2 d> fy from e_fy endo fy;");
+            Gekko.Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2020q1");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2020q2");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "fy | [0]");
+            Assert.AreEqual(table.Get(2, 2).number, -11.1344d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, -127.3160, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "FCB | [0]");
+            Assert.AreEqual(table.Get(3, 2).number, 0.7326d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -10.2819d, 0.0001);
         }
 
         [TestMethod]
@@ -10872,12 +10881,9 @@ namespace UnitTests
                 I("sim;");
                 I("clone;");
                 I("g += 10;");
-                I("sim;");
-                
+                I("sim;");                
                 //ShowDecompTable();  //will show the following decomp table and then abort
-                I("decomp <m> y from e_y endo y;");
-
-                                //TODO: better test!!
+                I("decomp <m> y from e_y endo y;");                                
                 //TODO: better test!!
                 //TODO: better test!!
                 //TODO: better test!!
@@ -10886,7 +10892,6 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2000q2");
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | [0]");
                 Assert.AreEqual(table.Get(2, 3).number, 16.6667d, 0.0001);
-
             }
         }
 
