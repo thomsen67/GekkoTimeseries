@@ -16757,7 +16757,7 @@ namespace Gekko
         private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             Model model = new Model();
-            model.modelCommon.subPeriods = O.CurrentSubperiods();
+            model.modelCommon.freq = Program.options.freq;
 
             Program.model = model;
 

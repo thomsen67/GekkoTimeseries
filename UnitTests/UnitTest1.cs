@@ -10836,6 +10836,18 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Decomp_MONA()
+        {
+            I("RESET;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option freq q;");
+            I("model mona.mar22.frm;");
+            I("read monadata;");
+            ShowDecompTable();  //will show the following decomp table and then abort
+            I("decomp fy from e_fy endo fy;");
+        }
+
+        [TestMethod]
         public void _Test_DecompQuarterly()
         {
             //-----------------------------------------------------------
@@ -11883,6 +11895,23 @@ namespace UnitTests
 
         }
 
+
+        [TestMethod]
+        public void _Test_MultiDimSets()
+        {
+            I("RESET; time 2000 2000;");
+            I("#i = (('a', '10'), ('a', '11'), ('b', '10'), ('b', '11'));");
+            I("#i0 = (('a', '11'), ('b', '10'));");
+            I("o = series(2);");
+            I("o[a, 10] = 100;");
+            I("o[a, 11] = 101;");
+            I("o[b, 10] = 102;");
+            I("o[b, 11] = 103;");
+            I("#dim1 = a, b;");
+            I("#dim2 = ('10', '11');");
+            //I("x[#dim1, #dim2] $ ((#dim1, #dim2) in #i) = o[#dim1, #dim2];");
+            I("x[#dim1, #dim2] $ (#i[#dim1, #dim2]) = o[#dim1, #dim2];");
+        }
 
 
         [TestMethod]
@@ -16098,11 +16127,14 @@ string cc1b=
         [TestMethod]
         public void _TestSingleton()
         {
+            I("reset;");
             I("time 2001 2001;");
             I("a = 100;");
+            string msg = "Is this a naked list missing a trailing comma?";
 
-            I("#m = a;");
-            _AssertListString(First(), "#m", new StringOrList("a"));
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("#m = a;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = a,;");
             _AssertListString(First(), "#m", new StringOrList("a"));
             FAIL("%m = a;");
@@ -16112,7 +16144,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 01;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("comma"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = 01,;");
             _AssertListString(First(), "#m", new StringOrList("01"));
             I("%m = 01;");
@@ -16125,7 +16157,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 2;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("comma"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = 2,;");
             _AssertListVal(First(), "#m", new List<double>() { 2d });
             I("%m = 2;");
@@ -16138,7 +16170,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 2.5;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("comma"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = 2.5,;");
             _AssertListVal(First(), "#m", new List<double>() { 2.5d });
             I("%m = 2.5;");
@@ -16151,7 +16183,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 1e5;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("comma"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = 1e5,;");
             _AssertListVal(First(), "#m", new List<double>() { 100000d });
             I("%m = 1e5;");
@@ -16164,7 +16196,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 2001q1;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("comma"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
             I("#m = 2001q1,;");
             _AssertListString(First(), "#m", new StringOrList("2001q1"));
             I("%m = 2001q1;");
@@ -16172,6 +16204,42 @@ string cc1b=
             FAIL("%m = 2001q1,;");
             FAIL("m = 2001q1;");
             FAIL("m = 2001q1,;");
+
+            // =========================================================
+            // ==================== FOR ================================
+            // =========================================================
+
+            I("reset;");
+            I("time 2001 2001;");
+            I("a = 100;");
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("for string %x = a; end;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            I("for string %x = a,; end;");            
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("for val %x = 1; end;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            I("for val %x = 1,; end;");
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("for string %x = 01; end;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            I("for string %x = 01,; end;");
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("for string %x = 1a; end;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            I("for string %x = 1a,; end;");
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("for string %x = 2001q1; end;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            I("for string %x = 2001q1,; end;");
+            FAIL("for date %x = 2001q1; end;"); //must not work
+            FAIL("for date %x = 2001q1,; end;"); //must not work
+
         }
 
 

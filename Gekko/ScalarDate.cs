@@ -24,7 +24,7 @@ namespace Gekko
 
         public double GetValOLD(GekkoSmpl t)
         {
-            new Error("Could not convert the date " + this.date + " directly into a VAL. You may try the date() conversion function.");
+            new Error("Could not convert the date " + this.date + " directly into a VAL (try the date() function).");
             return double.NaN;
         }
         public double GetVal(GekkoTime t)
@@ -39,7 +39,7 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Could not convert the date " + this.date + " directly into a string. You may try the string() conversion function."); return null;
+            new Error("Could not convert the date " + this.date + " directly into a string (try the string() function)."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)

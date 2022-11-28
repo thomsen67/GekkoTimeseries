@@ -499,6 +499,14 @@ namespace Gekko
                         ModelGamsScalar.FlushAAndRArrays(model.modelGamsScalar);
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);                        
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                        if (model.modelGamsScalar.nonExisting.Count > 0)
+                        {
+                            WriteMissingModelGamsScalarVariables(model, false);
+                        }
+                        if (model.modelGamsScalar.nonExisting_ref.Count > 0)
+                        {
+                            WriteMissingModelGamsScalarVariables(model, true);
+                        }
                     }
                 }
                 else
@@ -529,6 +537,31 @@ namespace Gekko
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }
 
+        private static void WriteMissingModelGamsScalarVariables(Model model, bool isRef)
+        {
+            using (Writeln txt = new Writeln())
+            {
+                string s = "first-position";
+                if (isRef) s = "reference";
+                txt.MainAdd(model.modelGamsScalar.nonExisting.Count + " model timeseries were not found in the " + s + " databank");
+                txt.MoreAdd("The " + model.modelGamsScalar.nonExisting.Count + " missing series are the following:");
+                txt.MoreNewLine();
+                List<int> list = model.modelGamsScalar.nonExisting;
+                if (isRef) list = model.modelGamsScalar.nonExisting_ref;
+                List<string> names = new List<string>();
+                foreach (int aNumber in list)
+                {
+                    names.Add(model.modelGamsScalar.dict_FromANumberToVarName[aNumber]);
+                }
+                names = names.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                foreach (string name in names)
+                {
+                    txt.MoreAdd(name);
+                    txt.MoreNewLineTight();
+                }
+            }
+        }
+
         /// <summary>
         /// Hooks up to GAMS scalar model
         /// </summary>
@@ -548,7 +581,7 @@ namespace Gekko
             GekkoTime gt1 = t1.Add(deduct);
             GekkoTime gt2 = t2;
             if (modelGamsScalar.is2000Model)
-            {
+            {                
                 gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
                 gt2 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             }

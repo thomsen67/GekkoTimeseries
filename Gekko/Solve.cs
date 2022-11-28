@@ -788,11 +788,15 @@ namespace Gekko
                 new Error("Unexpected error regarding the Gekko model, perhaps due to a caching issue. Try using 'flush();' before your MODEL statement.");
             }
 
-            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelCommon.subPeriods != -12345 && Program.model.modelCommon.subPeriods != O.CurrentSubperiods())
+            int x = 1;
+            if (Program.model.modelCommon.freq == EFreq.Q) x = Globals.freqQSubperiods;
+            else if (Program.model.modelCommon.freq == EFreq.M) x = Globals.freqMSubperiods;
+            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelCommon.freq != EFreq.None && x != O.CurrentSubperiods())
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("The loaded Gekko model has " + Program.model.modelCommon.subPeriods + " per year, whereas there are currently " + O.CurrentSubperiods() + " subperiods per year (given the current frequency).");
+
+                    e.MainAdd("The loaded Gekko model has frequency '" + G.ConvertFreq(Program.model.modelCommon.freq) + "' with " + x + " subperiods per year, whereas there are currently " + O.CurrentSubperiods() + " subperiods per year (given the current frequency).");
                     e.MainAdd("This problem applies to the pchy(), dify(), diffy(), dlogy() functions which depend upon the number of subperiods inside a year. Please put");
                     e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement to solve the issue.");
                 }

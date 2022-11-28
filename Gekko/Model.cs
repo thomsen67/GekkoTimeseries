@@ -609,7 +609,7 @@ namespace Gekko
 
         //See also GetFreq()
         [ProtoMember(2)]
-        public int subPeriods = -12345;  //Used for .modelGekko. Is = 1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
+        public EFreq freq = EFreq.None; //Used for .modelGekko. The value .None means inactive. This is only relevant regarding the pchy() and similar functions
 
         //not protobuffed
         public bool loadedFromCacheFile = false;  //not protobuffed
@@ -625,11 +625,8 @@ namespace Gekko
 
         public EFreq GetFreq()
         {
-            EFreq freq = EFreq.None;
-            if (this.subPeriods == -12345 || this.subPeriods == 1) freq = EFreq.A;
-            else if (this.subPeriods == 4) freq = EFreq.Q;
-            else if (this.subPeriods == 12) freq = EFreq.M;
-            return freq;
+            if (this.freq == EFreq.None) return Program.options.freq;
+            else return this.freq;
         }
 
         public void SetModelSourceType(EModelType type)
@@ -672,6 +669,9 @@ namespace Gekko
         public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
 
+        public List<int> nonExisting = null;
+        public List<int> nonExisting_ref = null;
+
         // ------------------------------------
 
         //not protobuffed
@@ -702,13 +702,15 @@ namespace Gekko
         public GekkoTime tBasis = GekkoTime.tNull;
 
         /// <summary>
-        /// First observed period in scalar model (at the moment equal to t0).
+        /// First observed period in scalar model (at the moment equal to t0). Note: for a static scalar model, this
+        /// shows the largest lag compared with year 2000.
         /// </summary>
         [ProtoMember(12)]
         public GekkoTime t1 = GekkoTime.tNull;
 
         /// <summary>
-        /// Last observed period in scalar model (at the moment equal to t0).
+        /// Last observed period in scalar model (at the moment equal to t0). Note: for a static scalar model, this
+        /// shows the largest lead compared with year 2000 (probably, not 100% sure).
         /// </summary>
         [ProtoMember(13)]
         public GekkoTime t2 = GekkoTime.tNull;
@@ -959,7 +961,7 @@ namespace Gekko
             GekkoTime tStart = this.t1;
             GekkoTime tEnd = this.t2;
             if (this.is2000Model)
-            {
+            {                
                 tStart = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt1, 1);
                 tEnd = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt2, 1);
                 if (isRef) this.a_ref = null;
@@ -1002,10 +1004,22 @@ namespace Gekko
                 this.r = G.CreateNaN(this.CountEqs(1));
             }
 
+            if (!isRef)
+            {
+                this.nonExisting = new List<int>();
+            }
+            else
+            {
+                this.nonExisting_ref = new List<int>();
+            }
+
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelperScalarModel(db, name, true, isRef);
+                
+                Series ts = DatabankAHelperScalarModel(db, i, name, true, isRef);
+                if (ts == null)
+                    continue;  //If not in the databank, it will contain NaN's
 
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
@@ -1101,7 +1115,7 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelperScalarModel(db, name, false, isRef);
+                Series ts = DatabankAHelperScalarModel(db, i, name, false, isRef);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
                 // NB: beware of OPTION series data missing, if it is set.
@@ -1122,8 +1136,10 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="fromDatabankToA"></param>
         /// <returns></returns>
-        private Series DatabankAHelperScalarModel(Databank db, string name, bool fromDatabankToA, bool isRef)
+        private Series DatabankAHelperScalarModel(Databank db, int aNumber, string name, bool fromDatabankToA, bool isRef)
         {
+            Series ts = null;
+
             string firstRef = "first-position";
             if (isRef) firstRef = "reference";
 
@@ -1136,15 +1152,20 @@ namespace Gekko
             int gekkoDimensions; bool isMultiDim;
             int hasTimeDimension = 1;
             GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDim);  //calling this is overkill, but binds neatly with other use of the method
-
-            Series ts = null;
+                        
             if (isMultiDim)
             {
                 Series ats = null;
                 if (fromDatabankToA)
                 {
                     //only reading
-                    if (!db.ContainsIVariable(varNameWithFreq)) new Error("Could not find array-series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
+                    if (!db.ContainsIVariable(varNameWithFreq))
+                    {
+                        if (!isRef) this.nonExisting.Add(aNumber);
+                        else this.nonExisting_ref.Add(aNumber);
+                        return ts;
+                        //new Error("Could not find array-series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
+                    }
                     ats = (Series)db.GetIVariable(varNameWithFreq);
                 }
                 else
@@ -1168,7 +1189,13 @@ namespace Gekko
                 IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                 if (iv == null)
                 {
-                    if (fromDatabankToA) new Error("In array-series '" + varNameWithFreq + "' in the " + firstRef + " databank, could not find sub-series '" + varNameWithFreqAndIndexes + "'");
+                    if (fromDatabankToA)
+                    {
+                        if (!isRef) this.nonExisting.Add(aNumber);
+                        else this.nonExisting_ref.Add(aNumber);
+                        return ts;
+                        //new Error("In array-series '" + varNameWithFreq + "' in the " + firstRef + " databank, could not find sub-series '" + varNameWithFreqAndIndexes + "'");
+                    }
                     ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
                     ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                 }
@@ -1186,7 +1213,13 @@ namespace Gekko
                 }
                 else
                 {
-                    if (fromDatabankToA) new Error("Could not find series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
+                    if (fromDatabankToA)
+                    {
+                        if (!isRef) this.nonExisting.Add(aNumber);
+                        else this.nonExisting_ref.Add(aNumber);
+                        return ts;
+                        //new Error("Could not find series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
+                    }
                     ts = new Series(freq, varNameWithFreq);
                     db.AddIVariable(ts.name, ts);
                 }                

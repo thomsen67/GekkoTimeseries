@@ -48,7 +48,7 @@ namespace Gekko
 
         public string ConvertToString()
         {            
-            G.Writeln2(EWrapType.Error, "Could not convert the value " + this.val + " directly into a string. You may try the string() conversion function.");            
+            G.Writeln2(EWrapType.Error, "Could not convert the value " + this.val + " directly into a string (try the string() function).");            
             return null;
         }
 
@@ -129,11 +129,11 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            using (Error e = new Error())
+            using (Error txt = new Error())
             {
-                e.MainAdd("You are trying to convert/use the value " + this.val + " as a string item in a list.");
-                e.MainAdd("In list commands, you must for example use '5' instead of 5, and '01' instead of 01.");                
-                e.MainAdd("If you are using a value scalar %v, you may try to use string(%v) instead.");
+                txt.MainAdd("You are trying to convert/use the value " + this.val + " as a string item in a list.");
+                txt.MainAdd("In list commands, you must for example use '5' instead of 5, and '01' instead of 01.");                
+                txt.MainAdd("If you are using a value scalar %v, you may try to use string(%v) instead.");
             }
             return null;
         }

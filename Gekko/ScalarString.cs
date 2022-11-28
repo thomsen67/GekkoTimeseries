@@ -240,8 +240,7 @@ namespace Gekko
         {
             using (Error e = new Error())
             {
-                e.MainAdd("Could not convert the string '" + this.string2 + "' directly into a date.");
-                e.MainAdd("You may try the date() conversion function.");
+                e.MainAdd("Could not convert the string '" + this.string2 + "' directly into a date (try the date() function).");
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);
                 if (this.isFromNakedList && !gt.IsNull())
                 {

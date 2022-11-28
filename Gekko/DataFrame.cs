@@ -61,7 +61,7 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Could not convert the dateframe " + this.val + " directly into string. You may try the string() conversion function.");
+            new Error("Could not convert the dateframe " + this.val + " directly into string (try the string() function).");
             return null;
         }
 

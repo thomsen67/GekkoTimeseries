@@ -1335,6 +1335,10 @@ namespace Gekko
             {
                 freq = "u";
             }
+            else if (eFreq == EFreq.None)
+            {
+                freq = "undefined";
+            }
             else
             {
                 new Error("Strange error regarding freq");
