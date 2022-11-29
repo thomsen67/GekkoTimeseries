@@ -508,7 +508,7 @@ namespace Gekko
         public const int decomp2000 = 2000;  //must be 2000, TODO handle frequencies
         public const int decompHackt1 = 1980; //can be anything, TODO handle frequencies
         public const int decompHackt2 = 2101; //can be anything, TODO handle frequencies
-        public const int decompLagLeadHack = 20;
+        public const int decompLagAddition = 4;  //so we are quite sure that a <dp> will work.
 
         //GUI hacks
         public static ItemHandler itemHandler = null;  //hack regardig FIND window

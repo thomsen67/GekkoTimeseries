@@ -639,7 +639,7 @@ namespace Gekko
     public class ModelGamsScalar
     {
         [ProtoMember(1)]
-        public bool is2000Model = false;  //only defined for 2000, other periods use offsets
+        public bool isScalarModel = false;  //only defined for 2000, other periods use offsets
 
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;
@@ -695,25 +695,25 @@ namespace Gekko
         public int unique = -12345;
 
         /// <summary>
-        /// Gekko period corresponding to time index = 0 in GAMS (at the moment, t0 = t1).
-        /// Later on, t0 may become smaller than t1.
+        /// Gekko period corresponding to time index = 0 in GAMS (at the moment, tBasis = t1).
+        /// Later on, tBasis may become smaller than t1.
         /// </summary>
         [ProtoMember(11)]
         public GekkoTime tBasis = GekkoTime.tNull;
 
         /// <summary>
-        /// First observed period in scalar model (at the moment equal to t0). Note: for a static scalar model, this
-        /// shows the largest lag compared with year 2000.
+        /// First observed period in scalar model (at the moment equal to tBasis). 
+        /// Note: for a static scalar model, this shows the largest lag compared with year 2000/2000q1/2000m1.
         /// </summary>
         [ProtoMember(12)]
-        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime absoluteT1 = GekkoTime.tNull;
 
         /// <summary>
-        /// Last observed period in scalar model (at the moment equal to t0). Note: for a static scalar model, this
-        /// shows the largest lead compared with year 2000 (probably, not 100% sure).
+        /// Last observed period in scalar model (at the moment equal to t0). 
+        /// Note: for a static scalar model, this shows the largest lead compared with year 2000/2000q1/2000m1.
         /// </summary>
         [ProtoMember(13)]
-        public GekkoTime t2 = GekkoTime.tNull;
+        public GekkoTime absoluteT2 = GekkoTime.tNull;
 
         // ---------- dicts etc. ------------
 
@@ -770,8 +770,18 @@ namespace Gekko
         public List<ModelScalarEquation> precedents = null;
                 
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
-        public GekkoTime dataT1 = GekkoTime.tNull; //start of data, not protobuffed
-        public GekkoTime dataT2 = GekkoTime.tNull; //end of data, not protobuffed
+
+        /// <summary>
+        /// Start of data for static scalar model, not protobuffed.
+        /// </summary>
+        public GekkoTime staticT1 = GekkoTime.tNull;
+
+        /// <summary>
+        /// End of data for static scalar model, not protobuffed.
+        /// </summary>
+        public GekkoTime staticT2 = GekkoTime.tNull;
+
+        public bool nonStaticHasLoaded = false;
 
         // =============================================
         // =============================================
@@ -852,7 +862,7 @@ namespace Gekko
         public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
         {
             GekkoTime tTemp = t0;
-            if (this.is2000Model) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+            if (this.isScalarModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             return tTemp;
         }
 
@@ -950,6 +960,132 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
+        /// </summary>
+        public void FlushAAndRArrays()
+        {
+            if (this.isScalarModel)
+            {
+                //static model, fill data in according to time period
+                //non-static model, fill all data in
+                //NOTE: when widening with new periods, it would be possible to reuse existing period,
+                //      but probably does not matter regarding performance.                
+
+                int n = GekkoTime.Observations(this.staticT1, this.staticT2);
+                this.a = new double[n][];
+                this.a_ref = new double[n][];
+                for (int j = 0; j < n; j++) this.a[j] = new double[this.dict_FromANumberToVarName.Length];
+                for (int j = 0; j < n; j++) this.a_ref[j] = new double[this.dict_FromANumberToVarName.Length];
+            }
+            else
+            {
+                //non-static model, fill all data in                               
+            }
+
+            if (this.a != null)
+            {
+                for (int j = 0; j < this.a.Length; j++) G.SetNaN(this.a[j]);
+            }
+            if (this.a_ref != null)
+            {
+                for (int j = 0; j < this.a_ref.Length; j++) G.SetNaN(this.a_ref[j]);
+            }
+
+            if (this.r != null)
+            {
+                G.SetNaN(this.r);
+            }
+            if (this.r_ref != null)
+            {
+                G.SetNaN(this.r_ref);
+            }
+        }
+
+
+        /// <summary>
+        /// For any eval of GAMS scalar model, we must consider loading
+        /// data into the model arrays. For now, it always returns true.
+        /// Later on, keep track of First/Ref databank changes...
+        /// </summary>
+        /// <returns></returns>
+        public void MaybeLoadDataIntoModel(GekkoTime gt1, GekkoTime gt2)
+        {
+
+            if (this.isScalarModel)
+            {
+                if (this.staticT1.IsNull() || this.staticT2.IsNull())
+                {
+                    //load data
+                }
+                else
+                {
+                    if (gt1.StrictlySmallerThan(this.staticT1) || gt2.StrictlyLargerThan(this.staticT2))
+                    {
+                        //load data, new period                        
+                    }
+                    else
+                    {
+                        return;  //nothing to do
+                    }
+                }
+
+                int largestLag = this.Maybe2000GekkoTime(GekkoTime.tNull).Subtract(this.absoluteT1);
+                int largestLead = this.absoluteT2.Subtract(this.Maybe2000GekkoTime(GekkoTime.tNull));
+                this.staticT1 = gt1.Add(-largestLag - Globals.decompLagAddition);
+                this.staticT2 = gt2.Add(largestLead);
+
+            }
+            else
+            {
+                if (this.nonStaticHasLoaded)
+                {
+                    return;  //has already loaded
+                }
+            }
+
+            this.FlushAAndRArrays();
+            this.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+            this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+
+            if (true)
+            {
+                if (this.nonExisting.Count > 0)
+                {
+                    this.WriteMissingModelGamsScalarVariables(false);
+                }
+                if (this.nonExisting_ref.Count > 0)
+                {
+                    this.WriteMissingModelGamsScalarVariables(true);
+                }
+            }
+        }
+
+        public void WriteMissingModelGamsScalarVariables(bool isRef)
+        {
+            using (Writeln txt = new Writeln())
+            {
+                string s = "first-position";
+                if (isRef) s = "reference";
+                txt.MainAdd(this.nonExisting.Count + " model timeseries were not found in the " + s + " databank");
+                txt.MoreAdd("The " + this.nonExisting.Count + " missing series are the following:");
+                txt.MoreNewLine();
+                List<int> list = this.nonExisting;
+                if (isRef) list = this.nonExisting_ref;
+                List<string> names = new List<string>();
+                foreach (int aNumber in list)
+                {
+                    names.Add(this.dict_FromANumberToVarName[aNumber]);
+                }
+                names = names.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToList();
+                foreach (string name in names)
+                {
+                    txt.MoreAdd(name);
+                    txt.MoreNewLineTight();
+                }
+            }
+        }
+
+        /// <summary>
         /// Obtains an a[][] data array from a Databank. This array is from model.a.
         /// if model is a ModelGamsScalar.
         /// </summary>
@@ -960,12 +1096,12 @@ namespace Gekko
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
 
-            GekkoTime tStart = this.t1;
-            GekkoTime tEnd = this.t2;
-            if (this.is2000Model)
-            {                
-                tStart = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt1, 1);
-                tEnd = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt2, 1);
+            GekkoTime tStart = this.absoluteT1;
+            GekkoTime tEnd = this.absoluteT2;
+            if (this.isScalarModel)
+            {
+                tStart = this.staticT1;
+                tEnd = this.staticT2;
                 if (isRef) this.a_ref = null;
                 else this.a = null;
             }
@@ -1098,12 +1234,12 @@ namespace Gekko
         /// <returns></returns>
         public void FromAToDatabankScalarModel(Databank db, bool isRef)
         {
-            GekkoTime tStart = this.t1;
-            GekkoTime tEnd = this.t2;
-            if (this.is2000Model)
+            GekkoTime tStart = this.absoluteT1;
+            GekkoTime tEnd = this.absoluteT2;
+            if (this.isScalarModel)
             {
-                tStart = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt1, 1);
-                tEnd = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decompHackt2, 1);
+                tStart = this.staticT1;
+                tEnd = this.staticT2;
             }
 
             //Beware of OPTION series data missing, if it is set.
@@ -1230,30 +1366,7 @@ namespace Gekko
             return ts;
         }
 
-        /// <summary>
-        /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
-        /// </summary>
-        public static void FlushAAndRArrays(int n, ModelGamsScalar modelGamsScalar)
-        {
-            //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
-            if (modelGamsScalar.a != null)
-            {
-                for (int j = 0; j < modelGamsScalar.a.Length; j++) G.SetNaN(modelGamsScalar.a[j]);
-            }
-            if (modelGamsScalar.a_ref != null)
-            {
-                for (int j = 0; j < modelGamsScalar.a_ref.Length; j++) G.SetNaN(modelGamsScalar.a_ref[j]);
-            }
-            if (modelGamsScalar.r != null)
-            {
-                G.SetNaN(modelGamsScalar.r);
-            }
-            if (modelGamsScalar.r_ref != null)
-            {
-                G.SetNaN(modelGamsScalar.r_ref);
-            }
-        }
-
+        
         /// <summary>
         /// Gets human-readable equation text corresponding to (unfolded) equation name.
         /// Uses equationChunks list, which is only about 1% of full scalar model size.
@@ -1293,7 +1406,7 @@ namespace Gekko
             int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
 
-            if (this.is2000Model)
+            if (this.isScalarModel)
             {
                 //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
 
@@ -1411,7 +1524,7 @@ namespace Gekko
 
         public string GamsModelDefinedString()
         {
-            return "GAMS model is defined over the period " + this.t1.ToString() + " to " + this.t2.ToString();
+            return "GAMS model is defined over the period " + this.absoluteT1.ToString() + " to " + this.absoluteT2.ToString();
         }
 
     }

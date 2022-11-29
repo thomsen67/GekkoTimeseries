@@ -727,7 +727,12 @@ namespace Gekko
             helper.t3 = helper.t2;  //could perhaps lead this later on... ?
             int periods = GekkoTime.Observations(helper.t1, helper.t2);
             helper.a = new double[periods][];
-            for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count()]; //beware: 0-based
+            for (int i = 0; i < helper.a.GetLength(0); i++)
+            {
+                //for a static scalar model, this will not be of much use, just showing largest lead minus largest lag in first dimension.
+                helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count()]; //beware: 0-based
+                G.SetNaN(helper.a[i]);
+            }
 
             List<string> csCodeLines = new List<string>();
 
@@ -827,6 +832,14 @@ namespace Gekko
             // -------------- these can evaluate an equation --------
             modelGamsScalar.functions = functions;
             modelGamsScalar.a = a;
+
+            modelGamsScalar.a_ref = new double[modelGamsScalar.a.Length][];
+            for (int i = 0; i < modelGamsScalar.a.Length; i++)
+            {
+                modelGamsScalar.a_ref[i] = new double[modelGamsScalar.a[i].Length];
+                G.SetNaN(modelGamsScalar.a_ref[i]);
+            }
+
             modelGamsScalar.r = r;
             // ------------------------------------------------------
             modelGamsScalar.bb = bb;
@@ -843,8 +856,8 @@ namespace Gekko
             // In principle, e1[2020] .. may designate an equation with
             // variables from 2025, so there are no guarantees.
             modelGamsScalar.tBasis = helper.tBasis;
-            modelGamsScalar.t1 = helper.t1;
-            modelGamsScalar.t2 = helper.t2;
+            modelGamsScalar.absoluteT1 = helper.t1;
+            modelGamsScalar.absoluteT2 = helper.t2;
             // -------------- helpers dictionaries ---------
             modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
             modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;  //dict
@@ -1661,7 +1674,7 @@ namespace Gekko
             tab.CurRow.SetText(1, "Model   : " + input.zipFilePathAndName);
             tab.CurRow.Next();
 
-            tab.CurRow.SetText(1, "Periods : " + model.modelGamsScalar.t1.ToString() + "-" + model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(model.modelGamsScalar.t1, model.modelGamsScalar.t2) + " periods");
+            tab.CurRow.SetText(1, "Periods : " + model.modelGamsScalar.absoluteT1.ToString() + "-" + model.modelGamsScalar.absoluteT2.ToString() + " = " + GekkoTime.Observations(model.modelGamsScalar.absoluteT1, model.modelGamsScalar.absoluteT2) + " periods");
             //tab.CurRow.Next();                        
 
             //tab.CurRow.SetText(1, "Lags      : Largest lag = " + 0 + ", largest lead = " + 0);
