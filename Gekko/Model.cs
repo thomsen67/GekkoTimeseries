@@ -1233,7 +1233,7 @@ namespace Gekko
         /// <summary>
         /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
         /// </summary>
-        public static void FlushAAndRArrays(ModelGamsScalar modelGamsScalar)
+        public static void FlushAAndRArrays(int n, ModelGamsScalar modelGamsScalar)
         {
             //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
             if (modelGamsScalar.a != null)

@@ -488,15 +488,19 @@ namespace Gekko
                 
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
-                    if (MustLoadDataIntoModel(decompOptions2.t1, decompOptions2.t2, model.modelGamsScalar))
+                    GekkoTime dataT1 = decompOptions2.t1.Add(-Globals.decompLagLeadHack);
+                    GekkoTime dataT2 = decompOptions2.t2.Add(Globals.decompLagLeadHack);
+                    int n = GekkoTime.Observations(dataT1, dataT2);
+
+                    if (MustLoadDataIntoModel(dataT1, dataT2, model.modelGamsScalar))
                     {
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
-                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
+                        // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK                         
                         
-                        ModelGamsScalar.FlushAAndRArrays(model.modelGamsScalar);
+                        ModelGamsScalar.FlushAAndRArrays(n, model.modelGamsScalar);
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);                        
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
                         if (true)
@@ -4611,9 +4615,7 @@ namespace Gekko
 
                 if (MustLoadDataIntoModel(o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, modelGamsScalar))
                 {
-                    ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
-                    modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-                    modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                    //TODO
                 }
 
                 Globals.itemHandler = new ItemHandler();  //hack
