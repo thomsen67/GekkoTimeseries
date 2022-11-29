@@ -300,7 +300,7 @@ namespace Gekko
             string s1 = MetaConsolidate(this.storageMain);
             string s2= MetaConsolidate(this.storageMore);
             if (s2 != null) s1 += "\n\n" + s2;
-            string s3 = s1 + "\n\nThe calculation crashed, beware of inconsistent data.";
+            string s3 = s1 + "\n\nBeware of inconsistent data.";
             MessageBox.Show(s3);
         }
 

@@ -353,7 +353,7 @@ namespace Gekko
         /// Later on, keep track of First/Ref databank changes...
         /// </summary>
         /// <returns></returns>
-        public static bool MustLoadDataIntoModel()
+        public static bool MustLoadDataIntoModel(GekkoTime t1, GekkoTime t2, ModelGamsScalar modelGamsScalar)
         {
             return true;
         }
@@ -488,7 +488,7 @@ namespace Gekko
                 
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
-                    if (MustLoadDataIntoModel())
+                    if (MustLoadDataIntoModel(decompOptions2.t1, decompOptions2.t2, model.modelGamsScalar))
                     {
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
                         // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK 
@@ -499,13 +499,16 @@ namespace Gekko
                         ModelGamsScalar.FlushAAndRArrays(model.modelGamsScalar);
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);                        
                         model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
-                        if (model.modelGamsScalar.nonExisting.Count > 0)
+                        if (true)
                         {
-                            WriteMissingModelGamsScalarVariables(model, false);
-                        }
-                        if (model.modelGamsScalar.nonExisting_ref.Count > 0)
-                        {
-                            WriteMissingModelGamsScalarVariables(model, true);
+                            if (model.modelGamsScalar.nonExisting.Count > 0)
+                            {
+                                WriteMissingModelGamsScalarVariables(model, false);
+                            }
+                            if (model.modelGamsScalar.nonExisting_ref.Count > 0)
+                            {
+                                WriteMissingModelGamsScalarVariables(model, true);
+                            }
                         }
                     }
                 }
@@ -4604,13 +4607,14 @@ namespace Gekko
                     new Error("FIND is only implemented for scalar models");
                 }
 
-                //For scalar model     
+                //For scalar model
 
-                //Runs pretty fast, but later on check is this is necessary...            
-                                
-                ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
-                modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
-                modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                if (MustLoadDataIntoModel(o.decompFind.decompOptions2.t1, o.decompFind.decompOptions2.t2, modelGamsScalar))
+                {
+                    ModelGamsScalar.FlushAAndRArrays(modelGamsScalar);
+                    modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                    modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+                }
 
                 Globals.itemHandler = new ItemHandler();  //hack
 

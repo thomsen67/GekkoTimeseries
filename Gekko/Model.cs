@@ -770,6 +770,8 @@ namespace Gekko
         public List<ModelScalarEquation> precedents = null;
                 
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
+        public GekkoTime dataT1 = GekkoTime.tNull; //start of data, not protobuffed
+        public GekkoTime dataT2 = GekkoTime.tNull; //end of data, not protobuffed
 
         // =============================================
         // =============================================
