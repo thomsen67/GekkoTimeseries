@@ -13717,7 +13717,7 @@ namespace UnitTests
             //      is probably due to protobuf and too little ram or something similar. Annoying 
             //      that it does not report ram issue instead. Try to run several times.
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++) 
             {
                 Globals.unitTestScreenOutput.Clear();
                 if (i==0) I("flush();");  //test without or with cache
