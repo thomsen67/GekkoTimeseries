@@ -13723,16 +13723,21 @@ namespace UnitTests
                 if (i==0) I("flush();");  //test without or with cache
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+                I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
+                I("READ <gdx> makro.zip\\makro0.gdx;");
 
-                //1 time back and forth takes about 0.3s in debug mode
-                //A good test of reading and writing from GAMS scalar model a array.
+                //Note: the first one is mandatory, else SIM has not data.
+                //The two next a good test of reading and writing from GAMS scalar model a array.
+                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                 Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
                 Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
                 I("SIM;");
-                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
-                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));
+                //Assert.IsTrue(s.Contains("RSS = 1.92045218981909E-10")); --> this is corresponding to the data contained in the GAMS scalar model output
+                Assert.IsTrue(s.Contains("RSS = 1.92045031439235E-10")); //this must be ok
 
                 //TODO
                 //TODO
