@@ -16893,7 +16893,7 @@ namespace Gekko
 
             Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
             model.modelGamsScalar = modelTemp.modelGamsScalar;
-            model.modelGamsScalar.isScalarModel = true;            
+            model.modelGamsScalar.isStaticModel = true;            
 
             new Writeln("TTH: Scalar model production: " + G.Seconds(dt0));
         }

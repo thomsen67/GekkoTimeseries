@@ -639,7 +639,7 @@ namespace Gekko
     public class ModelGamsScalar
     {
         [ProtoMember(1)]
-        public bool isScalarModel = false;  //only defined for 2000, other periods use offsets
+        public bool isStaticModel = false;  //only defined for 2000, other periods use offsets
 
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;
@@ -862,7 +862,7 @@ namespace Gekko
         public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
         {
             GekkoTime tTemp = t0;
-            if (this.isScalarModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+            if (this.isStaticModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             return tTemp;
         }
 
@@ -964,7 +964,7 @@ namespace Gekko
         /// </summary>
         public void FlushAAndRArrays()
         {
-            if (this.isScalarModel)
+            if (this.isStaticModel)
             {
                 //static model, fill data in according to time period
                 //non-static model, fill all data in
@@ -1010,16 +1010,20 @@ namespace Gekko
         /// <returns></returns>
         public void MaybeLoadDataIntoModel(GekkoTime gt1, GekkoTime gt2)
         {
-
-            if (this.isScalarModel)
+            if (this.isStaticModel)
             {
+                int largestLag = this.Maybe2000GekkoTime(GekkoTime.tNull).Subtract(this.absoluteT1);
+                int largestLead = this.absoluteT2.Subtract(this.Maybe2000GekkoTime(GekkoTime.tNull));
+                GekkoTime staticT1Probe = gt1.Add(-largestLag - Globals.decompLagAddition);
+                GekkoTime staticT2Probe = gt2.Add(largestLead);
+
                 if (this.staticT1.IsNull() || this.staticT2.IsNull())
                 {
                     //load data
                 }
                 else
                 {
-                    if (gt1.StrictlySmallerThan(this.staticT1) || gt2.StrictlyLargerThan(this.staticT2))
+                    if (staticT1Probe.StrictlySmallerThan(this.staticT1) || staticT2Probe.StrictlyLargerThan(this.staticT2))
                     {
                         //load data, new period                        
                     }
@@ -1029,10 +1033,8 @@ namespace Gekko
                     }
                 }
 
-                int largestLag = this.Maybe2000GekkoTime(GekkoTime.tNull).Subtract(this.absoluteT1);
-                int largestLead = this.absoluteT2.Subtract(this.Maybe2000GekkoTime(GekkoTime.tNull));
-                this.staticT1 = gt1.Add(-largestLag - Globals.decompLagAddition);
-                this.staticT2 = gt2.Add(largestLead);
+                this.staticT1 = staticT1Probe;
+                this.staticT2 = staticT2Probe;
 
             }
             else
@@ -1040,6 +1042,10 @@ namespace Gekko
                 if (this.nonStaticHasLoaded)
                 {
                     return;  //has already loaded
+                }
+                else
+                {
+                    this.nonStaticHasLoaded = true;  //no need to ever load anything into .a and .a_ref (unless databanks change)
                 }
             }
 
@@ -1098,7 +1104,7 @@ namespace Gekko
 
             GekkoTime tStart = this.absoluteT1;
             GekkoTime tEnd = this.absoluteT2;
-            if (this.isScalarModel)
+            if (this.isStaticModel)
             {
                 tStart = this.staticT1;
                 tEnd = this.staticT2;
@@ -1236,7 +1242,7 @@ namespace Gekko
         {
             GekkoTime tStart = this.absoluteT1;
             GekkoTime tEnd = this.absoluteT2;
-            if (this.isScalarModel)
+            if (this.isStaticModel)
             {
                 tStart = this.staticT1;
                 tEnd = this.staticT2;
@@ -1406,7 +1412,7 @@ namespace Gekko
             int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
 
-            if (this.isScalarModel)
+            if (this.isStaticModel)
             {
                 //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
 

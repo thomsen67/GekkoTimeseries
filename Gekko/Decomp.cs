@@ -527,7 +527,7 @@ namespace Gekko
 
             GekkoTime gt1 = t1.Add(deduct);
             GekkoTime gt2 = t2;
-            if (modelGamsScalar.isScalarModel)
+            if (modelGamsScalar.isStaticModel)
             {                
                 gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
                 gt2 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
@@ -537,7 +537,7 @@ namespace Gekko
             {                
                 int i = time.Subtract(modelGamsScalar.tBasis);
 
-                if (modelGamsScalar.isScalarModel) i = 0;
+                if (modelGamsScalar.isStaticModel) i = 0;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
                     if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + modelGamsScalar.GamsModelDefinedString() + ".");
@@ -902,7 +902,7 @@ namespace Gekko
                     element.indexes = mmi;
                     element.fullName = element.name + element.indexes.GetName();
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
-                    if (modelGamsScalar.isScalarModel) periods = 1;
+                    if (modelGamsScalar.isStaticModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
@@ -2430,7 +2430,7 @@ namespace Gekko
                 int timeIndex1 = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
                 int timeIndex2 = -timeIndex1;
                                 
-                if (modelGamsScalar.isScalarModel)
+                if (modelGamsScalar.isStaticModel)
                 {
                     ONE = 1;
                     timeIndex1 = 0;                    
