@@ -1924,7 +1924,21 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {   
+        {
+
+            if (false && Globals.runningOnTTComputer)
+            {
+                DateTime dt0 = DateTime.Now;
+                long j = 1;
+                for (int i = 0; i < 1e6; i++)
+                {
+                    //DateTime dt = DateTime.Now;  //0.3
+                    //DateTime dt = DateTime.UtcNow;  //0.08
+                    //ScalarVal v = new ScalarVal(123d); //0.01...
+                    j++;  //0.002
+                }
+                new Writeln(G.Seconds(dt0));
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -4722,7 +4736,6 @@ namespace Gekko
             if (removed.isDirty) isDirty = true;
             else
             {
-
                 foreach (IVariable iv in removed.storage.Values)
                 {
                     Series ts = iv as Series;

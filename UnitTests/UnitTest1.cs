@@ -11392,7 +11392,7 @@ namespace UnitTests
 
             // ------------------- <m> -----------------------------------
 
-            //ShowDecompTable();  //will show the following decomp table and then abort
+            ShowDecompTable();  //will show the following decomp table and then abort
             try
             {
                 I("g <2001 2002> = 40, 60;");
