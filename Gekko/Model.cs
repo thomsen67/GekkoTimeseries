@@ -780,9 +780,7 @@ namespace Gekko
         /// End of data for static scalar model, not protobuffed.
         /// </summary>
         public GekkoTime staticT2 = GekkoTime.tNull;
-
-        public bool nonStaticHasLoaded = false;
-
+        
         // =============================================
         // =============================================
         // =============================================
@@ -1008,8 +1006,11 @@ namespace Gekko
         /// Later on, keep track of First/Ref databank changes...
         /// </summary>
         /// <returns></returns>
-        public void MaybeLoadDataIntoModel(GekkoTime gt1, GekkoTime gt2)
+        public void MaybeLoadDataIntoModel(int depth, GekkoTime gt1, GekkoTime gt2)
         {
+            bool hasPeriodChanged = false;
+            bool hasDatabankChanged = true;  //in the longer run, keep track of that
+
             if (this.isStaticModel)
             {
                 int largestLag = this.Maybe2000GekkoTime(GekkoTime.tNull).Subtract(this.absoluteT1);
@@ -1018,40 +1019,38 @@ namespace Gekko
                 GekkoTime staticT2Probe = gt2.Add(largestLead);
 
                 if (this.staticT1.IsNull() || this.staticT2.IsNull())
-                {
-                    //load data
+                {                    
+                    hasPeriodChanged = true;
+                    this.staticT1 = staticT1Probe;
+                    this.staticT2 = staticT2Probe;
                 }
                 else
                 {
                     if (staticT1Probe.StrictlySmallerThan(this.staticT1) || staticT2Probe.StrictlyLargerThan(this.staticT2))
                     {
-                        //load data, new period                        
+                        hasPeriodChanged = true;
+                        this.staticT1 = staticT1Probe;
+                        this.staticT2 = staticT2Probe;
                     }
                     else
-                    {
-                        return;  //nothing to do
+                    {                    
                     }
-                }
-
-                this.staticT1 = staticT1Probe;
-                this.staticT2 = staticT2Probe;
-
+                }                
             }
             else
-            {
-                if (this.nonStaticHasLoaded)
-                {
-                    return;  //has already loaded
-                }
-                else
-                {
-                    this.nonStaticHasLoaded = true;  //no need to ever load anything into .a and .a_ref (unless databanks change)
-                }
+            {                
             }
 
+            bool shouldUpdate = false;
+            if (hasDatabankChanged || hasPeriodChanged) shouldUpdate = true;
+            if (depth > 0) shouldUpdate = false;  //do not update sub-windows
+            if (!shouldUpdate) return; //never returns
+
+            DateTime t0 = DateTime.Now;
             this.FlushAAndRArrays();
             this.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
             this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
+            if (Globals.runningOnTTComputer) G.Writeln2("TTH: Loading data to a array: " + G.Seconds(t0));
 
             if (true)
             {

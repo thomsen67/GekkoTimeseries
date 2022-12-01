@@ -11392,7 +11392,7 @@ namespace UnitTests
 
             // ------------------- <m> -----------------------------------
 
-            ShowDecompTable();  //will show the following decomp table and then abort
+            //ShowDecompTable();  //will show the following decomp table and then abort
             try
             {
                 I("g <2001 2002> = 40, 60;");
@@ -11895,9 +11895,30 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 2).number, 0.3d / 0.7d * 4d, 0.0001);
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);
-            
-            
+        }
 
+        [TestMethod]
+        public void _Test_Dirty()
+        {
+            I("RESET; time 2000 2001;");
+            I("x1 = 100;");
+            I("x2 = series(1);");
+            I("x2[a] = 101;");
+            I("x2[a][2000] = 102;");
+            I("%3 = 103;");
+            I("%4 = 2001q1;");
+            I("%5 = 'a';");
+            I("x1a = 400, 401;");
+            I("#m1 = ('a', 'b', x1a);");
+            I("#m1[2] = 'c';");
+            I("#m1[2][2001] = 402;");
+            I("#m2 = [1, 2];");
+            I("#m2[1, 2] = 3;");
+            I("#m1 = (%x = 1, x = x1a);");
+            I("#m1.%x = 1;");
+            I("#m1.x = 300, 301;");
+            I("#m1.x[2001] = 302;");
+            Assert.Fail();
         }
 
 
@@ -16135,7 +16156,7 @@ string cc1b=
         }
 
         [TestMethod]
-        public void _TestSingleton()
+        public void _Test_Singleton()
         {
             I("reset;");
             I("time 2001 2001;");
