@@ -11920,8 +11920,7 @@ namespace UnitTests
             I("#m1.x[2001] = 302;");
             Assert.Fail();
         }
-
-
+        
         [TestMethod]
         public void _Test_MultiDimSets()
         {
@@ -11938,7 +11937,6 @@ namespace UnitTests
             //I("x[#dim1, #dim2] $ ((#dim1, #dim2) in #i) = o[#dim1, #dim2];");
             I("x[#dim1, #dim2] $ (#i[#dim1, #dim2]) = o[#dim1, #dim2];");
         }
-
 
         [TestMethod]
         public void _Test_ArraySeriesAndDollar()

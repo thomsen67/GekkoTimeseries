@@ -60,6 +60,10 @@ namespace Gekko
 
         public DecompFind decompFind = null;
 
+        public BitmapImage green = null;
+        public BitmapImage yellow = null;
+        public BitmapImage red = null;
+
         public DecompDatas decompDatas = new DecompDatas(); //stores data for reuse, for instance for fast pivot selection
 
         public int frozenRows=0;
@@ -815,10 +819,16 @@ namespace Gekko
                 //Table table = this.decompOptions.guiDecompValues;
                 //MakeTable(table);                
             }
-            //_status = status;
-            //_statusText = statusText;
-            //this.decompOptions.guiDecompOperator = "n";   
-            //RefreshList();            
+
+            if (true)
+            {
+                //can later on use System.AppDomain.CurrentDomain.BaseDirectory instead of System.Windows.Forms.Application.StartupPath
+                green = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
+                yellow = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\yellow.png"));
+                red = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\red.png"));
+                this.statusColor.Source = green;
+            }
+
             this.Loaded += WindowDecomp_Loaded;
         }
 

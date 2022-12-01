@@ -3480,7 +3480,8 @@ namespace Gekko
                                     tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
                                     if (tsFirst == null)
                                     {
-                                        new Error("Decomp internal error: could not find variable '" + dictName + "'");
+                                        string s2 = dictName.Replace("Work:", "").Replace("¤", "");
+                                        new Error("Could not find variable " + s2 + "");
                                     }
                                     dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
@@ -3493,7 +3494,8 @@ namespace Gekko
                                     tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
                                     if (tsRef == null)
                                     {
-                                        new Error("Decomp internal error: could not find variable '" + dictName + "'");
+                                        string s2 = dictName.Replace("Work:", "").Replace("¤", "");
+                                        new Error("Could not find variable " + s2 + "");
                                     }
                                     dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1 + iLag));

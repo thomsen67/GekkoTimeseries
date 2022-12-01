@@ -1054,6 +1054,7 @@ namespace Gekko
 
             if (true)
             {
+                //Will have depth = 0 here, so ok to write it to screen.
                 if (this.nonExisting.Count > 0)
                 {
                     this.WriteMissingModelGamsScalarVariables(false);
@@ -1071,8 +1072,9 @@ namespace Gekko
             {
                 string s = "first-position";
                 if (isRef) s = "reference";
-                txt.MainAdd(this.nonExisting.Count + " model timeseries were not found in the " + s + " databank");
-                txt.MoreAdd("The " + this.nonExisting.Count + " missing series are the following:");
+                txt.MainAdd(this.nonExisting.Count + " model variables were not found in the " + s + " databank");
+                txt.MoreAdd("Some model variables were not found in the databank. For DECOMP, this is only a problem if the variables are part of the decomposed equations.");
+                txt.MoreAdd("The " + this.nonExisting.Count + " missing variables/timeseries are the following:");
                 txt.MoreNewLine();
                 List<int> list = this.nonExisting;
                 if (isRef) list = this.nonExisting_ref;
