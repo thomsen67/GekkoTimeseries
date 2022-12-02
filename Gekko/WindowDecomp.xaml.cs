@@ -60,9 +60,9 @@ namespace Gekko
 
         public DecompFind decompFind = null;
 
-        public BitmapImage green = null;
-        public BitmapImage yellow = null;
-        public BitmapImage red = null;
+        //public BitmapImage green = null;
+        //public BitmapImage yellow = null;
+        //public BitmapImage red = null;
 
         public DecompDatas decompDatas = new DecompDatas(); //stores data for reuse, for instance for fast pivot selection
 
@@ -820,14 +820,14 @@ namespace Gekko
                 //MakeTable(table);                
             }
 
-            if (true)
-            {
-                //can later on use System.AppDomain.CurrentDomain.BaseDirectory instead of System.Windows.Forms.Application.StartupPath
-                green = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
-                yellow = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\yellow.png"));
-                red = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\red.png"));
-                this.statusColor.Source = green;
-            }
+            //if (true)
+            //{
+            //    //can later on use System.AppDomain.CurrentDomain.BaseDirectory instead of System.Windows.Forms.Application.StartupPath
+            //    green = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
+            //    yellow = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\yellow.png"));
+            //    red = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\red.png"));
+            //    this.statusColor.Source = green;
+            //}
 
             this.Loaded += WindowDecomp_Loaded;
         }
@@ -1821,6 +1821,20 @@ namespace Gekko
         /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(Model model)
         {
+            if (false)
+            {
+                //See #f8kd8sfdgksldgjf
+                //this will put green lights one after one. But impossible to make it appear
+                //at one, it always waits for recalc to finish, all sorts of threads tried.
+                BitmapImage bi = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
+                System.Windows.Controls.Image i3 = new System.Windows.Controls.Image();
+                i3.Height = 12;
+                i3.Margin = new Thickness(0, 0, 25, 0);
+                i3.Source = bi;
+                //this.colors.Children.Add(i3);
+                //can remove child[0] if > 1 children, when this works.
+            }
+
             int remember = Globals.guiTableCellWidth;
             try
             {
