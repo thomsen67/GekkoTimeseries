@@ -11919,14 +11919,20 @@ namespace UnitTests
             I("#m1.x = 300, 301;");
             I("#m1.x[2001] = 302;");
             Assert.Fail();
-        }
-        
+        }        
+
         [TestMethod]
         public void _Test_MultiDimSets()
-        {
+        {            
             I("RESET; time 2000 2000;");
             I("#i = (('a', '10'), ('a', '11'), ('b', '10'), ('b', '11'));");
             I("#i0 = (('a', '11'), ('b', '10'));");
+            I("#i1 = (('a', '11'), ('b', '10'), ('a', 12, 'c'));");
+            I("#i2 = (('a', 12, 'c'), ('a', '11'), ('b', '10'));");
+            I("#i3 = (('a', '11'), ('b', '10'), ('a',));");
+            I("#i4 = (('a',), ('a', '11'), ('b', '10'));");
+            I("#i5 = (('a', 11), ('b', 10));");
+            I("#i6 = (('a', 11), ('b', 10));");
             I("o = series(2);");
             I("o[a, 10] = 100;");
             I("o[a, 11] = 101;");
@@ -11934,8 +11940,82 @@ namespace UnitTests
             I("o[b, 11] = 103;");
             I("#dim1 = a, b;");
             I("#dim2 = ('10', '11');");
-            //I("x[#dim1, #dim2] $ ((#dim1, #dim2) in #i) = o[#dim1, #dim2];");
+            I("#dim2a = (10, 11);");
+
+            //--> what about $ ((#dim1, #dim2) in #i) ??
+
+            I("x = series(2);");
+            I("x0 = series(2);");
+            I("x1 = series(2);");
+            I("x2 = series(2);");
+            I("x3 = series(2);");
+            I("x4 = series(2);");
+            I("x5 = series(2);");
+            I("x6 = series(2);");
+
             I("x[#dim1, #dim2] $ (#i[#dim1, #dim2]) = o[#dim1, #dim2];");
+            _AssertSeries(First(), "x!a", new string[2] { "a", "10" }, 2000, 100, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[2] { "a", "11" }, 2000, 101, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[2] { "b", "10" }, 2000, 102, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[2] { "b", "11" }, 2000, 103, sharedDelta);
+            Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.IsTrue(x.dimensionsStorage.storage.Count == 4);
+                        
+            I("x0[#dim1, #dim2] $ (#i0[#dim1, #dim2]) = o[#dim1, #dim2];");
+            _AssertSeries(First(), "x0!a", new string[2] { "a", "11" }, 2000, 101, sharedDelta);
+            _AssertSeries(First(), "x0!a", new string[2] { "b", "10" }, 2000, 102, sharedDelta);
+            Series x0 = Program.databanks.GetFirst().GetIVariable("x0!a") as Series;
+            Assert.IsTrue(x0.dimensionsStorage.storage.Count == 2);
+
+            FAIL("x1[#dim1, #dim2] $ (#i1[#dim1, #dim2]) = o[#dim1, #dim2];");
+
+            FAIL("x2[#dim1, #dim2] $ (#i2[#dim1, #dim2]) = o[#dim1, #dim2];");
+
+            FAIL("x3[#dim1, #dim2] $ (#i3[#dim1, #dim2]) = o[#dim1, #dim2];");
+
+            FAIL("x4[#dim1, #dim2] $ (#i4[#dim1, #dim2]) = o[#dim1, #dim2];");
+
+            FAIL("x5[#dim1, #dim2] $ (#i5[#dim1, #dim2]) = o[#dim1, #dim2];");
+
+            //Note: #dim2a used. Here, it is values 10 and 11 for both #dim2a and #i6,
+            //      but it will not work. Maybe it should...? But then there may be a problem
+            //      regarding slicing etc. Dangerous, probably avoid it.
+            //      Imagine a list #mariage = ((18, 18), (18, 19), ...) with all combination of oberved marriage
+            //      male/female ages. Then we have #a = 18, 19, ... , 99.
+            //      If we could use pop[#a, #a_alias] $ #mariage[#a, #a_alias], that would amount to asking
+            //      #mariage[18, 18], but that would ALSO mean row 18, column 18 in a 2d "table"!
+            //      Not good. So the age-shortcuts for array-series will not work, also not #a-1, #a+1 etc.
+            FAIL("x6[#dim1, #dim2a] $ (#i6[#dim1, #dim2a]) = o[#dim1, #dim2a];");
+
+
+            // =============================================
+            // =============================================
+            //            Test sum() function
+            // =============================================
+            // =============================================
+
+            I("RESET; time 2000 2000;");
+            I("x = series(2);");
+            I("x[a, 10] = 100;");
+            I("x[a, 11] = 101;");
+            I("x[b, 10] = 102;");
+            I("x[b, 11] = 103;");
+            I("e = series(2);");
+            I("e[a, 10] = timeless(0);");  //could also be just ... = 0, then it checks for each period.
+            I("e[a, 11] = timeless(1);");
+            I("e[b, 10] = timeless(1);");
+            I("e[b, 11] = timeless(0);");
+            I("#i = a, b;");
+            I("#j = ('10', '11');");
+            I("#e = (('a', '11'), ('b', '10'));");
+            I("y1 = sum((#i, #j), x[#i, #j] $ (e[#i, #j]));");
+            _AssertSeries(First(), "y1!a", 2000, 203d, sharedDelta);
+            I("y2 = sum((#i, #j) $ (e[#i, #j]), x[#i, #j]);");
+            _AssertSeries(First(), "y2!a", 2000, 203d, sharedDelta);
+            I("y3 = sum((#i, #j), x[#i, #j] $ (#e[#i, #j]));");
+            _AssertSeries(First(), "y3!a", 2000, 203d, sharedDelta);
+            I("y4 = sum((#i, #j) $ (#e[#i, #j]), x[#i, #j]);");
+            _AssertSeries(First(), "y4!a", 2000, 203d, sharedDelta);
         }
 
         [TestMethod]

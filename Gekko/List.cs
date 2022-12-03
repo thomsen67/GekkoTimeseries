@@ -64,7 +64,7 @@ namespace Gekko
                     int ival = O.ConvertToInt(index);
                     if (ival < 0)
                     {
-                        new Error("Illegal LIST indexer [" + ival + "]: negative number not allowed");
+                        new Error("Illegal list indexer [" + ival + "]: negative number not allowed");
                     }
                     else if (ival == 0)
                     {
@@ -72,7 +72,7 @@ namespace Gekko
                     }
                     else if (ival > this.list.Count)
                     {
-                        new Error("Illegal LIST indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
+                        new Error("Illegal list indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                     }
 
                     return this.list[ival - 1];
@@ -139,64 +139,124 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Type mismatch regarding []-index"); return null;
+                    new Error("Type mismatch regarding []-index, did not expect type " + G.GetTypeString(index)); return null;
                 }
             }
-            else if (indexes.Length == 2)
+            else if (indexes.Length == 2 && indexes[0].Type() == EVariableType.Val && (indexes[1].Type() == EVariableType.Val || indexes[1].Type() == EVariableType.Range))
             {
-                if (indexes[0].Type() == EVariableType.Val)
-                {
-                    //#m[3, 5] or #m[3, 4..5] or #m[1..2, 4..5]
-                    return this.Indexer(t, indexerType, indexes[0]).Indexer(t, indexerType, indexes[1]);
-                }
-                else if (indexes[0].Type() == EVariableType.Range)
-                {
-                    //#m[1..2, 4]
-                    //this corresponds to selecting a column. Note that #m[1..2, 4] is different from #m[1..2][4]!
-                                        
-                    Range index_range1 = indexes[0] as Range;
-                    int ival1 = 1;
-                    int ival2 = this.list.Count;
-                    if (index_range1.first != null) ival1 = O.ConvertToInt(index_range1.first);
-                    if (index_range1.last != null) ival2 = O.ConvertToInt(index_range1.last);
-                    CheckRange(ival1, ival2, true);
+                //#m[3, 5] or #m[3, 4..5]
+                return this.Indexer(t, indexerType, indexes[0]).Indexer(t, indexerType, indexes[1]);
+            }
+            else if (indexes.Length == 2 && indexes[0].Type() == EVariableType.Range && (indexes[1].Type() == EVariableType.Val || indexes[1].Type() == EVariableType.Range))
+            {
+                //#m[1..2, 4] or #m[1..2, 2..3]
+                //this corresponds to selecting a column. Note that #m[1..2, 4] is different from #m[1..2][4]!
 
-                    List m = null;
-                    if (indexes[1].Type() == EVariableType.Val)
+                Range index_range1 = indexes[0] as Range;
+                int ival1 = 1;
+                int ival2 = this.list.Count;
+                if (index_range1.first != null) ival1 = O.ConvertToInt(index_range1.first);
+                if (index_range1.last != null) ival2 = O.ConvertToInt(index_range1.last);
+                CheckRange(ival1, ival2, true);
+
+                List m = null;
+                if (indexes[1].Type() == EVariableType.Val)
+                {
+                    int j = O.ConvertToInt(indexes[1]);
+                    m = GetColumnSlice(ival1, ival2, j);
+                }
+                else if (indexes[1].Type() == EVariableType.Range)
+                {
+                    int jval1 = 1;
+                    int jval2 = this.list.Count;
+                    Range index_range2 = indexes[1] as Range;
+                    if (index_range2.first != null) jval1 = O.ConvertToInt(index_range2.first);
+                    if (index_range2.last != null) jval2 = O.ConvertToInt(index_range2.last);
+                    m = new List();
+                    for (int j = jval1; j <= jval2; j++)
                     {
-                        int j = O.ConvertToInt(indexes[1]);
-                        m = GetColumnSlice(ival1, ival2, j);
+                        List m3 = GetColumnSlice(ival1, ival2, j);
+                        m.list.Add(m3);
                     }
-                    else if (indexes[1].Type() == EVariableType.Range)
-                    {
-                        int jval1 = 1;
-                        int jval2 = this.list.Count;
-                        Range index_range2 = indexes[1] as Range;
-                        if (index_range2.first != null) jval1 = O.ConvertToInt(index_range2.first);
-                        if (index_range2.last != null) jval2 = O.ConvertToInt(index_range2.last);
-                        m = new List();
-                        for (int j = jval1; j <= jval2; j++)
-                        {
-                            List m3 = GetColumnSlice(ival1, ival2, j);
-                            m.list.Add(m3);
-                        }
-                        m = Functions.t(null, null, null, m) as List;
-                    }
-                    else
-                    {
-                        new Error("Expected value or range for second dimension of indexer"); return null;
-                    }
-                    return m;
+                    m = Functions.t(null, null, null, m) as List;
                 }
                 else
                 {
-                    new Error("Invalid use of [..., ...] indexer on list"); return null;
+                    new Error("Expected value or range for second dimension of indexer"); return null;
                 }
+                return m;
             }
             else
             {
-                new Error("Cannot use " + indexes.Length + "-dimensional indexer on LIST"); return null;
+
+                //this wil fail (error) unless this.list are all strings, and indexes are all strings,
+                //and some more conditions.
+                bool b = CheckMultiDim(indexes);
+
+                if (b)
+                {
+                    return Globals.scalarVal1;
+                }
+                else
+                {
+                    return Globals.scalarVal0;
+                }
             }
+        }
+
+        /// <summary>
+        /// A list #m may look like (('a', 'b'), ('a', 'c')). We may query this with #m['a', 'c'], which would
+        /// return 1 (true). Querying with #m['a', 'd'] will return 0 (false). Errors may occur if the lists are not "clear", 
+        /// with same dimensions and only strings. Though, above there was a hit regarding sublist #2, and therefore
+        /// #m may in that case contain illegal stuff at sublist #3 or later. If the method returns 0 without error, 
+        /// we are sure that all the elements conform.
+        /// </summary>
+        /// <param name="indexes"></param>
+        /// <returns></returns>
+        private bool CheckMultiDim(IVariable[] indexes)
+        {
+            bool good = false;
+
+            List<string> helper = new List<string>();
+            int counter1 = 0;
+            foreach(IVariable iv in indexes)
+            {
+                counter1++;
+                ScalarString ss = iv as ScalarString;
+                if (ss == null)
+                {
+                    new Error("When indexing a list with a multidim index, all elements of the multidim index are expected to be of string type, but element #" + counter1 + " is of " + G.GetTypeString(iv));
+                }
+                helper.Add(ss.string2);
+            }
+
+            int counter2 = 0;
+            foreach (IVariable iv in this.list)  //this.list is a list of tuples (from this.list being queried)
+            {
+                counter2++;
+                List iv_list = iv as List; //iv_list is 1 tuple (from this.list being queried)
+                if (iv_list == null)
+                {
+                    new Error("When indexing a list with a multidim index, the list element #" + counter2 + " is not a (sub)list, but a " + G.GetTypeString(iv));
+                }
+                if (iv_list.Count() != indexes.Length)
+                {
+                    new Error("When indexing a list with a multidim index, the dimensions must correspond. The list element #" + counter2 + " is a (sub)list with " + iv_list.Count() + " elements, and you cannot use a " + indexes.Length + "-dimensional indexer on that sublist");
+                }
+                for (int i = 0; i < iv_list.Count(); i++)
+                {
+                    ScalarString iv_string = iv_list.list[i] as ScalarString; //iv_string is one tuple item (from the list being queried)                    
+                    if (iv_string == null)
+                    {
+                        new Error("When indexing a list with a multidim index, the list element #" + counter2 + " is a (sub)list, but the element #" + i + " of that sublist is not a string, but a " + G.GetTypeString(iv_list.list[i]));
+                    }
+                    if (!G.Equal(iv_string.string2, helper[i])) goto Lbl1;
+                }
+                good = true;
+                break;
+            Lbl1:;
+            }
+            return good;
         }
 
         private List GetColumnSlice(int ival1, int ival2, int j)
