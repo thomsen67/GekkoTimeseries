@@ -585,8 +585,7 @@ namespace Gekko
                                                 ss = "any open databank";
                                                 if (Program.databanks.GetRef().storage.Count() > 0) s = " (excluding Ref)";
                                             }
-                                            new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ss + s);
-                                            //throw new GekkoException();
+                                            new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ss + s);                                            
                                         }
                                         else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
                                         {

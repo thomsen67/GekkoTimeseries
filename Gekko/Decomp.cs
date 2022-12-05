@@ -356,6 +356,7 @@ namespace Gekko
         public static void DecompStart(O.Decomp2 o)
         {
             Model model = Program.model;
+            if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
             if (o.from.Count == 0)
             {
@@ -363,8 +364,6 @@ namespace Gekko
                 find.t1 = o.t1;
                 find.t2 = o.t2;
                 find.opt_prtcode = o.opt_prtcode;
-                //find.iv = new List();
-                //foreach (IVariable iv in o.select) find.iv.Add(iv);
                 find.iv = o.select[0] as List;
                 find.Exe();
                 return;
@@ -379,9 +378,7 @@ namespace Gekko
             //See source code documentation
             
             Globals.lastDecompTable = null;
-            G.CheckLegalPeriod(o.t1, o.t2);
-
-            if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
+            G.CheckLegalPeriod(o.t1, o.t2);            
 
             DecompOptions2 decompOptions2 = null;
             if (o.decompFind != null)
@@ -1469,8 +1466,8 @@ namespace Gekko
                     DecompDict dd = null;
                     if (op.isRaw)
                     {
-                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO);
-                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO);
+                        DecompMainStoreRawVariable(decompDatas, xnewName, ZERO, modelGamsScalar);
+                        if (col == 0) DecompMainStoreRawVariable(decompDatas, enewName, ZERO, modelGamsScalar);
                     }
                     else
                     {
@@ -1489,7 +1486,7 @@ namespace Gekko
             //DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
-        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq)
+        private static void DecompMainStoreRawVariable(DecompDatas decompDatas, string name, int eq, ModelGamsScalar modelGamsScalar)
         {            
             int lag2; string name2;
             ConvertFromTurtleName(name, true, out name2, out lag2);
@@ -1506,24 +1503,38 @@ namespace Gekko
                 if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name))
                 {
                     Series ts = null;
-                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
+                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         ts = (ts.DeepClone(null) as Series);
                         ts.Lag(lag2);
-                        decompDatas.MAIN_data.cellsQuo.Add(name, ts);
                     }
+                    else
+                    {
+                        if (Globals.decompFix2)
+                        {
+                            ts = new Series(modelGamsScalar.parent.modelCommon.GetFreq(), null);
+                        }
+                    }
+                    decompDatas.MAIN_data.cellsQuo.Add(name, ts);
                 }
 
                 if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
                 {
-                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
+                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         ts = (ts.DeepClone(null) as Series);
                         ts.Lag(lag2);
-                        decompDatas.MAIN_data.cellsRef.Add(name, ts);
                     }
+                    else
+                    {
+                        if (Globals.decompFix2)
+                        {
+                            ts = new Series(modelGamsScalar.parent.modelCommon.GetFreq(), null);
+                        }
+                    }
+                    decompDatas.MAIN_data.cellsRef.Add(name, ts);
                 }
             }
         }
@@ -2762,16 +2773,16 @@ namespace Gekko
             DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
             Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
-
+            
             DecompTablePostProcessing(table, rownames, colnames, decompOptions2, model);
 
             if (model.DecompType() == EModelType.GAMSScalar)
             {
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
-            }
+            }            
 
             DecompOutput decompOutput2 = DecompTableHandleSortAndIgnore(table, decompOptions2);
-
+            
             return decompOutput2;
         }
 
@@ -3459,14 +3470,14 @@ namespace Gekko
 
                             if (op.isRaw)
                             {                                
-                                Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
+                                Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 if (tsFirst != null)
                                 {
                                     dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
                                     dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
                                 }
-                                Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
+                                Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                                 if (tsRef != null)
                                 {
                                     dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
@@ -3479,7 +3490,7 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;                                    
-                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;                                    
+                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;                                    
                                     if (tsFirst == null)
                                     {
                                         string s2 = dictName.Replace("Work:", "").Replace("¤", "");
@@ -3493,7 +3504,7 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;                                    
-                                    tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;                                    
+                                    tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;                                    
                                     if (tsRef == null)
                                     {
                                         string s2 = dictName.Replace("Work:", "").Replace("¤", "");
@@ -3602,7 +3613,8 @@ namespace Gekko
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
         private static DecompOutput DecompTableHandleSortAndIgnore(Table table1, DecompOptions2 decompOptions2)
-        {
+        {           
+
             bool showIgnoreSum = true;
 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
@@ -3611,7 +3623,7 @@ namespace Gekko
             string ignore = null;
             List<double> red = new List<double>();
 
-            List<SortHelper> sortHelperStart = new List<SortHelper>();
+            List<SortHelper> sortHelperStart = new List<SortHelper>();            
 
             if (rowsOrCols == ERowsCols.Rows)
             {                
@@ -3696,6 +3708,9 @@ namespace Gekko
             // ------------------- the preceding is common for rows vs cols END ------------------------
 
             Table table2 = new Table();
+            table2.writeOnce = true;
+            table2.Set(new Coord(1, 1), table1.Get(1, 1));
+
             if (rowsOrCols == ERowsCols.Rows)
             {
                 //copy the first two rows 
@@ -3717,15 +3732,14 @@ namespace Gekko
                         table2.Set(new Coord(i1, j), table1.Get(i2, j));
                     }
                 }
-                if (decompOptions2.showErrors)
+
+                if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
                 {
                     //get the last 2 rows with the ignore and errors
                     for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        int add = 0;                        
+                    {                                           
                         if (sortHelperIgnored.Count > 0)
-                        {
-                            add = 1;
+                        {                            
                             Cell c = new Cell();
                             if (j == 1)
                             {
@@ -3749,9 +3763,13 @@ namespace Gekko
                                 c.backgroundColor = Globals.decompIgnoredColor;
                                 c.vars_hack = new List<string>() { Globals.decompIgnoreName };
                             }
-                            table2.Set(new Coord(sortHelperFinal.Count + two + 1, j), c);
-                        }                        
-                        table2.Set(new Coord(sortHelperFinal.Count + two + 1 + add, j), table1.Get(table1.GetRowMaxNumber(), j));
+                            table2.Set(new Coord(sortHelperFinal.Count + two + 1, j), c);  //ignored
+                            table2.Set(new Coord(sortHelperFinal.Count + two + 2, j), table1.Get(table1.GetRowMaxNumber(), j));  //errors
+                        } 
+                        else
+                        {
+                            table2.Set(new Coord(sortHelperFinal.Count + two + 1, j), table1.Get(table1.GetRowMaxNumber(), j));  //errors
+                        }
                     }
                 }
             }
@@ -3776,16 +3794,13 @@ namespace Gekko
                         table2.Set(new Coord(i, j1), table1.Get(i, j2));
                     }
                 }
-                if (decompOptions2.showErrors)
+                if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
                 {
                     //get the last col with ignore and the errors                    
                     for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-                    {
-
-                        int add = 0;
+                    {   
                         if (sortHelperIgnored.Count > 0)
-                        {
-                            add = 1;
+                        {                            
                             Cell c = new Cell();
                             if (i == 1)
                             {
@@ -3809,9 +3824,13 @@ namespace Gekko
                                 c.backgroundColor = Globals.decompIgnoredColor;
                                 c.vars_hack = new List<string>() { Globals.decompIgnoreName };
                             }
-                            table2.Set(new Coord(i, sortHelperFinal.Count + two + 1), c);
+                            table2.Set(new Coord(i, sortHelperFinal.Count + two + 1), c); //ignored
+                            table2.Set(new Coord(i, sortHelperFinal.Count + two + 2), table1.Get(i, table1.GetColMaxNumber())); //errors
+                        } 
+                        else
+                        {
+                            table2.Set(new Coord(i, sortHelperFinal.Count + two + 1), table1.Get(i, table1.GetColMaxNumber())); //errors
                         }
-                        table2.Set(new Coord(i, sortHelperFinal.Count + two + 1 + add), table1.Get(i, table1.GetColMaxNumber()));                        
                     }
                 }
             }
@@ -3878,6 +3897,10 @@ namespace Gekko
             if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
+            }
+            else
+            {
+                tab.Set(1, 1, "");
             }
 
             //
