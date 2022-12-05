@@ -8185,7 +8185,7 @@ namespace Gekko
             public string opt_errors = null;
             public string opt_shares = null;
             public string opt_sort = null;
-            public double opt_prune = double.NaN;
+            public double opt_ignore = double.NaN;
             public string variable = null;
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            

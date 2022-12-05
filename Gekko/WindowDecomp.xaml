@@ -356,11 +356,11 @@
             <StackPanel Grid.Column="11" Grid.Row="3" Orientation="Horizontal">
                 <CheckBox x:Name="checkBoxErrors"  Width="57" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show residuals and non-linear errors (&lt;errors> option)"  Content="Errors" Checked="CheckBoxErrors_Checked" Unchecked="CheckBoxErrors_Unchecked"/>
                 <CheckBox x:Name="checkBoxSort"  Width="57" Margin="7.7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Sort contributions by size (&lt;sort> option)"  Content="Sort" Checked="CheckBoxSort_Checked" Unchecked="CheckBoxSort_Unchecked"/>
-                <TextBlock Text="Prune:" Margin="0,2,0,0" Grid.RowSpan="2" ToolTip="Ignore small contributions" />                
+                <TextBlock Text="Ignore:" Margin="0,2,0,0" Grid.RowSpan="2" ToolTip="Ignore small contributions" />                
                 <Grid  Height="23"  VerticalAlignment="Top">
                     <TextBox Width="30" HorizontalAlignment="Left" Height="15" FontSize="10" x:Name="txtNum" x:FieldModifier="private" Text="0" Padding="0,-0.6,0,0" TextChanged="txtNum_TextChanged" Margin="3,2,13,3"  ToolTip="Ignore contributions smaller than this" />                    
-                    <Button x:Name="cmdUp" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Height="10" Width="15" Click="cmdUp_Click" Margin="35,2,1,13" Foreground="Gray" ToolTip="Increase prune threshold" />
-                    <Button x:Name="cmdDown" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▼" Height="10" Width="15" Click="cmdDown_Click" Margin="35,12,1,3" Foreground="Gray"  ToolTip="Decrease prune threshold" />
+                    <Button x:Name="cmdUp" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▲" Height="10" Width="15" Click="cmdUp_Click" Margin="35,2,1,13" Foreground="Gray" ToolTip="Increase ignore threshold" />
+                    <Button x:Name="cmdDown" x:FieldModifier="private" FontSize="6" BorderThickness="0" Padding="0,-1,0,0" Content="▼" Height="10" Width="15" Click="cmdDown_Click" Margin="35,12,1,3" Foreground="Gray"  ToolTip="Decrease ignore threshold" />
                     <TextBlock Text="%" Width="10" HorizontalAlignment="Left" FontSize="10" Margin="22,4,0,0" />
                 </Grid>                
             </StackPanel>            
@@ -376,7 +376,7 @@
                 <TextBlock Text="Decimals:" Margin="0,0,0,0" ToolTip="Change number of decimals" />
                 <Button Margin="5,-0,0,0" Name="button2" ToolTip="Increase decimals" Click="button2_Click" FontSize="10" AllowDrop="False" HorizontalAlignment="Left" Width="18.875" Height="18" Opacity="0.7">.00</Button>
                 <Button HorizontalAlignment="Right" Margin="2,0,0,0" Name="button3" Width="18" Height="18" ToolTip="Decrease decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
-                <TextBlock  Name="textBlockPrune" Text="" FontSize="11" Foreground="Gray" Margin="29,0,0,0" ToolTip="Number of pruned rows or columns. The values of pruned rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
+                <TextBlock  Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="29,0,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">

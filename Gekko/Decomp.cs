@@ -16,12 +16,12 @@ namespace Gekko
     public class DecompOutput
     {
         public Table table = null;
-        public string prune = null;
+        public string ignore = null;
         public List<double> red = null;
-        public DecompOutput(Table table, string prune, List<double> red)
+        public DecompOutput(Table table, string ignore, List<double> red)
         {
             this.table = table;
-            this.prune = prune;
+            this.ignore = ignore;
             this.red = red;
         }
     }
@@ -406,13 +406,13 @@ namespace Gekko
                 if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
                 if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
                 if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
-                if (!double.IsNaN(o.opt_prune))
+                if (!double.IsNaN(o.opt_ignore))
                 {
-                    if (o.opt_prune < 0d || o.opt_prune > 100d)
+                    if (o.opt_ignore < 0d || o.opt_ignore > 100d)
                     {
-                        new Error("Option <prune=...> must be between 0 and 100 (inclusive). The value is " + o.opt_prune + ".");
+                        new Error("Option <ignore=...> must be between 0 and 100 (inclusive). The value is " + o.opt_ignore + ".");
                     }
-                    decompOptions2.prune = o.opt_prune;
+                    decompOptions2.ignore = o.opt_ignore;
                 }
                 decompOptions2.name = o.name;
                 decompOptions2.isNew = true;
@@ -2768,7 +2768,7 @@ namespace Gekko
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
             }
 
-            DecompOutput decompOutput2 = DecompTableHandleSortAndPrune(table, decompOptions2);
+            DecompOutput decompOutput2 = DecompTableHandleSortAndIgnore(table, decompOptions2);
 
             return decompOutput2;
         }
@@ -2978,7 +2978,7 @@ namespace Gekko
 
                     Cell c = table.Get(i + 2, j + 2);
                     c.vars_hack = fullVariableNames;
-                    c.value_hack = d;  //stored for sort and prune later on
+                    c.value_hack = d;  //stored for sort and ignore later on
                     c.backgroundColor = backgroundColor;
                 }
             }
@@ -3599,13 +3599,12 @@ namespace Gekko
         /// </summary>
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
-        private static DecompOutput DecompTableHandleSortAndPrune(Table table1, DecompOptions2 decompOptions2)
+        private static DecompOutput DecompTableHandleSortAndIgnore(Table table1, DecompOptions2 decompOptions2)
         {            
-            //if ((double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d) && !decompOptions2.sort) return new DecompOutput(table1, null, null);  //fast return 
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
 
-            string prune = null;
+            string ignore = null;
             List<double> red = new List<double>();
 
             List<SortHelper> sortHelper = new List<SortHelper>();
@@ -3617,7 +3616,7 @@ namespace Gekko
 
                     Cell c5 = table1.Get(i, 2);
                     string name2 = c5?.vars_hack?[0];
-                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and prune                                        
+                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and ignore                                        
                     double max = 0d;
                     for (int j = 2; j <= table1.GetColMaxNumber(); j++)
                     {
@@ -3635,7 +3634,7 @@ namespace Gekko
                 {
                     Cell c5 = table1.Get(2, j);
                     string name2 = c5?.vars_hack?[0];
-                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and prune                    
+                    if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and ignore                    
                     double max = 0d;
                     for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
                     {
@@ -3650,25 +3649,25 @@ namespace Gekko
 
             // ------------------- the following is common for rows vs cols START ------------------------
 
-            //maybe prune
+            //maybe ignore
             List<SortHelper> sortHelper2 = new List<SortHelper>();
-            if (!(double.IsNaN(decompOptions2.prune) || decompOptions2.prune == 0d))
+            if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d))
             {
                 foreach (SortHelper sh in sortHelper)
                 {
-                    if (sh.value >= decompOptions2.prune) sortHelper2.Add(sh);
+                    if (sh.value >= decompOptions2.ignore) sortHelper2.Add(sh);
                 }
             }
             else
             {
                 sortHelper2.AddRange(sortHelper);
             }
-            int pruneCount = sortHelper.Count - sortHelper2.Count;
-            if (pruneCount > 0)
+            int ignoreCount = sortHelper.Count - sortHelper2.Count;
+            if (ignoreCount > 0)
             {
-                string x = "row" + G.S(pruneCount);
-                if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(pruneCount);
-                prune = pruneCount + " " + x + " pruned";
+                string x = "row" + G.S(ignoreCount);
+                if (rowsOrCols == ERowsCols.Cols) x = "col" + G.S(ignoreCount);
+                ignore = ignoreCount + " " + x + " ignored";
             }
 
             //Maybe sort
@@ -3746,7 +3745,7 @@ namespace Gekko
                 }
             }
 
-            // --------------------- table2 is now sorted and pruned (errors are always present last).
+            // --------------------- table2 is now sorted and ignored (errors are always present last).
 
             if (rowsOrCols == ERowsCols.Rows)
             {
@@ -3790,7 +3789,7 @@ namespace Gekko
                 }
             }
 
-            DecompOutput decompOutput = new DecompOutput(table2, prune, red);
+            DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
             return decompOutput;
         }
 

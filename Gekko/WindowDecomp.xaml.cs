@@ -137,7 +137,7 @@ namespace Gekko
             {
                 if (!isInitializing)
                 {
-                    this.decompFind.decompOptions2.prune = i;
+                    this.decompFind.decompOptions2.ignore = i;
                     _numValue = i;
                     RecalcCellsWithNewType(decompFind.model);
                 }
@@ -712,9 +712,9 @@ namespace Gekko
                 checkBoxSort.IsChecked = true;
             }
 
-            if (!double.IsNaN(this.decompFind.decompOptions2.prune))
+            if (!double.IsNaN(this.decompFind.decompOptions2.ignore))
             {
-                this.NumValue = (int)this.decompFind.decompOptions2.prune;
+                this.NumValue = (int)this.decompFind.decompOptions2.ignore;
             }
         }
 
@@ -1254,7 +1254,7 @@ namespace Gekko
             dp.HorizontalAlignment = HorizontalAlignment.Right;
             string xx = "row";
             if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
-            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox and/or set 'Prune%' = 0.";
+            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox (and maybe set 'Ignore' = 0%).";
             g.Children.Add(dp);
         }
 
@@ -1746,7 +1746,7 @@ namespace Gekko
                                 {
                                     if (var7 == Globals.decompErrorName)
                                     {
-                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors should be = 0). If the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
+                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the shown rows (given that 'Ignore' is set at 0%)."));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
@@ -1835,6 +1835,11 @@ namespace Gekko
                 //can remove child[0] if > 1 children, when this works.
             }
 
+            if (true)
+            {
+                this.Cursor = Cursors.Wait;
+            }
+
             int remember = Globals.guiTableCellWidth;
             try
             {
@@ -1857,6 +1862,7 @@ namespace Gekko
             {
                 Globals.guiTableCellWidth = remember;
                 this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone(true);
+                this.Cursor = Cursors.Arrow;
             }
         }
 
@@ -1872,7 +1878,7 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
 
             DecompOutput decompOutput = Decomp.DecompMain(smpl, per1, per2, this.decompFind.decompOptions2, ref this.decompDatas, model);
-            textBlockPrune.Text = decompOutput.prune;
+            textBlockIgnore.Text = decompOutput.ignore;
 
             string s = null;            
             if (this.decompFind.model.DecompType() == EModelType.GAMSScalar)
@@ -2711,7 +2717,7 @@ namespace Gekko
         public bool dyn = false;
         public bool missingAsZero = false;
         public bool sort = false;
-        public double prune = double.NaN;  //between 0 and 100.
+        public double ignore = double.NaN;  //between 0 and 100.
         public List<string> new_select = null;
         public List<string> new_from = null;
         public List<string> new_endo = null;
@@ -2779,7 +2785,7 @@ namespace Gekko
             if (this.dyn) s.Add(" dyn");
             if (this.missingAsZero) s.Add(" missing=zero");
             if (this.sort) s.Add(" sort");
-            if (!double.IsNaN(this.prune) && prune > 0d && prune <= 100d) s.Add(" prune=" + this.prune);
+            if (!double.IsNaN(this.ignore) && ignore > 0d && ignore <= 100d) s.Add(" ignore=" + this.ignore);
             s.Add(">", color);
             s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
             s.Add(" from", color);
@@ -2853,7 +2859,7 @@ namespace Gekko
             d.missingAsZero = this.missingAsZero;
             d.isShares = this.isShares;
             d.sort = this.sort;
-            d.prune = this.prune;
+            d.ignore = this.ignore;
             
             d.modelHash = this.modelHash;
             d.type = this.type;

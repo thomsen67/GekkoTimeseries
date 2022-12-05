@@ -701,7 +701,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_VAL_PWIDTH;
 	ASTOPT_VAL_NDEC;
 	ASTOPT_VAL_PDEC;
-	ASTOPT_VAL_PRUNE;
+	ASTOPT_VAL_IGNORE;
 	ASTOPT_STRING_SORT;
     ASTOPT_VAL_LAG;
 	ASTOPT_VAL_SKIP;
@@ -968,7 +968,7 @@ YLINE                 = 'YLINE'                    ;
 SHARES                = 'SHARES';
 ERRORS                = 'ERRORS';
 //YMAX                  = 'YMAX'                     ;
-PRUNE              = 'PRUNE'                 ;
+IGNORE              = 'IGNORE'                 ;
 YMAXHARD              = 'YMAXHARD'                 ;
 YMAXSOFT              = 'YMAXSOFT'                 ;
 //YMIN                  = 'YMIN'                     ;
@@ -1604,7 +1604,7 @@ d.Add("Y" ,Y);
 										d.Add("SHARES",SHARES);
 										d.Add("ERRORS",ERRORS);
 										//d.Add("YMAX",YMAX);
-										d.Add("PRUNE", PRUNE);
+										d.Add("IGNORE", IGNORE);
 										d.Add("YMAXHARD",YMAXHARD);
 										d.Add("YMAXSOFT",YMAXSOFT);
 										//d.Add("YMIN",YMIN);
@@ -2957,7 +2957,7 @@ decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
 						  | ERRORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERRORS yesNo?)
 						  | SHARES (EQUAL yesNo)? -> ^(ASTOPT_STRING_SHARES yesNo?)
 						  | SORT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SORT yesNo?)
-						  | PRUNE (EQUAL expression)? -> ^(ASTOPT_VAL_PRUNE expression)
+						  | IGNORE (EQUAL expression)? -> ^(ASTOPT_VAL_IGNORE expression)
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 
@@ -4744,7 +4744,7 @@ ident2: 					Ident |
   YLINE|
   SHARES|
   ERRORS|
-  PRUNE|
+  IGNORE|
   YMAXHARD|
   YMAXSOFT|
   YMAX|
@@ -5205,7 +5205,7 @@ ident3: 					Ident |
   YLINE|
   SHARES|
   ERRORS| 
-  PRUNE|
+  IGNORE|
   YMAXHARD|
   YMAXSOFT|
   YMAX|
