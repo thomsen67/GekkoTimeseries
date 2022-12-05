@@ -4637,7 +4637,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -4662,7 +4662,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -4829,7 +4829,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -4854,7 +4854,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5014,7 +5014,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5039,7 +5039,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5199,7 +5199,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5224,7 +5224,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5387,7 +5387,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
@@ -5412,7 +5412,7 @@ namespace UnitTests
                             }
                             else
                             {
-                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
                                 _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);

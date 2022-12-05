@@ -1831,11 +1831,8 @@ namespace Gekko
                 //this.colors.Children.Add(i3);
                 //can remove child[0] if > 1 children, when this works.
             }
-
-            if (true)
-            {
-                this.Cursor = Cursors.Wait;
-            }
+            
+            this.Cursor = Cursors.Wait;
 
             int remember = Globals.guiTableCellWidth;
             try
@@ -1844,22 +1841,25 @@ namespace Gekko
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
                 }
-                if (this.decompFind.decompOptions2.count == ECountType.Names) Globals.guiTableCellWidth = 3 * remember;
+                if (this.decompFind.decompOptions2.count == ECountType.Names) Globals.guiTableCellWidth = 3 * remember;                
                 RecalcCellsWithNewTypeHelper(model);
                 return;
             }
             catch (Exception e)
             {
-                if (G.IsUnitTesting()) throw;
-                this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;  
-                RecalcCellsWithNewTypeHelper(model);
-                RefreshRowsColsFiltersList();
+                if (G.IsUnitTesting()) throw;                
+                if (this.decompFind.decompOptions2Previous != null)
+                {
+                    this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
+                    RecalcCellsWithNewTypeHelper(model);
+                    RefreshRowsColsFiltersList();
+                }
             }
             finally
             {
-                Globals.guiTableCellWidth = remember;
-                this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone(true);
+                Globals.guiTableCellWidth = remember;                                
                 this.Cursor = Cursors.Arrow;
+                this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone(true);
             }
         }
 

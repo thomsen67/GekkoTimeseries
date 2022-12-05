@@ -9907,7 +9907,7 @@ namespace Gekko
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
             List<string> rv = new List<string>();
-            IVariable iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNull, false);
+            IVariable iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
@@ -15318,7 +15318,7 @@ namespace Gekko
 
             foreach (ToFrom output in outputs)
             {
-                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);  //no search here
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);  //no search here
 
                 if (iv == null)
                 {
@@ -15340,7 +15340,7 @@ namespace Gekko
 
                 nOk++;
 
-                IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNull);
+                IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                 bool injectingToExistingSeries = false;
                 if (truncate != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
                 {
@@ -15754,7 +15754,7 @@ namespace Gekko
                 {
                     //a hack to make DISP x[a] work                    
                     //OR: it is an INDEX command without stars, here we must find out if the single non-wildcard item exists
-                    IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNull);
+                    IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                     if (iv != null)
                     {
                         lhsUnfolded.Add(wildCardLhs);
@@ -18090,21 +18090,21 @@ namespace Gekko
                 hasModel = true;
                 try
                 {
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exod", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exod", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exod.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoj", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoj", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exoj.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoz", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exoz.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exodjz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exodjz", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exodjz.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exo", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exo.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exotrue", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exotrue", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         exotrue.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "endo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "endo", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         endo.Add(s, "");
-                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "all", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "all", O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)).list.ToArray()))
                         all.Add(s, "");
                 }
                 catch { };  //if error, we just ignore it, and the list will be empty.

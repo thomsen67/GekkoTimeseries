@@ -138,22 +138,21 @@ namespace Gekko
                 LookupSettings settingsTemp = settings;
                 if (indexes != null)
                 {
-                    settingsTemp = new LookupSettings(); //normal abort if array-super-series is not found, cannot just be created
+                    settingsTemp = new LookupSettings(); //normal abort if array-super-series is not found, cannot just be created                    
                     settingsTemp.depth = settings.depth;  //no recursion for #alias
+                    //the if below was changed 5/12 2022, so that for ECreatePossibilities.NoneReturnNullAlways we can return a null for x[a], both if x does not exist, and if [a] does not exist. The stuff with settingsTemp probably has to do with auto-creation, not whether it return null or throws error.
+                    if (settings.create == ECreatePossibilities.NoneReturnNullAlways) settingsTemp.create = settings.create = ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries; //if it is set to return null, this should be allowed also for an array series parent series that is missing
                 }
-
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, settingsTemp, type, errorIfNotFound, options);
-
-                if (indexes != null)
+                
+                if (iv != null && indexes != null)
                 {
                     Series iv_series = iv as Series;
                     if (iv_series == null || iv_series.type != ESeriesType.ArraySuper)
                     {
                         new Error("Expected array-series variable");
                     }
-
                     rv = iv_series.FindArraySeries(smpl, Stringlist.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
-
                 }
                 else
                 {
@@ -666,8 +665,7 @@ namespace Gekko
             if (rv == null)
             {
 
-                new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
-                //throw new GekkoException();
+                new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());                
             }
             return rv;
         }
@@ -1683,11 +1681,10 @@ namespace Gekko
             IVariable rv = db.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
-                if (settings.create == ECreatePossibilities.NoneReturnNull) return rv;
+                if (settings.create == ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) return rv;
                 if (settings.create == ECreatePossibilities.NoneReportError)
                 {
-                    new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");
-                    //throw new GekkoException();
+                    new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");                    
                 }
                 else if (settings.create == ECreatePossibilities.Must || settings.create == ECreatePossibilities.Can)
                 {

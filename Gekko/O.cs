@@ -1107,10 +1107,11 @@ namespace Gekko
 
         public enum ECreatePossibilities
         {
-            NoneReturnNull,
+            NoneReturnNullButErrorForParentArraySeries,
             NoneReportError,
             Can,
-            Must
+            Must,
+            NoneReturnNullAlways
         }
 
 
@@ -2809,7 +2810,7 @@ namespace Gekko
         public static double PredictGetValue(string name, GekkoTime gt)
         {
             //We do not allow searching of vars in databanks
-            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), O.ECreatePossibilities.NoneReturnNull, false);
+            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
             if (iv == null)
             {
                 new Error("PREDICT: Series '" + name + "' does not exist in first-position databank");
@@ -9038,7 +9039,7 @@ namespace Gekko
 
                 if (domains != null)
                 {
-                    LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, ECreatePossibilities.NoneReturnNull, true);
+                    LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, true);
                     IVariable def = O.Lookup(null, null, null, "#default", null, null, settings, EVariableType.Var, false, null);
                     if (def != null)
                     {

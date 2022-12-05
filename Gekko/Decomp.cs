@@ -1354,7 +1354,7 @@ namespace Gekko
                                         {
                                             new Error("DECOMP matrix invert problem");
                                         }
-                                        Series ts = dd.storage[x2];
+                                        Series ts = dd.storage[x2];                                        
                                         double d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;
                                     }
@@ -1506,7 +1506,7 @@ namespace Gekko
                 if (!decompDatas.MAIN_data.cellsQuo.ContainsKey(name))
                 {
                     Series ts = null;
-                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNull) as Series;
+                    ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
                     if (ts != null)
                     {
                         ts = (ts.DeepClone(null) as Series);
@@ -1517,7 +1517,7 @@ namespace Gekko
 
                 if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
                 {
-                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
                     if (ts != null)
                     {
                         ts = (ts.DeepClone(null) as Series);
@@ -1869,13 +1869,14 @@ namespace Gekko
                     thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                     thread.IsBackground = true;
                     thread.Start(decompFind);
-                    
+
                     //Also see #9237532567
                     //This stuff makes sure we wait for the window to open, before we move on with the code.
                     for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
                         System.Threading.Thread.Sleep(10);  //0.01s
-                        if (decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
+                        //not sure why decompFind.decompOptions2 can become == null in the other thread...?
+                        if (decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
                         {
                             break;
                         }
@@ -1914,7 +1915,8 @@ namespace Gekko
                 Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;
+                windowDecomp.isInitializing = false;                
+
                 windowDecomp.RecalcCellsWithNewType(decompFind.model);
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
                 if (G.IsUnitTesting() && Globals.showDecompTable == false)
@@ -2512,7 +2514,7 @@ namespace Gekko
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (!G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
@@ -2553,7 +2555,7 @@ namespace Gekko
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (!G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
@@ -2594,7 +2596,7 @@ namespace Gekko
 
                                 //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (!G.isNumericalError(grad))
+                                if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
                                     string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
@@ -3395,7 +3397,7 @@ namespace Gekko
                         {
                             //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
                             //So in this case, #a and #sector would be added as columns
-                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways);
                             if (iv != null)
                             {
                                 Series ts = iv as Series;
@@ -3457,14 +3459,14 @@ namespace Gekko
 
                             if (op.isRaw)
                             {                                
-                                Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                Series tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
                                 if (tsFirst != null)
                                 {
                                     dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1 + iLag));
                                     dLevelLag2 = tsFirst.GetDataSimple(t2.Add(-2 + iLag));
                                 }
-                                Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                Series tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;
                                 if (tsRef != null)
                                 {
                                     dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
@@ -3477,7 +3479,7 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;                                    
-                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
+                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;                                    
                                     if (tsFirst == null)
                                     {
                                         string s2 = dictName.Replace("Work:", "").Replace("¤", "");
@@ -3491,7 +3493,7 @@ namespace Gekko
                                 if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;                                    
-                                    tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNull) as Series;                                    
+                                    tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries) as Series;                                    
                                     if (tsRef == null)
                                     {
                                         string s2 = dictName.Replace("Work:", "").Replace("¤", "");

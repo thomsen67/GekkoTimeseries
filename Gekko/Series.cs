@@ -2350,7 +2350,7 @@ namespace Gekko
 
                         //we start checking out settings (may be null). These origin from FindIVariableFromString(), will be null in normal expressions etc.
 
-                        if (settings?.create == O.ECreatePossibilities.NoneReturnNull)
+                        if (settings?.create == O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries)
                         {
                             rv = null;  //just return null
                         }

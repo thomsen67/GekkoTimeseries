@@ -933,6 +933,7 @@ namespace Gekko
         public const string decompErrorName2 = "Error";
         public static string decompIgnoreName = "Ignored_78hsgds98dsfus";
         public const string decompIgnoreName2 = "Ignored";
+        public const bool decompFix = true;
 
         public static CommandMemory commandMemory = new CommandMemory();
 

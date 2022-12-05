@@ -3436,7 +3436,7 @@ namespace Gekko
 
         private static void WalkTokensCsSyntaxHelper1(List<string> controlled1, List<List<string>> controlled2, string name)
         {
-            IVariable m = O.GetIVariableFromString("#" + name, O.ECreatePossibilities.NoneReturnNull);
+            IVariable m = O.GetIVariableFromString("#" + name, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
             if (m == null) new Error("Cannot find the list #" + name + " (representing the GAMS set " + name + ")");
             controlled1.Add(name);
             controlled2.Add(new List<string>());

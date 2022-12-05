@@ -1283,6 +1283,11 @@ namespace Gekko
         /// <returns></returns>
         private Series DatabankAHelperScalarModel(Databank db, int aNumber, string name, bool fromDatabankToA, bool isRef)
         {
+            if (name.ToLower().Contains("qxskala"))
+            {
+
+            }
+
             Series ts = null;
 
             string firstRef = "first-position";
@@ -1294,11 +1299,11 @@ namespace Gekko
             string varNameWithFreqAndIndexes = G.Chop_AddFreq(name, freq);
             string varNameWithFreq = G.Chop_GetNameAndFreq(varNameWithFreqAndIndexes);
             int gdxDimensions = dims.Count + 1;
-            int gekkoDimensions; bool isMultiDim;
+            int gekkoDimensions; bool isMultiDimInModel;
             int hasTimeDimension = 1;
-            GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDim);  //calling this is overkill, but binds neatly with other use of the method
-                        
-            if (isMultiDim)
+            GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDimInModel);  //calling this is overkill, but binds neatly with other use of the method
+            
+            if (isMultiDimInModel)
             {
                 Series ats = null;
                 if (fromDatabankToA)
@@ -1309,7 +1314,6 @@ namespace Gekko
                         if (!isRef) this.nonExisting.Add(aNumber);
                         else this.nonExisting_ref.Add(aNumber);
                         return ts;
-                        //new Error("Could not find array-series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
                     }
                     ats = (Series)db.GetIVariable(varNameWithFreq);
                 }
@@ -1329,9 +1333,19 @@ namespace Gekko
                         ats = (Series)db.GetIVariable(varNameWithFreq, true);  //for a scalar model, puts simulated data back to a databank
                     }
                 }
-                
+                                
+                if (ats.type != ESeriesType.ArraySuper)
+                {
+                    //If a model has the array-series x[a], but the databank only has the normal series x.
+                    if (!isRef) this.nonExisting.Add(aNumber);
+                    else this.nonExisting_ref.Add(aNumber);
+                    return ts;
+                }
+
                 MultidimItem mmi = new MultidimItem(dims.ToArray(), ats);
-                IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                IVariable iv = null;                
+                ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                
                 if (iv == null)
                 {
                     if (fromDatabankToA)
@@ -1339,7 +1353,6 @@ namespace Gekko
                         if (!isRef) this.nonExisting.Add(aNumber);
                         else this.nonExisting_ref.Add(aNumber);
                         return ts;
-                        //new Error("In array-series '" + varNameWithFreq + "' in the " + firstRef + " databank, could not find sub-series '" + varNameWithFreqAndIndexes + "'");
                     }
                     ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
                     ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
@@ -1355,6 +1368,13 @@ namespace Gekko
                 if (db.ContainsIVariable(varNameWithFreq))
                 {
                     ts = (Series)db.GetIVariable(varNameWithFreq);
+                    if (ts.type == ESeriesType.ArraySuper)
+                    {
+                        //If a model has the normal series x, but the databank only has the array-series x[...]
+                        if (!isRef) this.nonExisting.Add(aNumber);
+                        else this.nonExisting_ref.Add(aNumber);
+                        return ts;
+                    }
                 }
                 else
                 {
@@ -1363,7 +1383,6 @@ namespace Gekko
                         if (!isRef) this.nonExisting.Add(aNumber);
                         else this.nonExisting_ref.Add(aNumber);
                         return ts;
-                        //new Error("Could not find series '" + varNameWithFreq + "' in the " + firstRef + " databank.");
                     }
                     ts = new Series(freq, varNameWithFreq);
                     db.AddIVariable(ts.name, ts);
