@@ -514,6 +514,7 @@ namespace Gekko
         public static ItemHandler itemHandler = null;  //hack regardig FIND window
         public static string uglyHack_name;  //only for a treeview window
         public static DecompOptions2 uglyHack_decompOptions2;  //only for a treeview window
+        public static string decompIgnoredColor = "LightGreen";
         public static string decompResidualColor = "LightYellow";
         public static string decompErrorColor = "LightRed";
         public static string decompBlueColor = "LightBlue";
@@ -930,6 +931,8 @@ namespace Gekko
         public const string decompResidualName2 = "Residual";
         public static string decompErrorName = "Error_78hsgds98dsfus";
         public const string decompErrorName2 = "Error";
+        public static string decompIgnoreName = "Ignored_78hsgds98dsfus";
+        public const string decompIgnoreName2 = "Ignored";
 
         public static CommandMemory commandMemory = new CommandMemory();
 

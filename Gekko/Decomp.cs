@@ -3600,20 +3600,21 @@ namespace Gekko
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
         private static DecompOutput DecompTableHandleSortAndIgnore(Table table1, DecompOptions2 decompOptions2)
-        {            
+        {
+            bool showIgnoreSum = true;
+
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
 
             string ignore = null;
             List<double> red = new List<double>();
 
-            List<SortHelper> sortHelper = new List<SortHelper>();
+            List<SortHelper> sortHelperStart = new List<SortHelper>();
 
             if (rowsOrCols == ERowsCols.Rows)
             {                
                 for (int i = 3; i <= table1.GetRowMaxNumber(); i++)  //ignore first 2 rows
                 {
-
                     Cell c5 = table1.Get(i, 2);
                     string name2 = c5?.vars_hack?[0];
                     if (name2 == Globals.decompErrorName) continue;  //we always keep the error last no matter sort and ignore                                        
@@ -3622,10 +3623,10 @@ namespace Gekko
                     {
                         Cell c1 = table1.Get(i, j);
                         Cell c2 = table1.Get(2, j);
-                        double d = c1.value_hack / c2.value_hack * 100d;
+                        double d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
                     }
-                    sortHelper.Add(new SortHelper() { position = i, value = max, name = name2 });
+                    sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
             }
             else if (rowsOrCols == ERowsCols.Cols)
@@ -3640,29 +3641,38 @@ namespace Gekko
                     {
                         Cell c1 = table1.Get(i, j);
                         Cell c2 = table1.Get(i, 2);
-                        double d = c1.value_hack / c2.value_hack * 100d;
+                        double d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                         if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
                     }
-                    sortHelper.Add(new SortHelper() { position = j, value = max, name = name2 });
+                    sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }
             }
 
             // ------------------- the following is common for rows vs cols START ------------------------
 
             //maybe ignore
-            List<SortHelper> sortHelper2 = new List<SortHelper>();
+            double ignoreSum = 0d;
+            List<SortHelper> sortHelperNotIgnored = new List<SortHelper>();
+            List<SortHelper> sortHelperIgnored = new List<SortHelper>();
             if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d))
             {
-                foreach (SortHelper sh in sortHelper)
+                foreach (SortHelper sh in sortHelperStart)
                 {
-                    if (sh.value >= decompOptions2.ignore) sortHelper2.Add(sh);
+                    if (sh.value < decompOptions2.ignore)
+                    {
+                        sortHelperIgnored.Add(sh);
+                    }
+                    else
+                    {
+                        sortHelperNotIgnored.Add(sh);
+                    }
                 }
             }
             else
             {
-                sortHelper2.AddRange(sortHelper);
+                sortHelperNotIgnored.AddRange(sortHelperStart);
             }
-            int ignoreCount = sortHelper.Count - sortHelper2.Count;
+            int ignoreCount = sortHelperStart.Count - sortHelperNotIgnored.Count;
             if (ignoreCount > 0)
             {
                 string x = "row" + G.S(ignoreCount);
@@ -3671,14 +3681,14 @@ namespace Gekko
             }
 
             //Maybe sort
-            List<SortHelper> sortHelper3 = new List<SortHelper>();
+            List<SortHelper> sortHelperFinal = new List<SortHelper>();
             if (decompOptions2.sort)
             {
-                sortHelper3.AddRange(sortHelper2.OrderByDescending(x => x.value));
+                sortHelperFinal.AddRange(sortHelperNotIgnored.OrderByDescending(x => x.value));
             }
             else
             {
-                sortHelper3.AddRange(sortHelper2);
+                sortHelperFinal.AddRange(sortHelperNotIgnored);
             }
 
             // ------------------- the preceding is common for rows vs cols END ------------------------
@@ -3696,7 +3706,7 @@ namespace Gekko
                     }
                 }
                 int i1 = 2;
-                foreach (SortHelper sh in sortHelper3)
+                foreach (SortHelper sh in sortHelperFinal)
                 {
                     i1++;
                     int i2 = sh.position;
@@ -3707,10 +3717,39 @@ namespace Gekko
                 }
                 if (decompOptions2.showErrors)
                 {
-                    //get the last row with the errors
+                    //get the last 2 rows with the ignore and errors
                     for (int j = 1; j <= table1.GetColMaxNumber(); j++)
                     {
-                        table2.Set(new Coord(sortHelper3.Count + two + 1, j), table1.Get(table1.GetRowMaxNumber(), j));
+                        int add = 0;                        
+                        if (sortHelperIgnored.Count > 0)
+                        {
+                            add = 1;
+                            Cell c = new Cell();
+                            if (j == 1)
+                            {
+                                c.cellType = CellType.Text;
+                                c.CellText = new Text(Globals.decompIgnoreName2);
+                            }
+                            else
+                            {
+                                c.cellType = CellType.Number;
+                                double sum = 0d;
+                                double sum_hack = 0d;
+                                foreach (SortHelper x in sortHelperIgnored)
+                                {
+                                    sum += table1.Get(x.position, j).number;
+                                    sum_hack += table1.Get(x.position, j).value_hack;
+                                }
+                                c.number = sum;
+                                c.value_hack = sum_hack;
+                                if (decompOptions2.isShares) c.numberFormat = "f16." + decompOptions2.decimalsPch;
+                                else c.numberFormat = "f16." + decompOptions2.decimalsLevel;                                
+                                c.backgroundColor = Globals.decompIgnoredColor;
+                                c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                            }
+                            table2.Set(new Coord(sortHelperFinal.Count + two + 1, j), c);
+                        }                        
+                        table2.Set(new Coord(sortHelperFinal.Count + two + 1 + add, j), table1.Get(table1.GetRowMaxNumber(), j));
                     }
                 }
             }
@@ -3726,7 +3765,7 @@ namespace Gekko
                     }
                 }
                 int j1 = 2;
-                foreach (SortHelper sh in sortHelper3)
+                foreach (SortHelper sh in sortHelperFinal)
                 {
                     j1++;
                     int j2 = sh.position;
@@ -3737,10 +3776,40 @@ namespace Gekko
                 }
                 if (decompOptions2.showErrors)
                 {
-                    //get the last col with the errors
+                    //get the last col with ignore and the errors                    
                     for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
                     {
-                        table2.Set(new Coord(i, sortHelper3.Count + two + 1), table1.Get(i, table1.GetColMaxNumber()));
+
+                        int add = 0;
+                        if (sortHelperIgnored.Count > 0)
+                        {
+                            add = 1;
+                            Cell c = new Cell();
+                            if (i == 1)
+                            {
+                                c.cellType = CellType.Text;
+                                c.CellText = new Text(Globals.decompIgnoreName2);
+                            }
+                            else
+                            {
+                                c.cellType = CellType.Number;
+                                double sum = 0d;
+                                double sum_hack = 0d;
+                                foreach (SortHelper x in sortHelperIgnored)
+                                {
+                                    sum += table1.Get(i, x.position).number;
+                                    sum_hack += table1.Get(i, x.position).value_hack;
+                                }
+                                c.number = sum;
+                                c.value_hack = sum_hack;
+                                if (decompOptions2.isShares) c.numberFormat = "f16." + decompOptions2.decimalsPch;
+                                else c.numberFormat = "f16." + decompOptions2.decimalsLevel;
+                                c.backgroundColor = Globals.decompIgnoredColor;
+                                c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                            }
+                            table2.Set(new Coord(i, sortHelperFinal.Count + two + 1), c);
+                        }
+                        table2.Set(new Coord(i, sortHelperFinal.Count + two + 1 + add), table1.Get(i, table1.GetColMaxNumber()));                        
                     }
                 }
             }

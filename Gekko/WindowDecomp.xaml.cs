@@ -954,6 +954,7 @@ namespace Gekko
                                         
                     string v = c.vars_hack?[0];
                     if (v == Globals.decompErrorName) v = null;
+                    if (v == Globals.decompIgnoreName) v = null;
                     if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
                     {
                         c.backgroundColor = Globals.decompBlueColor;
@@ -1087,10 +1088,7 @@ namespace Gekko
                     Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
                     string v = c.vars_hack?[0];
                     if (v == Globals.decompErrorName) v = null;
-                    //if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
-                    //{
-                    //    isBlue = true;
-                    //}
+                    if (v == Globals.decompIgnoreName) v = null;
 
                     bool isEndogenous = false;
                     if (v != null)
@@ -1138,17 +1136,6 @@ namespace Gekko
                     }
                 }
 
-                //if (type == GekkoTableTypes.TableContent)
-                //{
-                //    Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i, j);
-                //    string v = c.vars_hack?[0];
-                //    if (v == Globals.decompErrorName) v = null;
-                //    if (v != null && this.decompFind.decompOptions2.mergeNewVariables != null && this.decompFind.decompOptions2.mergeNewVariables.Contains(v, StringComparer.OrdinalIgnoreCase))
-                //    {
-                //        isBlue = true;
-                //    }
-                //}
-
                 textBlock.HorizontalAlignment = HorizontalAlignment.Right;
                 if (leftAlign) textBlock.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock.VerticalAlignment = VerticalAlignment.Center;
@@ -1184,6 +1171,12 @@ namespace Gekko
                 {
                     //overrides                                    
                     dockPanel.originalBackgroundColor = new SolidColorBrush(Globals.LightRed);
+                    dockPanel.Background = dockPanel.originalBackgroundColor;
+                }
+                else if (backgroundColor == Globals.decompIgnoredColor)
+                {
+                    //overrides                                    
+                    dockPanel.originalBackgroundColor = new SolidColorBrush(G.Lighter(Colors.LightGreen, 0.85));
                     dockPanel.Background = dockPanel.originalBackgroundColor;
                 }
 
@@ -1746,7 +1739,11 @@ namespace Gekko
                                 {
                                     if (var7 == Globals.decompErrorName)
                                     {
-                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the shown rows (given that 'Ignore' is set at 0%)."));
+                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
+                                    }
+                                    else if (var7 == Globals.decompIgnoreName)
+                                    {
+                                        RichSetText(equation, Decomp.GetColoredEquations("Sum of ignored contributions (cf. the 'Ignore' option)."));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
