@@ -1192,13 +1192,13 @@ namespace Gekko
 
             if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
             {
-                SetRedCircle(g, i, j, type, isRowOrCol, red);
+                SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
             }
         }
 
         //public static double delete = 0.15;
 
-        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues)
+        private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues, DecompOptions2 decompOptions2)
         {
             List<double> thresholds = new List<double>();
             thresholds.Add(0.05);
@@ -1214,7 +1214,17 @@ namespace Gekko
             if (errorValues != null)
             {
                 d = Math.Abs((double)errorValues[ij]);
-                if (d < 0d) d = 0d; if (d > 1d) d = 1d;
+
+                if (Globals.runningOnTTComputer)
+                {
+                    //the method is probably never called with .isRaw==true, but never mind.
+                    if (!decompOptions2.decompOperator.isRaw && decompOptions2.showErrors)
+                    {
+                        if (d > 0.001d) MessageBox.Show("TTH: Error regarding red circles: value = " + errorValues[ij]);
+                    }
+                }
+
+                if (d > 1d) d = 1d;
 
                 //d = delete;                
 
@@ -1853,6 +1863,9 @@ namespace Gekko
                     this.decompFind.decompOptions2 = this.decompFind.decompOptions2Previous;
                     RecalcCellsWithNewTypeHelper(model);
                     RefreshRowsColsFiltersList();
+                    this.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
+                    this.SetRadioButtons();  //revert buttons
+                    this.isInitializing = false;
                 }
             }
             finally

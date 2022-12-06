@@ -1934,7 +1934,7 @@ namespace Gekko
                 Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 windowDecomp.SetRadioButtons();
-                windowDecomp.isInitializing = false;                
+                windowDecomp.isInitializing = false;
 
                 windowDecomp.RecalcCellsWithNewType(decompFind.model);
                 decompFind.decompOptions2.numberOfRecalcs++;  //signal for Decomp() method to move on            
@@ -2789,7 +2789,7 @@ namespace Gekko
                 DecompTableHandleSignAndSharesAndErrors(table, decompOptions2);
             }            
 
-            DecompOutput decompOutput2 = DecompTableHandleSortAndIgnore(table, decompOptions2);
+            DecompOutput decompOutput2 = DecompTableHandleSortAndIgnore(table, decompOptions2, model);
             
             return decompOutput2;
         }
@@ -3510,7 +3510,7 @@ namespace Gekko
                                     tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNullAlways) as Series;                                    
                                     if (tsFirst == null)
                                     {
-                                        string s2 = dictName.Replace("Work:", "").Replace("¤", "");
+                                        string s2 = fullName.Replace("¤", "");
                                         new Error("Could not find variable " + s2 + "");
                                     }
                                     dLevel = tsFirst.GetDataSimple(t2.Add(iLag));
@@ -3524,7 +3524,7 @@ namespace Gekko
                                     tsRef = O.GetIVariableFromString(fullNameRef, O.ECreatePossibilities.NoneReturnNullAlways) as Series;                                    
                                     if (tsRef == null)
                                     {
-                                        string s2 = dictName.Replace("Work:", "").Replace("¤", "");
+                                        string s2 = fullNameRef.Replace("¤", "");
                                         new Error("Could not find variable " + s2 + "");
                                     }
                                     dLevelRef = tsRef.GetDataSimple(t2.Add(iLag));
@@ -3629,11 +3629,8 @@ namespace Gekko
         /// </summary>
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
-        private static DecompOutput DecompTableHandleSortAndIgnore(Table table1, DecompOptions2 decompOptions2)
-        {           
-
-            bool showIgnoreSum = true;
-
+        private static DecompOutput DecompTableHandleSortAndIgnore(Table table1, DecompOptions2 decompOptions2, Model model)
+        {            
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
 
@@ -3895,6 +3892,68 @@ namespace Gekko
                     red.Add(error);  //one for each period
                 }
             }
+
+
+            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    try
+                    {
+                        Cell c = table2.Get(i, j);
+                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
+                        double d = c.number;
+                        if (double.IsNaN(d))
+                        {
+                            bool hit = false;
+                            List<string> xx = c.vars_hack;
+                            foreach (string s in xx)
+                            {
+                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.Get(s);
+                                if (a == -12345) continue;
+
+                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                if (b1) //first-position databank checked
+                                {
+                                    foreach (int a2 in model.modelGamsScalar.nonExisting)
+                                    {
+                                        if (a == a2)
+                                        {
+                                            hit = true;
+                                            goto Lbl1;
+                                        }
+                                    }
+                                }
+
+                                if (b2) //ref databank checked
+                                {
+                                    foreach (int a2 in model.modelGamsScalar.nonExisting_ref)
+                                    {
+                                        if (a == a2)
+                                        {
+                                            hit = true;
+                                            goto Lbl1;
+                                        }
+                                    }
+                                }
+                            }
+                        Lbl1:;
+                            if (hit)
+                            {
+                                c.number = Globals.missingVariableArtificialNumber;
+                                c.numberShouldShowAsN = true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        //if this fails, never mind, just a M instead of a N.
+                    }
+                }
+            }
+            
 
             DecompOutput decompOutput = new DecompOutput(table2, ignore, red);
             return decompOutput;
