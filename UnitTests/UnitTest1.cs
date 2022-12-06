@@ -11031,13 +11031,8 @@ namespace UnitTests
             I("z1 = 0, 0, 0;");
             I("z2 = 0, 1, 0;");
             I("z3 = 1, 2, 5;");
-            Gekko.Table table = null;            
-
-            //ModelGamsScalar.FlushAAndRArrays();
-            //modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            //modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
-
-            //ShowDecompTable();  //will show the following decomp table and then abort
+            Gekko.Table table = null;
+            
             I("decomp <2002 2003 d> y from e1, e2, e3 endo y, c, g;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
@@ -11100,6 +11095,84 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 3).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 4).number, 0.0000d, 0.0001);
+        }
+
+        [TestMethod]
+        public void _Test_DecompSimul2_combis()
+        {
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model <gms> simul3.zip;");
+            I("time 2001 2003;");
+            I("y = 76, 99, 27;");
+            I("c = 60, 80, 20;");
+            I("g = 15, 20, 5;");
+            I("z1 = 0, 0, 0;");
+            I("z2 = 0, 0, 0;");
+            I("z3 = 3, 4, 1;");
+            I("clone;");  //ref
+            I("y = 30, 70, 139;");
+            I("c = 20, 65, 100;");
+            I("g = 5, 15, 25;");
+            I("z1 = 0, 0, 0;");
+            I("z2 = 0, 1, 0;");
+            I("z3 = 1, 2, 5;");
+            Gekko.Table table = null;
+            int i = 0;
+
+            //for <m> we have this table:
+            //            2002      2003
+            // y           -29       112
+            // c           -15        80
+            // g            -5        20
+            // z1            0         0
+            // Residual     -9        12
+            // Error         0         0
+
+            // Combinations, errors always = on, sort always = on.
+            //
+            //   <xm> or <m>
+            //   ignore 0% or 20%
+            //   normal or <count> or <names>
+            //
+            //ShowDecompTable();  //will show the following decomp table and then abort
+
+            I("decomp <2002 2003 errors sort xm ignore=0      > y from e1 endo y;");            
+            table = Globals.lastDecompTable;
+
+            string s = Stringlist.ExtractTextFromLines(table.Print()).ToString();
+
+            i = 2;           
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;       
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+
+            I("decomp <2002 2003 errors sort xm ignore=0 count> y from e1 endo y;");
+            I("decomp <2002 2003 errors sort xm ignore=0 names> y from e1 endo y;");
+
+            I("decomp <2002 2003 errors sort xm ignore=20      > y from e1 endo y;");
+            I("decomp <2002 2003 errors sort xm ignore=20 count> y from e1 endo y;");
+            I("decomp <2002 2003 errors sort xm ignore=20 names> y from e1 endo y;");
+
+            I("decomp <2002 2003 errors sort m ignore=0      > y from e1 endo y;");
+            I("decomp <2002 2003 errors sort m ignore=0 count> y from e1 endo y;");
+            I("decomp <2002 2003 errors sort m ignore=0 names> y from e1 endo y;");
+
+            I("decomp <2002 2003 errors sort m ignore=20      > y from e1 endo y;");
+            I("decomp <2002 2003 errors sort m ignore=20 count> y from e1 endo y;");
+            I("decomp <2002 2003 errors sort m ignore=20 names> y from e1 endo y;");
+
+
+
         }
 
         [TestMethod]

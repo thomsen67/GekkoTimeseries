@@ -3058,7 +3058,6 @@ namespace Gekko
         /// <param name="colnamesFirst"></param>
         private static void DecompPivotOrderRowsAndColumns(DecompOptions2 decompOptions2, int parentI, List<string> rownamesInput, List<string> colnamesInput, out List<string> rownames, out List<string> colnames, out string rownamesFirst, out string colnamesFirst, Model model)
         {
-            bool sort = decompOptions2.sort;
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
 
             //------------------------------------------------
@@ -3651,8 +3650,10 @@ namespace Gekko
                     {
                         Cell c1 = table1.Get(i, j);
                         Cell c2 = table1.Get(2, j);
-                        double d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
+                        double d = 0d;
+                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                        if (!G.isNumericalError(d)) max = Math.Max(max, d);
                     }
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
@@ -3669,8 +3670,10 @@ namespace Gekko
                     {
                         Cell c1 = table1.Get(i, j);
                         Cell c2 = table1.Get(i, 2);
-                        double d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.isNumericalError(d)) max = Math.Max(max, Math.Abs(d));
+                        double d = 0d;
+                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                        if (!G.isNumericalError(d)) max = Math.Max(max, d);                        
                     }
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }
