@@ -11137,11 +11137,10 @@ namespace UnitTests
             //
             //ShowDecompTable();  //will show the following decomp table and then abort
 
+            //string s = Stringlist.ExtractTextFromLines(table.Print()).ToString();
+
             I("decomp <2002 2003 errors sort xm ignore=0      > y from e1 endo y;");            
-            table = Globals.lastDecompTable;
-
-            string s = Stringlist.ExtractTextFromLines(table.Print()).ToString();
-
+            table = Globals.lastDecompTable;            
             i = 2;           
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;       
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
@@ -11157,22 +11156,118 @@ namespace UnitTests
             Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
 
             I("decomp <2002 2003 errors sort xm ignore=0 count> y from e1 endo y;");
+            table = Globals.lastDecompTable;
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+
             I("decomp <2002 2003 errors sort xm ignore=0 names> y from e1 endo y;");
+            table = Globals.lastDecompTable;
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
 
             I("decomp <2002 2003 errors sort xm ignore=20      > y from e1 endo y;");
+            table = Globals.lastDecompTable; //ignore=20 has no effect
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+
             I("decomp <2002 2003 errors sort xm ignore=20 count> y from e1 endo y;");
+            table = Globals.lastDecompTable; //ignore=20 has no effect
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+
             I("decomp <2002 2003 errors sort xm ignore=20 names> y from e1 endo y;");
+            table = Globals.lastDecompTable; //ignore=20 has no effect
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
 
             I("decomp <2002 2003 errors sort m ignore=0      > y from e1 endo y;");
+            table = Globals.lastDecompTable;
+            //string s = Stringlist.ExtractTextFromLines(table.Print()).ToString();
+            i = 2;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Residual | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]"); i++;            
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "z1 | [0]"); i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "Error"); i++;
+            Assert.IsTrue(table.Get(i, 1) == null);
+            i = 2;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightYellow"); i++;
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;            
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "Transparent"); i++;            
+            Assert.IsTrue(table.Get(i, 2).backgroundColor == "LightRed"); i++;
+
             I("decomp <2002 2003 errors sort m ignore=0 count> y from e1 endo y;");
+            table = Globals.lastDecompTable;
+
             I("decomp <2002 2003 errors sort m ignore=0 names> y from e1 endo y;");
+            table = Globals.lastDecompTable;
 
             I("decomp <2002 2003 errors sort m ignore=20      > y from e1 endo y;");
+            table = Globals.lastDecompTable;
+
             I("decomp <2002 2003 errors sort m ignore=20 count> y from e1 endo y;");
+            table = Globals.lastDecompTable;
+
             I("decomp <2002 2003 errors sort m ignore=20 names> y from e1 endo y;");
-
-
-
+            table = Globals.lastDecompTable;
         }
 
         [TestMethod]
