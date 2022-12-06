@@ -3677,7 +3677,7 @@ namespace Gekko
             double ignoreSum = 0d;
             List<SortHelper> sortHelperNotIgnored = new List<SortHelper>();
             List<SortHelper> sortHelperIgnored = new List<SortHelper>();
-            if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d))
+            if (!(double.IsNaN(decompOptions2.ignore) || decompOptions2.ignore == 0d || decompOptions2.decompOperator.isRaw))
             {
                 foreach (SortHelper sh in sortHelperStart)
                 {
@@ -3719,9 +3719,7 @@ namespace Gekko
             Table table2 = new Table();
             table2.writeOnce = true;
             table2.Set(new Coord(1, 1), table1.Get(1, 1));
-
-            var xx = table1.Print();
-
+            
             if (rowsOrCols == ERowsCols.Rows)
             {
                 //copy the first two rows 
