@@ -3007,6 +3007,15 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
         {
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
+            {
+                tab.Set(1, 1, "%" + "  ");
+            }
+            else
+            {
+                tab.Set(1, 1, "");
+            }
+
             for (int i = 0; i < rownames.Count; i++)
             {
                 string s = rownames[i];
@@ -3711,6 +3720,8 @@ namespace Gekko
             table2.writeOnce = true;
             table2.Set(new Coord(1, 1), table1.Get(1, 1));
 
+            var xx = table1.Print();
+
             if (rowsOrCols == ERowsCols.Rows)
             {
                 //copy the first two rows 
@@ -3892,16 +3903,7 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void DecompTableHandleSignAndSharesAndErrors(Table tab, DecompOptions2 decompOptions2)
         {            
-            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);                        
-
-            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
-            {
-                tab.Set(1, 1, "%" + "  ");
-            }
-            else
-            {
-                tab.Set(1, 1, "");
-            }
+            ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);                                    
 
             //
             // ERRORS
