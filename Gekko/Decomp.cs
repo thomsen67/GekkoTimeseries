@@ -3917,25 +3917,19 @@ namespace Gekko
 
                                 if (b1) //first-position databank checked
                                 {
-                                    foreach (int a2 in model.modelGamsScalar.nonExisting)
+                                    if (model.modelGamsScalar.nonExisting.ContainsKey(a))
                                     {
-                                        if (a == a2)
-                                        {
-                                            hit = true;
-                                            goto Lbl1;
-                                        }
+                                        hit = true;
+                                        goto Lbl1;
                                     }
                                 }
 
                                 if (b2) //ref databank checked
                                 {
-                                    foreach (int a2 in model.modelGamsScalar.nonExisting_ref)
+                                    if (model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
                                     {
-                                        if (a == a2)
-                                        {
-                                            hit = true;
-                                            goto Lbl1;
-                                        }
+                                        hit = true;
+                                        goto Lbl1;
                                     }
                                 }
                             }

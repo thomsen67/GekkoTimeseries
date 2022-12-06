@@ -669,8 +669,8 @@ namespace Gekko
         public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
 
-        public List<int> nonExisting = null;
-        public List<int> nonExisting_ref = null;
+        public Dictionary<int, int> nonExisting = null;  //value not used
+        public Dictionary<int, int> nonExisting_ref = null; //value not used
 
         // ------------------------------------
 
@@ -1079,8 +1079,8 @@ namespace Gekko
                 txt.MoreAdd("Some model variables were not found in the databank. For DECOMP, this is only a problem if the variables are part of the decomposed equations.");
                 txt.MoreAdd("The " + this.nonExisting.Count + " missing variables/timeseries are the following:");
                 txt.MoreNewLine();
-                List<int> list = this.nonExisting;
-                if (isRef) list = this.nonExisting_ref;
+                List<int> list = this.nonExisting.Keys.ToList();
+                if (isRef) list = this.nonExisting_ref.Keys.ToList();
                 List<string> names = new List<string>();
                 foreach (int aNumber in list)
                 {
@@ -1154,11 +1154,11 @@ namespace Gekko
 
             if (!isRef)
             {
-                this.nonExisting = new List<int>();
+                this.nonExisting = new Dictionary<int, int>();
             }
             else
             {
-                this.nonExisting_ref = new List<int>();
+                this.nonExisting_ref = new Dictionary<int, int>();
             }
 
             for (int i = 0; i < this.CountVars(2); i++)
@@ -1314,8 +1314,14 @@ namespace Gekko
                     //only reading
                     if (!db.ContainsIVariable(varNameWithFreq))
                     {
-                        if (!isRef) this.nonExisting.Add(aNumber);
-                        else this.nonExisting_ref.Add(aNumber);
+                        if (!isRef)
+                        {
+                            if (!this.nonExisting.ContainsKey(aNumber)) this.nonExisting.Add(aNumber, 0);
+                        }
+                        else
+                        {
+                            if (!this.nonExisting_ref.ContainsKey(aNumber)) this.nonExisting_ref.Add(aNumber, 0);
+                        }
                         return ts;
                     }
                     ats = (Series)db.GetIVariable(varNameWithFreq);
@@ -1340,8 +1346,14 @@ namespace Gekko
                 if (ats.type != ESeriesType.ArraySuper)
                 {
                     //If a model has the array-series x[a], but the databank only has the normal series x.
-                    if (!isRef) this.nonExisting.Add(aNumber);
-                    else this.nonExisting_ref.Add(aNumber);
+                    if (!isRef)
+                    {
+                        if (!this.nonExisting.ContainsKey(aNumber)) this.nonExisting.Add(aNumber, 0);
+                    }
+                    else
+                    {
+                        if (!this.nonExisting_ref.ContainsKey(aNumber)) this.nonExisting_ref.Add(aNumber, 0);
+                    }
                     return ts;
                 }
 
@@ -1353,8 +1365,14 @@ namespace Gekko
                 {
                     if (fromDatabankToA)
                     {
-                        if (!isRef) this.nonExisting.Add(aNumber);
-                        else this.nonExisting_ref.Add(aNumber);
+                        if (!isRef)
+                        {
+                            if (!this.nonExisting.ContainsKey(aNumber)) this.nonExisting.Add(aNumber, 0);
+                        }
+                        else
+                        {
+                            if (!this.nonExisting_ref.ContainsKey(aNumber)) this.nonExisting_ref.Add(aNumber, 0);
+                        }
                         return ts;
                     }
                     ts = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
@@ -1374,8 +1392,14 @@ namespace Gekko
                     if (ts.type == ESeriesType.ArraySuper)
                     {
                         //If a model has the normal series x, but the databank only has the array-series x[...]
-                        if (!isRef) this.nonExisting.Add(aNumber);
-                        else this.nonExisting_ref.Add(aNumber);
+                        if (!isRef)
+                        {
+                            if (!this.nonExisting.ContainsKey(aNumber)) this.nonExisting.Add(aNumber, 0);
+                        }
+                        else
+                        {
+                            if (!this.nonExisting_ref.ContainsKey(aNumber)) this.nonExisting_ref.Add(aNumber, 0);
+                        }
                         return ts;
                     }
                 }
@@ -1383,8 +1407,14 @@ namespace Gekko
                 {
                     if (fromDatabankToA)
                     {
-                        if (!isRef) this.nonExisting.Add(aNumber);
-                        else this.nonExisting_ref.Add(aNumber);
+                        if (!isRef)
+                        {
+                            if (!this.nonExisting.ContainsKey(aNumber)) this.nonExisting.Add(aNumber, 0);
+                        }
+                        else
+                        {
+                            if (!this.nonExisting_ref.ContainsKey(aNumber)) this.nonExisting_ref.Add(aNumber, 0);                         
+                        }
                         return ts;
                     }
                     ts = new Series(freq, varNameWithFreq);
