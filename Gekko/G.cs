@@ -1809,7 +1809,6 @@ namespace Gekko
                 else
                 {
                     new Error("Table format error");
-                    //throw new GekkoException();
                 }
             }
             else
@@ -1827,7 +1826,6 @@ namespace Gekko
                 else
                 {
                     new Error("Table format error");
-                    //throw new GekkoException();
                 }
             }
 

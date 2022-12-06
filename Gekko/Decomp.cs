@@ -3762,20 +3762,34 @@ namespace Gekko
                             }
                             else
                             {
-                                c.cellType = CellType.Number;
-                                double sum = 0d;
-                                double sum_hack = 0d;
-                                foreach (SortHelper x in sortHelperIgnored)
+                                if (decompOptions2.count == ECountType.Names)
                                 {
-                                    sum += table1.Get(x.position, j).number;
-                                    sum_hack += table1.Get(x.position, j).value_hack;
+                                    //c.cellType = CellType.Text;
+                                    //c.CellText.TextData.Add("Ignored");
                                 }
-                                c.number = sum;
-                                c.value_hack = sum_hack;
-                                if (decompOptions2.isShares) c.numberFormat = "f16." + decompOptions2.decimalsPch;
-                                else c.numberFormat = "f16." + decompOptions2.decimalsLevel;                                
-                                c.backgroundColor = Globals.decompIgnoredColor;
-                                c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                                else if (decompOptions2.count == ECountType.N)
+                                {
+                                    c.cellType = CellType.Number;
+                                    c.number = 1d;
+                                    c.numberFormat = "f16.0";
+                                }
+                                else
+                                {
+                                    c.cellType = CellType.Number;
+                                    double sum = 0d;
+                                    double sum_hack = 0d;
+                                    foreach (SortHelper x in sortHelperIgnored)
+                                    {
+                                        sum += table1.Get(x.position, j).number;
+                                        sum_hack += table1.Get(x.position, j).value_hack;
+                                    }
+                                    c.number = sum;
+                                    c.value_hack = sum_hack;
+                                    if (decompOptions2.isShares) c.numberFormat = "f16." + decompOptions2.decimalsPch;
+                                    else c.numberFormat = "f16." + decompOptions2.decimalsLevel;
+                                    c.backgroundColor = Globals.decompIgnoredColor;
+                                    c.vars_hack = new List<string>() { Globals.decompIgnoreName };
+                                }
                             }
                             table2.Set(new Coord(sortHelperFinal.Count + two + 1, j), c);  //ignored
                             table2.Set(new Coord(sortHelperFinal.Count + two + 2, j), table1.Get(table1.GetRowMaxNumber(), j));  //errors
@@ -3936,7 +3950,7 @@ namespace Gekko
                         Lbl1:;
                             if (hit)
                             {
-                                c.number = Globals.missingVariableArtificialNumber;
+                                //c.number = Globals.missingVariableArtificialNumber;
                                 c.numberShouldShowAsN = true;
                             }
                         }

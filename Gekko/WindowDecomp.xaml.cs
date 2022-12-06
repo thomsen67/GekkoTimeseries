@@ -949,6 +949,7 @@ namespace Gekko
                     else if (c.cellType == CellType.Number)
                     {
                         s = G.UpdprtFormat(c.number, xx, false);
+                        if (c.numberShouldShowAsN) s = "N";
                     }
                     else if (c.cellType == CellType.Date) s = c.date;
                                         
@@ -1190,7 +1191,7 @@ namespace Gekko
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
 
-            if (!decompOperator.isRaw && ( isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
+            if (!decompOperator.isRaw && decompFind.decompOptions2.count == ECountType.None && (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
             {
                 SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
             }
