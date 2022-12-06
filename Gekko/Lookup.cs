@@ -120,10 +120,8 @@ namespace Gekko
 
             if (x.Type() == EVariableType.String)
             {
-
                 IVariable rv = null;
                 string x_string = (x as ScalarString).string2;
-
 
                 string dbName, varName, freq; string[] indexes; char firstChar;
                 if (Program.IsListfileArtificialName(x_string))
@@ -150,7 +148,8 @@ namespace Gekko
                     Series iv_series = iv as Series;
                     if (iv_series == null || iv_series.type != ESeriesType.ArraySuper)
                     {
-                        new Error("Expected array-series variable");
+                        string s = G.Chop_AddFreq(varName, freq);
+                        new Error("Expected variable '" + s + "' (from '" + x_string + "') to be an array-series");
                     }
                     rv = iv_series.FindArraySeries(smpl, Stringlist.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
                 }
@@ -169,7 +168,6 @@ namespace Gekko
                 if (items == null)
                 {
                     new Error("The list contains non-string elements");
-                    //throw new GekkoException();
                 }
                 else
                 {
@@ -185,8 +183,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Expected variable name to be a string, but it is of " + G.GetTypeString(x) + " type");
-                //throw new GekkoException();
+                new Error("Expected variable name to be a string, but it is of " + G.GetTypeString(x) + " type");                
             }
             return x;
         }

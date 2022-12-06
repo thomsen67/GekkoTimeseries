@@ -1506,6 +1506,10 @@ namespace Gekko
                     ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
+                        if (ts.type == ESeriesType.ArraySuper)
+                        {
+                            new Error("Did not expect variable '" + name2 + "' to be an array-series");
+                        }
                         ts = (ts.DeepClone(null) as Series);
                         ts.Lag(lag2);
                     }
@@ -1524,6 +1528,10 @@ namespace Gekko
                     Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
+                        if (ts.type == ESeriesType.ArraySuper)
+                        {
+                            new Error("Did not expect variable '" + name2 + "' to be an array-series");
+                        }
                         ts = (ts.DeepClone(null) as Series);
                         ts.Lag(lag2);
                     }

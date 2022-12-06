@@ -1052,8 +1052,11 @@ namespace Gekko
             this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: Loading data to a array: " + G.Seconds(t0));
 
-            if (true)
+            if (false)
             {
+                //?? how to report this ??
+                //   if activated, it will become a popup...
+
                 //Will have depth = 0 here, so ok to write it to screen.
                 if (this.nonExisting.Count > 0)
                 {
