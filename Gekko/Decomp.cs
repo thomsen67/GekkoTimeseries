@@ -2797,10 +2797,9 @@ namespace Gekko
         private static string GetNumberFormat(DecompOptions2 decompOptions2)
         {
             int decimals = 0;
-            if (decompOptions2.decompOperator.isPercentageType) decimals = decompOptions2.decimalsPch;
+            if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares) decimals = decompOptions2.decimalsPch;
             else decimals = decompOptions2.decimalsLevel;
-            string format2 = "f16." + decimals.ToString();
-            return format2;
+            return "f16." + decimals.ToString();
         }
 
         /// <summary>
@@ -3629,7 +3628,9 @@ namespace Gekko
         /// <param name="table1"></param>
         /// <param name="decompOptions2"></param>
         private static DecompOutput DecompTableHandleSortAndIgnoreAndErrors(Table table1, DecompOptions2 decompOptions2, Model model)
-        {            
+        {
+            string numberFormat = GetNumberFormat(decompOptions2);            
+
             ERowsCols rowsOrCols = VariablesOnRowsOrCols(decompOptions2);
             if (rowsOrCols == ERowsCols.None) return new DecompOutput(table1, null, null); //fast return 
 
@@ -3637,7 +3638,7 @@ namespace Gekko
             List<double> red = new List<double>();
 
             // --------------------------------
-            // SORT AND IGNORE
+            // SORT AND IGNORE START
             // --------------------------------
 
             List<SortHelper> sortHelperStart = new List<SortHelper>();            
@@ -3776,68 +3777,11 @@ namespace Gekko
                 }                
             }
 
+            // --------------------------------
+            // SORT AND IGNORE END
+            // --------------------------------
+
             // --------------------- table2 is now sorted and ignored (no errors yet).            
-
-            // ----------------------------------------------
-            // Show non-existing as N, not M
-            // ----------------------------------------------
-
-            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
-            {
-                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
-                {
-                    try
-                    {
-                        Cell c = table2.Get(i, j);
-                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
-                        double d = c.number;
-                        if (double.IsNaN(d))
-                        {
-                            bool hit = false;
-                            List<string> xx = c.vars_hack;
-                            foreach (string s in xx)
-                            {
-                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.Get(s);
-                                if (a == -12345) continue;
-
-                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                if (b1) //first-position databank checked
-                                {
-                                    if (model.modelGamsScalar.nonExisting.ContainsKey(a))
-                                    {
-                                        hit = true;
-                                        goto Lbl1;
-                                    }
-                                }
-
-                                if (b2) //ref databank checked
-                                {
-                                    if (model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
-                                    {
-                                        hit = true;
-                                        goto Lbl1;
-                                    }
-                                }
-                            }
-                        Lbl1:;
-                            if (hit)
-                            {
-                                //c.number = Globals.missingVariableArtificialNumber;
-                                c.numberShouldShowAsN = true;
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        //if this fails, never mind, just a M instead of a N.
-                    }
-                }
-            }
-
-
-
 
             //--> for rows
             //if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
@@ -3936,9 +3880,69 @@ namespace Gekko
             //}
 
 
-            //
+
+            // ----------------------------------------------
+            // Show non-existing variables as N, not M
+            // ----------------------------------------------
+
+            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+            {
+                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                {
+                    try
+                    {
+                        Cell c = table2.Get(i, j);
+                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
+                        double d = c.number;
+                        if (double.IsNaN(d))
+                        {
+                            bool hit = false;
+                            List<string> xx = c.vars_hack;
+                            foreach (string s in xx)
+                            {
+                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.Get(s);
+                                if (a == -12345) continue;
+
+                                bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                if (b1) //first-position databank checked
+                                {
+                                    if (model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                    {
+                                        hit = true;
+                                        goto Lbl1;
+                                    }
+                                }
+
+                                if (b2) //ref databank checked
+                                {
+                                    if (model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                    {
+                                        hit = true;
+                                        goto Lbl1;
+                                    }
+                                }
+                            }
+                        Lbl1:;
+                            if (hit)
+                            {
+                                //c.number = Globals.missingVariableArtificialNumber;
+                                c.numberShouldShowAsN = true;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        //if this fails, never mind, just a M instead of a N.
+                    }
+                }
+            }
+
+            // ------------------------------------------
             // ERRORS
-            //
+            // ------------------------------------------
+
             //Set error row/column, as a sum of rows 2 and on. Also sets count/names on that row/col.
             if (decompOptions2.showErrors && !decompOptions2.decompOperator.isRaw)
             {
@@ -3967,7 +3971,7 @@ namespace Gekko
                         }
                         else
                         {
-                            table2.SetNumber(rowmax + 1, j, sum - target, GetNumberFormat(decompOptions2));
+                            table2.SetNumber(rowmax + 1, j, target - sum, numberFormat);
                         }
 
                         table2.Get(rowmax + 1, j).vars_hack = new List<string>() { Globals.decompErrorName };
@@ -4001,7 +4005,7 @@ namespace Gekko
                         }
                         else
                         {
-                            table2.SetNumber(i, colmax + 1, sum - target, GetNumberFormat(decompOptions2));
+                            table2.SetNumber(i, colmax + 1, target - sum, numberFormat);
                         }
 
                         table2.Get(i, colmax + 1).vars_hack = new List<string>() { Globals.decompErrorName };
