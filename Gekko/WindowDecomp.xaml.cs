@@ -1201,11 +1201,6 @@ namespace Gekko
 
         private static void SetRedCircle(Grid g, int i, int j, GekkoTableTypes type, Decomp.ERowsCols isRowOrCol, List<double> errorValues, DecompOptions2 decompOptions2)
         {
-            List<double> thresholds = new List<double>();
-            thresholds.Add(0.05);
-            thresholds.Add(0.20);
-            thresholds.Add(0.35); //must be 3 of them
-
             int ij = 0;
             if (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) ij = j;
             else if (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left) ij = i;
@@ -1229,10 +1224,10 @@ namespace Gekko
 
                 //d = delete;                
 
-                if (d <= thresholds[0]) { /* do nothing */ }
-                else if (d > thresholds[0] && d <= thresholds[1]) brush.Color = Globals.yellow;
-                else if (d > thresholds[1] && d <= thresholds[2]) brush.Color = Globals.orange;
-                else if (d > thresholds[2]) brush.Color = Globals.red;
+                if (d <= Globals.redThresholds[0]) { /* do nothing */ }
+                else if (d > Globals.redThresholds[0] && d <= Globals.redThresholds[1]) brush.Color = Globals.yellow;
+                else if (d > Globals.redThresholds[1] && d <= Globals.redThresholds[2]) brush.Color = Globals.orange;
+                else if (d > Globals.redThresholds[2]) brush.Color = Globals.red;
 
                 //delete += 0.20;
             }
@@ -1242,7 +1237,7 @@ namespace Gekko
             r.Height = 9;
             r.Fill = brush;
             r.HorizontalAlignment = HorizontalAlignment.Right;
-            if (d > thresholds[0])
+            if (d > Globals.redThresholds[0])
             {
                 //border
                 r.Stroke = new SolidColorBrush(Colors.Gray);
@@ -1258,7 +1253,7 @@ namespace Gekko
             dp.HorizontalAlignment = HorizontalAlignment.Right;
             string xx = "row";
             if (isRowOrCol == Decomp.ERowsCols.Cols) xx = "col";
-            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox (and maybe set 'Ignore' = 0%).";
+            dp.ToolTip = "The relative difference between the value of " + xx + " #1 and the " + Environment.NewLine + "sum of the rest of the " + xx + "s is = " + (errorValues[ij] * 100d).ToString("0.00") + "%" + Environment.NewLine + "Try to click the 'Errors' checkbox.\nThe colors are yellow " + (100 * Globals.redThresholds[0]) + "-" + (100 * Globals.redThresholds[1]) + "%, orange " + (100 * Globals.redThresholds[1]) + "-" + (100 * Globals.redThresholds[2]) + "%, red > " + (100 * Globals.redThresholds[2]) + "%.";
             g.Children.Add(dp);
         }
 

@@ -935,6 +935,7 @@ namespace Gekko
         public const string decompIgnoreName2 = "Ignored";
         public const bool decompFix = true;
         public const bool decompFix2 = true;
+        public static List<double> redThresholds = new List<double>() { 0.05, 0.20, 0.35 }; //must be 3 of them
 
         public static CommandMemory commandMemory = new CommandMemory();
 
