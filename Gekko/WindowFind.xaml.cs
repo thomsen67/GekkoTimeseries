@@ -245,15 +245,14 @@ namespace Gekko
                     string residualName = "residual___";
                     int funcCounter = 0;
 
-                    DecompOperator operatorTemp = this.decompFind.decompOptions2.decompOperator.Clone();
-                    if (operatorTemp.isRaw) operatorTemp = Decomp.GetFindOperator();                    
+                    DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();  //also clones operator                    
+                    if (decompOptionsTemp.decompOperator.isRaw) decompOptionsTemp.decompOperator = Decomp.GetFindOperator();                    
 
                     //!!! a bit of a waste of time, but is probably not significantly slowing
-                    //    down the FIND window.
-                    DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();
+                    //    down the FIND window.                    
                     
                     decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
-                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false, model.modelGamsScalar);
+                    Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, decompOptionsTemp.decompOperator, decompOptionsTemp, false, model.modelGamsScalar);
 
                     //HMMMM [0]
                     //HMMMM [0]
@@ -271,7 +270,7 @@ namespace Gekko
                     if (!Decomp.IsOperatorOneOf3Types(op.type)) return;
 
                     Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.tSelected, this.decompFind.decompOptions2.tSelected, decompOptionsTemp.decompOperator);
-                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, operatorTemp, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
 
                     double max = 0d;
 
