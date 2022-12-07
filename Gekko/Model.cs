@@ -897,7 +897,7 @@ namespace Gekko
                 this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd, t);
                 return this.r[i];
             }
-        }    
+        }
 
         /// <summary>
         /// Get data in GAMS scalar model.
@@ -906,15 +906,20 @@ namespace Gekko
         /// <param name="variable"></param>
         /// <param name="isRef"></param>
         /// <returns></returns>
-        public double GetData(int period, int t, int variable, bool isRef)
+        public double GetData(int period, int t, int variable, bool missingAsZero, bool isRef)
         {
+            //Beware: does missingAsZero==false still slow this down for simations??
             if (isRef)
             {
-                return this.a_ref[period + t][variable];
+                double d = this.a_ref[period + t][variable];
+                if (missingAsZero && double.IsNaN(d)) d = 0d;
+                return d;
             }
             else
             {
-                return this.a[period + t][variable];
+                double d = this.a[period + t][variable];
+                if (missingAsZero && double.IsNaN(d)) d = 0d;
+                return d;
             }
         }
 

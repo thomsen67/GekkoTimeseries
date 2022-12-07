@@ -675,6 +675,11 @@ namespace Gekko
             else if (this.decompFind.decompOptions2.decompOperator.OperatorLower() == "mp")
             {
                 radioButton30.IsChecked = true;
+            }            
+
+            if (this.decompFind.decompOptions2.isShares)
+            {
+                checkBoxShares.IsChecked = true;
             }
 
             if (this.decompFind.decompOptions2.decompOperator.lowLevel == Decomp.ELowLevel.OnlyRef)
@@ -682,9 +687,9 @@ namespace Gekko
                 checkRef.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.isShares)
+            if (this.decompFind.decompOptions2.dyn)
             {
-                checkBoxShares.IsChecked = true;
+                checkBoxDyn.IsChecked = true;
             }
 
             if (this.decompFind.decompOptions2.count == ECountType.N)
@@ -697,9 +702,10 @@ namespace Gekko
                 checkBoxNames.IsChecked = true;
             }
 
-            if (this.decompFind.decompOptions2.dyn)
+            if (this.decompFind.decompOptions2.missingAsZero)
             {
-                checkBoxDyn.IsChecked = true;
+                MessageBox.Show(MissingProblemText());
+                checkMZero.IsChecked = true;
             }
 
             if (this.decompFind.decompOptions2.showErrors)
@@ -2243,10 +2249,28 @@ namespace Gekko
 
         private void checkBoxMZero_Checked(object sender, RoutedEventArgs e)
         {
+            if (!isInitializing)
+            {
+                MessageBox.Show(MissingProblemText());
+                return;
+                this.decompFind.decompOptions2.missingAsZero = true;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private static string MissingProblemText()
+        {
+            return "Option <missing=zero> does not work yet. It must be determined what\nthe option really means (missing input data represented as 0, missing decomp results represented as 0, ...?).";
         }
 
         private void checkBoxMZero_Unchecked(object sender, RoutedEventArgs e)
         {
+            if (!isInitializing)
+            {
+                return;
+                this.decompFind.decompOptions2.missingAsZero = false;
+                RecalcCellsWithNewType(decompFind.model);
+            }
         }
 
         private void checkBox2_Checked(object sender, RoutedEventArgs e)

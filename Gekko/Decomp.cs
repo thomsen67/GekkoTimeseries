@@ -636,7 +636,7 @@ namespace Gekko
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, model);
+                        DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, jj, dsh, decompOptions2.decompOperator, residualName, ref funcCounter, decompOptions2.missingAsZero, model);
                         DecompMainMergeOrAdd(decompDatas, dd, ii, jj);
                     }
                 }
@@ -2420,7 +2420,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, Model model)
+        public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, int linkNumber, DecompStartHelper eqPeriods, DecompOperator op, string residualName, ref int funcCounter, bool missingAsZero, Model model)
         {
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
@@ -2498,8 +2498,8 @@ namespace Gekko
                             y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                             d.cellsQuo[residualName].SetData(t, y1);
                         }
-                        double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, true);
-                        double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, false);
+                        double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
+                        double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
                         int lag2 = dp.date + timeIndex2;
                         string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
@@ -2521,8 +2521,8 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE)].eqNumber, false, tZero + ONE, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t.Add(1), y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, false);
-                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, false);
+                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
+                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, missingAsZero, false);
 
                             try
                             {
@@ -2562,8 +2562,8 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1 + (1 - ONE)].eqNumber, true, tZero + ONE, ref funcCounter);
                                 d.cellsRef[residualName].SetData(t.Add(1), y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, true);
-                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, true);
+                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
+                            double x1 = modelGamsScalar.GetData(dp.date + 1, tZero, dp.variable, missingAsZero, true);
 
                             try
                             {
@@ -2603,8 +2603,8 @@ namespace Gekko
                                 y1 = modelGamsScalar.Eval(eqPeriods.periods[timeIndex1].eqNumber, false, tZero, ref funcCounter);
                                 d.cellsQuo[residualName].SetData(t, y1);
                             }
-                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, true);
-                            double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, false);
+                            double x0_before = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
+                            double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
 
                             try
                             {
