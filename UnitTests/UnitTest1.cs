@@ -11100,6 +11100,10 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompSimul2_combis()
         {
+            //Note: This also tests transposed tables.
+            //      Only the "skeleton" is tested, not values inside tables.
+            //      A good sanity test if something is redsigned.
+
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("model <gms> simul3.zip;");

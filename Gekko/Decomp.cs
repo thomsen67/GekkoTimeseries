@@ -4507,7 +4507,13 @@ namespace Gekko
                 //do nothing
             }
 
-            if (missingAsZero && isScalarModel && G.isNumericalError(d)) d = 0d;
+            if (missingAsZero && isScalarModel)
+            {
+                if (G.isNumericalError(d))
+                {
+                    d = 0d;
+                }
+            }
 
             return d;
         }

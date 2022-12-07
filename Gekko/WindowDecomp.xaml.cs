@@ -1745,11 +1745,11 @@ namespace Gekko
                                 {
                                     if (var7 == Globals.decompErrorName)
                                     {
-                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When the variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
+                                        RichSetText(equation, Decomp.GetColoredEquations("Errors originating from possible non-linearities in the equation (for a linear equation, these errors are = 0). When variables are shown on rows, the error value is computed so that the first row equals the sum of the rest of the rows."));
                                     }
                                     else if (var7 == Globals.decompIgnoreName)
-                                    {
-                                        RichSetText(equation, Decomp.GetColoredEquations("Sum of ignored contributions (cf. the 'Ignore' option)."));
+                                    {                                        
+                                        RichSetText(equation, Decomp.GetColoredEquations("Ignored contributions (" + this.textBlockIgnore.Text + "), cf. the 'Ignore' option."));
                                     }
                                     else if (var7.StartsWith(Globals.decompResidualName) && number >= 0)
                                     {
