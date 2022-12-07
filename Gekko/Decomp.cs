@@ -1525,7 +1525,7 @@ namespace Gekko
 
                 if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
                 {
-                    Series ts = O.GetIVariableFromString(name2.Replace("Work:", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    Series ts = O.GetIVariableFromString(name2.Replace(Globals.WWW + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
@@ -3558,7 +3558,7 @@ namespace Gekko
                         FrameLightRow dr = new FrameLightRow(frame);
                         //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
 
-                        string dictName2 = dictName.Replace("Work:", "").Replace("¤[0]", "");
+                        string dictName2 = dictName.Replace(Globals.WWW + ":", "").Replace("¤[0]", "");
 
                         dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                         dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));

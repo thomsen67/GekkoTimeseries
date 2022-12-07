@@ -704,7 +704,11 @@ namespace Gekko
 
             if (this.decompFind.decompOptions2.missingAsZero)
             {
-                MessageBox.Show(MissingProblemText());
+                if (false)
+                {
+                    //We allow this without complaints here
+                    MessageBox.Show(MissingProblemText());
+                }
                 checkMZero.IsChecked = true;
             }
 
@@ -2252,7 +2256,6 @@ namespace Gekko
             if (!isInitializing)
             {
                 MessageBox.Show(MissingProblemText());
-                return;
                 this.decompFind.decompOptions2.missingAsZero = true;
                 RecalcCellsWithNewType(decompFind.model);
             }
@@ -2266,8 +2269,7 @@ namespace Gekko
         private void checkBoxMZero_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                return;
+            {                
                 this.decompFind.decompOptions2.missingAsZero = false;
                 RecalcCellsWithNewType(decompFind.model);
             }
