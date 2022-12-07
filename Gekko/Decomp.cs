@@ -72,7 +72,7 @@ namespace Gekko
         public string OperatorLower()
         {
             return this.operatorLower;
-        }
+        }        
 
         public DecompOperator(string x)
         {
@@ -3166,6 +3166,35 @@ namespace Gekko
                     new Error("Both row and col are set first for normalization");
                 }
             }
+        }
+
+        /// <summary>
+        /// Tries 'm' if databanks are reasonable, else 'd'
+        /// </summary>
+        /// <returns></returns>
+        public static DecompOperator GetFindOperator()
+        {
+            bool canUseM = false;
+            int w = Program.databanks.GetFirst().storage.Count;
+            int r = Program.databanks.GetRef().storage.Count;
+            if (w != 0 && r != 0)
+            {
+                double rel = (double)w / (double)r;
+                if (rel > 0.9d && rel < 1.1d) canUseM = true;
+            }
+
+            DecompOperator z = null;
+            if (Globals.useMAsDefaultOperatorInFindWindow && canUseM)
+            {
+                //if Work or Ref are empty, or if Ref is not of approximate same size
+                //as Work, we will not use "m" but instead "d".                            
+                z = new DecompOperator("m");
+            }
+            else
+            {
+                z = new DecompOperator("d");
+            }
+            return z;
         }
 
         /// <summary>

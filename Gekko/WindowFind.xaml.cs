@@ -244,15 +244,14 @@ namespace Gekko
 
                     string residualName = "residual___";
                     int funcCounter = 0;
+
                     DecompOperator operatorTemp = this.decompFind.decompOptions2.decompOperator.Clone();
+                    if (operatorTemp.isRaw) operatorTemp = Decomp.GetFindOperator();                    
 
                     //!!! a bit of a waste of time, but is probably not significantly slowing
                     //    down the FIND window.
                     DecompOptions2 decompOptionsTemp = this.decompFind.decompOptions2.Clone();
-
-                    //decompOptionsTemp.link.Clear();
-                    //decompOptionsTemp.link.Add(new Link());
-
+                    
                     decompOptionsTemp.new_from = new List<string>() { G.Chop_DimensionRemoveLast(eqName) };
                     Decomp.PrepareEquations(decompOptionsTemp.t1, decompOptionsTemp.t2, operatorTemp, decompOptionsTemp, false, model.modelGamsScalar);
 

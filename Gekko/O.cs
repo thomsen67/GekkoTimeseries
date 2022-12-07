@@ -8096,36 +8096,17 @@ namespace Gekko
                     this.decompFind.decompOptions2.t1 = this.t1;
                     this.decompFind.decompOptions2.t2 = this.t2;
                     if (this.opt_prtcode == null)
-                    {
-                        bool canUseM = false;
-                        int w = Program.databanks.GetFirst().storage.Count;
-                        int r = Program.databanks.GetRef().storage.Count;
-                        if (w != 0 && r != 0)
-                        {
-                            double rel = (double)w / (double)r;
-                            if (rel > 0.9d && rel < 1.1d) canUseM = true;
-                        }
-
-                        if (Globals.useMAsDefaultOperatorInFindWindow && canUseM)
-                        {
-                            //if Work or Ref are empty, or if Ref is not of approximate same size
-                            //as Work, we will not use "m" but instead "d".                            
-                            this.decompFind.decompOptions2.decompOperator = new DecompOperator("m");
-                        }
-                        else
-                        {
-                            this.decompFind.decompOptions2.decompOperator = new DecompOperator("d");
-                        }
+                    {                        
+                        this.decompFind.decompOptions2.decompOperator = Decomp.GetFindOperator();
                     }
                     else
                     {
                         this.decompFind.decompOptions2.decompOperator = new DecompOperator(this.opt_prtcode.ToLower());
                     }
-                    //this.decompFind.model.type = G.GetModelType();
                 }                                
                 G.CheckLegalPeriod(this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2);
                 Decomp.Find(this);
-            }
+            }            
         }
 
         public class Show
