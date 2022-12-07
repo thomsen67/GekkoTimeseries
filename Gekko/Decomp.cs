@@ -502,7 +502,14 @@ namespace Gekko
                         decompOptions2.link.Add(link);
                     }
                 }
-            }            
+            }
+
+            if (o.decompFind.decompOptions2.isShares && o.decompFind.decompOptions2.decompOperator.isRaw)
+            {
+                MessageBox.Show("DECOMP: You cannot mix option <shares> with 'Raw' operators like <xn>, <xd>, <xm>, etc.");
+                return;
+            }
+
             Decomp.DecompGetFuncExpressionsAndRecalc(o.decompFind, null);            
         }        
 
@@ -965,7 +972,7 @@ namespace Gekko
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in decompOptions2.link[0].endo)
             {
-                string s2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(s, 0);
+                string s2 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
                 if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
             }
 
@@ -1149,7 +1156,7 @@ namespace Gekko
                         decompDatas.MAIN_data = dd;
                     }
 
-                    string s3 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(s, 0);
+                    string s3 = DecompFirst() + ":" + ConvertToTurtleName(s, 0);
 
                     Series ts = GetDecompDatas(decompDatas.MAIN_data, operatorOneOf3Types)[s3];
                     ts.SetData(t, 1d);
@@ -1198,7 +1205,7 @@ namespace Gekko
                 foreach (string s in decompOptions2.link[0].endo)
                 {
                     //Transforms from for instance Work:x¤[+1] into Work:x¤[2002].
-                    string x = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(s, 0, t);
+                    string x = DecompFirst() + ":" + ConvertToTurtleName(s, 0, t);
                     if (!endo.ContainsKey(x))
                     {
                         int c = endo.Count;
@@ -1293,8 +1300,8 @@ namespace Gekko
                             {
                                 string varName = modelGamsScalar.GetVarNameA(dp.variable);
                                 int date = dp.date;
-                                string x1 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.tBasis);
-                                string x2 = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, date + add - t.Subtract(modelGamsScalar.tBasis));
+                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.tBasis);
+                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add - t.Subtract(modelGamsScalar.tBasis));
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -1525,7 +1532,7 @@ namespace Gekko
 
                 if (!decompDatas.MAIN_data.cellsRef.ContainsKey(name))
                 {
-                    Series ts = O.GetIVariableFromString(name2.Replace(Globals.WWW + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    Series ts = O.GetIVariableFromString(name2.Replace(DecompFirst() + ":", "Ref:"), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
                     if (ts != null)
                     {
                         if (ts.type == ESeriesType.ArraySuper)
@@ -1629,7 +1636,7 @@ namespace Gekko
             {
                 string s = kvp.Key;
                 string[] ss = s.Split('¤');
-                string s2 = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                string s2 = G.Chop_RemoveBank(ss[0], DecompFirst());
                 if (Program.IsDecompResidualName(s2))
                 {
                     //TODO TODO TODO
@@ -2501,7 +2508,7 @@ namespace Gekko
                         double x0 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, true);
                         double x1 = modelGamsScalar.GetData(dp.date, tZero, dp.variable, missingAsZero, false);
                         int lag2 = dp.date + timeIndex2;
-                        string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                        string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                         d.cellsRef[name].SetData(t, x0);
                         d.cellsQuo[name].SetData(t, x1);
                         if (!vars.ContainsKey(name))  //for decomp pivot
@@ -2536,7 +2543,7 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -2577,7 +2584,7 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsRef[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
                                     d.cellsGradRef[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
@@ -2618,7 +2625,7 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
-                                    string name = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(varName, lag2);
+                                    string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsRef[name].SetData(t, x0_before);
                                     d.cellsQuo[name].SetData(t, x1);
                                     d.cellsGradRef[name].SetData(t, grad);
@@ -2695,6 +2702,11 @@ namespace Gekko
             }
 
             return d;
+        }
+
+        public static string DecompFirst()
+        {
+            return Program.databanks.GetFirst().name;
         }
 
         private static void DecompInitDict(DecompData d)
@@ -3449,7 +3461,7 @@ namespace Gekko
 
                         //See #876435924365              
                         string bank2 = dbName;
-                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                        if (G.Equal(DecompFirst(), dbName)) bank2 = null;
                         string name2 = O.UnChop(null, varName, null, indexes);
 
                         double dLevel = double.NaN;
@@ -3558,7 +3570,7 @@ namespace Gekko
                         FrameLightRow dr = new FrameLightRow(frame);
                         //dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
 
-                        string dictName2 = dictName.Replace(Globals.WWW + ":", "").Replace("¤[0]", "");
+                        string dictName2 = dictName.Replace(DecompFirst() + ":", "").Replace("¤[0]", "");
 
                         dr.Set(frame, Globals.col_fullVariableName, new CellLight(dictName2));
                         dr.Set(frame, Globals.col_equ, new CellLight(super.ToString()));
@@ -4151,8 +4163,8 @@ namespace Gekko
 
                     bool isResidualName = name == Globals.decompResidualName;
 
-                    string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                    string name2 = Program.databanks.GetFirst().name + ":" + name;
+                    string name1 = DecompFirst() + ":" + name + "¤[0]";  //what about lags in eqs??
+                    string name2 = DecompFirst() + ":" + name;
                     string name2Ref = Program.databanks.GetRef().name + ":" + name;
 
                     if (GetDecompDatas(decompDatasSupremeClone, operatorOneOf3Types).ContainsKey(name1))
@@ -4320,7 +4332,7 @@ namespace Gekko
             int zero = 0;
             DecompData d = decompDatasSupremeClone;
             string name = decompOptions2.link[parentI].varnames;
-            d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
+            d.lhs = DecompFirst() + ":" + ConvertToTurtleName(name, 0);  //lag = 0
 
             if (!decompOptions2.decompOperator.isRaw)
             {

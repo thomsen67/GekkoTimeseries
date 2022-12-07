@@ -936,8 +936,7 @@ namespace Gekko
         public const bool decompFix = true;
         public const bool decompFix2 = true;
         public static List<double> redThresholds = new List<double>() { 0.05, 0.20, 0.35 }; //must be 3 of them
-        public const string WWW = "Work";
-
+        
         public static CommandMemory commandMemory = new CommandMemory();
 
         public static List<string> bugfixMissing1 = new List<string>();

@@ -242,7 +242,7 @@
             </DockPanel>
 
             <DockPanel Grid.ColumnSpan="2" Grid.Row="0" Grid.Column="8">
-                <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares Work and Ref databanks">Multiplier</TextBlock>
+                <TextBlock TextWrapping="Wrap" FontSize="13" FontFamily="Calibri" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="Compares first-position and reference databanks">Multiplier</TextBlock>
             </DockPanel>
 
             <DockPanel Grid.Row="1" Grid.Column="8">

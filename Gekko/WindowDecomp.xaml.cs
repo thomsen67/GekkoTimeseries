@@ -1201,7 +1201,15 @@ namespace Gekko
             dockPanel.SetValue(Grid.RowProperty, i);
             g.Children.Add(dockPanel);
 
-            if (!decompOperator.isRaw && decompFind.decompOptions2.count == ECountType.None && (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left))
+            bool b1 = !decompOperator.isRaw;
+            bool b2 = decompFind.decompOptions2.count == ECountType.None;
+            bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);
+            bool b4 = false;
+            if (decompFind.decompOptions2.rows.Contains(Globals.col_variable) && decompFind.decompOptions2.cols.Contains(Globals.col_t)) b4 = true;
+            if (decompFind.decompOptions2.rows.Contains(Globals.col_t) && decompFind.decompOptions2.rows.Contains(Globals.col_variable)) b4 = true;
+            //b4: to do red lamp, there must be both vars and time, and they must be on separate row/col.
+
+            if (b1 && b2 && b3 && b4)
             {
                 SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
             }
@@ -1226,7 +1234,10 @@ namespace Gekko
                     //the method is probably never called with .isRaw==true, but never mind.
                     if (!decompOptions2.decompOperator.isRaw && decompOptions2.showErrors)
                     {
-                        if (d > 0.001d) MessageBox.Show("TTH: Error regarding red circles: value = " + errorValues[ij]);
+                        if (d > 0.001d)
+                        {
+                            MessageBox.Show("TTH: Error regarding red circles: value = " + errorValues[ij]);
+                        }
                     }
                 }
 
@@ -2529,7 +2540,7 @@ namespace Gekko
             foreach (string s in varsNew)
             {
                 //TODO: there must be a method for this...
-                varsNew2.Add(s.Replace("Work:", "").Replace("¤[0]", ""));  //keep the ¤ for lags
+                varsNew2.Add(s.Replace(Decomp.DecompFirst() + ":", "").Replace("¤[0]", ""));  //keep the ¤ for lags
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            
