@@ -221,10 +221,7 @@ namespace Gekko
             }
             string rv = null;
             if (this.modelGams != null)
-            {
-                //rv += two.s1 + "\r";
-                //rv += "------------- scalar -------------" + "\r" + "\r" + s2 + "\r";
-                //rv += "-------------- GAMS --------------" + "\r" + "\r" + two.s2 + "\r";
+            {                
                 rv += two.s1 + G.NL;
                 rv += "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL;
                 rv += "-------------- GAMS --------------" + G.NL + G.NL + two.s2 + G.NL;

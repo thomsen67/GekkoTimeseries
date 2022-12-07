@@ -1234,7 +1234,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Add new black block.
+        /// Add new colored block.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="color"></param>
