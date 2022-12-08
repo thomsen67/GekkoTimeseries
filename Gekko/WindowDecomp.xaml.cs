@@ -1990,6 +1990,10 @@ namespace Gekko
                 }
 
                 //note, maybe just take name from o object?
+
+                //o.opt_key = "out horiz bot center Left reverse height 1";
+                //o.opt_key = "out vertical right center Left reverse height 1";
+                o.opt_key = "out vertical right center Left reverse height 1";
                 string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), true, smpl.p);
                 //webBrowser.Source = new Uri("file:///c:/Thomas/Gekko/regres/Doc_browser/browser/vars/tfon.svg");
                 webBrowser.Source = new Uri(svgFile);
