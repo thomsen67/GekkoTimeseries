@@ -9273,34 +9273,25 @@ namespace Gekko
                 }
             }
 
-
-
             public class Element
             {
-                public List<O.RecordedPieces> labelRecordedPieces = null;
-
-                //public List labelGiven2 = null;  //this one is inputted                 
-                public List<string> labelGiven = null;  //this one is created from the one above
-                
+                public List<O.RecordedPieces> labelRecordedPieces = null;                               
+                public List<string> labelGiven = null;  //this one is created from the one above                
                 public List<string> labelOLD = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.                
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string endoExoIndicator = null;
                 //-- layout
                 public List<OptString> operators = new List<OptString>();
-
                 public List<string> operatorsFinal = null;
                 public string operatorFinal = null;
-
                 public int width = -12345;
                 public int dec = -12345;
                 public int nwidth = -12345;
                 public int ndec = -12345;
                 public int pwidth = -12345;
                 public int pdec = -12345;
-
                 public int widthFinal = -12345;
                 public int decFinal = -12345;
-
                 //--- plot
                 public string linetype = null;
                 public string dashtype = null;
@@ -9311,16 +9302,9 @@ namespace Gekko
                 public string fillstyle = null;
                 public string y2 = null;
                 //--- errors
-                public List<string> errors = new List<string>();
-
-                //public double min = double.MaxValue;
-                //public double max = double.MinValue;
-                                
-            }
-
-            
+                public List<string> errors = new List<string>();                                
+            }            
         }
-
 
         public class PrtContainer
         {

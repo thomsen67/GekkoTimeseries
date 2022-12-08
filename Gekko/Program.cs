@@ -23168,8 +23168,8 @@ namespace Gekko
                         d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     i++;
-                    double tt = ((ScalarVal)Functions.helper_time(t)).val;
-                    if (freqHere == EFreq.A) tt += 0.5d;  //annual years should be 2020.5 to be centered correctly
+
+                    double tt = PlotTableTime(freqHere, t);
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
                     //We skip the j=1 column, so the following logic applies, if there are n variables
@@ -23186,6 +23186,18 @@ namespace Gekko
             return plotTable;
         }
 
+        /// <summary>
+        /// Concert a GekkoTime into a PLOT-suitable double.
+        /// </summary>
+        /// <param name="freqHere"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private static double PlotTableTime(EFreq freqHere, GekkoTime t)
+        {
+            double tt = ((ScalarVal)Functions.helper_time(t)).val;
+            if (freqHere == EFreq.A) tt += 0.5d;  //annual years should be 2020.5 to be centered correctly
+            return tt;
+        }
 
 
         public static void NonSeriesHandling(O.Prt oPrt)

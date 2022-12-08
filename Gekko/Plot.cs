@@ -14,7 +14,7 @@ namespace Gekko
 {
     public static class Plot
     {
-        public static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, P pp)
+        public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, bool showWindow, P p)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -68,7 +68,6 @@ namespace Gekko
             if (count == 0)
             {
                 new Error("PLOT called with 0 variables");
-                //throw new GekkoException();
             }
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
             int rr = Program.RandomInt();
@@ -88,8 +87,8 @@ namespace Gekko
                 if (Program.options.plot_using != "")
                 {
                     string fileName = Program.options.plot_using;
-                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
-                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, pp);
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
+                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, p);
                     fileName = ffh.realPathAndFileName;
                     if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 
@@ -101,7 +100,7 @@ namespace Gekko
                         doc1.LoadXml(xmlText);
                     }
                     catch (Exception e)
-                    {                        
+                    {
                         new Error("Plot template file: '" + fileName + "'. " + Program.GetXmlError(e, fileName));
                     }
                 }
@@ -115,10 +114,10 @@ namespace Gekko
                     {
                         Program.SelectFile(Globals.extensionPlot, ref fileName, ref cancel);
                     }
-                    if (cancel) return;
+                    if (cancel) return null;
 
-                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
-                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, pp);
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
+                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, p);
                     fileName = ffh.realPathAndFileName;
                     if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 
@@ -130,7 +129,7 @@ namespace Gekko
                         doc2.LoadXml(xmlText);
                     }
                     catch (Exception e)
-                    {                        
+                    {
                         new Error("Plot template file: '" + fileName + "'. " + Program.GetXmlError(e, fileName));
                     }
                 }
@@ -332,7 +331,6 @@ namespace Gekko
             {
                 //this should not be possible, but in any case...
                 new Error("PLOT gpt palette is empty");
-                //throw new GekkoException();
             }
 
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
@@ -349,7 +347,6 @@ namespace Gekko
                 linewidthCorrection = 2d / 3d;
                 pointsizeCorrection = 2d / 3d;
             }
-
 
             List<int> boxesY = new List<int>();
             List<int> boxesY2 = new List<int>();
@@ -373,8 +370,6 @@ namespace Gekko
             // ---------------------------------------
             // ---------------------------------------
 
-            //double[] dataMin = new double[containerExplode.Count];
-            //double[] dataMax = new double[containerExplode.Count];
             List<string> labelsNonBroken = new List<string>();
             for (int j = 0; j < count; j++)
             {
@@ -463,8 +458,8 @@ namespace Gekko
                 fontfactor = .8d;
             }
 
-            double siz1 = (1.5d * zoom * fontsize * fontfactor);
-            double siz2 = (zoom * fontsize * fontfactor);
+            double siz1 = 1.5d * zoom * fontsize * fontfactor;
+            double siz2 = zoom * fontsize * fontfactor;
 
             string bold2 = "";
             if (bold != null) bold2 = bold.Replace(" ", "").ToLower();
@@ -475,7 +470,6 @@ namespace Gekko
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
                     new Error("<bold = '...'> must be title, ytitle, xtics, ytics or key");
-                    //throw new GekkoException();
                 }
             }
             string title_bold = null; if (bold3.Contains("title")) title_bold = " Bold";
@@ -498,7 +492,6 @@ namespace Gekko
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
                     new Error("<italic = '...'> must be title, ytitle, xtics, ytics or key");
-                    //throw new GekkoException();
                 }
             }
 
@@ -692,8 +685,6 @@ namespace Gekko
                 txt.AppendLine("");
             }
 
-            //string plotline = null;
-
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
@@ -734,85 +725,17 @@ namespace Gekko
             // ---------------------------------------
             // ---------------------------------------
             string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
-
             txt.AppendLine(plotline);
 
-            using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {
-                tw.WriteLine(txt);
-                tw.Flush(); //probably not necessary
-                tw.Close(); //probably not necessary
-            }
+            string emfName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
 
-            if (G.Equal(o.opt_dump, "yes"))
-            {
-                try
-                {
-                    File.Copy(fileGp, Program.options.folder_working + "\\" + "gekkoplot.gp", true);
-                    File.Copy(fileData, Program.options.folder_working + "\\" + "gekkoplot.dat", true);
-                    string text = null;
-                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
-                    text = text.Replace("temp" + rr, "gekkoplot");
-                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
-                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
-                    text = text.Replace("temp" + rr, "gekkoplot");
-                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
-                    G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
+            CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
 
-                }
-                catch
-                {
-                    new Warning("PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
-                }
-            }
+            return emfName;
+        }
 
-            string emfName = path + "\\" + file2;
-            string exe = "wgnuplot51.exe";
-
-            Process p = new Process();
-            if (G.IsUnitTesting())
-            {
-                p.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
-            }
-            else
-            {
-                p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\" + exe;
-            }
-            //NOTE: quotes added because this path may contain blanks
-            p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
-            bool msg = false;
-            bool exited = false;
-            try
-            {
-                p.Start();
-                exited = p.WaitForExit(1 * 60 * 1000);  //1 minute, has been > 5 sec at DORS
-                if (!exited)
-                {
-                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 60 seconds, so the " + G.NL + "gnuplot call was aborted.");
-                    msg = true;
-                    throw new GekkoException();
-                }
-                else if (p.ExitCode != 0)
-                {
-                    MessageBox.Show("*** ERROR: The generated gnuplot script file had an unexpected error. If you use PLOT<dump>, Gekko will dump \nthe files gekkoplot.gp and gekkoplot.dat in the working folder. \nThese files can be tried out in gnuplot 5.1, to locate the error \n(by means of 'load gekkoplot.gp' in gnuplot).");
-                    msg = true;
-                    throw new GekkoException();
-                }
-            }
-            catch (Exception e)
-            {
-                if (exited && !msg)
-                {
-                    MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);
-                }
-                throw;
-            }
-
-            p.Close();
-            //resets current dir to previous location
-            Directory.SetCurrentDirectory(currentDir);
-
+        private static void CallGnuplotMakeWindow(O.Prt o, List<string> labelsNonBroken, string emfName)
+        {
             if (o.opt_filename != null && o.opt_filename != "")
             {
                 string fileNameWithPath = Program.CreateFullPathAndFileName(o.opt_filename);
@@ -909,6 +832,88 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string CallGnuplot2(O.Prt o, int rr, string file2, string file3, string currentDir, string path, string fileGp, string fileData, StringBuilder txt)
+        {
+            using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter tw = G.GekkoStreamWriter(fs))
+            {
+                tw.WriteLine(txt);
+                tw.Flush(); //probably not necessary
+                tw.Close(); //probably not necessary
+            }
+
+            if (G.Equal(o.opt_dump, "yes"))
+            {
+                try
+                {
+                    File.Copy(fileGp, Program.options.folder_working + "\\" + "gekkoplot.gp", true);
+                    File.Copy(fileData, Program.options.folder_working + "\\" + "gekkoplot.dat", true);
+                    string text = null;
+                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
+                    text = text.Replace("temp" + rr, "gekkoplot");
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
+                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
+                    text = text.Replace("temp" + rr, "gekkoplot");
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
+                    G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
+
+                }
+                catch
+                {
+                    new Warning("PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
+                }
+            }
+
+            string emfName = path + "\\" + file2;
+            string exe = "wgnuplot51.exe";
+
+            Process process = new Process();
+            if (G.IsUnitTesting())
+            {
+                process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
+            }
+            else
+            {
+                process.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\" + exe;
+            }
+
+            //NOTE: quotes added because this path may contain blanks
+            process.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
+            bool msg = false;
+            bool exited = false;
+            try
+            {
+                process.Start();
+                exited = process.WaitForExit(1 * 60 * 1000);  //1 minute, has been > 5 sec at DORS
+                if (!exited)
+                {
+                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 60 seconds, so the " + G.NL + "gnuplot call was aborted.");
+                    msg = true;
+                    throw new GekkoException();
+                }
+                else if (process.ExitCode != 0)
+                {
+                    MessageBox.Show("*** ERROR: The generated gnuplot script file had an unexpected error. If you use PLOT<dump>, Gekko will dump \nthe files gekkoplot.gp and gekkoplot.dat in the working folder. \nThese files can be tried out in gnuplot 5.1, to locate the error \n(by means of 'load gekkoplot.gp' in gnuplot).");
+                    msg = true;
+                    throw new GekkoException();
+                }
+            }
+            catch (Exception e)
+            {
+                if (exited && !msg)
+                {
+                    MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);
+                }
+                throw;
+            }
+
+            process.Close();
+
+            //resets current dir to previous location
+            Directory.SetCurrentDirectory(currentDir);
+            return emfName;
         }
 
         private static string GetText(XmlNode x, string def)
