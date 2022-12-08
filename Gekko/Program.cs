@@ -1928,6 +1928,13 @@ namespace Gekko
 
             if (false && Globals.runningOnTTComputer)
             {
+                //string ss = "100\t2\t3.3\t4\t3\t123456.78\t1234567.89\t12345678.91\t123456789.12\t1234567891.23\tabc\t4\r\n2\t3234234.2342343243\t123456.7811\t1234567.8911\t12345678.9111\t123456789.1211\t1234567891.2311\tdef\t3\t2.345\t3\t4";
+                string ss = "100\t2\t3.3\t4\t3\t1234567.89\t12345678.91\t123456789.12\t1234567891.23\tabc\t4\r\n2\t3234234.2342343243\tNB\t777777.7777e-13\t1234567.891\t12345678.911\t123456789.121\t1234567891.231\tdef\t3\t2.345\t3\t4";
+                Clipboard.SetText(ss, TextDataFormat.Text);
+            }
+
+            if (false && Globals.runningOnTTComputer)
+            {
                 DateTime dt0 = DateTime.Now;
                 long j = 1;
                 for (int i = 0; i < 1e6; i++)
@@ -24388,10 +24395,18 @@ namespace Gekko
             Globals.excelDnaData = new ExcelDnaData { cells = cells };
         }
 
+        /// <summary>
+        /// Format a double for use as string on clipboard. Respects Program.options.interface_clipboard_decimalseparator.
+        /// When pasting to Excel, make sure that decimalseparator there conforms to Program.options.interface_clipboard_decimalseparator,
+        /// and also that 1000-separator is the inverse value. Otherwise it is chaos.
+        /// </summary>
+        /// <param name="d2"></param>
+        /// <returns></returns>
         public static string PrepareDataForClipboard(double d2)
         {
-            string s2 = d2.ToString(CultureInfo.InvariantCulture);  //should always be "." with this locale corresponding to US style (is used also for PRT etc)
-
+            string s2 = null;            
+            s2 = d2.ToString(CultureInfo.InvariantCulture);  //should always be "." with this locale corresponding to US style (is used also for PRT etc)
+            
             if (s2.Contains(",") && s2.Contains("."))
             {
                 if (s2.IndexOf(",") < s2.IndexOf("."))
