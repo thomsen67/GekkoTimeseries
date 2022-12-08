@@ -62,17 +62,22 @@ namespace Gekko
             double zoom = 1d;
 
             double decompFontFactor = 1d;
-            string decompSize = " ";
+            string decompSvgSize = " ";
+            string decompMargin = null;
+            double decompXZoom = 1d;
+            string key2 = null;
             if (isDecomp)
-            {
+            {                
                 //Should in principle be possible to use zoom instead of these hacks, but it does not work,
                 //investigate at some point...                
                 double d = 1.0;  //overall size of canvas, relative to 600x480
                 decompFontFactor = d * 1.6; //size of fonts
-                //zoom *= 1.5;
-                int i1 = (int)(600d * d);
+                decompXZoom = 1.0d;
+                int i1 = (int)(600d * d * 1.3);
                 int i2 = (int)(480d * d);
-                decompSize = " size " + i1 + ", " + i2;
+                decompSvgSize = " size " + i1 + ", " + i2;
+                decompMargin = "set rmargin 30";
+                key2 = "out vertical at graph 1.4, graph 1.0 Left reverse height 1";  //must be Left
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
@@ -286,6 +291,8 @@ namespace Gekko
             string boxgap = GetText(null, G.isNumericalError(o.opt_boxgap) ? null : o.opt_boxgap.ToString(), null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
             string separate = GetText(null, o.opt_separate, null, doc.SelectSingleNode("gekkoplot/separate"), "no"); //default: no, #23475432985                        
 
+            if (key2 != null) key = key2;
+
             List<string> xlines = GetText(doc.SelectNodes("gekkoplot/xline"));
             if (!o.opt_xline.IsNull()) xlines.Add(o.opt_xline.ToString());
             List<string> xlinebefores = GetText(doc.SelectNodes("gekkoplot/xlinebefore"));
@@ -414,11 +421,13 @@ namespace Gekko
 
             StringBuilder txt = new StringBuilder();
 
-            txt.AppendLine("set size " + zoom + "," + zoom + "");
+            txt.AppendLine("set size " + decompXZoom * zoom + "," + zoom + "");
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set datafile missing \"NaN\"");
+
+            if (decompMargin != null) txt.AppendLine(decompMargin);
 
             int ii = 0;
             foreach (string s in key.ToLower().Split(' '))
@@ -443,7 +452,7 @@ namespace Gekko
                 fontsize = 0.75 * fontsize;                
             }            
 
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSize);           
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSvgSize);           
 
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);
