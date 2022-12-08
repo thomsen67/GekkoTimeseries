@@ -67,17 +67,29 @@ namespace Gekko
             double decompXZoom = 1d;
             string key2 = null;
             if (isDecomp)
-            {                
-                //Should in principle be possible to use zoom instead of these hacks, but it does not work,
-                //investigate at some point...                
-                double d = 1.0;  //overall size of canvas, relative to 600x480
-                decompFontFactor = d * 1.6; //size of fonts
-                decompXZoom = 1.0d;
-                int i1 = (int)(600d * d * 1.3);
-                int i2 = (int)(480d * d);
-                decompSvgSize = " size " + i1 + ", " + i2;
-                decompMargin = "set rmargin 30";
-                key2 = "out vertical at graph 1.4, graph 1.0 Left reverse height 1";  //must be Left
+            {
+                if (true)
+                {
+                    //Should in principle be possible to use zoom instead of these hacks, but it does not work,
+                    //investigate at some point...
+                    double d = 0.9;  //overall size of canvas, relative to 600x480
+                    decompFontFactor = d * 1.7; //size of fonts
+                    int n = containerExplode.Count;
+                    int maxLength = 0;
+                    foreach (var xx in containerExplode)
+                    {
+                        maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
+                    }
+                    int columns = ((n - 1) / 14) + 1; //1-->1, 14-->1, 15-->2, 28-->2, 29-->3, ...
+
+                    double widthProxy = columns * (14 + maxLength);  //chars                    
+                    double widthAdj = (1d + 0.015 * widthProxy) * 1.15;  //1 char --> 1%.                    
+                
+                    int i1 = (int)(600d * d * widthAdj);
+                    int i2 = (int)(480d * d);
+                    decompSvgSize = " size " + i1 + ", " + i2;                                        
+                    key2 = " outside Left reverse height 1 box";  //must be Left
+                }                
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
