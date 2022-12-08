@@ -380,7 +380,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                
+                <CheckBox Name="checkBoxPlot" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show decomposion in a plot." Checked="CheckBoxPlot_Checked" Unchecked="CheckBoxPlot_Unchecked">Plot</CheckBox>
             </StackPanel>
 
             <Button Name="button1" Visibility="Collapsed" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Height="22" Opacity="0.8" Content="Refresh">
@@ -408,6 +408,8 @@
                     <RowDefinition Height="5" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+
+                <WebBrowser Name="webBrowser" />
 
                 <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Border BorderThickness="0" BorderBrush="Black" Name="canvasBorder">

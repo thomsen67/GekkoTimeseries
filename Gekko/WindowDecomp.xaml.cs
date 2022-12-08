@@ -722,6 +722,11 @@ namespace Gekko
                 checkBoxSort.IsChecked = true;
             }
 
+            if (this.decompFind.decompOptions2.plot)
+            {
+                checkBoxPlot.IsChecked = true;
+            }
+
             if (!double.IsNaN(this.decompFind.decompOptions2.ignore))
             {
                 this.NumValue = (int)this.decompFind.decompOptions2.ignore;
@@ -752,7 +757,7 @@ namespace Gekko
             this.decompFind = df;
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
 
-            InitializeComponent();
+            InitializeComponent();            
 
             this.textMerge.Visibility = Visibility.Collapsed;
             //this.buttonMergeHide.Visibility = Visibility.Collapsed;
@@ -1061,13 +1066,13 @@ namespace Gekko
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)
         {
-            
+
             GekkoDockPanel2 dockPanel = new GekkoDockPanel2();
             int w = Globals.guiTableCellWidth;
             if (type == GekkoTableTypes.UpperLeft || type == GekkoTableTypes.Left)
             {
                 w = Globals.guiTableCellWidthFirst;
-            }            
+            }
             dockPanel.Width = w;
             dockPanel.Height = Globals.guiTableCellHeight;
             var border = new Border();
@@ -1083,7 +1088,7 @@ namespace Gekko
                 textBlock.Padding = new Thickness(2, 2, 4, 3);
             }
             else
-            {                
+            {
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
 
@@ -1203,17 +1208,15 @@ namespace Gekko
 
             bool b1 = !decompOperator.isRaw;
             bool b2 = decompFind.decompOptions2.count == ECountType.None;
-            bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);
-            bool b4 = false;
-            if (decompFind.decompOptions2.rows.Contains(Globals.col_variable) && decompFind.decompOptions2.cols.Contains(Globals.col_t)) b4 = true;
-            if (decompFind.decompOptions2.rows.Contains(Globals.col_t) && decompFind.decompOptions2.rows.Contains(Globals.col_variable)) b4 = true;
-            //b4: to do red lamp, there must be both vars and time, and they must be on separate row/col.
-
-            if (b1 && b2 && b3 && b4)
+            bool b3 = (isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Top) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Left);            
+            
+            if (b1 && b2 && b3 && Decomp.VarsAndTimeDimensionsAreSeparate(decompFind.decompOptions2))
             {
+                //to do red lamp, there must be both vars and time, and they must be on separate row/col.
                 SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
             }
         }
+
 
         //public static double delete = 0.15;
 
@@ -1921,17 +1924,92 @@ namespace Gekko
 
             this.decompFind.decompOptions2.guiDecompValues = decompOutput.table;
 
-            if (G.IsUnitTesting() && Globals.showDecompTable == false)
+            if (decompFind.decompOptions2.plot)
             {
-                Globals.lastDecompTable = decompOutput.table;
+
+                if (!Decomp.VarsAndTimeDimensionsAreSeparate(this.decompFind.decompOptions2))
+                {
+                    new Error("Cannot show this as a plot, because variables and time are not both selected and on different rows/cols.");
+                }
+                Decomp.ERowsCols variablesAreOnRows = Decomp.VariablesOnRowsOrCols(this.decompFind.decompOptions2);
+                if (variablesAreOnRows == Decomp.ERowsCols.Rows && decompFind.decompOptions2.cols.Count > 1)
+                {
+                    new Error("Cannot show this as a plot, because the time field is not the sole field on columns.");
+                }
+                if (variablesAreOnRows == Decomp.ERowsCols.Cols && decompFind.decompOptions2.rows.Count > 1)
+                {
+                    new Error("Cannot show this as a plot, because the time field is not the sole field on rows.");
+                }
+
+                webBrowser.Visibility = Visibility.Visible;
+                scrollView1.Visibility = Visibility.Collapsed;
+
+                string fileName = "gekko.svg"; //just to signal the file type
+
+                O.Prt o = new O.Prt();
+                o.prtType = "plot";
+                o.t1 = per1;
+                o.t2 = per2;
+                o.opt_filename = fileName;
+        
+                List<O.Prt.Element> container = new List<O.Prt.Element>();                
+
+                PlotTable plotTable = new PlotTable();
+                plotTable.dates = new List<List<double>>();
+                plotTable.values = new List<List<double>>();
+
+                if (variablesAreOnRows == Decomp.ERowsCols.Rows)
+                {
+                    for (int i = 2; i <= decompOutput.table.GetRowMaxNumber(); i++)
+                    {
+                        Cell cName = decompOutput.table.Get(i, 1);
+                        string name = cName.CellText.TextData[0];
+                        List<double> dates = new List<double>();
+                        List<double> values = new List<double>();
+                        for (int j = 2; j <= decompOutput.table.GetColMaxNumber(); j++)
+                        {
+                            Cell cDate = decompOutput.table.Get(1, j);
+                            Cell c = decompOutput.table.Get(i, j);
+                            GekkoTime date = cDate.date_hack;
+                            dates.Add(Program.PlotTableTime(date.freq, date));
+                            values.Add(c.number);                            
+                        }
+                        plotTable.dates.Add(dates);
+                        plotTable.values.Add(values);
+                        O.Prt.Element element = new O.Prt.Element();
+                        element.labelOLD = new List<string>() { name };
+                        container.Add(element);
+                    }
+                }
+                else
+                {
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                }
+
+                //note, maybe just take name from o object?
+                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), false, smpl.p);
+                //webBrowser.Source = new Uri("file:///c:/Thomas/Gekko/regres/Doc_browser/browser/vars/tfon.svg");
+                webBrowser.Source = new Uri(svgFile);
             }
             else
-            {
-                string more = null;
-                if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + " more)";
-                if (this.decompFind.window != null) (this.decompFind.window as WindowDecomp).Title = this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
-                ClearGrid();
-                MakeGuiTable2(decompOutput, this.decompFind.decompOptions2);
+            {                
+                webBrowser.Visibility = Visibility.Collapsed;
+                scrollView1.Visibility = Visibility.Visible;
+
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                {
+                    Globals.lastDecompTable = decompOutput.table;
+                }
+                else
+                {
+                    string more = null;
+                    if (this.decompFind.decompOptions2.new_from.Count > 1) more = " (+" + (this.decompFind.decompOptions2.new_from.Count - 1) + " more)";
+                    if (this.decompFind.window != null) (this.decompFind.window as WindowDecomp).Title = this.decompFind.decompOptions2.new_from[0] + more + " - Gekko decomp";
+                    ClearGrid();
+                    MakeGuiTable2(decompOutput, this.decompFind.decompOptions2);
+                }
             }
         }
         
@@ -2711,8 +2789,7 @@ namespace Gekko
         private void CheckBoxDyn_Checked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                //this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
+            {                
                 this.decompFind.decompOptions2.dyn = true;
                 RecalcCellsWithNewType(decompFind.model);
             }
@@ -2721,9 +2798,26 @@ namespace Gekko
         private void CheckBoxDyn_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!isInitializing)
-            {
-                //this.decompFind.decompOptions2Previous = this.decompFind.decompOptions2.Clone();
+            {                
                 this.decompFind.decompOptions2.dyn = false;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private void CheckBoxPlot_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.plot = true;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private void CheckBoxPlot_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.plot = false;
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
@@ -2761,6 +2855,7 @@ namespace Gekko
         public bool missingAsZero = false;
         public bool sort = false;
         public double ignore = double.NaN;  //between 0 and 100.
+        public bool plot = false;
         public List<string> new_select = null;
         public List<string> new_from = null;
         public List<string> new_endo = null;
@@ -2829,6 +2924,7 @@ namespace Gekko
             if (this.missingAsZero) s.Add(" missing=zero");
             if (this.sort) s.Add(" sort");
             if (!double.IsNaN(this.ignore) && ignore > 0d && ignore <= 100d) s.Add(" ignore=" + this.ignore);
+            if (this.plot) s.Add(" plot");
             s.Add(">", color);
             s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
             s.Add(" from", color);
@@ -2902,6 +2998,7 @@ namespace Gekko
             d.missingAsZero = this.missingAsZero;
             d.isShares = this.isShares;
             d.sort = this.sort;
+            d.plot = this.plot;
             d.ignore = this.ignore;
             
             d.modelHash = this.modelHash;

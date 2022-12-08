@@ -23192,7 +23192,7 @@ namespace Gekko
         /// <param name="freqHere"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        private static double PlotTableTime(EFreq freqHere, GekkoTime t)
+        public static double PlotTableTime(EFreq freqHere, GekkoTime t)
         {
             double tt = ((ScalarVal)Functions.helper_time(t)).val;
             if (freqHere == EFreq.A) tt += 0.5d;  //annual years should be 2020.5 to be centered correctly

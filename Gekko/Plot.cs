@@ -36,7 +36,6 @@ namespace Gekko
                 if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
                 {
                     new Error("In PLOT, expected file type is emf, png, svg or pdf");
-                    //throw new GekkoException();
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
             }
@@ -729,7 +728,7 @@ namespace Gekko
 
             string emfName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
 
-            CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
+            if (showWindow) CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
 
             return emfName;
         }

@@ -403,6 +403,7 @@ namespace Gekko
                 if (G.Equal(o.opt_errors, "yes")) decompOptions2.showErrors = true;
                 if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
                 if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
+                if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
                 if (!double.IsNaN(o.opt_ignore))
                 {
                     if (o.opt_ignore < 0d || o.opt_ignore > 100d)
@@ -789,6 +790,19 @@ namespace Gekko
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return decompOutput;
+        }
+
+        /// <summary>
+        /// Make sure the table is suitable for red lamps, or for plotting.
+        /// </summary>
+        /// <param name="decompOptions2"></param>
+        /// <returns></returns>
+        public static bool VarsAndTimeDimensionsAreSeparate(DecompOptions2 decompOptions2)
+        {
+            bool b4 = false;
+            if (decompOptions2.rows.Contains(Globals.col_variable) && decompOptions2.cols.Contains(Globals.col_t)) b4 = true;
+            if (decompOptions2.rows.Contains(Globals.col_t) && decompOptions2.cols.Contains(Globals.col_variable)) b4 = true;
+            return b4;
         }
 
         public static void DecompMainInit(out GekkoTime gt1, out GekkoTime gt2, GekkoTime per1, GekkoTime per2, DecompOperator op)
@@ -3026,6 +3040,9 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         private static void DecompTablePostProcessing(Table tab, List<string> rownames, List<string> colnames, DecompOptions2 decompOptions2, Model model)
         {
+            ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
+            if (!Decomp.VarsAndTimeDimensionsAreSeparate(decompOptions2)) rowsCols = ERowsCols.None;
+
             if (decompOptions2.decompOperator.isPercentageType || decompOptions2.isShares)
             {
                 tab.Set(1, 1, "%" + "  ");
@@ -3043,6 +3060,7 @@ namespace Gekko
                     if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2);
                 }
                 tab.Set(i + 2, 1, s);
+                if (rowsCols == ERowsCols.Cols) tab.Get(i + 2, 1).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
             }
 
             for (int j = 0; j < colnames.Count; j++)
@@ -3053,6 +3071,7 @@ namespace Gekko
                     if (s != null) s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "").Replace(Globals.decompResidualName, Globals.decompResidualName2); ;
                 }
                 tab.Set(1, j + 2, s);
+                if (rowsCols == ERowsCols.Rows) tab.Get(1, j + 2).date_hack = GekkoTime.FromStringToGekkoTime(s, false, false);
             }
         }
 
