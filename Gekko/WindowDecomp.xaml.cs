@@ -828,22 +828,8 @@ namespace Gekko
                 item3.Click += new RoutedEventHandler(item_Click);
                 mainMenu.Items.Add(item3);
 
-                grid1.ContextMenu = mainMenu;               
-
-                //will be done in RecalcCellsWithNewType()
-                //Table table = this.decompOptions.guiDecompValues;
-                //MakeTable(table);                
+                grid1.ContextMenu = mainMenu;                               
             }
-
-            //if (true)
-            //{
-            //    //can later on use System.AppDomain.CurrentDomain.BaseDirectory instead of System.Windows.Forms.Application.StartupPath
-            //    green = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\green.png"));
-            //    yellow = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\yellow.png"));
-            //    red = new BitmapImage(new Uri(System.Windows.Forms.Application.StartupPath + "\\images\\red.png"));
-            //    this.statusColor.Source = green;
-            //}
-
             this.Loaded += WindowDecomp_Loaded;
         }
 
@@ -1056,12 +1042,19 @@ namespace Gekko
                             s += c.CellText.TextData[0];
                         }
                     }
-                    if (j < c1) s += "\t";
+                    if (j < c1) s += ";"; //s += "\t";
                 }
-                s += "\r";
+                //s += "\r";
+                s += ";";
+                s += "\r\n";
             }
 
-            Clipboard.SetDataObject(s);
+            //s = s.Replace(".", ",");
+
+            //Clipboard.SetData(DataFormats.CommaSeparatedValue, s);
+            //Clipboard.SetData(DataFormats.Html, s);
+            //Clipboard.SetData(DataFormats.CommaSeparatedValue, s);
+            Clipboard.SetText("1\t2\t3.3\t4\t3\t2.345\t3\t4\r\n2\t3.3\t4\t3\t2.345\t3\t4", TextDataFormat.Text);
         }
 
         private void AddCell(Grid g, int i, int j, string s, bool leftAlign, GekkoTableTypes type, string backgroundColor, Decomp.ERowsCols isRowOrCol, List<double> red, DecompOperator decompOperator)

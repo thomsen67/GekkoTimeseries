@@ -657,6 +657,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_P;
     ASTOPT_STRING_PARAM;
     ASTOPT_STRING_PCIM;
+	ASTOPT_STRING_PLOT;
     ASTOPT_STRING_PLOTCODE;
 	ASTOPT_STRING_PRTCODE;
     ASTOPT_STRING_PRESERVE;
@@ -2904,24 +2905,23 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//old stuff
 decomp2:						
-DECOMP2 decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
-| DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
-;
+                            DECOMP2 decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
+                          | DECOMP2 decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
+                            ;
 decompExpression:           expression;
 
 // --------------
 
-//decomp2a:                 	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar1          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
-//decomp2b:                   DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar2          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+//new decomp
 decomp:                    	DECOMP decompOpt1? decompVar1Simple decompFrom decompEndo decompWhere? decompGroup? decompRows? decompCols?   -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    ^(ASTDECOMPFROM decompFrom) ^(ASTDECOMPENDO decompEndo)  ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
                           | DECOMP decompOpt1? decompVar1Simple                                                                           -> ^({token("ASTDECOMP3¤"+($decomp.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  ^(ASTDECOMPSELECT decompVar1Simple)    )
                           ;
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
-seqOfBankvarnamesAlias: seqOfBankvarnames;
+seqOfBankvarnamesAlias:     seqOfBankvarnames;
 
-//decompVar1:                 (seqOfBankvarnamesOnly1Alias IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1));
 decompVar1:                 (seqOfBankvarnamesAlias IN)? seqOfBankvarnamesOnly1 decompOpt2? -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesAlias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1) ^(ASTPLACEHOLDER decompOpt2?));
 decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression2 decompOpt2? -> ^(ASTDECOMPITEMSEXPR ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER decompExpression2) ^(ASTPLACEHOLDER decompOpt2?));
 
@@ -2958,6 +2958,7 @@ decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
 						  | SHARES (EQUAL yesNo)? -> ^(ASTOPT_STRING_SHARES yesNo?)
 						  | SORT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SORT yesNo?)
 						  | IGNORE (EQUAL expression)? -> ^(ASTOPT_VAL_IGNORE expression)
+						  | PLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PLOT yesNo?)
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 

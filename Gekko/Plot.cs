@@ -83,12 +83,12 @@ namespace Gekko
                     int columns = ((n - 1) / 14) + 1; //1-->1, 14-->1, 15-->2, 28-->2, 29-->3, ...
 
                     double widthProxy = columns * (14 + maxLength);  //chars                    
-                    double widthAdj = (1d + 0.015 * widthProxy) * 1.15;  //1 char --> 1%.                    
+                    double widthAdj = (1d + 0.015 * widthProxy) * 1.25;  //1 char --> 1%.                    
                 
                     int i1 = (int)(600d * d * widthAdj);
                     int i2 = (int)(480d * d);
                     decompSvgSize = " size " + i1 + ", " + i2;                                        
-                    key2 = " outside Left reverse height 1 box";  //must be Left
+                    key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
                 }                
             }
 
