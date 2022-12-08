@@ -1978,6 +1978,7 @@ namespace Gekko
                         plotTable.values.Add(values);
                         O.Prt.Element element = new O.Prt.Element();
                         element.labelOLD = new List<string>() { name };
+                        if (i == 2) element.linewidth = 6;  //double
                         container.Add(element);
                     }
                 }
@@ -1989,7 +1990,7 @@ namespace Gekko
                 }
 
                 //note, maybe just take name from o object?
-                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), false, smpl.p);
+                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), true, smpl.p);
                 //webBrowser.Source = new Uri("file:///c:/Thomas/Gekko/regres/Doc_browser/browser/vars/tfon.svg");
                 webBrowser.Source = new Uri(svgFile);
             }

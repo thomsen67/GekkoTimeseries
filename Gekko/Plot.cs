@@ -14,7 +14,7 @@ namespace Gekko
 {
     public static class Plot
     {
-        public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, bool showWindow, P p)
+        public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, bool isDecomp, P p)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -60,7 +60,20 @@ namespace Gekko
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
 
             double zoom = 1d;
-            double fontfactor = 1d;
+
+            double decompFontFactor = 1d;
+            string decompSize = " ";
+            if (isDecomp)
+            {
+                //Should in principle be possible to use zoom instead of these hacks, but it does not work,
+                //investigate at some point...                
+                double d = 1.0;  //overall size of canvas, relative to 600x480
+                decompFontFactor = d * 1.6; //size of fonts
+                //zoom *= 1.5;
+                int i1 = (int)(600d * d);
+                int i2 = (int)(480d * d);
+                decompSize = " size " + i1 + ", " + i2;
+            }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
@@ -427,10 +440,10 @@ namespace Gekko
             }
             else
             {
-                fontsize = 0.75 * fontsize;
-            }
+                fontsize = 0.75 * fontsize;                
+            }            
 
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize); ;
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize + decompSize);           
 
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);
@@ -440,13 +453,14 @@ namespace Gekko
                 txt.AppendLine("set decimalsign ','");
             }
 
+            double fontfactor = 1d;
             if (G.Equal(extension, "emf"))
             {
                 fontfactor = 1.4d / 1.2d;
             }
             else if (G.Equal(extension, "svg"))
             {
-                fontfactor = 1.4d / 1.2d;
+                fontfactor = 1.4d / 1.2d * decompFontFactor;
             }
             else if (G.Equal(extension, "png"))
             {
@@ -509,8 +523,6 @@ namespace Gekko
                 double alpha1 = 0.05d;
                 double alpha2 = 0.05;
                 double beta = 0.30d;
-                //linesMin=4, linesmMax=5
-                //boxesMin=0, boxesMax=1
                 set_yrange = (minMax[4] - (alpha1 + alpha2 + beta) * (minMax[5] - minMax[4])) + ":" + minMax[5];
                 set_y2range = (minMax[0] - alpha2 / beta * (minMax[1] - minMax[0])) + ":" + (minMax[1] + (1 + alpha1) / beta * (minMax[1] - minMax[0]));
             }
@@ -728,7 +740,7 @@ namespace Gekko
 
             string emfName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
 
-            if (showWindow) CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
+            if (!isDecomp) CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
 
             return emfName;
         }
@@ -1183,8 +1195,6 @@ namespace Gekko
                     fillstyle = null;  //fillstyle will fail if combined with other line types.
                     if (isSeparated) y2 = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                 }
-
-
 
                 // ---------------------------------------------
                 // --------- loading lines section end
