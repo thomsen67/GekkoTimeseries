@@ -16696,7 +16696,7 @@ string cc1b=
             FAIL("%m = a;");
             I("m = a;");
             _AssertSeries(First(), "m", 2001, 100d, sharedDelta);
-            FAIL("m = a,;");
+            FAIL("m = a,;"); 
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 01;");
