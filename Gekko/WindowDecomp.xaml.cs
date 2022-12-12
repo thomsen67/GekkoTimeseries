@@ -311,7 +311,7 @@ namespace Gekko
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(type);
             RecalcCellsWithNewType(decompFind.model);
-        }
+        }        
 
         public static List<string> GetAllPossibleValuesForListFilter(string name, DecompOptions2 decompOptions2)
         {
@@ -2399,8 +2399,8 @@ namespace Gekko
         {
             Globals.guiDecompWindowTopDistance = Math.Max(1, (int)this.Top);
             Globals.guiDecompWindowLeftDistance = Math.Max(1, (int)this.Left);
-            Globals.guiDecompWindowHeightDistance = Math.Max(1, (int)this.Height);
-            Globals.guiDecompWindowWidthDistance = Math.Max(1, (int)this.Width);
+            Globals.guiDecompWindowHeightDistance = Math.Max(1, (int)this.ActualHeight);
+            Globals.guiDecompWindowWidthDistance = Math.Max(1, (int)this.ActualWidth);
             Globals.guiDecompWindowSplitterHorizontal = Math.Max(1, (int)this.splitterHorizontal.Width.Value);
             Globals.guiDecompWindowSplitterVertical = Math.Max(1, (int)this.splitterVertical.Height.Value);
 
@@ -2547,18 +2547,7 @@ namespace Gekko
                 return;
             }
             WindowFind windowFindParent = dfParentFind.window as WindowFind;
-            WindowDecomp windowDecompParent = dfParentDecomp.window as WindowDecomp;
-
-            if (Globals.floatingDecompWindows)
-            {
-                //do nothing                
-            }
-            else
-            {
-                //if not floating, the FIND window is still open and needs to be closed.
-                //if floating, the FIND window is already closed.
-                windowFindParent.Close();
-            }
+            WindowDecomp windowDecompParent = dfParentDecomp.window as WindowDecomp;           
 
             //Close the child decomp window (= present window)
             this.Close();

@@ -37,6 +37,7 @@ namespace Gekko
     /// <summary>
     /// Contains global variables, settings etc.
     /// </summary>
+
     public class Globals
     {
         public static bool decompVar = false;  //default: false
@@ -647,8 +648,6 @@ namespace Gekko
         public static Queue<string> tasks = new Queue<string>();
 
         public const int systemTthreadsExtra = 3;
-
-        public static bool floatingDecompWindows = true; //is false, windows will block each other, and the main gui will wait, too.
 
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();

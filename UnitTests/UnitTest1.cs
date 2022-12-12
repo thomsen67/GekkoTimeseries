@@ -13946,7 +13946,6 @@ namespace UnitTests
         private static void ShowDecompTable()
         {
             Globals.showDecompTable = true;
-            Globals.floatingDecompWindows = false;
         }
 
         [TestMethod]

@@ -729,10 +729,36 @@ namespace Gekko
             catch { };  //fail silently
         }
 
-        // ======================================
-        //            WPF start
-        // ======================================
+        //weird delegate pattern, but it works!
+        delegate void GetDecompSizesCallback(WindowDecomp w);
+        public static void GetDecompSizes(WindowDecomp w)
+        {
+            try
+            {
+                if (!w.Dispatcher.CheckAccess())
+                {
+                    // It's on a different thread, so use Invoke.
+                    w.Dispatcher.Invoke(new GetDecompSizesCallback(GetDecompSizes), new object[] { w });
+                }
+                else
+                {
+                    Globals.guiDecompWindowTopDistance = Math.Max(1, (int)w.Top);
+                    Globals.guiDecompWindowLeftDistance = Math.Max(1, (int)w.Left);
+                    Globals.guiDecompWindowHeightDistance = Math.Max(1, (int)w.ActualHeight);
+                    Globals.guiDecompWindowWidthDistance = Math.Max(1, (int)w.ActualWidth);
+                    Globals.guiDecompWindowSplitterHorizontal = Math.Max(1, (int)w.splitterHorizontal.Width.Value);
+                    Globals.guiDecompWindowSplitterVertical = Math.Max(1, (int)w.splitterVertical.Height.Value);
+                }
+            }
+            catch { };  //fail silently
+        }
 
         
+
+        // ======================================
+        //            WPF end
+        // ======================================
+
+
     }
 }

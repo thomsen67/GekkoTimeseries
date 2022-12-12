@@ -1901,37 +1901,39 @@ namespace Gekko
             if (windowDecomp == null)
             {
                 //new DECOMP window
-                if (Globals.floatingDecompWindows)
+
+                DecompFind df2 = decompFind.SearchUpwards(EDecompFindNavigation.Decomp);
+                WindowDecomp parent = null;
+                if (df2?.window != null) parent = df2.window as WindowDecomp;
+                if (parent != null)
                 {
-                    Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
-                    thread.Name = "Decomp";
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                    thread.IsBackground = true;
-                    thread.Start(decompFind);
+                    CrossThreadStuff.GetDecompSizes(parent);
+                }
 
-                    //Also see #9237532567
-                    //This stuff makes sure we wait for the window to open, before we move on with the code.
-                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                    {
-                        System.Threading.Thread.Sleep(10);  //0.01s
-                        //not sure why decompFind.decompOptions2 can become == null in the other thread...?
-                        if (decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
-                        {
-                            break;
-                        }
-                    }
+                Thread thread = new Thread(new ParameterizedThreadStart(CreateDecompWindow));
+                thread.Name = "Decomp";
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                thread.IsBackground = true;
+                thread.Start(decompFind);
 
-                    DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
-                    if (df != null)
+                //Also see #9237532567
+                //This stuff makes sure we wait for the window to open, before we move on with the code.
+                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                {
+                    System.Threading.Thread.Sleep(10);  //0.01s
+                                                        //not sure why decompFind.decompOptions2 can become == null in the other thread...?
+                    if (decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0 || decompFind.hasException)
                     {
-                        WindowFind w = df.window as WindowFind;
-                        w.Close();
+                        break;
                     }
                 }
-                else
+
+                DecompFind df = decompFind.SearchUpwards(EDecompFindNavigation.Find);
+                if (df != null)
                 {
-                    CreateDecompWindow(decompFind);
+                    WindowFind w = df.window as WindowFind;
+                    w.Close();
                 }
             }
             else
@@ -4727,40 +4729,33 @@ namespace Gekko
 
         public static void Find(O.Find o)
         {
-            if (Globals.floatingDecompWindows)
-            {
-                //Open FIND window in a new thread
-                Thread thread = new Thread(new ParameterizedThreadStart(CreateFindWindow));
-                thread.Name = "Find";
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                thread.IsBackground = true;                
-                thread.Start(o);                
+            //Open FIND window in a new thread
+            Thread thread = new Thread(new ParameterizedThreadStart(CreateFindWindow));
+            thread.Name = "Find";
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            thread.IsBackground = true;
+            thread.Start(o);
 
-                if (true)
+            if (true)
+            {
+                //Also see #9237532567
+                //This stuff makes sure we wait for the window to open, before we move on with the code.
+                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                 {
-                    //Also see #9237532567
-                    //This stuff makes sure we wait for the window to open, before we move on with the code.
-                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                    System.Threading.Thread.Sleep(10);  //0.01s
+                                                        //TODO
+                                                        //TODO
+                                                        //TODO find a way to measure that the FIND window has been "calculated".
+                                                        //TODO --> problem would be if a new model was loaded in the meantime...
+                                                        //TODO Do it same way as for decomp, also testing if it has exception
+                                                        //TODO
+                                                        //TODO
+                    if (1 /* o.decompFind.decompOptions2.numberOfRecalcs */ > 0)
                     {
-                        System.Threading.Thread.Sleep(10);  //0.01s
-                        //TODO
-                        //TODO
-                        //TODO find a way to measure that the FIND window has been "calculated".
-                        //TODO --> problem would be if a new model was loaded in the meantime...
-                        //TODO Do it same way as for decomp, also testing if it has exception
-                        //TODO
-                        //TODO
-                        if (1 /* o.decompFind.decompOptions2.numberOfRecalcs */ > 0)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-            }
-            else
-            {
-                CreateFindWindow(o);
             }
         }
 
