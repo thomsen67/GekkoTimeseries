@@ -73,7 +73,8 @@ namespace Gekko
         public bool isInitializing = false; //a bit hacky, to handle radiobutton1 firing a clicked event when initializing
         
         public Grid _grid = null;
-                
+        public string _activeVariable = null;
+
         private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
         ListViewDragDropManager<GekkoTask> dragMgr;
         
@@ -1550,8 +1551,9 @@ namespace Gekko
 
         private void Mouse_Down(object sender, MouseButtonEventArgs e) // MouseEventArgs e)
         {
-            //#98732498724
-            if (e.ClickCount != 2) return;
+            //#98732498724    
+            //if (e.ClickCount != 2) return;
+
             TextBlock tb = (TextBlock)sender;
             Border b = (Border)(tb.Parent);
             DockPanel dp = (DockPanel)(b.Parent);
@@ -1574,6 +1576,13 @@ namespace Gekko
                 {                    
                     new Error(Decomp.Text1(1));
                 }
+
+                if (e.ClickCount == 1)
+                {
+                    _activeVariable = var;
+                    return;
+                }
+
                 O.Find o = new O.Find(this.decompFind);
                 List m = new List(new List<string>() { var });
                 o.iv = m;
