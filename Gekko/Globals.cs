@@ -446,6 +446,8 @@ namespace Gekko
         public static int guiTableCellWidthFirst = 135;
         public static int guiTableCellWidth = 100;
         public static int guiTableCellHeight = 20;
+        public static double guiDecompPlotFontSize = 1.85d;  //1.7
+        public static int guiDecompPlotItemsPerColumn = 13;  //14
 
         public static double pruneDecomp = 0.10d;
         public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?

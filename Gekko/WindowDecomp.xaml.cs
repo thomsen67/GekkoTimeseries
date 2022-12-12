@@ -1942,11 +1942,12 @@ namespace Gekko
                 PlotTable plotTable = new PlotTable();
                 plotTable.dates = new List<List<double>>();
                 plotTable.values = new List<List<double>>();
-
+                
                 if (variablesAreOnRows == Decomp.ERowsCols.Rows)
                 {
                     for (int i = 2; i <= decompOutput.table.GetRowMaxNumber(); i++)
                     {
+                    
                         Cell cName = decompOutput.table.Get(i, 1);
                         string name = cName.CellText.TextData[0];
                         List<double> dates = new List<double>();
@@ -1954,7 +1955,7 @@ namespace Gekko
                         for (int j = 2; j <= decompOutput.table.GetColMaxNumber(); j++)
                         {
                             Cell cDate = decompOutput.table.Get(1, j);
-                            Cell c = decompOutput.table.Get(i, j);
+                            Cell c = decompOutput.table.Get(i, j);                            
                             GekkoTime date = cDate.date_hack;
                             dates.Add(Program.PlotTableTime(date.freq, date));
                             values.Add(c.number);                            
@@ -1969,15 +1970,33 @@ namespace Gekko
                 }
                 else
                 {
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
+                    for (int j = 2; j <= decompOutput.table.GetColMaxNumber(); j++)
+                    {
+                        Cell cName = decompOutput.table.Get(1, j);
+                        string name = cName.CellText.TextData[0];
+                        List<double> dates = new List<double>();
+                        List<double> values = new List<double>();
+                        for (int i = 2; i <= decompOutput.table.GetRowMaxNumber(); i++)
+                        {
+                            Cell cDate = decompOutput.table.Get(i, 1);
+                            Cell c = decompOutput.table.Get(i, j);
+                            GekkoTime date = cDate.date_hack;
+                            dates.Add(Program.PlotTableTime(date.freq, date));
+                            values.Add(c.number);
+                        }
+                        plotTable.dates.Add(dates);
+                        plotTable.values.Add(values);
+                        O.Prt.Element element = new O.Prt.Element();
+                        element.labelOLD = new List<string>() { name };
+                        if (j == 2) element.linewidth = 6;  //double
+                        container.Add(element);
+                    }
                 }
 
                 //note, maybe just take name from o object?                
                 
-                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), true, smpl.p);                
-                webBrowser.Source = new Uri(svgFile);
+                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), true, smpl.p);
+                webBrowser.Source = new Uri(svgFile);                
             }
             else
             {                

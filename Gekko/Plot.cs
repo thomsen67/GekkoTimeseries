@@ -68,28 +68,25 @@ namespace Gekko
             string key2 = null;
             if (isDecomp)
             {
-                if (true)
+                //Should in principle be possible to use zoom instead of these hacks, but it does not work,
+                //investigate at some point...                
+                double d = 0.9;  //overall size of canvas, relative to 600x480
+                decompFontFactor = d * Globals.guiDecompPlotFontSize; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
+                int n = containerExplode.Count;
+                int maxLength = 0;
+                foreach (var xx in containerExplode)
                 {
-                    //Should in principle be possible to use zoom instead of these hacks, but it does not work,
-                    //investigate at some point...
-                    double d = 0.9;  //overall size of canvas, relative to 600x480
-                    decompFontFactor = d * 1.7; //size of fonts
-                    int n = containerExplode.Count;
-                    int maxLength = 0;
-                    foreach (var xx in containerExplode)
-                    {
-                        maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
-                    }
-                    int columns = ((n - 1) / 14) + 1; //1-->1, 14-->1, 15-->2, 28-->2, 29-->3, ...
+                    maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
+                }
+                int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
 
-                    double widthProxy = columns * (14 + maxLength);  //chars                    
-                    double widthAdj = (1d + 0.015 * widthProxy) * 1.25;  //1 char --> 1%.                    
-                
-                    int i1 = (int)(600d * d * widthAdj);
-                    int i2 = (int)(480d * d);
-                    decompSvgSize = " size " + i1 + ", " + i2;                                        
-                    key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
-                }                
+                double widthProxy = columns * (14 + maxLength);  //14 is chars                    
+                double widthAdj = (1d + 0.0141 * widthProxy) * 1.35;  //1 char --> 1%.                    
+
+                int i1 = (int)(600d * d * widthAdj);
+                int i2 = (int)(480d * d);
+                decompSvgSize = " size " + i1 + ", " + i2;
+                key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
