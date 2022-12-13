@@ -506,12 +506,30 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Suggestions in the GUI, when the user presses Ctrl+Space.
+        /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space. Other programs have intellisense too,
+        /// Visual Studio (Ctrl+Space), RStudio (tab, but Ctrl+Space also works), Sublime (Ctrl+Space), Spyder (tab or Ctrl+Space).
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static List<string> Suggestions(string s)
         {
+            /*
+             * 
+   
+   den behøver ikke forstå PRT <r> jd..., kan sige at den bare ret "dumt" kigger efter <navn>:<navn> eller
+   @<navn> for at fylde listen. Kunne være sejt at klistre
+   labels på. Skulle også virke mht. array-serier. Strengelister burde kunne have labels... Slukkes med Esc.   
+   
+   PRT x --> vise x* vars fra alle åbne banker med givne frekvens (kunne måske angive bank i label hvis <> first-pos)
+   PRT b:x --> kun fra b. PRT @x skal også virke.
+   Wildcards PRT a*b eller a?b.
+   Den søger højre mod venstre og prøver at finde [...]:[...] eller [...]. Her er * og ? ok, men ikke andre
+   karakterer inkl. kanteparenteser. Så rene idents og * og ? og 1 :. Stop ved blank. SKal kunne starte fra
+   tom streng.
+   
+             * 
+             */
+
             List<string> rv = new List<string>();
             string txt = s;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
