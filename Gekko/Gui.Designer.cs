@@ -1738,7 +1738,7 @@ namespace Gekko
                 suggestions = Program.options.Intellisense(s2);
             }
 
-            if (suggestions.Count > 0)
+            if (suggestions != null && suggestions.Count > 0)
             {
 
                 if (Globals.windowIntellisense == null)

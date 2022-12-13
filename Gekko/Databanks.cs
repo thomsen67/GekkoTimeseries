@@ -535,25 +535,47 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
-            
-            string part = null;
-            for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
-            {
-                if (tokens2.subnodes.storage[i].type == ETokenType.Word)
-                {
-                    part = tokens2.subnodes.storage[i].s;
-                    Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[i].column - s.Length - 1;
-                }
-            }
-            part += "*";
 
-            //TODO
-            //TODO
-            //TODO If there is already a * or ? or .., just use that. Also allow a bank before :, and also something after !.
-            //TODO
-            //TODO
-            
-            List<string> names = Program.Search(new List(new List<string>() { part }), null, EVariableType.Var);
+            int iEnd = int.MaxValue;
+            int iStart = int.MaxValue;
+            int offset = 0;
+            string varname = null;
+            bool first = true;
+            for (int i = tokens2.subnodes.storage.Count - 1; i >= 0; i--) 
+            {
+                TokenHelper th = tokens2.subnodes.storage[i];
+                if (th.type == ETokenType.EOF) continue;
+                if (th.type == ETokenType.EOL) continue;
+                if (th.type == ETokenType.Comment) continue;
+                if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
+                if ((th.type == ETokenType.Word || th.s == "*" || th.s == "?") && (first || tokens2.subnodes.storage[i + 1].leftblanks == 0))
+                {
+                    varname = th.s + varname;
+                    if (iEnd == int.MaxValue) iEnd = i;
+                    iStart = i;
+                }
+                else
+                {
+                    break;
+                }                
+                first = false;
+            }            
+
+            string bankname = null;
+            List<string> names = null;
+            if (iStart == int.MaxValue)
+            {
+                return names;
+            }
+            else
+            {
+                Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iStart].column - s.Length - 1;
+                string x = varname;
+                if (!x.EndsWith("*")) x += "*";
+                names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
+            }
+
+            new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
             
             return names;
         }
