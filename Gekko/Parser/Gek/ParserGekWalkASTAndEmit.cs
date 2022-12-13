@@ -1970,7 +1970,7 @@ namespace Gekko.Parser.Gek
                                     SingletonHelper missingCommma = IsRhsVariableWithoutSigil(node, node?[0]?[0]?[2]?[0]);
                                     if (missingCommma != null)
                                     {
-                                        //new Note("Suggestion: " + missingCommma.s + " (line " + missingCommma.line + ")");
+                                        //will contain trailing comma
                                         if (!Globals.suggestions.ContainsKey(missingCommma.s)) Globals.suggestions.Add(missingCommma.s, 0);
                                     }
                                 }
@@ -3489,7 +3489,7 @@ namespace Gekko.Parser.Gek
                                     SingletonHelper missingCommma = IsRhsVariableWithoutSigil(node, node?[1]);                                    
                                     if (missingCommma != null)
                                     {
-                                        //new Note("Suggestion: " + missingCommma.s + " (line " + missingCommma.line + ")");
+                                        //will not contain en ending semicolon.
                                         if (!Globals.suggestions.ContainsKey(missingCommma.s)) Globals.suggestions.Add(missingCommma.s, 0);
                                     }
                                 }                                
@@ -5147,13 +5147,13 @@ ASTPLACEHOLDER [0]
             {
                 string s = null;
                 string[] ss = node.specialExpressionAndLabelInfo;
-                if (ss[1] != null) s = G.ReplaceGlueSymbols(ss[1]) + "," + ";";
+                string s7 = G.ReplaceGlueSymbols(ss[1]);
+                if (ss[1] != null) s = s7.Trim();
                 if (s != null)
                 {
                     SingletonHelper h = new SingletonHelper();
                     h.s = s;
                     h.line = node.Line;
-                    new Note("Suggestion: " + s);
                     return h;
                 }                
             }

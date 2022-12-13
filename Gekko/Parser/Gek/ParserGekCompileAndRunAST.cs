@@ -244,14 +244,66 @@ namespace Gekko.Parser.Gek
                         Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
 
                     }
+                    if (true)
+                    {
+                        string problemLine2 = G.ReplaceGlueSymbols(problemLine);
+                        foreach (string s in Globals.suggestions.Keys)
+                        {
+                            if (s.EndsWith(";"))
+                            {
+                                //for
+                                SingletonSuggestion(problemLine2, s);
+                            }
+                            else
+                            {
+                                //assign                                
+                                SingletonSuggestion(problemLine2, s + ";");
+                                SingletonSuggestion(problemLine2, s + " ;");
+                                SingletonSuggestion(problemLine2, s + "  ;");
+                                SingletonSuggestion(problemLine2, s + "   ;");
+                                SingletonSuggestion(problemLine2, s + "    ;");  //this must be enough
+                            }
+                        }
+                    }
                 }
             }
             Program.WriteCallStack(false, p);  //will only be performed once
             throw e;
 
-        }        
+        }
 
-        
+        private static void SingletonSuggestion(string problemLine2, string temp1)
+        {                      
+            if (G.Contains(problemLine2, temp1))
+            {
+                string temp2 = G.ReplaceLastOccurrence(temp1, ";", ",;");
+                string end = null;
+                if (temp2.StartsWith("for", StringComparison.OrdinalIgnoreCase)) end = "end;";
+                bool is3_0 = ParserGekCreateAST.IsValid3_0Syntax(temp2 + end);
+                if (!is3_0) return;  //do not suggest invalid code
+                Action<GAO> a = (gao) =>
+                {
+                    using (Writeln txt = new Writeln("", -12345, Color.Empty, false, ETabs.Output))
+                    {
+                        txt.MainAdd("It seems the following syntax omits a necessary trailing comma:");
+                        txt.MainNewLine();
+                        txt.MainAdd(temp1);
+                        txt.MainNewLine();
+                        txt.MainAdd("The following syntax is correct:");
+                        txt.MainNewLine();
+                        txt.MainAdd(temp2);
+                        txt.MainNewLine();
+                        txt.MainAdd("Note the trailing comma. So-called singleton (1-element) lists must contain a trailing comma in order to be identified as lists.");
+                        txt.MainAdd("The trailing comma may seem odd, but Gekko uses it to distinguish whether a right-hand side is an expression or a list definition.");
+                        txt.MainAdd("See more about so-called naked list definitions {a{here¤i_naked_list.htm}a}, under the 'Singletons' section.");
+
+                    }
+                };
+                //G.Writeln("         ---> " + temp1 + " ---> " + G.GetLinkAction("suggestion", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "", Color.Blue);
+                G.Writeln("         ---> " + G.GetLinkAction("syntax suggestion (comma)", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "", Color.Blue);
+            }
+        }
+
         private static void HandleCommandCompileErrors(P p, CompilerResults cr)
         {
 

@@ -3856,6 +3856,23 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Find last occurence of find in s, replace it with replace.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="find"></param>
+        /// <param name="replace"></param>
+        /// <returns></returns>
+        public static string ReplaceLastOccurrence(string s, string find, string replace)
+        {
+            int place = s.LastIndexOf(find);
+
+            if (place == -1)
+                return s;
+
+            return s.Remove(place, find.Length).Insert(place, replace);
+        }
+
+        /// <summary>
         /// Internal method. Before a .gcm file is parsed, some "glue" symbols are added to aid parsing. These are removed here.
         /// Use to transform parser errors containing parts of the .gcm code.
         /// </summary>
