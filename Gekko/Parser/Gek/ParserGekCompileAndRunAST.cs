@@ -296,7 +296,6 @@ namespace Gekko.Parser.Gek
                         txt.MainAdd("Note the trailing comma. So-called singleton (1-element) lists must contain a trailing comma in order to be identified as lists.");
                         txt.MainAdd("The trailing comma may seem odd, but Gekko uses it to distinguish whether a right-hand side is an expression or a list definition.");
                         txt.MainAdd("See more about so-called naked list definitions {a{here¤i_naked_list.htm}a}, under the 'Singletons' section.");
-
                     }
                 };
                 //G.Writeln("         ---> " + temp1 + " ---> " + G.GetLinkAction("suggestion", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "", Color.Blue);

@@ -1314,7 +1314,6 @@ namespace Gekko
                 //                
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen && Globals.windowIntellisense.listBox1.SelectedItem != null)
                 {
-
                     string chosen = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
 
                     if (Globals.windowIntellisenseType == 1)
