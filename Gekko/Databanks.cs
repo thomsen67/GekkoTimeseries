@@ -539,6 +539,7 @@ namespace Gekko
             int iEnd = int.MaxValue;
             int iStart = int.MaxValue;
             int offset = 0;
+            string bankname = null;
             string varname = null;
             bool first = true;
             for (int i = tokens2.subnodes.storage.Count - 1; i >= 0; i--) 
@@ -559,13 +560,35 @@ namespace Gekko
                     break;
                 }                
                 first = false;
-            }            
+            }
 
-            string bankname = null;
+            if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == ":")
+            {
+                bool first2 = true;
+                for (int i = iStart-2; i >= 0; i--)
+                {
+                    TokenHelper th = tokens2.subnodes.storage[i];
+                    if (th.type == ETokenType.EOF) continue;
+                    if (th.type == ETokenType.EOL) continue;
+                    if (th.type == ETokenType.Comment) continue;
+                    if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
+                    if ((th.type == ETokenType.Word) && (first2 || tokens2.subnodes.storage[i + 1].leftblanks == 0))
+                    {
+                        bankname = th.s + bankname;                        
+                        iStart = i;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    first2 = false;
+                }
+            }
+            
             List<string> names = null;
             if (iStart == int.MaxValue)
             {
-                return names;
+                return null;
             }
             else
             {
