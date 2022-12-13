@@ -894,12 +894,8 @@ namespace Gekko
             if (Globals.runningOnTTComputer)
             {
                 using (var txt = new Writeln())
-                {
-                    txt.MainAdd("======================================================================");
-                    txt.MainNewLineTight();
-                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");
-                    txt.MainNewLineTight();
-                    txt.MainAdd("======================================================================");
+                {                    
+                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");                    
                 }
             }            
 

@@ -1542,6 +1542,12 @@ namespace Gekko
 
     }
 
+    public class SingletonHelper
+    {
+        public int line;
+        public string s = null;
+    }
+
     /// <summary>
     /// Simple helper class
     /// </summary>
@@ -8052,6 +8058,8 @@ namespace Gekko
         {
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
+
+            Globals.suggestions.Clear();  //to not fill out ram too much
 
             if (Globals.excelDna || Globals.hideGui)
             {
@@ -16789,21 +16797,7 @@ namespace Gekko
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
-
-            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + Globals.cacheExtensionModel;
-
-            //if (Program.options.model_cache == true)
-            //{
-            //    if (File.Exists(mdlFileNameAndPath))
-            //    {
-            //        ParserFrmGetProtobuf(fileNamePretty, mdlFileNameAndPath);
-            //    }
-            //}
-            //else
-            //{
-            //    model.modelGekko.modelInfo.parent.parent.loadedFromCacheFile = false;
-            //}
-
+            
             model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
             model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
             model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
@@ -16822,7 +16816,7 @@ namespace Gekko
             //  takes some time. It also writes out actual C# code to be used later on when compiling.
             Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
 
-            WriteGamsScalarModel(model); //in principle this could be done before first DECOMP. But then we would need to get that into protobuf, and WriteGamsScalarModel() is pretty fast.
+            ProduceGamsScalar2000Model(model); //in principle this could be done before first DECOMP. But then we would need to get that into protobuf, and WriteGamsScalarModel() is pretty fast.
 
             Program.GuiSetModelName();
             if (model.modelGekko.largestLead != model.modelGekko.largestLeadOutsideRevertedPart)
@@ -16849,13 +16843,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Write a scalar-2000 model suitable for DECOMP. Input is a Gekko model.        
+        /// Produce a scalar-2000 model suitable for DECOMP. Input is a Gekko model.        
         /// </summary>
         /// <param name="model"></param>
-        private static void WriteGamsScalarModel(Model model)
+        private static void ProduceGamsScalar2000Model(Model model)
         {
             DateTime dt0 = DateTime.Now;
-            new Writeln("Start scalar");
             
             /// See #jseds78hsd33.
             List<string> equations = new List<string>();
@@ -16913,9 +16906,9 @@ namespace Gekko
 
             Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
             model.modelGamsScalar = modelTemp.modelGamsScalar;
-            model.modelGamsScalar.isStaticModel = true;            
+            model.modelGamsScalar.isStaticModel = true;
 
-            new Writeln("TTH: Scalar model production: " + G.Seconds(dt0));
+            new Writeln("Linking to DECOMP module (" + G.Seconds(dt0) + ")");
         }
 
         /// <summary>

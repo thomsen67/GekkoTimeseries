@@ -1962,6 +1962,19 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.TypeCheck_" + type.ToLower() + "(" + node.forLoop[i].Item2 + ", 0);" + G.NL);
                             node.Code.A(node[1].Code);
                             node.Code.A("}").End();
+
+                            if (G.Equal(type, "string"))
+                            {                                
+                                {
+                                    //has # on lhs
+                                    SingletonHelper missingCommma = IsRhsVariableWithoutSigil(node, node?[0]?[0]?[2]?[0]);
+                                    if (missingCommma != null)
+                                    {
+                                        //new Note("Suggestion: " + missingCommma.s + " (line " + missingCommma.line + ")");
+                                        if (!Globals.suggestions.ContainsKey(missingCommma.s)) Globals.suggestions.Add(missingCommma.s, 0);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3469,7 +3482,17 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("};" + G.NL);  //end of action
 
                                 node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
-
+                                                                                                
+                                if (node?[0]?[0]?[1]?.Text == "ASTVARNAME" && node?[0]?[0]?[1]?[0]?[0]?.Text == "ASTHASH" && (node?[3]?.Text == "ASTPLACEHOLDER" || G.Equal(node?[3]?.Text, "list")))
+                                {
+                                    //has # on lhs
+                                    SingletonHelper missingCommma = IsRhsVariableWithoutSigil(node, node?[1]);                                    
+                                    if (missingCommma != null)
+                                    {
+                                        //new Note("Suggestion: " + missingCommma.s + " (line " + missingCommma.line + ")");
+                                        if (!Globals.suggestions.ContainsKey(missingCommma.s)) Globals.suggestions.Add(missingCommma.s, 0);
+                                    }
+                                }                                
                             }
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
@@ -5101,6 +5124,52 @@ ASTPLACEHOLDER [0]
                     }
                     break;
 
+            }
+        }
+
+        private static SingletonHelper IsRhsVariableWithoutSigil(ASTNode node, ASTNode node1)
+        {
+            if (node1 == null) return null;
+            int missingComma = -12345;
+            bool rightVarName = false;
+            bool hasSigil = false;
+
+            if (node1?.Text == "ASTDOTORINDEXER")
+            {
+                IsRhsVariableHelper(ref rightVarName, ref hasSigil, node1?[0]);
+            }
+            else
+            {
+                IsRhsVariableHelper(ref rightVarName, ref hasSigil, node1);
+            }
+
+            if (rightVarName && !hasSigil)
+            {
+                string s = null;
+                string[] ss = node.specialExpressionAndLabelInfo;
+                if (ss[1] != null) s = G.ReplaceGlueSymbols(ss[1]) + "," + ";";
+                if (s != null)
+                {
+                    SingletonHelper h = new SingletonHelper();
+                    h.s = s;
+                    h.line = node.Line;
+                    new Note("Suggestion: " + s);
+                    return h;
+                }                
+            }
+            return null;
+        }
+
+        private static void IsRhsVariableHelper(ref bool rightVarName, ref bool hasSigil, ASTNode node1)
+        {
+            if (node1 == null) return;
+            if (node1?.Text == "ASTBANKVARNAME")
+            {
+                rightVarName = true;
+                if (node1?[1]?[0]?[0]?.Text == "ASTPERCENT" || node1?[1]?[0]?[0]?.Text == "ASTHASH")
+                {
+                    hasSigil = true;
+                }
             }
         }
 

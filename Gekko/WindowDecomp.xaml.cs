@@ -1376,19 +1376,6 @@ namespace Gekko
                 TextBlock textBlock = (TextBlock)border.Child;
                 textBlock.Padding = new Thickness(0, 0, 1, 0);          
             }            
-        }        
-
-        private static Window GetWindow(GekkoDockPanel2 dockPanel)
-        {
-            Grid p = (Grid)dockPanel.Parent;
-            Border p2 = (Border)p.Parent;
-            Canvas p3 = (Canvas)p2.Parent;
-            Border p4 = (Border)p3.Parent;
-            ScrollViewer p5 = (ScrollViewer)p4.Parent;
-            StackPanel p6 = (StackPanel)p5.Parent;
-            DockPanel p7 = (DockPanel)p6.Parent;
-            Window ww = (Window)p7.Parent;
-            return ww;
         }
 
         private void Select(Grid g, int col, int row)
@@ -1555,9 +1542,7 @@ namespace Gekko
             //if (e.ClickCount != 2) return;
 
             TextBlock tb = (TextBlock)sender;
-            Border b = (Border)(tb.Parent);
-            DockPanel dp = (DockPanel)(b.Parent);
-            Grid g = (Grid)(dp.Parent);
+            DockPanel dp = G.FindParent<DockPanel>(tb);
 
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
@@ -1640,6 +1625,7 @@ namespace Gekko
             return name;
         }
 
+        
         private void Cell_Enter(object sender, MouseEventArgs e)
         {
             GekkoDockPanel2 dockPanel = (GekkoDockPanel2)sender;
@@ -1653,6 +1639,11 @@ namespace Gekko
 
             if (type == GekkoTableTypes.TableContent && this.decompFind.decompOptions2.guiDecompIsSelecting)
             {
+                //ScrollViewer p5 = G.FindParent<ScrollViewer>(g);                
+                //double x1 = p5.ContentVerticalOffset;
+                //double x2 = p5.ContentHorizontalOffset;
+                //double x3 = p5.ViewportWidth;
+                //double x4 = p5.ViewportHeight;
                 Select(g, col, row);
             }
             else
@@ -2679,11 +2670,7 @@ namespace Gekko
             //HACK HACK HACK
 
             TextBlock x1 = ((Hyperlink)sender).Parent as TextBlock;
-            StackPanel x2 = x1.Parent as StackPanel;
-            Grid x3 = x2.Parent as Grid;
-            DockPanel x4 = x3.Parent as DockPanel;
-            WindowDecomp x5 = x4.Parent as WindowDecomp;
-
+            WindowDecomp x5 = G.FindParent<WindowDecomp>(x1);
             x1.Text = "";
             x5.decompFind.decompOptions2.mergeNewVariables = null;
             x5.RecalcCellsWithNewType(x5.decompFind.model);            

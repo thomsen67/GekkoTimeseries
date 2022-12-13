@@ -3522,6 +3522,27 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Find a WPF parent of specific type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="child"></param>
+        /// <returns></returns>
+        public static T FindParent<T>(System.Windows.DependencyObject child) where T : System.Windows.DependencyObject
+        {
+            //get parent item
+            System.Windows.DependencyObject parentObject = System.Windows.Media.VisualTreeHelper.GetParent(child);
+            //we've reached the end of the tree
+            if (parentObject == null) return null;
+            //check if the parent matches the type we're looking for
+            T parent = parentObject as T;
+            if (parent != null)
+                return parent;
+            else
+                return FindParent<T>(parentObject);
+        }
+
+
+        /// <summary>
         /// Helper for getting installed .NET versions
         /// </summary>
         /// <returns></returns>

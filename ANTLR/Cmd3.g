@@ -3074,9 +3074,12 @@ findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE exp
 // FOR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
-						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+for2:                       forHelper7a functionStatements END -> ^({token("ASTFOR¤"+($forHelper7a.text), ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper7a) functionStatements)
+						  | forHelper7b functionStatements END -> ^({token("ASTFOR¤"+($forHelper7b.text), ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper7b) functionStatements)
 						    ;
+
+forHelper7a:               FOR           (forHelper2 ','?)+     SEMICOLON -> forHelper2+;
+forHelper7b:               FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? -> forHelper2+;
 
 forHelper2:                 forLhs expression TO expression2 (BY expression3)? -> ^(ASTFORTYPE1 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
                           | forLhs nakedList -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER nakedList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))

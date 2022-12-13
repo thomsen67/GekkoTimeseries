@@ -1397,6 +1397,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTFOR" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
                 }                
                 
                 if (flag)

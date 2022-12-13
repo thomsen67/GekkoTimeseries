@@ -904,6 +904,8 @@ namespace Gekko
 
         public static char pxInternalDelimiter = '¤';
 
+        public static GekkoDictionary<string, int> suggestions = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
         public static string RunGekkoTabToTextStuff_folder = "";  //not too pretty, but only used to send stuff from menu into thread
 
         public static CodeDomProvider csCompiler = CodeDomProvider.CreateProvider("CSharp");
