@@ -506,12 +506,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space. Other programs have intellisense too,
+        /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space or tab. Other programs have intellisense too,
         /// Visual Studio (Ctrl+Space), RStudio (tab, but Ctrl+Space also works), Sublime (Ctrl+Space), Spyder (tab or Ctrl+Space).
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static List<string> Suggestions(string s)
+        public static List<TwoStrings> IntellisenseVariables(string s)
         {
             /*
              * 
@@ -529,8 +529,7 @@ namespace Gekko
    
              * 
              */
-
-            List<string> rv = new List<string>();
+                         
             string txt = s;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
@@ -544,12 +543,12 @@ namespace Gekko
             bool first = true;
             for (int i = tokens2.subnodes.storage.Count - 1; i >= 0; i--) 
             {
-                TokenHelper th = tokens2.subnodes.storage[i];
+                TokenHelper th = tokens2.subnodes.storage[i];                
                 if (th.type == ETokenType.EOF) continue;
                 if (th.type == ETokenType.EOL) continue;
                 if (th.type == ETokenType.Comment) continue;
                 if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
-                if ((th.type == ETokenType.Word || th.s == "*" || th.s == "?") && (first || tokens2.subnodes.storage[i + 1].leftblanks == 0))
+                if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?") && (first || tokens2.subnodes.storage[i + 1].leftblanks == 0))
                 {
                     varname = th.s + varname;
                     if (iEnd == int.MaxValue) iEnd = i;
@@ -562,10 +561,14 @@ namespace Gekko
                 first = false;
             }
 
-            if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == ":")
+            if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == "@")
+            {
+                bankname = "Ref";
+            }
+            else if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == ":")
             {
                 bool first2 = true;
-                for (int i = iStart-2; i >= 0; i--)
+                for (int i = iStart - 2; i >= 0; i--)
                 {
                     TokenHelper th = tokens2.subnodes.storage[i];
                     if (th.type == ETokenType.EOF) continue;
@@ -574,7 +577,7 @@ namespace Gekko
                     if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
                     if ((th.type == ETokenType.Word) && (first2 || tokens2.subnodes.storage[i + 1].leftblanks == 0))
                     {
-                        bankname = th.s + bankname;                        
+                        bankname = th.s + bankname;
                         iStart = i;
                     }
                     else
@@ -588,19 +591,27 @@ namespace Gekko
             List<string> names = null;
             if (iStart == int.MaxValue)
             {
+                //new Writeln("null");
                 return null;
             }
             else
             {
-                Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iStart].column - s.Length - 1;
+                Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iStart].column - s.Length - 1 + 1;
                 string x = varname;
+                if (bankname != null) x = bankname + ":" + x;
                 if (!x.EndsWith("*")) x += "*";
                 names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
             }
 
-            new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
-            
-            return names;
+            //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
+            List<TwoStrings> rv2 = new List<TwoStrings>();
+            foreach (string s7 in names)
+            {
+                string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                rv2.Add(new TwoStrings(s7, ss));
+
+            }
+            return rv2;
         }
     }
 }

@@ -2562,7 +2562,8 @@ namespace Gekko
             else return false;
         }
 
-        /// <summary>        
+        /// <summary>   
+        /// English letters + digits, not underscore.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -3981,7 +3982,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload.
+        /// Overload. Can have minus = false, can be 0 = true.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>

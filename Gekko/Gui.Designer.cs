@@ -1330,7 +1330,7 @@ namespace Gekko
                             //See also #lu89ujksdfgpsdf for * bank name replace
 
                             RichTextBox textBox = this.textBoxMainTabLower;
-                            int offset = Globals.windowIntellisenseSuggestionsOffset;                            
+                            int offset = Globals.windowIntellisenseSuggestionsOffset;
                             int startOld = textBox.SelectionStart;
                             textBox.Select(startOld + offset - 1, -offset);
                             textBox.SelectedText = chosen;
@@ -1361,7 +1361,7 @@ namespace Gekko
                     {
                         new Error("Wrong value");
                     }
-                    
+
                     Globals.windowIntellisense.IsOpen = false;
                     Globals.windowIntellisenseType = 0;
                     e.Handled = true;
@@ -1400,7 +1400,7 @@ namespace Gekko
                 // F1
                 //
                 O.Help(Globals.helpStartPage);
-            }            
+            }
             else if (e.KeyCode == Keys.F2)
             {
                 //
@@ -1434,7 +1434,7 @@ namespace Gekko
                 // Ctrl+M
                 //
                 CrossThreadStuff.SetTab("main", true);
-            }            
+            }
             else if (e.Control && e.KeyCode == Keys.O)
             {
                 //
@@ -1463,7 +1463,7 @@ namespace Gekko
                 //
                 e.Handled = true;  //ignore -- else will left-justify
             }
-            else if (e.Control && e.KeyCode == Keys.Space)
+            else if (e.KeyCode == Keys.Tab || (e.Control && e.KeyCode == Keys.Space))
             {
                 //
                 // Ctrl+[Space]
@@ -1471,7 +1471,8 @@ namespace Gekko
                 //Calls autocomplete
                 Globals.windowIntellisenseType = 2;
                 StartIntellisense("ctrl-space", null);                
-                e.Handled = true;  //ignore -- else may do something in editor
+                e.Handled = true;  //ignore
+                e.SuppressKeyPress = true; //ignore
             }
             else if (isNormalSpace || isLessThanSign)
             {
@@ -1488,7 +1489,7 @@ namespace Gekko
                     Globals.windowIntellisenseType = 1;
                     StartIntellisense(keyword, Program.options.interface_suggestions);
                 }
-            }            
+            }
             else if (e.KeyCode == Keys.Down)
             {
                 //
@@ -1519,7 +1520,7 @@ namespace Gekko
                     }
                     e.Handled = true;
                 }
-            }            
+            }
             else
             {
                 if (Globals.windowIntellisense != null)
@@ -1728,34 +1729,43 @@ namespace Gekko
                 //do nothing
             }
 
-            List<string> suggestions = null;
+            List<TwoStrings> suggestions = null;
             if (keyword == "ctrl-space")
             {
-                suggestions = Databanks.Suggestions(s2);
+                string s_next = null;
+                try { s_next = textBoxMainTabLower.Lines[line2].Substring(column2, 1); } catch { };
+                if (!G.NullOrEmpty(s_next))
+                {
+                    if (s_next == "*" || s_next == "?" || s_next == "{" || G.IsLetterOrDigitOrUnderscore(s_next[0]))
+                    {
+                        return; //in "prt fkm", if cursor is between k and m and intellisense is called, it will be ignored. Also with fk?, fk*, fk_, fk7, fk{...,  etc.
+                    }
+                }
+                suggestions = Databanks.IntellisenseVariables(s2);
+                if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
             }
             else
             {
-                suggestions = Program.options.Intellisense(s2);
+                suggestions = Program.options.IntellisenseOptions(s2);
             }
 
             if (suggestions != null && suggestions.Count > 0)
             {
-
                 if (Globals.windowIntellisense == null)
                 {
                     Globals.windowIntellisense = new WindowIntellisense();
                 }
                 Globals.windowIntellisense.listBox1.Items.Clear();
                 int i = -1;
-                foreach (string suggest in suggestions)
+                foreach (TwoStrings suggest in suggestions)
                 {
                     i++;
                     System.Windows.Controls.ListBoxItem li = new System.Windows.Controls.ListBoxItem();
-                    li.Content = suggest;
+                    li.Content = suggest.s1;
                     li.MouseEnter += new System.Windows.Input.MouseEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseEnter);
                     li.PreviewMouseDown += new System.Windows.Input.MouseButtonEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseDown);
-                    Globals.windowIntellisense.listBox1.Items.Add(li);
-                    li.ToolTip = "Lønsum inkl. imputeret løn til selvstændige i landbrug\nKilde: Danmarks Statistik\nEnhed: Mio. kr.";
+                    li.ToolTip = suggest.s2;
+                    Globals.windowIntellisense.listBox1.Items.Add(li);                    
                 }
 
                 // Find the position of the caret
@@ -1772,7 +1782,6 @@ namespace Gekko
                 //Globals.windowIntellisenseType = ...; //is set to 1 or 2 elsewhere
                 Globals.windowIntellisense.listBox1.SelectedIndex = 0;
                 Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);                                                                                      
-
             }
         }
 

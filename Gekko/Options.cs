@@ -551,10 +551,10 @@ namespace Gekko
 
         }
 
-        public List<string> Intellisense(string s)
+        public List<TwoStrings> IntellisenseOptions(string s)
         {
             bool hasSeenEqual = false;
-            List<string> rv = new List<string>();
+            List<string> temp2 = new List<string>();
             s = s.ToLower().Substring("option ".Length).Trim(); //must start with "option "
             if (s.EndsWith("="))
             {
@@ -597,11 +597,11 @@ namespace Gekko
                 {
                     if (hasSeenEqual) goto Lbl1;  //for instance "option folder =" + [blank] --> should only match yes|no, not "option folder working" etc.
                     string w = words2[words1.Length]; //.Length - 1 would take the corresponding (last) element, but we take the next
-                    if (!rv.Contains(w)) rv.Add(w); //this .Contains() is a little slow, but should be unnoticeable in the GUI
+                    if (!temp2.Contains(w)) temp2.Add(w); //this .Contains() is a little slow, but should be unnoticeable in the GUI
                 }
                 else if (words1.Length == words2.Length)
                 {
-                    if (!hasSeenEqual && !rv.Contains("=")) rv.Add("=");
+                    if (!hasSeenEqual && !temp2.Contains("=")) temp2.Add("=");
                     if (ss.Count <= 2)
                     {
                         string w = ss[1];  //the type           
@@ -648,14 +648,14 @@ namespace Gekko
                             desc = "[integer]";
                         }                       
 
-                        if (!rv.Contains(w)) rv.Add(desc);
+                        if (!temp2.Contains(w)) temp2.Add(desc);
                     }
                     else
                     {
                         for (int i = 2; i < ss.Count; i++)
                         {
                             string w = ss[i];
-                            if (!rv.Contains(w)) rv.Add(w);
+                            if (!temp2.Contains(w)) temp2.Add(w);
                         }
                     }
                 }
@@ -663,6 +663,11 @@ namespace Gekko
             Lbl1:
                 int ii = 0;  //useless statement, just used for the label
 
+            }
+            List<TwoStrings> rv = new List<TwoStrings>();
+            foreach (string s7 in temp2)
+            {
+                rv.Add(new TwoStrings(s7, null));
             }
             return rv;
         }
