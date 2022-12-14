@@ -570,7 +570,7 @@ namespace Gekko
             int iCenter = -12345;
             for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                if (col1 >= tokens2.subnodes.storage[i].column && col1 <= tokens2.subnodes.storage[i].column + tokens2.subnodes.storage[i].s.Length) iCenter = i;
+                if (col1 >= tokens2.subnodes.storage[i].column && col1 < tokens2.subnodes.storage[i].column + tokens2.subnodes.storage[i].s.Length) iCenter = i;
             }
             if (iCenter == -12345) return new List<TwoStrings>();
 
