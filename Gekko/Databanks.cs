@@ -511,97 +511,110 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static List<TwoStrings> IntellisenseVariables(string s)
+        public static List<TwoStrings> IntellisenseVariables(string s, int col)
         {
-            /*
-             * 
-   
-   den behøver ikke forstå PRT <r> jd..., kan sige at den bare ret "dumt" kigger efter <navn>:<navn> eller
-   @<navn> for at fylde listen. Kunne være sejt at klistre
-   labels på. Skulle også virke mht. array-serier. Strengelister burde kunne have labels... Slukkes med Esc.   
-   
-   PRT x --> vise x* vars fra alle åbne banker med givne frekvens (kunne måske angive bank i label hvis <> first-pos)
-   PRT b:x --> kun fra b. PRT @x skal også virke.
-   Wildcards PRT a*b eller a?b.
-   Den søger højre mod venstre og prøver at finde [...]:[...] eller [...]. Her er * og ? ok, men ikke andre
-   karakterer inkl. kanteparenteser. Så rene idents og * og ? og 1 :. Stop ved blank. SKal kunne starte fra
-   tom streng.
-   
-             * 
-             */
-                         
+            //We have a pointer .................|
+            //We have a string "lkfjal klafjk lkadsfj lkj fkladsjf kl"
+            //From the pointer we will look left and right as long as it is legal
+            //Legal is alphanumeric, "_", "*", "?", ":", "@", "!". If we are left of ":" only
+            //accept if an ident is left of ":" and the pointer is at this ident.
+            //to the right of ":" or if no ":", accept normal and "*" and "?".
+            //No blanks are accepted at all, except around ":".   
+
+            //With "prt xa" and cursor between x and a, we get col=5
+            //      012345
+            //So col=5 is understood as cursor between col 4 and col 5.
+
+            ////look left
+            //int iStart = -12345;
+            //for (int i = col; i >= 0; i--)
+            //{
+            //    if (s[i] == ':')
+            //    {
+            //        //jump spaces
+            //        for (int j = i - 1; j >= 0; j--)
+            //        {
+            //            if (s[j] == ' ') i = j;
+            //            else break;
+            //        }
+            //        continue;
+            //    }
+            //    else if (s[i] == ' ')
+            //    {
+            //        //jump spaces
+            //        for (int j = i - 1; j >= 0; j--)
+            //        {
+            //            if (s[j] == ' ') i = j;
+            //            else break;
+            //        }
+            //        continue;
+            //    }
+            //    else if (G.IsLetterOrDigitOrUnderscore(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!')
+            //    {
+            //        //good
+            //    }
+            //    else
+            //    {
+            //        iStart = i + 1;
+            //        break;
+            //    }
+            //}
+
             string txt = s;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
 
-            int iEnd = int.MaxValue;
-            int iStart = int.MaxValue;
-            int offset = 0;
-            string bankname = null;
-            string varname = null;
-            bool first = true;
-            for (int i = tokens2.subnodes.storage.Count - 1; i >= 0; i--) 
+            int iCenter = -12345;
+            for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                TokenHelper th = tokens2.subnodes.storage[i];                
-                if (th.type == ETokenType.EOF) continue;
-                if (th.type == ETokenType.EOL) continue;
-                if (th.type == ETokenType.Comment) continue;
-                if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
-                if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?") && (first || tokens2.subnodes.storage[i + 1].leftblanks == 0))
-                {
-                    varname = th.s + varname;
-                    if (iEnd == int.MaxValue) iEnd = i;
-                    iStart = i;
-                }
-                else
-                {
-                    break;
-                }                
-                first = false;
+                if (tokens2.subnodes.storage[i].column > col) iCenter = i - 1;
+            }
+            if (iCenter == -12345) iCenter = tokens2.subnodes.storage.Count - 1;
+            if (iCenter == -1) iCenter = 0;
+
+            List<TokenHelper> left = new List<TokenHelper>();
+            List<TokenHelper> right = new List<TokenHelper>();
+            
+            //look at the left
+            for (int i = iCenter - 1; i >= 0; i--)
+            {
+                TokenHelper th = tokens2.subnodes.storage[i];
+                if (th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.Comment || th.type == ETokenType.WhiteSpace) left.Add(th);
+                else if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "?" || th.s == "!") && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":")) left.Add(th);
+                else if (th.s == ":") left.Add(th);
+                else break;
             }
 
-            if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == "@")
+            for (int i = iCenter + 1; i < tokens2.subnodes.storage.Count; i++)
             {
-                bankname = "Ref";
+                TokenHelper th = tokens2.subnodes.storage[i];
+                if (th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.Comment || th.type == ETokenType.WhiteSpace) right.Add(th);
+                else if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "?" || th.s == "!") && (tokens2.subnodes.storage[i].leftblanks == 0 || tokens2.subnodes.storage[i].s == ":")) right.Add(th);
+                else if (th.s == ":") left.Add(th);
+                else break;
             }
-            else if (StringTokenizer.GetS(tokens2.subnodes.storage, iStart - 1) == ":")
+
+            List<TokenHelper> all = new List<TokenHelper>();
+            left.Reverse();
+            all.AddRange(left);
+            all.Add(tokens2.subnodes.storage[iCenter]);
+            all.AddRange(right);
+
+            G.Writeln("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'");
+
+            string x = null;
+            foreach (TokenHelper th in all)
             {
-                bool first2 = true;
-                for (int i = iStart - 2; i >= 0; i--)
-                {
-                    TokenHelper th = tokens2.subnodes.storage[i];
-                    if (th.type == ETokenType.EOF) continue;
-                    if (th.type == ETokenType.EOL) continue;
-                    if (th.type == ETokenType.Comment) continue;
-                    if (th.type == ETokenType.WhiteSpace) continue; //this type is probably not possible
-                    if ((th.type == ETokenType.Word) && (first2 || tokens2.subnodes.storage[i + 1].leftblanks == 0))
-                    {
-                        bankname = th.s + bankname;
-                        iStart = i;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                    first2 = false;
-                }
+                x += th.ToString();
+                G.Writeln("--- '" + th.ToString() + "'   "+th.type);
             }
-            
+            if (!x.EndsWith("*")) x = x + "*";
+
             List<string> names = null;
-            if (iStart == int.MaxValue)
-            {
-                //new Writeln("null");
-                return null;
-            }
-            else
-            {
-                Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iStart].column - s.Length - 1 + 1;
-                string x = varname;
-                if (bankname != null) x = bankname + ":" + x;
-                if (!x.EndsWith("*")) x += "*";
-                names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
-            }
+
+            Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iCenter].column - s.Length - 1 + 1;
+            names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
 
             //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
             List<TwoStrings> rv2 = new List<TwoStrings>();
@@ -609,7 +622,6 @@ namespace Gekko
             {
                 string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
                 rv2.Add(new TwoStrings(s7, ss));
-
             }
             return rv2;
         }

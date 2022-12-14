@@ -13949,6 +13949,66 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Intellisense()
+        {
+            string s = null; int offset = 38;
+
+            List<TwoStrings> suggestions = Gui.StartIntellisenseHelper("option collapse", "space", "option", 0, 15);
+            Assert.AreEqual(2, suggestions.Count);
+
+            I("reset;");
+            I("xa1 = 1;");
+            I("xb2 = 2;");
+            I("prt1 = 11;");
+            I("prt2 = 12;");
+
+            s = ".........................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after t            
+            Assert.AreEqual(1, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "[no matches]");
+
+            s = "..........................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt ", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after blank
+            Assert.AreEqual(4, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+            Assert.IsTrue(suggestions[1].s1 == "xb2");
+            Assert.IsTrue(suggestions[2].s1 == "prt1");
+            Assert.IsTrue(suggestions[3].s1 == "prt2");
+
+            s = "...........................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt x", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after x            
+            Assert.AreEqual(2, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+            Assert.IsTrue(suggestions[1].s1 == "xb2");
+
+            s = "............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt xa", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after a
+            Assert.AreEqual(2, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+            Assert.IsTrue(suggestions[1].s1 == "xb2");
+
+            s = "............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt x,", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after ,
+            Assert.AreEqual(4, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+            Assert.IsTrue(suggestions[1].s1 == "xb2");
+            Assert.IsTrue(suggestions[2].s1 == "prt1");
+            Assert.IsTrue(suggestions[3].s1 == "prt2");
+
+            s = "............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt x+", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after +
+            Assert.AreEqual(4, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+            Assert.IsTrue(suggestions[1].s1 == "xb2");
+            Assert.IsTrue(suggestions[2].s1 == "prt1");
+            Assert.IsTrue(suggestions[3].s1 == "prt2");
+
+
+
+
+        }
+
+        [TestMethod]
         public void _Test_SeriesResize()
         {
             I("reset;");

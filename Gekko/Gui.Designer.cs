@@ -1660,94 +1660,10 @@ namespace Gekko
             int firstChar;
             int column2;
             TextInputHelper(out line2, out firstChar, out column2);
-            string s2 = null;
-            try
-            {
-                s2 = textBoxMainTabLower.Lines[line2].Substring(0, column2);
-            }
-            catch
-            {
-                if (line2 == 0 && column2 == 0)
-                {
-                    //an enter at the very beginning before any lines are made in textbox
-                }
-                else return;  //should not be possible, but we fail silently.
-            }
 
-            if (s2 == null) s2 = "";
-            s2 = s2.Trim();
+            string line = textBoxMainTabLower.Lines[line2];
 
-            if (keyword == "space") s2 += " ";
-            else if (keyword == "less") s2 += "<";
-            else if (keyword == "ctrl-space")
-            {
-                //do nothing
-            }
-
-            if (type == null)
-            {
-                //do nothing
-            }
-            else if (G.Equal(type, "none"))
-            {
-                return;
-            }
-            else if (G.Equal(type, "option"))
-            {
-                if (keyword == "space")
-                {
-                    bool ok = false;
-                    if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        ok = true;
-                    }
-                    if (ok == false) return;
-                }
-                else if (keyword == "less")
-                {
-                    return;
-                }
-            }
-            else if (G.Equal(type, "some"))
-            {
-                if (keyword == "space")
-                {
-                    bool ok = false;
-                    if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        ok = true;
-                    }
-                    if (s2.Contains("<") && !s2.Contains(">"))
-                    {
-                        ok = true;
-                    }
-                    if (ok == false) return;
-                }
-            }
-            else if (G.Equal(type, "all"))
-            {
-                //do nothing
-            }
-
-            List<TwoStrings> suggestions = null;
-            if (keyword == "ctrl-space")
-            {
-                string s_next = null;
-                try { s_next = textBoxMainTabLower.Lines[line2].Substring(column2, 1); } catch { };
-                if (!G.NullOrEmpty(s_next))
-                {
-                    if (s_next == "*" || s_next == "?" || s_next == "{" || G.IsLetterOrDigitOrUnderscore(s_next[0]))
-                    {
-                        return; //in "prt fkm", if cursor is between k and m and intellisense is called, it will be ignored. Also with fk?, fk*, fk_, fk7, fk{...,  etc.
-                    }
-                }
-                suggestions = Databanks.IntellisenseVariables(s2);
-                if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
-            }
-            else
-            {
-                suggestions = Program.options.IntellisenseOptions(s2);
-            }
+            List<TwoStrings> suggestions = StartIntellisenseHelper(line, keyword, type, line2, column2);
 
             if (suggestions != null && suggestions.Count > 0)
             {
@@ -1765,12 +1681,12 @@ namespace Gekko
                     li.MouseEnter += new System.Windows.Input.MouseEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseEnter);
                     li.PreviewMouseDown += new System.Windows.Input.MouseButtonEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseDown);
                     li.ToolTip = suggest.s2;
-                    Globals.windowIntellisense.listBox1.Items.Add(li);                    
+                    Globals.windowIntellisense.listBox1.Items.Add(li);
                 }
 
                 // Find the position of the caret
                 Point point = this.textBoxMainTabLower.GetPositionFromCharIndex(textBoxMainTabLower.SelectionStart);
-                Point pp = this.textBoxMainTabLower.PointToScreen(point);                
+                Point pp = this.textBoxMainTabLower.PointToScreen(point);
                 double xx = double.NaN;
                 double yy = double.NaN;
                 int ixx = 0;
@@ -1781,8 +1697,88 @@ namespace Gekko
                 Globals.windowIntellisense.IsOpen = true;
                 //Globals.windowIntellisenseType = ...; //is set to 1 or 2 elsewhere
                 Globals.windowIntellisense.listBox1.SelectedIndex = 0;
-                Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);                                                                                      
+                Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);
             }
+        }
+
+        public static List<TwoStrings> StartIntellisenseHelper(string line, string keyword, string type, int line2, int column2)
+        {
+            string s2 = null;
+            try
+            {
+                s2 = line.Substring(0, column2);
+            }
+            catch { }
+            if (s2 == null) s2 = "";
+            s2 = s2.Trim();
+            string s_next = null;
+            try { s_next = line.Substring(column2, 1); } catch { };
+
+            List<TwoStrings> suggestions = null;
+            if (keyword == "space") s2 += " ";
+            else if (keyword == "less") s2 += "<";
+            else if (keyword == "ctrl-space")
+            {
+                //do nothing
+            }
+
+            if (type == null)
+            {
+                //do nothing
+            }
+            else if (G.Equal(type, "none"))
+            {
+                goto Lbl1;
+            }
+            else if (G.Equal(type, "option"))
+            {
+                if (keyword == "space")
+                {
+                    bool ok = false;
+                    if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ok = true;
+                    }
+                    if (ok == false) goto Lbl1;
+                }
+                else if (keyword == "less")
+                {
+                    goto Lbl1;
+                }
+            }
+            else if (G.Equal(type, "some"))
+            {
+                if (keyword == "space")
+                {
+                    bool ok = false;
+                    if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ok = true;
+                    }
+                    if (s2.Contains("<") && !s2.Contains(">"))
+                    {
+                        ok = true;
+                    }
+                    if (ok == false) goto Lbl1;
+                }
+            }
+            else if (G.Equal(type, "all"))
+            {
+                //do nothing
+            }
+
+            if (keyword == "ctrl-space")
+            {                
+                suggestions = Databanks.IntellisenseVariables(line, column2);
+                if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
+            }
+            else
+            {
+                suggestions = Program.options.IntellisenseOptions(s2);
+            }
+
+        Lbl1:;
+            return suggestions;
         }
 
         /// <summary>
