@@ -1782,7 +1782,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Finds position in input text box
+        /// Finds position in input text box. Guess these are 0-based.
         /// </summary>
         /// <param name="lineNumberInTextField"></param>
         /// <param name="positionInAllLinesInTotalFile"></param>

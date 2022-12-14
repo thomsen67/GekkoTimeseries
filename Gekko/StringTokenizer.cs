@@ -164,8 +164,8 @@ namespace Gekko
         public string s = "";  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
         public ETokenType type = ETokenType.Unknown;
         public int leftblanks = 0; //if subnodes != null, leftblanks will always be = 0.
-        public int line = -12345;
-        public int column = -12345;
+        public int line = -12345;  //guess this is 1-based
+        public int column = -12345;  //guess this is 1-based
         //below is advanced (recursive) stuff        
         public TokenList subnodes = null;
         public TokenHelper parent = null;

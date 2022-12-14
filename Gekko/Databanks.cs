@@ -560,6 +560,8 @@ namespace Gekko
             //    }
             //}
 
+            int col1 = col + 1;  //col1 is 1-based, easier here
+
             string txt = s;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
@@ -568,10 +570,11 @@ namespace Gekko
             int iCenter = -12345;
             for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                if (tokens2.subnodes.storage[i].column > col) iCenter = i - 1;
+                if (col1 >= tokens2.subnodes.storage[i].column && col1 <= tokens2.subnodes.storage[i].column + tokens2.subnodes.storage[i].s.Length) iCenter = i;
             }
-            if (iCenter == -12345) iCenter = tokens2.subnodes.storage.Count - 1;
-            if (iCenter == -1) iCenter = 0;
+            if (iCenter == -12345) return new List<TwoStrings>();
+
+            TokenHelper center = tokens2.subnodes.storage[iCenter];
 
             List<TokenHelper> left = new List<TokenHelper>();
             List<TokenHelper> right = new List<TokenHelper>();
@@ -580,30 +583,37 @@ namespace Gekko
             for (int i = iCenter - 1; i >= 0; i--)
             {
                 TokenHelper th = tokens2.subnodes.storage[i];
-                if (th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.Comment || th.type == ETokenType.WhiteSpace) left.Add(th);
-                else if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "?" || th.s == "!") && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":")) left.Add(th);
+                if (AcceptableToken(th) && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":")) left.Add(th);
                 else if (th.s == ":") left.Add(th);
                 else break;
             }
 
-            for (int i = iCenter + 1; i < tokens2.subnodes.storage.Count; i++)
+            if (AcceptableToken(center) || center.s == ":")
             {
-                TokenHelper th = tokens2.subnodes.storage[i];
-                if (th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.Comment || th.type == ETokenType.WhiteSpace) right.Add(th);
-                else if ((th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "?" || th.s == "!") && (tokens2.subnodes.storage[i].leftblanks == 0 || tokens2.subnodes.storage[i].s == ":")) right.Add(th);
-                else if (th.s == ":") left.Add(th);
-                else break;
+                for (int i = iCenter + 1; i < tokens2.subnodes.storage.Count; i++)
+                {
+                    TokenHelper th = tokens2.subnodes.storage[i];
+                    if (AcceptableToken(th) && (tokens2.subnodes.storage[i].leftblanks == 0 || tokens2.subnodes.storage[i].s == ":")) right.Add(th);
+                    else if (th.s == ":") right.Add(th);
+                    else break;
+                }
             }
 
             List<TokenHelper> all = new List<TokenHelper>();
             left.Reverse();
             all.AddRange(left);
-            all.Add(tokens2.subnodes.storage[iCenter]);
+            if (AcceptableToken(center) || center.s == ":") all.Add(center);
             all.AddRange(right);
 
-            G.Writeln("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'");
+            //List<TokenHelper> all = new List<TokenHelper>();
+            //foreach (TokenHelper th in all2)
+            //{
+            //    if (AcceptableToken(th) || th.s == ":") all.Add(th);  //remove strange tokens, probably always at the ends
+            //}
 
-            string x = null;
+            G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'");            
+
+            string x = "";
             foreach (TokenHelper th in all)
             {
                 x += th.ToString();
@@ -624,6 +634,11 @@ namespace Gekko
                 rv2.Add(new TwoStrings(s7, ss));
             }
             return rv2;
+        }
+
+        private static bool AcceptableToken(TokenHelper th)
+        {
+            return th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "@" || th.s == "!";
         }
     }
 }
