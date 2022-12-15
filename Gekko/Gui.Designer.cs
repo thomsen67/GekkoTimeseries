@@ -1338,25 +1338,25 @@ namespace Gekko
                             textBox.Select(startOld + offset1, offset2 - offset1 + 1);
                             textBox.SelectedText = chosen;
 
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //TODO TODO TODO TODO
-                            //doing the same for commandhistory
-                            string s3 = Globals.commandMemory.storage.ToString();
-                            string select2Start = s3.Substring(0, Globals.commandMemory.lengthWhenLastEnterPressed);
-                            string select2 = s3.Substring(Globals.commandMemory.lengthWhenLastEnterPressed);
-                            int count2 = select2.Length - select2.Replace("*", "").Length;
-                            if (count2 == 1)
-                            {
-                                if (!select2.Contains(" *")) select2 = G.ReplaceString(select2, "*", " *", true);  //READ* --> READ *, otherwise the blank will be lacking when the '*' is substituted
-                                select2 = G.ReplaceString(select2, "*", "xyz", true);
-                                Globals.commandMemory.storage = new StringBuilder(select2Start + select2);
-                                Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;  //probably superfluous, will be set later on
-                            }
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////TODO TODO TODO TODO
+                            ////doing the same for commandhistory
+                            //string s3 = Globals.commandMemory.storage.ToString();
+                            //string select2Start = s3.Substring(0, Globals.commandMemory.lengthWhenLastEnterPressed);
+                            //string select2 = s3.Substring(Globals.commandMemory.lengthWhenLastEnterPressed);
+                            //int count2 = select2.Length - select2.Replace("*", "").Length;
+                            //if (count2 == 1)
+                            //{
+                            //    if (!select2.Contains(" *")) select2 = G.ReplaceString(select2, "*", " *", true);  //READ* --> READ *, otherwise the blank will be lacking when the '*' is substituted
+                            //    select2 = G.ReplaceString(select2, "*", "xyz", true);
+                            //    Globals.commandMemory.storage = new StringBuilder(select2Start + select2);
+                            //    Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;  //probably superfluous, will be set later on
+                            //}
                         }
                         catch { }
                     }
@@ -1773,7 +1773,7 @@ namespace Gekko
             if (keyword == "ctrl-space")
             {                
                 suggestions = Databanks.IntellisenseVariables(line, column2);
-                if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
+                //if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
             }
             else
             {

@@ -3169,12 +3169,12 @@ namespace Gekko
             if (iv.Type() == EVariableType.Range)
             {
                 Range iv_range = iv as Range;
-                string s1 = iv_range.first.ConvertToString().Trim();
-                string s2 = iv_range.last.ConvertToString().Trim();
+                string s1 = iv_range.first.ConvertToString().Trim(); //Gekko 4.0, maybe remove all spaces
+                string s2 = iv_range.last.ConvertToString().Trim(); //Gekko 4.0, maybe remove all spaces
                 return s1 + ".." + s2;
             }
 
-            string s = iv.ConvertToString();
+            string s = iv.ConvertToString();  //Gekko 4.0, maybe remove all spaces, at least could use .Trim().
 
             if (Program.IsListfileArtificialName(s)) return s;  //do not chew on an artificial "listfile___..." name, used for #(listfile m) kinds of IVariables
 

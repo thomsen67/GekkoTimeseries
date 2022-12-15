@@ -518,7 +518,7 @@ namespace Gekko
         /// <summary>
         /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space or tab. Other programs have intellisense too,
         /// Visual Studio (Ctrl+Space), RStudio (tab, but Ctrl+Space also works), Sublime (Ctrl+Space), Spyder (tab or Ctrl+Space).
-        /// Returns a list of names|labels.
+        /// Returns a list of names|labels. Returns list with count = 0 if malformed input or no results.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -533,6 +533,7 @@ namespace Gekko
             //No blanks are accepted at all, except around ":".   
             
             int col1 = col + 1;  //col1 is 1-based, easier here
+            List<TwoStrings> rv2 = new List<TwoStrings>();            
 
             string txt = s;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
@@ -557,6 +558,16 @@ namespace Gekko
             bool blankAtCursor = false;
             try { if (s[col] == ' ') blankAtCursor = true; } catch { }
 
+            bool centerAcceptable = false;                
+            if (AcceptableToken(center) || center.s == ":")
+            {
+                centerAcceptable = true;
+            }
+            else
+            {
+                //starts at something like ";" or "," etc.
+            }
+
             //look at the left
             for (int i = iCenter - 1; i >= 0; i--)
             {
@@ -564,8 +575,9 @@ namespace Gekko
                 TokenHelper th = tokens2.subnodes.storage[i];
                 if (AcceptableToken(th) && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":" || tokens2.subnodes.storage[i + 1].type == ETokenType.EOF)) left.Add(th);
                 else if (th.s == ":") left.Add(th);
+                else if (i == iCenter - 1 && !centerAcceptable) left.Add(th);
                 else break;
-            }            
+            }
 
             //if (!blankAtCursor && (AcceptableToken(center) || center.s == ":"))
             if(AcceptableToken(center) || center.s == ":")
@@ -580,10 +592,9 @@ namespace Gekko
             }
 
             List<TokenHelper> all = new List<TokenHelper>();
-
             left.Reverse();
             all.AddRange(left);
-            if (AcceptableToken(center) || center.s == ":") all.Add(center);
+            if (centerAcceptable) all.Add(center);
             all.AddRange(right);
 
             bool bad = false;
@@ -601,29 +612,31 @@ namespace Gekko
                 int end = TokenBorders(all[all.Count - 1]).Item2;                
                 Globals.windowIntellisenseSuggestionsOffset1 = start - col1;
                 Globals.windowIntellisenseSuggestionsOffset2 = end - col1;
+
+                //G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'   "+iCenter);            
+                //G.Writeln();            
+                string x = "";
+                foreach (TokenHelper th in all)
+                {
+                    x += th.ToString();
+                    //G.Writeln("--- '" + th.ToString() + "'   "+th.type);
+                }
+                if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
+
+                List<string> names = null;
+
+                string x2 = x.Replace(" ", "");
+                names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);
+
+                //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
+                
+                foreach (string s7 in names)
+                {
+                    string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                    rv2.Add(new TwoStrings(s7, ss));
+                }
             }
-
-            //G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'   "+iCenter);            
-            //G.Writeln();            
-            string x = "";
-            foreach (TokenHelper th in all)
-            {
-                x += th.ToString();
-                //G.Writeln("--- '" + th.ToString() + "'   "+th.type);
-            }
-            if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
-
-            List<string> names = null;            
-
-            names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
-
-            //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
-            List<TwoStrings> rv2 = new List<TwoStrings>();
-            foreach (string s7 in names)
-            {
-                string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
-                rv2.Add(new TwoStrings(s7, ss));
-            }
+            
             return rv2;
         }
 
