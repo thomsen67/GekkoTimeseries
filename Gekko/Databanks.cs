@@ -506,8 +506,19 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Real borders of token, including blanks to the left and adjusting for length. 1-based like TokenHelper.column.
+        /// </summary>
+        /// <param name="th"></param>
+        /// <returns></returns>
+        public static Tuple<int, int> TokenBorders(TokenHelper th)
+        {
+            return new Tuple<int, int>(th.column - th.leftblanks, th.column + th.s.Length - 1);
+        }
+
+        /// <summary>
         /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space or tab. Other programs have intellisense too,
         /// Visual Studio (Ctrl+Space), RStudio (tab, but Ctrl+Space also works), Sublime (Ctrl+Space), Spyder (tab or Ctrl+Space).
+        /// Returns a list of names|labels.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -520,46 +531,7 @@ namespace Gekko
             //accept if an ident is left of ":" and the pointer is at this ident.
             //to the right of ":" or if no ":", accept normal and "*" and "?".
             //No blanks are accepted at all, except around ":".   
-
-            //With "prt xa" and cursor between x and a, we get col=5
-            //      012345
-            //So col=5 is understood as cursor between col 4 and col 5.
-
-            ////look left
-            //int iStart = -12345;
-            //for (int i = col; i >= 0; i--)
-            //{
-            //    if (s[i] == ':')
-            //    {
-            //        //jump spaces
-            //        for (int j = i - 1; j >= 0; j--)
-            //        {
-            //            if (s[j] == ' ') i = j;
-            //            else break;
-            //        }
-            //        continue;
-            //    }
-            //    else if (s[i] == ' ')
-            //    {
-            //        //jump spaces
-            //        for (int j = i - 1; j >= 0; j--)
-            //        {
-            //            if (s[j] == ' ') i = j;
-            //            else break;
-            //        }
-            //        continue;
-            //    }
-            //    else if (G.IsLetterOrDigitOrUnderscore(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!')
-            //    {
-            //        //good
-            //    }
-            //    else
-            //    {
-            //        iStart = i + 1;
-            //        break;
-            //    }
-            //}
-
+            
             int col1 = col + 1;  //col1 is 1-based, easier here
 
             string txt = s;
@@ -570,9 +542,12 @@ namespace Gekko
             int iCenter = -12345;
             for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                if (col1 >= tokens2.subnodes.storage[i].column) iCenter = i;
+                //the token start pos (.column) is its first non-blank. So real start has leftblanks deducted,
+                //and the end has added length of token (.s) minus 1.
+                TokenHelper th = tokens2.subnodes.storage[i];
+                if (TokenBorders(th).Item1 <= col1 && col1 <= TokenBorders(th).Item2) iCenter = i;
             }
-            if (iCenter == -12345) iCenter = tokens2.subnodes.storage.Count - 1;
+            if (iCenter == -12345) iCenter = tokens2.subnodes.storage.Count - 1; //should not happen
 
             TokenHelper center = tokens2.subnodes.storage[iCenter];
 
@@ -585,48 +560,61 @@ namespace Gekko
             //look at the left
             for (int i = iCenter - 1; i >= 0; i--)
             {
+                //accepts blank between i and i+1 if i+1 is colon
                 TokenHelper th = tokens2.subnodes.storage[i];
                 if (AcceptableToken(th) && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":" || tokens2.subnodes.storage[i + 1].type == ETokenType.EOF)) left.Add(th);
                 else if (th.s == ":") left.Add(th);
                 else break;
             }            
 
-            if (!blankAtCursor && (AcceptableToken(center) || center.s == ":"))
+            //if (!blankAtCursor && (AcceptableToken(center) || center.s == ":"))
+            if(AcceptableToken(center) || center.s == ":")
             {
                 for (int i = iCenter + 1; i < tokens2.subnodes.storage.Count; i++)
                 {
                     TokenHelper th = tokens2.subnodes.storage[i];
-                    if (AcceptableToken(th) && (tokens2.subnodes.storage[i].leftblanks == 0 || tokens2.subnodes.storage[i].s == ":")) right.Add(th);
+                    if (AcceptableToken(th) && (th.leftblanks == 0 || tokens2.subnodes.storage[i - 1].s == ":")) right.Add(th);
                     else if (th.s == ":") right.Add(th);
                     else break;
                 }
             }
 
             List<TokenHelper> all = new List<TokenHelper>();
+
             left.Reverse();
             all.AddRange(left);
             if (AcceptableToken(center) || center.s == ":") all.Add(center);
             all.AddRange(right);
 
-            //List<TokenHelper> all = new List<TokenHelper>();
-            //foreach (TokenHelper th in all2)
-            //{
-            //    if (AcceptableToken(th) || th.s == ":") all.Add(th);  //remove strange tokens, probably always at the ends
-            //}
+            bool bad = false;
+            if (all.Count > 0)
+            {
+                //end-point restrictions
+                if (col1 < all[0].column) bad = true;
+                if (TokenBorders(all[all.Count - 1]).Item2 < col1 - 1) bad = true;
+            }
+            if (bad) all.Clear();
 
-            G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'");            
+            if (all.Count > 0)
+            {
+                int start = all[0].column;
+                int end = TokenBorders(all[all.Count - 1]).Item2;                
+                Globals.windowIntellisenseSuggestionsOffset1 = start - col1;
+                Globals.windowIntellisenseSuggestionsOffset2 = end - col1;
+            }
 
+            //G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'   "+iCenter);            
+            //G.Writeln();            
             string x = "";
             foreach (TokenHelper th in all)
             {
                 x += th.ToString();
-                G.Writeln("--- '" + th.ToString() + "'   "+th.type);
+                //G.Writeln("--- '" + th.ToString() + "'   "+th.type);
             }
-            if (!x.EndsWith("*")) x = x + "*";
+            if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
 
-            List<string> names = null;
+            List<string> names = null;            
 
-            Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[iCenter].column - s.Length - 1 + 1;
             names = Program.Search(new List(new List<string>() { x }), null, EVariableType.Var);
 
             //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);

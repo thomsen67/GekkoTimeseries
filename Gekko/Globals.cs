@@ -922,8 +922,9 @@ namespace Gekko
         public static string sessionMemoryHistory = null;        
 
         public static WindowIntellisense windowIntellisense = null;
-        public static int windowIntellisenseType = 0;  //0:none, 1:options, 2:variable suggestions.
-        public static int windowIntellisenseSuggestionsOffset = 0;  //where does the suggestion wildcard start
+        public static int windowIntellisenseType = 0;  //0:none, 1:options, 2:variable suggestions.        
+        public static int windowIntellisenseSuggestionsOffset1 = -12345;  //for variables start
+        public static int windowIntellisenseSuggestionsOffset2 = -12345;  //for variables end
 
         public static Table lastPrtOrMulprtTable = null; 
         public static Table lastDecompTable = null;  //only used for unit tests

@@ -1318,10 +1318,12 @@ namespace Gekko
 
                     if (Globals.windowIntellisenseType == 1)
                     {
+                        //only options intellisense
                         textBoxMainTabLower.SelectedText = chosen;
                     }
                     else if (Globals.windowIntellisenseType == 2)
                     {
+                        //only variables intellisense
                         int lineNumber; int positionInAllLines; int positionInLine;
                         TextInputHelper(out lineNumber, out positionInAllLines, out positionInLine);
                         string s2 = null;
@@ -1330,9 +1332,10 @@ namespace Gekko
                             //See also #lu89ujksdfgpsdf for * bank name replace
 
                             RichTextBox textBox = this.textBoxMainTabLower;
-                            int offset = Globals.windowIntellisenseSuggestionsOffset;
+                            int offset1 = Globals.windowIntellisenseSuggestionsOffset1;
+                            int offset2 = Globals.windowIntellisenseSuggestionsOffset2;
                             int startOld = textBox.SelectionStart;
-                            textBox.Select(startOld + offset - 1, -offset);
+                            textBox.Select(startOld + offset1, offset2 - offset1 + 1);
                             textBox.SelectedText = chosen;
 
                             //TODO TODO TODO TODO
