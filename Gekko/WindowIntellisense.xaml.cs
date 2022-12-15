@@ -59,11 +59,9 @@ namespace Gekko
         }
 
         public void listBoxItem_PreviewMouseEnter(object sender, MouseEventArgs e)
-        {
-            //Print(sender);
-            //Console.WriteLine("ldkasj");
-            System.Windows.Controls.ListBoxItem xx = (System.Windows.Controls.ListBoxItem)sender;
-            xx.IsSelected = true;
+        {            
+            //ListBoxItem xx = (ListBoxItem)sender;
+            //xx.IsSelected = true;
         }
 
         private static void Print(object sender)

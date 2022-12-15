@@ -554,10 +554,7 @@ namespace Gekko
 
             List<TokenHelper> left = new List<TokenHelper>();
             List<TokenHelper> right = new List<TokenHelper>();
-
-            bool blankAtCursor = false;
-            try { if (s[col] == ' ') blankAtCursor = true; } catch { }
-
+            
             bool centerAcceptable = false;                
             if (AcceptableToken(center) || center.s == ":")
             {

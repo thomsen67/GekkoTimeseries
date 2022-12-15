@@ -1670,18 +1670,39 @@ namespace Gekko
 
             if (suggestions != null && suggestions.Count > 0)
             {
-                if (Globals.windowIntellisense == null)
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Suggestions: " + suggestions.Count);
+
+                bool fix = true;
+
+                if (!fix)
+                {
+                    if (Globals.windowIntellisense == null)
+                    {
+                        Globals.windowIntellisense = new WindowIntellisense();
+                    }
+                    Globals.windowIntellisense.listBox1.Items.Clear();
+                }
+                else
                 {
                     Globals.windowIntellisense = new WindowIntellisense();
+                    //var v = Globals.windowIntellisense.listBox1.ItemsSource;
+                    //Globals.windowIntellisense.listBox1.ItemsSource = null;
+                    //Globals.windowIntellisense.listBox1.ItemsSource = v;
                 }
-                Globals.windowIntellisense.listBox1.Items.Clear();
+
                 int i = -1;
                 foreach (TwoStrings suggest in suggestions)
                 {
+                    //This is a bit slow to load, maybe because of all the methods added.
+                    //The code below might be faster.
+                    //https://stackoverflow.com/questions/192584/how-can-i-set-different-tooltip-text-for-each-item-in-a-listbox
+                    //answer by "Michael". But beware that a timer is used for mouse down event, ...?
+                    //Could use SuspendLayout somehow...
                     i++;
                     System.Windows.Controls.ListBoxItem li = new System.Windows.Controls.ListBoxItem();
                     li.Content = suggest.s1;
-                    li.MouseEnter += new System.Windows.Input.MouseEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseEnter);
+                    //the method below seems unneeded, 15-12-2022.
+                    //li.MouseEnter += new System.Windows.Input.MouseEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseEnter);
                     li.PreviewMouseDown += new System.Windows.Input.MouseButtonEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseDown);
                     li.ToolTip = suggest.s2;
                     Globals.windowIntellisense.listBox1.Items.Add(li);
@@ -1698,7 +1719,6 @@ namespace Gekko
                 Globals.windowIntellisense.VerticalOffset = yy;
                 Globals.windowIntellisense.HorizontalOffset = xx;
                 Globals.windowIntellisense.IsOpen = true;
-                //Globals.windowIntellisenseType = ...; //is set to 1 or 2 elsewhere
                 Globals.windowIntellisense.listBox1.SelectedIndex = 0;
                 Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);
             }
@@ -1771,13 +1791,13 @@ namespace Gekko
             }
 
             if (keyword == "ctrl-space")
-            {                
-                suggestions = Databanks.IntellisenseVariables(line, column2);
+            {
+                try { suggestions = Databanks.IntellisenseVariables(line, column2); } catch { }
                 //if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
             }
             else
             {
-                suggestions = Program.options.IntellisenseOptions(s2);
+                try { suggestions = Program.options.IntellisenseOptions(s2); } catch { }
             }
 
         Lbl1:;
