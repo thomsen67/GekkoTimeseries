@@ -570,25 +570,28 @@ namespace Gekko
             int iCenter = -12345;
             for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                if (col1 >= tokens2.subnodes.storage[i].column && col1 < tokens2.subnodes.storage[i].column + tokens2.subnodes.storage[i].s.Length) iCenter = i;
+                if (col1 >= tokens2.subnodes.storage[i].column) iCenter = i;
             }
-            if (iCenter == -12345) return new List<TwoStrings>();
+            if (iCenter == -12345) iCenter = tokens2.subnodes.storage.Count - 1;
 
             TokenHelper center = tokens2.subnodes.storage[iCenter];
 
             List<TokenHelper> left = new List<TokenHelper>();
             List<TokenHelper> right = new List<TokenHelper>();
-            
+
+            bool blankAtCursor = false;
+            try { if (s[col] == ' ') blankAtCursor = true; } catch { }
+
             //look at the left
             for (int i = iCenter - 1; i >= 0; i--)
             {
                 TokenHelper th = tokens2.subnodes.storage[i];
-                if (AcceptableToken(th) && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":")) left.Add(th);
+                if (AcceptableToken(th) && (tokens2.subnodes.storage[i + 1].leftblanks == 0 || tokens2.subnodes.storage[i + 1].s == ":" || tokens2.subnodes.storage[i + 1].type == ETokenType.EOF)) left.Add(th);
                 else if (th.s == ":") left.Add(th);
                 else break;
-            }
+            }            
 
-            if (AcceptableToken(center) || center.s == ":")
+            if (!blankAtCursor && (AcceptableToken(center) || center.s == ":"))
             {
                 for (int i = iCenter + 1; i < tokens2.subnodes.storage.Count; i++)
                 {
