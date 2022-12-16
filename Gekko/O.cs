@@ -6681,6 +6681,7 @@ namespace Gekko
             public string type = null;  //read or import
             public string opt_dateformat = null;
             public string opt_datetype = null;
+            public string opt_variablecode = null;
 
             public P p = null;
             public void Exe()
@@ -6695,15 +6696,15 @@ namespace Gekko
                 {
                     GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect, this.opt_all, this.type);
                     
-                    ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
+                    ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                     if (truncate != null)
                     {
-                        hlp.t1 = truncate.t1;
-                        hlp.t2 = truncate.t2;
+                        oRead.t1 = truncate.t1;
+                        oRead.t2 = truncate.t2;
                     }
-                    hlp.dateformat = this.opt_dateformat;
-                    hlp.datetype = this.opt_datetype;
-                    hlp.sheet = this.opt_sheet;
+                    oRead.dateformat = this.opt_dateformat;
+                    oRead.datetype = this.opt_datetype;
+                    oRead.sheet = this.opt_sheet;
 
                     bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
 
@@ -6739,28 +6740,28 @@ namespace Gekko
                         {
                             new Error("IMPORT<merge> is not legal syntax, IMPORT merges already.");
                         }
-                        hlp.Merge = true;               //this is so for IMPORT
-                        hlp.openType = EOpenType.First;  //this is so for IMPORT                    
+                        oRead.Merge = true;               //this is so for IMPORT
+                        oRead.openType = EOpenType.First;  //this is so for IMPORT                    
                     }
 
                     bool isTo = false; if (this.readTo != null) isTo = true;
-                    hlp.FileName = this.fileName;
-                    if (G.Equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
-                    if (G.Equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
-                    if (G.Equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
-                    if (G.Equal(this.opt_tsd, "yes")) hlp.Type = EDataFormat.Tsd;
-                    if (G.Equal(this.opt_gbk, "yes")) hlp.Type = EDataFormat.Gbk;
-                    if (G.Equal(this.opt_tsdx, "yes")) hlp.Type = EDataFormat.Tsdx;
-                    if (G.Equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
-                    if (G.Equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
-                    if (G.Equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
-                    if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
-                    if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
-                    if (G.Equal(this.opt_flat, "yes")) hlp.Type = EDataFormat.Flat;
-                    if (G.Equal(this.opt_aremos, "yes")) hlp.Type = EDataFormat.Aremos;
-                    if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
+                    oRead.FileName = this.fileName;
+                    if (G.Equal(this.opt_csv, "yes")) oRead.Type = EDataFormat.Csv;
+                    if (G.Equal(this.opt_prn, "yes")) oRead.Type = EDataFormat.Prn;
+                    if (G.Equal(this.opt_pcim, "yes")) oRead.Type = EDataFormat.Pcim;
+                    if (G.Equal(this.opt_tsd, "yes")) oRead.Type = EDataFormat.Tsd;
+                    if (G.Equal(this.opt_gbk, "yes")) oRead.Type = EDataFormat.Gbk;
+                    if (G.Equal(this.opt_tsdx, "yes")) oRead.Type = EDataFormat.Tsdx;
+                    if (G.Equal(this.opt_tsp, "yes")) oRead.Type = EDataFormat.Tsp;
+                    if (G.Equal(this.opt_xls, "yes")) oRead.Type = EDataFormat.Xls;
+                    if (G.Equal(this.opt_xlsx, "yes")) oRead.Type = EDataFormat.Xlsx;
+                    if (G.Equal(this.opt_gdx, "yes")) oRead.Type = EDataFormat.Gdx;
+                    if (G.Equal(this.opt_px, "yes")) oRead.Type = EDataFormat.Px;
+                    if (G.Equal(this.opt_flat, "yes")) oRead.Type = EDataFormat.Flat;
+                    if (G.Equal(this.opt_aremos, "yes")) oRead.Type = EDataFormat.Aremos;
+                    if (G.Equal(this.opt_cols, "yes")) oRead.Orientation = "cols";
 
-                    hlp.gdxopt = this.opt_gdxopt;
+                    oRead.gdxopt = this.opt_gdxopt;
 
                     bool isSimple = false;
 
@@ -6783,20 +6784,20 @@ namespace Gekko
                     else
                     {
                         //READ or IMPORT
-                        if (G.Equal(this.opt_merge, "yes")) hlp.Merge = true;
-                        if (G.Equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
-                        if (G.Equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
-                        if (hlp.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
+                        if (G.Equal(this.opt_merge, "yes")) oRead.Merge = true;
+                        if (G.Equal(this.opt_first, "yes")) oRead.openType = EOpenType.First;
+                        if (G.Equal(this.opt_ref, "yes")) oRead.openType = EOpenType.Ref;
+                        if (oRead.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
                         if (isRead)
                         {
-                            if (hlp.openType == EOpenType.First)
+                            if (oRead.openType == EOpenType.First)
                             {
                                 if (!Program.databanks.GetFirst().editable)
                                 {
                                     new Error("Cannot READ<first>, since first-position databank is non-editable");
                                 }
                             }
-                            else if (hlp.openType == EOpenType.Ref)
+                            else if (oRead.openType == EOpenType.Ref)
                             {
                                 if (!Program.databanks.GetRef().editable)
                                 {
@@ -6834,7 +6835,7 @@ namespace Gekko
                                 new Warning("General READ is not intended for data-mode. Please use IMPORT, or consider READ<first>");
                             }
                         }
-                        if (isRead && !isTo && hlp.openType == EOpenType.Ref)
+                        if (isRead && !isTo && oRead.openType == EOpenType.Ref)
                         {
                             if (Globals.modeIntendedWarning)
                             {
@@ -6850,20 +6851,20 @@ namespace Gekko
                     {
                         //is in reality an OPEN                     
                         open = true;
-                        hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
-                        hlp.editable = false;  //superfluous but for safety
-                        hlp.openType = EOpenType.Normal;
+                        oRead.Merge = false;  //but mixing <merge> and TO give error above anyway                
+                        oRead.editable = false;  //superfluous but for safety
+                        oRead.openType = EOpenType.Normal;
                         if (readTo == "*")
                         {
-                            readTo = Path.GetFileNameWithoutExtension(hlp.FileName);
+                            readTo = Path.GetFileNameWithoutExtension(oRead.FileName);
                         }
-                        hlp.openFileNames = new List<List<string>>();
-                        hlp.openFileNames.Add(new List<string>() { hlp.FileName, readTo });
+                        oRead.openFileNames = new List<List<string>>();
+                        oRead.openFileNames.Add(new List<string>() { oRead.FileName, readTo });
                     }
 
                     bool wipeDatabankBeforeInsertingData = false;
 
-                    if (isRead && !hlp.Merge && !isTo)
+                    if (isRead && !oRead.Merge && !isTo)
                     {
                         //See #987432529835
                         //READ, not IMPORT
@@ -6872,16 +6873,17 @@ namespace Gekko
                         wipeDatabankBeforeInsertingData = true;
                     }
 
-                    hlp.array = this.opt_array;
+                    oRead.array = this.opt_array;
+                    if (G.Equal(this.opt_variablecode, "yes")) oRead.isVariablecode = true;
 
                     CellOffset offset = new CellOffset();
                     offset.cell = this.opt_cell;
                     offset.namecell = this.opt_namecell;
                     offset.datecell = this.opt_datecell;
 
-                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, hlp, open, readInfos, false, this.p);
+                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, oRead, open, readInfos, false, this.p);
                     Program.ReadInfo readInfo = readInfos[0];
-                    readInfo.shouldMerge = hlp.Merge;
+                    readInfo.shouldMerge = oRead.Merge;
 
                     if (readInfo.abortedStar) return;  //an aborted READ *
 
@@ -7572,7 +7574,7 @@ namespace Gekko
                     new Error("OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should use OPEN<edit> instead of OPEN<prim>, if you intend to change data in the databank.");
                 }
 
-                ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
+                ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
 
                 bool create = false;
                 if (G.Equal(opt_create, "yes"))
@@ -7580,7 +7582,7 @@ namespace Gekko
                     create = true;
                 }
                 
-                hlp.openFileNames = new List<List<string>>();
+                oRead.openFileNames = new List<List<string>>();
 
                 if (openFileNamesAs != null && openFileNames.list.Count != openFileNamesAs.list.Count)
                 {
@@ -7599,22 +7601,23 @@ namespace Gekko
                     {
                         temp.Add(null);
                     }
-                    hlp.openFileNames.Add(temp);
+                    oRead.openFileNames.Add(temp);
                 }
 
-                if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
-                if (this.opt_prn == "yes") hlp.Type = EDataFormat.Prn;
-                if (this.opt_pcim == "yes") hlp.Type = EDataFormat.Pcim;
-                if (this.opt_tsd == "yes") hlp.Type = EDataFormat.Tsd;
-                if (this.opt_tsdx == "yes") hlp.Type = EDataFormat.Tsdx;
-                if (this.opt_gbk == "yes") hlp.Type = EDataFormat.Gbk;
-                if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
-                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;
-                if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
-                if (this.opt_px == "yes") hlp.Type = EDataFormat.Px;
-                if (this.opt_cols == "yes") hlp.Orientation = "cols";
+                if (this.opt_csv == "yes") oRead.Type = EDataFormat.Csv;
+                if (this.opt_prn == "yes") oRead.Type = EDataFormat.Prn;
+                if (this.opt_pcim == "yes") oRead.Type = EDataFormat.Pcim;
+                if (this.opt_tsd == "yes") oRead.Type = EDataFormat.Tsd;
+                if (this.opt_tsdx == "yes") oRead.Type = EDataFormat.Tsdx;
+                if (this.opt_gbk == "yes") oRead.Type = EDataFormat.Gbk;
+                if (this.opt_xls == "yes") oRead.Type = EDataFormat.Xls;
+                if (this.opt_xlsx == "yes") oRead.Type = EDataFormat.Xlsx;
+                if (this.opt_gdx == "yes") oRead.Type = EDataFormat.Gdx;
+                if (this.opt_px == "yes") oRead.Type = EDataFormat.Px;
+                if (this.opt_cols == "yes") oRead.Orientation = "cols";
 
-                hlp.gdxopt = this.opt_gdxopt;
+                oRead.gdxopt = this.opt_gdxopt;
+                //oRead.isVariablecode is not activated from <> options at the moment...
 
                 int posCounter = 0;
                 if (G.Equal(opt_first, "yes")) posCounter++;
@@ -7632,30 +7635,30 @@ namespace Gekko
                 }
                 if (G.Equal(opt_first, "yes"))
                 {
-                    hlp.openType = EOpenType.First;
+                    oRead.openType = EOpenType.First;
                 }
                 if (G.Equal(opt_last, "yes"))
                 {
-                    hlp.openType = EOpenType.Last;
+                    oRead.openType = EOpenType.Last;
                 }
                 if (G.Equal(opt_edit, "yes"))
                 {
-                    hlp.openType = EOpenType.Edit;
-                    hlp.editable = true;  //will override the born false value of the field
+                    oRead.openType = EOpenType.Edit;
+                    oRead.editable = true;  //will override the born false value of the field
                 }
                 if (G.Equal(opt_ref, "yes"))
                 {
                     new Error("OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");                    
-                    hlp.openType = EOpenType.Ref;                    
+                    oRead.openType = EOpenType.Ref;                    
                 }
                 if (G.Equal(opt_sec, "yes"))
                 {
-                    hlp.openType = EOpenType.Sec;
+                    oRead.openType = EOpenType.Sec;
                 }
                 if (!G.isNumericalError(this.opt_pos))
                 {
-                    hlp.openType = EOpenType.Pos;
-                    if (G.ConvertToInt(out hlp.openTypePosition, opt_pos) == false)
+                    oRead.openType = EOpenType.Pos;
+                    if (G.ConvertToInt(out oRead.openTypePosition, opt_pos) == false)
                     {
                         new Error("OPEN<pos=...> should be integer value");
                     }
@@ -7664,7 +7667,7 @@ namespace Gekko
                 CellOffset offset = new CellOffset();
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(offset, false, hlp, true, readInfos, create, this.p);
+                Program.OpenOrRead(offset, false, oRead, true, readInfos, create, this.p);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {

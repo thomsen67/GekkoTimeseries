@@ -6545,7 +6545,7 @@ namespace Gekko
             GekkoTime startYear;
             GekkoTime endYear;
             string warning = null;
-            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, out vars, out warning, out startYear, out endYear);
+            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, oRead.isVariablecode, out vars, out warning, out startYear, out endYear);
             if (warning != null) new Warning(warning);
 
             readInfo.startPerInFile = startYear.super;
@@ -6746,7 +6746,7 @@ namespace Gekko
         /// <summary>
         /// Read the .px data file format (used by Statistics Denmark and others)
         /// </summary>
-        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
         {
             bool pxAllowAnyTimeDimensionIndex = false;  //starts out false. May become true if time dimension is not last
 
@@ -6777,6 +6777,7 @@ namespace Gekko
             List<List<string>> codes = new List<List<string>>();
             List<List<string>> codesIncludingTime = new List<List<string>>();
             List<List<string>> values = new List<List<string>>();
+            GekkoDictionary<string, string> variablecodes = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             int timeDimensionIncodesIncludingTime = -12345;
             int[] indexes = null;
@@ -6787,6 +6788,7 @@ namespace Gekko
             string codeString = "CODES(";
             string valueString = "VALUES(";
             string matrixString = "MATRIX=";
+            string variableCodeString = "VARIABLECODE(";
 
             List<string> codesCombi = null;
             List<string> valuesCombi = null;
@@ -6811,7 +6813,7 @@ namespace Gekko
             GekkoTime gt0 = GekkoTime.tNull;
             GekkoTime gt1 = GekkoTime.tNull;
 
-            int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4
+            int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4, VARIABLECODE(...)=5
             foreach (string line2 in lines2)
             {
                 lineCounter++;
@@ -6855,6 +6857,12 @@ namespace Gekko
                     lineHelper = new StringBuilder();
                     firstLine = true;
                     state = 4;
+                }
+                else if (line.StartsWith(variableCodeString, StringComparison.OrdinalIgnoreCase))
+                {
+                    lineHelper = new StringBuilder();
+                    firstLine = true;
+                    state = 5;
                 }
                 else if (line.StartsWith(matrixString, StringComparison.OrdinalIgnoreCase))
                 {
@@ -6930,8 +6938,24 @@ namespace Gekko
                             codes.Insert(timeDimensionIncodesIncludingTime, null);
                         }
 
-                        //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
+                        //we may use codesHeaderJson instead of codesHeader (these are more verbose)
+                        //also we may use alias for these headers, if we have import<px variablecode>.
+                        List<string> codesHeader3 = null;
+                        if (isVariablecode)
+                        {
+                            codesHeader3 = new List<string>();
+                            foreach (string s7 in codesHeader2)
+                            {
+                                string s2 = null; variablecodes.TryGetValue(s7, out s2);
+                                if (s2 != null) codesHeader3.Add(s2);
+                                else codesHeader3.Add(s7);
+                            }
+                        }
+                        else
+                        {
+                            codesHeader3 = codesHeader2;
+                        }
+                        WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, tableName, codesHeader3, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
 
                         //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                         //also handles holes in dates, for instance for daily observations if there is no data for weekends
@@ -7194,29 +7218,29 @@ namespace Gekko
                         new Error("Expected a '=' in this line: " + line777);
                     }
 
-                    string s3 = line777.Substring(0, i); s3 = s3.Substring(7); s3 = s3.Substring(0, s3.Length - 2);
+                    string s3 = line777.Substring(0, i);
+                    s3 = s3.Substring(7);
+                    s3 = s3.Substring(0, s3.Length - 2);
                     codesHeader.Add(s3);
 
                     string s = line777.Substring(i + 1);
 
-                    string[] ss = ss = G.SplitCsv(s).ToArray();
+                    string[] ss = G.SplitCsv(s).ToArray();
 
                     List<string> names2 = new List<string>();
                     foreach (string s2 in ss)
                     {
                         string s4 = s2;
-
                         s4 = s4.Trim();
-
                         names2.Add(s4);
                     }
                     if (names2.Count == 0)
                     {
                         new Error("Expected 1 or more items in this line: " + line);
-                        //throw new GekkoException();
                     }
+                    
                     codes.Add(names2);
-                    codesIncludingTime.Add(names2);
+                    codesIncludingTime.Add(names2);                    
                 }
                 else if (state == 4)
                 {
@@ -7249,6 +7273,43 @@ namespace Gekko
                         //throw new GekkoException();
                     }
                     values.Add(values2);
+                }
+                else if (state == 5)
+                {
+                    //state=5, handle the variablecodes (aliases of names of dimensions)
+                    //For instance:
+                    //
+                    //  VARIABLECODE("varegruppe")="VAREGR";
+                    //                    
+
+                    string line777 = lineHelper.ToString();
+                    int i = line777.IndexOf("=");
+                    if (i < 0)
+                    {
+                        new Error("Expected a '=' in this line: " + line777);
+                    }
+
+                    string s3 = line777.Substring(0, i);
+                    s3 = s3.Substring(14); 
+                    s3 = s3.Substring(0, s3.Length - 2);
+
+                    string s = line777.Substring(i + 1);
+
+                    string[] ss = G.SplitCsv(s).ToArray();
+
+                    List<string> names2 = new List<string>();
+                    foreach (string s2 in ss)
+                    {
+                        string s4 = s2;
+                        s4 = s4.Trim();
+                        names2.Add(s4);
+                    }
+                    if (names2.Count != 1)
+                    {
+                        new Error("Expected 1 item in this line: " + line);
+                    }
+
+                    variablecodes.Add(s3, names2[0]);                                        
                 }
 
                 if (semi) state = 0;  //resetting
@@ -31258,6 +31319,7 @@ namespace Gekko
         public string dateformat = null;
         public string datetype = null;
         public string sheet = null;
+        public bool isVariablecode = false;
 
         public string FileName
         {

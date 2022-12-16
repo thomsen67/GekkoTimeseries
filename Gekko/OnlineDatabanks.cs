@@ -193,7 +193,8 @@ namespace Gekko
                     GekkoTime perStart;
                     GekkoTime perEnd;
                     string warning = null;
-                    Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out warning, out perStart, out perEnd);
+                    //we set isVariablecode=false here, so codes are taken from the .json. For Gekko 4.0, we could set it = true, so it is always taken from px file. That should be ok.
+                    Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, false, out vars, out warning, out perStart, out perEnd);
                     if (warning != null) new Warning(warning);
                 }
             }

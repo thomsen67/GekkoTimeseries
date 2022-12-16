@@ -59,6 +59,7 @@ tokens {
 	ASTOPT_STRING_DATEFORMAT;
 	ASTOPT_STRING_DATETYPE;
 	ASTOPT_STRING_KEEPTYPES;
+	ASTOPT_STRING_VARIABLECODE;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -1144,6 +1145,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	VARIABLECODE = 'VARIABLECODE';
 	VIEW = 'VIEW';
 	KEEPTYPES      = 'KEEPTYPES'     ;
 	PREDICT      = 'PREDICT'     ;
@@ -1785,6 +1787,7 @@ d.Add("Y" ,Y);
                                         d.Add("fields"  , FIELDS  );
                                         d.Add("file"    , FILE  );
                                         d.Add("filewidth"               , FILEWIDTH  );
+										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
 										d.Add("view", VIEW);
@@ -3634,7 +3637,6 @@ asOrToBank:					ASBANK | TOBANK;
 // READ and IMPORT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-						    //!!!Two identical lines ONLY because of token stuff
 read:                       readHelper   readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, input.LT(1).Line)} readHelper readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
 						    ;
 
@@ -3676,6 +3678,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
+						  | VARIABLECODE (EQUAL yesNo)? -> ^(ASTOPT_STRING_VARIABLECODE yesNo?)
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4430,6 +4433,7 @@ ident2: 					Ident |
   FEED|
   FIELDS|
   FILEWIDTH|
+  VARIABLECODE|
   FILE|
   FILLEDCURVES|
   FILLSTYLE|
@@ -4896,6 +4900,7 @@ ident3: 					Ident |
   FEED|
   FIELDS|
   FILEWIDTH|
+  VARIABLECODE|
   FILE|
   FILLEDCURVES|
   FILLSTYLE|
