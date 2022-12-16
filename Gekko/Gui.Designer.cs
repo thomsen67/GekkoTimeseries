@@ -1331,11 +1331,8 @@ namespace Gekko
                         {
                             //See also #lu89ujksdfgpsdf for * bank name replace
 
-                            RichTextBox textBox = this.textBoxMainTabLower;
-                            int offset1 = Globals.windowIntellisenseSuggestionsOffset1;
-                            int offset2 = Globals.windowIntellisenseSuggestionsOffset2;
-                            int startOld = textBox.SelectionStart;
-                            textBox.Select(startOld + offset1, offset2 - offset1 + 1);
+                            RichTextBox textBox = this.textBoxMainTabLower;                                                        
+                            textBox.Select(textBox.SelectionStart + Globals.windowIntellisenseSuggestionsOffset1, Globals.windowIntellisenseSuggestionsOffset2 - Globals.windowIntellisenseSuggestionsOffset1 + 1);
                             textBox.SelectedText = chosen;
 
                             ////TODO TODO TODO TODO

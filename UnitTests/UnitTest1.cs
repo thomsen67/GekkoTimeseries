@@ -16753,82 +16753,106 @@ string cc1b=
         [TestMethod]
         public void _Test_Singleton()
         {
+            string msg = "syntax suggestion (comma)";
+
             I("reset;");
             I("time 2001 2001;");
-            I("a = 100;");
-            string msg = "Is this a naked list missing a trailing comma?";
+            I("a = 100;");            
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = a;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = a,;");
             _AssertListString(First(), "#m", new StringOrList("a"));
+
+            Globals.unitTestScreenOutput.Clear();
             FAIL("%m = a;");
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("m = a;");
             _AssertSeries(First(), "m", 2001, 100d, sharedDelta);
-            FAIL("m = a,;"); 
+
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("m = a,;");
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = 01;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = 01,;");
             _AssertListString(First(), "#m", new StringOrList("01"));
+
             I("%m = 01;");
             _AssertScalarVal(First(), "%m", 1d, sharedDelta);
+
             FAIL("%m = 01,;");
+
             I("m = 01;");
             _AssertSeries(First(), "m", 2001, 1d, sharedDelta);
-            I("m = 01,;");
-            _AssertSeries(First(), "m", 2001, 1d, sharedDelta);
 
-            Globals.unitTestScreenOutput.Clear();
+            FAIL("m = 01,;");  //becomes string
+                        
             FAIL("#m = 2;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = 2,;");
             _AssertListVal(First(), "#m", new List<double>() { 2d });
+
             I("%m = 2;");
             _AssertScalarVal(First(), "%m", 2d, sharedDelta);
+
             FAIL("%m = 2,;");
+
             I("m = 2;");
             _AssertSeries(First(), "m", 2001, 2d, sharedDelta);
+
             I("m = 2,;");
             _AssertSeries(First(), "m", 2001, 2d, sharedDelta);
-
-            Globals.unitTestScreenOutput.Clear();
+                        
             FAIL("#m = 2.5;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = 2.5,;");
             _AssertListVal(First(), "#m", new List<double>() { 2.5d });
+
             I("%m = 2.5;");
             _AssertScalarVal(First(), "%m", 2.5d, sharedDelta);
+
             FAIL("%m = 2.5,;");
+
             I("m = 2.5;");
             _AssertSeries(First(), "m", 2001, 2.5d, sharedDelta);
+
             I("m = 2.5,;");
             _AssertSeries(First(), "m", 2001, 2.5d, sharedDelta);
-
-            Globals.unitTestScreenOutput.Clear();
+                        
             FAIL("#m = 1e5;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = 1e5,;");
-            _AssertListVal(First(), "#m", new List<double>() { 100000d });
+            _AssertListString(First(), "#m", new StringOrList("1e5"));
+
             I("%m = 1e5;");
             _AssertScalarVal(First(), "%m", 100000d, sharedDelta);
+
             FAIL("%m = 1e5,;");
+
             I("m = 1e5;");
             _AssertSeries(First(), "m", 2001, 100000d, sharedDelta);
-            I("m = 1e5,;");
-            _AssertSeries(First(), "m", 2001, 100000d, sharedDelta);
 
-            Globals.unitTestScreenOutput.Clear();
+            FAIL("m = 1e5,;");
+                        
             FAIL("#m = 2001q1;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("#m = 2001q1,;");
             _AssertListString(First(), "#m", new StringOrList("2001q1"));
+
             I("%m = 2001q1;");
             _AssertScalarDate(First(), "%m", EFreq.Q, 2001, 1);
+
             FAIL("%m = 2001q1,;");
+
             FAIL("m = 2001q1;");
+
             FAIL("m = 2001q1,;");
 
             // =========================================================
@@ -16842,28 +16866,35 @@ string cc1b=
             Globals.unitTestScreenOutput.Clear();
             FAIL("for string %x = a; end;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("for string %x = a,; end;");            
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("for val %x = 1; end;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("for val %x = 1,; end;");
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("for string %x = 01; end;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("for string %x = 01,; end;");
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("for string %x = 1a; end;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("for string %x = 1a,; end;");
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("for string %x = 2001q1; end;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
+            Assert.IsTrue(!Globals.unitTestScreenOutput.ToString().Contains(msg));
+
             I("for string %x = 2001q1,; end;");
+
             FAIL("for date %x = 2001q1; end;"); //must not work
+
             FAIL("for date %x = 2001q1,; end;"); //must not work
 
         }

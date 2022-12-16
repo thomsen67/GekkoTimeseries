@@ -378,7 +378,16 @@ namespace Gekko
                 }
                 else
                 {
-                    Gui.gui.textBoxMainTabLower.SelectedText = Globals.windowIntellisense.lastSelected;
+                    bool fix = true;
+                    if (Globals.windowIntellisenseType == 2)
+                    {
+                        Gui.gui.textBoxMainTabLower.Select(Gui.gui.textBoxMainTabLower.SelectionStart + Globals.windowIntellisenseSuggestionsOffset1, Globals.windowIntellisenseSuggestionsOffset2 - Globals.windowIntellisenseSuggestionsOffset1 + 1);
+                        Gui.gui.textBoxMainTabLower.SelectedText = Globals.windowIntellisense.lastSelected;                        
+                    }
+                    else
+                    {
+                        Gui.gui.textBoxMainTabLower.SelectedText = Globals.windowIntellisense.lastSelected;
+                    }
                 }
                 Globals.windowIntellisense.IsOpen = false;
                 Globals.windowIntellisenseType = 0;

@@ -20,26 +20,26 @@ namespace Gekko
     /// </summary>
     public partial class WindowIntellisense : System.Windows.Controls.Primitives.Popup
     {
-        private System.Timers.Timer ClickTimer;
-        private int ClickCounter;
+        private System.Timers.Timer clikcTimer;
+        private int clickCounter;
         //public static int listBoxHelper = 0;
         public string lastSelected = null;
 
         public WindowIntellisense()
         {
-            ClickTimer = new System.Timers.Timer(300);
-            ClickTimer.Elapsed += new System.Timers.ElapsedEventHandler(EvaluateClicks);
+            clikcTimer = new System.Timers.Timer(300);
+            clikcTimer.Elapsed += new System.Timers.ElapsedEventHandler(EvaluateClicks);
             InitializeComponent();
         }
 
         private void EvaluateClicks(object source, System.Timers.ElapsedEventArgs e)
         {
-            ClickTimer.Stop();            
-            if (ClickCounter == 2)
+            clikcTimer.Stop();            
+            if (clickCounter == 2)
             {                
                 CrossThreadStuff.Intellisense();                
             }
-            ClickCounter = 0;            
+            clickCounter = 0;            
         }        
 
         //private void listBox1_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -53,9 +53,9 @@ namespace Gekko
 
         public void listBoxItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {            
-            ClickTimer.Stop();
-            ClickCounter++;
-            ClickTimer.Start();            
+            clikcTimer.Stop();
+            clickCounter++;
+            clikcTimer.Start();            
         }
 
         public void listBoxItem_PreviewMouseEnter(object sender, MouseEventArgs e)
