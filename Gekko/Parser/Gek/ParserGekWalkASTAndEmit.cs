@@ -1301,6 +1301,9 @@ namespace Gekko.Parser.Gek
                 case "ASTEXO":
                     {
 
+                        string e = "ENDO";
+                        if (node.Text == "ASTEXO") e = "EXO";
+                        if (node[1][0].AlternativeCode == null) new Error("Malformed " + e + " command arguments");  //bad error: no line numbers...
                         string a = node[1][0].AlternativeCode.ToString();
 
                         string gt = "gt" + ++Globals.counter;

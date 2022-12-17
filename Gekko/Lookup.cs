@@ -764,7 +764,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
+                        new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToLower() + " type");
                         //throw new GekkoException();
                     }
 
@@ -949,7 +949,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
+                        new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToLower() + " type");
                         //throw new GekkoException();
                     }
 
@@ -1220,8 +1220,19 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
-                        //throw new GekkoException();
+                        string type = lhsType.ToString().ToLower();
+                        if (type == "val" || type == "date" || type == "string")
+                        {
+                            new Error("Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' symbol cannot be of " + type + " type");
+                        }
+                        else if (type == "list" || type == "matrix" || type == "map")
+                        {
+                            new Error("Name '" + varnameWithFreq + "' without '" + Globals.symbolCollection + "' symbol cannot be of " + type + " type");
+                        }
+                        else
+                        {
+                            new Error("Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + type + " type");
+                        }
                     }
 
                     //Now we know that it is either SERIES x = ...  or VAR x = ...  or x = ...   
@@ -1270,7 +1281,6 @@ namespace Gekko
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
                                     new Error("Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
-                                    //throw new GekkoException();
                                 }
 
                                 if (Program.options.series_dyn_check)
@@ -1825,19 +1835,28 @@ namespace Gekko
 
         private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type, int extra)
         {
+            string sigil = G.Chop_GetSigil(varnameWithFreq);
+
             string s = null;
             if (extra == 1)
             {
-                s += Globals.stringConversionNote + ".";
+                s += " " + Globals.stringConversionNote + ".";
             }
-            
+
+            if (sigil == "#" && (type.ToString().ToLower() == "var" || type.ToString().ToLower() == "list"))
+            {
+                //it is "list #m = ..." or "#m = ..."
+                if (rhs.Type().ToString().ToLower() == "val" || rhs.Type().ToString().ToLower() == "date" || rhs.Type().ToString().ToLower() == "string")
+                {
+                    s += " " + "NOTE: If you intend to create a 1-element list from %x, you may use (%x,).";
+                }
+            }
+
             string vtype = "The variable type is not indicated, ";
             if (type.ToString().ToLower() != "var") vtype = "The variable type is set to " + type.ToString().ToLower() + ", ";
 
             using (Error txt = new Error())
-            {
-
-                string sigil = G.Chop_GetSigil(varnameWithFreq);
+            {                
                 if (sigil == null)
                 {
                     txt.MainAdd(vtype + "the variable name '" + varnameWithFreq + "' indicates a time-series, and the right-hand side is of type " + rhs.Type().ToString().ToLower() + ". ");
@@ -1850,7 +1869,7 @@ namespace Gekko
                 {
                     txt.MainAdd(vtype + "the variable name '" + varnameWithFreq + "' indicates a collection (list/matrix/map), and the right-hand side is of type " + rhs.Type().ToString().ToLower() + ". ");
                 }
-                txt.MainAdd("This fails: you may read more about assignment rules {a{here¤appendix_assignments.htm}a}. " + s);
+                txt.MainAdd(s + " Info on type errors {a{here¤appendix_assignments.htm}a}.");
             }
         }
 

@@ -6748,6 +6748,8 @@ namespace Gekko
         /// </summary>
         public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
         {
+            string variablecodeNote = null;
+
             bool pxAllowAnyTimeDimensionIndex = false;  //starts out false. May become true if time dimension is not last
 
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
@@ -6953,6 +6955,10 @@ namespace Gekko
                         }
                         else
                         {
+                            if (variablecodes.Count > 0 && !isArray)
+                            {
+                                variablecodeNote = "The .px file contains variable codes. You may try the <variablecode> option to obtain shorter timeseries names.";
+                            }
                             codesHeader3 = codesHeader2;
                         }
                         WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, tableName, codesHeader3, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
@@ -7495,6 +7501,7 @@ namespace Gekko
                     }
                 }
             }
+            if (variablecodeNote != null) new Note(variablecodeNote);
         }
 
         /// <summary>
@@ -15752,25 +15759,21 @@ namespace Gekko
                     if (!G.Equal(bankLhs1, bankLhs2))
                     {
                         new Error("You must use the same bankname before and after '..' in a range");
-                        //throw new GekkoException();
                     }
 
                     if (!G.Equal(freqLhs1, freqLhs2))
                     {
                         new Error("You must use the same freq before and after '..' in a range");
-                        //throw new GekkoException();
                     }
 
                     if (nameLhs1[0] == Globals.symbolScalar && nameLhs2[0] != Globals.symbolScalar)
                     {
-                        new Error("Scalar symbol ('%') should be present both before and after '..'");
-                        //throw new GekkoException();
+                        new Error("Scalar symbol '%' should be present both before and after '..'");
                     }
 
                     if (nameLhs1[0] == Globals.symbolCollection && nameLhs2[0] != Globals.symbolCollection)
                     {
-                        new Error("Collection symbol ('#') should be present both before and after '..'");
-                        //throw new GekkoException();
+                        new Error("Collection symbol '#' should be present both before and after '..'");
                     }
                     bankLhs = bankLhs1;
                     nameLhsRange1 = nameLhs1;

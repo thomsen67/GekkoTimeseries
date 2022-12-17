@@ -1182,12 +1182,15 @@ namespace Gekko
 
                 foreach (string s in vars)
                 {
-
                     count++; //array-series updates like x[#i, #j] will only count as 1.                       
                     if (!G.IsSimpleToken(s))
                     {
-                        new Error("The name '" + s + "' is not a simple series name");
-                        //throw new GekkoException();
+                        string extra = null;
+                        if (s.StartsWith(Globals.symbolScalar.ToString()) || s.StartsWith(Globals.symbolCollection.ToString()))
+                        {
+                            extra = Globals.stringConversionNote2 + ". ";
+                        }
+                        new Error("The name '" + s + "' is not a simple variable name. " + extra);
                     }
 
                     if (model.modelCommon.GetModelSourceType() == EModelType.Gekko)
@@ -1216,7 +1219,7 @@ namespace Gekko
 
                         if (gts == null)
                         {
-                            new Error("No time period given for variable '" + s + "'");
+                            new Error("No time period given for variable '" + s + "'. Note that no Gekko model has been loaded with MODEL, so ENDO/EXO assume non-Gekko models.");
                         }
 
                         Series ts2 = null;
@@ -3181,28 +3184,22 @@ namespace Gekko
             if (!allowBank && s.Contains(Globals.symbolBankColon))
             {
                 new Error("Bankname not accepted as part of name");
-                //throw new GekkoException();
             }
             if (!allowSigil && s.Contains(Globals.symbolScalar))
             {
-                new Error("Scalar symbol (" + Globals.symbolScalar + ") not accepted, use {%x} instead of %x");
-                //throw new GekkoException();
+                new Error(Globals.stringConversionNote3);
             }
             if (!allowSigil && s.Contains(Globals.symbolCollection))
             {
-                new Error("Collection symbol (" + Globals.symbolCollection + ") not accepted, you may use {#x} instead of #x. If you are concatenating lists, use '+' to add the elements of one list to another");
-
-                //throw new GekkoException();
+                new Error(Globals.stringConversionNote4);
             }
             if (!allowFreq && s.Contains(Globals.freqIndicator))
             {
                 new Error("Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
-                //throw new GekkoException();
             }
             if (!allowIndexes && (s.Contains("[") || s.Contains("]")))
             {
                 new Error("Index [...] not accepted as part of name");
-                //throw new GekkoException();
             }
 
             return s;

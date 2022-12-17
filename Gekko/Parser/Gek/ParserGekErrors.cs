@@ -297,7 +297,8 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
                             }
-                        }
+                        }                        
+
                         string extra = null;
                         foreach (string s8 in statement.parenthesisErrors2)
                         {
@@ -315,24 +316,52 @@ namespace Gekko.Parser.Gek
                             h = "";  //could point to help file regarding procedure or function, but typically it is just a question of parentheses etc. that do not match
                         }
 
-                        string help = ParserGekCreateAST.GetLinkToHelpFile2(h);                        
+                        string help = ParserGekCreateAST.GetLinkToHelpFile2(h);
 
-                        if (extra != null || help != null)
-                        {
-                            if (extra != null)
+                        try
+                        {                            
+
+                            //we actually already have tokens, but not recursive tokens, so we do them here.
+                            string ss = G.ReplaceGlueSymbols(helper.textWithExtraLines);
+                            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                            var tags2 = new List<string>() { "//" };
+                            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(statement.text, tags1, tags2, null, null);
+
+                            List<TokenHelper> list = tokens2.subnodes.storage;
+
+                            int iStart = -1;
+                            for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
                             {
-                                extra = extra.Substring(0, extra.Length - ". ".Length);
-                                if (!extra.EndsWith(".")) extra = extra + ". ";
-                            }
-
-                            string indent = start2;
-                            indent = "";                            
-
-                            using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
-                            {
-                                txt.MainAdd("Statement note: " + extra + help);
+                                if (tokens2.subnodes.storage[i].s == ";")
+                                {
+                                    List<TokenHelper> listTemp = list.GetRange(iStart + 1, i - iStart);
+                                    ErrorMessagesHelperNakedList(listTemp, i, widthRemember);
+                                    iStart = i;
+                                }
                             }
                         }
+                        catch { }
+
+                        try
+                        {
+                            if (extra != null || help != null)
+                            {
+                                if (extra != null)
+                                {
+                                    extra = extra.Substring(0, extra.Length - ". ".Length);
+                                    if (!extra.EndsWith(".")) extra = extra + ". ";
+                                }
+
+                                string indent = start2;
+                                indent = "";
+
+                                using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
+                                {
+                                    txt.MainAdd("Statement note: " + extra + help);
+                                }
+                            }
+                        }
+                        catch { }
 
                         string gekko2_4 = null;
                         try
@@ -369,7 +398,7 @@ namespace Gekko.Parser.Gek
                         }
                         catch { };
 
-                        if (Globals.runningOnTTComputer) new Writeln("TTH --> TYPE: " + statement.type);
+                        //if (Globals.runningOnTTComputer) new Writeln("TTH --> TYPE: " + statement.type);
 
                         if (CountErrors(statement.errorDictionary) != CountErrors(originalErrors))
                         {
@@ -377,24 +406,7 @@ namespace Gekko.Parser.Gek
                         }
 
                         if (ph.isOneLinerFromGui) WritelnError("", true);
-
-                        if (false)
-                        {
-                            G.Writeln();
-                            foreach (KeyValuePair<long, ErrorHelper> kvp in originalErrors)
-                            {
-                                int line = (int)(kvp.Key / (long)1e9);
-                                int pos = (int)(kvp.Key % (long)1e9);
-                                foreach (string s8 in kvp.Value.errors)
-                                {
-                                    G.Writeln("ln " + line + " col " + pos + ": " + s8);
-                                }
-                            }
-                            foreach (string s8 in statement.parenthesisErrors2)
-                            {
-                                G.Writeln(s8);
-                            }
-                        }
+                        
                     }
                     if (counter >= maxShow) break;
                 }
@@ -402,9 +414,75 @@ namespace Gekko.Parser.Gek
             finally
             {
                 Program.options.print_width = widthRemember;
-            }
+            }                        
+
             G.Write("");  //removes marking
+
             return false;
+        }
+
+        /// <summary>
+        /// Pattern "list #m = ... , .... ;" or "#m = ... , .... ;" or "for string ... = ... , .... ;" or "for (string ... = ... , .... ;" . In that case, a note is written if there are % or # variables without {}-curlies.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="iStart"></param>
+        /// <param name="widthRemember"></param>
+        private static void ErrorMessagesHelperNakedList(List<TokenHelper> list, int iStart, int widthRemember)
+        {
+            int commaCount = 0;
+            int equalCount = 0;
+            bool isLhsList = false;
+            bool isLhsFor = false;
+            bool hashProblem = false;
+            bool percentProblem = false;
+            bool hasParenthesis = false;
+
+            if (list.Count >= 2 && G.Equal(list[0].s, "for") && list[1].subnodes != null && list[1].subnodes.storage[0].s == "(")
+            {
+                list = list[1].subnodes.storage.GetRange(1, list[1].subnodes.storage.Count - 2);   //inside a for(...), includes start/end parentheses
+                isLhsFor = true;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].s == ",") commaCount++; //does not count commas inside in parentheses                                
+                if (list[i].s == "=") equalCount++; //does not count = inside in parentheses                                
+            }
+
+            if (list.Count >= 2 && G.Equal(list[0].s, "list") && G.Equal(list[1].s, "#")) isLhsList = true;
+            if (list.Count >= 1 && G.Equal(list[0].s, "#")) isLhsList = true;
+
+            if (list.Count >= 2 && G.Equal(list[0].s, "for") && G.Equal(list[1].s, "string")) isLhsFor = true;
+                        
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                if (list[i].s == "=" && list[i + 1].s == "%") percentProblem = true;
+                if (list[i].s == "," && list[i + 1].s == "%") percentProblem = true;
+                if (list[i].s == "=" && list[i + 1].s == "#") hashProblem = true;
+                if (list[i].s == "," && list[i + 1].s == "#") hashProblem = true;
+                if (list[i].s == "=" && list[i + 1].s == "(") hasParenthesis = true;
+            }
+
+            if (equalCount == 1 && commaCount > 0 && (isLhsList || isLhsFor) && !hasParenthesis && (percentProblem || hashProblem))
+            {
+                int widthRemember2 = Program.options.print_width; //just to set a normal width here
+                Program.options.print_width = widthRemember;
+                try
+                {
+                    using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
+                    {
+                        string x = "#y";
+                        if (isLhsFor) x = "for string %y";
+                        txt.MainAdd("Note that in a parenthesis-free {a{naked list¤i_naked_list.htm}a}, a string %x or list of strings #x must be enclosed in {}-curlies, for instance: " + x + " = a, {%x}, {#x}, b;.");
+                    }
+                }
+                finally
+                {
+                    Program.options.print_width = widthRemember2;
+                }
+            }
+
+            return;
         }
 
         private static string HandleGlueSymbols(Statement statement, string statementLine, string statementLine2, StringBuilder statementLine3)

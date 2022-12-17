@@ -1753,7 +1753,7 @@ namespace Gekko.Parser.Gek
             s = s.Replace(" GLUEBACKSLASH", " '\\'");            
             s = s.Replace(" GLUEDOTNUMBER:", " '.'");
             s = s.Replace(" GLUESTAR", " '*'");
-            s = s.Replace(" GLUE", " some alternative");
+            s = s.Replace(" GLUE", " alternative");
             s = s.Replace(" DOT", " '.'");
             s = s.Replace(" HASHEQUAL", " '#='");
             s = s.Replace(" HASH", " '#'");

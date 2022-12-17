@@ -300,8 +300,11 @@ namespace Gekko
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
         public static List<string> unitTestDependents = null;
-
-        public const string stringConversionNote = "NOTE: You can use a string %s as a variable name with {%s}";
+                
+        public const string stringConversionNote = "NOTE: If a string %x is enclosed in {}-curlies like {%x}, it can be used as a name reference";
+        public const string stringConversionNote2 = "NOTE: A string %x or a list of strings #x can be enclosed in {}-curlies like {%x} or {#x} and be used as name reference";
+        public const string stringConversionNote3 = "Scalar symbol '%' is not accepted. NOTE: a string like %x can be enclosed in {}-curlies like {%x}, to be used as a name reference.";
+        public const string stringConversionNote4 = "Collection symbol '#' is not accepted. NOTE: a list of strings #x can be enclosed in {}-curlies like {#x}, to be used as a name references.";
 
         public const string Work = "Work";
         public const string Ref = "Ref";
