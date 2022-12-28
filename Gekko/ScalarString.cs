@@ -166,15 +166,13 @@ namespace Gekko
                 }
                 else if (index.Type() == EVariableType.String)
                 {
-                    new Error("You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the search() function.");
+                    new Error("You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the index() function.");
                     return null;
-                    //throw new GekkoException();
                 }
                 else
                 {
                     new Error("Type mismatch regarding []-index");
                     return null;
-                    //throw new GekkoException();
                 }
             }
             else

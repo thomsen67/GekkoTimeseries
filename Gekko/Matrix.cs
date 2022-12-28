@@ -101,7 +101,7 @@ namespace Gekko
                 }
                 string s = null;
                 if (index.Type() == EVariableType.Val) s += "" + O.ConvertToInt(index);
-                else if (index.Type() == EVariableType.Range) s += "" + O.ConvertToInt(((Range)index).first) + ".." + O.ConvertToInt(((Range)index).first);
+                else if (index.Type() == EVariableType.Range) s += "" + O.ConvertToInt(((Range)index).first) + ".." + O.ConvertToInt(((Range)index).last);
                 new Error("You are trying to use [" + s + "] on a " + d1 + " x " + d2 + " matrix. This notation can only be used regarding nx1 matrices (column vectors)"); return null;
             }
             else if (indexes.Length == 2)

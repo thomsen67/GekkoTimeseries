@@ -2204,7 +2204,6 @@ namespace Gekko
                         else
                         {
                             new Error("You cannot index " + this.freq.Pretty() + " series with value " + i);
-                            //throw new GekkoException();
                         }
                     }
                     else
@@ -2213,13 +2212,12 @@ namespace Gekko
                         var temp = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
                         if (temp != null)
                         {
-                            new Error("Could not understand index " + this.name + "[" + Stringlist.GetListWithCommas(temp) + "]");
+                            new Error("Could not understand index " + this.name + "[" + Stringlist.GetListWithCommas(temp) + "]. Beware that the series is a normal series, not an array-series, so you cannot index it with one or more strings.");
                         }
                         else
                         {
-                            new Error("Could not understand index " + this.name + "[...]");
+                            new Error("Could not understand index " + this.name + "[...].");
                         }
-                        //throw new GekkoException();
                     }
                 }                
             }  //end of non-arraysuper
