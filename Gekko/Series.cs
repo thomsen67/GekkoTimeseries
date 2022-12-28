@@ -2311,30 +2311,53 @@ namespace Gekko
                 }
             }
 
-            MultidimItem mi = new MultidimItem(keys);
+            MultidimItem miWildcard = new MultidimItem(keys); //for instance x[a*, *].
             if (isWild)
             {
+                List<KeyValuePair<MultidimItem, IVariable>> hits1 = new List<KeyValuePair<MultidimItem, IVariable>>();
+                List<KeyValuePair<MultidimItem, IVariable>> hits2 = new List<KeyValuePair<MultidimItem, IVariable>>();
+                hits1.AddRange(this.dimensionsStorage.storage);
+                
+                for (int i = 0; i < miWildcard.storage.Length; i++)  //each dimension
+                {
+                    hits2.Clear();
+                    Wildcard wc = new Wildcard(miWildcard.storage[i], System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    foreach (KeyValuePair<MultidimItem, IVariable> kvp in hits1)
+                    {
+                        //one subseries inside arrayseries, for instance x[a, j] out of x[a, j], x[b, k2].
+                        MultidimItem miChild = kvp.Key;
+
+                        if (wc.IsMatch(miChild.storage[i]))
+                        {
+                            //testing dimension i
+                            hits2.Add(kvp);
+                        }
+                    }
+                    hits1.Clear();
+                    hits1.AddRange(hits2);
+                }
+
+                iv = new List();
                 if (Globals.fixWildcardLabel && smpl != null)
                 {
                     smpl.labelRecordedPieces = new List<O.RecordedPieces>();
                 }
 
-                iv = new List();
-
-                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in hits1)
                 {
+                    Series child_series = kvp.Value as Series;
                     (iv as List).Add(kvp.Value);
                     if (Globals.fixWildcardLabel && smpl != null)
                     {
-                        string namei = (kvp.Value as Series).GetNameWithoutCurrentFreq(true);
+                        string namei = child_series.GetNameWithoutCurrentFreq(true);
                         O.RecordedPieces r = new O.RecordedPieces(Globals.wildcardText, new ScalarString(namei));
                         smpl.labelRecordedPieces.Add(r);
                     }
                 }
             }
             else
-            {                
-                this.dimensionsStorage.TryGetValue(mi, out iv);
+            {
+                this.dimensionsStorage.TryGetValue(miWildcard, out iv);
             }
 
 
@@ -2459,7 +2482,7 @@ namespace Gekko
             }
 
             Program.PrecedentsHelper(null, rv, this.GetParentDatabank());
-            Program.Trace("[" + mi.ToString() + "]", this.GetParentDatabank(), rv, isLhs);
+            Program.Trace("[" + miWildcard.ToString() + "]", this.GetParentDatabank(), rv, isLhs);
 
             return rv;
         }        

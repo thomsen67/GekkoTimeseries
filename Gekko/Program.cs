@@ -15819,8 +15819,7 @@ namespace Gekko
                 {
                     if (lhsHasStarOrQuestion)
                     {
-                        new Error("" + command + " with wildcard indexes not yet implemented");
-                        //throw new GekkoException();
+                        new Error("" + command + " where variable name has wildcard and where []-brackets are present is not yet implemented");
                     }
                     else
                     {
@@ -16351,7 +16350,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Matches wildcards like a*b?c
+        /// Matches wildcards like a*b?c. Simple matching, no fancy stuff regarding %, # or !.
         /// </summary>
         /// <param name="wild1"></param>
         /// <param name="stringsThatCanBeMatched"></param>
@@ -16359,15 +16358,14 @@ namespace Gekko
         public static List<string> MatchWildcard(string wild1, List<string> stringsThatCanBeMatched)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
-            //Sorted at the end
+            //Not sorted at the end
             List<string> inputs = new List<string>();
 
-            Wildcard wc = new Wildcard(wild1, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            Wildcard wc = new Wildcard(wild1, RegexOptions.IgnoreCase);
             foreach (string n2 in stringsThatCanBeMatched)
             {
                 if (wc.IsMatch(n2)) inputs.Add(n2);
             }
-
             //if (sort) inputs.Sort(StringComparer.OrdinalIgnoreCase);
             return inputs;
         }
