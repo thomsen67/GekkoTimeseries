@@ -530,7 +530,7 @@ namespace Gekko
             //Legal is alphanumeric, "_", "*", "?", ":", "@", "!". If we are left of ":" only
             //accept if an ident is left of ":" and the pointer is at this ident.
             //to the right of ":" or if no ":", accept normal and "*" and "?".
-            //No blanks are accepted at all, except around ":".   
+            //No blanks are accepted at all, except around ":".
             
             int col1 = col + 1;  //col1 is 1-based, easier here
             List<TwoStrings> rv2 = new List<TwoStrings>();            

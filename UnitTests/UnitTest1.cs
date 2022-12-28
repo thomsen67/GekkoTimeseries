@@ -26787,6 +26787,18 @@ print(df2)
             I("index x[b?];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[bx], x[by]\r\n"));
 
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[ax], x[ay], x[bx], x[by], x[by1], x[by2]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['b*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[bx], x[by], x[by1], x[by2]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['b?'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[bx], x[by]\r\n"));
+
             // =========================================================================================
             // =========================================================================================
             // =========================================================================================
@@ -26877,6 +26889,18 @@ print(df2)
             I("index x[*, b?];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by]\r\n"));
 
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['*', '*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['*', 'b*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by], x[j, by1], x[j, by2]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['*', 'b?'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx], x[j, by]\r\n"));
+
             // =========================================================================================
             // =========================================================================================
             // =========================================================================================
@@ -26951,6 +26975,18 @@ print(df2)
 
             Globals.unitTestScreenOutput.Clear();
             I("index x[i, b?];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['i', '*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, ax], x[i, ay], x[i, bx]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['i', 'b*'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index x['i', 'b?'];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x[i, bx]\r\n"));
 
         }
