@@ -13261,7 +13261,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// finds [a*b?] patterns, handled like {'a*b?'}. Problem is that [a*b] looks like a matrix definition, therefore this code.
+        /// finds [a*b?] patterns, handled like {'a*b?'}. 
+        /// Problem is that [a*b] looks like a matrix definition, therefore this code.
         /// </summary>
         /// <param name="inside"></param>
         /// <returns></returns>
@@ -13317,7 +13318,7 @@ namespace Gekko
                 else return false;
             }
 
-            //seems this regex splits after '*' and '?', but keeps these delimiters
+            //seems this regex splits by '*' and '?', but keeps these delimiters
             string[] ss = Regex.Matches(rest1, @"[-\*?]|[^\*?-]+")
                 .Cast<Match>()
                 .Select(m => m.Value)
@@ -15833,11 +15834,24 @@ namespace Gekko
                 {
                     //a hack to make DISP x[a] work                    
                     //OR: it is an INDEX command without stars, here we must find out if the single non-wildcard item exists
+                    //OR: it is an index wildcard like x[*] or x[?] that returns a List (of Series).
                     IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                     if (iv != null)
                     {
-                        lhsUnfolded.Add(wildCardLhs);
-                        lhsUnfoldedExplicit.Add(hasExplicitBank);
+                        if (iv.Type() == EVariableType.List)
+                        {
+                            //x[*], x[?] etc.
+                            foreach (IVariable child in (iv as List).list)
+                            {
+                                lhsUnfolded.Add((child as Series).GetNameWithoutCurrentFreq(true));
+                                lhsUnfoldedExplicit.Add(hasExplicitBank);
+                            }
+                        }
+                        else
+                        {
+                            lhsUnfolded.Add(wildCardLhs);
+                            lhsUnfoldedExplicit.Add(hasExplicitBank);
+                        }
                     }
                 }
                 else if (lhsHasStarOrQuestion)

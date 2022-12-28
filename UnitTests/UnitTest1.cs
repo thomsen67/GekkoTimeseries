@@ -26702,6 +26702,47 @@ print(df2)
         }
 
         [TestMethod]
+        public void _Test_ArraySeriesWildcards()
+        {
+            I("reset;");
+            I("x = series(1);");
+            I("x[ax] = 2;");
+            I("x[ay] = 3;");
+            I("x[bx] = 4;");
+            I("x[by] = 5;");
+            I("x[by1] = 6;");
+            I("x[by2] = 7;");
+
+            I("prt <n> {'x[*]'};");
+            //test print of 6 series x[ax] etc.
+            I("prt <n> {'x[b*]'};");
+            //test print of 4 series
+            I("prt <n> {'x[b?]'};");
+            //test print of 2 series
+
+            I("prt <n> x['*'];");
+            //test print of 6 series x[ax] etc.
+            I("prt <n> x['b*'];");
+            //test print of 4 series
+            I("prt <n> x['b?'];");
+            //test print of 2 series
+
+            I("index {'x[*]'};");
+            //test 6 series x[ax] etc.
+            I("index {'x[b*]'};");
+            //test 4 series
+            I("index {'x[b?]'};");
+            //test 2 series
+
+            I("index x[*];");
+            //test 6 series x[ax] etc.
+            I("index x[b*];");
+            //test 4 series
+            I("index x[b?];");
+            //test 2 series
+        }
+
+        [TestMethod]
         public void _Test_PxRead()
         {
 

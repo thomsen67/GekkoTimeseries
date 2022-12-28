@@ -2269,7 +2269,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method (find sub-series inside array super-series)
+        /// Helper method (find sub-series inside array super-series). Also handles wildcards like x[*],
+        /// in which case a List (of Series) is returned.
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="isLhs"></param>
@@ -2278,8 +2279,8 @@ namespace Gekko
         /// <param name="settings"></param>
         /// <returns></returns>
         private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless, LookupSettings settings)
-        {
-             IVariable rv = null;
+        {            
+            IVariable rv = null;
 
             if (this.dimensionsStorage == null)
             {
@@ -2300,13 +2301,47 @@ namespace Gekko
                 new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
             }
 
-            MultidimItem mi = new MultidimItem(keys);
-            this.dimensionsStorage.TryGetValue(mi, out iv);
-            string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
+            bool isWild = false;
+            foreach (string key in keys)
+            {
+                if (key.Contains("*") || key.Contains("?"))
+                {
+                    isWild = true;
+                    break;
+                }
+            }
 
+            MultidimItem mi = new MultidimItem(keys);
+            if (isWild)
+            {
+                if (Globals.fixWildcardLabel && smpl != null)
+                {
+                    smpl.labelRecordedPieces = new List<O.RecordedPieces>();
+                }
+
+                iv = new List();
+
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {
+                    (iv as List).Add(kvp.Value);
+                    if (Globals.fixWildcardLabel && smpl != null)
+                    {
+                        string namei = (kvp.Value as Series).GetNameWithoutCurrentFreq(true);
+                        O.RecordedPieces r = new O.RecordedPieces(Globals.wildcardText, new ScalarString(namei));
+                        smpl.labelRecordedPieces.Add(r);
+                    }
+                }
+            }
+            else
+            {                
+                this.dimensionsStorage.TryGetValue(mi, out iv);
+            }
+
+
+            string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
+            
             if (iv == null)
             {
-
                 if (!isLhs)
                 {
 
@@ -2418,14 +2453,9 @@ namespace Gekko
                     rv = ts;
                 }
                 else
-                {
-                    rv = iv as Series;
-                }
-                if (rv == null)
-                {
-                    //should not be possible
-                    new Error("Array-timeseries element is non-series.");
-                }
+                {                    
+                    rv = iv; //may be a List of Series if for instance x[*] is used.                   
+                }                
             }
 
             Program.PrecedentsHelper(null, rv, this.GetParentDatabank());

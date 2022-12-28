@@ -483,7 +483,7 @@ namespace Gekko
                     smpl.labelRecordedPieces = new List<RecordedPieces>();
                     for (int i = 0; i < names.Count; i++)
                     {
-                        RecordedPieces r = new RecordedPieces("wildcard", new ScalarString(names[i]));
+                        RecordedPieces r = new RecordedPieces(Globals.wildcardText, new ScalarString(names[i]));
                         smpl.labelRecordedPieces.Add(r);
                     }
                 }
