@@ -1789,7 +1789,7 @@ namespace Gekko
 
             if (keyword == "ctrl-space")
             {
-                try { suggestions = Databanks.IntellisenseVariables(line, column2); } catch { }
+                try { suggestions = Program.IntellisenseVariables(line, column2); } catch { }
             }
             else
             {

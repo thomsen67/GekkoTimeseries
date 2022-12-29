@@ -12843,6 +12843,260 @@ namespace Gekko
         }
 
         /// <summary>
+        /// First non-blank to the left. Returns blank if not found.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static char Left(string s, int col)
+        {
+            char rv = ' ';
+            for (int i = col - 1; i >= 0; i--)
+            {
+                if (s[i] != ' ')
+                {
+                    rv = s[i];
+                    break;
+                }
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// First non-blank to the right. Returns blank if not found.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static char Right(string s, int col)
+        {
+            char rv = ' ';
+            for (int i = col + 1; i < s.Length; i++)
+            {
+                if (s[i] != ' ')
+                {
+                    rv = s[i];
+                    break;
+                }
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Suggestions/intellisense in the GUI, when the user presses Ctrl+Space or tab. 
+        /// Inputs a string and the current cursor position. With an input string like "prt 1+ab-2;" it will activate
+        /// when the cursor is at the 'a', the 'b' or the '-'.
+        /// Returns a list of names|labels. Returns list with count = 0 if malformed input or no results.
+        /// Also sets Globals.windowIntellisenseSuggestionsOffset1|2, for the GUI when pasted.
+        /// Other programs have intellisense too,
+        /// Visual Studio (Ctrl+Space), RStudio (tab, but Ctrl+Space also works), Sublime (Ctrl+Space), Spyder (tab or Ctrl+Space).
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<TwoStrings> IntellisenseVariables(string s, int col)
+        {
+            List<TwoStrings> rv2 = new List<TwoStrings>();
+
+            if (true)
+            {
+                //b : a*b!q[ * , *b ]
+                //find start
+                int start = -12345;
+                for (int i = col; i >= 0; i--)
+                {
+                    bool ok = IsCharOk(s, i);
+                    if (!ok)
+                    {
+                        start = i + 1; //best bet
+                        break;
+                    }
+                    if (i == 0) start = i;
+                }
+
+                //now we have a start
+
+                int end = -12345;
+                for (int i = start; i < s.Length; i++)
+                {
+                    bool ok = IsCharOk(s, i);
+                    if (!ok)
+                    {
+                        end = i - 1; //best bet
+                        break;
+                    }
+                    if (i == s.Length - 1) end = i;
+                }
+
+                string x = x = G.Substring(s, start, end);                
+                if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
+
+                List<string> names = null;
+
+                string x2 = x.Replace(" ", "");
+                names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);                
+
+                foreach (string s7 in names)
+                {
+                    string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                    rv2.Add(new TwoStrings(s7, ss));
+                }
+                Globals.windowIntellisenseSuggestionsOffset1 = start - col;
+                Globals.windowIntellisenseSuggestionsOffset2 = end - col;
+            }
+            else
+            {
+
+                //We have a pointer .................|
+                //We have a string "lkfjal klafjk lkadsfj lkj fkladsjf kl"
+                //From the pointer we will look left and right as long as it is legal
+                //Legal is alphanumeric, "_", "*", "?", ":", "@", "!". If we are left of ":" only
+                //accept if an ident is left of ":" and the pointer is at this ident.
+                //to the right of ":" or if no ":", accept normal and "*" and "?".
+                //No blanks are accepted at all, except around ":".
+
+                int col1 = col + 1;  //col1 is 1-based, easier here                
+
+                string txt = s;
+                var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                var tags2 = new List<string>() { "//" };
+                TokenList tokens2 = StringTokenizer.GetTokensWithLeftBlanks(txt, 0, tags1, tags2, null, null);
+                int iCenter = -12345;
+                for (int i = 0; i < tokens2.storage.Count; i++)
+                {
+                    //the token start pos (.column) is its first non-blank. So real start has leftblanks deducted,
+                    //and the end has added length of token (.s) minus 1.
+                    TokenHelper th = tokens2.storage[i];
+                    if (TokenBorders(th).Item1 <= col1 && col1 <= TokenBorders(th).Item2) iCenter = i;
+                }
+                if (iCenter == -12345) iCenter = tokens2.storage.Count - 1; //should not happen
+
+                //try to find out if we have this pattern: bankvarname [ ... ]
+                //bankvarname will be found
+
+                TokenHelper center = tokens2.storage[iCenter];
+
+                List<TokenHelper> left = new List<TokenHelper>();
+                List<TokenHelper> right = new List<TokenHelper>();
+
+                bool centerAcceptable = false;
+                if (AcceptableToken(center) || center.s == ":")
+                {
+                    centerAcceptable = true;
+                }
+                else
+                {
+                    //starts at something like ";" or "," etc.
+                }
+
+                //look at the left
+                for (int i = iCenter - 1; i >= 0; i--)
+                {
+                    //accepts blank between i and i+1 if i+1 is colon
+                    TokenHelper th = tokens2.storage[i];
+                    if (AcceptableToken(th) && (tokens2.storage[i + 1].leftblanks == 0 || tokens2.storage[i + 1].s == ":" || tokens2.storage[i + 1].type == ETokenType.EOF)) left.Add(th);
+                    else if (th.s == ":") left.Add(th);
+                    else if (i == iCenter - 1 && !centerAcceptable) left.Add(th);
+                    else break;
+                }
+
+                if (AcceptableToken(center) || center.s == ":")
+                {
+                    //look at the right
+                    for (int i = iCenter + 1; i < tokens2.storage.Count; i++)
+                    {
+                        TokenHelper th = tokens2.storage[i];
+                        if (AcceptableToken(th) && (th.leftblanks == 0 || tokens2.storage[i - 1].s == ":")) right.Add(th);
+                        else if (th.s == ":") right.Add(th);
+                        else break;
+                    }
+                }
+
+                List<TokenHelper> all = new List<TokenHelper>();
+                left.Reverse();
+                all.AddRange(left);
+                if (centerAcceptable) all.Add(center);
+                all.AddRange(right);
+
+                bool bad = false;
+                if (all.Count > 0)
+                {
+                    //end-point restrictions
+                    if (col1 < all[0].column) bad = true;
+                    if (TokenBorders(all[all.Count - 1]).Item2 < col1 - 1) bad = true;
+                }
+                if (bad) all.Clear();
+
+                if (all.Count > 0)
+                {
+                    int start = all[0].column;
+                    int end = TokenBorders(all[all.Count - 1]).Item2;
+                    Globals.windowIntellisenseSuggestionsOffset1 = start - col1;
+                    Globals.windowIntellisenseSuggestionsOffset2 = end - col1;
+
+                    //G.Writeln2("Center: '" + tokens2.subnodes.storage[iCenter].ToString() + "'   "+iCenter);            
+                    //G.Writeln();            
+                    string x = "";
+                    foreach (TokenHelper th in all)
+                    {
+                        x += th.ToString();
+                        //G.Writeln("--- '" + th.ToString() + "'   "+th.type);
+                    }
+                    if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
+
+                    List<string> names = null;
+
+                    string x2 = x.Replace(" ", "");
+                    names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);
+
+                    //new Writeln("bankname = " + bankname + ", varname = " + varname + ", offset = " + Globals.windowIntellisenseSuggestionsOffset);
+
+                    foreach (string s7 in names)
+                    {
+                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                        rv2.Add(new TwoStrings(s7, ss));
+                    }
+                }
+            }
+
+            return rv2;
+        }
+
+        private static bool IsCharOk(string s, int i)
+        {
+            bool ok = false;
+            if (s[i] == '_' || char.IsLetterOrDigit(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!' || s[i] == '[' || s[i] == ']' || s[i] == ',')
+            {
+                ok = true;
+            }
+            else if (s[i] == ' ')
+            {
+                char l = Left(s, i);
+                char r = Right(s, i);
+                if (r == ']') ok = true;
+                else if (l == ',' || r == ',') ok = true;
+                else if (l == '[') ok = true;
+                else if (l == ':' || r == ':') ok = true;
+            }
+
+            return ok;
+        }
+
+        private static bool AcceptableToken(TokenHelper th)
+        {
+            return th.type == ETokenType.Word || (th.type == ETokenType.Number && G.IsInteger(th.s)) || th.s == "*" || th.s == "?" || th.s == "@" || th.s == "!";
+        }
+
+        /// <summary>
+        /// Real borders of token, including blanks to the left and adjusting for length. 1-based like TokenHelper.column.
+        /// </summary>
+        /// <param name="th"></param>
+        /// <returns></returns>
+        public static Tuple<int, int> TokenBorders(TokenHelper th)
+        {
+            return new Tuple<int, int>(th.column - th.leftblanks, th.column + th.s.Length - 1);
+        }
+
+        /// <summary>
         /// Helper method for HandleGekkoCommandsGlueSymbols()
         /// </summary>
         /// <param name="lineNewVersion"></param>
