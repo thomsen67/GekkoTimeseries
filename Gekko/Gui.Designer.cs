@@ -1790,7 +1790,6 @@ namespace Gekko
             if (keyword == "ctrl-space")
             {
                 try { suggestions = Databanks.IntellisenseVariables(line, column2); } catch { }
-                //if (suggestions.Count == 0) suggestions = new List<TwoStrings>() { new TwoStrings("[no matches]", null) };
             }
             else
             {

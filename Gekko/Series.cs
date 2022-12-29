@@ -2293,10 +2293,12 @@ namespace Gekko
                     e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it,");
                     e.MainAdd("perhaps with 'CREATE " + this.name + ";' first.");
                 }
-            }
+            }                   
 
-            IVariable iv = null;
-            if (this.dimensions != keys.Length)
+            bool isDoubleStars = false;
+            if (keys.Length == 1 && keys[0] == "**") isDoubleStars = true;
+
+            if (!isDoubleStars && this.dimensions != keys.Length)
             {
                 new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
             }
@@ -2311,30 +2313,39 @@ namespace Gekko
                 }
             }
 
+            IVariable iv = null;
             MultidimItem miWildcard = new MultidimItem(keys); //for instance x[a*, *].
+
             if (isWild)
             {
                 List<KeyValuePair<MultidimItem, IVariable>> hits1 = new List<KeyValuePair<MultidimItem, IVariable>>();
                 List<KeyValuePair<MultidimItem, IVariable>> hits2 = new List<KeyValuePair<MultidimItem, IVariable>>();
                 hits1.AddRange(this.dimensionsStorage.storage);
-                
-                for (int i = 0; i < miWildcard.storage.Length; i++)  //each dimension
-                {
-                    hits2.Clear();
-                    Wildcard wc = new Wildcard(miWildcard.storage[i], System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    foreach (KeyValuePair<MultidimItem, IVariable> kvp in hits1)
-                    {
-                        //one subseries inside arrayseries, for instance x[a, j] out of x[a, j], x[b, k2].
-                        MultidimItem miChild = kvp.Key;
 
-                        if (wc.IsMatch(miChild.storage[i]))
+                if (isDoubleStars)
+                {
+                    //do not do any filtering
+                }
+                else
+                {
+                    for (int i = 0; i < miWildcard.storage.Length; i++)  //each dimension
+                    {
+                        hits2.Clear();
+                        Wildcard wc = new Wildcard(miWildcard.storage[i], System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        foreach (KeyValuePair<MultidimItem, IVariable> kvp in hits1)
                         {
-                            //testing dimension i
-                            hits2.Add(kvp);
+                            //one subseries inside arrayseries, for instance x[a, j] out of x[a, j], x[b, k2].
+                            MultidimItem miChild = kvp.Key;
+
+                            if (wc.IsMatch(miChild.storage[i]))
+                            {
+                                //testing dimension i
+                                hits2.Add(kvp);
+                            }
                         }
+                        hits1.Clear();
+                        hits1.AddRange(hits2);
                     }
-                    hits1.Clear();
-                    hits1.AddRange(hits2);
                 }
 
                 iv = new List();

@@ -2372,7 +2372,8 @@ indexerHelper7:
 
 name7:						  (identDigit | nameCurlyStart) (GLUE! identDigit | nameCurly)*;  //was: name, but name7 can be 117, 007, 1e10, 1a, etc.
 
-wildcardIndexer7:  		      name7 (wildSymbolMiddle name7)* wildSymbolEnd? //a?b a?b?, a?b?c a?b?c?, etc.
+wildcardIndexer7:  		      stars -> ASTSTARS	//covers [*], [*,*], [*,*,*], ... --> everything
+                            | name7 (wildSymbolMiddle name7)* wildSymbolEnd? //a?b a?b?, a?b?c a?b?c?, etc.
 						    | name7 wildSymbolEnd //a?						  	
 						    | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd? //?a ?a? ?a?b ?a?b?, etc.
 						    | wildSymbolFree //?	
