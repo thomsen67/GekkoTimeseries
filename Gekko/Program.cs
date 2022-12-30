@@ -12902,7 +12902,10 @@ namespace Gekko
                 //b : a*b!q[ * , *b ]
                 //find start
                 int start = -12345;
-                for (int i = col; i >= 0; i--)
+                int lineEnd = col;
+                if (lineEnd > s.Length - 1) lineEnd = s.Length - 1; //if outside string move it inside
+                if (s[lineEnd] == ' ') lineEnd--;  //we allow a blank as very last char
+                for (int i = lineEnd; i >= 0; i--)
                 {
                     bool ok = IsCharOk(s, i);
                     if (!ok)
@@ -12927,21 +12930,29 @@ namespace Gekko
                     if (i == s.Length - 1) end = i;
                 }
 
-                string x = x = G.Substring(s, start, end);                
-                if (!(x.Contains("*") || x.Contains("?"))) x = x + "*";
-
-                List<string> names = null;
-
-                string x2 = x.Replace(" ", "");
-                names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);                
-
-                foreach (string s7 in names)
+                string x = G.Substring(s, start, end);
+                if (x != null)
                 {
-                    string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
-                    rv2.Add(new TwoStrings(s7, ss));
+                    x = x.Trim();
+                    if (!(x.Contains("*") || x.Contains("?"))) x = x + "*"; //aa --> aa*, x[ --> x[* x[aa --> x[aa*, x[a] --> x[a]* (the last is bad, but never mind)
+                    bool bleft = x.Contains("[");
+                    bool bright = x.Contains("]");
+                    if (bleft && !bright) x = x + "]";
+                    if (!bright && x.EndsWith("[*]")) x = x.Substring(0, x.Length - "[*]".Length) + "[**]";
+                    List<string> names = null;
+                    string x2 = x.Replace(" ", "");
+
+                    if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
+                    names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);
+
+                    foreach (string s7 in names)
+                    {
+                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                        rv2.Add(new TwoStrings(s7, ss));
+                    }
+                    Globals.windowIntellisenseSuggestionsOffset1 = start - col;
+                    Globals.windowIntellisenseSuggestionsOffset2 = end - col;
                 }
-                Globals.windowIntellisenseSuggestionsOffset1 = start - col;
-                Globals.windowIntellisenseSuggestionsOffset2 = end - col;
             }
             else
             {
@@ -13064,6 +13075,7 @@ namespace Gekko
         private static bool IsCharOk(string s, int i)
         {
             bool ok = false;
+            if (i < 0 || i > s.Length - 1) return false;
             if (s[i] == '_' || char.IsLetterOrDigit(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!' || s[i] == '[' || s[i] == ']' || s[i] == ',')
             {
                 ok = true;

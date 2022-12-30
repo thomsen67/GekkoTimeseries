@@ -2950,6 +2950,7 @@ namespace Gekko
                 x = s.Substring(position1, position2 - position1 + 1);
             }
             catch (Exception e) { };
+            if (x == "") x = null;  //happens with Substring(s, 5, 4) for instance --> length 0.
             return x;
         }
 
