@@ -13974,6 +13974,28 @@ namespace UnitTests
             I("z = series(2);");
             I("z[i, ax] = 100; ");
             I("z[i, ay] = 200; ");
+            I("clone;");
+            I("@z[i, az] = 300; ");
+
+
+
+
+
+
+
+
+            s = ".............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt @z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
+            Assert.AreEqual(3, suggestions.Count);
+
+
+
+
+
+
+
+
+
 
             s = ".........................................|";            
             suggestions = Gui.StartIntellisenseHelper("prt", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after t            
@@ -14159,7 +14181,7 @@ namespace UnitTests
             
             s = "............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt y[,", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
-            Assert.AreEqual(0, suggestions.Count); //hmmm could be 2?
+            Assert.AreEqual(0, suggestions.Count); //we do not allow this, could be misplaced comma.
 
             s = "............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt y[+", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
@@ -14208,6 +14230,22 @@ namespace UnitTests
             s = "...............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt z[**]", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(2, suggestions.Count);
+
+            // ------------------------------------------------------------------------------------
+            // ------------ with ! date
+            // ------------------------------------------------------------------------------------
+
+            s = "..............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt z!a[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
+            Assert.AreEqual(2, suggestions.Count);
+
+            // ------------------------------------------------------------------------------------
+            // ------------ with @ ref
+            // ------------------------------------------------------------------------------------
+
+            s = ".............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt @z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
+            Assert.AreEqual(3, suggestions.Count);
 
         }
 

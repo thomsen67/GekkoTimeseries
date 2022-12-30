@@ -12938,7 +12938,7 @@ namespace Gekko
 
                 string x = G.Substring(s, start, end);
                 string drop = G.Substring(s, end + 1, lineEnd);  //"prt xx, " with col at last blank will drop ", " which is too much. At col 1 less it would be "," and ok.
-                if (Globals.runningOnTTComputer) new Writeln("TTH: STRING = {" + x + "} DROP = {" + drop + "}");
+                if (Globals.runningOnTTComputer) new Writeln("TTH: input = {" + x + "} drop = {" + drop + "}");
 
                 bool dropProblem1 = false;
                 if (drop != null && drop.Length > 1) dropProblem1 = true;
@@ -12960,8 +12960,9 @@ namespace Gekko
                     List<string> names = null;
                     string x2 = x.Replace(" ", "");
 
-                    //if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
+                    if (x2.StartsWith("@")) x2 = "Ref:" + x2.Substring(1);
 
+                    if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
                     try { names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var); } catch { };
 
                     if (names != null)
@@ -15947,6 +15948,7 @@ namespace Gekko
         /// and having a central hub assures the the wildcard logic is consistent. 
         /// It deals with the logic of for instance INDEX x*; or COPY x*b TO y*; etc. Also deals with {'...'} wildcards, and handles
         /// the logic if banknames are given, too. This is a quite complicated method.
+        /// Beware that you cannot use @x, must use ref:x.
         /// </summary>
         /// <param name="names0"></param>
         /// <param name="names1"></param>
