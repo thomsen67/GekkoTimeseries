@@ -12909,7 +12909,7 @@ namespace Gekko
                     lineEnd = s.Length - 1; //if outside string move it inside
                     hasMoved = true;
                 }
-                if (!hasMoved && s[lineEnd] == ' ') lineEnd--;  //we allow a blank as very last char
+                if (!hasMoved && !IsCharOk(s, lineEnd, -12345)) lineEnd--;  //we allow a blank as very last char
                 for (int i = lineEnd; i >= 0; i--)
                 {
                     bool ok = IsCharOk(s, i, -12345);
