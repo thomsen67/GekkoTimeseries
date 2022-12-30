@@ -12940,10 +12940,16 @@ namespace Gekko
                 string drop = G.Substring(s, end + 1, lineEnd);  //"prt xx, " with col at last blank will drop ", " which is too much. At col 1 less it would be "," and ok.
                 if (Globals.runningOnTTComputer) new Writeln("TTH: STRING = {" + x + "} DROP = {" + drop + "}");
 
-                bool dropProblem = false;
-                if (drop != null && drop.Length > 1) dropProblem = true;
+                bool dropProblem1 = false;
+                if (drop != null && drop.Length > 1) dropProblem1 = true;
 
-                if (x != null && !dropProblem)
+                bool dropProblem2 = false;
+                if (drop != null && x.EndsWith(" ") && drop.Length > 0) dropProblem2 = true;
+
+                bool dropProblem3 = false;
+                if (x != null && x.EndsWith("  ")) dropProblem3 = true;
+
+                if (x != null && !dropProblem1 && !dropProblem2 && !dropProblem3)
                 {
                     x = x.Trim();
                     if (!(x.Contains("*") || x.Contains("?"))) x = x + "*"; //aa --> aa*, x[ --> x[* x[aa --> x[aa*, x[a] --> x[a]* (the last is bad, but never mind)
@@ -12955,12 +12961,16 @@ namespace Gekko
                     string x2 = x.Replace(" ", "");
 
                     //if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
-                    names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);
 
-                    foreach (string s7 in names)
+                    try { names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var); } catch { };
+
+                    if (names != null)
                     {
-                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
-                        rv2.Add(new TwoStrings(s7, ss));
+                        foreach (string s7 in names)
+                        {
+                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(s7, s7, false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                            rv2.Add(new TwoStrings(s7, ss));
+                        }
                     }
                     Globals.windowIntellisenseSuggestionsOffset1 = start - col;
                     Globals.windowIntellisenseSuggestionsOffset2 = end - col;

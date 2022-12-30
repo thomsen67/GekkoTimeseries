@@ -1192,9 +1192,7 @@ namespace Gekko
         public System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private ToolStripMenuItem utilitiesToolStripMenuItem;
         private ToolStripMenuItem optionsToolStripMenuItem;
-
-        //private RichTextBox textBox2;
-        //private AutoComplete textBox2;
+                
         private SplitContainerFix splitContainerMainTab;
 
         private ToolStripMenuItem setWorkingDirToolStripMenuItem;
@@ -1468,9 +1466,9 @@ namespace Gekko
                 //
                 // Ctrl+[Space]
                 //
-                //Calls autocomplete
+                //Calls intellisense
                 Globals.windowIntellisenseType = 2;
-                StartIntellisense("ctrl-space", null);                
+                StartIntellisense(EIntellisenseType.Tab, null);                
                 e.Handled = true;  //ignore
                 e.SuppressKeyPress = true; //ignore
             }
@@ -1480,9 +1478,9 @@ namespace Gekko
                 // Space or '<'
                 //
                 bool ok = true;
-                string keyword = null;
-                if (isNormalSpace) keyword = "space";
-                else if (isLessThanSign) keyword = "less";
+                EIntellisenseType keyword = EIntellisenseType.Null;
+                if (isNormalSpace) keyword = EIntellisenseType.Space;
+                else if (isLessThanSign) keyword = EIntellisenseType.Less;
                 else ok = false;
                 if (ok)
                 {
@@ -1654,7 +1652,15 @@ namespace Gekko
             return style;
         }
 
-        private void StartIntellisense(string keyword, string type)
+        public enum EIntellisenseType
+        {
+            Null,
+            Space,
+            Less,
+            Tab
+        }
+
+        private void StartIntellisense(EIntellisenseType keyword, string type)
         {
             int line2;
             int firstChar;
@@ -1724,7 +1730,7 @@ namespace Gekko
             }
         }
 
-        public static List<TwoStrings> StartIntellisenseHelper(string line, string keyword, string type, int line2, int column2)
+        public static List<TwoStrings> StartIntellisenseHelper(string line, EIntellisenseType keyword, string type, int line2, int column2)
         {
             string s2 = null;
             try
@@ -1738,9 +1744,9 @@ namespace Gekko
             try { s_next = line.Substring(column2, 1); } catch { };
 
             List<TwoStrings> suggestions = null;
-            if (keyword == "space") s2 += " ";
-            else if (keyword == "less") s2 += "<";
-            else if (keyword == "ctrl-space")
+            if (keyword == EIntellisenseType.Space) s2 += " ";
+            else if (keyword == EIntellisenseType.Less) s2 += "<";
+            else if (keyword == EIntellisenseType.Tab)
             {
                 //do nothing
             }
@@ -1755,7 +1761,7 @@ namespace Gekko
             }
             else if (G.Equal(type, "option"))
             {
-                if (keyword == "space")
+                if (keyword == EIntellisenseType.Space)
                 {
                     bool ok = false;
                     if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
@@ -1764,14 +1770,14 @@ namespace Gekko
                     }
                     if (ok == false) goto Lbl1;
                 }
-                else if (keyword == "less")
+                else if (keyword == EIntellisenseType.Less)
                 {
                     goto Lbl1;
                 }
             }
             else if (G.Equal(type, "some"))
             {
-                if (keyword == "space")
+                if (keyword == EIntellisenseType.Space)
                 {
                     bool ok = false;
                     if (s2.StartsWith("option ", StringComparison.OrdinalIgnoreCase))
@@ -1790,7 +1796,7 @@ namespace Gekko
                 //do nothing
             }
 
-            if (keyword == "ctrl-space")
+            if (keyword == EIntellisenseType.Tab)
             {
                 try { suggestions = Program.IntellisenseVariables(line, column2); } catch { }
             }
