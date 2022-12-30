@@ -13977,26 +13977,6 @@ namespace UnitTests
             I("clone;");
             I("@z[i, az] = 300; ");
 
-
-
-
-
-
-
-
-            s = ".............................................|";
-            suggestions = Gui.StartIntellisenseHelper("prt @z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
-            Assert.AreEqual(3, suggestions.Count);
-
-
-
-
-
-
-
-
-
-
             s = ".........................................|";            
             suggestions = Gui.StartIntellisenseHelper("prt", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after t            
             Assert.AreEqual(2, suggestions.Count);
@@ -14246,7 +14226,9 @@ namespace UnitTests
             s = ".............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt @z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(3, suggestions.Count);
-
+            Assert.IsTrue(suggestions[0].s1 == "Ref:z[i, ax]");
+            Assert.IsTrue(suggestions[1].s1 == "Ref:z[i, ay]");
+            Assert.IsTrue(suggestions[2].s1 == "Ref:z[i, az]");
         }
 
         [TestMethod]
@@ -27237,6 +27219,8 @@ print(df2)
             I("x2[j, by] = 5;");
             I("x2[j, by1] = 6;");
             I("x2[j, by2] = 7;");
+            I("clone;");
+            I("@x2[j, by3] = 8;");
 
             I("prt <n> {'x1[**]'};");
             table = Globals.lastPrtOrMulprtTable;
@@ -27301,7 +27285,15 @@ print(df2)
             Globals.unitTestScreenOutput.Clear();
             I("index x2['**'];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x2[i, ax], x2[i, ay], x2[i, bx], x2[j, by], x2[j, by1], x2[j, by2]\r\n"));
-            
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index ref:x2['**'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i, ax], Ref:x2[i, ay], Ref:x2[i, bx], Ref:x2[j, by], Ref:x2[j, by1], Ref:x2[j, by2], Ref:x2[j, by3]\r\n"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("index @x2['**'];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Ref:x2[i, ax], Ref:x2[i, ay], Ref:x2[i, bx], Ref:x2[j, by], Ref:x2[j, by1], Ref:x2[j, by2], Ref:x2[j, by3]\r\n"));
+
         }
 
         [TestMethod]

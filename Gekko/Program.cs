@@ -16183,7 +16183,23 @@ namespace Gekko
                             //x[*], x[?] etc.
                             foreach (IVariable child in (iv as List).list)
                             {
-                                lhsUnfolded.Add((child as Series).GetNameWithoutCurrentFreq(true));
+                                Series child_ts = child as Series;
+                                string db = child_ts.GetParentDatabank().GetName();
+                                EFreq freq = child_ts.freq;
+
+                                string name = child_ts.GetName();
+
+                                if (freq != Program.options.freq)
+                                {
+                                    name = G.Chop_SetFreq(name, freq);
+                                }
+
+                                if (!G.Equal(currentFirstBankName, db))
+                                {
+                                    name = G.Chop_SetBank(name, db);
+                                }                                
+
+                                lhsUnfolded.Add(name);
                                 lhsUnfoldedExplicit.Add(hasExplicitBank);
                             }
                         }

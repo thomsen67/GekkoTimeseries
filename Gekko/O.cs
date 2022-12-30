@@ -8376,7 +8376,6 @@ namespace Gekko
                     else
                     {
                         new Error("showfreq must be = yes, no or all");
-                        //throw new GekkoException();
                     }
 
                     if (!G.Equal(this.opt_mute, "yes"))
