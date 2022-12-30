@@ -12900,7 +12900,8 @@ namespace Gekko
             if (true)
             {
                 //b : a*b!q[ * , *b ]
-                //find start
+                //find start                
+
                 int start = -12345;
                 int lineEnd = col;
                 bool hasMoved = false;
@@ -12936,7 +12937,13 @@ namespace Gekko
                 }
 
                 string x = G.Substring(s, start, end);
-                if (x != null)
+                string drop = G.Substring(s, end + 1, lineEnd);  //"prt xx, " with col at last blank will drop ", " which is too much. At col 1 less it would be "," and ok.
+                if (Globals.runningOnTTComputer) new Writeln("TTH: STRING = {" + x + "} DROP = {" + drop + "}");
+
+                bool dropProblem = false;
+                if (drop != null && drop.Length > 1) dropProblem = true;
+
+                if (x != null && !dropProblem)
                 {
                     x = x.Trim();
                     if (!(x.Contains("*") || x.Contains("?"))) x = x + "*"; //aa --> aa*, x[ --> x[* x[aa --> x[aa*, x[a] --> x[a]* (the last is bad, but never mind)
@@ -12947,7 +12954,7 @@ namespace Gekko
                     List<string> names = null;
                     string x2 = x.Replace(" ", "");
 
-                    if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
+                    //if (Globals.runningOnTTComputer) new Writeln("TTH: string = " + x2);
                     names = Program.Search(new List(new List<string>() { x2 }), null, EVariableType.Var);
 
                     foreach (string s7 in names)
