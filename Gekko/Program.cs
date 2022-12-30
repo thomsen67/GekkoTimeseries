@@ -12903,11 +12903,16 @@ namespace Gekko
                 //find start
                 int start = -12345;
                 int lineEnd = col;
-                if (lineEnd > s.Length - 1) lineEnd = s.Length - 1; //if outside string move it inside
-                if (s[lineEnd] == ' ') lineEnd--;  //we allow a blank as very last char
+                bool hasMoved = false;
+                if (lineEnd > s.Length - 1)
+                {
+                    lineEnd = s.Length - 1; //if outside string move it inside
+                    hasMoved = true;
+                }
+                if (!hasMoved && s[lineEnd] == ' ') lineEnd--;  //we allow a blank as very last char
                 for (int i = lineEnd; i >= 0; i--)
                 {
-                    bool ok = IsCharOk(s, i);
+                    bool ok = IsCharOk(s, i, -12345);
                     if (!ok)
                     {
                         start = i + 1; //best bet
@@ -12921,7 +12926,7 @@ namespace Gekko
                 int end = -12345;
                 for (int i = start; i < s.Length; i++)
                 {
-                    bool ok = IsCharOk(s, i);
+                    bool ok = IsCharOk(s, i, start);
                     if (!ok)
                     {
                         end = i - 1; //best bet
@@ -13072,13 +13077,65 @@ namespace Gekko
             return rv2;
         }
 
-        private static bool IsCharOk(string s, int i)
+        private static bool IsCharOk(string s, int i, int start)
         {
             bool ok = false;
+            int leftBracketCounter = 0;
+            int rightBracketCounter = 0;
+
+            if (start != -12345)
+            {
+                bool hasLeftBracket = false;
+                for (int ii = start; ii < i; ii++)
+                {
+                    if (s[ii] == '[')
+                    {
+                        leftBracketCounter++;
+                    }
+                    else if (s[ii] == ']')
+                    {
+                        rightBracketCounter++;
+                    }
+                }
+            }
+
             if (i < 0 || i > s.Length - 1) return false;
-            if (s[i] == '_' || char.IsLetterOrDigit(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!' || s[i] == '[' || s[i] == ']' || s[i] == ',')
+            if (s[i] == '_' || char.IsLetterOrDigit(s[i]) || s[i] == '*' || s[i] == '?' || s[i] == ':' || s[i] == '@' || s[i] == '!')
             {
                 ok = true;
+            }
+            else if (s[i] == '[')
+            {
+                if (start == -12345)
+                {
+                    ok = true;
+                }
+                else
+                {
+                    if (leftBracketCounter == 0 && rightBracketCounter == 0) ok = true;
+                }
+            }
+            else if (s[i] == ']')
+            {
+                if (start == -12345)
+                {
+                    ok = true;
+                }
+                else
+                {
+                    if (leftBracketCounter == 1 && rightBracketCounter == 0) ok = true;
+                }
+            }
+            else if (s[i] == ',')
+            {
+                if (start == -12345)
+                {
+                    ok = true;
+                }
+                else
+                {
+                    if (leftBracketCounter == 1 && rightBracketCounter == 0) ok = true;
+                }
             }
             else if (s[i] == ' ')
             {
@@ -13089,7 +13146,6 @@ namespace Gekko
                 else if (l == '[') ok = true;
                 else if (l == ':' || r == ':') ok = true;
             }
-
             return ok;
         }
 

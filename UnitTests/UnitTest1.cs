@@ -14014,6 +14014,11 @@ namespace UnitTests
             Assert.AreEqual(1, suggestions.Count);
             Assert.IsTrue(suggestions[0].s1 == "xa1");
 
+            s = "............................................|";
+            suggestions = Gui.StartIntellisenseHelper("prt xa+", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after ,
+            Assert.AreEqual(1, suggestions.Count);
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
+
             s = ".............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt xa, ", "ctrl-space", null, 0, s.IndexOf("|") - offset);  //cursor right after ,
             Assert.AreEqual(0, suggestions.Count);

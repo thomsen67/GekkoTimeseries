@@ -25,11 +25,12 @@ namespace Gekko
         //public static int listBoxHelper = 0;
         public string lastSelected = null;
 
-        public WindowIntellisense()
+        public WindowIntellisense(int width)
         {
             clikcTimer = new System.Timers.Timer(300);
             clikcTimer.Elapsed += new System.Timers.ElapsedEventHandler(EvaluateClicks);
             InitializeComponent();
+            this.Width = width;
         }
 
         private void EvaluateClicks(object source, System.Timers.ElapsedEventArgs e)

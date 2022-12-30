@@ -1665,27 +1665,30 @@ namespace Gekko
 
             List<TwoStrings> suggestions = StartIntellisenseHelper(line, keyword, type, line2, column2);
 
+            //if (suggestions != null)
+            //{
+            //    foreach (TwoStrings ts in suggestions)
+            //    {
+            //        ts.s1 = ts.s1 + "," + ts.s1;
+            //    }
+            //}
+
             if (suggestions != null && suggestions.Count > 0)
             {
                 if (Globals.runningOnTTComputer) new Writeln("TTH: Suggestions: " + suggestions.Count);
 
-                bool fix = true;
+                int w = 0;
+                foreach (TwoStrings suggest in suggestions)
+                {
+                    w = Math.Max(w, suggest.s1.Length);
+                }
+                int width = Math.Max(150, 20 + w * 8); //more space for instance for x[**] results. Using 8 seems reasonable.
+                //new Writeln("width " + w + " / " + width);
 
-                if (!fix)
-                {
-                    if (Globals.windowIntellisense == null)
-                    {
-                        Globals.windowIntellisense = new WindowIntellisense();
-                    }
-                    Globals.windowIntellisense.listBox1.Items.Clear();
-                }
-                else
-                {
-                    Globals.windowIntellisense = new WindowIntellisense();
-                    //var v = Globals.windowIntellisense.listBox1.ItemsSource;
-                    //Globals.windowIntellisense.listBox1.ItemsSource = null;
-                    //Globals.windowIntellisense.listBox1.ItemsSource = v;
-                }
+                Globals.windowIntellisense = new WindowIntellisense(width);
+                //var v = Globals.windowIntellisense.listBox1.ItemsSource;
+                //Globals.windowIntellisense.listBox1.ItemsSource = null;
+                //Globals.windowIntellisense.listBox1.ItemsSource = v;
 
                 int i = -1;
                 foreach (TwoStrings suggest in suggestions)
