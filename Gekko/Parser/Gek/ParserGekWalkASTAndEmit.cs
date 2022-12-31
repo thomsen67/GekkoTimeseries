@@ -971,7 +971,7 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTSTARS":
                     {
-                        node.Code.CA("new ScalarString(`**`)");
+                        node.Code.CA("new ScalarString(`**`)"); 
                     }
                     break;
                 case "ASTTRIPLESTARS":
