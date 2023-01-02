@@ -381,6 +381,8 @@ namespace Gekko
         {
             if (s.Trim() == "") return;
 
+            if (Globals.runningOnTTComputer && s.Trim().StartsWith("TTH: ")) color = Color.Gray;
+
             int i1 = 0;
             List<TwoInts> links = new List<TwoInts>();
             while (true)

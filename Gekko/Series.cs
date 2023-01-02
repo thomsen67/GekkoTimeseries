@@ -184,9 +184,9 @@ namespace Gekko
         public Databank GetParentDatabank()
         {
             //also works for array-subseries
-            if (this.name == null && Globals.runningOnTTComputer)
+            if (this.name == null)
             {
-                new Warning("TTH: Parent problem (.name)");
+                if (Globals.runningOnTTComputer) new Warning("TTH: Parent problem (.name)");
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {

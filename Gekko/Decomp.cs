@@ -787,7 +787,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return decompOutput;
         }
