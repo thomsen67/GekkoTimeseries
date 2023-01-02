@@ -244,10 +244,17 @@ namespace Gekko
 
             if (G.IsDecompOrFindThread())
             {
-                MessageBoxShow();
-                if (type == EWrapType.Error && this.throwExceptionForError)
+                if (Globals.decompIsCalculatingButtonColors)
                 {
-                    throw new GekkoException();
+                    //ignore the error completely, so not even a popup box
+                }
+                else
+                {
+                    MessageBoxShow();
+                    if (type == EWrapType.Error && this.throwExceptionForError)
+                    {
+                        throw new GekkoException();
+                    }
                 }
             }
             else
@@ -268,10 +275,10 @@ namespace Gekko
                 {
                     Action<GAO> a = (gao) =>
                     {
-                    //-------------------------------
-                    //The long explanation in output tab
-                    //-------------------------------
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                        //-------------------------------
+                        //The long explanation in output tab
+                        //-------------------------------
+                        Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                         O.Cls("output");
                         this.ConsolidateLines("more");
                         for (int ii = 0; ii < this.storageMore.Count; ii++)

@@ -16023,6 +16023,8 @@ namespace Gekko
             string currentRefBankName = Program.databanks.GetRef().name;
             string currentFreq = G.ConvertFreq(Program.options.freq);
 
+            bool allowIndexes = false;
+
             string command = "COPY";
             string command2 = "copy";
             string command3 = "copied";
@@ -16037,6 +16039,7 @@ namespace Gekko
                 command = "Search";
                 command2 = "search";
                 command3 = "searched";
+                allowIndexes = true;
             }
             else if (type == EWildcardSearchType.Write)
             {
@@ -16053,14 +16056,14 @@ namespace Gekko
 
             List<ToFrom> outputs = new List<ToFrom>();
 
-            List<string> lhs = O.Restrict(names0, true, true, true, true);
+            List<string> lhs = O.Restrict(names0, true, true, true, allowIndexes);
             bool allowBankRhs = true;
             if (type == EWildcardSearchType.Write)
             {
                 allowBankRhs = true;
             }
 
-            List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
+            List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, allowIndexes);
 
             // --------------------------------------------
             //           LHS
@@ -18175,14 +18178,29 @@ namespace Gekko
 
             if (!success)
             {
-                if (reportErrorNormalFile)
+                if (G.ContainsZipPath(filenameMaybeWithoutPath))
                 {
-                    new Error("Could not find file '" + filenameMaybeWithoutPath + "'");
+                    if (reportErrorInsideZip)
+                    {
+                        //maybe note here if the zip itself does not exist...
+                        new Error("Could not find file '" + filenameMaybeWithoutPath + "'");
+                    }
+                    else
+                    {
+                        rv.realPathAndFileName = null;  //signals failure
+                    }
                 }
                 else
                 {
-                    rv.realPathAndFileName = null;  //signals failure
-                }
+                    if (reportErrorNormalFile)
+                    {
+                        new Error("Could not find file '" + filenameMaybeWithoutPath + "'");
+                    }
+                    else
+                    {
+                        rv.realPathAndFileName = null;  //signals failure
+                    }
+                }                
             }
             return rv;
         }
@@ -23019,8 +23037,6 @@ namespace Gekko
 
         public static void Delete(List vars2)
         {
-
-
             List vars = O.Restrict2(vars2, true, true, true, false);
 
             List<ToFrom> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);

@@ -1769,10 +1769,10 @@ namespace Gekko
                 try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }                
                 try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }                
             }
-            
-            input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, false, true, o.p);            
-            input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, false, true, o.p);            
-            input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, false, true, o.p);
+
+            input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, true, true, o.p);
+            input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, true, true, o.p);
+            input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, true, false, o.p);  //this will not abort with error if file not found 
 
             model = ReadGamsScalarModelEquations(input, model);
             

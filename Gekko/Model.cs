@@ -211,26 +211,30 @@ namespace Gekko
             }
             TwoStrings two = this.GetEquationTextFoldedScalar(eqs2);
 
-            string s2 = null;
+            string sUnfolded = null;
             int i = -1;
             foreach (string s in eqs)
             {
                 i++;
-                if (i > 0) s2 += G.NL;
-                s2 += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
+                if (i > 0) sUnfolded += G.NL;
+                sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
             }
-            string rv = null;
-            if (this.modelGams != null)
-            {                
-                rv += two.s1 + G.NL;
-                rv += "------------- scalar -------------" + G.NL + G.NL + s2 + G.NL;
-                rv += "-------------- GAMS --------------" + G.NL + G.NL + two.s2 + G.NL;
-            }
-            else if (this.modelGekko != null)
+            string rv = null;            
+            if (this.modelGekko != null)
             {
                 rv += two.s1;
                 rv += "------------- detailed -------------" + G.NL + G.NL + two.s2;
-                if (false && Globals.runningOnTTComputer) rv += "------------- TTH: detailed2 -------------" + G.NL + G.NL + s2 + G.NL;
+                if (false && Globals.runningOnTTComputer) rv += "------------- TTH: detailed2 -------------" + G.NL + G.NL + sUnfolded + G.NL;
+            }
+            else
+            {
+                string s1 = two.s1;
+                string s2 = two.s2;
+                if (G.NullOrBlanks(s1)) s1 = "<no raw eqs>" + G.NL;
+                if (G.NullOrBlanks(s2)) s2 = "<no raw eqs>" + G.NL;
+                rv += s1 + G.NL;
+                rv += "------------- scalar -------------" + G.NL + G.NL + sUnfolded + G.NL;
+                rv += "-------------- GAMS --------------" + G.NL + G.NL + s2 + G.NL;
             }
             return rv;
         }

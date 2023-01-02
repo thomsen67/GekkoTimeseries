@@ -8408,7 +8408,7 @@ namespace Gekko
 
             private void PrintFound(EVariableType type, List<string> names)
             {
-                G.Writeln2("Found " + names.Count + " matching items");
+                G.Writeln2("Found " + names.Count + " matching item" + G.S(names.Count));
 
                 if (names.Count == 0)
                 {

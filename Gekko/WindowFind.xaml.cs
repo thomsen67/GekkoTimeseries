@@ -270,7 +270,17 @@ namespace Gekko
                     if (!Decomp.IsOperatorOneOf3Types(op.type)) return;
 
                     Decomp.DecompMainInit(out gt1, out gt2, this.decompFind.decompOptions2.tSelected, this.decompFind.decompOptions2.tSelected, decompOptionsTemp.decompOperator);
-                    DecompData dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+
+                    DecompData dd = null;
+                    try
+                    {
+                        Globals.decompIsCalculatingButtonColors = true;  //so we will never get popups
+                        dd = Decomp.DecompLowLevelScalar(gt1, gt2, 0, dsh, decompOptionsTemp.decompOperator, residualName, ref funcCounter, this.decompFind.decompOptions2.missingAsZero, model);
+                    }
+                    finally
+                    {
+                        Globals.decompIsCalculatingButtonColors = false;
+                    }
 
                     double max = 0d;
 
@@ -368,7 +378,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Button color problem...");
+                //if (Globals.runningOnTTComputer) new Writeln("TTH: Button color problem...");
             }
         }
 
