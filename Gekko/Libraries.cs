@@ -418,7 +418,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_command);
                 folders.Add(Program.options.folder_command1);
                 folders.Add(Program.options.folder_command2);
-                FindFileHelper ffh = Program.FindFile(fileName2, folders, true, false, null);  //also calls CreateFullPathAndFileName()
+                FindFileHelper ffh = Program.FindFile(fileName2, folders, true, false, false, true, null);  //also calls CreateFullPathAndFileName()
                 string fileNameWithPath = ffh.realPathAndFileName;
                 if (fileNameWithPath == null)
                 {

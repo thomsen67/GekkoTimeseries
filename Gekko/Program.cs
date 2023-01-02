@@ -3320,7 +3320,7 @@ namespace Gekko
 
             string freqHere = G.ConvertFreq(Program.options.freq);
 
-            FindFileHelper ffh = Program.FindFile(file, null, true, false, null);
+            FindFileHelper ffh = Program.FindFile(file, null, true, false, false, true, null);
             string fullFileNameAndPath = ffh.realPathAndFileName;
 
             if (fullFileNameAndPath == null)
@@ -4906,7 +4906,7 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
-            FindFileHelper ffh = Program.FindFile(fileName, null, true, true, o.p);
+            FindFileHelper ffh = Program.FindFile(fileName, null, true, true, false, true, o.p);
             fileName = ffh.realPathAndFileName;
 
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
@@ -9159,7 +9159,7 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, o.p);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, false, true, o.p);
                 string file = ffh.realPathAndFileName;
                 if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
@@ -9400,7 +9400,7 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, o.p);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, false, true, o.p);
                 string file = ffh.realPathAndFileName;
                 if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
@@ -13820,7 +13820,7 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
             string s2 = G.AddExtension(o.fileName, "." + x);
-            FindFileHelper ffh = Program.FindFile(s2, null, true, true, o.p);
+            FindFileHelper ffh = Program.FindFile(s2, null, true, true, false, true, o.p);
             string fn = ffh.realPathAndFileName;
             if (fn == null) new Error("Could not find file '" + ffh.prettyPathAndFileName + "'");
 
@@ -14373,7 +14373,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            FindFileHelper ffh = FindFile(s, folders, true, true, o.p);  //also calls CreateFullPathAndFileName()
+            FindFileHelper ffh = FindFile(s, folders, true, true, false, true, o.p);  //also calls CreateFullPathAndFileName()
             string fileName2 = ffh.realPathAndFileName;
 
             if (fileName2 == null)
@@ -16523,39 +16523,42 @@ namespace Gekko
                 try
                 {
                     string s = O.ConvertToString(iv);
-                    string bank = G.Chop_GetBank(s);
-                    string freq = G.Chop_GetFreq(s);
-                    bool sigil = G.Chop_HasSigil(s);
-
-                    if (true)
+                    if (s != "***")
                     {
-                        string newName = G.Chop_SetBank(s, "*");
-                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
-                        helper.allBanks.name = newName;
-                        helper.allBanks.nameOriginal = s;
-                        helper.allBanks.count = extraNames.Count;
-                    }
+                        string bank = G.Chop_GetBank(s);
+                        string freq = G.Chop_GetFreq(s);
+                        bool sigil = G.Chop_HasSigil(s);
 
-                    if (true)
-                    {
-                        string newName = G.Chop_SetFreq(s, "*");
-                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
-                        helper.allFreqs.name = newName;
-                        helper.allFreqs.nameOriginal = s;
-                        helper.allFreqs.count = extraNames.Count;
-                    }
+                        if (true)
+                        {
+                            string newName = G.Chop_SetBank(s, "*");
+                            List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                            helper.allBanks.name = newName;
+                            helper.allBanks.nameOriginal = s;
+                            helper.allBanks.count = extraNames.Count;
+                        }
 
-                    if (true)
-                    {
-                        string newName = G.Chop_SetFreq(s, "*");
-                        newName = G.Chop_SetBank(newName, "*");
-                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
-                        helper.allBanksAndFreqs.name = newName;
-                        helper.allBanksAndFreqs.nameOriginal = s;
-                        helper.allBanksAndFreqs.count = extraNames.Count;
+                        if (true)
+                        {
+                            string newName = G.Chop_SetFreq(s, "*");
+                            List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                            helper.allFreqs.name = newName;
+                            helper.allFreqs.nameOriginal = s;
+                            helper.allFreqs.count = extraNames.Count;
+                        }
+
+                        if (true)
+                        {
+                            string newName = G.Chop_SetFreq(s, "*");
+                            newName = G.Chop_SetBank(newName, "*");
+                            List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                            helper.allBanksAndFreqs.name = newName;
+                            helper.allBanksAndFreqs.nameOriginal = s;
+                            helper.allBanksAndFreqs.count = extraNames.Count;
+                        }
                     }
                 }
-                catch { };  //if it fails, we live with that
+                catch { };  //if it fails, we live with that, and no errors will be shown.
             }
 
             return helper;
@@ -17086,7 +17089,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder            
-            FindFileHelper ffh = FindFile(fileName, folders, true, true, o.p);  //calls CreateFullPathAndFileName()
+            FindFileHelper ffh = FindFile(fileName, folders, true, true, false, true, o.p);  //calls CreateFullPathAndFileName()
 
             Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
             Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);
@@ -17097,7 +17100,7 @@ namespace Gekko
                 {
                     e.MainAdd("Could not find model file '" + ffh.prettyPathAndFileName + "'");
                     e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                    e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                    e.MoreAdd("For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
                     e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                 }
             }
@@ -17960,7 +17963,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                ffh = FindFile(fileName, folders, true, true, p);
+                ffh = FindFile(fileName, folders, true, true, false, true, p);
                 fileName = ffh.realPathAndFileName;
             }
 
@@ -17987,16 +17990,20 @@ namespace Gekko
 
         /// <summary>
         /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. 
-        /// Will return null if no file is found (no file exists), but if return is non-null, the object will
-        /// include the real path of the file (maybe copied or unzipped with a temp name) together with the pretty name
+        /// With reportErrorNormalFile=true, Gekko will abort with an error if a normal file is not found.
+        /// With reportErrorInsideZip=true, Gekko will abort with an error if a file is not found inside a .zip.
+        /// If these errors do not occur (or are suppressed), Gekko will return .realPathAndFileName=null if no file is found, as a signal. 
+        /// If .realPathAndFileName is non-null, this
+        /// will be the real path of the file (maybe copied or unzipped with a temp name) together with the pretty name
         /// for human use.
         /// Note that when allowLibrary == true, p must point to P object. If allowLibrary == false, p may be null.
+        /// NOTE: For Gekko 4.0, reportErrorNormalFile ought to be = reportErrorInsideZip in all calls, which would be more streamlined.
         /// </summary>
         /// <param name="filenameMaybeWithoutPath"></param>
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static FindFileHelper FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary, P p)
+        public static FindFileHelper FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary, bool reportErrorNormalFile, bool reportErrorInsideZip, P p)
         {
             // +--------------- #kja890adsfjkaas1 ------------------+
             // |                                                    |
@@ -18080,7 +18087,7 @@ namespace Gekko
                     new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
                 }
                 rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
-                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.                
+                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName, reportErrorInsideZip); //Here, we swap any parts of path that passes through zip files.                
                 if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
                 //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
                 //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
@@ -18102,7 +18109,7 @@ namespace Gekko
                     if (dataFilePathInsideZip != null)
                     {
                         rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                        rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                        rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName, reportErrorInsideZip); //Here, we swap any parts of path that passes through zip files.
                         if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
                     }
                 }
@@ -18113,7 +18120,7 @@ namespace Gekko
                 //always searched first of normal files in the file system, if it is included
                 //allowed __ prefix names here.
                 rv.prettyPathAndFileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...    
-                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName, reportErrorInsideZip); //Here, we swap any parts of path that passes through zip files.
                 if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
             }
 
@@ -18126,7 +18133,7 @@ namespace Gekko
                     //as long as working folder is always king, this is not an issue.
                     if (string.IsNullOrWhiteSpace(folder)) continue;
                     rv.prettyPathAndFileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
-                    rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                    rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName, reportErrorInsideZip); //Here, we swap any parts of path that passes through zip files.
                     if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName))
                     {
                         success = true;
@@ -18155,7 +18162,7 @@ namespace Gekko
                         if (dataFilePathInsideZip != null)
                         {
                             rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                            rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                            rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName, reportErrorInsideZip); //Here, we swap any parts of path that passes through zip files.
                             if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName))
                             {
                                 success = true;
@@ -18166,7 +18173,17 @@ namespace Gekko
                 }
             }
 
-            if (!success) rv.realPathAndFileName = null;  //signals failure
+            if (!success)
+            {
+                if (reportErrorNormalFile)
+                {
+                    new Error("Could not find file '" + filenameMaybeWithoutPath + "'");
+                }
+                else
+                {
+                    rv.realPathAndFileName = null;  //signals failure
+                }
+            }
             return rv;
         }
 
@@ -18199,14 +18216,15 @@ namespace Gekko
         /// <summary>
         /// Will identify zip parts of a path, like g:\sub1\data.zip\sub2\xx.csv, extract the file inside the zip, and put the xx.csv
         /// file somewhere in a temp folder (and return this path). The method will call itself recursively before leaving (so
-        /// nested zips are possible).
+        /// nested zips are possible --> hmm does not work yet). If reportErrorInsideZip==true, it will abort with an error if the file is not found,
+        /// otherwise it returns null in that case.
         /// </summary>
         /// <param name="fileNameWithPath"></param>
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <param name="allowLibrary"></param>
         /// <returns></returns>
-        private static string FindFileResolveZip(string fileNameWithPath)
+        private static string FindFileResolveZip(string fileNameWithPath, bool reportErrorInsideZip)
         {
             if ((fileNameWithPath.ToLower().Contains(Globals.zip) && (fileNameWithPath.Contains(":\\") || fileNameWithPath.StartsWith("\\\\"))))
             {
@@ -18252,9 +18270,16 @@ namespace Gekko
 
                 if (entry == null)
                 {
-                    string s = null;
-                    if (pathInsideZip.ToLower().Contains(Globals.zip)) s = "Note that nested zip files are not yet supported. ";
-                    new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "' (the zip file has " + zFile.Entries.Count + " entries). " + s);
+                    if (reportErrorInsideZip)
+                    {
+                        string s = null;
+                        if (pathInsideZip.ToLower().Contains(Globals.zip)) s = "Note that nested zip files are not yet supported. ";
+                        new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "' (the zip file has " + zFile.Entries.Count + " entries). " + s);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 string tempFileNameWithPath = WaitForExtractZipFileEntryToTempFile(entry, zipFileWithPath);
                 //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
@@ -30756,7 +30781,7 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            FindFileHelper ffh = FindFile(inputFileName, folders, true, true, p);
+            FindFileHelper ffh = FindFile(inputFileName, folders, true, true, false, true, p);
             string fileNameTemp = ffh.realPathAndFileName;
 
             if (fileNameTemp == null)

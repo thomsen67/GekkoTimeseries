@@ -816,13 +816,16 @@ namespace Gekko
             ModelGams modelGams = null;
             if (!settings.scalarMemoryModelProducedByGekko)
             {
-                string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
-                List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
-                IVariable nestedListOfDependents_opt_dep = null;
-                Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
-                GekkoDictionary<string, string> dependents = tup.Item1;
-                modelGams = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+                if (settings.ffh_rawModel.realPathAndFileName != null) //if raw.gms does not exist, this is skipped
+                {
+                    string text = Program.GetTextFromFileWithWait(settings.ffh_rawModel.realPathAndFileName);
+                    List<string> gamsFoldedModel = Stringlist.ExtractLinesFromText(text);
+                    IVariable nestedListOfDependents_opt_dep = null;
+                    Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
+                    GekkoDictionary<string, string> dependents = tup.Item1;
+                    modelGams = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
+                    if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
+                }
             }
 
             dt1 = DateTime.Now;
@@ -1731,61 +1734,48 @@ namespace Gekko
         private static Model ReadGAMSScalarModel2(O.Model o, List<string> folders, Model model, GAMSScalarModelSettings input)
         {
             //if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");
-            FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, o.p);
-            string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
-            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            Dictionary<string, object> jsonTree = null;
-            try
+            FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, false, false, o.p);
+
+            //defaults
+            input.unrolledModel = "gams.gms";
+            input.unrolledNames = "dict.txt";
+            input.rawModel = "raw.gms";
+
+            if (ffh2.realPathAndFileName == null)
             {
-                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                //no ModelInfo.json found, then we assume defaults                
             }
-            catch (Exception e)
+            else
             {
-                using (Error txt = new Error())
+                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
                 {
-                    txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
-                    txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
-                    txt.MoreNewLine();
-                    txt.MoreAdd("The technical error message is the following: " + e.Message);
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
                 }
-            }
+                catch (Exception e)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
+                        txt.MoreAdd("Gekko uses a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
+                        txt.MoreNewLine();
+                        txt.MoreAdd("The technical error message is the following: " + e.Message);
+                    }
+                }
 
-            DateTime t3 = DateTime.Now;
-
-            try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
-            if (input.unrolledModel == null)
-            {
-                new Error("JSON: setting unrolledModel not found");
+                try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
+                try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }                
+                try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }                
             }
-            else
-            {
-                input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
-            }
-
-            try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
-            if (input.unrolledNames == null)
-            {
-                new Error("JSON: setting unrolledNames not found");
-            }
-            else
-            {
-                input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
-            }
-
-            try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }
-            if (input.rawModel == null)
-            {
-                //ignore
-            }
-            else
-            {
-                input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, o.p);
-            }
-
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Unzip: " + G.Seconds(t3));
+            
+            input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, false, true, o.p);            
+            input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, false, true, o.p);            
+            input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, false, true, o.p);
 
             model = ReadGamsScalarModelEquations(input, model);
-
+            
             DateTime t1 = DateTime.Now;
             return model;
         }

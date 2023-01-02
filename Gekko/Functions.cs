@@ -3815,7 +3815,7 @@ namespace Gekko
         public static IVariable readfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
-            FindFileHelper ffh = Program.FindFile(s1, null, true, true, smpl.p);
+            FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
             if (ffh.realPathAndFileName == null) new Error("Could not find file: " + s1);
             string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
             return new ScalarString(txt);
@@ -3824,7 +3824,7 @@ namespace Gekko
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
-            FindFileHelper ffh = Program.FindFile(s1, null, true, true, smpl.p);
+            FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
             if (ffh.realPathAndFileName == null) return Globals.scalarVal0;
             return Globals.scalarVal1;
         }

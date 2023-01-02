@@ -950,7 +950,7 @@ namespace Gekko.Parser.Frm
                 //try to find it externally, look also in model path!
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
-                FindFileHelper ffh = Program.FindFile("varlist.dat", folders, true, true, p);
+                FindFileHelper ffh = Program.FindFile("varlist.dat", folders, true, true, false, true, p);
                 fileNameTemp = ffh.realPathAndFileName;
                 if (fileNameTemp != null)
                 {
