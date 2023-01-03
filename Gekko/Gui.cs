@@ -321,7 +321,17 @@ namespace Gekko
 
             G.WriteDirs("small", false);
 
-            if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13" || Globals.gekkoVersion == "3.1.14")
+            if (Globals.gekkoVersion == "3.1.14" || Globals.gekkoVersion == "3.1.15" || Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17")
+            {
+                using (Note note = new Note())
+                {
+                    note.MainAdd("From version 3.1.14 and on, Gekko offers autocomplete of series and array-series names. For instance, after reading a databank containing the series xyz, you may type 'prt x' followed by [Tab] or [Ctrl+Space] to select xyz from a list of names. See more {a{here¤user_interface.htm}a}.");
+                    //
+                    //note.MoreAdd("");
+                }
+            }
+
+            if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13")
             {
                 using (Note note = new Note())
                 {

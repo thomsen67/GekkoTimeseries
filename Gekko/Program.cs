@@ -4564,8 +4564,12 @@ namespace Gekko
         /// <returns></returns>
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
+            //file may be == null, if we are calling from Gekcel (import <xlsx> gekcel).
+
             string fileRemember = file;  //because file may change when reading
-            long fileRememberSize = new FileInfo(fileRemember).Length;
+            long fileRememberSize = 0;
+            try { fileRememberSize = new FileInfo(fileRemember).Length; } //fileRemember may be == null
+            catch { }
             
             //note: file is altered below, not sure why
             //file is the "real" system filepath and filename.
@@ -4683,6 +4687,8 @@ namespace Gekko
         {
             //Only allows the typical "bulk" formats. The 2D formats are fishy: what about 
             //offset and transpose?
+
+            if (bytes == 0) return false; //Could be a Gekcel call "import<xlsx>gekcel.
 
             bool gbk = type == EDataFormat.Gbk || type == EDataFormat.None;
             bool nonGbk = type == EDataFormat.Tsd || type == EDataFormat.Tsdx || type == EDataFormat.Gdx || type == EDataFormat.Px || type == EDataFormat.Flat;
@@ -4826,7 +4832,14 @@ namespace Gekko
             {
                 if (Globals.excelDna)
                 {
-                    matrix = Globals.excelDnaData.tableLight;
+                    if (Globals.excelDnaData == null || Globals.excelDnaData.tableLight == null)
+                    {
+                        new Error("Gekcel is trying to read/import Excel cells directly from Excel, but this fails.");
+                    }
+                    else
+                    {
+                        matrix = Globals.excelDnaData.tableLight;
+                    }                    
                 }
                 else
                 {
@@ -16523,6 +16536,7 @@ namespace Gekko
             SearchHelper1 helper = new SearchHelper1();
             foreach (IVariable iv in names1.list)
             {
+                int numberOfErrorsRemember = Globals.numberOfErrors;
                 try
                 {
                     string s = O.ConvertToString(iv);
@@ -16561,7 +16575,11 @@ namespace Gekko
                         }
                     }
                 }
-                catch { };  //if it fails, we live with that, and no errors will be shown.
+                catch
+                {
+                    //if it fails, we live with that, and no errors will be shown.
+                    Globals.numberOfErrors = numberOfErrorsRemember;  //so we are not shown a count of error messages because of this
+                }
             }
 
             return helper;

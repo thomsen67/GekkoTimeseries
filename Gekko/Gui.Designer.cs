@@ -1667,7 +1667,10 @@ namespace Gekko
             int column2;
             TextInputHelper(out line2, out firstChar, out column2);
 
-            string line = textBoxMainTabLower.Lines[line2];
+            string line = null;
+            try { line = textBoxMainTabLower.Lines[line2]; }
+            catch { }
+            if (line == null) return;
 
             List<TwoStrings> suggestions = StartIntellisenseHelper(line, keyword, type, line2, column2);
 

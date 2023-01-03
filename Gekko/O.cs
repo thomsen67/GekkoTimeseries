@@ -6682,7 +6682,7 @@ namespace Gekko
 
             public P p = null;
             public void Exe()
-            {
+            {                
                 G.CheckLegalPeriod(this.t1, this.t2);
 
                 if (opt_collapse != null)
