@@ -23538,7 +23538,7 @@ print(df2)
             Setup_Exceptions_Test();
             Globals.unitTestScreenOutput.Clear();
             I("INDEX temp:x*;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Found 1 matching items"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Found 1 matching item"));
             Globals.unitTestScreenOutput.Clear();
             I("INDEX x*;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Found 0 matching items"));

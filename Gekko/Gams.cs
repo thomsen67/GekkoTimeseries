@@ -898,7 +898,7 @@ namespace Gekko
             {
                 using (var txt = new Writeln())
                 {                    
-                    txt.MainAdd("===> TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");                    
+                    txt.MainAdd("TTH: Setting up everything took: " + G.Seconds(dt0) + ", all included");                    
                 }
             }            
 

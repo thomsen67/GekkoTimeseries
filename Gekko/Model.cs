@@ -1056,7 +1056,7 @@ namespace Gekko
             this.FlushAAndRArrays();
             this.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
             this.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
-            if (Globals.runningOnTTComputer) G.Writeln2("TTH: Loading data to a array: " + G.Seconds(t0));
+            if (Globals.runningOnTTComputer) G.Writeln2("TTH: Loading data to a array: " + G.Seconds(t0), System.Drawing.Color.Gray);  //writeln2 to avoid popup
 
             if (false)
             {
