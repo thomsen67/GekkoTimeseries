@@ -52,6 +52,7 @@ namespace Gekko
         // ---
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
+        public int decomp_plot_zoom = 100;
         // ---
         public int fit_ols_rekur_dfmin = 10;
         // ---
@@ -312,6 +313,7 @@ namespace Gekko
             Add("DATABANK SEARCH", Globals.xbool);
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
+            Add("DECOMP PLOT ZOOM", Globals.xint);
             Add("FIT OLS REKUR DFMIN", Globals.xint);
             Add("FOLDER", Globals.xbool);
             Add("FOLDER BANK", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j

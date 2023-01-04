@@ -19,6 +19,10 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            double decompSvgOverallFactor = (double)Program.options.decomp_plot_zoom / 100d;
+            int decompSvgOverallWidth = 0;
+            int decompSvgOverallHeight = 0;
+
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
@@ -67,10 +71,9 @@ namespace Gekko
             double decompXZoom = 1d;
             string key2 = null;
             if (isDecomp)
-            {
-                //Should in principle be possible to use zoom instead of these hacks, but it does not work,
-                //investigate at some point...                
-                double d = 0.9;  //overall size of canvas, relative to 600x480
+            {   
+                //Seems zoom can only be done "manually", altering the gnuplot svg file.         
+                double d = 0.9;  //overall size of canvas, relative to 600x480                
                 decompFontFactor = d * Globals.guiDecompPlotFontSize; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
                 int n = containerExplode.Count;
                 int maxLength = 0;
@@ -83,9 +86,9 @@ namespace Gekko
                 double widthProxy = columns * (14 + maxLength);  //14 is chars                    
                 double widthAdj = (1d + 0.0141 * widthProxy) * 1.35;  //1 char --> 1%.                    
 
-                int i1 = (int)(600d * d * widthAdj);
-                int i2 = (int)(480d * d);
-                decompSvgSize = " size " + i1 + ", " + i2;
+                decompSvgOverallWidth = (int)(600d * d * widthAdj);
+                decompSvgOverallHeight = (int)(480d * d);
+                decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
             }
 
@@ -756,11 +759,30 @@ namespace Gekko
             string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
             txt.AppendLine(plotline);
 
-            string emfName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
+            string plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
 
-            if (!isDecomp) CallGnuplotMakeWindow(o, labelsNonBroken, emfName);
-
-            return emfName;
+            if (isDecomp)
+            {
+                if (decompSvgOverallFactor != 1d)
+                {
+                    int w2 = (int)(((double)decompSvgOverallWidth) * decompSvgOverallFactor);
+                    int h2 = (int)(((double)decompSvgOverallHeight) * decompSvgOverallFactor);
+                    string s = Program.GetTextFromFileWithWait(plotFileName);
+                    s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
+                    s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
+                    using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(s);
+                        sw.Flush();
+                    }
+                }
+            }
+            else
+            {
+                CallGnuplotMakeWindow(o, labelsNonBroken, plotFileName);
+            }
+            return plotFileName;
         }
 
         private static void CallGnuplotMakeWindow(O.Prt o, List<string> labelsNonBroken, string emfName)

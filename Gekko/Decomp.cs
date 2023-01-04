@@ -1994,6 +1994,17 @@ namespace Gekko
                 }
                 decompFind.hasException = true;
             }
+            finally
+            {
+                if (Globals.runningOnTTComputer)
+                {
+                    if (Globals.decompWindowCounter == 1)  //not very first one, annoying...
+                    {
+                        //System.Windows.Media.VisualTreeHelper.GetDpi(new Button()).PixelsPerDip
+                    }
+                    Globals.decompWindowCounter++;
+                }
+            }
         }
 
         public static void Decomp2ThreadFunction(Object o)

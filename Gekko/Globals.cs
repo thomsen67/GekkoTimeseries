@@ -147,6 +147,8 @@ namespace Gekko
         public static ExcelDnaData excelDnaData = null;
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
 
+        public static int decompWindowCounter = 0;
+
         public static bool decompUnitCsvPivot = false;  //can activate xlsx pivot writing   
 
         public const string internalColumnIdentifyer = "gekkopivot__";
