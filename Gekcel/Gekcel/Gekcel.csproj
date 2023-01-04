@@ -95,6 +95,9 @@
     <Reference Include="protobuf-net">
       <HintPath>Diverse\ExternalDllFiles\protobuf-net.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net.Core">
+      <HintPath>Diverse\ExternalDllFiles\protobuf-net.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
