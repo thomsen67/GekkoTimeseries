@@ -147,7 +147,7 @@ namespace Gekko
         public static ExcelDnaData excelDnaData = null;
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
 
-        public static int decompWindowCounter = 0;
+        //public static int decompWindowCounter = 0;
 
         public static bool decompUnitCsvPivot = false;  //can activate xlsx pivot writing   
 
@@ -924,6 +924,9 @@ namespace Gekko
         public static string GekkoSmplNull = "" + Globals.smpl + " = null;";
 
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
+
+        public static int screenDpiZoomX = 0;
+        public static int screenDpiZoomY = 0;
 
         public static bool isAutoExec = true;
         public static string sessionMemorySnapshot = null;

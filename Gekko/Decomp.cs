@@ -1950,9 +1950,10 @@ namespace Gekko
         private static void CreateDecompWindow(object o2)
         {
             DecompFind decompFind = o2 as DecompFind;
+            WindowDecomp windowDecomp = null;
             try
             {                
-                WindowDecomp windowDecomp = new WindowDecomp(decompFind);
+                windowDecomp = new WindowDecomp(decompFind);
                 windowDecomp.decompFind.SetWindow(windowDecomp);
                 Globals.windowsDecomp2.Add(windowDecomp);
                 windowDecomp.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
@@ -1976,12 +1977,41 @@ namespace Gekko
                     }
                     else
                     {
+
+                        //if (Globals.runningOnTTComputer)
+                        //{
+                        //    if (Globals.decompWindowCounter == 0)
+                        //    {
+                        //        int dpiXb = 0;
+                        //        int dpiYb = 0;
+                        //        double scaleX = 0d;
+                        //        double scaleY = 0d;
+                        //        try
+                        //        {
+                        //            var dpiXProperty = typeof(System.Windows.SystemParameters).GetProperty("DpiX", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                        //            var dpiYProperty = typeof(System.Windows.SystemParameters).GetProperty("Dpi", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                        //            dpiXb = (int)dpiXProperty.GetValue(null, null);
+                        //            dpiYb = (int)dpiYProperty.GetValue(null, null);
+                        //            scaleX = (dpiXb / 96d) * 100d;
+                        //            scaleY = (dpiYb / 96d) * 100d;
+                        //        }
+                        //        catch
+                        //        {
+                        //            scaleX = 150d;  //seems pretty normal these days
+                        //            scaleY = 150d;
+                        //        }
+                        //        MessageBox.Show("Screen dpi x-scale = " + scaleX + "%, y-scale = " + scaleY + "%");
+
+                        //    }
+                        //    Globals.decompWindowCounter++;
+                        //}
+
                         windowDecomp.ShowDialog();
                         if (Globals.showDecompTable)
                         {
                             Globals.showDecompTable = false;
                             new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
-                        }
+                        }                        
                     }
                 }
             }
@@ -1993,18 +2023,7 @@ namespace Gekko
                     MessageBox.Show(e.Message + " --decomptrace-> " + e.StackTrace);
                 }
                 decompFind.hasException = true;
-            }
-            finally
-            {
-                if (Globals.runningOnTTComputer)
-                {
-                    if (Globals.decompWindowCounter == 1)  //not very first one, annoying...
-                    {
-                        //System.Windows.Media.VisualTreeHelper.GetDpi(new Button()).PixelsPerDip
-                    }
-                    Globals.decompWindowCounter++;
-                }
-            }
+            }            
         }
 
         public static void Decomp2ThreadFunction(Object o)

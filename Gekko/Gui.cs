@@ -314,7 +314,7 @@ namespace Gekko
         {
             //#7980345743573
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;            
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
@@ -382,6 +382,24 @@ namespace Gekko
 
             Program.StartPulse();  //regarding remote.gcm
 
+            if (true) {
+                int dpiXb = 0;
+                int dpiYb = 0;                
+                try
+                {
+                    var dpiXProperty = typeof(System.Windows.SystemParameters).GetProperty("DpiX", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    var dpiYProperty = typeof(System.Windows.SystemParameters).GetProperty("Dpi", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    dpiXb = (int)dpiXProperty.GetValue(null, null);
+                    dpiYb = (int)dpiYProperty.GetValue(null, null);
+                    Globals.screenDpiZoomX = (int)((dpiXb / 96d) * 100d);
+                    Globals.screenDpiZoomY = (int)((dpiYb / 96d) * 100d);
+                }
+                catch
+                {
+                    Globals.screenDpiZoomX = 150;  //seems pretty normal these days
+                    Globals.screenDpiZoomY = 150;
+                }
+            }
         }
 
         private void StartupExeAndIniStuff()

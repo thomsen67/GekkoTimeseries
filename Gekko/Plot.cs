@@ -18,10 +18,36 @@ namespace Gekko
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
-
-            double decompSvgOverallFactor = (double)Program.options.decomp_plot_zoom / 100d;
+                        
             int decompSvgOverallWidth = 0;
             int decompSvgOverallHeight = 0;
+
+            //Problem with zoom etc. is that it appears that
+            //WPF Webbrowser does not scale svg image inside it
+            //according to Windows dpi settings (that are 150% on developer
+            //laptop, but can be 100% on a large screen).
+            //The decomp plot is optimized (developed) using 150% dpi scaling,
+            //so when dpi is for instance 100%, the svg plot becomes too large.
+            //To fix this, we both have to (a) alter physical size of svg inside the
+            //svg file, and (b) alter the font size.
+            //When this is done, the result is reasonable for dpi scaling <> 100%.
+            //It would be nice if the WPF Webbrowser could just know about dpi scaling,
+            //maybe in some newer .NET version? And maybe .NET 4.6.2 would just fix the issue?
+            //Or the Webbrowser could be put inside some other WPF component, and some size set??
+            //But the problem is that the width of the svg plot is very dynamic, so the height should
+            //be used. This might be the way to go, also for future svg-based PLOT window.
+            double windowsDpiScaling2 = Globals.screenDpiZoomY;
+            if (windowsDpiScaling2 == 0)
+            {
+                windowsDpiScaling2 = 150;  //sensible because not recognized
+            }
+            else
+            {
+                if (windowsDpiScaling2 < 50) windowsDpiScaling2 = 50;
+                else if (windowsDpiScaling2 > 400) windowsDpiScaling2 = 400;
+            }
+            double windowsDpiScaling = windowsDpiScaling2 / 150d;  //so if Globals.screenDpiZoomY = 150, we get 1 here. This is what decomp plot was tuned with.
+            double overallZoom = ((double)Program.options.decomp_plot_zoom / 100d) * windowsDpiScaling; //windowsDpiScaling because a 100 % Windows dpi zoom(96 inches) makes the decomp plot too large, but here it would be multiplied with 100 / 150 = 0.67.
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -74,7 +100,7 @@ namespace Gekko
             {   
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
-                decompFontFactor = d * Globals.guiDecompPlotFontSize; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
+                decompFontFactor = d * Globals.guiDecompPlotFontSize * overallZoom; //size of fonts, BEWARE that this changes key size, and then we need to adjust keyColBreak size!!
                 int n = containerExplode.Count;
                 int maxLength = 0;
                 foreach (var xx in containerExplode)
@@ -83,10 +109,10 @@ namespace Gekko
                 }
                 int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
 
-                double widthProxy = columns * (14 + maxLength);  //14 is chars                    
-                double widthAdj = (1d + 0.0141 * widthProxy) * 1.35;  //1 char --> 1%.                    
+                double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
+                double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
 
-                decompSvgOverallWidth = (int)(600d * d * widthAdj);
+                decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
@@ -763,10 +789,10 @@ namespace Gekko
 
             if (isDecomp)
             {
-                if (decompSvgOverallFactor != 1d)
+                if (overallZoom < 0.999 || overallZoom > 1.001)
                 {
-                    int w2 = (int)(((double)decompSvgOverallWidth) * decompSvgOverallFactor);
-                    int h2 = (int)(((double)decompSvgOverallHeight) * decompSvgOverallFactor);
+                    int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
+                    int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
                     string s = Program.GetTextFromFileWithWait(plotFileName);
                     s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
                     s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
