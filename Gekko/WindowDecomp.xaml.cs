@@ -1994,9 +1994,56 @@ namespace Gekko
                 }
 
                 //note, maybe just take name from o object?                
+
+                PlotHelper plotHelper1 = new PlotHelper();
+                plotHelper1.isDecompPlot = true;
+                string svgFile1 = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), plotHelper1, smpl.p);
+
+                if (Globals.decompPlotFix)
+                {
+                    //A bit hacky, but we count the gnuplot key (legend) cols by looking into the svg file
+                    //Below, we first find "gnuplot_plot_1". Then we get 121796.6 from "translate(121796.6,45.0)".
+                    //The numbers like 121796.6 are looked at, and each different number represents a col.
+                    /*
+                    	<g id="gnuplot_plot_1" ><title>fy | [0]   </title>
+                        <g fill="none" color="white" stroke="black" stroke-width="4.00" stroke-linecap="butt" stroke-linejoin="miter">
+                        </g>
+                        <g fill="none" color="black" stroke="currentColor" stroke-width="4.00" stroke-linecap="butt" stroke-linejoin="miter">
+	                    <g transform="translate(121796.6,45.0)" stroke="none" fill="black" font-family="Verdana" font-size="17.48"  text-anchor="start">
+		                <text xml:space="preserve"><tspan font-family="Verdana"  xml:space="preserve">fy | [0]   </tspan></text>
+	                    
+                    */
+
+                    string svg = Program.GetTextFromFileWithWait(svgFile1);
+                    Dictionary<string, string> dict = new Dictionary<string, string>();
+                    int start = 0;
+                    for (int i = 1; i < int.MaxValue; i++)
+                    {
+                        string id = "gnuplot_plot_" + i;
+                        int idx1 = svg.IndexOf(id, start);
+                        if (idx1 == -1) break;
+                        int idx2 = svg.IndexOf("translate(", idx1);
+                        if (idx2 == -1) break;
+                        int idx3 = svg.IndexOf(",", idx2);
+                        if (idx3 == -1) break;
+                        string number = G.Substring(svg, idx2 + "translate(".Length, idx3 - 1).Trim();
+                        if (!dict.ContainsKey(number)) dict.Add(number, null);
+                        start = idx3;  //no need to start all over                        
+                    }                    
+
+                    PlotHelper plotHelper2 = new PlotHelper();
+                    plotHelper2.isDecompPlot = true;
+                    plotHelper2.decompPlotCallNumber = 1;
+                    plotHelper2.decompPlotNumberOfKeyColumns = dict.Count;  //better than guesstimating
+                    string svgFile2 = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), plotHelper2, smpl.p);
+                    webBrowser.Source = new Uri(svgFile2);
+                }
+                else
+                {
+                    webBrowser.Source = new Uri(svgFile1);
+                }
+
                 
-                string svgFile = Plot.CallGnuplot(plotTable, o, container, model.modelCommon.GetFreq(), true, smpl.p);
-                webBrowser.Source = new Uri(svgFile);                
             }
             else
             {                

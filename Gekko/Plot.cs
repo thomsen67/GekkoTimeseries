@@ -12,10 +12,18 @@ using System.Diagnostics;
 
 namespace Gekko
 {
+    public class PlotHelper
+    {
+        public bool isDecompPlot = false;
+        public int decompPlotCallNumber = 0;
+        public int decompPlotNumberOfKeyColumns = -12345;
+    }
+
     public static class Plot
     {
-        public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, bool isDecomp, P p)
+        public static string CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, PlotHelper plotHelper, P p)
         {
+            
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
                         
@@ -96,7 +104,7 @@ namespace Gekko
             string decompMargin = null;
             double decompXZoom = 1d;
             string key2 = null;
-            if (isDecomp)
+            if (plotHelper.isDecompPlot)
             {   
                 //Seems zoom can only be done "manually", altering the gnuplot svg file.         
                 double d = 0.9;  //overall size of canvas, relative to 600x480                
@@ -107,12 +115,15 @@ namespace Gekko
                 {
                     maxLength = Math.Max(maxLength, xx.labelOLD[0].Length);
                 }
-                int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
+
+                int columns = ((n - 1) / Globals.guiDecompPlotItemsPerColumn) + 1; //heuristic not working good, 1-->1, 13-->1, 14-->2, 26-->2, 27-->3, ...
+                if (plotHelper.decompPlotCallNumber == 1) columns = Math.Max(1, plotHelper.decompPlotNumberOfKeyColumns); //works better! And probably will never become 0.
 
                 double widthProxyNumberOfChars = columns * (14 + maxLength);  //14 is chars                    
                 double widthAdjFactor = (1d + 0.0141 * widthProxyNumberOfChars) * 1.35;  //1 char --> 1%.                    
 
                 decompSvgOverallWidth = (int)(600d * d * widthAdjFactor);
+                if (plotHelper.decompPlotCallNumber == 0) decompSvgOverallWidth *= 100;  //room for lots of labels in cols...
                 decompSvgOverallHeight = (int)(480d * d);
                 decompSvgSize = " size " + decompSvgOverallWidth + ", " + decompSvgOverallHeight;
                 key2 = " outside Left reverse height 1";  //must be Left. Use 'box' to see box around.
@@ -787,20 +798,24 @@ namespace Gekko
 
             string plotFileName = CallGnuplot2(o, rr, file2, file3, currentDir, path, fileGp, fileData, txt);
 
-            if (isDecomp)
+            if (plotHelper.isDecompPlot)
             {
-                if (overallZoom < 0.999 || overallZoom > 1.001)
-                {
-                    int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
-                    int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
-                    string s = Program.GetTextFromFileWithWait(plotFileName);
-                    s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
-                    s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
-                    using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                if (plotHelper.decompPlotCallNumber == 1) //no need to do zoom it at first fake rendering
+                {                    
+                    if (overallZoom < 0.999 || overallZoom > 1.001)
                     {
-                        sw.Write(s);
-                        sw.Flush();
+                        int w2 = (int)(((double)decompSvgOverallWidth) * overallZoom); //
+                        int h2 = (int)(((double)decompSvgOverallHeight) * overallZoom);
+                        string s = Program.GetTextFromFileWithWait(plotFileName);
+                        //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
+                        s = G.ReplaceFirstOccurrence(s, "width=\"" + decompSvgOverallWidth + "\"", "width=\"" + w2 + "\"");
+                        s = G.ReplaceFirstOccurrence(s, "height=\"" + decompSvgOverallHeight + "\"", "height=\"" + h2 + "\"");
+                        using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
+                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                        {
+                            sw.Write(s);
+                            sw.Flush();
+                        }
                     }
                 }
             }

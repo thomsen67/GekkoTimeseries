@@ -493,7 +493,7 @@ namespace Gekko
 
             if (type == EPrintTypes.Plot)
             {                
-                Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, false, smpl.p);
+                Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, new PlotHelper(), smpl.p);
             }
             else if (type == EPrintTypes.Sheet)
             {
