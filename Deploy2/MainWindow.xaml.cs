@@ -523,6 +523,12 @@ namespace Deploy2
             //but the file in \packages is newer.
             list.Add("24c2c7a0d6c9918f037393c2a17e28a49d340df1", path + @"protobuf-net.dll", @"C:\Thomas\Gekko\GekkoCS\packages\protobuf-net.2.4.4\lib\net40\protobuf-net.dll");
 
+            // !!
+            // !!
+            // ----------> add protobuf-net.Core.dll here too
+            // !!
+            // !!
+
             //same as 2.4.2
             list.Add("bf8056fd232c261f75c5dec7fd81dcfb4e5ab0a6", path + @"wshom.ocx", @"C:\Windows\SysWOW64\wshom.ocx");
 
@@ -748,6 +754,11 @@ namespace Deploy2
             }
             if (fail) return;
             files.Add("protobuf-net.dll");
+            files.Add("protobuf-net.Core.dll"); //needed for parallel protobuf
+            files.Add("System.Buffers.dll"); //needed for parallel protobuf
+            files.Add("System.Collections.Immutable.dll"); //needed for parallel protobuf
+            files.Add("System.Memory.dll"); //needed for parallel protobuf
+            files.Add("System.Runtime.CompilerServices.Unsafe.dll"); //needed for parallel protobuf
             files.Add("GAMS.net4.dll");
             files.Add("EPPlus.dll");
             files.Add("Antlr3.Runtime.dll");
@@ -783,6 +794,11 @@ namespace Deploy2
             }
             if (fail) return;
             files.Add(path1 + "protobuf-net.dll");
+            files.Add(path1 + "protobuf-net.Core.dll");
+            files.Add(path1 + "System.Buffers.dll");
+            files.Add(path1 + "System.Collections.Immutable.dll");
+            files.Add(path1 + "System.Memory.dll");
+            files.Add(path1 + "System.Runtime.CompilerServices.Unsafe.dll");
             files.Add(path1 + "GAMS.net4.dll");
             files.Add(path1 + "EPPlus.dll");
             files.Add(path1 + "Antlr3.Runtime.dll");
