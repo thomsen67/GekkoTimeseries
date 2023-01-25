@@ -777,15 +777,32 @@ namespace Gekko
                 int i1 = helper2.time.Subtract(helper.tBasis);
                 int i2 = aNumber;
                 double d;
+                string toParse = "";
                 if (ss[1].Trim() == "")
                 {
                     //probably always so
-                    d = double.Parse(ss[2]);
+                    toParse = ss[2].Trim();
+                }
+                else
+                {                    
+                    toParse = ss[1].Trim();
+                }
+                if (G.Equal(toParse, "eps"))
+                {
+                    d = 0d;
                 }
                 else
                 {
-                    d = double.Parse(ss[1]);
-                }
+                    try
+                    {
+                        d = double.Parse(toParse);
+                    }
+                    catch
+                    {
+                        new Error("Could not parse the number '" + toParse + "' as a floating-point value.");
+                        throw;
+                    }
+                }                
                 helper.a[i1][i2] = d;
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
@@ -1320,9 +1337,9 @@ namespace Gekko
                 }
                 TokenHelper th1 = tokens[i];
                 TokenHelper th1Next = tokens[i + 1];
-                if (th1.type == ETokenType.Number)
+                if (IsNumber(th1))
                 {
-                    if (th2 != null && th2.type == ETokenType.Number)
+                    if (th2 != null && IsNumber(th2))
                     {
                         //do nothing
                     }
@@ -1330,30 +1347,47 @@ namespace Gekko
                     {
                         knownPattern = false;
                     }
+
+                    string sNumber = th1.ToString();
+                    if (G.Equal(sNumber, "eps"))
+                        sNumber = "0";
+
                     int i1 = helper.dict_Constants.Count;
-                    if (helper.dict_Constants.ContainsKey(th1.s))
+                    if (helper.dict_Constants.ContainsKey(sNumber))
                     {
-                        i1 = helper.dict_Constants[th1.s];
+                        i1 = helper.dict_Constants[sNumber];
                     }
                     else
                     {
-                        helper.dict_Constants.Add(th1.s, i1);
-                        helper.exoValues.Add(double.Parse(th1.ToString()));
-                    }                    
+                        helper.dict_Constants.Add(sNumber, i1);
+                        helper.exoValues.Add(double.Parse(sNumber));
+                    }
                     HandleEqLineAppend(helper, i, "c[d[" + helper.exo.Count + "]]");
                     helper.exo.Add(i1);
                 }
                 else if (IsEVariable(th1, th1Next))
                 {
                     if (th2 != null && IsEVariable(th2, th2Next))
-                    {      
+                    {
                         //do nothing
                     }
                     else
                     {
                         knownPattern = false;
                     }
-                    int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+
+                    int number = -12345;
+
+                    try
+                    {
+                        number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                    }
+                    catch
+                    {
+                        new Error("Could not parse integer part of the string '" + th1.s + "'");
+                        throw;
+                    }
+
                     string eqname = helper.dict_FromEqNumberToEqName[number];
                     string helper2 = "";
                     HandleEqLineAppend(helper, i, helper2);
@@ -1361,7 +1395,7 @@ namespace Gekko
                 else if (IsXVariable(th1, th1Next))
                 {
                     if (th2 != null && IsXVariable(th2, th2Next))
-                    {    
+                    {
                         //do nothing
                     }
                     else
@@ -1369,18 +1403,18 @@ namespace Gekko
                         knownPattern = false;
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    string varname = helper.dict_FromVarNumberToVarName[number];                    
+                    string varname = helper.dict_FromVarNumberToVarName[number];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
                     int i1 = helper2.time.Subtract(helper.tBasis);
                     int i2 = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
-                                        
+
                     int ii1 = helper.endo.Count;
                     int ii2 = helper.endo.Count + 1;
 
                     bool seenBefore = false;
-                    
+
                     HandleEqLineAppend(helper, i, "a[b[" + ii1 + "]+t][b[" + ii2 + "]]");
-                                        
+
                     if (!seenBefore)
                     {
                         //avoid dublets in an equation (for instance y[2020] = x[2020] + x[2020]/z[2020])
@@ -1400,7 +1434,7 @@ namespace Gekko
                     HandleEqLineAppend(helper, i, s);
                 }
             }  //end of tokens loop
-            
+
             if (knownPattern)
             {
                 helper.known++;
@@ -1418,6 +1452,11 @@ namespace Gekko
             helper.d.Add(helper.exo);
 
             return tokens;  //to compare with next
+        }
+
+        private static bool IsNumber(TokenHelper th1)
+        {
+            return th1.type == ETokenType.Number || G.Equal(th1.s, "eps");
         }
 
         public static string RenameFunctions(TokenHelper th1, bool b)

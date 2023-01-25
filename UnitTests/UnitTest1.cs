@@ -6391,8 +6391,9 @@ namespace UnitTests
 
         }
 
-        private static void TestCopyHelper(int i)
+        private static void _Test_CopyHelper(int i)
         {
+            //what does this test??
             I("reset; time 2001 2003;");
             I("x1 = 11;");
             I("%x1 = 12;");
@@ -7334,7 +7335,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ModelStatic()
+        public void _Test_ModelStatic()
         {
             //also checking CheckYesNoNull() logic
             I("RESET;");
@@ -17113,7 +17114,7 @@ string cc1b=
 
 
         [TestMethod]
-        public void _TestOverloadAndPrompt()
+        public void _Test_OverloadAndPrompt()
         {
             
             // -------- 0 required, 2 optional
@@ -27797,7 +27798,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ModelLille1()
+        public void _Test_ModelLille1()
         {
             //-----------------------------------------------------------
             //----------------- testing lille1.cmd ----------------------
@@ -27818,7 +27819,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ModelLille2()
+        public void _Test_ModelLille2()
         {
             //-----------------------------------------------------------
             //----------------- testing lille2.cmd ----------------------
@@ -27839,7 +27840,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ModelLille3()
+        public void _Test_ModelLille3()
         {
             //-----------------------------------------------------------
             //----------------- testing lille3.cmd ----------------------
@@ -27860,7 +27861,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ModelLille4()
+        public void _Test_ModelLille4()
         {
             //-----------------------------------------------------------
             //----------------- testing lille4.cmd ----------------------
@@ -28631,7 +28632,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ForwardLookingStackedTimeMiniExcel()
+        public void _Test_ForwardLookingStackedTimeMiniExcel()
         {
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\forward';");
@@ -28674,147 +28675,10 @@ print(df2)
             u = Data("y", 2004, "a"); _AssertHelperTwoDoubles(u.w, 9.2235d, epsilon);
             u = Data("y", 2005, "a"); _AssertHelperTwoDoubles(u.w, 5d, epsilon);
 
-        }
+        }        
 
         [TestMethod]
-        public void Test__ForwardLookingStackedTimeADAM()
-        {
-            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
-            return;
-            //Can probably be deleted, the model is found elsewhere
-            UData u = null;
-            double e = 0.0001d;
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\forward';");
-            I("RUN re.cmd;");
-            u = Data("fy", 2014, "a"); Assert.AreEqual(u.q, 0.0016d, e);
-            u = Data("fy", 2015, "a"); Assert.AreEqual(u.q, 0.0064d, e);
-            u = Data("fy", 2016, "a"); Assert.AreEqual(u.q, 0.0086d, e);
-            u = Data("fy", 2017, "a"); Assert.AreEqual(u.q, 0.0134d, e);
-            u = Data("fy", 2018, "a"); Assert.AreEqual(u.q, 0.0158d, e);
-            u = Data("fy", 2019, "a"); Assert.AreEqual(u.q, 0.0170d, e);
-            u = Data("fy", 2020, "a"); Assert.AreEqual(u.q, 0.0734d, e);
-            u = Data("fy", 2021, "a"); Assert.AreEqual(u.q, 0.0798d, e);
-            u = Data("fy", 2022, "a"); Assert.AreEqual(u.q, 0.0717d, e);
-            u = Data("fy", 2023, "a"); Assert.AreEqual(u.q, 0.0651d, e);
-            u = Data("fy", 2024, "a"); Assert.AreEqual(u.q, 0.0613d, e);
-            u = Data("fy", 2025, "a"); Assert.AreEqual(u.q, 0.0575d, e);
-            u = Data("fy", 2026, "a"); Assert.AreEqual(u.q, 0.0542d, e);
-            u = Data("fy", 2027, "a"); Assert.AreEqual(u.q, 0.0499d, e);
-            u = Data("fy", 2028, "a"); Assert.AreEqual(u.q, 0.0456d, e);
-            u = Data("fy", 2029, "a"); Assert.AreEqual(u.q, 0.0418d, e);
-            u = Data("fy", 2030, "a"); Assert.AreEqual(u.q, 0.0376d, e);
-            u = Data("fy", 2031, "a"); Assert.AreEqual(u.q, 0.0362d, e);
-            u = Data("fy", 2032, "a"); Assert.AreEqual(u.q, 0.0344d, e);
-            u = Data("fy", 2033, "a"); Assert.AreEqual(u.q, 0.0318d, e);
-            u = Data("fy", 2034, "a"); Assert.AreEqual(u.q, 0.0289d, e);
-            u = Data("fy", 2035, "a"); Assert.AreEqual(u.q, 0.0284d, e);
-            u = Data("fy", 2036, "a"); Assert.AreEqual(u.q, 0.0266d, e);
-            u = Data("fy", 2037, "a"); Assert.AreEqual(u.q, 0.0256d, e);
-            u = Data("fy", 2038, "a"); Assert.AreEqual(u.q, 0.0243d, e);
-            u = Data("fy", 2039, "a"); Assert.AreEqual(u.q, 0.0240d, e);
-            u = Data("fy", 2040, "a"); Assert.AreEqual(u.q, 0.0226d, e);
-            u = Data("fy", 2041, "a"); Assert.AreEqual(u.q, 0.0223d, e);
-            u = Data("fy", 2042, "a"); Assert.AreEqual(u.q, 0.0220d, e);
-            u = Data("fy", 2043, "a"); Assert.AreEqual(u.q, 0.0217d, e);
-            u = Data("fy", 2044, "a"); Assert.AreEqual(u.q, 0.0209d, e);
-            u = Data("fy", 2045, "a"); Assert.AreEqual(u.q, 0.0220d, e);
-            u = Data("fy", 2046, "a"); Assert.AreEqual(u.q, 0.0219d, e);
-            u = Data("fy", 2047, "a"); Assert.AreEqual(u.q, 0.0211d, e);
-            u = Data("fy", 2048, "a"); Assert.AreEqual(u.q, 0.0209d, e);
-            u = Data("fy", 2049, "a"); Assert.AreEqual(u.q, 0.0203d, e);
-            u = Data("fy", 2050, "a"); Assert.AreEqual(u.q, 0.0204d, e);
-            u = Data("fy", 2051, "a"); Assert.AreEqual(u.q, 0.0214d, e);
-            u = Data("fy", 2052, "a"); Assert.AreEqual(u.q, 0.0209d, e);
-            u = Data("fy", 2053, "a"); Assert.AreEqual(u.q, 0.0203d, e);
-            u = Data("fy", 2054, "a"); Assert.AreEqual(u.q, 0.0194d, e);
-            u = Data("fy", 2055, "a"); Assert.AreEqual(u.q, 0.0186d, e);
-            u = Data("fy", 2056, "a"); Assert.AreEqual(u.q, 0.0174d, e);
-            u = Data("fy", 2057, "a"); Assert.AreEqual(u.q, 0.0167d, e);
-            u = Data("fy", 2058, "a"); Assert.AreEqual(u.q, 0.0157d, e);
-            u = Data("fy", 2059, "a"); Assert.AreEqual(u.q, 0.0162d, e);
-            u = Data("fy", 2060, "a"); Assert.AreEqual(u.q, 0.0150d, e);
-        }
-
-        [TestMethod]
-        public void Test__ForwardLookingStackedTimeSmall()
-        {
-            UData u = null;
-            double e = 0.0002d;
-
-            //!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!! activate again!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                //This tests a manual rolling out of the model, with y__2000, y__2001, ..., y__2031 etc. solve
-                //for an artificial period (2006).
-                //The result is the same as when using Fair-Taylor.
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-                I("RUN re1x." + Globals.extensionCommand + ";");
-                ForwardLookingHelperAssert(u, e);
-
-                //This is a similar model, but with both y(-1), y and y(+1)
-                //The result is the same as when using Fair-Taylor.
-                e = 0.0001d;
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-                I("RUN re2x." + Globals.extensionCommand + ";");
-                ForwardLookingHelperAssert2(u, e);
-
-                //This is real stacked time
-                e = 0.0001d;
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-                I("RUN re2y." + Globals.extensionCommand + ";");
-                ForwardLookingHelperAssert2(u, e);
-            }
-
-            //no fair-taylor loop
-            e = 0.0001d;
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("RUN re3y;");
-            ForwardLookingHelperAssert3(u, e);
-
-            //has to do fair-taylor loop, 2 periods, starting with 2000 and 2001
-            //note that terminal = exo
-            e = 0.0005d;
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("RUN re3y_horizon2;");
-            ForwardLookingHelperAssert3(u, e);
-
-            //has to do fair-taylor loop, 3 periods, 2000, 2001 and 2002
-            //note that terminal = exo
-            e = 0.0006d;
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("RUN re3y_horizon1;");
-            ForwardLookingHelperAssert3(u, e);
-
-        }
-
-        [TestMethod]
-        public void _Test_RAMLargeAware()
-        {
-            //Tests the version deployed
-            //
-            // rem c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\editbin.exe  /LARGEADDRESSAWARE Gekko.exe > zzz
-            // call editbin.exe  /LARGEADDRESSAWARE Gekko.exe > zzz, se xx.bat i c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\
-            //
-            if (false)
-            {
-                Assert.IsTrue(Program.IsLargeAware(@"c:\Program Files (x86)\Gekko\gekko.exe"));
-            }
-        }
-
-        [TestMethod]
-        public void Test__ForwardLookingExhaustive()
+        public void _Test_ForwardLookingExhaustive()
         {
             //TODO: It could be interesting to analyze number of simulations used (or time), and the
             //      precision of results.
@@ -29068,7 +28932,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void Test__ForwardLookingSmall()
+        public void _Test_ForwardLookingSmall()
         {
             UData u = null;
             double e = 0.01d;

@@ -1166,8 +1166,14 @@ namespace Gekko
                 G.SetNaN(dataArray);
             }
         }
-
-        //Not intended for outside use
+                
+        /// <summary>
+        /// For an uninitialized series object, anchorPeriodPositionInArray will be = -123454321, and this will overwhelm everything else,
+        /// so a large negative number &lt; -100.000.000 will be returned. This is not pretty, and ought to be prettified for Gekko 4.0.
+        /// Not intended for outside use.
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <returns></returns>
         public int GetArrayIndex(GekkoTime gt)
         {
             // ----------------------------------------------------------------------------
@@ -1244,11 +1250,28 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             
             int index = GetArrayIndex(gt);
+
             while (index < 0 || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
 
                 //Resize data array
                 //Keeps on going until the array is large enough.
+
+                if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
+                {
+                    //It seems this can happen for a <dyn> expression like
+                    //x = x[-1] + 1, or x[a] = x[a][-1] + 1, where x or x[a]
+                    //does not exist beforehand. Probably the LHS is semi-created
+                    //first, but in any case it ought not work, even if 
+                    //option series array calc missing = zero. It would just be
+                    //weird and random for it to work, even in that case.
+                    //So we issue an error.
+                    //BTW: when getting here, the value of index is most likely < -100.000.000,
+                    //because GetArrayIndex() has essentially already failed. Not pretty, but
+                    //cannot be fixed before Gekko 4.0.
+                    new Error("This error may arise in statements where the left-hand side variable appears on the right-hand side too (like for instance x = x + 10; or x <dyn> = x[-1] + 10;), but where x is not defined beforehand.");
+                }
+
                 double n = Math.Max(this.data.GetDataArray_ONLY_INTERNAL_USE().Length, 4);  //the length could be 1 (or maybe even 0), so we translate 0, 1, 2, 3 into 4 which will become 6 with 1.5 times expandRate.
                 double[] newDataArray = new double[(int)(n * Globals.defaultExpandRateForDataArrays)];
                 InitializeDataArray(newDataArray);
