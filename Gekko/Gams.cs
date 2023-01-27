@@ -312,7 +312,14 @@ namespace Gekko
                             string varname2 = varname;
                             if (wh.dictVars != null)
                             {
-                                varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
+                                try
+                                {
+                                    varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
+                                }
+                                catch
+                                {
+                                    new Error("Could not parse integer part of the string '" + varname + "'");
+                                }
                             }
                             
                             ExtractTimeDimensionHelper helper = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname2, true);
@@ -607,7 +614,7 @@ namespace Gekko
             int end = input.Length - 1;
             if (input[end] != ']') return simple;
             if (input.Length < 7) return simple;  //if input has length 7, it is like '123456', where x[6] = x[end] = '6'. Here, x[end-6] = x[0] = '1' is legal.            
-            string s = G.Substring(input, end - 4, end - 1);
+            string s = G.Substring(input, end - 4, end - 1);            
             int i9 = G.IntParse(s);
             if (i9 == -12345 || char.IsDigit(input[end - 5])) return simple;
             helper.time = new GekkoTime(EFreq.A, i9, 1);
@@ -770,7 +777,15 @@ namespace Gekko
             {
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
                 string[] ss = line.Split(split, StringSplitOptions.None);
-                int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
+                int id = -12345;
+                try
+                {
+                    id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
+                }
+                catch
+                {
+                    new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                }
                 string inputName = helper.dict_FromVarNumberToVarName[id];                
                 ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
                 int aNumber = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
@@ -1083,7 +1098,15 @@ namespace Gekko
                 if (status2 == 1)
                 {
                     string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                    int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    int n = -12345;
+                    try
+                    {
+                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    }
+                    catch
+                    {
+                        new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                    }
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     string eqName = ss2;
                     int idx = ss2.IndexOf("[");
@@ -1096,7 +1119,15 @@ namespace Gekko
                 else if (status2 == 2)
                 {
                     string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                    int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    int n = -12345;
+                    try
+                    {
+                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                    }
+                    catch
+                    {
+                        new Error("Could not parse integer part of the string '" + ss[0] + "'");
+                    }
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     helper.dict_FromVarNumberToVarName[n] = ss2;
                     helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);                    
@@ -1350,7 +1381,9 @@ namespace Gekko
 
                     string sNumber = th1.ToString();
                     if (G.Equal(sNumber, "eps"))
+                    {
                         sNumber = "0";
+                    }
 
                     int i1 = helper.dict_Constants.Count;
                     if (helper.dict_Constants.ContainsKey(sNumber))
@@ -1360,7 +1393,14 @@ namespace Gekko
                     else
                     {
                         helper.dict_Constants.Add(sNumber, i1);
-                        helper.exoValues.Add(double.Parse(sNumber));
+                        try
+                        {
+                            helper.exoValues.Add(double.Parse(sNumber));
+                        }
+                        catch
+                        {
+                            new Error("Could not parse the string '" + sNumber + "' as a value");
+                        }
                     }
                     HandleEqLineAppend(helper, i, "c[d[" + helper.exo.Count + "]]");
                     helper.exo.Add(i1);
@@ -1402,7 +1442,15 @@ namespace Gekko
                     {
                         knownPattern = false;
                     }
-                    int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                    int number = -12345;
+                    try
+                    {
+                        number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                    }
+                    catch
+                    {
+                        new Error("Could not parse integer part of the string '" + th1.s + "'");
+                    }
                     string varname = helper.dict_FromVarNumberToVarName[number];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
                     int i1 = helper2.time.Subtract(helper.tBasis);
