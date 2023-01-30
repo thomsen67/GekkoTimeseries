@@ -4225,13 +4225,14 @@ namespace Gekko
                     if (ErrNr != 0)
                     {
                         //xp_example1.ReportIOError(ErrNr);
-                        throw new GekkoException();
+                        new Error("GAMS gdx write error number " + ErrNr);
                     }
                     //int counter = 0;
                     foreach (ToFrom bnv in list)
                     {
+                        string inputVariableName = bnv.s1;
 
-                        IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
+                        IVariable iv = O.GetIVariableFromString(inputVariableName, O.ECreatePossibilities.NoneReportError, true);
 
                         string name = bnv.s2;
                         string nameWithoutFreq = G.Chop_GetName(name);
@@ -4295,14 +4296,14 @@ namespace Gekko
                             if (ts.meta != null && ts.meta.fix == EFixedType.Parameter) dt_ = gamsglobals.dt_par;                            
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, dt_, 0) == 0)
                             {
-                                new Error("Internal GAMS/gdx problem (gdxDataWriteStrStart)");
+                                new Error("Internal GAMS/gdx problem (variable '" + inputVariableName + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
                             }
 
                             gdx.gdxSystemInfo(ref syCnt, ref uelCnt);
 
                             if (gdx.gdxSymbolSetDomainX(syCnt, domains) == 0)
                             {
-                                new Error("Could not write domain names (gdxSymbolSetDomainX)");
+                                new Error("Could not write domain names (gdxSymbolSetDomainX), variable '" + inputVariableName + "'");
                             }
 
                             if (ts.type == ESeriesType.ArraySuper)
@@ -4320,16 +4321,16 @@ namespace Gekko
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
-                            {                                
-                                throw new GekkoException();
+                            {
+                                new Error("GAMS gdx did not terminate properly, variable '" + inputVariableName + "'.");
                             }
                             counterVariables++;
                         }
                         else if (iv.Type() == EVariableType.List)
                         {
                             if (gdx.gdxDataWriteStrStart(nameWithoutFreq.Replace(Globals.symbolCollection.ToString(), ""), "", 1, gamsglobals.dt_set, 0) == 0)
-                            {                                
-                                throw new GekkoException();
+                            {
+                                new Error("Internal GAMS/gdx problem (variable '" + inputVariableName + "'). It may be a name collision problem, for instance writing the series 'i' and the list '#i'.");
                             }
 
                             List l = iv as List;
@@ -4338,13 +4339,13 @@ namespace Gekko
                             {
                                 if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
                                 {
-                                    new Error("Problem writing set (list) for gdx");
+                                    new Error("Problem writing set (list) element for gdx, variable '" + inputVariableName + "'");
                                 }
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
-                            {                                
-                                throw new GekkoException();
+                            {
+                                new Error("GAMS gdx did not terminate properly, variable '" + inputVariableName + "'.");
                             }
                             exportedSets++;
                         }
