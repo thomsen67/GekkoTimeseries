@@ -724,28 +724,28 @@ namespace Gekko
         public string[] dict_FromANumberToVarName = null;
 
         [ProtoMember(15)]
-        public GekkoDictionaryDimensional dict_FromVarNameToANumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromVarNameToANumber = new GekkoDictionaryDimensional<int>();
 
         //eq numbers in folded model, corresponds to i/ii dimension
         [ProtoMember(16)]
         public string[] dict_FromEqChunkNumberToEqName = null;
 
         [ProtoMember(17)]
-        public GekkoDictionaryDimensional dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional<int>();
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
         [ProtoMember(18)]
         public string[] dict_FromEqNumberToEqName = null;
 
         [ProtoMember(19)]
-        public GekkoDictionaryDimensional dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional<int>();
 
         //lowest level variable numbers (in unfolded/unrolled model)
         [ProtoMember(20)]
         public string[] dict_FromVarNumberToVarName = null;
 
         [ProtoMember(21)]
-        public GekkoDictionaryDimensional dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional<int>();
 
         //from lowest level equation number to chunk equations number
         [ProtoMember(22)]
@@ -804,7 +804,7 @@ namespace Gekko
         public int GetEqNumber(string eqName)
         {
             //TODO: handle errors
-            return this.dict_FromEqNameToEqNumber.Get(eqName);
+            return this.dict_FromEqNameToEqNumber.GetInt(eqName);
         }
 
         public string GetEqName(int eqNumber)
@@ -1456,7 +1456,7 @@ namespace Gekko
             // superfluous parentheses.
             // -------------------------------------------
 
-            int eq = this.dict_FromEqNameToEqNumber.Get(name);
+            int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
             {
                 return "...equation '" + name + "' could not be found...";

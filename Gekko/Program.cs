@@ -32711,10 +32711,10 @@ namespace Gekko
     /// for instance if querying "x[a, b]".
     /// </summary>
     [ProtoContract]
-    public class GekkoDictionaryDimensional
+    public class GekkoDictionaryDimensional<T>
     {
         [ProtoMember(1)]
-        private GekkoDictionary<string, int> storage = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private GekkoDictionary<string, T> storage = new GekkoDictionary<string, T>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Add something. Beware: case-insensitive keys. The input string may contain blanks,
@@ -32722,7 +32722,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <param name="i"></param>
-        public void Add(string s, int i, bool willRemoveBlanks)
+        public void Add(string s, T i, bool willRemoveBlanks)
         {
             if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanks(s), i);
             else this.storage.Add(s, i);
@@ -32733,7 +32733,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <param name="i"></param>
-        public void Add(string s, int i)
+        public void Add(string s, T i)
         {
             Add(s, i, true);
         }
@@ -32745,7 +32745,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="i"></param>
         /// <param name="willRemoveBlanks"></param>
-        public void AddIfNotAlreadyThere(string s, int i, bool willRemoveBlanks)
+        public void AddIfNotAlreadyThere(string s, T i, bool willRemoveBlanks)
         {
             string s2 = null;
             if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
@@ -32756,26 +32756,50 @@ namespace Gekko
             }
         }
 
-        public void AddIfNotAlreadyThere(string s, int i)
+        public void AddIfNotAlreadyThere(string s, T i)
         {
             AddIfNotAlreadyThere(s, i, true);
         }
 
         /// <summary>
         /// See if s is in dictionary. Beware: case-insensitive keys. The input string may contain blanks,
-        /// which will be removed ("x[a, b]" becomes "x[a,b]").
-        /// Note: if key is not found, the method returns -12345.
+        /// which will be removed ("x[a, b]" becomes "x[a,b]"). For objects returns null if not found.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public int Get(string s, bool willRemoveBlanks)
+        public T Get(string s, bool willRemoveBlanks)
         {
             string s2 = null;
             if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
             else s2 = s;
-            int i; bool b = this.storage.TryGetValue(s2, out i);  //is set to 0 if not found
-            if (!b) i = -12345;
+            T i; bool b = this.storage.TryGetValue(s2, out i);
+            if (!b)
+            {
+                i = default(T);
+            }
             return i;
+        }
+
+        /// <summary>
+        /// See if s is in dictionary. Beware: case-insensitive keys. The input string may contain blanks,
+        /// which will be removed ("x[a, b]" becomes "x[a,b]").
+        /// Note: if key is not found, the method returns -12345. The normal Get() returns 0, so this method
+        /// may be better in some cases (where a value = 0 makes sense).
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="willRemoveBlanks"></param>
+        /// <returns></returns>
+        public int GetInt(string s, bool willRemoveBlanks)
+        {
+            string s2 = null;
+            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            else s2 = s;
+            T i; bool b = this.storage.TryGetValue(s2, out i);
+            if (!b)
+            {
+                return -12345;
+            }
+            return (int)(i as int?); //second parenthesis will be <> null if the key type is int. Hmm boxing speed penalty, but only when the key is actually found, so probably ok.
         }
 
         /// <summary>
@@ -32783,9 +32807,19 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public int Get(string s)
+        public T Get(string s)
         {
             return Get(s, true);
+        }
+
+        /// <summary>
+        /// Overload, removes blanks from input string.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public int GetInt(string s)
+        {
+            return GetInt(s, true);
         }
 
         public int Count()
@@ -32797,7 +32831,7 @@ namespace Gekko
         /// Only intended to be used when iterating!
         /// </summary>
         /// <returns></returns>
-        public GekkoDictionary<string, int> GetDictionaryForIteration()
+        public GekkoDictionary<string, T> GetDictionaryForIteration()
         {
             return this.storage;
         }

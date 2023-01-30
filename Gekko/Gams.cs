@@ -788,7 +788,7 @@ namespace Gekko
                 }
                 string inputName = helper.dict_FromVarNumberToVarName[id];                
                 ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
-                int aNumber = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
+                int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
                 int i1 = helper2.time.Subtract(helper.tBasis);
                 int i2 = aNumber;
                 double d;
@@ -1454,7 +1454,7 @@ namespace Gekko
                     string varname = helper.dict_FromVarNumberToVarName[number];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
                     int i1 = helper2.time.Subtract(helper.tBasis);
-                    int i2 = helper.dict_FromVarNameToANumber.Get(helper2.resultingFullName);
+                    int i2 = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
 
                     int ii1 = helper.endo.Count;
                     int ii2 = helper.endo.Count + 1;
@@ -4875,7 +4875,7 @@ namespace Gekko
         public int unique = 0;
 
         public string[] dict_FromANumberToVarName = null;
-        public GekkoDictionaryDimensional dict_FromVarNameToANumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromVarNameToANumber = new GekkoDictionaryDimensional<int>();
 
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
@@ -4885,11 +4885,11 @@ namespace Gekko
         public List<int> eqPointers = new List<int>();        
 
         public string[] dict_FromEqNumberToEqName = null;
-        public GekkoDictionaryDimensional dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional<int>();
         public string[] dict_FromVarNumberToVarName = null;
-        public GekkoDictionaryDimensional dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional<int>();
         public string[] dict_FromEqChunkNumberToEqName = null;
-        public GekkoDictionaryDimensional dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional();
+        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional<int>();
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         //public List<List<PeriodAndVariable>> precedentsScalar = new List<List<PeriodAndVariable>>();

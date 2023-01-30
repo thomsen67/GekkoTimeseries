@@ -556,7 +556,7 @@ namespace Gekko
 
                 string s2 = G.Chop_DimensionAddLast(s, time.ToString(), false);
 
-                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s2);
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s2);
                 if (eqNumber == -12345)
                 {
                     if (showErrors) new Error("Could not find the equation '" + s2 + "'");
@@ -1306,7 +1306,7 @@ namespace Gekko
 
                             string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                             if (k == 0) eqNames.Add(eqName);
-                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(eqName);
+                            int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(eqName);
 
                             List<TwoStrings> variables = new List<TwoStrings>();
                             //foreach precedent variable
@@ -2512,7 +2512,7 @@ namespace Gekko
                     tZero = t.Subtract(modelGamsScalar.staticT1) + timeIndex2;
                 }
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t));
-                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.Get(s);
+                int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s);
                 if (eqNumber == -12345)
                 {
                     new Error("Could not find equation '" + s + "'");
@@ -3954,7 +3954,7 @@ namespace Gekko
                             List<string> xx = c.vars_hack;
                             foreach (string s in xx)
                             {
-                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.Get(s);
+                                int a = model.modelGamsScalar.dict_FromVarNameToANumber.GetInt(s);
                                 if (a == -12345) continue;
 
                                 bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
@@ -4833,7 +4833,7 @@ namespace Gekko
                 int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
 
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
-                int aNumber = modelGamsScalar.dict_FromVarNameToANumber.Get(variableName);
+                int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
                 if (aNumber == -12345)
                 {
                     new Error(NonFoundInModelError(variableName, modelGamsScalar));
@@ -5119,10 +5119,10 @@ namespace Gekko
 
             Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
 
-            int a1 = modelGamsScalar.dict_FromVarNameToANumber.Get(x1);
+            int a1 = modelGamsScalar.dict_FromVarNameToANumber.GetInt(x1);
             if (a1 == -12345) new Error(NonFoundInModelError(x1, modelGamsScalar));
 
-            int a2 = modelGamsScalar.dict_FromVarNameToANumber.Get(x2);
+            int a2 = modelGamsScalar.dict_FromVarNameToANumber.GetInt(x2);
             if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
             PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
