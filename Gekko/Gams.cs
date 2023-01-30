@@ -1379,7 +1379,7 @@ namespace Gekko
                         knownPattern = false;
                     }
 
-                    string sNumber = th1.ToString();
+                    string sNumber = th1.ToString().Trim();
                     if (G.Equal(sNumber, "eps"))
                     {
                         sNumber = "0";

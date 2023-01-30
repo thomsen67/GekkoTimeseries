@@ -21652,7 +21652,7 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(false);
             //Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = false;  //this logic can be removed in a couple of years (maybe in 2015)
             G.Writeln();
-            G.Writeln("Clearing options, databanks, models, scalars, lists, collections and procedures/functions");
+            G.Writeln("Clearing databanks, models, options and procedures/functions.");
             if (ini) G.Writeln("INI files ('" + Globals.autoExecCmdFileName + "') will be run");
             else G.Writeln("No INI files ('" + Globals.autoExecCmdFileName + "') will be run");
             G.Writeln("Use CLS to clear the output window, and CUT to close plot/decomp windows.");

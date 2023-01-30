@@ -671,7 +671,7 @@ namespace Gekko
 
             if (false)
             {
-                DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                DecompPrintDatas(per1, per2, decompDatas.storage, operatorOneOf3Types);
             }
 
             bool[] used = new bool[decompDatas.storage.Count];
@@ -783,7 +783,7 @@ namespace Gekko
 
             if (false)
             {
-                DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                DecompPrintDatas(per1, per2, decompDatas.storage, operatorOneOf3Types);
                 throw new GekkoException();
             }
 
@@ -1030,7 +1030,7 @@ namespace Gekko
 
             if (false)
             {
-                DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                DecompPrintDatas(per1, per2, decompDatas.storage, operatorOneOf3Types);
             }
             decompDatas.MAIN_data = new DecompData();  //this is where the results end up
 
@@ -1138,7 +1138,7 @@ namespace Gekko
                         }
                     }
                     if (!nan)
-                    {
+                    {                        
                         new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
                         throw;
                     }
@@ -1432,7 +1432,7 @@ namespace Gekko
                         if (!nan)
                         {
                             string extra = null;
-                            if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";
+                            if (CheckIfEverythingIsZero(mEndo)) extra = " Note that the " + mEndo.GetLength(0) + " x " + mEndo.GetLength(1) + " matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not change at all, and hence the effects cannot be calculated.";                            
                             new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
                             throw;
                         }
@@ -2835,7 +2835,7 @@ namespace Gekko
             List<string> tempColNames = new List<string>();
             GekkoDictionary<string, AggContainer> agg = DecompPivotAggregate(frame, decompOptions2, normalizerVariableWithIndex, tempRowNames, tempColNames, model);
 
-            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;
+            List<string> rownames, colnames; string rownamesFirst, colnamesFirst;            
             DecompPivotOrderRowsAndColumns(decompOptions2, parentI, tempRowNames, tempColNames, out rownames, out colnames, out rownamesFirst, out colnamesFirst, model);
 
             Table table = DecompGetTableFromAggObject(agg, op, decompOptions2, format2, rownames, colnames, rownamesFirst, colnamesFirst);
@@ -3205,17 +3205,10 @@ namespace Gekko
 
             if (rownamesFirst != null) rownames.Insert(0, rownamesFirst);
             if (colnamesFirst != null) colnames.Insert(0, colnamesFirst);
-
+            
             if (orderNormalize && rownamesFirst == null && colnamesFirst == null)
-            {
-                if (rownamesFirst == null && colnamesFirst == null)
-                {
-                    new Error("Could not find variable field in order to construct pivot table (in a later Gekko version, this may be legal).");
-                }
-                if (rownamesFirst != null && colnamesFirst != null)
-                {
-                    new Error("Both row and col are set first for normalization");
-                }
+            {                
+                new Error("Pivot table problem regarding first row/col (dependent variable).");
             }
         }
 
@@ -4619,7 +4612,7 @@ namespace Gekko
             return banks;
         }
 
-        public static void DecompPrintDatas(List<List<DecompData>> decompDatas, EContribType operatorOneOf3Types)
+        public static void DecompPrintDatas(GekkoTime gt1, GekkoTime gt2, List<List<DecompData>> decompDatas, EContribType operatorOneOf3Types)
         {
             int c1 = -1;
             foreach (List<DecompData> dd in decompDatas)
@@ -4634,10 +4627,10 @@ namespace Gekko
                     {
                         string nme = kvp.Key;
                         Series ts = kvp.Value;
-                        for (int i = 2021; i <= 2022; i++)
+                        foreach(GekkoTime t in new GekkoTimeIterator(gt1, gt2))
                         {
-                            double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
-                            G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
+                            double v = ts.GetVal(t);
+                            G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + t.ToString() + " = " + v);
                         }
                     }
                 }

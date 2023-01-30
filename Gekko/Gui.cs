@@ -325,7 +325,7 @@ namespace Gekko
             {
                 using (Note note = new Note())
                 {
-                    note.MainAdd("From version 3.1.14 and on, Gekko offers autocomplete of series and array-series names. For instance, after reading a databank containing the series xyz, you may type 'prt x' followed by [Tab] or [Ctrl+Space] to select xyz from a list of names. See more {a{here¤user_interface.htm}a}.");
+                    note.MainAdd("From Gekko 3.1.14 and on, [Tab] or [Ctrl+Space] activates autocomplete of series names. For instance, \"prt x\" + [Tab] will show series starting with 'x', and \"prt x[\" + [Tab] will show elements of the array-series 'x'. See more {a{here¤user_interface.htm}a}.");
                     //
                     //note.MoreAdd("");
                 }
