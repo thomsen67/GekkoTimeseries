@@ -32724,7 +32724,7 @@ namespace Gekko
         /// <param name="i"></param>
         public void Add(string s, T i, bool willRemoveBlanks)
         {
-            if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanks(s), i);
+            if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanksExceptInsideQuotedStrings(s), i);
             else this.storage.Add(s, i);
         }
 
@@ -32748,7 +32748,7 @@ namespace Gekko
         public void AddIfNotAlreadyThere(string s, T i, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
             else s2 = s;
             if (!this.storage.ContainsKey(s2))
             {
@@ -32770,7 +32770,7 @@ namespace Gekko
         public T Get(string s, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
             else s2 = s;
             T i; bool b = this.storage.TryGetValue(s2, out i);
             if (!b)
@@ -32792,7 +32792,7 @@ namespace Gekko
         public int GetInt(string s, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanks(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
             else s2 = s;
             T i; bool b = this.storage.TryGetValue(s2, out i);
             if (!b)

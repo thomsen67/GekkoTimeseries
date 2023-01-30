@@ -1857,11 +1857,13 @@ namespace Gekko
 
         /// <summary>
         /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
-        /// But not tested. Pretty fast return if input has no blanks (the input string is returned).
+        /// But not tested. Fast return if input has no blanks (the input string is returned).
+        /// Beware that blanks inside single-quoted strings are preserved, so with input
+        /// "a, b, c, 'd, e, f', h" we get --> "a,b,c,'d, e, f',h".
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string ReplaceBlanks(string s)
+        public static string ReplaceBlanksExceptInsideQuotedStrings(string s)
         {
             bool hit = false; //maybe using this is a bit faster?
             foreach (char c in s)
@@ -1872,15 +1874,30 @@ namespace Gekko
                     break;
                 }
             }
-
-            if (!hit) return s;  //fast without object construction if no blanks in input
-            
+            if (!hit) return s;  //fast without object construction if no blanks at all in input            
             StringBuilder sb = new StringBuilder(s.Length);
+            bool insidePling = false;
             foreach (char c in s)
             {
-                if (c != ' ')
-                {                    
+                if (c == ' ')
+                {
+                    if (insidePling) sb.Append(c); //allow blanks inside '...' single quotes.
+                }
+                else
+                {
                     sb.Append(c);
+                }
+
+                if (c == '\'')
+                {
+                    if (insidePling == false)
+                    {
+                        insidePling = true;
+                    }
+                    else
+                    {
+                        insidePling = false;
+                    }
                 }
             }
             return sb.ToString();
