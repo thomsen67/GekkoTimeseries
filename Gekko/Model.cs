@@ -724,28 +724,28 @@ namespace Gekko
         public string[] dict_FromANumberToVarName = null;
 
         [ProtoMember(15)]
-        public GekkoDictionaryDimensional<int> dict_FromVarNameToANumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
 
         //eq numbers in folded model, corresponds to i/ii dimension
         [ProtoMember(16)]
         public string[] dict_FromEqChunkNumberToEqName = null;
 
         [ProtoMember(17)]
-        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
         [ProtoMember(18)]
         public string[] dict_FromEqNumberToEqName = null;
 
         [ProtoMember(19)]
-        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
 
         //lowest level variable numbers (in unfolded/unrolled model)
         [ProtoMember(20)]
         public string[] dict_FromVarNumberToVarName = null;
 
         [ProtoMember(21)]
-        public GekkoDictionaryDimensional<int> dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
 
         //from lowest level equation number to chunk equations number
         [ProtoMember(22)]

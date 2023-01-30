@@ -1209,8 +1209,8 @@ namespace Gekko
         /// <param name="parentI"></param>
         private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
-            GekkoDictionaryDimensional<int> endo = new GekkoDictionaryDimensional<int>();
-            GekkoDictionaryDimensional<int> exo = new GekkoDictionaryDimensional<int>();
+            GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
+            GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
             //GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             //GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
@@ -1265,7 +1265,7 @@ namespace Gekko
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
                             txt.MoreNewLine();
-                            List<string> temp1 = endo.GetKeysList();
+                            List<string> temp1 = endo.GetKeys();
                             for (int i = 0; i < temp1.Count; i++) { temp1[i] = temp1[i].Replace("¤", ""); }
                             temp1.Sort(G.CompareNaturalIgnoreCase);
                             txt.MoreAdd("There are the following " + endo.Count() + " endo variables given:");

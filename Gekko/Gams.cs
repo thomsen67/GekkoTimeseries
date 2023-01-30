@@ -4875,7 +4875,7 @@ namespace Gekko
         public int unique = 0;
 
         public string[] dict_FromANumberToVarName = null;
-        public GekkoDictionaryDimensional<int> dict_FromVarNameToANumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromVarNameToANumber = new GekkoDictionaryBlanks<int>();
 
         public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
@@ -4885,11 +4885,11 @@ namespace Gekko
         public List<int> eqPointers = new List<int>();        
 
         public string[] dict_FromEqNumberToEqName = null;
-        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqNumber = new GekkoDictionaryBlanks<int>();
         public string[] dict_FromVarNumberToVarName = null;
-        public GekkoDictionaryDimensional<int> dict_FromVarNameToVarNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromVarNameToVarNumber = new GekkoDictionaryBlanks<int>();
         public string[] dict_FromEqChunkNumberToEqName = null;
-        public GekkoDictionaryDimensional<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryDimensional<int>();
+        public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         //public List<List<PeriodAndVariable>> precedentsScalar = new List<List<PeriodAndVariable>>();

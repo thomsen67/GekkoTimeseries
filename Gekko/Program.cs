@@ -32706,20 +32706,20 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Wrapper for dictionaries used in GAMS scalar model, with type T values. This issue is that keys are represented
-    /// as for instance "x[a,b]", note no blanks. So the wrapper is to absolutely ensure that we avoid blanks-gotchas,
-    /// for instance if querying "x[a, b]". If you have T as int, you can use GetInt to return -12345 if key is not there (instead of returning 0).
+    /// Wrapper for dictionaries, used for instance in GAMS scalar model, with type T values. 
+    /// For variables like x[a, b] the issue is that x[a,b] should be equal (note missing blank).
+    /// But GekkoDictionaryBlanks can be used for other things as well.
+    /// Beware of method GetInt() instead of Get() that for int type returns -12345 if not found as key.
     /// The keys will be squeezed (blanks removed, except if inside '...' quotes), so the info on these blanks is not
-    /// preserved (but the capitalization is). If printing keys, consider pretty-print with space around commas -->
-    /// do a method here for returning pretty keys if needed!!!!
+    /// preserved (but the letter case is). Use GetKeys() to get the keys out, with nice blanks after commas!
     /// </summary>
     [ProtoContract]
-    public class GekkoDictionaryDimensional<T>
+    public class GekkoDictionaryBlanks<T>
     {
         [ProtoMember(1)]
         private GekkoDictionary<string, T> storage = new GekkoDictionary<string, T>(StringComparer.OrdinalIgnoreCase);
 
-        public List<string> GetKeysList()
+        public List<string> GetKeys()
         {
             List<string> m = this.storage.Keys.ToList();
             List<string> m2 = new List<string>();
@@ -32867,6 +32867,12 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// Dictionary where the string keys are case-independent.
+    /// If there are varying blanks (and commas) inside the keys, consider GekkoDictionaryBlanks.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public class GekkoDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public GekkoDictionary()
