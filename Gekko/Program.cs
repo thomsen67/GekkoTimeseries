@@ -32706,15 +32706,29 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Wrapper for dictionaries used in GAMS scalar model. This issue is that keys are represented
+    /// Wrapper for dictionaries used in GAMS scalar model, with type T values. This issue is that keys are represented
     /// as for instance "x[a,b]", note no blanks. So the wrapper is to absolutely ensure that we avoid blanks-gotchas,
-    /// for instance if querying "x[a, b]".
+    /// for instance if querying "x[a, b]". If you have T as int, you can use GetInt to return -12345 if key is not there (instead of returning 0).
+    /// The keys will be squeezed (blanks removed, except if inside '...' quotes), so the info on these blanks is not
+    /// preserved (but the capitalization is). If printing keys, consider pretty-print with space around commas -->
+    /// do a method here for returning pretty keys if needed!!!!
     /// </summary>
     [ProtoContract]
     public class GekkoDictionaryDimensional<T>
     {
         [ProtoMember(1)]
         private GekkoDictionary<string, T> storage = new GekkoDictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+
+        public List<string> GetKeysList()
+        {
+            List<string> m = this.storage.Keys.ToList();
+            List<string> m2 = new List<string>();
+            foreach (string s in m)
+            {
+                m2.Add(G.ReplaceBlanksExceptInsideQuotedStrings(s, true));
+            }
+            return m2;
+        }        
 
         /// <summary>
         /// Add something. Beware: case-insensitive keys. The input string may contain blanks,
@@ -32724,7 +32738,7 @@ namespace Gekko
         /// <param name="i"></param>
         public void Add(string s, T i, bool willRemoveBlanks)
         {
-            if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanksExceptInsideQuotedStrings(s), i);
+            if (willRemoveBlanks) this.storage.Add(G.ReplaceBlanksExceptInsideQuotedStrings(s, false), i);
             else this.storage.Add(s, i);
         }
 
@@ -32748,7 +32762,7 @@ namespace Gekko
         public void AddIfNotAlreadyThere(string s, T i, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s, false);
             else s2 = s;
             if (!this.storage.ContainsKey(s2))
             {
@@ -32770,7 +32784,7 @@ namespace Gekko
         public T Get(string s, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s, false);
             else s2 = s;
             T i; bool b = this.storage.TryGetValue(s2, out i);
             if (!b)
@@ -32792,7 +32806,7 @@ namespace Gekko
         public int GetInt(string s, bool willRemoveBlanks)
         {
             string s2 = null;
-            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s);
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s, false);
             else s2 = s;
             T i; bool b = this.storage.TryGetValue(s2, out i);
             if (!b)
@@ -32820,6 +32834,22 @@ namespace Gekko
         public int GetInt(string s)
         {
             return GetInt(s, true);
+        }
+
+        //Does the dict contain the key?
+        public bool ContainsKey(string s, bool willRemoveBlanks)
+        {
+            string s2 = null;
+            if (willRemoveBlanks) s2 = G.ReplaceBlanksExceptInsideQuotedStrings(s, false);
+            else s2 = s;
+            bool b = this.storage.ContainsKey(s2);
+            return b;
+        }
+
+        //Overload
+        public bool ContainsKey(string s)
+        {
+            return ContainsKey(s, true);
         }
 
         public int Count()

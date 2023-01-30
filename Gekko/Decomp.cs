@@ -1209,8 +1209,10 @@ namespace Gekko
         /// <param name="parentI"></param>
         private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
-            GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionaryDimensional<int> endo = new GekkoDictionaryDimensional<int>();
+            GekkoDictionaryDimensional<int> exo = new GekkoDictionaryDimensional<int>();
+            //GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            //GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
             Dictionary<int, string> exoReverse = new Dictionary<int, string>();  //just inverted
 
@@ -1222,7 +1224,7 @@ namespace Gekko
                     string x = DecompFirst() + ":" + ConvertToTurtleName(s, 0, t);
                     if (!endo.ContainsKey(x))
                     {
-                        int c = endo.Count;
+                        int c = endo.Count();
                         endo.Add(x, c);
                         endoReverse.Add(c, x);
                     }
@@ -1252,28 +1254,28 @@ namespace Gekko
                 }
                 else
                 {
-                    if (endo.Count != eqNames.Count)
+                    if (endo.Count() != eqNames.Count)
                     {
                         using (Error txt = new Error())
                         {
-                            txt.MainAdd("The numbers of total equations (" + eqNames.Count + ") and the number of endogenous variables (" + endo.Count + ") do not match");
+                            txt.MainAdd("The numbers of total equations (" + eqNames.Count + ") and the number of endogenous variables (" + endo.Count() + ") do not match");
                             List<string> temp2 = eqNames;
                             temp2.Sort(G.CompareNaturalIgnoreCase);
                             txt.MoreAdd("There are the following " + eqNames.Count + " equations given:");
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp2));
                             txt.MoreNewLine();
-                            List<string> temp1 = endo.Keys.ToList();
+                            List<string> temp1 = endo.GetKeysList();
                             for (int i = 0; i < temp1.Count; i++) { temp1[i] = temp1[i].Replace("¤", ""); }
                             temp1.Sort(G.CompareNaturalIgnoreCase);
-                            txt.MoreAdd("There are the following " + endo.Count + " endo variables given:");
+                            txt.MoreAdd("There are the following " + endo.Count() + " endo variables given:");
                             txt.MoreNewLineTight();
                             txt.MoreAdd(Stringlist.GetListWithCommas(temp1));
                         }
                     }
 
-                    mEndo = new double[endo.Count, endo.Count];
-                    mExo = new double[endo.Count, exo.Count];
+                    mEndo = new double[endo.Count(), endo.Count()];
+                    mExo = new double[endo.Count(), exo.Count()];
                 }
                 int row = -1;
                 int ii = -1;
@@ -1342,7 +1344,7 @@ namespace Gekko
                                     else
                                     {
                                         //exo
-                                        int c = exo.Count;
+                                        int c = exo.Count();
                                         exo.Add(x1, c);
                                         exoReverse.Add(c, x1);
                                     }
@@ -1356,7 +1358,7 @@ namespace Gekko
                                     //k == 1
                                     if (endo.ContainsKey(x1))
                                     {
-                                        int col = endo[x1];
+                                        int col = endo.GetInt(x1);
                                         if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
@@ -1367,7 +1369,7 @@ namespace Gekko
                                     }
                                     else if (exo.ContainsKey(x1))
                                     {
-                                        int col = exo[x1];
+                                        int col = exo.GetInt(x1);
                                         if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
@@ -1391,7 +1393,7 @@ namespace Gekko
             //TODO: check that number of endo and number of eqs match
             //TODO: check that number of endo and number of eqs match
 
-            int n = endo.Count + exo.Count;
+            int n = endo.Count() + exo.Count();
 
             if (refreshObjects)
             {                
@@ -1408,7 +1410,7 @@ namespace Gekko
                 if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                 {
                     //nothing happens, so we can say that the effect is also zeroes...
-                    effect = new double[endo.Count, exo.Count];
+                    effect = new double[endo.Count(), exo.Count()];
                 }
                 else
                 {
@@ -1456,7 +1458,7 @@ namespace Gekko
             //    }
             //}
 
-            for (int row = 0; row < endo.Count; row++)
+            for (int row = 0; row < endo.Count(); row++)
             {
                 //
                 // Not extremely pretty, but what else to do?
@@ -1467,7 +1469,7 @@ namespace Gekko
                 ConvertFromTurtleName(endoReverse[row], true, out name, out gtNotUsed);
                 if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
-                for (int col = 0; col < exo.Count; col++)
+                for (int col = 0; col < exo.Count(); col++)
                 {
                     string endoName = endoReverse[row];
                     GekkoTime etime; string ename;

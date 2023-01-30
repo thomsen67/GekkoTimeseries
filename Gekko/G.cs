@@ -1856,36 +1856,55 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
+        /// With reverse=false, removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
         /// But not tested. Fast return if input has no blanks (the input string is returned).
         /// Beware that blanks inside single-quoted strings are preserved, so with input
         /// "a, b, c, 'd, e, f', h" we get --> "a,b,c,'d, e, f',h".
+        /// With reverse=true, "a,b,c,'d,e,f',h" becomes --> "a, b, c, 'd,e,f', h"
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string ReplaceBlanksExceptInsideQuotedStrings(string s)
+        public static string ReplaceBlanksExceptInsideQuotedStrings(string s, bool inverse)
         {
-            bool hit = false; //maybe using this is a bit faster?
-            foreach (char c in s)
+            if (!inverse)
             {
-                if (c == ' ')
+                bool hit = false; //maybe using this is a bit faster?
+                foreach (char c in s)
                 {
-                    hit = true;
-                    break;
+                    if (c == ' ')
+                    {
+                        hit = true;
+                        break;
+                    }
                 }
+                if (!hit) return s;  //fast without object construction if no blanks at all in input            
             }
-            if (!hit) return s;  //fast without object construction if no blanks at all in input            
             StringBuilder sb = new StringBuilder(s.Length);
             bool insidePling = false;
             foreach (char c in s)
             {
-                if (c == ' ')
+                if (inverse)
                 {
-                    if (insidePling) sb.Append(c); //allow blanks inside '...' single quotes.
+                    if (c == ',')
+                    {
+                        if (insidePling) sb.Append(c); //do not touch inside single quotes.
+                        else sb.Append(c).Append(' ');
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
                 }
                 else
                 {
-                    sb.Append(c);
+                    if (c == ' ')
+                    {
+                        if (insidePling) sb.Append(c); //allow blanks inside '...' single quotes.
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
                 }
 
                 if (c == '\'')
