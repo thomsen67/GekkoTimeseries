@@ -4434,6 +4434,7 @@ namespace Gekko
                     }
                     if (ntimeless > 0 && nnontimeless > 0)
                     {
+                        //Note: this is fixed in WriteGdx(), the fast version
                         new Error("The array-timeseries " + ts.name + " has subseries that are both timeless and non-timeless --> cannot write to GDX.");
                     }
                     if (ntimeless > 0) timeDimension = 0;
