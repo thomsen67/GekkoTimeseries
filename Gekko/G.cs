@@ -1864,7 +1864,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string ReplaceBlanksExceptInsideQuotedStrings(string s, bool inverse)
+        private static string HandleBlanks(string s, bool inverse)
         {
             if (!inverse)
             {
@@ -1920,6 +1920,32 @@ namespace Gekko
                 }
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Removes blank characters in a string fast. Maybe a factor 2-3 faster than .Replace(" ", "").
+        /// But not tested. Fast return if input has no blanks (the input string is returned).
+        /// Beware that blanks inside single-quoted strings are preserved, so with input
+        /// "a, b, c, 'd, e, f', h" we get --> "a,b,c,'d, e, f',h". See also HandleBlanksResurrect().
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="inverse"></param>
+        /// <returns></returns>
+        public static string HandleBlanksRemove(string s)
+        {
+            return G.HandleBlanks(s, false);
+        }
+
+        /// <summary>
+        /// Resurrects blank characters around commas, cf. HandleBlanksRemove().
+        /// Note "a,b,c,'d,e,f',h" becomes --> "a, b, c, 'd,e,f', h". So inside quotes is not touched.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="inverse"></param>
+        /// <returns></returns>
+        public static string HandleBlanksResurrect(string s)
+        {
+            return G.HandleBlanks(s, true);
         }
 
         /// <summary>

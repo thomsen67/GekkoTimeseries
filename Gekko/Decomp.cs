@@ -453,7 +453,7 @@ namespace Gekko
                 Link temp = new Link();
                 if (x1 != null)
                 {
-                    temp.varnames = x1[0];
+                    temp.varnames = G.HandleBlanksRemove(x1[0]);
                 }
                 if (x2 != null) temp.eqname = x2[0];
                 temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
@@ -474,7 +474,10 @@ namespace Gekko
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
-                
+                for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
+                for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
+                for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);
+                               
                 if (model.DecompType() == EModelType.GAMSScalar)
                 {
                     model.modelGamsScalar.MaybeLoadDataIntoModel(o.decompFind.depth, decompOptions2.t1, decompOptions2.t2);
@@ -490,7 +493,11 @@ namespace Gekko
                         if (counter == 0)
                         {
                             link.endo = new List<string>();
-                            link.endo.AddRange(decompOptions2.new_endo);
+                            foreach (string s10 in decompOptions2.new_endo)
+                            {
+                                link.endo.Add(s10);
+                            }
+                            //link.endo.AddRange(decompOptions2.new_endo);
                             link.varnames = decompOptions2.new_select[0];
                         }
                         else
@@ -964,7 +971,11 @@ namespace Gekko
                     if (decompOptions2.new_endo != null)
                     {
                         link.endo = new List<string>();
-                        link.endo.AddRange(decompOptions2.new_endo);
+                        foreach (string s10 in decompOptions2.new_endo)
+                        {
+                            link.endo.Add(s10);
+                        }
+                        //link.endo.AddRange(decompOptions2.new_endo);
                     }
                     if (decompOptions2.new_select != null)
                     {
@@ -1711,7 +1722,7 @@ namespace Gekko
 
         private static string ConvertToTurtleName(string s, int lag, GekkoTime t)
         {
-            return s + "¤[" + t.Add(lag).ToString() + "]";
+            return G.HandleBlanksRemove(s + "¤[" + t.Add(lag).ToString() + "]");
         }
 
         private static string ConvertToTurtleName(string s, int lag)
@@ -1719,11 +1730,11 @@ namespace Gekko
             string slag = lag.ToString();
             if (lag > 0) slag = "+" + slag;
             slag = "[" + slag + "]";
-            return s + "¤" + slag;
+            return G.HandleBlanksRemove(s + "¤" + slag);
         }
 
         /// <summary>
-        /// Splits something like x[a, b]¤[1999q3] up into 1999q3 and x[a, b]. If no ¤, an error is issued.
+        /// Splits something like x[a,b]¤[1999q3] up into 1999q3 and x[a,b]. If no ¤, an error is issued.
         /// Splits at the '¤' no matter what is before. If strict==true and > one '¤', it will fail.
         /// See overload for lags like x[-1].
         /// </summary>
@@ -1757,7 +1768,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Splits something like x[a, b]¤[-1] up into -1 and x[a, b]. If no ¤, the lag is 0.
+        /// Splits something like x[a,b]¤[-1] up into -1 and x[a,b]. If no ¤, the lag is 0.
         /// Splits at the '¤' no matter what is before. If strict==true and > one '¤', it will fail.
         /// See overload for periods like x[1999q3].
         /// </summary>
@@ -1789,7 +1800,6 @@ namespace Gekko
                 else new Error("Turtle error");
             }
         }
-
 
 
         // ----------------------------
@@ -2827,7 +2837,10 @@ namespace Gekko
             int xlag = 0; string temp = null;
             ConvertFromTurtleName(decompDataMAINClone.lhs, true, out temp, out xlag);
             string normalizerVariableWithIndex = null;
-            if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
+            if (temp != null)
+            {
+                normalizerVariableWithIndex = G.HandleBlanksRemove(G.Chop_RemoveBank(temp));
+            }
 
             DecomposeReplaceVars(decompOptions2.rows, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);
             DecomposeReplaceVars(decompOptions2.cols, Globals.col_t, Globals.col_variable, Globals.col_lag, Globals.col_universe, Globals.col_equ);

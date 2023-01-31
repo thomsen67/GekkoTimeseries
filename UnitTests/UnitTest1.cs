@@ -23586,6 +23586,25 @@ print(df2)
 
         }
 
+        private static void TestCopyHelper(int i)
+        {
+            I("reset; time 2001 2003;");
+            I("x1 = 11;");
+            I("%x1 = 12;");
+            I("#x1 = (13,);");
+            if (i == 1) I("<2001q1 2003q4> x1!q = 111;");
+            I("clone;");  //copies to Ref
+            I("x2 = 21;");  //special for Work
+            I("open<edit>b1; clear b1;");
+            I("x3 = 31;");
+            I("%x3 = 32;");
+            I("#x3 = (33,);");
+            if (i == 1) I("<2001q1 2003q4> x3!q = 131;");
+            I("close b1; open b1; unlock b1;");
+            //hmmm seems the only way to create a fresh bank not in first position
+            I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
+        }
+
         private static void Setup_Exceptions_Test()
         {
             I("RESET; TIME 2001 2010; OPTION databank search = yes;");
