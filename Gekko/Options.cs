@@ -36,8 +36,8 @@ namespace Gekko
         //bugfix options (options starting with "bugfix_" are not shown in user manual or in "option?"
         public bool bugfix_import_export = false;  //not mentioned in help                     
         public bool bugfix_missing = true;         //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
-        public bool bugfix_readfast = true;        //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
-
+        public bool bugfix_readfast = true;        //not mentioned in help.
+        public bool bugfix_missingignore = false;  //not mentioned in help, set true for Gekko 3.2.
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -153,6 +153,7 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
+        public string series_modify = "update";
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
@@ -303,6 +304,7 @@ namespace Gekko
             Add("BUGFIX IMPORT EXPORT", Globals.xbool);
             Add("BUGFIX MISSING", Globals.xbool);
             Add("BUGFIX READFAST", Globals.xbool);
+            Add("BUGFIX MISSINGIGNORE", Globals.xbool);
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
             Add("DATABANK FILE CACHE", Globals.xnameOrString, "all", "nongbk", "none");

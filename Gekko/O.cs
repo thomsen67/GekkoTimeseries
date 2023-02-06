@@ -3306,10 +3306,17 @@ namespace Gekko
             finally
             {
                 if (o.opt_missing != null)
-                {
-                    missing.print = Program.options.series_array_print_missing;
-                    missing.calc = Program.options.series_array_calc_missing;
-                    missing.data = Program.options.series_data_missing;
+                {                    
+                    if (Program.options.bugfix_missingignore == true)
+                    {
+                        //skip
+                    }
+                    else
+                    {
+                        missing.print = Program.options.series_array_print_missing;
+                        missing.calc = Program.options.series_array_calc_missing;
+                        missing.data = Program.options.series_data_missing;
+                    }
                     HandleMissing2(missing.print, missing.calc, missing.data);
                 }
             }

@@ -1759,7 +1759,7 @@ namespace Gekko
                 }
                 else if (ss.Length == 2)
                 {
-                    //qwerty, do something for Q and M...
+                    //do something for Q and M...
                     gt = GekkoTime.FromStringToGekkoTime(ss[1].Substring(1, ss[1].Length - 2));
                     name = ss[0];
                 }

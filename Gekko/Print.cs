@@ -487,9 +487,13 @@ namespace Gekko
                 {
                     printTable = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
                 }
-            }                
+            }
 
             //bool filter = ShouldFilterPeriod(new GekkoTime());
+
+            bool seriesAreInRows = true;  //default for SHEET, opposite of default for PRT.
+            bool hasNames = true; if (G.Equal(o.opt_names, "no")) hasNames = false;
+            bool hasDates = true; if (G.Equal(o.opt_dates, "no")) hasDates = false;
 
             if (type == EPrintTypes.Plot)
             {                
@@ -505,9 +509,21 @@ namespace Gekko
                 if (Globals.excelDna)
                 {
                     //transposing is easier here for ExcelDna than for Epplus.
-                    if (G.Equal(o.opt_cols, "yes")) tab2 = printTable;
-                    else tab2 = printTable.Transpose();
-                    Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title);
+                    if (G.Equal(o.opt_cols, "yes"))
+                    {
+                        tab2 = printTable;
+                        seriesAreInRows = false;
+                    }
+                    else
+                    {
+                        tab2 = printTable.Transpose();                        
+                    }
+                    //
+                    //
+                    // BUG: the method does not handle <names=no> or <dates=no>... #yuadsf8adsfjs
+                    //
+                    //
+                    Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title, hasNames, hasDates, seriesAreInRows);
                 }
                 else
                 {
@@ -533,11 +549,18 @@ namespace Gekko
             }
             else  //is .Print type
             {
-                if (rows) printTable = printTable.Transpose();  //else we have series normally, <cols>
+                if (rows)
+                {
+                    printTable = printTable.Transpose();  //else we have series normally, <cols>
+                }
+                else
+                {
+                    seriesAreInRows = false;
+                }
 
                 if (Globals.excelDna)
                 {
-                    Program.PrtToExcelDna(printTable, false, false, null);
+                    Program.PrtToExcelDna(printTable, false, false, null, hasNames, hasDates, seriesAreInRows);
                 }
                 else
                 {

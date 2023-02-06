@@ -24825,7 +24825,7 @@ namespace Gekko
             }
         }
 
-        public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title)
+        public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title, bool hasNames, bool hasDates, bool seriesAreInRows)
         {            
             int extraRows = 0;
             if (isStamp) extraRows++;
@@ -24834,7 +24834,22 @@ namespace Gekko
             int rowsOffset = 0; //not used yet
             int colOffset = 0; //not used yet
 
-            object[,] cells = new object[table.GetRowMaxNumber() + rowsOffset + extraRows, table.GetColMaxNumber() + colOffset];
+            int startRow = 0;
+            int startCol = 0;
+            if (seriesAreInRows)
+            {
+                //SHEET style, names on rows, dates on cols
+                if (hasNames == false) startRow = 1;
+                if (hasDates == false) startCol = 1;
+            }
+            else
+            {
+                //PRT style, dates on rows, names on cols
+                if (hasDates == false) startRow = 1;
+                if (hasNames == false) startCol = 1;                
+            }
+
+            object[,] cells = new object[table.GetRowMaxNumber() + rowsOffset + extraRows - startRow, table.GetColMaxNumber() + colOffset - startCol];
 
             int extra = 0;
             if (isStamp)
@@ -24847,9 +24862,9 @@ namespace Gekko
                 cells[extra, 0] = title;
             }
 
-            for (int i = 0; i < table.GetRowMaxNumber(); i++)
+            for (int i = startRow; i < table.GetRowMaxNumber(); i++)
             {
-                for (int j = 0; j < table.GetColMaxNumber(); j++)
+                for (int j = startCol; j < table.GetColMaxNumber(); j++)
                 {
                     Cell cell2 = table.Get(i + 1, j + 1);
                     string s2 = "";
@@ -24859,8 +24874,8 @@ namespace Gekko
                     }
                     else
                     {
-                        int ii = i + rowsOffset + extraRows;
-                        int jj = j + colOffset;
+                        int ii = i + rowsOffset + extraRows - startRow;
+                        int jj = j + colOffset - startCol;
                         if (cell2.cellType == CellType.Number)
                         {
                             cells[ii, jj] = cell2.number;

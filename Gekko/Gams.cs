@@ -4185,6 +4185,8 @@ namespace Gekko
 
             //GAMSWorkspace ws = null;
 
+            List<string> timelessProblems = new List<string>();  //only used in rare cases
+
             if (true)
             {
                 string Msg = string.Empty;
@@ -4220,7 +4222,8 @@ namespace Gekko
                 }                
 
                 if (true)
-                {
+                {                    
+
                     gdx.gdxOpenWrite(pathAndFilename, "Gekko", ref ErrNr);
                     if (ErrNr != 0)
                     {
@@ -4242,6 +4245,9 @@ namespace Gekko
 
                             Series ts = iv as Series;
 
+                            GekkoTime t1Timeless = GekkoTime.tNull; //only used in rare cases
+                            GekkoTime t2Timeless = GekkoTime.tNull; //only used in rare cases
+
                             string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
 
                             int timeDimension = 1;
@@ -4260,9 +4266,31 @@ namespace Gekko
                                 }
                                 if (ntimeless > 0 && nnontimeless > 0)
                                 {
-                                    new Error("The array-timeseries " + ts.name + " has subseries that are both timeless and non-timeless --> cannot write to GDX.");
+                                    //Mix of timeless and normal
+                                    //new Error("The array-timeseries " + ts.name + " has subseries that are both timeless and non-timeless --> cannot write to GDX.");
+
+                                    foreach (IVariable iv2 in ts.dimensionsStorage.storage.Values)
+                                    {
+                                        Series sub = iv2 as Series;
+                                        if (sub.type != ESeriesType.Timeless)
+                                        {
+                                            GekkoTime tReal1 = sub.GetRealDataPeriodFirst();
+                                            if (!tReal1.IsNull())
+                                            {
+                                                if (t1Timeless.IsNull() || tReal1.StrictlySmallerThan(t1Timeless)) t1Timeless = tReal1;
+                                            }
+                                            GekkoTime tReal2 = sub.GetRealDataPeriodLast();
+                                            if (!tReal2.IsNull())
+                                            {
+                                                if (t2Timeless.IsNull() || tReal2.StrictlyLargerThan(t2Timeless)) t2Timeless = tReal2;
+                                            }
+                                        }
+                                    }
                                 }
-                                if (ntimeless > 0) timeDimension = 0;
+                                else
+                                {
+                                    if (ntimeless > 0) timeDimension = 0;
+                                }
                                 //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
                             }
 
@@ -4311,13 +4339,13 @@ namespace Gekko
                                 foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                                 {
                                     string[] ss = kvp.Key.storage;
-                                    WriteGdxHelper2(t1, t2, hasPrefix, gdx, kvp.Value as Series, ss, gdxValues);
+                                    WriteGdxHelper2(t1, t2, t1Timeless, t2Timeless, hasPrefix, gdx, kvp.Value as Series, ss, gdxValues, timelessProblems);
                                 }
                             }
                             else
                             {
                                 //normal timeseries
-                                WriteGdxHelper2(t1, t2, hasPrefix, gdx, ts, new string[0], gdxValues);
+                                WriteGdxHelper2(t1, t2, GekkoTime.tNull, GekkoTime.tNull, hasPrefix, gdx, ts, new string[0], gdxValues, null);
                             }
 
                             if (gdx.gdxDataWriteDone() == 0)
@@ -4361,6 +4389,32 @@ namespace Gekko
 
                 G.Writeln2("Wrote " + counterVariables + " variables and " + exportedSets + " sets to " + pathAndFilename + " (" + G.Seconds(t) + ")");
                 if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
+                if (timelessProblems.Count > 0)
+                {
+                    Action<GAO> a = (gao) =>
+                    {
+                        string s = null;
+                        s += G.NL; //to avoid annoying visible blank
+                        s += "The following " + timelessProblems.Count + " subseries are timeless in the Gekko databank, ";
+                        s += "but since they are inside an array-series with mixed timeless and non-timeless (normal) subseries, these ";
+                        s += "timeless subseries are converted to normal timeseries in the gdx file. The data period for ";
+                        s += "this conversion reflects the data period of the normal subseries inside the particular array-series.";
+                        s += G.NL;
+                        s += G.NL;
+                        s += "The converted subseries are:";
+                        s += G.NL;
+                        s += G.NL;
+                        foreach (string ss in timelessProblems)
+                        {
+                            s += ss + G.NL; //funny break in output tab for the first of these, strange...
+                        }
+                        s += G.NL;
+                        Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                        O.Cls("output");
+                        G.Writeln(s, ETabs.Output);
+                    };
+                    new Note(timelessProblems.Count + " timeless array-subseries were converted to normal timeseries (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
+                }
             }
         }
 
@@ -4457,10 +4511,9 @@ namespace Gekko
             if (timelessCounter > 0) new Note(timelessCounter + " timeless timeseries skipped");
         }
 
-        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, gdxcs gdx, Series ts2, string[] ss, double[] gdxValues)
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, GekkoTime t1Timeless, GekkoTime t2Timeless, bool usePrefix, gdxcs gdx, Series ts2, string[] ss, double[] gdxValues, List<string> timelessProblems)
         {
-
-            if (ts2.type == ESeriesType.Timeless)
+            if (ts2.type == ESeriesType.Timeless && t1Timeless.IsNull())
             {
                 try
                 {
@@ -4475,13 +4528,27 @@ namespace Gekko
             }
             else
             {
+                //May be timeless, and if so must be converted to non-timeless here
+                //Will only be timeless here if t1Timeless and t2Timeless are not null.
+
                 GekkoTime gt1 = t1;
                 GekkoTime gt2 = t2;
-                if (t1.IsNull())
+
+                if (ts2.type == ESeriesType.Timeless)
                 {
-                    gt1 = ts2.GetRealDataPeriodFirst();
-                    gt2 = ts2.GetRealDataPeriodLast();
+                    gt1 = t1Timeless;
+                    gt2 = t2Timeless;
+                    timelessProblems.Add(ts2.GetNameWithoutCurrentFreq(true));
                 }
+                else
+                {                    
+                    if (t1.IsNull())
+                    {
+                        gt1 = ts2.GetRealDataPeriodFirst();
+                        gt2 = ts2.GetRealDataPeriodLast();
+                    }
+                }
+            
                 if (gt1.IsNull())
                 {
                     //do not write a weird record if the timeseries has no data
