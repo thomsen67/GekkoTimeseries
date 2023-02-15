@@ -8191,6 +8191,105 @@ namespace UnitTests
                 _AssertSeries(First(), "ts0b", 2010, 46d, delta);
                 _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
                 _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
+
+                // ------------------------------------------------------
+                // Multi-splice
+                // ------------------------------------------------------
+                //
+                // ------------
+                //        ----------
+                //                ----------- 
+
+                I("RESET;");
+                I("SERIES <2002 2006> ts1 = 2, 3, 4, 5, 6;");
+                I("SERIES <2004 2010> ts2 = 41, 42, 43, 44, 45, 46, 47;");
+                I("SERIES <2008 2014> ts3 = 91, 92, 93, 94, 95, 96, 97;");
+                I("SERIES <2006 2014> ts3a = 1, 1, 91, 92, 93, 94, 95, 96, 97;"); //2006 in all series
+                                                                                  //
+                                                                                  // series must overlap pairwise
+                                                                                  // designated dates must be inside overlaps
+                                                                                  // single date expanded to double
+                                                                                  // resulting dates may not overlap 
+                                                                                  // <first>, <last>, <n=...>
+                                                                                  // <p> relative, <d> absolute, <log> logarithmic. Last only differs from <p> with large overlap
+                                                                                  //     and growth vars.
+                                                                                  // Note: difference between going left or right, if there are > 1 period overlap.
+
+                // Regarding fugures, see Excel sheet: c:\Thomas\Gekko\GekkoCS\Diverse\Splice.xlsx.
+                // AREMOS is reproduced regarding ts2a.
+
+                //we are doing it as R = ((y1+y2+y3)/3) / ((x1+x2+x)/3), but it could also be
+                //                   R = (y1/x1 + y2/x2 + y3/x4)/3
+                //
+                //differences:       D = ((y1+y2+y3)/3) - ((x1+x2+x)/3)
+                //                   D = (y1-x1 + y2-x2 + y3-x4)/3
+
+                I("splice <first> ts0a = ts1 ts2 ts3;");
+                _AssertSeries(First(), "ts0a", 2001, double.NaN, delta);
+                _AssertSeries(First(), "ts0a", 2002, 2.0000, delta);
+                _AssertSeries(First(), "ts0a", 2003, 3.0000, delta);
+                _AssertSeries(First(), "ts0a", 2004, 4.0000, delta);
+                _AssertSeries(First(), "ts0a", 2005, 5.0000, delta);
+                _AssertSeries(First(), "ts0a", 2006, 6.0000, delta);
+                _AssertSeries(First(), "ts0a", 2007, 5.2381, delta);
+                _AssertSeries(First(), "ts0a", 2008, 5.3571, delta);
+                _AssertSeries(First(), "ts0a", 2009, 5.4762, delta);
+                _AssertSeries(First(), "ts0a", 2010, 5.5952, delta);
+                _AssertSeries(First(), "ts0a", 2011, 5.5952, delta);
+                _AssertSeries(First(), "ts0a", 2012, 5.6548, delta);
+                _AssertSeries(First(), "ts0a", 2003, 5.7143, delta);
+                _AssertSeries(First(), "ts0a", 2014, 5.7738, delta);
+                _AssertSeries(First(), "ts0a", 2015, double.NaN, delta);
+
+                I("splice <n=2> ts1a = ts1 ts2 ts3;");
+                _AssertSeries(First(), "ts1a", 2001, double.NaN, delta);
+                _AssertSeries(First(), "ts1a", 2002, 16.8000, delta);
+                _AssertSeries(First(), "ts1a", 2003, 25.2000, delta);
+                _AssertSeries(First(), "ts1a", 2004, 41.0000, delta);
+                _AssertSeries(First(), "ts1a", 2005, 42.0000, delta);
+                _AssertSeries(First(), "ts1a", 2006, 43.0000, delta);
+                _AssertSeries(First(), "ts1a", 2007, 44.0000, delta);
+                _AssertSeries(First(), "ts1a", 2008, 45.0000, delta);
+                _AssertSeries(First(), "ts1a", 2009, 46.0000, delta);
+                _AssertSeries(First(), "ts1a", 2010, 47.0000, delta);
+                _AssertSeries(First(), "ts1a", 2011, 47.0000, delta);
+                _AssertSeries(First(), "ts1a", 2012, 47.5000, delta);
+                _AssertSeries(First(), "ts1a", 2003, 48.0000, delta);
+                _AssertSeries(First(), "ts1a", 2014, 48.5000, delta);
+                _AssertSeries(First(), "ts1a", 2015, double.NaN, delta);
+
+                I("splice <last> ts1a = ts1 ts2 ts3;");
+                _AssertSeries(First(), "ts2a", 2001, double.NaN, delta);
+                _AssertSeries(First(), "ts2a", 2002, 33.6000, delta);
+                _AssertSeries(First(), "ts2a", 2003, 50.4000, delta);
+                _AssertSeries(First(), "ts2a", 2004, 82.0000, delta);
+                _AssertSeries(First(), "ts2a", 2005, 84.0000, delta);
+                _AssertSeries(First(), "ts2a", 2006, 86.0000, delta);
+                _AssertSeries(First(), "ts2a", 2007, 88.0000, delta);
+                _AssertSeries(First(), "ts2a", 2008, 91.0000, delta);
+                _AssertSeries(First(), "ts2a", 2009, 92.0000, delta);
+                _AssertSeries(First(), "ts2a", 2010, 93.0000, delta);
+                _AssertSeries(First(), "ts2a", 2011, 94.0000, delta);
+                _AssertSeries(First(), "ts2a", 2012, 95.0000, delta);
+                _AssertSeries(First(), "ts2a", 2003, 96.0000, delta);
+                _AssertSeries(First(), "ts2a", 2014, 97.0000, delta);
+                _AssertSeries(First(), "ts2a", 2015, double.NaN, delta);
+
+                I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3;");
+                I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3a;"); //ts3a ok with explicit time
+                I("splice ts0a = ts1 2005 ts2 2009 ts3;");
+
+                //Do same with <first>, <n=2> etc.
+                //Do same with <rel>
+                //Do the same as function variants
+                //Implement frombank, tobank.
+
+                FAIL("splice ts0a = ts1 ts3 ts2;"); //no overlap
+                FAIL("splice ts0a = ts1 ts2 ts3a;"); //overlap of overlaps (2004-6 vs 2006-10)
+                FAIL("splice ts0a = ts1 2004 2006 ts2 2006 2010 ts3a;"); //same
+                FAIL("splice ts0a = ts1 2005 2007 ts2 2009 2010 ts3;"); //outside overlap
+                FAIL("splice ts0a = ts1 2006 2005 ts2 2010 2009 ts3;"); //wrong date order
+
             }
 
         }
