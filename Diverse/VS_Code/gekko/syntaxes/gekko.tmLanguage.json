@@ -1,0 +1,71 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Gekko",
+	"patterns": [
+		{
+			"include": "#comments"
+		},		
+		{
+			"include": "#strings"
+		},		
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#numeric"
+		},
+		{
+			"include": "#maths"
+		}
+	],
+	"repository": {
+		"comments" : {
+            "patterns": [
+                {
+                   "begin": "//",
+                   "end": "$",
+                   "name": "comment.line.double-slash.gekko"
+                },
+                {
+                    "begin": "/\\*",
+                    "end" : "\\*/",
+                    "name": "comment.block.gekko"
+                }
+             ]
+        },
+		"keywords": {
+			"patterns": [
+        {
+			  	"name": "keyword.control.gekko",
+				  "match": "(?i)\\b(accept|analyze|block|checkoff|clear|clip|clone|close|cls|collapse|compare|copy|count|cut|create|date|decomp|delete|disp|doc|download|edit|end|endo|exit|exo|export|findmissingdata|for|function|global|goto|hdg|help|if|import|index|ini|interpolate|itershow|library|list|local|lock|map|matrix|mem|menu|mode|model|mulprt|ols|open|option|pause|pipe|plot|procedure|prt|predict|r_run|python_run|rebase|read|rename|reset|restart|return|run|series|sheet|sign|sim|smooth|splice|stop|string|sys|table|target|tell|time|timefilter|translate|truncate|unfix|unlock|val|var|write|x12a|xedit|frml)\\b"
+		  	},
+        {
+          "name": "keyword.control.gekko",
+          "match": "(%=|#=|\\+|\\-|\\*|/|<|>|=|\\^|~|\\?|@|\\$|:|,|;|\\.|\\\\|&|!|\\|)",
+          "comment": "+-*/<>=^~?@$:,;. backslash &!|"
+      }
+      ]
+		},
+		"strings": {
+			"name": "string.quoted.single.gekko",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.gekko",
+					"match": "\\\\."
+				}
+			]
+		},
+		"numeric": {
+            "name": "constant.numeric.gekko",
+            "match": "\\b(\\d+\\.?\\d*|\\.\\d+)\\b",
+            "captures": {
+            "0": {
+                "name": "constant.numeric.gekko"
+                }
+		    }
+	    }
+	},	
+	"scopeName": "source.gekko"
+}

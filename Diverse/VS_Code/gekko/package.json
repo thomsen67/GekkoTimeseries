@@ -1,0 +1,39 @@
+{
+  "name": "gekko",
+  "activationEvents": [""],
+  "displayName": "Gekko",
+  "description": "Language support for Gekko Timeseries and Modeling Software.",
+  "publisher": "t-t-analyse",
+  "version": "1.1.0",
+  "engines": {
+    "vscode": "^1.53.0"
+  },
+  "main": "src/extension.js",
+  "icon": "icon.png",
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "gekko",
+        "aliases": [
+          "Gekko",
+          "gekko"
+        ],
+        "extensions": [
+          ".gcm",
+          ".frm"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gekko",
+        "scopeName": "source.gekko",
+        "path": "./syntaxes/gekko.tmLanguage.json"
+      }
+    ]
+  }
+}

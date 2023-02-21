@@ -1,0 +1,7 @@
+To update: bump version number, for instance from 1.5.0 to 1.6.0 (bugfixes may bump last number).
+Compile to vsix with "vsce package" from a CMD window at root.
+Go to marketplace.visualstudio.com --> publish extensions --> hit three dots (...) right of Gekko name --> Update --> drag vsix file.
+
+Could use .yaml instead of .json, and convert with kqr_yaml.bat? Then the Sublime coloring could be used here. THen it would be
+npx yaml-js syntaxes/gekko.tmLanguage.json > syntaxes/gekko.tmLanguage.yaml.
+
