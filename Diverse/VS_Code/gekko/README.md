@@ -9,16 +9,15 @@ This is a [Visual Studio Code](https://code.visualstudio.com) extension for Gekk
 </tr>
 </table>
 
-You may consider using the 'Dark' instead of the default 'Dark+' color theme. These colors are shown above: use 'File' --> 'Preferences' --> 'Theme' --> 'Color Theme' to change colors (or Ctrl+K Ctrl+T on Windows).
+You may consider using the above 'Dark' color theme. Use Ctrl+K Ctrl+T or 'File' --> 'Preferences' --> 'Theme' --> 'Color Theme' to select color theme (default VS Code theme is 'Dark+').
 
 ## Features
 
-Right now the Gekko extension provides syntax highlighting for Gekko .gcm command files and Gekko .frm model files, but more capabilities may evolve later on (like being able to issue Gekko commands directly from VS Code).
+Right now the Gekko extension provides syntax highlighting for Gekko .gcm command files and Gekko .frm model files, but more capabilities may evolve later on (like autocomplete or being able to run Gekko commands directly from VS Code). The extension is developed with Gekko 3.x in mind, but should work ok for Gekko 2.x, too.
 
 ## Known Issues
 
-Keywords like PLOT etc. are marked, but not intelligently enough (should only be marked if they are
-the first token in a line, or if they follow a semicolon).
+Keywords like PLOT etc. are marked, but not intelligently enough (should only be marked if they are the first token in a line, or if they follow a semicolon).
 
 ## Other text editors
 
@@ -27,6 +26,10 @@ For Sublime Text, see [this](https://github.com/MartinBonde/gekko_sublime) exten
 ## Release Notes
 
 There are the following releases of the Gekko extension:
+
+### 1.2.0
+
+Included the sigils '%' and '#' in the symbol coloring.
 
 ### 1.1.0
 

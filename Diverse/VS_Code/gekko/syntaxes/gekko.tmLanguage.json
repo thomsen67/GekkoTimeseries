@@ -16,6 +16,9 @@
 		},
 		{
 			"include": "#maths"
+		},
+		{
+			"include": "#sigils"
 		}
 	],
 	"repository": {
@@ -42,20 +45,14 @@
         {
           "name": "keyword.control.gekko",
           "match": "(%=|#=|\\+|\\-|\\*|/|<|>|=|\\^|~|\\?|@|\\$|:|,|;|\\.|\\\\|&|!|\\|)",
-          "comment": "+-*/<>=^~?@$:,;. backslash &!|"
+          "comment": "+ - * / < > = ^ ~ ? @ $ : , ; . backslash & ! | %= #="
       }
       ]
 		},
 		"strings": {
 			"name": "string.quoted.single.gekko",
 			"begin": "'",
-			"end": "'",
-			"patterns": [
-				{
-					"name": "constant.character.escape.gekko",
-					"match": "\\\\."
-				}
-			]
+			"end": "'"			
 		},
 		"numeric": {
             "name": "constant.numeric.gekko",
@@ -65,7 +62,16 @@
                 "name": "constant.numeric.gekko"
                 }
 		    }
-	    }
-	},	
+	    },
+		"sigils": {
+			"patterns": [        
+        {
+          "name": "keyword.control.gekko",
+          "match": "(%|#)",
+          "comment": "% #  --> could in principle use other color than for other symbols."
+        }
+      ]
+	}
+	},		
 	"scopeName": "source.gekko"
 }

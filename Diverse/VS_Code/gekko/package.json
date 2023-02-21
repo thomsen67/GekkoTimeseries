@@ -4,7 +4,7 @@
   "displayName": "Gekko",
   "description": "Language support for Gekko Timeseries and Modeling Software.",
   "publisher": "t-t-analyse",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "engines": {
     "vscode": "^1.53.0"
   },
