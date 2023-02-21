@@ -2115,6 +2115,7 @@ namespace Gekko
         {
             Globals.applicationIsInProcessOfAborting = true;
             Globals.threadIsInProcessOfAborting = true;
+            Environment.ExitCode = Globals.exit;
             throw new GekkoException();
         }
 

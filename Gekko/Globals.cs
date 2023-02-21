@@ -222,6 +222,16 @@ namespace Gekko
 
         public static string errorHelper = null;
 
+        //When calling gekko.exe from batch, it sometimes fails/crashes. Then the user closes Gekko,
+        //but the batch script continues. If in that case Gekko could return errorlevel=1,
+        //the script could terminate.
+        //Is this always equivalent to typing exit or hitting X or using Alt-F4 or using File menu exit, in 
+        //the case where the status lamp is red?
+        //If so, we could set errorlevel=1 when the lamp turns red. And set it = 0 when the lamp turns green.
+        //We presume that errorlevel=0 per default.
+        //???
+        public const int exit = 0; //0=ok, 1=fail, Windows exit code (error level, errorlevel).
+
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
         public static string isAProto = "Is_a_protobuffer_file";
