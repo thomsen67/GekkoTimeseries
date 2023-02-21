@@ -1,4 +1,4 @@
-To update: bump version number, for instance from 1.5.0 to 1.6.0 (bugfixes may bump last number).
+To update: bump version number, for instance from 1.1.5 to 1.1.6.
 Compile to vsix with "vsce package" from a CMD window at root.
 Go to marketplace.visualstudio.com --> publish extensions --> hit three dots (...) right of Gekko name --> Update --> drag vsix file.
 
