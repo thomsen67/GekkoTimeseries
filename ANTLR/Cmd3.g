@@ -699,6 +699,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_AREMOS;
 	ASTOPT_VAL_WIDTH;
 	ASTOPT_VAL_DEC;
+	ASTOPT_VAL_N;
 	ASTOPT_VAL_NWIDTH;
 	ASTOPT_VAL_PWIDTH;
 	ASTOPT_VAL_NDEC;
@@ -3778,7 +3779,7 @@ spliceOpt1:                 ISNOTQUAL
 
 spliceOpt1h:                FIRST -> ^(ASTOPT_STRING_FIRST ASTYES)
                           | LAST -> ^(ASTOPT_STRING_LAST ASTYES)
-						  | N EQUAL expression -> ^(ASTOPT_STRING_N expression)
+						  | N EQUAL expression -> ^(ASTOPT_VAL_N expression)
 							;
 
 

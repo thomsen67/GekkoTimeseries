@@ -7224,7 +7224,7 @@ namespace Gekko
             public List rhs = null;
             public string opt_first = null; //pos 1
             public string opt_last = null; //pos n
-            public string opt_n = null; //specific n
+            public double opt_n = double.NaN; //specific n
 
             public GekkoTime date = GekkoTime.tNull; //old remove
             public P p = null;
@@ -7254,9 +7254,9 @@ namespace Gekko
                     //TODO
                     //TODO
 
-                    string[] ss = opt_n.Split('=');
-                    if (ss.Length != 2) new Error("Expected <n=...> option.");
-                    if (!G.Equal(ss[0].Trim(), "n")) new Error("Expected <n=...> option.");
+                    //string[] ss = opt_n.Split('=');
+                    //if (ss.Length != 2) new Error("Expected <n=...> option.");
+                    //if (!G.Equal(ss[0].Trim(), "n")) new Error("Expected <n=...> option.");
 
                 }
                 else
@@ -7272,12 +7272,11 @@ namespace Gekko
                         count++;
                         n = int.MaxValue;  //just a signal, is set later on when count is known
                     }
-                    if (opt_n != null)
+                    if (!double.IsNaN(opt_n))
                     {
                         count++;
-                        int ii = -12345;
-                        try { ii = int.Parse(opt_n); } catch { };
-                        if (ii != -12345) n = ii - 1;  //n is 0-based.
+                        int ii = G.ConvertToInt(opt_n);  //will fail with error if not int
+                        n = ii - 1;  //n is 0-based.
                     }
                     if (count > 1)
                     {
@@ -7402,25 +7401,49 @@ namespace Gekko
                 // (a) not at start/end and (b) has explict dates given around itself.
                 // ----------------------------------------------------------------
 
+                //some more fail checks...
+
                 if (n == int.MaxValue) n = data.Count - 1;  //n is 0-based
-                if (n < 0 || n >= data.Count) new Error("Illegal series element designated as basis (n=...), series #" + (n + 1) + " does not exist.");
+                if (n < 0 || n >= data.Count) new Error(splice + ": Illegal series element designated as basis (n=...), series #" + (n + 1) + " does not exist.");
 
                 for (int i = 0; i < data.Count; i++)
                 {
                     if (data[i].x.Type() != EVariableType.Series) new Error(splice + ": At the moment, only series variables are accepted when splicing (for a constant series, you may use timeless()). Variable #" + (i + 1) + " is of type " + G.GetTypeString(data[i].x) + ".");
                 }
 
+                for (int i = 0; i < data.Count - 2; i++)  //note -2
+                {
+                    //   ----------------------                        x1 [b..d]
+                    //            ----------------------               x2 [c..e]
+                    //                    ----------------------       x3 null
+                    //
+                    //   a        b       c   d         e       f
+                    // In this scenario, x1 and x3 overlap --> fail. Because d must be < c (strictly)
+                    if (data[i].t[1].StrictlySmallerThan(data[i + 1].t[0]))
+                    {
+                        //good
+                    }
+                    else
+                    {
+                        new Error(splice + ": There is an overlap between the two overlap ranges " + data[i].t[0].ToString() + ".." + data[i].t[1].ToString() + " and " + data[i + 1].t[0].ToString() + ".." + data[i + 1].t[1].ToString() + ". If these dates separate series x1, x2 andd x3, perhaps the series x1 and x3 overlap and can be spliced directly");
+                    }                    
+                }
+
+                // -------------------------------------------------------------
+
                 //Get data into arrays
+                double factorRight = 1d;
                 for (int i = n; i < data.Count - 1; i++)  //note -1
                 {
                     //right
-                    SpliceAdjust(data, i, freq, type, false);
+                    factorRight = SpliceAdjust(data, i, freq, type, factorRight, false);
                 }
 
+                double factorLeft = 1d;
                 for (int i = n; i >= 1; i--)  //note 1
                 {
                     //left
-                    SpliceAdjust(data, i, freq, type, true);
+                    factorLeft = SpliceAdjust(data, i, freq, type, factorLeft, true);
                 }
 
                 // ---------------------------------------------
@@ -7502,8 +7525,8 @@ namespace Gekko
                 try { alternativeEnd = data[i + 1].t[1]; } catch { };
             }
 
-            public void SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, bool moveLeft)
-            {
+            public double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft)
+            {                
                 SpliceHelper left = null;
                 SpliceHelper basis = null;
                 SpliceHelper right = null;
@@ -7564,6 +7587,8 @@ namespace Gekko
                     }
                 }
 
+                factor = factor * sum_basis / sum_alternative;
+
                 //adjust alternative series
                 foreach (GekkoTime t in new GekkoTimeIterator(adjustStart, adjustEnd))
                 {
@@ -7573,13 +7598,14 @@ namespace Gekko
                     }
                     else if (type == ESpliceType.Rel1)
                     {
-                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * sum_basis / sum_alternative);
+                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * factor);
                     }
                     else if (type == ESpliceType.Rel2)
                     {
 
                     }
                 }
+                return factor;
 
             }
 
