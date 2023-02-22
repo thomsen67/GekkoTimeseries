@@ -3762,14 +3762,31 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 // SPLICE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 expression seqOfBankvarnames3 -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 expression     )
-                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 seqOfBankvarnames3            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 )  //no date
-						    ;
+//splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 expression seqOfBankvarnames3 -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 expression     )
+//                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 seqOfBankvarnames3            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 )  //no date
+//						    ;
+//spliceOpt1:                 ISNOTQUAL
+//						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
+//                            ;
+//spliceOpt1h:                KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
+//spliceOptions:              FIRST | LAST;
+
+splice:                     SPLICE spliceOpt1? bankvarname EQUAL expression+ -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} ^(ASTPLACEHOLDER spliceOpt1?) bankvarname expression+);
 spliceOpt1:                 ISNOTQUAL
-						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
+						  | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
                             ;
-spliceOpt1h:                KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
-spliceOptions:              FIRST | LAST;
+
+spliceOpt1h:                FIRST -> ^(ASTOPT_STRING_FIRST ASTYES)
+                          | LAST -> ^(ASTOPT_STRING_LAST ASTYES)
+						  | N EQUAL expression -> ^(ASTOPT_STRING_N expression)
+							;
+
+
+//splice:                     SPLICE spliceOpt1? expression -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} spliceOpt1? expression);
+//spliceOpt1:                 ISNOTQUAL | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*;
+//spliceOpt1h:                TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
+//						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
+//						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // STOP

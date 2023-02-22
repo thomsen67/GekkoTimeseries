@@ -12506,7 +12506,9 @@ namespace Gekko
                         new Writeln("Start Cmd4.g");
                         Program.ExecuteShellCommand(s4, false);
                         new Writeln("End Cmd4.g");
-                        new Writeln("Parsing finished");
+                        new Writeln("--------------------------------------------------------------");
+                        new Writeln("Parsing finished - remember to close and reopen Gekko!");
+                        new Writeln("--------------------------------------------------------------");
                     }
                     break;
                 case "--gray":

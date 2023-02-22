@@ -7194,13 +7194,27 @@ namespace Gekko
         public class Splice
         {
                        
-            public List names0 = null;
-            public List names1 = null;
-            public List names2 = null;
-            public GekkoTime date = GekkoTime.tNull;
+            public List names0 = null; //old remove
+            public List names1 = null; //old remove
+            public List names2 = null; //old remove
+            public List vars = null;
+            public GekkoTime date = GekkoTime.tNull; //old remove
             public P p = null;
 
             public void Exe()
+            {
+                if(false) Splice_OLDREMOVE();
+                List<string> names = new List<string>();
+                
+                foreach (IVariable iv in this.vars.list)
+                {
+                    //if(iv.typ)
+                    //if (iv == null) names.Add(iv);
+                    //else if( iv.Type()==EVariableType.Date)
+                }
+            }
+
+            private void Splice_OLDREMOVE()
             {
                 List<string> listItems0 = Restrict(names0, true, false, true, true);
                 List<string> listItems1 = Restrict(names1, true, false, true, true);

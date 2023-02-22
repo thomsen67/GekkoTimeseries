@@ -4534,16 +4534,26 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTSPLICE":
                     {
+                        //node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
+                        //node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                        //node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
+                        //node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
+                        //node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
+
+                        //if (node.ChildrenCount() > 3)
+                        //{
+                        //    node.Code.A("o" + Num(node) + ".date = O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                        //}
+                        //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+
                         node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                        node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
-
-                        if (node.ChildrenCount() > 3)
-                        {
-                            node.Code.A("o" + Num(node) + ".date = O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
-                        }
+                        GetCodeFromAllChildren(node[0]); //options                        
+                        node.Code.A("o" + Num(node) + ".vars = new List();" + G.NL);                        
+                        for (int i = 1; i < node.ChildrenCount(); i++) //skip the first
+                        {                            
+                            node.Code.A("o" + Num(node) + ".vars.Add(" + node[i].Code + ");" + G.NL);
+                        }                        
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                     }
