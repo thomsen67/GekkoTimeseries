@@ -8291,15 +8291,8 @@ namespace UnitTests
                 FAIL("splice ts0a = ts1 ts2 ts3a;"); //overlap of overlaps (2004-6 vs 2006-10)
                 FAIL("splice ts0a = ts1 2004 2006 ts2 2006 2010 ts3a;"); //same                
                 FAIL("splice ts0a = ts1 2006 2005 ts2 2010 2009 ts3;"); //wrong date order
-
-                MessageBox.Show("splice is not finished");
-                if (false)
-                {
-                    FAIL("splice ts0a = ts1 2005 2007 ts2 2009 2010 ts3;"); //outside overlap
-                }
-
+                FAIL("splice ts0a = ts1 2005 2007 ts2 2009 2010 ts3;"); //outside overlap
             }
-
         }
 
         [TestMethod]

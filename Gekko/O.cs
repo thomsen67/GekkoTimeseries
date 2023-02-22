@@ -7426,8 +7426,27 @@ namespace Gekko
                     else
                     {
                         new Error(splice + ": There is an overlap between the two overlap ranges " + data[i].t[0].ToString() + ".." + data[i].t[1].ToString() + " and " + data[i + 1].t[0].ToString() + ".." + data[i + 1].t[1].ToString() + ". If these dates separate series x1, x2 andd x3, perhaps the series x1 and x3 overlap and can be spliced directly");
-                    }                    
+                    }
                 }
+
+                for (int i = 0; i < data.Count - 1; i++)  //note -1
+                {
+                    //   ----------------------                        x1 [b..c]
+                    //            ----------------------               x2 [d..e]
+                    //                             --------------      x3 null
+                    //
+                    //   a        b           c    d    e        f
+                    // In this scenario, x1 and x3 overlap --> fail. Because d must be < c (strictly)
+                    GekkoTime tStart = (data[i].x as Series).GetRealDataPeriodFirst();
+                    GekkoTime tEnd = (data[i].x as Series).GetRealDataPeriodLast();
+                    if (i > 0)
+                    {
+                        if (data[i - 1].t[0].StrictlySmallerThan(tStart)) new Error(splice + ": Series #" + (i + 1) + " is not defined over the full interval to the left of it.");
+                        //if (data[i - 1].t[1].StrictlyLargerThan(tEnd)) new Error(splice + ": Between series #" + (i + 1) + " and series #" + (i + 2) + ", the date range is outside the data of one of these series");
+                    }
+                    //if (data[i].t[0].StrictlyLargerThan(tStart)) new Error(splice + ": Between series #" + (i + 1) + " and series #" + (i + 2) + ", the date range is outside the data of one of these series");
+                    if (data[i].t[1].StrictlyLargerThan(tEnd)) new Error(splice + ": Series #" + (i + 1) + " is not defined over the full interval to the right of it.");
+                }            
 
                 // -------------------------------------------------------------
 
