@@ -8106,32 +8106,28 @@ namespace UnitTests
             Databank work = First();
             //==================== SPLICE ===========================================
 
-            if (false)
+            if (true)
             {
                 //Maybe also an option to splice where the first series is the anchor
 
                 I("RESET;");
                 I("create ts1, ts2, ts0a, ts0b;");
                 I("SERIES <2002 2006> ts1 = (2, 3, 4, 5, 6);");
-                I("SERIES <2004 2010> ts2 = (41, 42, 43, 44, 45, 46, 46);");
-                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
+                I("SERIES <2004 2010> ts2 = (41, 42, 43, 44, 45, 46, 47);");
+                I("splice <first> ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
                 double delta = 0.0001d;
                 _AssertSeries(First(), "ts0a", 2006, 6d, delta);
                 _AssertSeries(First(), "ts0a", 2007, 5.2381d, delta);
                 _AssertSeries(First(), "ts0a", 2008, 5.3571d, delta);
                 _AssertSeries(First(), "ts0a", 2009, 5.4762d, delta);
                 _AssertSeries(First(), "ts0a", 2010, 5.5952d, delta);
-                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
+                I("splice <first> ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                 _AssertSeries(First(), "ts0b", 2006, 6d, delta);
                 _AssertSeries(First(), "ts0b", 2007, 6.1395d, delta);
                 _AssertSeries(First(), "ts0b", 2008, 6.2791d, delta);
                 _AssertSeries(First(), "ts0b", 2009, 6.4186d, delta);
                 _AssertSeries(First(), "ts0b", 2010, 6.5581d, delta);
-            }
-            else
-            {
-                MessageBox.Show("!splice, ignoring something!");
-            }
+            }            
 
             // AREMOS RESULTS:
 
@@ -8181,7 +8177,7 @@ namespace UnitTests
                 _AssertSeries(First(), "ts0a", 2009, 46d, delta);
                 _AssertSeries(First(), "ts0a", 2010, 46d, delta);
                 _AssertSeries(First(), "ts0a", 2011, double.NaN, delta);
-                I("splice work:ts0b = work:ts1 2006 work:ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
+                I("splice work:ts0b = work:ts1 2006 work:ts2;  //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                 _AssertSeries(First(), "ts0b", 2001, double.NaN, delta);
                 _AssertSeries(First(), "ts0b", 2002, 14.3333333d, delta);
                 _AssertSeries(First(), "ts0b", 2003, 21.5d, delta);
@@ -8192,7 +8188,6 @@ namespace UnitTests
                 _AssertSeries(First(), "ts0b", 2008, 45d, delta);
                 _AssertSeries(First(), "ts0b", 2009, 46d, delta);
                 _AssertSeries(First(), "ts0b", 2010, 46d, delta);
-                _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
                 _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
 
                 // ------------------------------------------------------
