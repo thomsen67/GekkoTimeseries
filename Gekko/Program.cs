@@ -13873,7 +13873,7 @@ namespace Gekko
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
                     }
 
-                    if (temp.Year < 1500 || temp.Year > 2500)
+                    if (temp.Year < Globals.possibleYearStart || temp.Year > Globals.possibleYearEnd)
                     {
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
                     }

@@ -7191,9 +7191,16 @@ namespace Gekko
             }            
         }
 
-        public class Splice
+        public class SpliceHelper
         {
-                       
+            //for instance y = x1 2001 2002 x2 2005 2006 x3.
+            //for x3 (the last), the t list is always = null.
+            public IVariable x = null;
+            public List<GekkoTime> t = new List<GekkoTime>();
+        }
+
+        public class Splice
+        {                       
             public List names0 = null; //old remove
             public List names1 = null; //old remove
             public List names2 = null; //old remove
@@ -7204,14 +7211,94 @@ namespace Gekko
 
             public void Exe()
             {
-                if(false) Splice_OLDREMOVE();
-                List<string> names = new List<string>();
-                
-                foreach (IVariable iv in this.rhs.list)
+                if (false)
                 {
-                    //if(iv.typ)
-                    //if (iv == null) names.Add(iv);
-                    //else if( iv.Type()==EVariableType.Date)
+                    Splice_OLDREMOVE();
+                    return;
+                }
+
+                List<string> lhs_string = Restrict(this.lhs, true, false, true, true);
+                if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
+                IVariable iv3 = O.GetIVariableFromString(lhs_string[0], ECreatePossibilities.Must, false); //left side, creates brand new even if it exists beforehand
+
+                // ===========================================================
+
+                string splice = "SPLICE";  //splice()
+
+                List<SpliceHelper> data = new List<SpliceHelper>();
+                for (int i = 0; i < this.rhs.list.Count; i++)
+                {
+                    IVariable iv = this.rhs.list[i];
+                    GekkoTime period = GekkoTime.tNull;
+                    if (iv.Type() == EVariableType.Val)
+                    {
+                        int date = O.ConvertToInt(iv, false);
+                        if (date != int.MaxValue && date >= Globals.possibleYearStart && date <= Globals.possibleYearEnd)
+                        {
+                            //integer between 1500 and 3000, seems like a year, else it will be considered a constant value like a timeless series
+                            period = new GekkoTime(EFreq.A, date, 1);
+                        }
+                    }
+                    else if (iv.Type() == EVariableType.Date)
+                    {
+                        period = iv.ConvertToDate(GetDateChoices.Strict);
+                    }
+
+                    if (period.IsNull())
+                    {
+                        //variable
+                        data.Add(new SpliceHelper());
+                        data[data.Count - 1].x = iv;
+                    }
+                    else
+                    {
+                        //period
+                        if (data.Count == 0) new Error(splice + ": you cannot start with a date element.");
+                        if (i == this.rhs.list.Count - 1) new Error(splice + ": you cannot end with a date element.");
+                        if (data[data.Count - 1].t.Count > 1) new Error(splice + ": you cannot state three or more consecutive dates.");
+                        data[data.Count - 1].t.Add(period);
+                    }
+                }
+
+                if (data.Count < 2) new Error(splice + ": you must provide at least two timeseries elements.");
+
+                //Test that there is at least 1 series to get freq, and if there are > 1 series
+                //that the freqs are the same.
+                EFreq freq = EFreq.None;
+                for (int i = 0; i < data.Count; i++)
+                {
+                    if (data[i].x.Type() == EVariableType.Series)
+                    {
+                        Series x_series = data[i].x as Series;
+                        EFreq freq2 = x_series.freq;
+                        if (freq == EFreq.None)
+                        {
+                            freq = freq2;
+                        }
+                        else
+                        {                            
+                            if (freq != freq2) new Error(splice + ": frequency mismatch in the elements: " + freq.Pretty() + " vs. " + freq2.Pretty() + ".");
+                        }
+                    }
+                }
+                if (freq == EFreq.None) new Error(splice + ": no timeseries variables were provided as elements.");
+
+                //Test that all the freqs of the given dates comply with the series freq.
+                for (int i = 0; i < data.Count; i++)
+                {
+                    foreach (GekkoTime gt in data[i].t)
+                    {
+                        if (gt.freq != freq) new Error(splice + ": The series frequency is " + freq.Pretty() + ", but one of the dates (" + gt.ToString() + ") has " + gt.freq.Pretty() + " frequency");
+                    }
+                }
+
+                //Test that all the freqs of the given dates are ascending
+                for (int i = 0; i < data.Count; i++)
+                {
+                    if (data[i].t.Count == 2)
+                    {
+                        if (data[i].t[0].StrictlyLargerThan(data[i].t[1])) new Error(splice + ": The date pair " + data[i].t[0].ToString() + " and " + data[i].t[1].ToString() + " is decreasing.";
+                    }
                 }
             }
 

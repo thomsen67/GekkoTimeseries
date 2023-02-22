@@ -1576,7 +1576,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Human-readable version.
+        /// Human-readable version for Gekko.
         /// </summary>
         /// <returns></returns>
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()

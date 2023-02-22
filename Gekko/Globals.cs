@@ -232,6 +232,9 @@ namespace Gekko
         //???
         public const int exit = 0; //0=ok, 1=fail, Windows exit code (error level, errorlevel).
 
+        public const int possibleYearStart = 1500;
+        public const int possibleYearEnd = 3000;
+
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
         public static string isAProto = "Is_a_protobuffer_file";

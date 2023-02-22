@@ -3760,7 +3760,7 @@ namespace Gekko
         /// <returns></returns>
         public static int FindYear(int x)
         {
-            if (x >= 1500 && x <= 3000)
+            if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd)
             {
                 return x;
             }
@@ -3770,7 +3770,7 @@ namespace Gekko
             }
             else
             {
-                new Error("A year with value " + x + " was input. The allowable range for years is [1500-3000] or [0-199] -- the latter has 1900 added.");
+                new Error("A year with value " + x + " was input. The allowable range for years is [" + Globals.possibleYearStart + "-" + Globals.possibleYearEnd + "] or [0-199] -- the latter has 1900 added.");
                 return -12345;  //will never return anything
             }
         }
