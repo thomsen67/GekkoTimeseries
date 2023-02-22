@@ -7240,7 +7240,7 @@ namespace Gekko
                 // ===========================================================
 
                 bool isFunction = false;
-                int n = -12345; //0-based
+                int n = int.MaxValue; //0-based. Default indicates 'last'
                 ESpliceType type = ESpliceType.Rel1;  //default
                 //TODO
                 //TODO type...
@@ -7278,7 +7278,7 @@ namespace Gekko
                     {
                         new Error("You can only use option <first>, <last> or <n=...> one at a time.");
                     }
-                }
+                }                
 
                 //NOTE: In the data[] list, intermediate dates are generally stored together with the LEFT variable.
                 //      For intance in x1 2020 2022 x2 we get (x1, 2020..2022) and (x2, null).
@@ -7347,7 +7347,7 @@ namespace Gekko
                 if (freq == EFreq.None) new Error(splice + ": no timeseries variables were provided as elements.");
 
                 //Test that all the freqs of the given dates comply with the series freq.
-                for (int i = 0; i < data.Count; i++)
+                for (int i = 0; i < data.Count - 1; i++)  //note -1, the last has no dates
                 {
                     foreach (GekkoTime gt in data[i].t)
                     {
@@ -7375,6 +7375,8 @@ namespace Gekko
                         if (gt1.IsNull()) new Error(splice + ": Variable #" + (i + 2) + " has no starting date, which is necessary because there is no stated date(s) between this variable and the previous variable.");
                         // -------------------------------------
                         if (gt1.StrictlyLargerThan(gt2)) new Error(splice + ": The implicit date interval " + gt1.ToString() + " and " + gt2.ToString() + " between variable #" + (i + 1) + " and #" + (i + 2) + " is decreasing --> the ending date of series " + (i + 1) + " is smaller than the starting date of series #" + (i + 2) + ".");
+                        data[i].t.Add(gt1);
+                        data[i].t.Add(gt2);
                     }
                     else if (data[i].t.Count == 1)
                     {
@@ -7382,7 +7384,7 @@ namespace Gekko
                     }
                     else if (data[i].t.Count == 2)
                     {
-                        if (data[i].t[0].StrictlyLargerThan(data[i].t[1])) new Error(splice + ": The date pair " + data[i].t[0].ToString() + " and " + data[i].t[1].ToString() + " is decreasing.";
+                        if (data[i].t[0].StrictlyLargerThan(data[i].t[1])) new Error(splice + ": The date pair " + data[i].t[0].ToString() + " and " + data[i].t[1].ToString() + " is decreasing.");
                     }
                 }
 
@@ -7406,24 +7408,24 @@ namespace Gekko
                 //Get data into arrays
                 for (int i = n; i < data.Count - 1; i++)  //note -1
                 {
-                    SpliceHelper sh1 = null;
-                    SpliceHelper sh2 = null;
-                    SpliceHelper sh3 = null;
-                    if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
-                    if (i >= 0 && i < data.Count) sh2 = data[i];
-                    if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
-                    SpliceAdjust(sh1, sh2, sh3, freq, type, false);
+                    //SpliceHelper sh1 = null;
+                    //SpliceHelper sh2 = null;
+                    //SpliceHelper sh3 = null;
+                    //if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
+                    //if (i >= 0 && i < data.Count) sh2 = data[i];
+                    //if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
+                    SpliceAdjust(data, n, freq, type, false);
                 }
 
                 for (int i = n; i >= 1; i--)  //note 1
                 {
-                    SpliceHelper sh1 = null;
-                    SpliceHelper sh2 = null;
-                    SpliceHelper sh3 = null;
-                    if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
-                    if (i >= 0 && i < data.Count) sh2 = data[i];
-                    if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
-                    SpliceAdjust(sh1, sh2, sh3, freq, type, true);
+                    //SpliceHelper sh1 = null;
+                    //SpliceHelper sh2 = null;
+                    //SpliceHelper sh3 = null;
+                    //if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
+                    //if (i >= 0 && i < data.Count) sh2 = data[i];
+                    //if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
+                    SpliceAdjust(data, n, freq, type, true);
                 }
 
                 // ---------------------------------------------
@@ -7447,23 +7449,19 @@ namespace Gekko
                 //right
                 for (int i = n + 1; i < data.Count; i++)
                 {
-                    GekkoTime alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
-                    GekkoTime alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
-                    if (i > 0) alternativeStart = data[i - 1].t[1].Add(1);
-                    if (i < data.Count) alternativeEnd = data[i].t[1];
+                    GekkoTime alternativeStart, alternativeEnd;
+                    PeriodsRight(n, data, i, out alternativeStart, out alternativeEnd);
                     foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
                     {
                         rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
-                    }                            
+                    }
                 }
 
                 //left
                 for (int i = n - 1; i <= 0; i--)
                 {
-                    GekkoTime alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
-                    GekkoTime alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
-                    if (i > 0) alternativeStart = data[i - 1].t[0];
-                    if (i < data.Count) alternativeEnd = data[i].t[0].Add(-1);
+                    GekkoTime alternativeStart, alternativeEnd;
+                    PeriodsLeft(n, data, i, out alternativeStart, out alternativeEnd);
                     foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
                     {
                         rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
@@ -7471,8 +7469,31 @@ namespace Gekko
                 }
             }
 
-            public void SpliceAdjust(SpliceHelper left, SpliceHelper basis, SpliceHelper right, EFreq freq, ESpliceType type, bool moveLeft)
+            private static void PeriodsLeft(int n, List<SpliceHelper> data, int i, out GekkoTime alternativeStart, out GekkoTime alternativeEnd)
             {
+                alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
+                alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
+                if (i > 0) alternativeStart = data[i - 1].t[0];
+                if (i < data.Count) alternativeEnd = data[i].t[0].Add(-1);
+            }
+
+            private static void PeriodsRight(int n, List<SpliceHelper> data, int i, out GekkoTime alternativeStart, out GekkoTime alternativeEnd)
+            {
+                alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
+                alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
+                if (i > 0) alternativeStart = data[i - 1].t[1].Add(1);
+                if (i < data.Count) alternativeEnd = data[i].t[1];
+            }
+
+            public void SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, bool moveLeft)
+            {
+                SpliceHelper left = null;
+                SpliceHelper basis = null;
+                SpliceHelper right = null;
+                if (n > 0) left = data[n - 1];
+                basis = data[n];
+                if (n < data.Count - 1) right = data[n + 1];
+
                 Series alternative = null;
                 Series alternative_adjusted = null;
                 right.x_adjusted = null;
@@ -7482,18 +7503,26 @@ namespace Gekko
                 GekkoTime adjustEnd = GekkoTime.tNull;
 
                 if (moveLeft)
-                {
-
+                {                    
+                    alternative = left.x as Series;
+                    alternative_adjusted = left.x_adjusted;
+                    left.x_adjusted = new Series(freq, null);
+                    overlapStart = left.t[0];
+                    overlapEnd = left.t[1];
+                    PeriodsLeft(n, data, n - 1, out adjustStart, out adjustEnd);
+                    //adjustStart = basis.t[0]; //no need to start sooner
+                    //adjustEnd = alternative.GetRealDataPeriodLast();
                 }
                 else
-                {
+                {                     
                     alternative = right.x as Series;
                     alternative_adjusted = right.x_adjusted;
                     right.x_adjusted = new Series(freq, null);
                     overlapStart = basis.t[0];
                     overlapEnd = basis.t[1];
-                    adjustStart = basis.t[0]; //no need to start sooner
-                    adjustEnd = alternative.GetRealDataPeriodLast();                    
+                    PeriodsRight(n, data, n + 1, out adjustStart, out adjustEnd);
+                    //adjustStart = basis.t[1].Add(1); //no need to start sooner
+                    //adjustEnd = alternative.GetRealDataPeriodLast(); //TODO:                    
                 }
 
                 // ----------

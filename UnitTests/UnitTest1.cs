@@ -8128,7 +8128,10 @@ namespace UnitTests
                 _AssertSeries(First(), "ts0b", 2009, 6.4186d, delta);
                 _AssertSeries(First(), "ts0b", 2010, 6.5581d, delta);
             }
-
+            else
+            {
+                MessageBox.Show("!splice, ignoring something!");
+            }
 
             // AREMOS RESULTS:
 
@@ -8163,9 +8166,9 @@ namespace UnitTests
             {
                 I("RESET;");
                 I("create ts1, ts2, ts0a, ts0b;");
-                I("SERIES <2002 2006> ts1 = (2, 3, 4, 5, 6);");
-                I("SERIES <2004 2010> ts2 = (41, 42, 43, 44, 45, 46, 46);");
-                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
+                I("SERIES <2002 2006> ts1 = 2, 3, 4, 5, 6;");
+                I("SERIES <2004 2010> ts2 = 41, 42, 43, 44, 45, 46, 46;");
+                I("splice ts0a = ts1 ts2; //splicing two series by means of three common observations");
                 double delta = 0.0001d;
                 _AssertSeries(First(), "ts0a", 2001, double.NaN, delta);
                 _AssertSeries(First(), "ts0a", 2002, 16.8d, delta);
