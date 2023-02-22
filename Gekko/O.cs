@@ -7223,8 +7223,15 @@ namespace Gekko
 
                 // ===========================================================
 
-                string splice = "SPLICE";  //splice()
+                bool isFunction = false;
 
+                //NOTE: In the data[] list, intermediate dates are generally stored together with the LEFT variable.
+                //      For intance in x1 2020 2022 x2 we get (x1, 2020..2022) and (x2, null).
+
+                string splice = "SPLICE";  //splice()
+                if (isFunction) splice = "splice()";
+
+                //generate data[] list
                 List<SpliceHelper> data = new List<SpliceHelper>();
                 for (int i = 0; i < this.rhs.list.Count; i++)
                 {
@@ -7259,8 +7266,9 @@ namespace Gekko
                         data[data.Count - 1].t.Add(period);
                     }
                 }
-
                 if (data.Count < 2) new Error(splice + ": you must provide at least two timeseries elements.");
+
+                data[data.Count - 1].t = null;  //just for safety, cannot contain anything!
 
                 //Test that there is at least 1 series to get freq, and if there are > 1 series
                 //that the freqs are the same.
@@ -7293,9 +7301,31 @@ namespace Gekko
                 }
 
                 //Test that all the freqs of the given dates are ascending
-                for (int i = 0; i < data.Count; i++)
+                for (int i = 0; i < data.Count - 1; i++)  //note minus 1, we are not checking dates after last data item.
                 {
-                    if (data[i].t.Count == 2)
+                    if (data[i].t.Count == 0)
+                    {
+                        GekkoTime gt2 = GekkoTime.tNull;
+                        if (data[i].x.Type() == EVariableType.Series)
+                        {
+                            gt2 = (data[i].x as Series).GetRealDataPeriodLast();
+                        }
+                        if (gt2.IsNull()) new Error(splice + ": Variable #" + (i + 1) + " has no ending date, which is necessary because there is no stated date(s) between this variable and the next variable.");
+                        // -------------------------------------
+                        GekkoTime gt1 = GekkoTime.tNull;
+                        if (data[i + 1].x.Type() == EVariableType.Series)
+                        {
+                            gt1 = (data[i + 1].x as Series).GetRealDataPeriodFirst();
+                        }
+                        if (gt1.IsNull()) new Error(splice + ": Variable #" + (i + 2) + " has no starting date, which is necessary because there is no stated date(s) between this variable and the previous variable.");
+                        // -------------------------------------
+                        if (gt1.StrictlyLargerThan(gt2)) new Error(splice + ": The dates "+gt1.ToString() +" and "+gt2.ToString()+ "  betwee Variable #" + (i + 2) + " has no starting date, which is necessary because there is no stated date(s) between this variable and the previous variable.");
+                    }
+                    else if (data[i].t.Count == 1)
+                    {
+                        data[i].t.Add(data[i].t[0]); //duplicating
+                    }
+                    else if (data[i].t.Count == 2)
                     {
                         if (data[i].t[0].StrictlyLargerThan(data[i].t[1])) new Error(splice + ": The date pair " + data[i].t[0].ToString() + " and " + data[i].t[1].ToString() + " is decreasing.";
                     }
