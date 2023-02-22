@@ -126,6 +126,20 @@ namespace Gekko
             List
         }
 
+        /// <summary>
+        /// Abs ||
+        /// Rel1 AREMOS style ||
+        /// Rel2 correction factors, mean of these ||
+        /// Rel3 first log(), then .Abs, then exp()
+        /// </summary>
+        public enum ESpliceType
+        {
+            Abs,
+            Rel1, //AREMOS style
+            Rel2, //correction factors, mean of thesse
+            Rel3 //first log(), then .Abs, then exp()
+        }
+
         public enum EIndexerType
         {
             None,
@@ -7197,6 +7211,8 @@ namespace Gekko
             //for x3 (the last), the t list is always = null.
             public IVariable x = null;
             public List<GekkoTime> t = new List<GekkoTime>();
+            // ---------------
+            public Series x_adjusted = null;
         }
 
         public class Splice
@@ -7206,6 +7222,10 @@ namespace Gekko
             public List names2 = null; //old remove
             public List lhs = null;
             public List rhs = null;
+            public string opt_first = null; //pos 1
+            public string opt_last = null; //pos n
+            public string opt_n = null; //specific n
+
             public GekkoTime date = GekkoTime.tNull; //old remove
             public P p = null;
 
@@ -7217,13 +7237,48 @@ namespace Gekko
                     return;
                 }
 
-                List<string> lhs_string = Restrict(this.lhs, true, false, true, true);
-                if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
-                IVariable iv3 = O.GetIVariableFromString(lhs_string[0], ECreatePossibilities.Must, false); //left side, creates brand new even if it exists beforehand
-
                 // ===========================================================
 
                 bool isFunction = false;
+                int n = -12345; //0-based
+                ESpliceType type = ESpliceType.Rel1;  //default
+                //TODO
+                //TODO type...
+                //TODO
+
+                if (isFunction)
+                {
+                    //DO SOMETHING REGARDING FIRST ARG x = splice('first', x1, 2003, 2006, x2);
+                    //adjust n...
+                    //TODO
+                    //TODO
+                    //TODO
+                }
+                else
+                {
+                    int count = 0;
+                    if (opt_first != null)
+                    {
+                        count++;
+                        n = 0;
+                    }
+                    if (opt_last != null)
+                    {
+                        count++;
+                        n = int.MaxValue;  //just a signal, is set later on when count is known
+                    }
+                    if (opt_n != null)
+                    {
+                        count++;
+                        int ii = -12345;
+                        try { ii = int.Parse(opt_n); } catch { };
+                        if (ii != -12345) n = ii - 1;  //n is 0-based.
+                    }
+                    if (count > 1)
+                    {
+                        new Error("You can only use option <first>, <last> or <n=...> one at a time.");
+                    }
+                }
 
                 //NOTE: In the data[] list, intermediate dates are generally stored together with the LEFT variable.
                 //      For intance in x1 2020 2022 x2 we get (x1, 2020..2022) and (x2, null).
@@ -7284,7 +7339,7 @@ namespace Gekko
                             freq = freq2;
                         }
                         else
-                        {                            
+                        {
                             if (freq != freq2) new Error(splice + ": frequency mismatch in the elements: " + freq.Pretty() + " vs. " + freq2.Pretty() + ".");
                         }
                     }
@@ -7334,10 +7389,151 @@ namespace Gekko
                 // ----------------------------------------------------------------
                 // Now that data should be all set for calculations
                 // Some of the IVariables may be scalars, timeless series,
-                // 1x1 matrices, ...
+                // 1x1 matrices --> for now we issue error for these.
+                // For scalars, we could in principle use O.ConvertToSeriesMaybeConstant()
+                // but for now we issue error. Could be fixed if necessary, if the scalar is
+                // (a) not at start/end and (b) has explict dates given around itself.
                 // ----------------------------------------------------------------
 
+                if (n == int.MaxValue) n = data.Count - 1;  //n is 0-based
+                if (n < 0 || n >= data.Count) new Error("Illegal series element designated as basis (n=...), series #" + (n + 1) + " does not exist.");
 
+                for (int i = 0; i < data.Count; i++)
+                {
+                    if (data[i].x.Type() != EVariableType.Series) new Error(splice + ": At the moment, only series variables are accepted when splicing (for a constant series, you may use timeless()). Variable #" + (i + 1) + " is of type " + G.GetTypeString(data[i].x) + ".");
+                }
+
+                //Get data into arrays
+                for (int i = n; i < data.Count - 1; i++)  //note -1
+                {
+                    SpliceHelper sh1 = null;
+                    SpliceHelper sh2 = null;
+                    SpliceHelper sh3 = null;
+                    if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
+                    if (i >= 0 && i < data.Count) sh2 = data[i];
+                    if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
+                    SpliceAdjust(sh1, sh2, sh3, freq, type, false);
+                }
+
+                for (int i = n; i >= 1; i--)  //note 1
+                {
+                    SpliceHelper sh1 = null;
+                    SpliceHelper sh2 = null;
+                    SpliceHelper sh3 = null;
+                    if (i - 1 >= 0 && i - 1 < data.Count) sh1 = data[i - 1];
+                    if (i >= 0 && i < data.Count) sh2 = data[i];
+                    if (i + 1 >= 0 && i + 1 < data.Count) sh3 = data[i + 1];
+                    SpliceAdjust(sh1, sh2, sh3, freq, type, true);
+                }
+
+                // ---------------------------------------------
+                // Resulting series
+                // ---------------------------------------------
+
+                List<string> lhs_string = Restrict(this.lhs, true, false, true, true);
+                if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
+                Series rv = O.GetIVariableFromString(G.Chop_SetFreq(lhs_string[0], freq), ECreatePossibilities.Must, false) as Series; //left side, creates brand new even if it exists beforehand
+
+                //basis
+                GekkoTime basisStart = (data[n].x as Series).GetRealDataPeriodFirst();
+                GekkoTime basisEnd = (data[n].x as Series).GetRealDataPeriodLast();
+                if (n > 0) basisStart = data[n - 1].t[0];
+                if (n < data.Count - 1) basisStart = data[n].t[1];
+                foreach (GekkoTime t in new GekkoTimeIterator(basisStart, basisEnd))
+                {
+                    rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy
+                }
+
+                //right
+                for (int i = n + 1; i < data.Count; i++)
+                {
+                    GekkoTime alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
+                    GekkoTime alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
+                    if (i > 0) alternativeStart = data[i - 1].t[1].Add(1);
+                    if (i < data.Count) alternativeEnd = data[i].t[1];
+                    foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
+                    {
+                        rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                    }                            
+                }
+
+                //left
+                for (int i = n - 1; i <= 0; i--)
+                {
+                    GekkoTime alternativeStart = data[n].x_adjusted.GetRealDataPeriodFirst();
+                    GekkoTime alternativeEnd = data[n].x_adjusted.GetRealDataPeriodLast();
+                    if (i > 0) alternativeStart = data[i - 1].t[0];
+                    if (i < data.Count) alternativeEnd = data[i].t[0].Add(-1);
+                    foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
+                    {
+                        rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                    }
+                }
+            }
+
+            public void SpliceAdjust(SpliceHelper left, SpliceHelper basis, SpliceHelper right, EFreq freq, ESpliceType type, bool moveLeft)
+            {
+                Series alternative = null;
+                Series alternative_adjusted = null;
+                right.x_adjusted = null;
+                GekkoTime overlapStart = GekkoTime.tNull;
+                GekkoTime overlapEnd = GekkoTime.tNull;
+                GekkoTime adjustStart = GekkoTime.tNull;
+                GekkoTime adjustEnd = GekkoTime.tNull;
+
+                if (moveLeft)
+                {
+
+                }
+                else
+                {
+                    alternative = right.x as Series;
+                    alternative_adjusted = right.x_adjusted;
+                    right.x_adjusted = new Series(freq, null);
+                    overlapStart = basis.t[0];
+                    overlapEnd = basis.t[1];
+                    adjustStart = basis.t[0]; //no need to start sooner
+                    adjustEnd = alternative.GetRealDataPeriodLast();                    
+                }
+
+                // ----------
+
+                //calculate factor
+                double sum_basis = 0d;
+                double sum_alternative = 0d;
+                foreach (GekkoTime gt in new GekkoTimeIterator(overlapStart, overlapEnd))
+                {
+                    if (type == ESpliceType.Abs)
+                    {
+
+                    }
+                    else if (type == ESpliceType.Rel1)
+                    {
+                        sum_basis += (basis.x as Series).GetDataSimple(gt);
+                        sum_alternative += alternative.GetDataSimple(gt);
+                    }
+                    else if (type == ESpliceType.Rel2)
+                    {
+
+                    }
+                }
+
+                //adjust alternative series
+                foreach (GekkoTime t in new GekkoTimeIterator(adjustStart, adjustEnd))
+                {
+                    if (type == ESpliceType.Abs)
+                    {
+
+                    }
+                    else if (type == ESpliceType.Rel1)
+                    {
+                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * sum_basis / sum_alternative);
+                    }
+                    else if (type == ESpliceType.Rel2)
+                    {
+
+                    }
+                }
 
             }
 
