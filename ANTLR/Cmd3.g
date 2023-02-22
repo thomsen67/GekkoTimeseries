@@ -3771,7 +3771,7 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 //spliceOpt1h:                KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
 //spliceOptions:              FIRST | LAST;
 
-splice:                     SPLICE spliceOpt1? bankvarname EQUAL expression+ -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} ^(ASTPLACEHOLDER spliceOpt1?) bankvarname expression+);
+splice:                     SPLICE spliceOpt1? seqOfBankvarnames EQUAL expression+ -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} ^(ASTPLACEHOLDER spliceOpt1?) seqOfBankvarnames expression+);
 spliceOpt1:                 ISNOTQUAL
 						  | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
                             ;

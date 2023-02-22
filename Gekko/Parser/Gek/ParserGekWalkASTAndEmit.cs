@@ -4548,11 +4548,12 @@ ASTPLACEHOLDER [0]
 
                         node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                        GetCodeFromAllChildren(node[0]); //options                        
-                        node.Code.A("o" + Num(node) + ".vars = new List();" + G.NL);                        
-                        for (int i = 1; i < node.ChildrenCount(); i++) //skip the first
+                        GetCodeFromAllChildren(node[0]); //options  
+                        node.Code.A("o" + Num(node) + ".lhs = " + node[1].Code + ";" + G.NL);
+                        node.Code.A("o" + Num(node) + ".rhs = new List();" + G.NL);                        
+                        for (int i = 2; i < node.ChildrenCount(); i++) //skip the first 2
                         {                            
-                            node.Code.A("o" + Num(node) + ".vars.Add(" + node[i].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".rhs.Add(" + node[i].Code + ");" + G.NL);
                         }                        
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 

@@ -7197,7 +7197,8 @@ namespace Gekko
             public List names0 = null; //old remove
             public List names1 = null; //old remove
             public List names2 = null; //old remove
-            public List vars = null;
+            public List lhs = null;
+            public List rhs = null;
             public GekkoTime date = GekkoTime.tNull; //old remove
             public P p = null;
 
@@ -7206,7 +7207,7 @@ namespace Gekko
                 if(false) Splice_OLDREMOVE();
                 List<string> names = new List<string>();
                 
-                foreach (IVariable iv in this.vars.list)
+                foreach (IVariable iv in this.rhs.list)
                 {
                     //if(iv.typ)
                     //if (iv == null) names.Add(iv);
