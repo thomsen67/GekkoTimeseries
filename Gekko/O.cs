@@ -7300,7 +7300,7 @@ namespace Gekko
                     }
                 }
 
-                //Test that all the freqs of the given dates are ascending
+                //Test that all the date intervals are non-descending, also if these are implicit dates.
                 for (int i = 0; i < data.Count - 1; i++)  //note minus 1, we are not checking dates after last data item.
                 {
                     if (data[i].t.Count == 0)
@@ -7319,7 +7319,7 @@ namespace Gekko
                         }
                         if (gt1.IsNull()) new Error(splice + ": Variable #" + (i + 2) + " has no starting date, which is necessary because there is no stated date(s) between this variable and the previous variable.");
                         // -------------------------------------
-                        if (gt1.StrictlyLargerThan(gt2)) new Error(splice + ": The dates "+gt1.ToString() +" and "+gt2.ToString()+ "  betwee Variable #" + (i + 2) + " has no starting date, which is necessary because there is no stated date(s) between this variable and the previous variable.");
+                        if (gt1.StrictlyLargerThan(gt2)) new Error(splice + ": The implicit date interval " + gt1.ToString() + " and " + gt2.ToString() + " between variable #" + (i + 1) + " and #" + (i + 2) + " is decreasing --> the ending date of series " + (i + 1) + " is smaller than the starting date of series #" + (i + 2) + ".");
                     }
                     else if (data[i].t.Count == 1)
                     {
@@ -7330,6 +7330,15 @@ namespace Gekko
                         if (data[i].t[0].StrictlyLargerThan(data[i].t[1])) new Error(splice + ": The date pair " + data[i].t[0].ToString() + " and " + data[i].t[1].ToString() + " is decreasing.";
                     }
                 }
+
+                // ----------------------------------------------------------------
+                // Now that data should be all set for calculations
+                // Some of the IVariables may be scalars, timeless series,
+                // 1x1 matrices, ...
+                // ----------------------------------------------------------------
+
+
+
             }
 
             private void Splice_OLDREMOVE()
