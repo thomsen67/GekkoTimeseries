@@ -153,7 +153,7 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
-        public string series_modify = "update";
+        //public string series_modify = "update";
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;

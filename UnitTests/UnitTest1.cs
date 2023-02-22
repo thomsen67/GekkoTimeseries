@@ -8199,6 +8199,7 @@ namespace UnitTests
                 // ------------
                 //        ----------
                 //                ----------- 
+                // If overlaps overlap, no need for middle series!!
 
                 I("RESET;");
                 I("SERIES <2002 2006> ts1 = 2, 3, 4, 5, 6;");
@@ -8215,14 +8216,23 @@ namespace UnitTests
                                                                                   //     and growth vars.
                                                                                   // Note: difference between going left or right, if there are > 1 period overlap.
 
-                // Regarding fugures, see Excel sheet: c:\Thomas\Gekko\GekkoCS\Diverse\Splice.xlsx.
+                // Regarding numbers, see Excel sheet: c:\Thomas\Gekko\GekkoCS\Diverse\Splice.xlsx.
                 // AREMOS is reproduced regarding ts2a.
 
-                //we are doing it as R = ((y1+y2+y3)/3) / ((x1+x2+x)/3), but it could also be
-                //                   R = (y1/x1 + y2/x2 + y3/x4)/3
+                //we are doing it as R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x)/3)  --> rel1
+                //but could be:      R = (y1/x1 + y2/x2 + y3/x3)/3               --> rel2
                 //
-                //differences:       D = ((y1+y2+y3)/3) - ((x1+x2+x)/3)
-                //                   D = (y1-x1 + y2-x2 + y3-x4)/3
+                //Also additive correction:
+                //                   D = (y1 + y2 + y3)/3 - (x1 + x2 + x3)/3     --> abs
+                //                   same, with log() and exp() transformation.  --> rel3
+                //
+                // <method = rel1 | rel2 | rel3 | abs>.
+                //
+                //implement: goal x1 2001 2003 x2 2005 2006 x3
+                //                x1 2001      x2 2005      x3 -->
+                //                x1 2001 2001 x2 2005 2005 x3
+                //                x1           x2           x3 -->
+                //                x1 1999 2002 x2 2003 2007 x3 (true data overlaps)
 
                 I("splice <first> ts0a = ts1 ts2 ts3;");
                 _AssertSeries(First(), "ts0a", 2001, double.NaN, delta);
@@ -8277,12 +8287,7 @@ namespace UnitTests
 
                 I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3;");
                 I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3a;"); //ts3a ok with explicit time
-                I("splice ts0a = ts1 2005 ts2 2009 ts3;");
-
-                //Do same with <first>, <n=2> etc.
-                //Do same with <rel>
-                //Do the same as function variants
-                //Implement frombank, tobank.
+                I("splice ts0a = ts1 2005 ts2 2009 ts3;");                
 
                 FAIL("splice ts0a = ts1 ts3 ts2;"); //no overlap
                 FAIL("splice ts0a = ts1 ts2 ts3a;"); //overlap of overlaps (2004-6 vs 2006-10)
