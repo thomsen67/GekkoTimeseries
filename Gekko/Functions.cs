@@ -5104,7 +5104,14 @@ namespace Gekko
             else if (rootHelper.roots.Count == 1)
             {
                 string fileAndFolder = rootHelper.roots[0];
+                //seems to work ok on UNC path, for instance "\\localhost\b$\xx\root.ini" --> "\\localhost\b$\xx"
                 string folder = Path.GetDirectoryName(fileAndFolder);
+                //if we have "g:\root.ini", this will return "g:\" (note the backslash that is normally omitted)
+                //whereas "g:\sub\root.ini" will return "g:\sub". 
+                //So for the root we remove the backslash to be consistent, so we get "g:" instead of "g:\".
+                //The thing is that we prefer to use {root()}\xx\yy and not {root()}xx\yy.
+                //NOTE: Someting like RUN c:x.gcm is always interpreted as a (malformed) library call (library names must be > 1 char).
+                if (folder.EndsWith("\\")) folder = folder.Remove(folder.Length - 1);
                 return new ScalarString(folder);
             }
             else

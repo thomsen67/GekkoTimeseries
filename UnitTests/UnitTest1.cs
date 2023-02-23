@@ -8266,6 +8266,13 @@ namespace UnitTests
                 _AssertSeries(First(), "ts1a", 2014, 48.5000, delta);
                 _AssertSeries(First(), "ts1a", 2015, double.NaN, delta);
 
+                // The following reproduces this AREMOS code:
+                // set per 2000 2015;
+                // SERIES < 2002 2006 > ts1 = 2, 3, 4, 5, 6;
+                // SERIES < 2004 2010 > ts2 = 41, 42, 43, 44, 45, 46, 47;
+                // SERIES < 2008 2014 > ts3 = 91, 92, 93, 94, 95, 96, 97;
+                // splice ts2a = ts1 ts2 ts3;
+                // print ts2a;
                 I("splice <last> ts2a = ts1 ts2 ts3;");
                 _AssertSeries(First(), "ts2a", 2001, double.NaN, delta);
                 _AssertSeries(First(), "ts2a", 2002, 33.6000, delta);
