@@ -93,12 +93,41 @@ namespace Gekko.Parser.Gek
                     {
                         firstWord = th;
                     }
-                }
+                }                
 
                 bool hasSigil = statement.tokens?[0].s == Globals.symbolScalar.ToString() || statement.tokens?[0].s == Globals.symbolCollection.ToString();
                 if (!hasSigil)
                 {
-                    if (Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+                    //We are trying to find commands here, to distinguish them from assignments.
+                    //function and procedure calls like f(...), p ..., m.f(...), m.p ... are 
+                    //dealt with, so below we try to identify normal commands like "prt ...", "read ..." etc.
+                    //because else they become assignments.
+                    //
+                    //Default is assignment, because it is most difficult to determine.
+                    //
+                    //We must guard against the firstWord being for instance "global" (command name) but it is a bank or something,
+                    //like global:%x = ... etc.
+                    //
+                    // ------------------------------------
+                    // THE FOLLOWING ARE ASSIGNMENTS --> beware ¨ etc.
+                    // ------------------------------------
+                    // Maybe with blanks
+                    // ------------------------------------
+                    // :             global : x, global:x
+                    // =             global = x, global=x
+                    // $             global $ x, global$x
+                    // .             global . x, global.x
+                    // !             global ! x, global!x     
+                    // |             global | x, global|x
+                    // ------------------------------------
+                    // No blanks
+                    // ------------------------------------                              
+                    // #             global#x               
+                    // %             global%x               
+                    // {             global{x
+                    // ------------------------------------                              
+
+                    if (statement.type != ParserGekCreateAST.EParserType.OnlyProcedureCallEtc && firstWord != null && Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
 
                     if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
 
