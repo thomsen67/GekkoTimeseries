@@ -119,12 +119,19 @@ namespace Gekko.Parser.Gek
                     // .             global . x, global.x
                     // !             global ! x, global!x     
                     // |             global | x, global|x
+                    // +             global +=, global+=    for these 5 also check =
+                    // -             global -=, global-=
+                    // -             global *=, global*=
+                    // -             global /=, global/=
+                    // -             global ^=, global/=
+                    // -             global <, global<      only if first > is followed by =
                     // ------------------------------------
                     // No blanks
                     // ------------------------------------                              
                     // #             global#x               
                     // %             global%x               
                     // {             global{x
+                    // [             global[x
                     // ------------------------------------                              
 
                     if (statement.type != ParserGekCreateAST.EParserType.OnlyProcedureCallEtc && firstWord != null && Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
