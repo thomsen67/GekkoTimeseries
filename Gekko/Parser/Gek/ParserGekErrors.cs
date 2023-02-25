@@ -81,7 +81,8 @@ namespace Gekko.Parser.Gek
                 List<TokenHelper> m = new List<TokenHelper>();
                 foreach (TokenHelper th in statement.tokens)
                 {
-                    if (th.type != ETokenType.Comment) m.Add(th);
+                    //ignores any "noise" from syntax
+                    if (th.type == ETokenType.Word || th.type == ETokenType.Number || th.type == ETokenType.QuotedString || th.type == ETokenType.Symbol) m.Add(th);                    
                 }
                 for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));                
                                 
@@ -160,8 +161,15 @@ namespace Gekko.Parser.Gek
                             (m[1].s == "[" && m[1].leftblanks == 0 && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
                         ) seemsAssignment = true;
                     }
-
-                    if (statement.type != ParserGekCreateAST.EParserType.OnlyProcedureCallEtc && Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+                    if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc || seemsAssignment)
+                    {
+                        //always keep type as it is
+                    }
+                    else
+                    {
+                        //may be a statement
+                        if (Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+                    }
 
                     if (G.Equal(m[0].s, "end") && m[1].s == ";") continue;
 
