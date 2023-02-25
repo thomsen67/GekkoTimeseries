@@ -84,15 +84,10 @@ namespace Gekko.Parser.Gek
                     //ignores any "noise" from syntax
                     if (th.type == ETokenType.Word || th.type == ETokenType.Number || th.type == ETokenType.QuotedString || th.type == ETokenType.Symbol) m.Add(th);                    
                 }
-                for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));                
-                                
-                long start = -12345; long end = -12345;
-                foreach (TokenHelper th in statement.tokens)
-                {
-                    //hmmm why looping to do this?
-                    if (start == -12345) start = (long)1e9 * th.line + th.column;
-                    end = (long)1e9 * th.line + th.column;                                        
-                }                
+                for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));                                                
+                
+                long    start = (long)1e9 * statement.tokens[0].line + statement.tokens[0].column;
+                long    end = (long)1e9 * statement.tokens[statement.tokens.Count - 1].line + statement.tokens[statement.tokens.Count - 1].column;                                
 
                 bool hasSigil = m[0].s == Globals.symbolScalar.ToString() || m[0].s == Globals.symbolCollection.ToString();
                 if (!hasSigil)
