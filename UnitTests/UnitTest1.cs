@@ -8366,6 +8366,58 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ErrorMessages()
+        {
+            //
+            // All these first parts are statement syntax, so they should not show any errors because they are
+            // mistaken for being normal statements like "global %x, %y;" etc.
+            // The PRT statement activates error reporting.
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global:x = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global : x = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global=1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global$(1==1)=1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global $ (1==1) = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global.a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));            
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global!a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global|a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global+= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global += 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global-= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global -= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global*= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> this x*=... does not work anyway (probably because of wildcard logic)
+            Globals.unitTestScreenOutput.Clear(); FAIL("global *= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global/= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global /= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global^= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global ^= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global<2001 2002>= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));            
+            Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002>= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global<2001 2002> = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002> = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global#i = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global%i = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global{%i} = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global[2001] = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+        }
+
+        [TestMethod]
         public void _Test_Analyze()
         {
             //See details on this example in the analyze code            

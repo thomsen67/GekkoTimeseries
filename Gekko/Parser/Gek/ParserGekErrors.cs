@@ -155,7 +155,8 @@ namespace Gekko.Parser.Gek
                             (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "{" && m[2].leftblanks == 0) ||
                             (m[1].s == "[" && m[1].leftblanks == 0 && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
                         ) seemsAssignment = true;
-                    }
+                    }                    
+
                     if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc || seemsAssignment)
                     {
                         //always keep type as it is
