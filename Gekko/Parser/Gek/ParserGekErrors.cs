@@ -142,22 +142,22 @@ namespace Gekko.Parser.Gek
                             (m[1].s == "=") ||
                             (m[1].s == "$") ||
                             (m[1].s == ".") ||
-                            (m[1].s == "£" && m[2].s == "." && m[2].leftblanks == 0) ||
+                            (m[1].s == "£" && m[1].leftblanks == 0 && m[2].s == "." && m[2].leftblanks == 0) ||
                             (m[1].s == "!") ||
-                            (m[1].s == "¨" && m[2].s == "!" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "!" && m[2].leftblanks == 0) ||
                             (m[1].s == "|") ||
-                            (m[1].s == "¨" && m[2].s == "|" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "|" && m[2].leftblanks == 0) ||
                             (m[1].s == "+" && m[2].s == "=" && m[2].leftblanks == 0) ||
                             (m[1].s == "-" && m[2].s == "=" && m[2].leftblanks == 0) ||
-                            (m[1].s == "*" && m[2].s == "=" && m[2].leftblanks == 0) ||
-                            (m[1].s == "½" && m[2].s == "*" && m[2].leftblanks == 0) ||
+                            (m[1].s == "*" && m[2].s == "=" && m[2].leftblanks == 0) || // global *
+                            (m[1].s == "½" && m[1].leftblanks == 0 && m[2].s == "*" && m[2].leftblanks == 0) || // global*
                             (m[1].s == "/" && m[2].s == "=" && m[2].leftblanks == 0) ||
-                            (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||
-                            (m[1].s == "<" && HasLargerThanAndEqual()) ||
-                            (m[1].s == "¨" && m[2].s == "%" && m[2].leftblanks == 0) ||
-                            (m[1].s == "¨" && m[2].s == "#" && m[2].leftblanks == 0) ||
-                            (m[1].s == "¨" && m[2].s == "{" && m[2].leftblanks == 0) ||
-                            (m[1].s == "[" && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
+                            (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||                            
+                            (m[1].s == "<" && HasLargerThanAndEqual(m)) ||              // identifies global <2001 2002> = 100; for instance
+                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "%" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "#" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "{" && m[2].leftblanks == 0) ||
+                            (m[1].s == "[" && m[1].leftblanks == 0 && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
                         ) seemsAssignment = true;
                     }
 
@@ -482,6 +482,29 @@ namespace Gekko.Parser.Gek
             G.Write("");  //removes marking
 
             return false;
+        }
+
+        /// <summary>
+        /// Searches for the ">=" in a line like x &lt;2001 2005>= 100 ; to distinguish this
+        /// from being a command like PRT &lt;2001 2005> x file = out.txt; In the latter, the "=" is
+        /// separated from the ">".
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static bool HasLargerThanAndEqual(List<TokenHelper> m)
+        {
+            bool b = false;
+            int found = -12345;
+            for (int i = 0; i < m.Count; i++)
+            {
+                if (m[i].s == ">")
+                {
+                    found = i; //first one
+                    break;
+                }
+            }
+            if (found != -12345 && m[found + 1].s == "=") return true;
+            return b;
         }
 
         /// <summary>
