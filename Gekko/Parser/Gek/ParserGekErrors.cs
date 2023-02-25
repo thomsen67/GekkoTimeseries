@@ -138,21 +138,21 @@ namespace Gekko.Parser.Gek
                             (m[1].s == "=") ||
                             (m[1].s == "$") ||
                             (m[1].s == ".") ||
-                            (m[1].s == "£" && m[1].leftblanks == 0 && m[2].s == "." && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar2.ToString() && m[1].leftblanks == 0 && m[2].s == "." && m[2].leftblanks == 0) ||
                             (m[1].s == "!") ||
-                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "!" && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "!" && m[2].leftblanks == 0) ||
                             (m[1].s == "|") ||
-                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "|" && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "|" && m[2].leftblanks == 0) ||
                             (m[1].s == "+" && m[2].s == "=" && m[2].leftblanks == 0) ||
                             (m[1].s == "-" && m[2].s == "=" && m[2].leftblanks == 0) ||
                             (m[1].s == "*" && m[2].s == "=" && m[2].leftblanks == 0) || // global *
-                            (m[1].s == "½" && m[1].leftblanks == 0 && m[2].s == "*" && m[2].leftblanks == 0) || // global*
+                            (m[1].s == Globals.symbolGlueChar4.ToString() && m[1].leftblanks == 0 && m[2].s == "*" && m[2].leftblanks == 0) || // global*
                             (m[1].s == "/" && m[2].s == "=" && m[2].leftblanks == 0) ||
                             (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||                            
                             (m[1].s == "<" && HasLargerThanAndEqual(m)) ||              // identifies global <2001 2002> = 100; for instance
-                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "%" && m[2].leftblanks == 0) ||
-                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "#" && m[2].leftblanks == 0) ||
-                            (m[1].s == "¨" && m[1].leftblanks == 0 && m[2].s == "{" && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "%" && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "#" && m[2].leftblanks == 0) ||
+                            (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "{" && m[2].leftblanks == 0) ||
                             (m[1].s == "[" && m[1].leftblanks == 0 && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
                         ) seemsAssignment = true;
                     }                    
