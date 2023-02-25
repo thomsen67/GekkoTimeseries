@@ -963,10 +963,10 @@ namespace Gekko.Parser.Gek
                     {
 
                         int j1 = -12345; string s1 = StringTokenizer.GetFirstTokenReal(statement.tokens, out j1);
-                        int j2 = -12345; string s2 = null; if (s1 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
-                        int j3 = -12345; string s3 = null; if (s2 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
-                        int j4 = -12345; string s4 = null; if (s3 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j3, 1, out j4);
-                        int j5 = -12345; string s5 = null; if (s4 != null) StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
+                        int j2 = -12345; string s2 = null; if (s1 != null) s2 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
+                        int j3 = -12345; string s3 = null; if (s2 != null) s3 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
+                        int j4 = -12345; string s4 = null; if (s3 != null) s4 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j3, 1, out j4);
+                        int j5 = -12345; string s5 = null; if (s4 != null) s5 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
 
                         bool flag = false;
 

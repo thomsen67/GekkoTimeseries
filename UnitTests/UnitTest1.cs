@@ -8415,6 +8415,30 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear(); FAIL("global{%i} = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             //
             Globals.unitTestScreenOutput.Clear(); FAIL("global[2001] = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //
+            //
+            // Test that function and procedure calls are ok
+            //
+            //
+            Globals.unitTestScreenOutput.Clear(); FAIL("global('a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("lib:global('a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+
+            Globals.unitTestScreenOutput.Clear(); FAIL("global(x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+
+            Globals.unitTestScreenOutput.Clear(); FAIL("global(%x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(%x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+
+            Globals.unitTestScreenOutput.Clear(); FAIL("global(<2001 2002>, %x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(<2001 2002>, %x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
         }
 
         [TestMethod]
