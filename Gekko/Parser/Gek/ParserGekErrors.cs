@@ -173,6 +173,8 @@ namespace Gekko.Parser.Gek
 
                     if (G.Equal(m[0].s, "end") && m[1].s == ";") continue;
 
+                    if (G.Equal(m[0].s, "else") && m[1].s == ";") continue;
+
                     if (G.Equal(m[0].s, "for") || G.Equal(m[0].s, "if") || G.Equal(m[0].s, "block") || G.Equal(m[0].s, "function") || G.Equal(m[0].s, "procedure"))
                     {
                         s7 += "end;";  //to get it to parse
