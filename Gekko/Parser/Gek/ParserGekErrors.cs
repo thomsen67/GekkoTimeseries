@@ -77,30 +77,28 @@ namespace Gekko.Parser.Gek
 
                 string s7 = statement.text;
 
-                TokenHelper firstWord = null;
-                TokenHelper next = null;
+                int extras = 5;  //easier to do "leads"
+                List<TokenHelper> m = new List<TokenHelper>();
+                foreach (TokenHelper th in statement.tokens)
+                {
+                    if (th.type != ETokenType.Comment) m.Add(th);
+                }
+                for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));                
+                                
                 long start = -12345; long end = -12345;
                 foreach (TokenHelper th in statement.tokens)
                 {
+                    //hmmm why looping to do this?
                     if (start == -12345) start = (long)1e9 * th.line + th.column;
-                    end = (long)1e9 * th.line + th.column;
-                    if (firstWord != null && next == null && (th.type != ETokenType.Comment))
-                    {
-                        next = th;
-                        break;
-                    }
-                    if (firstWord == null && th.type == ETokenType.Word)
-                    {
-                        firstWord = th;
-                    }
+                    end = (long)1e9 * th.line + th.column;                                        
                 }                
 
-                bool hasSigil = statement.tokens?[0].s == Globals.symbolScalar.ToString() || statement.tokens?[0].s == Globals.symbolCollection.ToString();
+                bool hasSigil = m[0].s == Globals.symbolScalar.ToString() || m[0].s == Globals.symbolCollection.ToString();
                 if (!hasSigil)
                 {
                     //We are trying to find commands here, to distinguish them from assignments.
                     //function and procedure calls like f(...), p ..., m.f(...), m.p ... are 
-                    //dealt with, so below we try to identify normal commands like "prt ...", "read ..." etc.
+                    //dealt with already, so below we try to identify normal commands like "prt ...", "read ..." etc.
                     //because else they become assignments.
                     //
                     //Default is assignment, because it is most difficult to determine.
@@ -108,39 +106,68 @@ namespace Gekko.Parser.Gek
                     //We must guard against the firstWord being for instance "global" (command name) but it is a bank or something,
                     //like global:%x = ... etc.
                     //
-                    // ------------------------------------
-                    // THE FOLLOWING ARE ASSIGNMENTS --> beware ¨ etc.
-                    // ------------------------------------
+                    // ------------------------------------------------------
+                    // THE FOLLOWING ARE ASSIGNMENTS and should be removed
+                    // even if they start with a command name like for
+                    // instance "global".
+                    // ------------------------------------------------------
                     // Maybe with blanks
                     // ------------------------------------
                     // :             global : x, global:x
                     // =             global = x, global=x
                     // $             global $ x, global$x
-                    // .             global . x, global.x
-                    // !             global ! x, global!x     
-                    // |             global | x, global|x
-                    // +             global +=, global+=    for these 5 also check =
-                    // -             global -=, global-=
-                    // -             global *=, global*=
-                    // -             global /=, global/=
-                    // -             global ^=, global/=
-                    // -             global <, global<      only if first > is followed by =
+                    // .             global . x, global.x  (last: global£.x)
+                    // !             global ! x, global!x  (last: global¨!¨x)   
+                    // |             global | x, global|x  (last: global¨|x)
+                    // +             global +=, global+=                       1 for these 5 also check =
+                    // -=            global -=, global-=                       2
+                    // *=            global *=, global*=   (last: global½*=)   3
+                    // /=            global /=, global/=                       4
+                    // ^=            global ^=, global/=                       5
+                    // <             global <, global<      only if first > is followed by = (in principle also += etc but oh well...)
                     // ------------------------------------
                     // No blanks
                     // ------------------------------------                              
-                    // #             global#x               
-                    // %             global%x               
-                    // {             global{x
-                    // [             global[x
-                    // ------------------------------------                              
+                    // #             global#x               (global¨#¨x)              
+                    // %             global%x               (global¨%¨x)
+                    // {             global{x               (global¨{x)
+                    // [             global[x               (global[_[x)
+                    // ------------------------------------                  
 
-                    if (statement.type != ParserGekCreateAST.EParserType.OnlyProcedureCallEtc && firstWord != null && Globals.commandNames.Contains(firstWord.s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
-
-                    if (G.Equal(firstWord.s, "end") && next != null && next.s == ";") continue;
-
-                    if (G.Equal(firstWord.s, "for") || G.Equal(firstWord.s, "if") || G.Equal(firstWord.s, "block") || G.Equal(firstWord.s, "function") || G.Equal(firstWord.s, "procedure"))
+                    bool seemsAssignment = false;
+                    if (m[0].type == ETokenType.Word)
                     {
-                        s7 += "end;";
+                        if (
+                            (m[1].s == ":") ||
+                            (m[1].s == "=") ||
+                            (m[1].s == "$") ||
+                            (m[1].s == ".") ||
+                            (m[1].s == "£" && m[2].s == "." && m[2].leftblanks == 0) ||
+                            (m[1].s == "!") ||
+                            (m[1].s == "¨" && m[2].s == "!" && m[2].leftblanks == 0) ||
+                            (m[1].s == "|") ||
+                            (m[1].s == "¨" && m[2].s == "|" && m[2].leftblanks == 0) ||
+                            (m[1].s == "+" && m[2].s == "=" && m[2].leftblanks == 0) ||
+                            (m[1].s == "-" && m[2].s == "=" && m[2].leftblanks == 0) ||
+                            (m[1].s == "*" && m[2].s == "=" && m[2].leftblanks == 0) ||
+                            (m[1].s == "½" && m[2].s == "*" && m[2].leftblanks == 0) ||
+                            (m[1].s == "/" && m[2].s == "=" && m[2].leftblanks == 0) ||
+                            (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||
+                            (m[1].s == "<" && HasLargerThanAndEqual()) ||
+                            (m[1].s == "¨" && m[2].s == "%" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[2].s == "#" && m[2].leftblanks == 0) ||
+                            (m[1].s == "¨" && m[2].s == "{" && m[2].leftblanks == 0) ||
+                            (m[1].s == "[" && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
+                        ) seemsAssignment = true;
+                    }
+
+                    if (statement.type != ParserGekCreateAST.EParserType.OnlyProcedureCallEtc && Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+
+                    if (G.Equal(m[0].s, "end") && m[1].s == ";") continue;
+
+                    if (G.Equal(m[0].s, "for") || G.Equal(m[0].s, "if") || G.Equal(m[0].s, "block") || G.Equal(m[0].s, "function") || G.Equal(m[0].s, "procedure"))
+                    {
+                        s7 += "end;";  //to get it to parse
                     }
                 }
 
