@@ -228,7 +228,7 @@ namespace Gekko.Parser.Gek
 
                         string link = null;
                         string x = null;
-                        if (number > 1 && maxShow == 1) link = " (" + G.GetLinkAction("show " + number + "", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                        if (number > 1 && maxShow == 1) link = " (" + G.GetLinkAction("show " + number + " errors", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         if (maxShow == 1) x = " 1 of " + number;
                         txt.MainAdd("Showing syntax errors from" + x + plus + " erroneous statements " + part + link);
                     }
@@ -241,8 +241,19 @@ namespace Gekko.Parser.Gek
             try
             {
                 int counter = 0;
+                //int line777 = -1;
+                //int col777 = -1;
                 foreach (Statement statement in statements)
                 {
+                    int offset = 0;
+                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
+                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
+                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
+                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
+                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
+                    new Writeln(statement.tokens[0].column + " --- " + statement.tokens[0].leftblanks);
+                    if (statement.tokens != null && statement.tokens.Count > 0) offset = statement.tokens[0].column - statement.tokens[0].leftblanks - 1; //seems to work
+
                     if (statement.errorDictionary != null)
                     {
                         SortedDictionary<long, ErrorHelper> originalErrors = CloneErrorDictionary(statement.errorDictionary);
@@ -288,18 +299,20 @@ namespace Gekko.Parser.Gek
                             int cOld = 0; int errorCounter = 0;
                             string s1 = start2;
                             string s2 = start2;
+                            int first = 1;
                             foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
-                            {
+                            {                                
                                 int ln = (int)(kvp.Key / (long)1e9);
                                 int col = (int)(kvp.Key % (long)1e9);
                                 col += kvp.Value.offset;  //kind of like cheating, but much easier because keys of a dict cannot be changed
                                 if (ln != line2) continue;
                                 errorCounter++;
                                 char letter = (char)(97 + errorCounter - 1);
-                                int c = col - 1 - cOld;
+                                int c = col - 1 - cOld + first * offset;
                                 s1 += G.Blanks(c) + "^";
                                 s2 += G.Blanks(c) + letter;
                                 cOld = col;
+                                first = 0;
                             }
 
                             //
@@ -322,7 +335,7 @@ namespace Gekko.Parser.Gek
                             foreach (KeyValuePair<long, ErrorHelper> kvp in statement.errorDictionary)
                             {
                                 int ln = (int)(kvp.Key / (long)1e9);
-                                int col = (int)(kvp.Key % (long)1e9);
+                                int col = (int)(kvp.Key % (long)1e9) + offset;
                                 if (ln != line2) continue;
                                 errorCounter++;
                                 char letter = (char)(97 + errorCounter - 1);
