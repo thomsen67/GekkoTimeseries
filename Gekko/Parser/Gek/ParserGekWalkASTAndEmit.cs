@@ -766,6 +766,12 @@ namespace Gekko.Parser.Gek
                         string returnType = node[0].Text;
                         string functionName = GetFunctionName2(node);  //node[1]
 
+                        if (functionName == "if" || functionName == "for" || functionName == "do" || functionName == "while" || functionName == "repeat" || functionName == "until" || functionName == "else" || functionName == "end")
+                        {
+                            //cf #jkaf8907adsfyuh
+                            new Error("From Gekko 3.1.15 on, you cannot use 'if', 'for', 'do', 'while', 'repeat', 'until', 'else', 'end' as funtion or procedure names, to avoid confusion. Please rename your function/procedure.");
+                        } //May get syntax like this: for (); end;  if (); else; end;  while (); end;  repeat; until(); do; until(); end; 
+
                         if (IsFunctionDefOptionalTimeParams(node[2][0]))  //f(<date %t1, date %t2>)
                         {
                             foreach (ASTNode child in node[2][0].ChildrenIterator())

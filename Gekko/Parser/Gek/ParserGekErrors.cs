@@ -77,17 +77,10 @@ namespace Gekko.Parser.Gek
 
                 string s7 = statement.text;
 
-                int extras = 5;  //easier to do "leads"
-                List<TokenHelper> m = new List<TokenHelper>();
-                foreach (TokenHelper th in statement.tokens)
-                {
-                    //ignores any "noise" from syntax
-                    if (th.type == ETokenType.Word || th.type == ETokenType.Number || th.type == ETokenType.QuotedString || th.type == ETokenType.Symbol) m.Add(th);                    
-                }
-                for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));                                                
-                
-                long    start = (long)1e9 * statement.tokens[0].line + statement.tokens[0].column;
-                long    end = (long)1e9 * statement.tokens[statement.tokens.Count - 1].line + statement.tokens[statement.tokens.Count - 1].column;                                
+                List<TokenHelper> m = GetM(statement);
+
+                //long start = (long)1e9 * statement.tokens[0].line + statement.tokens[0].column;
+                //long end = (long)1e9 * statement.tokens[statement.tokens.Count - 1].line + statement.tokens[statement.tokens.Count - 1].column;
 
                 bool hasSigil = m[0].s == Globals.symbolScalar.ToString() || m[0].s == Globals.symbolCollection.ToString();
                 if (!hasSigil)
@@ -148,14 +141,14 @@ namespace Gekko.Parser.Gek
                             (m[1].s == "*" && m[2].s == "=" && m[2].leftblanks == 0) || // global *
                             (m[1].s == Globals.symbolGlueChar4.ToString() && m[1].leftblanks == 0 && m[2].s == "*" && m[2].leftblanks == 0) || // global*
                             (m[1].s == "/" && m[2].s == "=" && m[2].leftblanks == 0) ||
-                            (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||                            
+                            (m[1].s == "^" && m[2].s == "=" && m[2].leftblanks == 0) ||
                             (m[1].s == "<" && HasLargerThanAndEqual(m)) ||              // identifies global <2001 2002> = 100; for instance
                             (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "%" && m[2].leftblanks == 0) ||
                             (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "#" && m[2].leftblanks == 0) ||
                             (m[1].s == Globals.symbolGlueChar1.ToString() && m[1].leftblanks == 0 && m[2].s == "{" && m[2].leftblanks == 0) ||
                             (m[1].s == "[" && m[1].leftblanks == 0 && m[2].s == "_" && m[2].leftblanks == 0 && m[3].s == "[" && m[3].leftblanks == 0)
                         ) seemsAssignment = true;
-                    }                    
+                    }
 
                     if (statement.type == ParserGekCreateAST.EParserType.OnlyProcedureCallEtc || seemsAssignment)
                     {
@@ -167,6 +160,7 @@ namespace Gekko.Parser.Gek
                         if (Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
                     }
 
+                    //int line = m[0].line;
                     if (G.Equal(m[0].s, "end") && m[1].s == ";") continue;
 
                     if (G.Equal(m[0].s, "else") && m[1].s == ";") continue;
@@ -178,20 +172,20 @@ namespace Gekko.Parser.Gek
                 }
 
                 ph7.commandsText = s7;
-                ph7.syntaxType = statement.type;
+                ph7.syntaxType = statement.type;                
 
                 // ========================================
                 // calling parser
                 // ========================================
                 ConvertHelper parseOutput7; string textWithExtraLines7; CommonTree t7;
-                LexerAndParserErrors lexerAndParserErrors7 = ParserGekCreateAST.ParseAndSyntaxErrors(out parseOutput7, out textWithExtraLines7, out t7, ph7);
+                LexerAndParserErrors lexerAndParserErrors7 = ParserGekCreateAST.ParseAndSyntaxErrors(out parseOutput7, out textWithExtraLines7, out t7, ph7);                
 
                 if (lexerAndParserErrors7.parserErrors != null && lexerAndParserErrors7.parserErrors.Count > 0)
                 {
                     statement.errorDictionary = GetErrorsFromOneStatement(ph, maxCalc, statement, ph7, lexerAndParserErrors7);
                 }
 
-                if (statement.errorDictionary != null) linesWithErrors++;                
+                if (statement.errorDictionary != null) linesWithErrors++;
                 if (linesWithErrors >= maxCalc) break;  //no need to carry on
 
             } //end loop over statements and calling the parser
@@ -244,19 +238,15 @@ namespace Gekko.Parser.Gek
                 //int line777 = -1;
                 //int col777 = -1;
                 foreach (Statement statement in statements)
-                {
-                    int offset = 0;
-                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
-                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
-                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
-                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
-                    //new Writeln("FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME FIX ME ");
-                    new Writeln(statement.tokens[0].column + " --- " + statement.tokens[0].leftblanks);
-                    if (statement.tokens != null && statement.tokens.Count > 0) offset = statement.tokens[0].column - statement.tokens[0].leftblanks - 1; //seems to work
-
+                {                    
                     if (statement.errorDictionary != null)
                     {
+                        List<TokenHelper> m = GetM(statement);
+                        int offset = 0;
+                        if (m != null && m.Count > 0) offset = m[0].column - m[0].leftblanks - 1; //seems to work
+
                         SortedDictionary<long, ErrorHelper> originalErrors = CloneErrorDictionary(statement.errorDictionary);
+                        
                         counter++;                        
 
                         SortedDictionary<int, string> split = new SortedDictionary<int, string>();  //relevant lines for multi-line errors
@@ -308,7 +298,7 @@ namespace Gekko.Parser.Gek
                                 if (ln != line2) continue;
                                 errorCounter++;
                                 char letter = (char)(97 + errorCounter - 1);
-                                int c = col - 1 - cOld + first * offset;
+                                int c = col - 1 - cOld + first * offset;  //offset only affects the whole statement, so only first time (else it would accumulate)
                                 s1 += G.Blanks(c) + "^";
                                 s2 += G.Blanks(c) + letter;
                                 cOld = col;
@@ -484,7 +474,16 @@ namespace Gekko.Parser.Gek
 
                         if (CountErrors(statement.errorDictionary) != CountErrors(originalErrors))
                         {
-                            if (Globals.runningOnTTComputer) new Error("Dict mismatch");
+                            if (Globals.runningOnTTComputer)
+                            {
+                                new Writeln("");
+                                new Writeln("---------------------");
+                                new Writeln("---------------------");
+                                new Writeln("Dict mismatch");
+                                new Writeln("---------------------");
+                                new Writeln("---------------------");
+                                new Writeln("");
+                            }
                         }
 
                         if (ph.isOneLinerFromGui) WritelnError("", true);
@@ -501,6 +500,25 @@ namespace Gekko.Parser.Gek
             G.Write("");  //removes marking
 
             return false;
+        }
+
+        /// <summary>
+        /// Tokens without "noise"
+        /// </summary>
+        /// <param name="statement"></param>
+        /// <returns></returns>
+        private static List<TokenHelper> GetM(Statement statement)
+        {
+            if (statement.tokens == null) return null;
+            List<TokenHelper> m = new List<TokenHelper>();
+            int extras = 5;  //easier to do "leads"
+            foreach (TokenHelper th in statement.tokens)
+            {
+                //ignores any "noise" from syntax
+                if (th.type == ETokenType.Word || th.type == ETokenType.Number || th.type == ETokenType.QuotedString || th.type == ETokenType.Symbol) m.Add(th);
+            }
+            for (int i = 0; i < extras; i++) m.Add(new TokenHelper(""));
+            return m;
         }
 
         /// <summary>
@@ -982,31 +1000,42 @@ namespace Gekko.Parser.Gek
                         int j5 = -12345; string s5 = null; if (s4 != null) s5 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j4, 1, out j5);
 
                         bool flag = false;
-
-                        if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j3].s == "(")
+                        
+                        if (G.Equal(s1, "if") || G.Equal(s1, "for") || G.Equal(s1, "do") || G.Equal(s1, "while") || G.Equal(s1, "repeat") || G.Equal(s1, "until") || G.Equal(s1, "else") || G.Equal(s1, "end"))
                         {
-                            //f¨(
-                            if (!Globals.leftSideFunctions.Contains(s1.ToLower())) flag = true;
+                            //cf #jkaf8907adsfyuh
+                            //these are reserved from Gekko 3.1.15
                         }
-                        else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && j4 != -12345 && j5 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word && statement.tokens[j4].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j5].s == "(")
+                        else
                         {
-                            //b:f¨(
-                            flag = true;
-                        }
-                        else if (j1 != -12345 && statement.tokens[j1].type == ETokenType.Word)
-                        {
-                            //f
-                            if (!Globals.commandNames.Contains(s1.ToUpper())) flag = true;
-                        }
-                        else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word)
-                        {
-                            //b:f                            
-                            flag = true;
+                            if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j3].s == "(")
+                            {
+                                //f¨(
+                                if (!Globals.leftSideFunctions.Contains(s1.ToLower())) flag = true;
+                            }
+                            else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && j4 != -12345 && j5 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word && statement.tokens[j4].s == Globals.symbolGlueChar1.ToString() && statement.tokens[j5].s == "(")
+                            {
+                                //b:f¨(
+                                flag = true;
+                            }
+                            else if (j1 != -12345 && statement.tokens[j1].type == ETokenType.Word)
+                            {
+                                //f
+                                if (!Globals.commandNames.Contains(s1.ToUpper())) flag = true;
+                            }
+                            else if (j1 != -12345 && j2 != -12345 && j3 != -12345 && statement.tokens[j1].type == ETokenType.Word && statement.tokens[j2].s == ":" && statement.tokens[j3].type == ETokenType.Word)
+                            {
+                                //b:f                            
+                                flag = true;
+                            }
                         }
 
                         int eq = StringTokenizer.FindS(statement.tokens, "=");
 
-                        if (flag && eq == -12345) statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+                        if (flag && eq == -12345)
+                        {
+                            statement.type = ParserGekCreateAST.EParserType.OnlyProcedureCallEtc;
+                        }
                                                 
                     }
 
