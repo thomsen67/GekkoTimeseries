@@ -31,6 +31,7 @@ namespace Gekko.Parser.Gek
     public class Statement
     {
         public List<TokenHelper> tokens = new List<TokenHelper>();
+        public List<TokenHelper> m = null; //real tokens without noise from commments, EOL, EOF etc. --> better for "parsing" and logic.
         public List<int?> paren_parentheses = new List<int?>();
         public List<int?> paren_brackets = new List<int?>();
         public List<int?> paren_curlies = new List<int?>();
@@ -907,6 +908,7 @@ namespace Gekko.Parser.Gek
             StringBuilder rv = new StringBuilder();
 
             int n_paren = 0; int n_bracket = 0; int n_curly = 0;
+            int leftBracketLastLine = -12345;
             List<string> comments = new List<string>();
             Statement statement = new Statement();                       
             
@@ -946,6 +948,7 @@ namespace Gekko.Parser.Gek
                 {
                     n_bracket++;
                     statement.paren_brackets.Add(n_bracket);
+                    leftBracketLastLine = tok.line;
                 }
                 else if (tok.s == "]")
                 {
@@ -984,15 +987,20 @@ namespace Gekko.Parser.Gek
 
                 statement.tokens.Add(tok);
 
-                if (tok.s == ";")  // && (n_paren == 0 && n_bracket == 0 && n_curly == 0))
+                bool seemsLikeSemicolonInsideMatrixDef = false;
+                if (n_bracket > 0 && tok.line == leftBracketLastLine) seemsLikeSemicolonInsideMatrixDef = true;
+
+                if (tok.s == ";" && !seemsLikeSemicolonInsideMatrixDef)
                 {
-                    //Next statement. We make sure that for instance #m = [1, 2; 3, 4]; does not break into two.                                                        
+                    //Next statement. 
+                    //if n_bracket > 0, it could be something like #m = [1, 2; 3, 4]; --> do not break it into two.
+                    //but the "inside bracket" stuff can only happen on the same line, so an unclosed "[" does not havoc all lines.
                     statement.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement.tokens, true);
                     if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field");
 
                     if (true)
                     {
-
+                        //This is similar to the GetM() method, maybe merge the logic at some point?
                         int j1 = -12345; string s1 = StringTokenizer.GetFirstTokenReal(statement.tokens, out j1);
                         int j2 = -12345; string s2 = null; if (s1 != null) s2 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j1, 1, out j2);
                         int j3 = -12345; string s3 = null; if (s2 != null) s3 = StringTokenizer.OffsetTokensRightReal(statement.tokens, j2, 1, out j3);
