@@ -6365,8 +6365,17 @@ namespace Gekko
                         if (!G.Equal(name2, G.ConvertFreq(freq)))
                         {
                             //for instance quarterly x.sol (not x.q)
-                            new Warning("Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
-                            name += "_" + name2;
+                            if (true)
+                            {
+                                new Warning("Changed " + name1 + "." + name2 + " into " + name1 + "__" + name2 + "!" + G.ConvertFreq(freq));
+                                name += "__" + name2;
+                            }
+                            else
+                            {
+                                //this gave problems, better to use "__"
+                                new Warning("Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
+                                name += "_" + name2;
+                            }
                         }
                     }
                     name = name + Globals.freqIndicator + G.ConvertFreq(freq);
@@ -15753,7 +15762,10 @@ namespace Gekko
                 }
             }
 
-            GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, o.opt_respect, null, "copy");
+            string respect = o.opt_respect; //local option, COPY<respect>.
+            if (Program.options.copy_respect) respect = "yes"; //if global "option copy respect = yes", we set respect = "yes". So if either local or global is yes, respect = "yes".
+
+            GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, respect, null, "copy");
 
             foreach (ToFrom output in outputs)
             {
@@ -15840,7 +15852,6 @@ namespace Gekko
                     if (G.Equal(type, "import") || G.Equal(type, "export"))
                     {
                         new Error("You cannot use " + type.ToUpper() + "<respect>");
-                        //throw new GekkoException();
                     }
                     //COPY<respect>, READ<respect>, WRITE<respect>
                     truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
@@ -15850,7 +15861,6 @@ namespace Gekko
                     if (G.Equal(type, "copy") || G.Equal(type, "read") || G.Equal(type, "write"))
                     {
                         new Error("You cannot use " + type.ToUpper() + "<all>");
-                        //throw new GekkoException();
                     }
                     //IMPORT<all> or EXPORT<all>
                     //truncate = new GekkoSmplSimple(true);

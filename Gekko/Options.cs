@@ -43,6 +43,8 @@ namespace Gekko
         public string collapse_method = "total";  //total|avg|first|last
         public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---        
+        public bool copy_respect = false;  //yes|no
+        // ---        
         public bool databank_create_auto = true;
         public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache databank files for faster (re)read.
         public bool databank_file_copylocal = true;
@@ -307,6 +309,7 @@ namespace Gekko
             Add("BUGFIX MISSINGIGNORE", Globals.xbool);
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
+            Add("COPY RESPECT", Globals.xbool);
             Add("DATABANK FILE CACHE", Globals.xnameOrString, "all", "nongbk", "none");
             Add("DATABANK CREATE AUTO", Globals.xbool);
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);

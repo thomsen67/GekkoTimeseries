@@ -785,6 +785,7 @@ namespace Gekko
 
         public static List<string> extraNames = new List<string>() { "P", "PRI", "PRINT", "SER" };
         public static List<string> commandNames = Program.Add2Lists(Globals.helpTopics, Globals.extraNames);  //must be after the two lists
+        public static List<string> assignNames = new List<string>() { "SERIES", "SER", "VAL", "DATE", "STRING", "LIST", "MATRIX", "MAP" };
 
         public static Dictionary<string, string> createdVariables = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 

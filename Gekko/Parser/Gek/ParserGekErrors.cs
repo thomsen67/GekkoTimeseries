@@ -71,6 +71,8 @@ namespace Gekko.Parser.Gek
             int linesWithErrors = 0;
             foreach (Statement statement in statements)
             {
+                //new Writeln(statement.text);
+
                 bool startFor = false;
                 bool startIf = false;
                 ParseHelper ph7 = ph.Clone();
@@ -158,7 +160,7 @@ namespace Gekko.Parser.Gek
                     else
                     {
                         //may be a statement
-                        if (Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
+                        if (!Globals.assignNames.Contains(m[0].s.ToUpper()) && Globals.commandNames.Contains(m[0].s.ToUpper())) statement.type = ParserGekCreateAST.EParserType.Normal;
                     }
 
                     //int line = m[0].line;
