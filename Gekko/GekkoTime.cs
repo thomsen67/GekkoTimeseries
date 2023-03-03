@@ -894,10 +894,31 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Central method regarding conversion of frequencies.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="tt1"></param>
+        /// <param name="tt2"></param>
         public static void ConvertFreqs(EFreq freq, GekkoTime t1, GekkoTime t2, ref GekkoTime tt1, ref GekkoTime tt2)
         {
             tt1 = ConvertFreqsFirst(freq, t1, null);
             tt2 = ConvertFreqsLast(freq, t2);
+        }
+
+        /// <summary>
+        /// Helper, here with GekkoSmplSimple
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="tt1"></param>
+        /// <param name="tt2"></param>
+        public static GekkoSmplSimple ConvertFreqs(EFreq freq, GekkoSmplSimple input)
+        {
+            return new GekkoSmplSimple(ConvertFreqsFirst(freq, input.t1, null), ConvertFreqsLast(freq, input.t2));
         }
 
         /// <summary>

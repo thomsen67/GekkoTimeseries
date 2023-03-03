@@ -795,11 +795,28 @@ namespace Gekko
             return fix;
         }
 
+        /// <summary>
+        /// OBSOLETE
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x1"></param>
+        /// <returns></returns>
         public static IVariable bankfilename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             return bankfilename(smpl, _t1, _t2, x1, new ScalarString(""));
         }
 
+        /// <summary>
+        /// OBSOLETE
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
         public static IVariable bankfilename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             string y1 = x1.ConvertToString();
@@ -4835,6 +4852,10 @@ namespace Gekko
             {
                 return new ScalarString(ts.meta.stamp);
             }
+            else if (G.Equal(s2, "stamp2"))
+            {
+                return new ScalarDate(GekkoTime.FromDateTimeToGekkoTime(EFreq.D, Program.GetDateTimePrettyInverse(ts.meta.stamp)));
+            }
             else if (G.Equal(s2, "units"))
             {
                 return new ScalarString(ts.meta.units);
@@ -4956,7 +4977,75 @@ namespace Gekko
             else
             {
                 new Error("fromSeries(): Argument '" + s2 + "' not recognized."); return null;
+            }
+        }
+
+        /// <summary>
+        /// This should obsolete bankfilename() and banktime(), whereas bankname() could stay.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
+        public static IVariable frombank(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            string bank = null;
+            if (x1.Type() == EVariableType.String)
+            {
+                bank = x1.ConvertToString();
+            }
+            else
+            {
+                new Error("frombank(): expected first argument to be string type");
                 //throw new GekkoException();
+            }
+
+            string s2 = O.ConvertToString(x2);
+
+            Databank db = Program.databanks.GetDatabank(bank, true);
+
+            if (G.Equal(s2, "filename"))
+            {
+                string rv = Program.GetDatabankFilename(db);
+                return new ScalarString(rv);                
+            }
+            else if (G.Equal(s2, "fullpath"))
+            {
+                string rv = db.FileNameWithPathPretty;
+                return new ScalarString(rv);
+            }
+            else if (G.Equal(s2, "label"))
+            {
+                return new ScalarString(db.info1);
+            }
+            else if (G.Equal(s2, "stamp"))
+            {
+                return new ScalarString(db.date);
+            }
+            else if (G.Equal(s2, "stamp2"))
+            {
+                if (G.NullOrEmpty(db.date)) return new GekkoNull();
+                return new ScalarDate(GekkoTime.FromDateTimeToGekkoTime(EFreq.D, Program.GetDateTimePrettyInverse(db.date)));
+            }
+            else if (G.Equal(s2, "format"))
+            {
+                string s = Globals.currentGbkVersion;
+                if (!G.NullOrEmpty(db.databankVersion))
+                {
+                    s = db.databankVersion;
+                }
+                return new ScalarString(s);
+            }            
+            else if (G.Equal(s2, "count"))
+            {
+                return new ScalarVal(db.storage.Count);
+            }
+            else
+            {
+                new Error("Unrecognized frombank() option '" + s2 + "'");
+                throw new GekkoException();
             }
         }
 

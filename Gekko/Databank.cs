@@ -178,6 +178,7 @@ namespace Gekko
         public bool editable = true;  //used to set an OPEN databank as editable. Don't use protobuffer on this field.        
         public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
         public string fileHash = null; //do not store this in protobuf
+        public string databankVersion = null; //do not store this in protobuf
 
         private Databank()
         {

@@ -667,6 +667,11 @@ namespace Gekko
             this.t1 = t1;
             this.t2 = t2;
         }
+
+        public GekkoSmplSimple Clone()
+        {
+            return new GekkoSmplSimple(this.t1, this.t2);
+        }
     }
 
     public class GekkoSmpl2
@@ -5348,11 +5353,11 @@ namespace Gekko
                     databank = deserializedDatabank;  //since this pointer is altered
                     databank.FileNameWithPath = originalFilePath;
                     databank.FileNameWithPathPretty = originalFilePathPretty;
+                    databank.databankVersion = databankVersion;
                 }
                 catch (Exception e)
                 {
                     new Error("Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
-                    //throw new GekkoException();
                 }
 
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
@@ -15793,7 +15798,27 @@ namespace Gekko
 
                 IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                 bool injectingToExistingSeries = false;
-                if (truncate != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
+
+                GekkoSmplSimple truncateTemp = null;
+
+                try
+                {
+                    if (truncate != null)
+                    {
+                        truncateTemp = truncate.Clone();
+                        if (iv.Type() == EVariableType.Series)
+                        {
+                            //if truncate freqs are same as iv freq, the method below will just return the same dates (and that runs fast)
+                            truncateTemp = GekkoTime.ConvertFreqs((iv as Series).freq, truncate);
+                        }
+                    }
+                }
+                catch
+                {
+                    //ultra safety: remove this try-catch in Gekko 3.2
+                }
+
+                if (truncateTemp != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
                 {
                     Series iv_series = iv as Series;
                     Series existing_series = existing as Series;
@@ -15801,8 +15826,9 @@ namespace Gekko
                     {
                         if (iv_series.freq == existing_series.freq)
                         {
-                            injectingToExistingSeries = true;
-                            foreach (GekkoTime gt in new GekkoTimeIterator(truncate.t1, truncate.t2))
+                            injectingToExistingSeries = true;                            
+
+                            foreach (GekkoTime gt in new GekkoTimeIterator(truncateTemp.t1, truncateTemp.t2))
                             {
                                 existing_series.SetData(gt, iv_series.GetDataSimple(gt));
                             }
@@ -15812,7 +15838,7 @@ namespace Gekko
 
                 if (!injectingToExistingSeries)
                 {
-                    IVariable iv_clone = iv.DeepClone(truncate);
+                    IVariable iv_clone = iv.DeepClone(truncateTemp);
                     Series ts_clone = iv_clone as Series;
                     if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
@@ -16041,6 +16067,8 @@ namespace Gekko
             //       of fixed names.
             //
             // =============================================
+
+            string freqWarning = null;
 
             bool removeCurrentFirstBankAndCurrentFreq = true;
 
@@ -16353,6 +16381,8 @@ namespace Gekko
                     O.Chop(rhsElement, out bankRhs, out nameRhs, out freqRhs, out indexRhs);
                     bankRhs = SubstituteFirstRefNames(bankRhs);
 
+                    if (freqLhs != null && freqRhs != null && !G.Equal(freqLhs, freqRhs)) freqWarning = "Frequency mismatch: beware that some series before TO/AS are of different frequency than corresponding series after TO/AS (the frequency part of the latter names is ignored).";
+
                     if (bankRhs == null && tobank != null) bankRhs = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
 
                     string[] name2split = nameRhs.Split('*');
@@ -16444,7 +16474,6 @@ namespace Gekko
                     }
                 }
 
-
                 //So now, if RHS has > 1 element, LHS has no '*' or '?'
                 //And if RHS has > 1 element, LHS has the same number.                
 
@@ -16459,12 +16488,10 @@ namespace Gekko
                     {
                         //Copying to "itself" (that is, the databank) is fine for WRITE
                         new Error("You cannot " + command2 + " element '" + two.s1 + "' to itself");
-                        //throw new GekkoException();
                     }
                     if (lhsCheck.ContainsKey(two.s1))
                     {
                         new Error("Dublet: element '" + two.s1 + "' appears several times before TO/AS");
-                        //throw new GekkoException();
                     }
                     else
                     {
@@ -16528,6 +16555,8 @@ namespace Gekko
                     }
                 }
             }
+
+            if (freqWarning != null) new Warning(freqWarning); //Gekko 3.2  --> maybe make this an error
 
             return outputs;
         }
@@ -20528,6 +20557,58 @@ namespace Gekko
             if (shortTime) code = "g";  //no seconds
             string now = date1.ToString(code, CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             return now;
+        }
+
+        /// <summary>
+        /// Inverse of the above, from "28-02-2023" or "28-02-2023 12:45:32". 
+        /// In the former case, the shortTime parameter is not used.    
+        /// Afterwards, GekkoTime.FromDateTimeToGekkoTime() can be used.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="shortTime"></param>
+        /// <returns></returns>
+        public static DateTime GetDateTimePrettyInverse(string input)
+        {
+            CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture(Globals.languageDaDK);
+
+            //See https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
+
+            try
+            {
+                //28-02-2023 12:45:32
+                return GetDateTimePrettyInverse(input, "G", cultureInfo);
+            }
+            catch
+            {
+            }
+            
+            try
+            {
+                //28-02-2023 12:45
+                return GetDateTimePrettyInverse(input, "g", cultureInfo);
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                //28-02-2023
+                return GetDateTimePrettyInverse(input, "d", cultureInfo);
+            }
+            catch
+            {
+            }
+
+            new Error("Unable to parse '" + input + "' into a date/time");
+            throw new GekkoException();
+
+        }
+
+        public static DateTime GetDateTimePrettyInverse(string input, string code, CultureInfo cultureInfo)
+        {            
+            DateTime dateTime = DateTime.ParseExact(input, code, cultureInfo);
+            return dateTime;
         }
 
         public static string GetDateStamp()
@@ -30602,6 +30683,8 @@ namespace Gekko
 
         /// <summary>
         /// Pick out a freq from ConvertDateFreqsToAllFreqs(). Used to convert frequencies.
+        /// NOTE: can one not just use method from GekkoTime class?? Why convert all and pick????
+        /// Fix this for Gekko 3.2.
         /// </summary>
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>

@@ -821,7 +821,11 @@ namespace Gekko
             so.isStatic = Program.GetYesNoNullLocalOption(o.opt_static);  //works faster as an enumeration
 
             string before = null;
-            if (Program.model.modelGekko.runBefore != null) before = Program.model.modelGekko.runBefore.Replace("runbefore$", "").Replace("runbefore;", "");
+            if (Program.model.modelGekko.runBefore != null)
+            {
+                before = G.Replace(Program.model.modelGekko.runBefore, "runbefore$", "", StringComparison.OrdinalIgnoreCase, 0);
+                before = G.Replace(before, "runbefore;", "", StringComparison.OrdinalIgnoreCase, 0);
+            }
             if (!G.NullOrBlanks(before))
             {
                 ScalarDate t1 = new ScalarDate(o.t1);
@@ -836,7 +840,11 @@ namespace Gekko
             SimFast(o.t1, o.t2, so);
 
             string after = null;
-            if (Program.model.modelGekko.runAfter != null) after = Program.model.modelGekko.runAfter.Replace("runafter$", "").Replace("runafter;", "");
+            if (Program.model.modelGekko.runAfter != null)
+            {
+                after = G.Replace(Program.model.modelGekko.runAfter, "runafter$", "", StringComparison.OrdinalIgnoreCase, 0);
+                after = G.Replace(after, "runafter;", "", StringComparison.OrdinalIgnoreCase, 0);
+            }
             if (!G.NullOrBlanks(after))
             {
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
