@@ -1610,20 +1610,21 @@ namespace Gekko
             MergeDecompDict(dd.cellsRef, decompDatas.storage[ii][jj].cellsRef);
         }
 
-        private static void MergeDecompDict(DecompDict dNew, DecompDict dOld)
+        private static void MergeDecompDict(DecompDict d, DecompDict dStorage)
         {
-            foreach (KeyValuePair<string, Series> kvp in dNew.storage)
+            foreach (KeyValuePair<string, Series> kvp in d.storage)
             {
-                Series tsNew = kvp.Value;
-                Series tsOld = dOld[kvp.Key]; //may be created
-                GekkoTime t1 = tsNew.GetRealDataPeriodFirst();
-                GekkoTime t2 = tsNew.GetRealDataPeriodLast();
+                Series ts = kvp.Value;
+                Series tsStorage = dStorage[kvp.Key]; //may be created
+                GekkoTime t1 = ts.GetRealDataPeriodFirst();
+                GekkoTime t2 = ts.GetRealDataPeriodLast();
                 if (!t1.IsNull())
                 {
                     foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                     {
                         //the following if is probably not necessary
-                        if (G.isNumericalError(tsOld.GetDataSimple(t))) tsOld.SetData(t, tsNew.GetDataSimple(t));
+                        //The IF is dropped ... if (G.isNumericalError(tsStorage.GetDataSimple(t))) tsStorage.SetData(t, ts.GetDataSimple(t));
+                        tsStorage.SetData(t, ts.GetDataSimple(t));
                     }
                 }
             }
