@@ -8604,6 +8604,7 @@ namespace Gekko
             public string opt_shares = null;
             public string opt_sort = null;
             public string opt_plot = null;
+            public string opt_expand = null;
             public double opt_ignore = double.NaN;
             public string variable = null;
             public string expressionCs = null;

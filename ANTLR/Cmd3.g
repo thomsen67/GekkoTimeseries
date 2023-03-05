@@ -624,6 +624,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_DATES;
     ASTOPT_STRING_DIRECT;
 	ASTOPT_STRING_EDIT;
+	ASTOPT_STRING_EXPAND;
 	ASTOPT_STRING_FIRST;
 	ASTOPT_STRING_CREATE;
 	ASTOPT_STRING_LAST;
@@ -1146,6 +1147,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	EXPAND = 'EXPAND';
 	VARIABLECODE = 'VARIABLECODE';
 	VIEW = 'VIEW';
 	KEEPTYPES      = 'KEEPTYPES'     ;
@@ -1791,6 +1793,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("expand"   , EXPAND     );
 										d.Add("view", VIEW);
 										d.Add("keeptypes"               , KEEPTYPES  );
 										d.Add("predict"               , PREDICT  );
@@ -1956,7 +1959,7 @@ d.Add("Y" ,Y);
                                         d.Add("pdec"    , PDEC    );
                                         d.Add("period"  , PERIOD    );
                                         d.Add("pipe"    , PIPE      );
-                                        d.Add("plot"   , PLOT     );
+                                        d.Add("plot"   , PLOT     );										
 										d.Add("cut"   , CUT     );
                                         d.Add("PLOTCODE" ,PLOTCODE);
                                         d.Add("points"    , POINTS   );
@@ -2964,6 +2967,7 @@ decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
 						  | SORT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SORT yesNo?)
 						  | IGNORE (EQUAL expression)? -> ^(ASTOPT_VAL_IGNORE expression)
 						  | PLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PLOT yesNo?)
+						  | EXPAND (EQUAL yesNo)? -> ^(ASTOPT_STRING_EXPAND yesNo?)
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 
@@ -4444,6 +4448,7 @@ ident2: 					Ident |
   EXCEL|
   EXE|
   EXP|
+  EXPAND|
   EXTERNAL|
   FAILSAFE|
   FAIR|
@@ -4911,6 +4916,7 @@ ident3: 					Ident |
   EXCEL|
   EXE|
   EXP|
+  EXPAND|
   EXTERNAL|
   FAILSAFE|
   FAIR|

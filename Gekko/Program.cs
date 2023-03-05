@@ -15836,7 +15836,7 @@ namespace Gekko
                         {
                             injectingToExistingSeries = true;                            
 
-                            foreach (GekkoTime gt in new GekkoTimeIterator(truncateTemp.t1, truncateTemp.t2))
+                            foreach (GekkoTime gt in new GekkoTimeIterator(truncateTemp))
                             {
                                 existing_series.SetData(gt, iv_series.GetDataSimple(gt));
                             }
@@ -16398,13 +16398,11 @@ namespace Gekko
                     if (name2split.Length - 1 > 1)
                     {
                         new Error("More than one '*' not allowed in name in TO/AS part of " + command + "");
-                        //throw new GekkoException();
                     }
 
                     if ((bankRhs != null && bankRhs.Contains("?")) || nameRhs.Contains("?"))
                     {
                         new Error("'?' not not allowed in TO/AS part of " + command + "");
-                        //throw new GekkoException();
                     }
 
                     if (bankRhs == null)
@@ -16536,12 +16534,10 @@ namespace Gekko
                         if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
                         {
                             new Error("Internal error #08745765398475");
-                            //throw new GekkoException();
                         }
                         if ((!G.Chop_HasSigil(two.s1) && !two.s1.Contains(Globals.freqIndicator)) || (!G.Chop_HasSigil(two.s2) && !two.s2.Contains(Globals.freqIndicator)))
                         {
                             new Error("Internal error #08745765398475");
-                            //throw new GekkoException();
                         }
                     }
 

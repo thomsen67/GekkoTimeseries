@@ -373,14 +373,16 @@
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="4" Orientation="Horizontal">
-                <TextBlock Text="Decimals:" Margin="0,0,0,0" ToolTip="Change number of decimals" />
+                <CheckBox Name="checkBoxPlot" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show decomposion in a plot." Checked="CheckBoxPlot_Checked" Unchecked="CheckBoxPlot_Unchecked">Plot</CheckBox>
+                <TextBlock Text="Decimals:" Margin="5,2,0,0" ToolTip="Change number of decimals" />
                 <Button Margin="5,-0,0,0" Name="button2" ToolTip="Increase decimals" Click="button2_Click" FontSize="10" AllowDrop="False" HorizontalAlignment="Left" Width="18.875" Height="18" Opacity="0.7">.00</Button>
                 <Button HorizontalAlignment="Right" Margin="2,0,0,0" Name="button3" Width="18" Height="18" ToolTip="Decrease decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
-                <TextBlock  Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="29,0,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
+                <TextBlock  Name="textBlockIgnore" Text="" FontSize="11" Foreground="Gray" Margin="39,0,0,0" ToolTip="Number of ignored rows or columns. The values of ignored rows/cols are ignored &#x0a;completely, and this may affect the summability of the rows/cols." />
+                
             </StackPanel>
 
             <StackPanel Grid.Column="11" Grid.Row="5" Orientation="Horizontal">
-                <CheckBox Name="checkBoxPlot" Width="62" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show decomposion in a plot." Checked="CheckBoxPlot_Checked" Unchecked="CheckBoxPlot_Unchecked">Plot</CheckBox>
+                <CheckBox Name="checkBoxExpand" Margin="0,3,0,0" Content="Expand" ToolTip="Expand all elements (all data cells will get 'Count' = 1)" Checked="checkBoxExpand_Checked" Unchecked="checkBoxExpand_Unchecked" />
             </StackPanel>
 
             <Button Name="button1" Visibility="Collapsed" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Height="22" Opacity="0.8" Content="Refresh">

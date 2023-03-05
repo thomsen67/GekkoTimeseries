@@ -404,6 +404,7 @@ namespace Gekko
                 if (G.Equal(o.opt_missing, "zero")) decompOptions2.missingAsZero = true;
                 if (G.Equal(o.opt_sort, "yes")) decompOptions2.sort = true;
                 if (G.Equal(o.opt_plot, "yes")) decompOptions2.plot = true;
+                if (G.Equal(o.opt_expand, "yes")) decompOptions2.expand = true;
                 if (!double.IsNaN(o.opt_ignore))
                 {
                     if (o.opt_ignore < 0d || o.opt_ignore > 100d)

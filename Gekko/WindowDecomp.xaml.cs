@@ -728,6 +728,11 @@ namespace Gekko
                 checkBoxPlot.IsChecked = true;
             }
 
+            if (this.decompFind.decompOptions2.expand)
+            {
+                checkBoxExpand.IsChecked = true;
+            }
+
             if (!double.IsNaN(this.decompFind.decompOptions2.ignore))
             {
                 this.NumValue = (int)this.decompFind.decompOptions2.ignore;
@@ -2858,6 +2863,24 @@ namespace Gekko
                 RecalcCellsWithNewType(decompFind.model);
             }
         }
+
+        private void checkBoxExpand_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.expand = true;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
+
+        private void checkBoxExpand_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompFind.decompOptions2.expand = false;
+                RecalcCellsWithNewType(decompFind.model);
+            }
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel
@@ -2893,6 +2916,7 @@ namespace Gekko
         public bool sort = false;
         public double ignore = double.NaN;  //between 0 and 100.
         public bool plot = false;
+        public bool expand = false;
         public List<string> new_select = null;
         public List<string> new_from = null;
         public List<string> new_endo = null;
@@ -2961,6 +2985,7 @@ namespace Gekko
             if (this.missingAsZero) s.Add(" missing=zero");
             if (this.sort) s.Add(" sort");
             if (!double.IsNaN(this.ignore) && ignore > 0d && ignore <= 100d) s.Add(" ignore=" + this.ignore);
+            if (this.expand) s.Add(" expand");
             if (this.plot) s.Add(" plot");
             s.Add(">", color);
             s.Add(" " + Stringlist.GetListWithCommas(this.new_select));
@@ -3036,6 +3061,7 @@ namespace Gekko
             d.isShares = this.isShares;
             d.sort = this.sort;
             d.plot = this.plot;
+            d.expand = this.expand;
             d.ignore = this.ignore;
             
             d.modelHash = this.modelHash;

@@ -909,7 +909,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper, here with GekkoSmplSimple
+        /// Central method regarding conversion of frequencies (here using GekkoSmplSimple).
         /// </summary>
         /// <param name="freq"></param>
         /// <param name="t1"></param>
@@ -1836,7 +1836,7 @@ namespace Gekko
         private GekkoTime _EndDate;
         private EFreq _freq;
 
-        public GekkoTimeIterator(GekkoSmplSimple tuple) : this(tuple.t1, tuple.t2) { }       
+        public GekkoTimeIterator(GekkoSmplSimple tuple) : this(tuple.t1, tuple.t2) { }        
 
         public GekkoTimeIterator(GekkoTime t1, GekkoTime t2)
         {
@@ -1848,6 +1848,8 @@ namespace Gekko
             }
             _freq = t1.freq;
         }
+
+        public GekkoTimeIterator(EFreq convertToThisFreq, GekkoSmplSimple tuple) : this(convertToThisFreq, tuple.t1, tuple.t2) { }
 
         public GekkoTimeIterator(EFreq convertToThisFreq, GekkoTime t1, GekkoTime t2)
         {
