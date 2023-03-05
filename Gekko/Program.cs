@@ -662,15 +662,23 @@ namespace Gekko
         //public bool allObservations = false;
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
+        public int extraInt = -12345;  //seldom used
         public GekkoSmplSimple(GekkoTime t1, GekkoTime t2)
         {
             this.t1 = t1;
             this.t2 = t2;
         }
 
+        public GekkoSmplSimple(GekkoTime t1, GekkoTime t2, int extraInt)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+            this.extraInt = extraInt;
+        }
+
         public GekkoSmplSimple Clone()
         {
-            return new GekkoSmplSimple(this.t1, this.t2);
+            return new GekkoSmplSimple(this.t1, this.t2, this.extraInt);
         }
     }
 
@@ -5625,8 +5633,8 @@ namespace Gekko
                         {
                             //this will adjust first and last to comply with the dates window
                             var tuple = GetFirstLastDates(dates, firstSource, lastSource);
-                            GekkoTime firstTruncated = tuple.Item1;
-                            GekkoTime lastTruncated = tuple.Item2;
+                            GekkoTime firstTruncated = tuple.t1;
+                            GekkoTime lastTruncated = tuple.t2;
                             //offset is not used
 
                             int nob = GekkoTime.Observations(firstTruncated, lastTruncated);
@@ -5719,7 +5727,7 @@ namespace Gekko
         /// <param name="first"></param>
         /// <param name="last"></param>
         /// <returns></returns>
-        public static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
+        public static GekkoSmplSimple GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
         {
             //offset is the distance from first to dates.t1. If dates.t1 < first, offset will be 0.
             //So offset tells us when to start taking data in the array of the existing timeseries, as counted from the first date.
@@ -5771,7 +5779,7 @@ namespace Gekko
                     lastRv = dates.t2Monthly;
                 }
             }
-            return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
+            return new GekkoSmplSimple(firstRv, lastRv, offset);
         }
 
         /// <summary>
@@ -15425,7 +15433,7 @@ namespace Gekko
                                 List<string> temp = new List<string>();
                                 string varnameWithBankAndFreq = ts.GetParentDatabank().name + Globals.symbolBankColon + ts.GetName();
                                 temp.Add(varnameWithBankAndFreq);
-                                Program.Disp(ConvertFreqs(tStart, tEnd, ts.freq).Item1, ConvertFreqs(tStart, tEnd, ts.freq).Item2, temp, false, true, true, null);
+                                Program.Disp(ConvertFreqs(tStart, tEnd, ts.freq).t1, ConvertFreqs(tStart, tEnd, ts.freq).t2, temp, false, true, true, null);
                             };
                             G.Writeln(surplus + " " + ps + " hidden (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                         }
@@ -18982,12 +18990,12 @@ namespace Gekko
         /// <param name="t2"></param>
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
-            Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(t1, t2, Program.options.freq);
+            GekkoSmplSimple freqs = ConvertFreqs(t1, t2, Program.options.freq);
 
-            G.CheckLegalPeriod(freqs.Item1, freqs.Item2);
+            G.CheckLegalPeriod(freqs.t1, freqs.t2);
 
-            Globals.globalPeriodStart = freqs.Item1;
-            Globals.globalPeriodEnd = freqs.Item2;
+            Globals.globalPeriodStart = freqs.t1;
+            Globals.globalPeriodEnd = freqs.t2;
             G.Writeln2(G.FreqAndPeriodPretty(false, true));
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
@@ -30690,7 +30698,7 @@ namespace Gekko
         /// <param name="tEnd"></param>
         /// <param name="tsFreq"></param>
         /// <returns></returns>
-        public static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, EFreq tsFreq)
+        public static GekkoSmplSimple ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, EFreq tsFreq)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -30729,7 +30737,7 @@ namespace Gekko
                 tStart2 = dates.t1Undated;
                 tEnd2 = dates.t2Undated;
             }
-            return new Tuple<GekkoTime, GekkoTime>(tStart2, tEnd2);
+            return new GekkoSmplSimple(tStart2, tEnd2);
         }
 
         /// <summary>

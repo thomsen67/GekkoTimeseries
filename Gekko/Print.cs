@@ -781,7 +781,7 @@ namespace Gekko
                 {
                     int counter = 0;
 
-                    Tuple<GekkoTime, GekkoTime> period = Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D);
+                    GekkoSmplSimple period = Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D);
 
                     int oldYear = -12345;
 

@@ -2028,37 +2028,37 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
-            Tuple<GekkoTime, GekkoTime> freqs = Program.ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
+            GekkoSmplSimple freqs = Program.ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
 
             if (Program.options.freq == EFreq.A)
             {
                 G.Writeln("Freq changed to annual (A)");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
+                Globals.globalPeriodStart = freqs.t1;
+                Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.Q)
             {
                 G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
+                Globals.globalPeriodStart = freqs.t1;
+                Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.M)
             {
                 G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
+                Globals.globalPeriodStart = freqs.t1;
+                Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.W)
             {
                 G.Writeln("Freq changed to weekly (W) -- note that start/end weeks have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
+                Globals.globalPeriodStart = freqs.t1;
+                Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.D)
             {
                 G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
+                Globals.globalPeriodStart = freqs.t1;
+                Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.U)
             {
