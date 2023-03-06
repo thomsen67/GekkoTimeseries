@@ -3275,8 +3275,13 @@ namespace Gekko
             //Aggregation into table suitable for showing
             //Aggregation
             //Aggregation
+            //
+            // decompOptions2.all gets sets at the end, for instance "#i"
+            // decompOptions2.freeValues has a Dict for each frame.colnames.Count (for instance 15)
+            //
+            //
             // ==============================================================================
-            
+
             decompOptions2.all.Clear();
             foreach (string s in frame.colnames)
             {
@@ -3365,7 +3370,7 @@ namespace Gekko
                 {
                     s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
                 }
-                string key = s1 + "¤" + s2;  //row ¤ col                                
+                string key = s1 + "¤" + s2;  //row ¤ col
 
                 double d = row.Get(frame, Globals.col_value).data;
                 double dAlternative = row.Get(frame, Globals.col_valueAlternative).data;
@@ -3375,8 +3380,8 @@ namespace Gekko
                 double dLevelRef = row.Get(frame, Globals.col_valueLevelRef).data;
                 double dLevelRefLag = row.Get(frame, Globals.col_valueLevelRefLag).data;
                 double dLevelRefLag2 = row.Get(frame, Globals.col_valueLevelRefLag2).data;
-                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;
-                                
+                string fullVariableName = row.Get(frame, Globals.col_fullVariableName).text;                
+
                 string backgroundColor = "Transparent";
                 if (Program.IsDecompResidualName(fullVariableName)) backgroundColor = Globals.decompResidualColor;
 
