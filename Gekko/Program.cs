@@ -23750,11 +23750,11 @@ namespace Gekko
                     double d = double.NaN;
                     if (isScalar)  //not series
                     {
-                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     else
                     {
-                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     i++;
 
@@ -25643,7 +25643,7 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, GekkoTime index, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 

@@ -9166,6 +9166,7 @@ namespace Gekko
             public string opt_datetype = null;
 
             public string opt_view = null;  //only for PRT, starts a data viewer
+            public GekkoTime opt_i = GekkoTime.tNull; //may be set to GekkoTime.tNotNull corresponding to <i> or 'yes'.
 
             public void Exe()
             {

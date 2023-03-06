@@ -217,6 +217,7 @@ ASTCOMPARE2;
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
+	ASTOPT_DATE_I;
 	ASTOPT_STRING_GMS;
 	ASTOPT_STRING_PX;
 	ASTOPT_STRING_NOMAX;
@@ -1482,6 +1483,7 @@ Y2                    = 'Y2'                       ;
     YES              = 'yes'             ;
     YMAX = 'YMAX';
     YMIN = 'YMIN';
+	I = 'I';
 	Y2MAX = 'Y2MAX';
     Y2MIN = 'Y2MIN';
     ZERO             = 'ZERO'            ;
@@ -2132,6 +2134,7 @@ d.Add("Y" ,Y);
                                         d.Add("yes"     , YES       );
                                         d.Add("ymax",YMAX);
                                         d.Add("ymin",YMIN);
+										d.Add("I",I);
 										d.Add("y2max",Y2MAX);
                                         d.Add("y2min",Y2MIN);
                                         d.Add("zero"    , ZERO      );
@@ -3491,7 +3494,7 @@ prtOpt1Helper:              filter
 						  | SPLIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLIT yesNo?)
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
-
+						  | I (EQUAL expression)? -> ^(ASTOPT_DATE_I expression?)
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -4783,6 +4786,7 @@ ident2: 					Ident |
   YMINHARD|
   YMINSOFT|
   YMIN|
+  I|
   YMIRROR|
   YTITLE|
   Y|
@@ -5246,6 +5250,7 @@ ident3: 					Ident |
   YMINHARD|
   YMINSOFT|
   YMIN|
+  I|
   YMIRROR|
   YTITLE|
   Y|

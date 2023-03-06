@@ -71,7 +71,6 @@ namespace Gekko
                     if (xx0.list.Count != xx1.list.Count)
                     {
                         new Error("Lists with different number of items");
-                        //throw new GekkoException();
                     }
                 }
                 if (xx0 != null) prtElementCounter = xx0.list.Count;
@@ -339,7 +338,6 @@ namespace Gekko
             if (freqs["U"] && (freqs["A"] || freqs["Q"] || freqs["M"] || freqs["W"] || freqs["D"]))
             {
                 new Error("You cannot mix undated and other frequencies for PRT/PLOT");
-                //throw new GekkoException();
             }
 
             EFreq sameFreq = EFreq.None;
@@ -364,7 +362,6 @@ namespace Gekko
             }
 
             // --------------------------- end ---------------------------------------------
-
 
             int y1 = smpl.t1.super;
             int y2 = smpl.t2.super;
@@ -395,9 +392,7 @@ namespace Gekko
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max + ". You can use PRT<nomax> or set OPTION print elements max = ... ;");
-
-                        //throw new GekkoException();
+                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max + ". You can use PRT<nomax> or set OPTION print elements max = ... ;");                        
                     }
                 }
             }
@@ -475,15 +470,15 @@ namespace Gekko
             }
             else
             {
-                if (tabletype==EPrtPlotSheet.PrintMixedAQMPretty)
+                if (tabletype == EPrtPlotSheet.PrintMixedAQMPretty)
                 {
-                    printTable = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);                    
+                    printTable = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);
                 }
                 else if (tabletype == EPrtPlotSheet.PrintMixedWDPretty)
-                {                    
+                {
                     printTable = PrintMixedWD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
                 }
-                else if(tabletype==EPrtPlotSheet.PrintMixedMDPretty)
+                else if (tabletype == EPrtPlotSheet.PrintMixedMDPretty)
                 {
                     printTable = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
                 }
@@ -656,11 +651,11 @@ namespace Gekko
                                     double d = double.NaN;
                                     if (tsWork == null && tsRef == null)  //not series
                                     {
-                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
                                     else
                                     {
-                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
                                     table.SetNumber(i, j, d, format);
                                 }
@@ -682,11 +677,11 @@ namespace Gekko
                                 double d = double.NaN;
                                 if (tsWork == null && tsRef == null)  //not series
                                 {
-                                    d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                 }
                                 else
                                 {
-                                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                 }
 
                                 table.SetNumber(i, j, d, format);
@@ -719,11 +714,11 @@ namespace Gekko
                             double d = double.NaN;
                             if (tsWork == null && tsRef == null)  //not series
                             {
-                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                             }
                             else
                             {
-                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                             }
                             table.SetNumber(i, j, d, format);
                         }
@@ -820,11 +815,11 @@ namespace Gekko
                                     double d = double.NaN;
                                     if (tsWork == null && tsRef == null)  //not series
                                     {
-                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
                                     else
                                     {
-                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tWeek, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tWeek, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
                                     table.SetNumber(i, j, d, format);
                                 }
@@ -849,11 +844,11 @@ namespace Gekko
                                     double d = double.NaN;
                                     if (tsWork == null && tsRef == null)  //not series
                                     {
-                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
                                     else
                                     {
-                                        d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
 
                                     table.SetNumber(i, j, d, format);
@@ -886,11 +881,11 @@ namespace Gekko
                             double d = double.NaN;
                             if (tsWork == null && tsRef == null)  //not series
                             {
-                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                             }
                             else
                             {
-                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                             }
                             table.SetNumber(i, j, d, format);
                         }
@@ -1011,7 +1006,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1035,7 +1030,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1060,7 +1055,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1098,7 +1093,7 @@ namespace Gekko
                                     }
                                     else
                                     {                                        
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1124,7 +1119,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1157,7 +1152,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1183,7 +1178,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1209,7 +1204,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1247,7 +1242,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1273,7 +1268,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1322,7 +1317,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1348,7 +1343,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1374,7 +1369,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1412,7 +1407,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1439,7 +1434,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1477,7 +1472,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1502,7 +1497,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1528,7 +1523,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1567,7 +1562,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1607,7 +1602,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1632,7 +1627,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -1671,7 +1666,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -1722,7 +1717,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                                 if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                             }
@@ -1733,7 +1728,7 @@ namespace Gekko
             return table;
         }
 
-        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter, O.Prt.Element cc)
+        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, GekkoTime index, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {            
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
 
@@ -1754,13 +1749,13 @@ namespace Gekko
             double? d = null;
             if (tsWork == null && tsRef == null)  //not series
             {
-                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, collapse, sumOver, skipCounter);
+                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, index, collapse, sumOver, skipCounter);
             }
             else
             {
                 if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn))
                 {
-                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, collapse, sumOver, skipCounter);
+                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, index, collapse, sumOver, skipCounter);
                 }                    
             }
             if (d != null)
@@ -1875,19 +1870,16 @@ namespace Gekko
             }
         }
 
-        public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
+        public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
         {
-            if (true)
-            {
-                //TODO filter and skip, see below
-                double var1 = double.NaN;
-                double varPch = double.NaN;
-                Program.ComputeValueForPrintPlotNew(out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, false, collapse, sumOver);
-                return var1;
-            }
+            //TODO filter and skip, see below
+            double var1 = double.NaN;
+            double varPch = double.NaN;
+            Program.ComputeValueForPrintPlotNew(out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, index, false, collapse, sumOver);
+            return var1;
         }
 
-        public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
+        public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
         {           
 
             if (logTransform)
