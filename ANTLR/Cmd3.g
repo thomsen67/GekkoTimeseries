@@ -376,7 +376,7 @@ ASTCOMPARE2;
     ASTFILENAMEPARTBACKSLASH;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
-    ASTFINDMISSINGDATA;
+    ASTFINDMISSINGDATA;	
 	ASTPREDICT;
     ASTFIND;
     ASTFLAT;
@@ -1794,7 +1794,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
-										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("findmissingdata"               , FINDMISSINGDATA  );										
 										d.Add("expand"   , EXPAND     );
 										d.Add("view", VIEW);
 										d.Add("keeptypes"               , KEEPTYPES  );
@@ -2589,6 +2589,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 			              | clear                SEMICOLON!		
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
+						  | closeall             SEMICOLON!
 						  | cls                  SEMICOLON!
 						  | collapse             SEMICOLON!
 						  | compare              SEMICOLON!
@@ -2844,6 +2845,12 @@ close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLO
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
 						    ;		
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CLOSEALL
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+closeall:					CLOSEALL -> ^({token("ASTCLOSEALL", ASTCLOSEALL, input.LT(1).Line)});
 												
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // COLLAPSE
@@ -4257,6 +4264,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  CLOSEALL|
   VIEW|
   LIBRARY|
   KEEPTYPES|
@@ -4385,8 +4393,7 @@ ident2: 					Ident |
   CELL|
   CHANGE|
   CLEAR2|
-  CLIPBOARD|
-  CLOSEALL|
+  CLIPBOARD|  
   CLOSEBANKS|
   CODE|
   MOVE|
@@ -4856,7 +4863,6 @@ ident3: 					Ident |
   CHANGE|
   //CLEAR2|
   CLIPBOARD|
-  CLOSEALL|
   CLOSEBANKS|
   CODE|
   MOVE|
@@ -4979,6 +4985,7 @@ ident3: 					Ident |
   IGNOREVARS|
   IMPOSE|
   IMPULSES|
+  I|
   IN|
   INFOFILE|
   INFO|
@@ -5250,7 +5257,6 @@ ident3: 					Ident |
   YMINHARD|
   YMINSOFT|
   YMIN|
-  I|
   YMIRROR|
   YTITLE|
   Y|

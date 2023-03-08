@@ -1880,7 +1880,14 @@ namespace Gekko
         }
 
         public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
-        {           
+        {
+            //TTH: index=100
+            
+            //if (!index.IsNull())
+            //{
+            //    scalarWork = 100d;
+            //    scalarRef = 100d;
+            //}
 
             if (logTransform)
             {

@@ -16560,7 +16560,7 @@ namespace Gekko
                 }
             }
 
-            if (freqWarning != null) new Warning(freqWarning); //Gekko 3.2  --> maybe make this an error
+            if (freqWarning != null) new Error(freqWarning); //Gekko 3.2  --> maybe make this an error
 
             return outputs;
         }
@@ -22527,8 +22527,7 @@ namespace Gekko
         {
             if (o.opt_rel != 0d && o.opt_pch != 0d)
             {
-                new Error("You cannot use <rel> and <pch> at the same time");
-                //throw new GekkoException();
+                new Error("You cannot use <rel> and <pch> at the same time,");
             }
             double rel = o.opt_rel;
             if (o.opt_pch != 0d) rel = o.opt_pch / 100d;
@@ -25645,6 +25644,9 @@ namespace Gekko
         /// <param name="sumOver"></param>
         public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, GekkoTime index, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
+            //TTH: index=100
+            //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
+
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
             if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
@@ -30500,6 +30502,12 @@ namespace Gekko
                     Series ts = sh.series1;
                     Series tsGrund = sh.series2;
 
+                    int dateWidth = 4;
+                    if (ts.freq == EFreq.Q) dateWidth = 6;
+                    else if (ts.freq == EFreq.M) dateWidth = 7;
+                    else if (ts.freq == EFreq.W) dateWidth = 7;
+                    else if (ts.freq == EFreq.D) dateWidth = 10;                    
+
                     string name = null;
 
                     if (removeCurrentFreqFromNames)
@@ -30515,11 +30523,11 @@ namespace Gekko
 
                     if (variables == null)
                     {
-                        samFile.Write(G.varFormat(name) + "   WORK       REFERENCE             ABS DIFF      % DIFF");
+                        samFile.Write(G.varFormat(name) + G.Blanks(dateWidth - 4) + "   WORK       REFERENCE             ABS DIFF      % DIFF");
                     }
                     else
                     {
-                        samFile.Write(G.varFormat(name) + "   FRML       DATABANK              ABS DIFF      % DIFF");
+                        samFile.Write(G.varFormat(name) + G.Blanks(dateWidth - 4) + "   FRML       DATABANK              ABS DIFF      % DIFF");
                     }
 
                     if (history)
@@ -30552,7 +30560,8 @@ namespace Gekko
                     if (history) samFile.WriteLine("------------");
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
-                    int tCounter = -1;
+                    int tCounter = -1;                    
+
                     foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
                         tCounter++;
@@ -30564,7 +30573,10 @@ namespace Gekko
                         double varPch = 0;
                         double varDlog = double.NaN;
                         double varRelHist = double.NaN;
-                        samFile.Write(t + " ");
+                        string tString = t.ToString();
+                        int dateExtra = dateWidth - tString.Length;
+
+                        samFile.Write(tString + G.Blanks(dateExtra) + " ");
 
                         {
                             var1 = ts.GetDataSimple(t);

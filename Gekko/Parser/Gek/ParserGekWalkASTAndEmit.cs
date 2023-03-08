@@ -1082,7 +1082,7 @@ namespace Gekko.Parser.Gek
                         GetCodeFromAllChildren(node, node[0]);  //options
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
-                    break;
+                    break;                
                 case "ASTLOCK":
                     {
                         node.Code.A("O.Lock o" + Num(node) + " = new O.Lock();" + G.NL);
@@ -1131,6 +1131,13 @@ namespace Gekko.Parser.Gek
                     {
                         node.Code.A("O.LibraryClear o" + Num(node) + " = new O.LibraryClear();" + G.NL);
                         node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
+                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    }
+                    break;
+                case "ASTCLOSEALL":
+                    {
+                        node.Code.A("O.Closeall o" + Num(node) + " = new O.Closeall();" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

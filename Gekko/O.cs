@@ -7141,6 +7141,20 @@ namespace Gekko
             }
         }
 
+        public class Closeall
+        {
+            public P p = null;
+            public void Exe()
+            {
+                O.Close o1 = new Close();                
+                o1.listItems = new List(new List<IVariable>() { new ScalarString("*") });
+                o1.Exe();
+                O.Clear o2 = new Clear();                
+                o2.p = p;
+                o2.Exe();
+            }
+        }
+
         public class Smooth
         {            
 
@@ -7862,7 +7876,7 @@ namespace Gekko
 
         public class Close
         {
-            public string name = null;  //only if '*' is indicated, not used otherwise
+            public string name = null;  //NOT TRUE --> only if '*' is indicated, not used otherwise. Remove in Gekko 3.2.
             public List listItems = null;
             public string opt_save = null;
             public void Exe()
@@ -7871,6 +7885,9 @@ namespace Gekko
                 List<string> databanks = new List<string>();
                 if (this.listItems == null)
                 {
+                    //???
+                    //??? Is this used anymore? A * seems to be handled in listItems.
+                    //???
                     if (this.name == "*")
                     {
                         foreach (Databank db in Program.databanks.storage)

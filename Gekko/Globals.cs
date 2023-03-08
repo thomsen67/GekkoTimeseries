@@ -697,6 +697,7 @@ namespace Gekko
             "CLIP",
             "CLONE",
             "CLOSE",
+            "CLOSEALL",
             "CLS",
             "COLLAPSE",
             "COMPARE",
