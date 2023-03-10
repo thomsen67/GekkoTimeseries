@@ -3425,6 +3425,85 @@ namespace Gekko
             return tsNew;
         }
 
+        public static IVariable splice(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            //The functions collapse(), interpolate(), rebase(), smooth() and splice are essentially timeless, operating
+            //on the full sample. Therefore, _t1 and _t2 are ignored.
+
+            // splice(x1, 2010, x2)
+            // splice('first', x1, 2010, x2)
+            // splice('2', x1, 2010, x2)
+            // splice('first-2', x1, 2010, x2)            
+
+            //Corresponds to SPLICE, but truncates the returned series to the time period                        
+
+            if (x.Length < 1) new Error("Expected splice() with >= 1 arguments.");
+
+            IVariable iv = x[0];
+            if (G.IsGekkoNull(iv)) return iv;
+            Series ts = iv as Series;
+            if (ts == null) new Error("Expected a timeseries as first argument, got " + G.GetTypeString(iv) + " type");
+
+            string missing = null;
+            string freq_destination = null;
+            string method = Program.options.collapse_method.ToLower(); //starts as "total"
+
+            if (x.Length > 1)
+            {
+                string s = O.ConvertToString(x[1]);
+                if (s.ToLower().StartsWith("total") || s.ToLower().StartsWith("avg") || s.ToLower().StartsWith("first") || s.ToLower().StartsWith("last") || s.ToLower().StartsWith("strict") || s.ToLower().StartsWith("flex"))
+                {
+                    // collapse(x!d, 'total') or collapse(x!d, 'avg-strict') or collapse(x!d, 'strict'), etc.
+                    // Not allowed to do collapse(x!d, 'total', 'a')
+
+                    string[] ss = s.Split('-');
+                    if (ss.Length == 2)
+                    {
+                        method = ss[0];
+                        missing = ss[1];
+                    }
+                    else if (s.ToLower().StartsWith("strict") || s.ToLower().StartsWith("flex"))
+                    {
+                        missing = s;
+                    }
+                    else
+                    {
+                        method = s;
+                    }
+                    if (x.Length >= 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the destination frequency first, and then the method.");
+                }
+                else
+                {
+                    // collapse(x!d, 'a') or collapse(x!d, 'q'), etc.
+                    freq_destination = s;
+                    if (x.Length == 3) method = O.ConvertToString(x[2]);
+                    if (x.Length > 3) new Error("Collapse() function has too many arguments.");
+                }
+            }
+
+            if (freq_destination == null)
+            {
+                //state defaults                
+                if (ts.freq == EFreq.Q) freq_destination = "a";
+                else if (ts.freq == EFreq.M) freq_destination = "q";
+                else if (ts.freq == EFreq.W) freq_destination = "m";  //will use fractions...
+                else if (ts.freq == EFreq.D) freq_destination = "m";  //not W!
+                else
+                {
+                    new Error("The frequency of the input timeseries should be D, M or Q for collapse().");
+                }
+            }
+
+            Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
+
+            CollapseHelper helper = new CollapseHelper();
+            if (method != null) helper.method = method;
+            if (missing != null) helper.collapse_missing = missing;
+            Program.CollapseHelper(tsNew, ts, helper);
+
+            return tsNew;
+        }
+
         /// <summary>
         /// Work out the date for Easter Sunday for specified year
         /// </summary>

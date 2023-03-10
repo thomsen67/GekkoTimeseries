@@ -3794,8 +3794,8 @@ spliceOpt1:                 ISNOTQUAL
 spliceOpt1h:                FIRST -> ^(ASTOPT_STRING_FIRST ASTYES)
                           | LAST -> ^(ASTOPT_STRING_LAST ASTYES)
 						  | N EQUAL expression -> ^(ASTOPT_VAL_N expression)
+						  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)  //rel1, rel2, rel3, abs
 							;
-
 
 //splice:                     SPLICE spliceOpt1? expression -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} spliceOpt1? expression);
 //spliceOpt1:                 ISNOTQUAL | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*;

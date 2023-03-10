@@ -16389,7 +16389,10 @@ namespace Gekko
                     O.Chop(rhsElement, out bankRhs, out nameRhs, out freqRhs, out indexRhs);
                     bankRhs = SubstituteFirstRefNames(bankRhs);
 
-                    if (freqLhs != null && freqRhs != null && !G.Equal(freqLhs, freqRhs)) freqWarning = "Frequency mismatch: beware that some series before TO/AS are of different frequency than corresponding series after TO/AS (the frequency part of the latter names is ignored).";
+                    if (freqLhs != null && freqRhs != null && freqRhs != "*" && !G.Equal(freqLhs, freqRhs))
+                    {
+                        freqWarning = "Frequency mismatch: beware that some series before TO/AS are of different frequency than corresponding series after TO/AS (the frequency part of the latter names is ignored). This warning will become an error in Gekko 3.2.";
+                    }
 
                     if (bankRhs == null && tobank != null) bankRhs = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
 
@@ -16560,7 +16563,7 @@ namespace Gekko
                 }
             }
 
-            if (freqWarning != null) new Error(freqWarning); //Gekko 3.2  --> maybe make this an error
+            if (freqWarning != null) new Warning(freqWarning); //Gekko 3.2  --> maybe make this an error
 
             return outputs;
         }

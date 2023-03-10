@@ -7237,8 +7237,9 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string opt_first = null; //pos 1
-            public string opt_last = null; //pos n
+            public string opt_last = null; //pos n --> default
             public double opt_n = double.NaN; //specific n
+            public string opt_type = null;  //rel1, rel2, rel3, abs
 
             public GekkoTime date = GekkoTime.tNull; //old remove
             public P p = null;
@@ -7251,51 +7252,79 @@ namespace Gekko
                     return;
                 }
 
+                // rel1: R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3)
+                // rel2: R = (y1/x1 + y2/x2 + y3/x3)/3 
+                // rel3: som abs, men log-->exp.
+                // abs:  D = (y1 + y2 + y3)/3 - (x1 + x2 + x3)/3 =  (y1-x1 + y2-x2 + y3-x3)/3
+                // 'rel1', 'rel2'
+                // 'first', 'last', '2'
+                // 'rel1-2', 'rel1-first', 'rel1-last', 
+
                 // ===========================================================
 
+                bool isLog = false;
                 bool isFunction = false;
                 int n = int.MaxValue; //0-based. Default indicates 'last'
                 ESpliceType type = ESpliceType.Rel1;  //default
-                //TODO
-                //TODO type...
-                //TODO
 
-                if (isFunction)
+                if (opt_type == null)
                 {
-                    //DO SOMETHING REGARDING FIRST ARG x = splice('first', x1, 2003, 2006, x2);
-                    //adjust n...
-                    //TODO
-                    //TODO
-                    //TODO
-
-                    //string[] ss = opt_n.Split('=');
-                    //if (ss.Length != 2) new Error("Expected <n=...> option.");
-                    //if (!G.Equal(ss[0].Trim(), "n")) new Error("Expected <n=...> option.");
-
+                    //do nothing
+                }
+                else if (G.Equal(opt_type, "rel1"))
+                {
+                    //do nothing
+                }
+                else if (G.Equal(opt_type, "rel2"))
+                {
+                    //do nothing
+                    type = ESpliceType.Rel2;
+                }
+                else if (G.Equal(opt_type, "rel3"))
+                {
+                    //do nothing
+                    type = ESpliceType.Rel3;
+                }
+                else if (G.Equal(opt_type, "abs"))
+                {
+                    //do nothing
+                    type = ESpliceType.Abs;
                 }
                 else
                 {
-                    int count = 0;
-                    if (G.Equal(opt_first, "yes"))
-                    {
-                        count++;
-                        n = 0;
-                    }
-                    if (G.Equal(opt_last, "yes"))
-                    {
-                        count++;
-                        n = int.MaxValue;  //just a signal, is set later on when count is known
-                    }
-                    if (!double.IsNaN(opt_n))
-                    {
-                        count++;
-                        int ii = G.ConvertToInt(opt_n);  //will fail with error if not int
-                        n = ii - 1;  //n is 0-based.
-                    }
-                    if (count > 1)
-                    {
-                        new Error("You can only use option <first>, <last> or <n=...> one at a time.");
-                    }
+                    new Error("SPLICE type must be rel1, rel2, rel3 or abs.");
+                }
+
+                //TODO
+                //TODO type...
+                //TODO
+                if (type == ESpliceType.Rel3)
+                {
+                    //note that the type is changed artificially here
+                    type = ESpliceType.Abs;
+                    isLog = true;
+                }
+
+                int count = 0;
+                if (G.Equal(opt_first, "yes"))
+                {
+                    count++;
+                    n = 0;
+                }
+                if (G.Equal(opt_last, "yes"))
+                {
+                    count++;
+                    n = int.MaxValue;  //just a signal, is set later on when count is known
+                }
+                if (!double.IsNaN(opt_n))
+                {
+                    count++;
+                    int ii = G.ConvertToInt(opt_n);  //will fail with error if not int
+                    n = ii - 1;  //n is 0-based.
+                }
+                if (count > 1)
+                {
+                    new Error("You can only use option <first>, <last> or <n=...> one at a time.");
                 }
 
                 //NOTE: In the data[] list, intermediate dates are generally stored together with the LEFT variable.
@@ -7456,11 +7485,9 @@ namespace Gekko
                     if (i > 0)
                     {
                         if (data[i - 1].t[0].StrictlySmallerThan(tStart)) new Error(splice + ": Series #" + (i + 1) + " is not defined over the full interval to the left of it.");
-                        //if (data[i - 1].t[1].StrictlyLargerThan(tEnd)) new Error(splice + ": Between series #" + (i + 1) + " and series #" + (i + 2) + ", the date range is outside the data of one of these series");
                     }
-                    //if (data[i].t[0].StrictlyLargerThan(tStart)) new Error(splice + ": Between series #" + (i + 1) + " and series #" + (i + 2) + ", the date range is outside the data of one of these series");
                     if (data[i].t[1].StrictlyLargerThan(tEnd)) new Error(splice + ": Series #" + (i + 1) + " is not defined over the full interval to the right of it.");
-                }            
+                }
 
                 // -------------------------------------------------------------
 
@@ -7469,14 +7496,14 @@ namespace Gekko
                 for (int i = n; i < data.Count - 1; i++)  //note -1
                 {
                     //right
-                    factorRight = SpliceAdjust(data, i, freq, type, factorRight, false);
+                    factorRight = SpliceAdjust(data, i, freq, type, factorRight, false, isLog);
                 }
 
                 double factorLeft = 1d;
                 for (int i = n; i >= 1; i--)  //note 1
                 {
                     //left
-                    factorLeft = SpliceAdjust(data, i, freq, type, factorLeft, true);
+                    factorLeft = SpliceAdjust(data, i, freq, type, factorLeft, true, isLog);
                 }
 
                 // ---------------------------------------------
@@ -7504,7 +7531,14 @@ namespace Gekko
                     PeriodsRight(data, i - 1, out alternativeStart, out alternativeEnd);
                     foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
                     {
-                        rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                        if (isLog)
+                        {
+
+                        }
+                        else
+                        {
+                            rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                        }
                     }
                 }
 
@@ -7515,7 +7549,14 @@ namespace Gekko
                     PeriodsLeft(data, i + 1, out alternativeStart, out alternativeEnd);
                     foreach (GekkoTime t in new GekkoTimeIterator(alternativeStart, alternativeEnd))
                     {
-                        rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                        if (isLog)
+                        {
+                            rv.SetData(t, Math.Exp(data[i].x_adjusted.GetDataSimple(t)));
+                        }
+                        else
+                        {
+                            rv.SetData(t, data[i].x_adjusted.GetDataSimple(t));
+                        }
                     }
                 }
             }
@@ -7558,8 +7599,19 @@ namespace Gekko
                 try { alternativeEnd = data[i + 1].t[1]; } catch { };
             }
 
-            public double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft)
-            {                
+            /// <summary>
+            /// Helper method for SPLICE
+            /// </summary>
+            /// <param name="data"></param>
+            /// <param name="n"></param>
+            /// <param name="freq"></param>
+            /// <param name="type"></param>
+            /// <param name="factor"></param>
+            /// <param name="moveLeft"></param>
+            /// <returns></returns>
+            public double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft, bool isLog)
+            {
+                //NOTE: "rel3" is not performed here: it is done by taking log(), then "abs", and then exp().
                 SpliceHelper left = null;
                 SpliceHelper basis = null;
                 SpliceHelper right = null;
@@ -7603,43 +7655,58 @@ namespace Gekko
                 //calculate factor
                 double sum_basis = 0d;
                 double sum_alternative = 0d;
+                double sum_correction = 0d;
+                int obs = GekkoTime.Observations(overlapStart, overlapEnd);
                 foreach (GekkoTime gt in new GekkoTimeIterator(overlapStart, overlapEnd))
                 {
-                    if (type == ESpliceType.Abs)
+                    if (type == ESpliceType.Abs || type == ESpliceType.Rel1)
                     {
-
-                    }
-                    else if (type == ESpliceType.Rel1)
-                    {
-                        sum_basis += (basis.x as Series).GetDataSimple(gt);
-                        sum_alternative += alternative.GetDataSimple(gt);
+                        if (isLog)
+                        {
+                            sum_basis += Math.Log((basis.x as Series).GetDataSimple(gt));
+                            sum_alternative += Math.Log(alternative.GetDataSimple(gt));
+                        }
+                        else
+                        {
+                            sum_basis += (basis.x as Series).GetDataSimple(gt);
+                            sum_alternative += alternative.GetDataSimple(gt);
+                        }
                     }
                     else if (type == ESpliceType.Rel2)
                     {
-
-                    }
+                        sum_correction += (basis.x as Series).GetDataSimple(gt) / alternative.GetDataSimple(gt);
+                    }                    
                 }
 
-                factor = factor * sum_basis / sum_alternative;
+                if (type == ESpliceType.Abs)
+                {
+                    //D = (y1 + y2 + y3)/3 - (x1 + x2 + x3)/3
+                    factor += sum_basis / obs - sum_alternative / obs;
+                }
+                else if (type == ESpliceType.Rel1)
+                {
+                    //R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3).
+                    factor *= sum_basis / sum_alternative;
+                }
+                else if (type == ESpliceType.Rel2)
+                {
+                    //R = (y1 / x1 + y2 / x2 + y3 / x3) / 3
+                    factor *= sum_correction / obs;
+                }
 
                 //adjust alternative series
                 foreach (GekkoTime t in new GekkoTimeIterator(adjustStart, adjustEnd))
                 {
                     if (type == ESpliceType.Abs)
                     {
-
+                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
                     }
-                    else if (type == ESpliceType.Rel1)
+                    else if (type == ESpliceType.Rel1 || type == ESpliceType.Rel2)
                     {
                         alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * factor);
-                    }
-                    else if (type == ESpliceType.Rel2)
-                    {
-
-                    }
+                    }                    
                 }
                 return factor;
-
             }
 
             private void Splice_OLDREMOVE()
