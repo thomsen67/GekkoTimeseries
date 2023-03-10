@@ -8110,7 +8110,7 @@ namespace UnitTests
             {
                 //Maybe also an option to splice where the first series is the anchor
 
-                I("RESET;");
+                I("RESET; time 1990 1990;");
                 I("create ts1, ts2, ts0a, ts0b;");
                 I("SERIES <2002 2006> ts1 = (2, 3, 4, 5, 6);");
                 I("SERIES <2004 2010> ts2 = (41, 42, 43, 44, 45, 46, 47);");
@@ -8180,6 +8180,23 @@ namespace UnitTests
                     _AssertSeries(First(), "ts0a", 2009, 46d, delta);
                     _AssertSeries(First(), "ts0a", 2010, 46d, delta);
                     _AssertSeries(First(), "ts0a", 2011, double.NaN, delta);
+
+                    if (i == 1)
+                    {
+                        I("ts0a_function <2003 2007> = splice(ts1, ts2);");  //test of truncated period for function
+                        _AssertSeries(First(), "ts0a_function", 2001, double.NaN, delta);
+                        _AssertSeries(First(), "ts0a_function", 2002, double.NaN, delta);
+                        _AssertSeries(First(), "ts0a_function", 2003, 25.2d, delta);
+                        _AssertSeries(First(), "ts0a_function", 2004, 41d, delta);
+                        _AssertSeries(First(), "ts0a_function", 2005, 42d, delta);
+                        _AssertSeries(First(), "ts0a_function", 2006, 43d, delta);
+                        _AssertSeries(First(), "ts0a_function", 2007, 44d, delta);
+                        _AssertSeries(First(), "ts0a_function", 2008, double.NaN, delta);
+                        _AssertSeries(First(), "ts0a_function", 2009, double.NaN, delta);
+                        _AssertSeries(First(), "ts0a_function", 2010, double.NaN, delta);
+                        _AssertSeries(First(), "ts0a_function", 2011, double.NaN, delta);
+                    }
+
                     if (i == 0) I("splice work:ts0b = work:ts1 2006 work:ts2;  //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                     else I("work:ts0b = splice(work:ts1, 2006, work:ts2);");
                     _AssertSeries(First(), "ts0b", 2001, double.NaN, delta);
@@ -8203,7 +8220,7 @@ namespace UnitTests
                     //                ----------- 
                     // If overlaps overlap, no need for middle series!!
 
-                    I("RESET;");
+                    I("RESET; time 2002 2014;");
                     I("SERIES <2002 2006> ts1 = 2, 3, 4, 5, 6;");
                     I("SERIES <2004 2010> ts2 = 41, 42, 43, 44, 45, 46, 47;");
                     I("SERIES <2008 2014> ts3 = 91, 92, 93, 94, 95, 96, 97;");
@@ -8255,7 +8272,7 @@ namespace UnitTests
                     _AssertSeries(First(), "ts0a", 2015, double.NaN, delta);
 
                     if (i == 0) I("splice <n=2> ts1a = ts1 ts2 ts3;");
-                    else I("ts1a('2', ts1, ts2, ts3);");
+                    else I("ts1a = splice('2', ts1, ts2, ts3);");
                     _AssertSeries(First(), "ts1a", 2001, double.NaN, delta);
                     _AssertSeries(First(), "ts1a", 2002, 16.8000, delta);
                     _AssertSeries(First(), "ts1a", 2003, 25.2000, delta);
@@ -8280,7 +8297,7 @@ namespace UnitTests
                     // splice ts2a = ts1 ts2 ts3;
                     // print ts2a;
                     if (i == 0) I("splice <last> ts2a = ts1 ts2 ts3;");
-                    else I("ts2a = splice('last', ts1, ts2, ts3);");
+                    else I("ts2a = splice('rel1-last', ts1, ts2, ts3);");  //just to test the '-' (rel1 is default)
                     _AssertSeries(First(), "ts2a", 2001, double.NaN, delta);
                     _AssertSeries(First(), "ts2a", 2002, 33.6000, delta);
                     _AssertSeries(First(), "ts2a", 2003, 50.4000, delta);
@@ -8298,7 +8315,7 @@ namespace UnitTests
                     _AssertSeries(First(), "ts2a", 2015, double.NaN, delta);
 
                     if (i == 0) I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3;");
-                    else I("ts0a = splice(ts1, 2005, 2006, ts2, 2009, 2010, ts3;");
+                    else I("ts0a = splice(ts1, 2005, 2006, ts2, 2009, 2010, ts3);");
 
                     if(i==0) I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3a;"); //ts3a ok with explicit time
                     else I("ts0a = splice(ts1, 2005, 2006, ts2, 2009, 2010, ts3a);");

@@ -7529,7 +7529,7 @@ namespace Gekko
                 List<string> lhs_string = null;
                 if (!isFunction)
                 {
-                    Restrict(lhs, true, false, true, true);
+                    lhs_string = Restrict(lhs, true, false, true, true);
                     if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
                 }
 
