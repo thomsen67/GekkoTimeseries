@@ -8392,6 +8392,38 @@ namespace UnitTests
             // was allowed in AREMOS.
             //
             //  
+
+            // ----------------------------------------
+            // Sanity test of types rel1, rel2, rel3 and abs.
+            // ----------------------------------------
+
+            I("reset; time 2001 2004;");
+            I("x1 = 1, 1.1, m(), m();");
+            I("x2 = m(), 5.0, 5.1, 5.2;");
+            I("splice <type = rel1> y = x1 x2;");
+            _AssertSeries(First(), "y", 2001, 5d/1.1d, sharedDelta);
+
+            I("reset; time 2001 2004;");
+            I("x1 = 1, 1.1, m(), m();");
+            I("x2 = m(), 5.0, 5.1, 5.2;");
+            I("splice <type = rel2> y = x1 x2;");
+            _AssertSeries(First(), "y", 2001, 5d / 1.1d, sharedDelta);
+
+            I("reset; time 2001 2004;");
+            I("x1 = 1, 1.1, m(), m();");
+            I("x2 = m(), 5.0, 5.1, 5.2;");
+            I("splice <type = rel3> y = x1 x2;");
+            _AssertSeries(First(), "y", 2001, 5d / 1.1d, sharedDelta);
+
+            I("reset; time 2001 2004;");
+            I("x1 = 1, 1.1, m(), m();");
+            I("x2 = m(), 5.0, 5.1, 5.2;");
+            I("splice <type = abs> y = x1 x2;");
+            _AssertSeries(First(), "y", 2001, 4.9d, sharedDelta); //0.1 dif
+
+
+
+
         }
 
         [TestMethod]
