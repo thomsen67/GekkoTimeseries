@@ -3435,72 +3435,97 @@ namespace Gekko
             // splice('2', x1, 2010, x2)
             // splice('first-2', x1, 2010, x2)            
 
-            //Corresponds to SPLICE, but truncates the returned series to the time period                        
+            //Corresponds to SPLICE, but truncates the returned series to the time period  
+
+            string opt_type = null;
+            string opt_first = null;
+            string opt_last = null;
+            double opt_n = double.NaN;
 
             if (x.Length < 1) new Error("Expected splice() with >= 1 arguments.");
 
-            IVariable iv = x[0];
-            if (G.IsGekkoNull(iv)) return iv;
-            Series ts = iv as Series;
-            if (ts == null) new Error("Expected a timeseries as first argument, got " + G.GetTypeString(iv) + " type");
-
-            string missing = null;
-            string freq_destination = null;
-            string method = Program.options.collapse_method.ToLower(); //starts as "total"
-
-            if (x.Length > 1)
+            int hasStringStart = 0;
+            if (x[0].Type() == EVariableType.String)
             {
-                string s = O.ConvertToString(x[1]);
-                if (s.ToLower().StartsWith("total") || s.ToLower().StartsWith("avg") || s.ToLower().StartsWith("first") || s.ToLower().StartsWith("last") || s.ToLower().StartsWith("strict") || s.ToLower().StartsWith("flex"))
+                hasStringStart = 1;
+                string temp = x[0].ConvertToString();
+                string[] ss = temp.Split('-');
+                if (ss.Length > 2) new Error("splice(): You can onlyt use one '-'");
+                if (ss.Length == 1)
                 {
-                    // collapse(x!d, 'total') or collapse(x!d, 'avg-strict') or collapse(x!d, 'strict'), etc.
-                    // Not allowed to do collapse(x!d, 'total', 'a')
-
-                    string[] ss = s.Split('-');
-                    if (ss.Length == 2)
+                    if (G.Equal(temp, "rel1"))
                     {
-                        method = ss[0];
-                        missing = ss[1];
+                        opt_type = "rel1";
                     }
-                    else if (s.ToLower().StartsWith("strict") || s.ToLower().StartsWith("flex"))
+                    else if (G.Equal(temp, "rel2"))
                     {
-                        missing = s;
+                        opt_type = "rel2";
                     }
-                    else
+                    else if (G.Equal(temp, "rel3"))
                     {
-                        method = s;
+                        opt_type = "rel3";
                     }
-                    if (x.Length >= 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the destination frequency first, and then the method.");
+                    else if (G.Equal(temp, "abs"))
+                    {
+                        opt_type = "abs";
+                    }
+                    else if (G.Equal(temp, "first"))
+                    {
+                        opt_first = "yes";
+                    }
+                    else if (G.Equal(temp, "last"))
+                    {
+                        opt_last = "yes";
+                    }
+                    else if (G.IntParse(temp) != -12345)
+                    {
+                        opt_n = G.IntParse(temp);
+                    }
+                    else new Error("In splice(), could not understand first parameter '" + temp + "'");
                 }
                 else
                 {
-                    // collapse(x!d, 'a') or collapse(x!d, 'q'), etc.
-                    freq_destination = s;
-                    if (x.Length == 3) method = O.ConvertToString(x[2]);
-                    if (x.Length > 3) new Error("Collapse() function has too many arguments.");
+                    if (G.Equal(ss[0], "rel1"))
+                    {
+                        opt_type = "rel1";
+                    }
+                    else if (G.Equal(ss[0], "rel2"))
+                    {
+                        opt_type = "rel2";
+                    }
+                    else if (G.Equal(ss[0], "rel3"))
+                    {
+                        opt_type = "rel3";
+                    }
+                    else if (G.Equal(ss[0], "abs"))
+                    {
+                        opt_type = "abs";
+                    }
+                    else new Error("In splice(), could not understand first parameter '" + temp + "'");
+
+                    if (G.Equal(ss[1], "first"))
+                    {
+                        opt_first = "yes";
+                    }
+                    else if (G.Equal(ss[1], "last"))
+                    {
+                        opt_last = "yes";
+                    }
+                    else if (G.IntParse(ss[1]) != -12345)
+                    {
+                        opt_n = G.IntParse(ss[1]);
+                    }
+                    else new Error("In splice(), could not understand first parameter '" + temp + "'");
                 }
             }
 
-            if (freq_destination == null)
+            List rhs = new List();
+            for (int i = hasStringStart; i < x.Length; i++)
             {
-                //state defaults                
-                if (ts.freq == EFreq.Q) freq_destination = "a";
-                else if (ts.freq == EFreq.M) freq_destination = "q";
-                else if (ts.freq == EFreq.W) freq_destination = "m";  //will use fractions...
-                else if (ts.freq == EFreq.D) freq_destination = "m";  //not W!
-                else
-                {
-                    new Error("The frequency of the input timeseries should be D, M or Q for collapse().");
-                }
+                rhs.Add(x[i]);
             }
 
-            Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
-
-            CollapseHelper helper = new CollapseHelper();
-            if (method != null) helper.method = method;
-            if (missing != null) helper.collapse_missing = missing;
-            Program.CollapseHelper(tsNew, ts, helper);
-
+            Series tsNew = O.Splice.SpliceHelper(null, rhs, opt_type, opt_first, opt_last, opt_n, true);
             return tsNew;
         }
 

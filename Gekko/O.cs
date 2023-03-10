@@ -7255,8 +7255,20 @@ namespace Gekko
                 SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);
             }
 
+            /// <summary>
+            /// Helper for SPLICE and splice(). lhs is == null if called with isFunction == true. Returns null if isFunction == false.
+            /// </summary>
+            /// <param name="lhs"></param>
+            /// <param name="rhs"></param>
+            /// <param name="opt_type"></param>
+            /// <param name="opt_first"></param>
+            /// <param name="opt_last"></param>
+            /// <param name="opt_n"></param>
+            /// <param name="isFunction"></param>
+            /// <returns></returns>
             public static Series SpliceHelper(List lhs, List rhs, string opt_type, string opt_first, string opt_last, double opt_n, bool isFunction)
-            {
+            {                
+                //
                 // rel1: R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3)
                 // rel2: R = (y1/x1 + y2/x2 + y3/x3)/3 
                 // rel3: som abs, men log-->exp.
@@ -7514,8 +7526,12 @@ namespace Gekko
                 // Resulting series
                 // ---------------------------------------------
 
-                List<string> lhs_string = Restrict(lhs, true, false, true, true);
-                if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
+                List<string> lhs_string = null;
+                if (!isFunction)
+                {
+                    Restrict(lhs, true, false, true, true);
+                    if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
+                }
 
                 Series rv = null;
                 if (isFunction) rv = new Series(freq, null);
