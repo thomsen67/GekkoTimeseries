@@ -7509,6 +7509,7 @@ namespace Gekko
 
                 //Get data into arrays
                 double factorRight = 1d;
+                if (type == ESpliceType.Abs) factorRight = 0d;
                 for (int i = n; i < data.Count - 1; i++)  //note -1
                 {
                     //right
@@ -7516,6 +7517,7 @@ namespace Gekko
                 }
 
                 double factorLeft = 1d;
+                if (type == ESpliceType.Abs) factorLeft = 0d;
                 for (int i = n; i >= 1; i--)  //note 1
                 {
                     //left
@@ -7544,7 +7546,14 @@ namespace Gekko
                 try { basisEnd = data[n].t[1]; } catch { };
                 foreach (GekkoTime t in new GekkoTimeIterator(basisStart, basisEnd))
                 {
-                    rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy
+                    //if (isLog)
+                    //{
+                    //    rv.SetData(t, Math.Exp((data[n].x as Series).GetDataSimple(t)));  //just a copy
+                    //}
+                    //else
+                    //{
+                        rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy
+                    //}
                 }
 
                 //right
@@ -7556,7 +7565,7 @@ namespace Gekko
                     {
                         if (isLog)
                         {
-
+                            rv.SetData(t, Math.Exp(data[i].x_adjusted.GetDataSimple(t)));
                         }
                         else
                         {
@@ -7687,7 +7696,14 @@ namespace Gekko
                 {
                     if (type == ESpliceType.Abs)
                     {
-                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
+                        if (isLog)
+                        {
+                            alternative_adjusted.SetData(t, Math.Log(alternative.GetDataSimple(t)) + factor);
+                        }
+                        else
+                        {
+                            alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
+                        }                        
                     }
                     else if (type == ESpliceType.Rel1 || type == ESpliceType.Rel2)
                     {
