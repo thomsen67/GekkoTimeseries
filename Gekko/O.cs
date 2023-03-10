@@ -7252,6 +7252,11 @@ namespace Gekko
                     return;
                 }
 
+                SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);
+            }
+
+            public static Series SpliceHelper(List lhs, List rhs, string opt_type, string opt_first, string opt_last, double opt_n, bool isFunction)
+            {
                 // rel1: R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3)
                 // rel2: R = (y1/x1 + y2/x2 + y3/x3)/3 
                 // rel3: som abs, men log-->exp.
@@ -7263,7 +7268,6 @@ namespace Gekko
                 // ===========================================================
 
                 bool isLog = false;
-                bool isFunction = false;
                 int n = int.MaxValue; //0-based. Default indicates 'last'
                 ESpliceType type = ESpliceType.Rel1;  //default
 
@@ -7335,9 +7339,9 @@ namespace Gekko
 
                 //generate data[] list
                 List<SpliceHelper> data = new List<SpliceHelper>();
-                for (int i = 0; i < this.rhs.list.Count; i++)
+                for (int i = 0; i < rhs.list.Count; i++)
                 {
-                    IVariable iv = this.rhs.list[i];
+                    IVariable iv = rhs.list[i];
                     GekkoTime period = GekkoTime.tNull;
                     if (iv.Type() == EVariableType.Val)
                     {
@@ -7363,7 +7367,7 @@ namespace Gekko
                     {
                         //period
                         if (data.Count == 0) new Error(splice + ": you cannot start with a date element.");
-                        if (i == this.rhs.list.Count - 1) new Error(splice + ": you cannot end with a date element.");
+                        if (i == rhs.list.Count - 1) new Error(splice + ": you cannot end with a date element.");
                         if (data[data.Count - 1].t.Count > 1) new Error(splice + ": you cannot state three or more consecutive dates.");
                         data[data.Count - 1].t.Add(period);
                     }
@@ -7510,9 +7514,12 @@ namespace Gekko
                 // Resulting series
                 // ---------------------------------------------
 
-                List<string> lhs_string = Restrict(this.lhs, true, false, true, true);
+                List<string> lhs_string = Restrict(lhs, true, false, true, true);
                 if (lhs_string.Count > 1) new Error("SPLICE: You can only designate 1 left-side variable.");
-                Series rv = O.GetIVariableFromString(G.Chop_SetFreq(lhs_string[0], freq), ECreatePossibilities.Must, false) as Series; //left side, creates brand new even if it exists beforehand
+
+                Series rv = null;
+                if (isFunction) rv = new Series(freq, null);
+                else rv = O.GetIVariableFromString(G.Chop_SetFreq(lhs_string[0], freq), ECreatePossibilities.Must, false) as Series; //left side, creates brand new even if it exists beforehand
 
                 //basis
                 GekkoTime basisStart = (data[n].x as Series).GetRealDataPeriodFirst();
@@ -7559,6 +7566,119 @@ namespace Gekko
                         }
                     }
                 }
+
+                return rv;
+
+            }
+
+            /// <summary>
+            /// Helper method for SPLICE
+            /// </summary>
+            /// <param name="data"></param>
+            /// <param name="n"></param>
+            /// <param name="freq"></param>
+            /// <param name="type"></param>
+            /// <param name="factor"></param>
+            /// <param name="moveLeft"></param>
+            /// <returns></returns>
+            private static double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft, bool isLog)
+            {
+                //NOTE: "rel3" is not performed here: it is done by taking log(), then "abs", and then exp().
+                SpliceHelper left = null;
+                SpliceHelper basis = null;
+                SpliceHelper right = null;
+                if (n > 0) left = data[n - 1];
+                basis = data[n];
+                if (n < data.Count - 1) right = data[n + 1];
+
+                Series alternative = null;
+                Series alternative_adjusted = null;
+
+                GekkoTime overlapStart = GekkoTime.tNull;
+                GekkoTime overlapEnd = GekkoTime.tNull;
+                GekkoTime adjustStart = GekkoTime.tNull;
+                GekkoTime adjustEnd = GekkoTime.tNull;
+
+                if (moveLeft)
+                {
+                    alternative = left.x as Series;
+                    left.x_adjusted = new Series(freq, null);
+                    alternative_adjusted = left.x_adjusted;
+                    overlapStart = left.t[0];
+                    overlapEnd = left.t[1];
+                    PeriodsLeft(data, n, out adjustStart, out adjustEnd);
+                    //adjustStart = basis.t[0]; //no need to start sooner
+                    //adjustEnd = alternative.GetRealDataPeriodLast();
+                }
+                else
+                {
+                    alternative = right.x as Series;
+                    right.x_adjusted = new Series(freq, null);
+                    alternative_adjusted = right.x_adjusted;
+                    overlapStart = basis.t[0];
+                    overlapEnd = basis.t[1];
+                    PeriodsRight(data, n, out adjustStart, out adjustEnd);
+                    //adjustStart = basis.t[1].Add(1); //no need to start sooner
+                    //adjustEnd = alternative.GetRealDataPeriodLast(); //TODO:                    
+                }
+
+                // ----------
+
+                //calculate factor
+                double sum_basis = 0d;
+                double sum_alternative = 0d;
+                double sum_correction = 0d;
+                int obs = GekkoTime.Observations(overlapStart, overlapEnd);
+                foreach (GekkoTime gt in new GekkoTimeIterator(overlapStart, overlapEnd))
+                {
+                    if (type == ESpliceType.Abs || type == ESpliceType.Rel1)
+                    {
+                        if (isLog)
+                        {
+                            sum_basis += Math.Log((basis.x as Series).GetDataSimple(gt));
+                            sum_alternative += Math.Log(alternative.GetDataSimple(gt));
+                        }
+                        else
+                        {
+                            sum_basis += (basis.x as Series).GetDataSimple(gt);
+                            sum_alternative += alternative.GetDataSimple(gt);
+                        }
+                    }
+                    else if (type == ESpliceType.Rel2)
+                    {
+                        sum_correction += (basis.x as Series).GetDataSimple(gt) / alternative.GetDataSimple(gt);
+                    }
+                }
+
+                if (type == ESpliceType.Abs)
+                {
+                    //D = (y1 + y2 + y3)/3 - (x1 + x2 + x3)/3
+                    factor += sum_basis / obs - sum_alternative / obs;
+                }
+                else if (type == ESpliceType.Rel1)
+                {
+                    //R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3).
+                    factor *= sum_basis / sum_alternative;
+                }
+                else if (type == ESpliceType.Rel2)
+                {
+                    //R = (y1 / x1 + y2 / x2 + y3 / x3) / 3
+                    factor *= sum_correction / obs;
+                }
+
+                //adjust alternative series
+                foreach (GekkoTime t in new GekkoTimeIterator(adjustStart, adjustEnd))
+                {
+                    if (type == ESpliceType.Abs)
+                    {
+                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
+                    }
+                    else if (type == ESpliceType.Rel1 || type == ESpliceType.Rel2)
+                    {
+                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * factor);
+                    }
+                }
+                return factor;
             }
 
             /// <summary>
@@ -7598,116 +7718,7 @@ namespace Gekko
                 try { alternativeStart = data[i].t[1].Add(1); } catch { };
                 try { alternativeEnd = data[i + 1].t[1]; } catch { };
             }
-
-            /// <summary>
-            /// Helper method for SPLICE
-            /// </summary>
-            /// <param name="data"></param>
-            /// <param name="n"></param>
-            /// <param name="freq"></param>
-            /// <param name="type"></param>
-            /// <param name="factor"></param>
-            /// <param name="moveLeft"></param>
-            /// <returns></returns>
-            public double SpliceAdjust(List<SpliceHelper> data, int n, EFreq freq, ESpliceType type, double factor, bool moveLeft, bool isLog)
-            {
-                //NOTE: "rel3" is not performed here: it is done by taking log(), then "abs", and then exp().
-                SpliceHelper left = null;
-                SpliceHelper basis = null;
-                SpliceHelper right = null;
-                if (n > 0) left = data[n - 1];
-                basis = data[n];
-                if (n < data.Count - 1) right = data[n + 1];
-
-                Series alternative = null;
-                Series alternative_adjusted = null;
-
-                GekkoTime overlapStart = GekkoTime.tNull;
-                GekkoTime overlapEnd = GekkoTime.tNull;
-                GekkoTime adjustStart = GekkoTime.tNull;
-                GekkoTime adjustEnd = GekkoTime.tNull;
-
-                if (moveLeft)
-                {                    
-                    alternative = left.x as Series;
-                    left.x_adjusted = new Series(freq, null);
-                    alternative_adjusted = left.x_adjusted;                    
-                    overlapStart = left.t[0];
-                    overlapEnd = left.t[1];
-                    PeriodsLeft(data, n, out adjustStart, out adjustEnd);
-                    //adjustStart = basis.t[0]; //no need to start sooner
-                    //adjustEnd = alternative.GetRealDataPeriodLast();
-                }
-                else
-                {                     
-                    alternative = right.x as Series;
-                    right.x_adjusted = new Series(freq, null);
-                    alternative_adjusted = right.x_adjusted;                    
-                    overlapStart = basis.t[0];
-                    overlapEnd = basis.t[1];
-                    PeriodsRight(data, n, out adjustStart, out adjustEnd);
-                    //adjustStart = basis.t[1].Add(1); //no need to start sooner
-                    //adjustEnd = alternative.GetRealDataPeriodLast(); //TODO:                    
-                }
-
-                // ----------
-
-                //calculate factor
-                double sum_basis = 0d;
-                double sum_alternative = 0d;
-                double sum_correction = 0d;
-                int obs = GekkoTime.Observations(overlapStart, overlapEnd);
-                foreach (GekkoTime gt in new GekkoTimeIterator(overlapStart, overlapEnd))
-                {
-                    if (type == ESpliceType.Abs || type == ESpliceType.Rel1)
-                    {
-                        if (isLog)
-                        {
-                            sum_basis += Math.Log((basis.x as Series).GetDataSimple(gt));
-                            sum_alternative += Math.Log(alternative.GetDataSimple(gt));
-                        }
-                        else
-                        {
-                            sum_basis += (basis.x as Series).GetDataSimple(gt);
-                            sum_alternative += alternative.GetDataSimple(gt);
-                        }
-                    }
-                    else if (type == ESpliceType.Rel2)
-                    {
-                        sum_correction += (basis.x as Series).GetDataSimple(gt) / alternative.GetDataSimple(gt);
-                    }                    
-                }
-
-                if (type == ESpliceType.Abs)
-                {
-                    //D = (y1 + y2 + y3)/3 - (x1 + x2 + x3)/3
-                    factor += sum_basis / obs - sum_alternative / obs;
-                }
-                else if (type == ESpliceType.Rel1)
-                {
-                    //R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3).
-                    factor *= sum_basis / sum_alternative;
-                }
-                else if (type == ESpliceType.Rel2)
-                {
-                    //R = (y1 / x1 + y2 / x2 + y3 / x3) / 3
-                    factor *= sum_correction / obs;
-                }
-
-                //adjust alternative series
-                foreach (GekkoTime t in new GekkoTimeIterator(adjustStart, adjustEnd))
-                {
-                    if (type == ESpliceType.Abs)
-                    {
-                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
-                    }
-                    else if (type == ESpliceType.Rel1 || type == ESpliceType.Rel2)
-                    {
-                        alternative_adjusted.SetData(t, alternative.GetDataSimple(t) * factor);
-                    }                    
-                }
-                return factor;
-            }
+            
 
             private void Splice_OLDREMOVE()
             {
