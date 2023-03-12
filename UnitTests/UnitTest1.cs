@@ -8421,9 +8421,7 @@ namespace UnitTests
             I("splice <type = abs> y = x1 x2;");
             _AssertSeries(First(), "y", 2001, 4.9d, sharedDelta); //0.1 dif
 
-
-
-
+            Assert.Fail("TODO: Make a test of rel1/2/3/abs with 2 overlapping. Rel3 should reproduce an abs with log/exp");
         }
 
         [TestMethod]
@@ -8434,6 +8432,50 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\AREMOS\Ras';");
             I("RUN regres;");
             CheckFullDatabank(0.0001, 0.01, 2010, 2013);  //must be < 0.0001 abs or < 0.01%. Quite strict.
+        }
+
+        [TestMethod]
+        public void _Test_Root()
+        {
+            I("RESET;");
+            I("%s = readfile('{root()}/Working/root.txt');");
+            _AssertScalarString(First(), "%s", "Root test ok (1)" + G.NL);
+
+            Globals.unitTestScreenOutput.Clear();
+            I("RESET;");
+            I("run root.gcm;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Root test ok (1)"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("RESET;");            
+            FAIL("run \\..\\..\\regres2\\Working\\root.gcm;");
+
+            //will return "Root test ok (1)" !
+            //Problem is that the found ini path (c:\Thomas\Gekko\regres2) is not subset (part) of the 
+            //gcm file path (c:\Thomas\Gekko\regres\Working). And hence we do not know whether a root()
+            //from working folder = c:\Thomas\Gekko\regres\Working would return the same root.ini (it
+            //would not here). So the Gekko working folder and the running gcm file path must point to
+            //the same root.ini.
+            //NOTE NOTE: root() from functions/procedures/libraries should be ok (hm what about a gcm
+            //inside a library?)
+            //Or maybe test root() from both working folder and gcm file:
+            //- if working folder has none --> fail
+            //- if gcm has none --> good
+            //- if gcm is the same as working folder --> good
+            //- else --> bad
+            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("You are calling a .gcm file that calls the root() function, which returns ...\\root.ini. This is because Gekko the working folder (\\xx\\xx) has this root.ini as a parent folder. However, the root.ini path is not part of the gcm file path, which is not allowed. Remedy: change Gekko working folder to the same folder as the .gcm file resides in."));
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres2\Working';");
+            I("%s = readfile('{root()}/Working/root.txt');");
+            _AssertScalarString(First(), "%s", "Root test ok (2)" + G.NL);
+
+            Globals.unitTestScreenOutput.Clear();
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres2\Working';");
+            I("run root.gcm;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Root test ok (2)"));
         }
 
         [TestMethod]

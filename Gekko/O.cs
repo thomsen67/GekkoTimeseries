@@ -8890,57 +8890,7 @@ namespace Gekko
                 }
                 else
                 {
-
-                    if (G.Equal(opt_showbank, "all"))
-                    {
-                        for (int i = 0; i < names.Count; i++)
-                        {
-                            //This will add first-name (e.g. 'Work') if it is not there
-                            names[i] = G.Chop_AddBank(names[i], Program.databanks.GetFirst().name);
-                        }
-                    }
-                    else if (G.Equal(opt_showbank, "no"))
-                    {
-                        for (int i = 0; i < names.Count; i++)
-                        {
-                            //This will remove any bank
-                            names[i] = G.Chop_RemoveBank(names[i]);
-                        }
-                    }
-                    else if (G.Equal(opt_showbank, "yes") || opt_showbank == null)
-                    {
-                        //this is default
-                    }
-                    else
-                    {
-                        new Error("showbank must be = yes, no or all");
-                        //throw new GekkoException();
-                    }
-
-                    if (G.Equal(opt_showfreq, "all"))
-                    {
-                        for (int i = 0; i < names.Count; i++)
-                        {
-                            //This will add current freq (e.g. '!a') if it is not there
-                            names[i] = G.Chop_AddFreq(names[i], G.ConvertFreq(Program.options.freq));
-                        }
-                    }
-                    else if (G.Equal(opt_showfreq, "no"))
-                    {
-                        for (int i = 0; i < names.Count; i++)
-                        {
-                            //This will remove any freq
-                            names[i] = G.Chop_RemoveFreq(names[i]);
-                        }
-                    }
-                    else if (G.Equal(opt_showfreq, "yes") || opt_showfreq == null)
-                    {
-                        //this is default
-                    }
-                    else
-                    {
-                        new Error("showfreq must be = yes, no or all");
-                    }
+                    names = HandleBanksFreqs(names);
 
                     if (!G.Equal(this.opt_mute, "yes"))
                     {
@@ -8970,6 +8920,60 @@ namespace Gekko
                 }
             }
 
+            private List<string> HandleBanksFreqs(List<string> names)
+            {
+                if (G.Equal(this.opt_showbank, "all"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will add first-name (e.g. 'Work') if it is not there
+                        names[i] = G.Chop_AddBank(names[i], Program.databanks.GetFirst().name);
+                    }
+                }
+                else if (G.Equal(this.opt_showbank, "no"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will remove any bank
+                        names[i] = G.Chop_RemoveBank(names[i]);
+                    }
+                }
+                else if (G.Equal(this.opt_showbank, "yes") || this.opt_showbank == null)
+                {
+                    //this is default
+                }
+                else
+                {
+                    new Error("showbank must be = yes, no or all");
+                }
+
+                if (G.Equal(this.opt_showfreq, "all"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will add current freq (e.g. '!a') if it is not there
+                        names[i] = G.Chop_AddFreq(names[i], G.ConvertFreq(Program.options.freq));
+                    }
+                }
+                else if (G.Equal(this.opt_showfreq, "no"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will remove any freq
+                        names[i] = G.Chop_RemoveFreq(names[i]);
+                    }
+                }
+                else if (G.Equal(this.opt_showfreq, "yes") || this.opt_showfreq == null)
+                {
+                    //this is default
+                }
+                else
+                {
+                    new Error("showfreq must be = yes, no or all");
+                }
+                return names;
+            }
+
             private void PrintFound(EVariableType type, List<string> names)
             {
                 G.Writeln2("Found " + names.Count + " matching item" + G.S(names.Count));
@@ -8977,10 +8981,26 @@ namespace Gekko
                 if (names.Count == 0)
                 {
                     //See also #87582903573828
-                    SearchHelper1 helper = Program.SearchAllBanksAllFreqs(this.names1, this.opt_bank, type);
-                    if (helper.allBanks.count > 0) G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + helper.allBanks.count + " matches");
-                    if (helper.allFreqs.count > 0) G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + helper.allFreqs.count + " matches");
-                    if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count) G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + helper.allBanksAndFreqs.count + " matches");
+                    SearchHelper1 helper = Program.SearchAllBanksAllFreqs(false, this.names1, this.opt_bank, type);
+                    //Below we may redo the search. This double work is to avoid filling ram with long lists of names.
+                    if (helper.allBanks.count > 0)
+                    {
+                        SearchHelper1 helper2 = Program.SearchAllBanksAllFreqs(true, this.names1, this.opt_bank, type);
+                        Action<GAO> a = (gao) => { new Writeln(Stringlist.GetListWithCommas(HandleBanksFreqs(helper2.allBanks.list))); };
+                        G.Writeln("Note: " + helper2.allBanks.name + " instead of " + helper2.allBanks.nameOriginal + " --> " + G.GetLinkAction(helper2.allBanks.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                    }
+                    if (helper.allFreqs.count > 0)
+                    {                        
+                        SearchHelper1 helper2 = Program.SearchAllBanksAllFreqs(true, this.names1, this.opt_bank, type);
+                        Action<GAO> a = (gao) => { new Writeln(Stringlist.GetListWithCommas(HandleBanksFreqs(helper2.allFreqs.list))); };
+                        G.Writeln("Note: " + helper2.allFreqs.name + " instead of " + helper2.allFreqs.nameOriginal + " --> " + G.GetLinkAction(helper2.allFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                    }
+                    if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count)
+                    {                        
+                        SearchHelper1 helper2 = Program.SearchAllBanksAllFreqs(true, this.names1, this.opt_bank, type);
+                        Action<GAO> a = (gao) => { new Writeln(Stringlist.GetListWithCommas(HandleBanksFreqs(helper2.allBanksAndFreqs.list))); };
+                        G.Writeln("Note: " + helper2.allBanksAndFreqs.name + " instead of " + helper2.allBanksAndFreqs.nameOriginal + " --> " + G.GetLinkAction(helper2.allBanksAndFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                    }
                 }
             }
         }

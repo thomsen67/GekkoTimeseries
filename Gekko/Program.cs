@@ -173,6 +173,19 @@ namespace Gekko
         public Flood parent = null;
     }
 
+    public class DstCodesHelper
+    {
+        public int int1 = -12345;
+        public int int2 = -12345;
+        public string s = null;
+        public DstCodesHelper(int int1, int int2, string s)
+        {
+            this.int1 = int1;
+            this.int2 = int2;
+            this.s = s;
+        }
+    }
+
     public class DecompFind
     {        
         public int depth = 0;
@@ -1944,6 +1957,11 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+
+            if (true && Globals.runningOnTTComputer)
+            {
+                new Writeln("M123AB7ÆØÅ.TABEL_13224153" + " --> " + DstCodes("M123AB7ÆØÅ.TABEL_13224153"));
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -14682,6 +14700,78 @@ namespace Gekko
                 }
             }
 
+            DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+
+            if (seriesCounter + nonSeries == 0)
+            {
+                G.Writeln2("Did not find any variable(s) to display");
+
+                //See also #87582903573829
+                SearchHelper1 helper = Program.SearchAllBanksAllFreqs(true, o.iv, null, EVariableType.Var);
+                if (helper.allBanks.count > 0)
+                {                    
+                    Action<GAO> a = (gao) => 
+                    {
+                        m = new List<IVariable>();
+                        names = new List<string>();
+                        foreach (string s in helper.allBanks.list)
+                        {
+                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                            names.Add(ss);
+                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                        }
+                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                    };
+                    G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + G.GetLinkAction(helper.allBanks.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                }
+                if (helper.allFreqs.count > 0)
+                {
+                    Action<GAO> a = (gao) =>
+                    {
+                        m = new List<IVariable>();
+                        names = new List<string>();
+                        foreach (string s in helper.allFreqs.list)
+                        {
+                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                            names.Add(ss);
+                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                        }
+                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                    };
+                    G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                }
+                if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count)
+                {
+                    Action<GAO> a = (gao) =>
+                    {
+                        m = new List<IVariable>();
+                        names = new List<string>();
+                        foreach (string s in helper.allBanksAndFreqs.list)
+                        {
+                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                            names.Add(ss);
+                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                        }
+                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                    };
+                    G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allBanksAndFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                }
+            }
+            else if (seriesCounter == 0 && nonSeries > 0)
+            {
+                //nomessage
+            }
+            else
+            {
+                if (seriesCounter + nonSeries > 1)
+                {
+                    G.Writeln2("Displayed " + (seriesCounter + nonSeries) + " variables");
+                }
+            }
+        }
+
+        private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
+        {
             for (int i5 = 0; i5 < m.Count; i5++)
             {
 
@@ -14730,30 +14820,6 @@ namespace Gekko
                     }
                 }
             }
-
-            if (seriesCounter + nonSeries == 0)
-            {
-                G.Writeln2("Did not find any variable(s) to display");
-
-                //See also #87582903573829
-                SearchHelper1 helper = Program.SearchAllBanksAllFreqs(o.iv, null, EVariableType.Var);
-                if (helper.allBanks.count > 0) G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + helper.allBanks.count + " matches");
-                if (helper.allFreqs.count > 0) G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + helper.allFreqs.count + " matches");
-                if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count) G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + helper.allBanksAndFreqs.count + " matches");
-            }
-            else if (seriesCounter == 0 && nonSeries > 0)
-            {
-                //nomessage
-            }
-            else
-            {
-                if (seriesCounter + nonSeries > 1)
-                {
-                    G.Writeln2("Displayed " + (seriesCounter + nonSeries) + " variables");
-                }
-
-            }
-
         }
 
 
@@ -16568,6 +16634,60 @@ namespace Gekko
             return outputs;
         }
 
+        public static string DstCodes(string s)
+        {
+            string rv1 = null;
+            string rv2 = null;
+
+            string[] ss = s.Split('.');
+            if (ss.Length != 2) new Error("DST code: expected 1 dot (.)");
+
+            string[] ss2 = ss[1].Split('_');
+            if (ss2.Length != 2) new Error("DST code: expected 1 underscore (_) after dot");
+
+            string s0 = ss[0].Substring(0, 1);
+            string s1 = ss[0].Substring(1);
+            string s2 = ss2[0];
+            string s3 = ss2[1];
+            List<DstCodesHelper> data = new List<DstCodesHelper>();
+            int n = 0;
+            for (int i = 0; i < s3.Length - 1; i += 2)
+            {
+                string h1 = s3[i].ToString();
+                string h2 = s3[i+1].ToString();
+
+                int i1 = -12345; int.TryParse(h1, out i1);
+                if (i1 == -12345) new Error("Cannot parse " + h1 + " as an integer");
+
+                int i2 = -12345;
+                if (G.Equal(h2, "a")) i2 = 10;
+                else if (G.Equal(h2, "b")) i2 = 11;
+                else if (G.Equal(h2, "c")) i2 = 12;
+                else if (G.Equal(h2, "d")) i2 = 13;
+                else if (G.Equal(h2, "e")) i2 = 14;
+                else if (G.Equal(h2, "f")) i2 = 15;
+                else
+                {
+                    int.TryParse(h2, out i2);
+                    if (i2 == -12345) new Error("Cannot parse " + h1 + " as a hex integer");
+                }
+                data.Add(new DstCodesHelper(i1, i2, s1.Substring(n, i2)));
+                n += i2;
+            }
+
+            rv1 = s2 + "!" + s0 + "[";
+            rv2 = s0 + " " + s1 + " " + s2 + " ";
+            foreach (DstCodesHelper ti in data)
+            {
+                rv1 += "/*" + ti.int1 + "*/ " + ti.s + ", ";
+                rv2 += "(" + ti.int1 + ", " + ti.int2 + ", " + ti.s + ") ";
+            }
+            rv1 = rv1.Substring(0, rv1.Length - 2);
+            rv1 += "]";
+
+            return rv1 + "   =====   " + rv2;
+        }
+
         /// <summary>
         /// A helper method for Search(), and also implicit SearchFromTo(). For instance, an INDEX *; may 
         /// return 0 hits, because the timeseries are in other databanks, or in other frecuencies. So what this
@@ -16579,7 +16699,7 @@ namespace Gekko
         /// <param name="opt_bank"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static SearchHelper1 SearchAllBanksAllFreqs(List names1, string opt_bank, EVariableType type)
+        public static SearchHelper1 SearchAllBanksAllFreqs(bool keepLists, List names1, string opt_bank, EVariableType type)
         {
             SearchHelper1 helper = new SearchHelper1();
             foreach (IVariable iv in names1.list)
@@ -16601,6 +16721,7 @@ namespace Gekko
                             helper.allBanks.name = newName;
                             helper.allBanks.nameOriginal = s;
                             helper.allBanks.count = extraNames.Count;
+                            if (keepLists) helper.allBanks.list = extraNames;
                         }
 
                         if (true)
@@ -16610,6 +16731,7 @@ namespace Gekko
                             helper.allFreqs.name = newName;
                             helper.allFreqs.nameOriginal = s;
                             helper.allFreqs.count = extraNames.Count;
+                            if (keepLists) helper.allFreqs.list = extraNames;
                         }
 
                         if (true)
@@ -16620,6 +16742,7 @@ namespace Gekko
                             helper.allBanksAndFreqs.name = newName;
                             helper.allBanksAndFreqs.nameOriginal = s;
                             helper.allBanksAndFreqs.count = extraNames.Count;
+                            if (keepLists) helper.allBanksAndFreqs.list = extraNames;
                         }
                     }
                 }
@@ -33061,6 +33184,7 @@ namespace Gekko
         public string name = null;
         public string nameOriginal = null;
         public int count = 0;
+        public List<string> list = null;
     }
 
     public class GAMSScalarModelSettings
