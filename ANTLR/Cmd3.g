@@ -60,6 +60,7 @@ tokens {
 	ASTOPT_STRING_DATETYPE;
 	ASTOPT_STRING_KEEPTYPES;
 	ASTOPT_STRING_VARIABLECODE;
+	ASTOPT_STRING_NOCR;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -238,6 +239,7 @@ ASTCOMPARE2;
 	ASTOPT_STRING_TYPE;
 	ASTOPT_STRING_ARRAY;
 	ASTOPT_STRING_SPLIT;
+	ASTOPT_STRING_LINE;
 	ASTXLINE;
 	ASTYLINE;
 	ASTREBASE;
@@ -973,6 +975,7 @@ YLINE                 = 'YLINE'                    ;
 SHARES                = 'SHARES';
 ERRORS                = 'ERRORS';
 //YMAX                  = 'YMAX'                     ;
+LINE                 = 'LINE';
 IGNORE              = 'IGNORE'                 ;
 YMAXHARD              = 'YMAXHARD'                 ;
 YMAXSOFT              = 'YMAXSOFT'                 ;
@@ -2134,6 +2137,7 @@ d.Add("Y" ,Y);
                                         d.Add("yes"     , YES       );
                                         d.Add("ymax",YMAX);
                                         d.Add("ymin",YMIN);
+										d.Add("line", LINE);
 										d.Add("I",I);
 										d.Add("y2max",Y2MAX);
                                         d.Add("y2min",Y2MIN);
@@ -3869,7 +3873,12 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // TELL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-tell:					    TELL ('<' NOCR? '>')? expression? -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} ^(ASTPLACEHOLDER expression?) NOCR?);
+tell:					    TELL tellOpt1? expression? -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} ^(ASTPLACEHOLDER expression?) ^(ASTPLACEHOLDER tellOpt1?));
+tellOpt1:			        ISNOTQUAL | leftAngle tellOpt1h* RIGHTANGLE -> tellOpt1h*;
+tellOpt1h:                  NOCR (EQUAL yesNo)? -> ^(ASTOPT_STRING_NOCR yesNo?)
+                          | MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
+						  | LINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_LINE yesNo?)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TIME
@@ -4790,6 +4799,7 @@ ident2: 					Ident |
   YMAXHARD|
   YMAXSOFT|
   YMAX|
+  LINE|
   YMINHARD|
   YMINSOFT|
   YMIN|
@@ -5254,6 +5264,7 @@ ident3: 					Ident |
   YMAXHARD|
   YMAXSOFT|
   YMAX|
+  LINE|
   YMINHARD|
   YMINSOFT|
   YMIN|

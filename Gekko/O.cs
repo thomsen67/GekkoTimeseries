@@ -2116,12 +2116,6 @@ namespace Gekko
             Program.Cut(true);
         }
 
-        public static void Tell(string text, bool nocr)
-        {            
-            Program.Tell(text, nocr);
-        }
-
-
         /// <summary>
         /// EXIt command.
         /// </summary>
@@ -10264,7 +10258,51 @@ namespace Gekko
                 }
             }
         }
-        
+
+        public class Tell
+        {
+            public string opt_mute = null;
+            public string opt_nocr = null;
+            public string opt_line = null;
+            public IVariable s = null;
+            public void Exe()
+            {
+                string mute = null;
+                if (G.Equal(this.opt_mute, "yes")) mute = "yes";
+                else if (G.Equal(this.opt_mute, "no")) mute = "no";
+                else mute = Program.options.interface_mute; //no effect, covers == null
+
+                bool nocr = false;
+                if (G.Equal(this.opt_nocr, "yes")) nocr = true;
+
+                bool line = false;
+                if (G.Equal(this.opt_line, "yes")) line = true;
+
+                string ss = O.ConvertToString(this.s);
+
+                string nl = "";
+                if (line) nl = G.NL;
+
+                string muteRemember = Program.options.interface_mute;
+                try
+                {
+                    Program.options.interface_mute = mute;  //will be reversed
+
+                    if (s == null)
+                    {
+                        Program.Tell(nl + "", nocr);
+                    }
+                    else
+                    {
+                        Program.Tell(nl + ss, nocr);
+                    }
+                }
+                finally
+                {
+                    Program.options.interface_mute = muteRemember;
+                }
+            }
+        }
 
         public class X12a
         {

@@ -1958,7 +1958,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153"));
             }
