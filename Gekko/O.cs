@@ -8980,7 +8980,7 @@ namespace Gekko
 
                 if (names.Count == 0)
                 {
-                    //See also #87582903573828
+                    //See also #87582903573828 
                     SearchHelper1 helper = Program.SearchAllBanksAllFreqs(false, this.names1, this.opt_bank, type);
                     //Below we may redo the search. This double work is to avoid filling ram with long lists of names.
                     if (helper.allBanks.count > 0)
