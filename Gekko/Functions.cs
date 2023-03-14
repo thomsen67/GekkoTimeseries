@@ -3204,6 +3204,90 @@ namespace Gekko
             Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x1, ilags, true);
         }
+                
+        public static IVariable asbrename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable file, IVariable decorate)
+        {
+            string s = null;
+            string sname = O.ConvertToString(name);
+            string sfile = O.ConvertToString(file);
+            string sdecorate = O.ConvertToString(decorate);
+            bool d = false;
+            if (G.Equal(sdecorate, "yes")) d = true;
+
+            string txt = null;
+            try
+            {
+                FindFileHelper ffh = Program.FindFile(sfile, null, true, false, true, true, null);
+                txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
+            }
+            catch
+            {
+                new Error("Problem finding/reading file: " + sfile);
+            }
+
+            List<string> ss = Stringlist.ExtractLinesFromText(txt);
+
+            int dubletCounter = 0;
+            int blanksCounter = 0;
+
+            GekkoDictionary<string, string> dict = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string line in ss)
+            {
+                if (line == null || line.Trim() == "") continue;
+                string[] linex = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                if (linex.Length != 2)
+                {
+                    blanksCounter++;                    
+                    continue;
+                }
+                try
+                {
+                    if (dict.ContainsKey(linex[1].Trim()))
+                    {
+                        dubletCounter++;
+                        continue;
+                    }
+                    dict.Add(linex[1].Trim(), linex[0].Trim());
+                }
+                catch
+                {
+                    new Warning("This line could not be put into dictionary: " + line + ", skipping...");
+                }
+            }
+
+            if (dubletCounter > 0)
+            {
+                new Warning("In the recode file, there were " + dubletCounter + " dublets on the right-hand side.");
+            }
+
+            if (blanksCounter > 0)
+            {
+                new Warning("In the recode file, there were " + blanksCounter + " lines where blanks did not separate exactly two parts/names");
+            }
+
+            string s5 = null;
+            try
+            {
+                s5 = dict[sname];
+            }
+            catch
+            {
+                new Error("Could not find name '" + sname + "' as right-hand side in " + sfile);
+            }
+
+            string s6 = null;
+            try
+            {
+                s6 = Program.DstCodes(s5, d);
+            }
+            catch
+            {
+                new Error("Could not understend name '" + s5 + "' as an asb name");
+            }            
+
+            ScalarString rv = new ScalarString(s6);
+            return rv;
+        }
 
         private static IVariable MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
         {

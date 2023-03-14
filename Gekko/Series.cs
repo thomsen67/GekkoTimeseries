@@ -2233,13 +2233,14 @@ namespace Gekko
                     {
                         //not a single-dimensional time index (or lag/lead)
                         var temp = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
+                        string s = "The series is a normal series, and for a normal series indexes are expected to be either lags/leads like [-1] and [+1], or a period index like [2020] or [2020q3]. On a normal series, you cannot use indexes like [a], [a, b] etc. -- this is only possible for array-series.";
                         if (temp != null)
                         {
-                            new Error("Could not understand index " + this.name + "[" + Stringlist.GetListWithCommas(temp) + "]. Beware that the series is a normal series, not an array-series, so you cannot index it with one or more strings.");
+                            new Error("Could not understand index " + this.name + "[" + Stringlist.GetListWithCommas(temp) + "]. " + s);
                         }
                         else
                         {
-                            new Error("Could not understand index " + this.name + "[...].");
+                            new Error("Could not understand index " + this.name + "[...]. " + s);
                         }
                     }
                 }                

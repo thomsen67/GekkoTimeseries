@@ -1958,9 +1958,10 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
 
+                                                                    
             if (false && Globals.runningOnTTComputer)
             {
-                new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153"));
+                new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153", true));
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -6339,7 +6340,6 @@ namespace Gekko
                     if (tokens[i + 1].s != "<")
                     {
                         new Error("Expected '<', " + tokens[i + 1].LineAndPosText());
-                        //throw new GekkoException();
                     }
 
                     string freq2 = tokens[i + 2].s;
@@ -6349,8 +6349,9 @@ namespace Gekko
                     else if (G.Equal(freq2, "monthly")) freq = EFreq.M;
                     else
                     {
-                        new Error("Expected 'ANNUAL', 'QUARTERLY' or 'MONTHLY', " + tokens[i + 2].LineAndPosText());
-                        //throw new GekkoException();
+                        string s = null;
+                        if (G.Equal(freq2, "daily")) s = " ('DAILY' freq encountered: these are not supported, please delete those in the .dmp file and import them via .tsd)";
+                        new Error("Expected 'ANNUAL', 'QUARTERLY' or 'MONTHLY'" + s + ", " + tokens[i + 2].LineAndPosText());
                     }
 
                     GekkoTime gt1 = GekkoTime.tNull;
@@ -6378,15 +6379,15 @@ namespace Gekko
                     if (tokens[i + 5 + offset].s != ">")
                     {
                         new Error("Expected '>', " + tokens[i + 5 + offset].LineAndPosText());
-                        //throw new GekkoException();
                     }
 
                     string name1 = tokens[i + 6 + offset].s;
 
                     if (tokens[i + 7 + offset].s != ".")
                     {
-                        new Error("Expected '.', " + tokens[i + 7 + offset].LineAndPosText());
-                        //throw new GekkoException();
+                        string s = tokens[i + 7 + offset].s;
+                        string ss = " (got the symbol '" + s + "' as part of the variable name. Please replace this symbol with something else, for instance double underscore '__')";
+                        new Error("Expected '.'" + ss + ", " + tokens[i + 7 + offset].LineAndPosText());
                     }
                     string name2 = tokens[i + 8 + offset].s;
 
@@ -16634,7 +16635,7 @@ namespace Gekko
             return outputs;
         }
 
-        public static string DstCodes(string s)
+        public static string DstCodes(string s, bool d)
         {
             string rv1 = null;
             string rv2 = null;
@@ -16679,13 +16680,16 @@ namespace Gekko
             rv2 = s0 + " " + s1 + " " + s2 + " ";
             foreach (DstCodesHelper ti in data)
             {
-                rv1 += "/*" + ti.int1 + "*/ " + ti.s + ", ";
+                if (d) rv1 += "/*" + ti.int1 + "*/ " + ti.s + ", ";
+                else rv1 += ti.s + ", ";
                 rv2 += "(" + ti.int1 + ", " + ti.int2 + ", " + ti.s + ") ";
             }
             rv1 = rv1.Substring(0, rv1.Length - 2);
             rv1 += "]";
 
-            return rv1 + "   =====   " + rv2;
+            return rv1;
+
+            //return rv1 + "   =====   " + rv2;
         }
 
         /// <summary>

@@ -1439,21 +1439,6 @@ namespace Gekko.Parser.Gek
                 case "ASTHDG":
                     node.Code.A("O.Hdg(O.ConvertToString(" + node[0].Code + "));");
                     break;
-                //case "ASTTELL":
-                //    {
-                //        string s = "false";
-                //        string ss = "new ScalarString(``)";
-                //        if (node.ChildrenCount() > 1)
-                //        {
-                //            s = "true";
-                //        }
-                //        if (node[0].ChildrenCount() == 1)
-                //        {
-                //            ss = node[0][0].Code.ToString();
-                //        }
-                //        node.Code.A("O.Tell(O.ConvertToString(" + ss + "), " + s + ");");
-                //    }
-                //    break;
                 case "ASTTELL":
                     {
                         node.Code.A("O.Tell o" + Num(node) + " = new O.Tell();" + G.NL);                        

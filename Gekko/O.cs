@@ -10276,9 +10276,7 @@ namespace Gekko
                 if (G.Equal(this.opt_nocr, "yes")) nocr = true;
 
                 bool line = false;
-                if (G.Equal(this.opt_line, "yes")) line = true;
-
-                string ss = O.ConvertToString(this.s);
+                if (G.Equal(this.opt_line, "yes")) line = true;                
 
                 string nl = "";
                 if (line) nl = G.NL;
@@ -10293,8 +10291,8 @@ namespace Gekko
                         Program.Tell(nl + "", nocr);
                     }
                     else
-                    {
-                        Program.Tell(nl + ss, nocr);
+                    {                        
+                        Program.Tell(nl + O.ConvertToString(this.s), nocr);
                     }
                 }
                 finally
