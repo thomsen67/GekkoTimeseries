@@ -1957,8 +1957,31 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            //if (false && Globals.runningOnTTComputer)
+            //{
+            //    if (Globals.modelFileName == null) new Error("No model defined");
 
-                                                                    
+            //    byte[] data = null;
+
+            //    try
+            //    {
+            //        string filePath = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info.zip");
+            //        data = File.ReadAllBytes(filePath);
+            //    }
+            //    catch { };  //does not fail
+
+            //    try
+            //    {
+            //        string filePath2 = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info2.zip");
+            //        if (File.Exists(filePath2)) WaitForFileDelete(filePath2);
+            //        using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(filePath2)))
+            //        {
+            //            writer.Write(data);
+            //        }
+            //    }
+            //    catch { };  //does not fail
+            //}
+
             if (false && Globals.runningOnTTComputer)
             {
                 new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153", true));
@@ -2877,7 +2900,19 @@ namespace Gekko
 
         public static void WriteParallelModel(int k, string inputFileName, string hash, double hashMs, Model model)
         {
-            DateTime t = DateTime.Now;
+            DateTime t = DateTime.Now;            
+
+            try
+            {
+                if (Program.model?.modelGekko?.modelInfo != null)
+                {
+                    PutListsIntoModelListHelper(); //makes Program.model.modelGekko.modelInfo.modelListHelper object
+                    string filePath = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info.zip");
+                    byte[] data = File.ReadAllBytes(filePath);
+                    Program.model.modelGekko.modelInfo.modelListHelper.model__info = data;
+                }
+            }
+            catch { };  //does not fail
 
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
@@ -2930,7 +2965,28 @@ namespace Gekko
             string s = G.SecondsFormat(milliseconds);
             if (print) new Writeln("TTH: WriteParallelModel: " + s);
         }
-        
+
+        /// <summary>
+        /// From the lists Global:#all, Global:#endo etc. we make modelGekko.modelInfo.modelListHelper.* .
+        /// NOT USED??
+        /// </summary>
+        public static void PutListsIntoModelListHelper()
+        {
+
+            ModelListHelper modelListHelper = new ModelListHelper();
+
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "all"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "endo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exod"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exodjz"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoj"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
+
+            Program.model.modelGekko.modelInfo.modelListHelper = modelListHelper;
+        }
+
         /// <summary>
         /// Reads model protobuf files in parallel. Will return null if there is nothing found in cache.
         /// </summary>
@@ -3000,8 +3056,25 @@ namespace Gekko
                 GetListsFromModelListHelper(model.modelGekko);
                 //=============================================
                 //FOR SAFETY: see mail from TKD 5/3 2013
-                Program.model.modelGekko.simulateResults = new double[10];
+                model.modelGekko.simulateResults = new double[10];
                 //=============================================   
+
+                try
+                {
+                    if (model.modelGekko?.modelInfo?.modelListHelper?.model__info != null && model.modelGekko.modelInfo.modelListHelper.model__info.Length > 0)
+                    {
+                        string filePath2 = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info.zip");
+                        if (File.Exists(filePath2)) WaitForFileDelete(filePath2);
+                        using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(filePath2)))
+                        {
+                            writer.Write(model.modelGekko.modelInfo.modelListHelper.model__info);
+                        }
+                    }
+                }
+                catch { };  //does not fail
+
+                model.modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
+
             }
 
             return model;
@@ -17833,6 +17906,7 @@ namespace Gekko
 
         /// <summary>
         /// Helper method when loading a model from a cached internal protobuf file (getting model lists back in).
+        /// From modelGekko.modelInfo.modelListHelper.* the lists Global:#all, Global:#endo etc. are made.        
         /// </summary>
         private static void GetListsFromModelListHelper(ModelGekko modelGekko)
         {
@@ -17866,7 +17940,7 @@ namespace Gekko
             if (modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List());
 
-            modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
+            
         }
 
         /// <summary>

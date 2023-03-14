@@ -420,6 +420,8 @@ namespace Gekko
         public List<string> exotrue = null;
         [ProtoMember(8)]
         public List<string> exoz = null;
+        [ProtoMember(9)]
+        public byte[] model__info = null;  //recurrect <model>__info.zip.
     }
 
     [ProtoContract]
