@@ -2991,8 +2991,20 @@ namespace Gekko
                     return 0;
                 }, _ => { });
             }
-            
-            return ProtobufModelGamsScalar5b(Program.options.system_threads, lists);
+
+            Model model = ProtobufModelGamsScalar5b(Program.options.system_threads, lists);
+
+            if (model.modelGekko != null)
+            {
+                //get lists #endo, #exo, #exotrue, etc. (8 in all, into Global).
+                GetListsFromModelListHelper(model.modelGekko);
+                //=============================================
+                //FOR SAFETY: see mail from TKD 5/3 2013
+                Program.model.modelGekko.simulateResults = new double[10];
+                //=============================================   
+            }
+
+            return model;
         }
 
         public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
