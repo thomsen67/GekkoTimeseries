@@ -7341,7 +7341,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL static;");
-            I("CREATE #all;");
+            I("CREATE {#all};");
             I("TIME 2000 2003;");
             I("SERIES g = 100;");
             I("SERIES y = 500;");
@@ -8438,16 +8438,19 @@ namespace UnitTests
         public void _Test_Root()
         {
             I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
             I("%s = readfile('{root()}/Working/root.txt');");
             _AssertScalarString(First(), "%s", "Root test ok (1)" + G.NL);
 
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
             I("run root.gcm;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Root test ok (1)"));
 
             Globals.unitTestScreenOutput.Clear();
-            I("RESET;");            
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
             FAIL("run \\..\\..\\regres2\\Working\\root.gcm;");
 
             //will return "Root test ok (1)" !
@@ -8463,8 +8466,8 @@ namespace UnitTests
             //- if gcm has none --> good
             //- if gcm is the same as working folder --> good
             //- else --> bad
-            
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("You are calling a .gcm file that calls the root() function, which returns ...\\root.ini. This is because Gekko the working folder (\\xx\\xx) has this root.ini as a parent folder. However, the root.ini path is not part of the gcm file path, which is not allowed. Remedy: change Gekko working folder to the same folder as the .gcm file resides in."));
+                        
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(Globals.rootError2));
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres2\Working';");

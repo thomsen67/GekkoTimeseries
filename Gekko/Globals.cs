@@ -121,6 +121,9 @@ namespace Gekko
         // ------------------------------------------------------------
 
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
+        public const string rootError1 = "This is not allowed, in order to avoid confusion. Please change your Gekko working folder (File --> Set working folder...) and try again.";
+        public const string rootError2 = "This is not allowed,";  //for unit tests: because of line breaks.
+
 
         //Must be near the top of Globals.cs
         //do not move localTempFilesLocation below here!

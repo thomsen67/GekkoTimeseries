@@ -22446,7 +22446,7 @@ namespace Gekko
 
             string command = p.GetStack(i);
             int ii = i - 1;
-            if (command.StartsWith("procedure ", StringComparison.OrdinalIgnoreCase) || command.StartsWith("function ", StringComparison.OrdinalIgnoreCase))
+            if (P.IsFunctionOrProcedure(command))
             {
                 ii--;
             }
@@ -32152,6 +32152,11 @@ namespace Gekko
         private GekkoDictionary<string, string> commandFileCounterTainted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public int numberOfServiceMessages = 0;
 
+        public static bool IsFunctionOrProcedure(string command)
+        {
+            return command.StartsWith("procedure ", StringComparison.OrdinalIgnoreCase) || command.StartsWith("function ", StringComparison.OrdinalIgnoreCase);
+        }
+
         public string GetStack(int i)
         {
             return stack[i];
@@ -32160,6 +32165,38 @@ namespace Gekko
         public string GetLastFileSentToANTLR(int i)
         {
             return stackFileSentToAntlr[i];
+        }
+
+        /// <summary>
+        /// Returns the currently executing gcm file (and line after "¤"). Will not return functions/procedures,
+        /// these are considered "free floating". May return null (among other things if root() is called from GUI),
+        /// and beware when calling that the P p object may be null.
+        /// </summary>
+        /// <returns></returns>
+        public string GetExecutingGcmFile()
+        {
+            string command = null;
+
+            try
+            {
+                int max = this.GetDepth();
+                for (int i = max; i >= 1; i--)
+                {
+                    command = this.GetStack(i);
+                    if (IsFunctionOrProcedure(command))
+                    {
+                        //not good, continue
+                    }
+                    else
+                    {
+                        string[] ss = command.Split('¤');
+                        if (ss.Length == 2 && File.Exists(ss[0])) return ss[0];
+                    }
+                }                
+            }
+            catch { } //do not choke on this
+
+            return null;
         }
 
 

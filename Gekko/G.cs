@@ -3076,6 +3076,30 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Is dir2 a subfolder of dir1? Note: the two dirs must not end with "\".
+        /// </summary>
+        /// <param name="dir1"></param>
+        /// <param name="dir2"></param>
+        /// <returns></returns>
+        public static bool IsSubFolder(string dir1, string dir2)
+        {
+            DirectoryInfo di1 = new DirectoryInfo(dir1);
+            DirectoryInfo di2 = new DirectoryInfo(dir2);
+            bool isParent = false;
+            while (di2.Parent != null)
+            {
+                if (di2.Parent.FullName == di1.FullName)
+                {
+                    isParent = true;
+                    break;
+                }
+                else di2 = di2.Parent;
+            }
+
+            return isParent;
+        }
+
+        /// <summary>
         /// Get locatino of working folder
         /// </summary>
         /// <returns></returns>

@@ -5382,14 +5382,32 @@ namespace Gekko
             {
                 string fileAndFolder = rootHelper.roots[0];
                 //seems to work ok on UNC path, for instance "\\localhost\b$\xx\root.ini" --> "\\localhost\b$\xx"
-                string folder = Path.GetDirectoryName(fileAndFolder);
+                string dir1 = Path.GetDirectoryName(fileAndFolder);
                 //if we have "g:\root.ini", this will return "g:\" (note the backslash that is normally omitted)
                 //whereas "g:\sub\root.ini" will return "g:\sub". 
                 //So for the root we remove the backslash to be consistent, so we get "g:" instead of "g:\".
                 //The thing is that we prefer to use {root()}\xx\yy and not {root()}xx\yy.
                 //NOTE: Someting like RUN c:x.gcm is always interpreted as a (malformed) library call (library names must be > 1 char).
-                if (folder.EndsWith("\\")) folder = folder.Remove(folder.Length - 1);
-                return new ScalarString(folder);
+                if (dir1.EndsWith("\\")) dir1 = dir1.Remove(dir1.Length - 1);
+
+                if (true)
+                {
+                    //now we test that the executing gcm (if any) is consistent with this root
+                    P p = smpl.p;
+                    string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile();                    
+                    if (gcm != null)
+                    {
+                        string dir2 = Path.GetDirectoryName(gcm);
+                        if (dir2.EndsWith("\\")) dir2 = dir2.Remove(dir2.Length - 1);
+                        bool isParent = G.IsSubFolder(dir1, dir2);
+                        if (!isParent)
+                        {
+                            new Error("The root.ini folder determined from the Gekko working folder is '" + dir1 + "', but this folder is not a parent folder of the currently executing gcm file (which has folder '" + dir2 + "'). " + Globals.rootError1);
+                        }
+                    }
+                }
+
+                return new ScalarString(dir1);
             }
             else
             {
@@ -5407,7 +5425,7 @@ namespace Gekko
                 }
             }
             return null;  //because of errors we never get here
-        }
+        }        
 
         private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {
