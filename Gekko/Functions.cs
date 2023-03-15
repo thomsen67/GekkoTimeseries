@@ -5402,7 +5402,7 @@ namespace Gekko
                         bool isParent = G.IsSubFolder(dir1, dir2);
                         if (!isParent)
                         {
-                            new Error("The root.ini folder determined from the Gekko working folder is '" + dir1 + "', but this folder is not a parent folder of the currently executing gcm file (which has folder '" + dir2 + "'). " + Globals.rootError1);
+                            new Error("The root.ini folder determined from the Gekko working folder is '" + dir1 + "', but this folder is not a parent folder of the currently running gcm file (which has folder '" + dir2 + "'). " + Globals.rootError1);
                         }
                     }
                 }
