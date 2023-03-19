@@ -1481,6 +1481,19 @@ namespace Gekko
         }
     }
 
+    public class MonthNames
+    {
+        public int number = 1;  //default: january, but default not used anyway...
+        public string en = null;
+        public string da = null;
+        public MonthNames(int number, string eng, string dan)
+        {
+            this.number = number;
+            this.en = eng;
+            this.da = dan;
+        }
+    }
+
     /// <summary>
     /// Helper class
     /// </summary>
@@ -9359,7 +9372,7 @@ namespace Gekko
             else
             {
                 //overrides
-                if (Program.options.r_exe_folder.ToLower().EndsWith("\\" + exe))
+                if (IsExeOrBatOrCmd(Program.options.r_exe_folder))
                 {
                     RPathUsedHere = Program.options.r_exe_folder;
                 }
@@ -9589,7 +9602,7 @@ namespace Gekko
             else
             {
                 //overrides
-                if (Program.options.python_exe_folder.ToLower().EndsWith("\\python.exe"))
+                if (IsExeOrBatOrCmd(Program.options.python_exe_folder))
                 {
                     pythonPathUsedHere = Program.options.python_exe_folder;
                 }
@@ -9620,6 +9633,11 @@ namespace Gekko
             string s = Program.GetTextFromFileWithWait(pythonExportFileName);
             List<string> lines = Stringlist.ExtractLinesFromText(s);
             MatrixFromROrPythonToGekko(lines, 1);
+        }
+
+        private static bool IsExeOrBatOrCmd(string s)
+        {
+            return s.ToLower().EndsWith(".exe") || s.ToLower().EndsWith(".bat") || s.ToLower().EndsWith(".cmd");
         }
 
         /// <summary>
@@ -21936,7 +21954,6 @@ namespace Gekko
             Globals.printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
 
             Program.model = new Model();
-
             Globals.modelFileName = "";
             GuiSetModelName();
 
@@ -21990,9 +22007,7 @@ namespace Gekko
             Globals.expressionText = null;
             Globals.expression = null;
             Globals.expressions = null;
-            //Globals.freeIndexedListsDecomp = null;
-
-
+            Globals.asbRecode_dict1 = null;
 
             RemoteInit();
 
@@ -22471,10 +22486,13 @@ namespace Gekko
             {
                 commandLines = Stringlist.CreateListOfStringsFromFile(fileText);
             }
-            if (p.hasSeenStopCommand == 1)
+            if (!Globals.stopFix)
             {
-                lineNumber2++;  //else it reports the line before the STOP command                
-                p.hasSeenStopCommand = 2;  //no adjustments for callee command files (this is a bit of a hack)
+                if (p.hasSeenStopCommand == 1)
+                {
+                    lineNumber2++;  //else it reports the line before the STOP command                
+                    p.hasSeenStopCommand = 2;  //no adjustments for callee command files (this is a bit of a hack)
+                }
             }
         }
 

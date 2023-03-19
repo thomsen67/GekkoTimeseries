@@ -354,7 +354,7 @@ namespace Gekko
 
                 if (rv == null)
                 {
-                    if (functionName == Globals.stopHelper)
+                    if (!Globals.stopFix && functionName == Globals.stopHelper)
                     {
                         using (Writeln writeln = new Writeln())
                         {
@@ -367,7 +367,14 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("The " + G.FromLibraryToFunctionProcedureName(functionName, 4) + " does not seem to exist.");
+                        if (functionName == Globals.stopHelper)
+                        {
+                            new Error("Stopping execution: STOP command encountered.");
+                        }
+                        else
+                        {
+                            new Error("The " + G.FromLibraryToFunctionProcedureName(functionName, 4) + " does not seem to exist.");
+                        }
                     }
                 }
             }

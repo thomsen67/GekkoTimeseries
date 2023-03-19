@@ -2868,6 +2868,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
+                MessageBox.Show("Expand is intended to expand all cells with Count > 1. Work in progress, not implemented yet...");
                 this.decompFind.decompOptions2.expand = true;
                 RecalcCellsWithNewType(decompFind.model);
             }

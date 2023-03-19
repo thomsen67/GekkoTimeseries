@@ -179,19 +179,47 @@ namespace Gekko
 
         public static IVariable getmonth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
+            return getmonth(smpl, _t1, _t2, ths, null);
+        }
+
+        public static IVariable getmonth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable lang)
+        {
             if (ths.Type() != EVariableType.Date)
             {
                 new Error("getmonth() expects date input");
-                //throw new GekkoException();
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
-            if (gt.freq != EFreq.M && gt.freq != EFreq.D)
+            if (gt.freq != EFreq.D && gt.freq != EFreq.M)
             {
                 new Error("getmonth() expects monthly or daily date");
-                //throw new GekkoException();
             }
-            return new ScalarVal(gt.sub);
+
+            int month = gt.sub;            
+
+            if (lang == null)
+            {
+                return new ScalarVal(month);
+            }
+            else
+            {
+                string language = O.ConvertToString(lang);
+                string s = null;
+                foreach (MonthNames m in GekkoTime.MonthNames)
+                {
+                    if (G.Equal(language, Globals.languageEn))
+                    {
+                        if (m.number == month) return new ScalarString(m.en);
+                    }
+                    else if (G.Equal(language, Globals.languageDa))
+                    {
+                        if (m.number == month) return new ScalarString(m.da);
+                    }
+                    else new Error("Language '" + language + "' not recognized.");
+                }
+                new Error("Unexpected error #623uikhd7af1");  //should not be possible
+                return null;
+            }
         }
 
         public static IVariable getday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
@@ -261,7 +289,6 @@ namespace Gekko
             if (ths.Type() != EVariableType.Series)
             {
                 new Error("getparent() expects series input");
-                //throw new GekkoException();
             }
 
             Series ts = ths as Series;
@@ -3213,62 +3240,111 @@ namespace Gekko
             string sdecorate = O.ConvertToString(decorate);
             bool d = false;
             if (G.Equal(sdecorate, "yes")) d = true;
+            bool debug = false;
+            if (G.Equal(sdecorate, "debug")) debug = true;
 
-            string txt = null;
-            try
+            if (debug || Globals.asbRecode_dict1 == null)
             {
-                FindFileHelper ffh = Program.FindFile(sfile, null, true, false, true, true, null);
-                txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-            }
-            catch
-            {
-                new Error("Problem finding/reading file: " + sfile);
-            }
 
-            List<string> ss = Stringlist.ExtractLinesFromText(txt);
-
-            int dubletCounter = 0;
-            int blanksCounter = 0;
-
-            GekkoDictionary<string, string> dict = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in ss)
-            {
-                if (line == null || line.Trim() == "") continue;
-                string[] linex = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                if (linex.Length != 2)
-                {
-                    blanksCounter++;                    
-                    continue;
-                }
+                string txt = null;
                 try
                 {
-                    if (dict.ContainsKey(linex[1].Trim()))
-                    {
-                        dubletCounter++;
-                        continue;
-                    }
-                    dict.Add(linex[1].Trim(), linex[0].Trim());
+                    FindFileHelper ffh = Program.FindFile(sfile, null, true, false, true, true, null);
+                    txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
                 }
                 catch
                 {
-                    new Warning("This line could not be put into dictionary: " + line + ", skipping...");
+                    new Error("Problem finding/reading file: " + sfile);
                 }
-            }
 
-            if (dubletCounter > 0)
-            {
-                new Warning("In the recode file, there were " + dubletCounter + " dublets on the right-hand side.");
-            }
+                List<string> ss = Stringlist.ExtractLinesFromText(txt);
 
-            if (blanksCounter > 0)
-            {
-                new Warning("In the recode file, there were " + blanksCounter + " lines where blanks did not separate exactly two parts/names");
+                if (debug)
+                {
+                    GekkoDictionary<string, int> dict1a = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, int> dict2a = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string line in ss)
+                    {
+                        if (line == null || line.Trim() == "") continue;
+                        string[] linex = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        if (linex.Length != 2)
+                        {
+                            new Writeln("NOT2: " + line);
+                            continue;
+                        }
+                        if (linex[0].StartsWith(".") || linex[0].EndsWith(".") || linex[1].StartsWith(".") || linex[1].EndsWith("."))
+                        {
+                            new Writeln("DOT: " + line);
+                        }
+                        if (!dict1a.ContainsKey(linex[0])) dict1a.Add(linex[0], 1);
+                        else dict1a[linex[0]] = dict1a[linex[0]] + 1;
+                        if (!dict2a.ContainsKey(linex[1])) dict2a.Add(linex[1], 1);
+                        else dict2a[linex[1]] = dict2a[linex[1]] + 1;
+                    }
+
+                    foreach (KeyValuePair<string, int> kvp in dict1a)
+                    {
+                        if (kvp.Value > 1) new Writeln(kvp.Value + " --1-- " + kvp.Key);
+                    }
+
+                    foreach (KeyValuePair<string, int> kvp in dict2a)
+                    {
+                        if (kvp.Value > 1) new Writeln(kvp.Value + " --2-- " + kvp.Key);
+                    }
+
+                    new Writeln("-------------------------------------------------------");
+                    new Writeln("DEBUGGED " + ss.Count + " lines");
+                    new Writeln("-------------------------------------------------------");
+
+                    return new ScalarString("");
+                }
+
+                int dubletCounter1 = 0;
+                int blanksCounter = 0;
+                int dotCounter = 0;
+
+                Globals.asbRecode_dict1 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (string line in ss)
+                {
+                    if (line == null || line.Trim() == "") continue;
+                    string[] linex = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    if (linex.Length != 2)
+                    {
+                        blanksCounter++;
+                        continue;
+                    }
+                    try
+                    {
+                        if (Globals.asbRecode_dict1.ContainsKey(linex[1].Trim()))
+                        {
+                            dubletCounter1++;
+                            continue;
+                        }
+                        Globals.asbRecode_dict1.Add(linex[1].Trim(), linex[0].Trim());
+                    }
+                    catch
+                    {
+                        new Warning("This line could not be put into dictionary: " + line + ", skipping...");
+                    }
+                }
+
+                //if (dubletCounter1 > 0)
+                //{
+                //    new Warning("In the recode file, there were " + dubletCounter1 + " dublets on the right-hand side.");
+                //}
+
+                //if (blanksCounter > 0)
+                //{
+                //    new Warning("In the recode file, there were " + blanksCounter + " lines where blanks did not separate exactly two parts/names");
+                //}
+
             }
 
             string s5 = null;
             try
             {
-                s5 = dict[sname];
+                s5 = Globals.asbRecode_dict1[sname];
             }
             catch
             {
@@ -5366,23 +5442,24 @@ namespace Gekko
         public static IVariable root(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             string rootFileName = "root.ini";
-            string startFolder = Program.options.folder_working;
+            string folder1 = Program.options.folder_working;
 
-            //!!!HMMM, what folder??
+            //From working folder
+            RootHelper rootHelper1 = new RootHelper();
+            rootHelper1.rootFileName = rootFileName;
+            helper_root(new DirectoryInfo(folder1), rootHelper1);
 
-            RootHelper rootHelper = new RootHelper();
-            rootHelper.rootFileName = rootFileName;
-            helper_root(new DirectoryInfo(startFolder), rootHelper);
+            //From gcm file
 
-            if (rootHelper.roots.Count == 0)
+            if (rootHelper1.roots.Count == 0)
             {
-                new Error("Could not find a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders");
+                new Error("Could not find a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders");
             }
-            else if (rootHelper.roots.Count == 1)
+            else if (rootHelper1.roots.Count == 1)
             {
-                string fileAndFolder = rootHelper.roots[0];
+                string fileAndFolder1 = rootHelper1.roots[0];
                 //seems to work ok on UNC path, for instance "\\localhost\b$\xx\root.ini" --> "\\localhost\b$\xx"
-                string dir1 = Path.GetDirectoryName(fileAndFolder);
+                string dir1 = Path.GetDirectoryName(fileAndFolder1);
                 //if we have "g:\root.ini", this will return "g:\" (note the backslash that is normally omitted)
                 //whereas "g:\sub\root.ini" will return "g:\sub". 
                 //So for the root we remove the backslash to be consistent, so we get "g:" instead of "g:\".
@@ -5390,19 +5467,27 @@ namespace Gekko
                 //NOTE: Someting like RUN c:x.gcm is always interpreted as a (malformed) library call (library names must be > 1 char).
                 if (dir1.EndsWith("\\")) dir1 = dir1.Remove(dir1.Length - 1);
 
-                if (true)
+                //now we test that the executing gcm (if any) is consistent with this root
+                P p = smpl.p;
+                string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(); //p may be null, and method may return null                    
+                if (gcm != null)
                 {
-                    //now we test that the executing gcm (if any) is consistent with this root
-                    P p = smpl.p;
-                    string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile();                    
-                    if (gcm != null)
+                    string folder2 = Path.GetDirectoryName(gcm);
+
+                    if (!G.Equal(folder1, folder2)) //if working folder and gcm folder is the same, no need to check further (this is often the case)
                     {
-                        string dir2 = Path.GetDirectoryName(gcm);
-                        if (dir2.EndsWith("\\")) dir2 = dir2.Remove(dir2.Length - 1);
-                        bool isParent = G.IsSubFolder(dir1, dir2);
-                        if (!isParent)
+                        //From gcm folder
+                        RootHelper rootHelper2 = new RootHelper();
+                        rootHelper2.rootFileName = rootFileName;
+                        helper_root(new DirectoryInfo(folder2), rootHelper2);
+
+                        if (rootHelper2.roots.Count >= 1)
                         {
-                            new Error("The root.ini folder determined from the Gekko working folder is '" + dir1 + "', but this folder is not a parent folder of the currently running gcm file (which has folder '" + dir2 + "'). " + Globals.rootError1);
+                            string fileAndFolder2 = rootHelper2.roots[0];  //the first and deepest one
+                            if (!G.Equal(fileAndFolder1, fileAndFolder2))
+                            {
+                                new Error("The root.ini file determined from the Gekko working folder is '" + fileAndFolder1 + "', while the root.ini file determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
+                            }
                         }
                     }
                 }
@@ -5413,13 +5498,13 @@ namespace Gekko
             {
                 using (Error error = new Error())
                 {
-                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The files found are the following:");
+                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The files found are the following:");
                     error.MainNewLineTight();
                     int counter = 0;
-                    foreach (string s in rootHelper.roots)
+                    foreach (string s in rootHelper1.roots)
                     {
                         counter++;
-                        error.MainAdd("File #" + counter + " of " + rootHelper.roots.Count + ": " + s);
+                        error.MainAdd("File #" + counter + " of " + rootHelper1.roots.Count + ": " + s);
                         error.MainNewLineTight();
                     }
                 }

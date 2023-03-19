@@ -184,7 +184,7 @@ namespace Gekko
             version = G.PrintVersion(version, false);
 
             string pink = "";
-            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (23/9 2021)]";
+            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (spring 2023)]";
 
             this.Text = "Gekko " + version + pink;
             this.Name = "Gekko " + version + pink;
@@ -1911,7 +1911,7 @@ namespace Gekko
 
                 bool blue = false;
                 if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
-                    if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
+                if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
                 if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
                 if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
                 if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;

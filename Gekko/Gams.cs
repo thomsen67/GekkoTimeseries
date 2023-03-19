@@ -4438,6 +4438,8 @@ namespace Gekko
             GAMSWorkspace ws = null;
             try
             {
+                //for Python and R, some users had problems with the system shell calling python.exe and r.exe and had
+                //to use .bat files. But the following use is different, not calling the system shell like that.
                 ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
             }
             catch (Exception e)

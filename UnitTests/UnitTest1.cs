@@ -15118,6 +15118,27 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ModelCacheResurrectsIniZipAndListsWIthAllEndoExoEtc()
+        {
+            File.Delete(Globals.ttPath2 + @"\regres\models\jul05__info.zip");
+            I("RESET;");
+            I("flush();");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");            
+            I("model jul05;");
+            Assert.IsTrue(File.Exists(Globals.ttPath2 + @"\regres\models\jul05__info.zip"));
+            Assert.IsTrue(Program.databanks.GetGlobal().storage.Count == 8);  //#all, #endo, #exo, etc.
+
+            // --------------------------------------------------
+
+            File.Delete(Globals.ttPath2 + @"\regres\models\jul05__info.zip");
+            I("RESET;");  //note: no flush
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("model jul05;");
+            Assert.IsTrue(File.Exists(Globals.ttPath2 + @"\regres\models\jul05__info.zip"));
+            Assert.IsTrue(Program.databanks.GetGlobal().storage.Count == 8);  //#all, #endo, #exo, etc.
+        }
+
+        [TestMethod]
         public void _Test_FunctionLocalTime_AndSomeBlock()
         {
             // ============================================ 

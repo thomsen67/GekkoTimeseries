@@ -186,10 +186,33 @@ namespace Gekko
                 weekdays.Add(new WeekDayNames(3, "Wednesday", "Onsdag"));
                 weekdays.Add(new WeekDayNames(4, "Thursday", "Torsdag"));
                 weekdays.Add(new WeekDayNames(5, "Friday", "Fredag"));
-                weekdays.Add(new WeekDayNames(6, "Saturday", "Loerdag"));
-                weekdays.Add(new WeekDayNames(7, "Sunday", "Soendag"));
+                weekdays.Add(new WeekDayNames(6, "Saturday", "Lørdag"));
+                weekdays.Add(new WeekDayNames(7, "Sunday", "Søndag"));
                 GekkoTime.weekdayNames = weekdays;
                 return weekdays;
+            }
+        }
+
+        private static List<MonthNames> monthNames = null;  //use WeekdayNames!!
+        public static List<MonthNames> MonthNames
+        {
+            get
+            {
+                if (GekkoTime.monthNames != null) return GekkoTime.monthNames;
+                GekkoTime.monthNames = new List<MonthNames>();
+                GekkoTime.monthNames.Add(new MonthNames(1, "January", "Januar"));
+                GekkoTime.monthNames.Add(new MonthNames(2, "February", "Februar"));
+                GekkoTime.monthNames.Add(new MonthNames(3, "March", "Marts"));
+                GekkoTime.monthNames.Add(new MonthNames(4, "April", "April"));
+                GekkoTime.monthNames.Add(new MonthNames(5, "May", "Maj"));
+                GekkoTime.monthNames.Add(new MonthNames(6, "June", "Juni"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "July", "Juli"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "August", "August"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "September", "September"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "October", "Oktober"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "November", "November"));
+                GekkoTime.monthNames.Add(new MonthNames(7, "December", "December"));
+                return GekkoTime.monthNames;
             }
         }
 

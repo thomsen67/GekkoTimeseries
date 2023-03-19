@@ -71,7 +71,17 @@ namespace Gekko
         public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
         // -------------------------------------------------
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.
-        // -------------------------------------------------               
+        // -------------------------------------------------     
+
+        // -------------------------------------------------
+        // orange stuff start
+        // -------------------------------------------------
+
+        // -------------------------------------------------
+        // orange stuff start
+        // -------------------------------------------------
+
+
 
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
@@ -219,6 +229,8 @@ namespace Gekko
         public static bool modeIntendedWarning = false;
 
         public static string blockHelper = "<[time]>";
+
+        public static bool stopFix = true;
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" } };
@@ -629,6 +641,8 @@ namespace Gekko
         /// </summary>
         public static int defaultPeriodsWhenCreatingTimeSeries = 200;  //200
         public static double defaultExpandRateForDataArrays = 1.5d;
+
+        public static GekkoDictionary<string, string> asbRecode_dict1 = null;
 
         /// <summary>
         /// Used for kind of an internal hack
