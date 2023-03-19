@@ -6561,7 +6561,7 @@ namespace Gekko
         public static void Stop(P p)
         {
             Globals.threadIsInProcessOfAborting = true;
-            if (!Globals.stopFix) p.hasSeenStopCommand = 1;
+            //if (!Globals.stopFix) p.hasSeenStopCommand = 1;
             throw new GekkoException();
         }
 
@@ -6572,7 +6572,7 @@ namespace Gekko
         /// <param name="p"></param>
         public static void StopHelper(GekkoSmpl smpl, P p)
         {
-            if (!Globals.stopFix) p.hasSeenStopCommand = 1;
+            //if (!Globals.stopFix) p.hasSeenStopCommand = 1;
             O.FunctionLookupNew2(p, null, Globals.stopHelper)(smpl, p, false, null, null);
         }
 

@@ -354,19 +354,19 @@ namespace Gekko
 
                 if (rv == null)
                 {
-                    if (!Globals.stopFix && functionName == Globals.stopHelper)
-                    {
-                        using (Writeln writeln = new Writeln())
-                        {
-                            writeln.MainAdd("-------------------------------------------------------------");
-                            writeln.MainNewLineTight();
-                            writeln.MainAdd("------------ The job was stopped by STOP command ------------");
-                            writeln.MainNewLineTight();
-                            writeln.MainAdd("-------------------------------------------------------------");
-                        }                        
-                    }
-                    else
-                    {
+                    //if (!Globals.stopFix && functionName == Globals.stopHelper)
+                    //{
+                    //    using (Writeln writeln = new Writeln())
+                    //    {
+                    //        writeln.MainAdd("-------------------------------------------------------------");
+                    //        writeln.MainNewLineTight();
+                    //        writeln.MainAdd("------------ The job was stopped by STOP command ------------");
+                    //        writeln.MainNewLineTight();
+                    //        writeln.MainAdd("-------------------------------------------------------------");
+                    //    }                        
+                    //}
+                    //else
+                    //{
                         if (functionName == Globals.stopHelper)
                         {
                             new Error("Stopping execution: STOP command encountered.");
@@ -375,7 +375,7 @@ namespace Gekko
                         {
                             new Error("The " + G.FromLibraryToFunctionProcedureName(functionName, 4) + " does not seem to exist.");
                         }
-                    }
+                    //}
                 }
             }
             return rv;
