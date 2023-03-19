@@ -567,8 +567,7 @@ namespace UnitTests
             I("%s = readfile('compare_databanks.txt');");
             string ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
-            //_AssertScalarString
-
+            
             I("compare<dump>;");
             I("p #dif;");
             I("p <n m q> {#dif};");
@@ -950,6 +949,23 @@ namespace UnitTests
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss5.Contains("Out of the 7 common series, there are differences regarding 7 of them"));            
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There are many missing values"));
+
+            //
+            // <missing = zero>
+            //
+
+            I("reset;");
+            I("time 2001 2002;");
+            I("xx = 0, m();");
+            I("yy = series(1);");
+            I("yy[i] = 0, m();");
+            I("clone;");
+            I("xx = m(), 0;");
+            I("yy[i] = m(), 0;");
+            I("compare <missing = zero>;");
+            I("%s = readfile('compare_databanks.txt');");
+            ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss.Contains("Out of the 2 common series, there are differences regarding 0 of them"));
         }
 
         [TestMethod]

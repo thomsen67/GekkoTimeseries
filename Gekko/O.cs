@@ -8391,6 +8391,7 @@ namespace Gekko
             public List listItems = null;
             public string opt_sort = null;
             public string opt_dump = null;
+            public string opt_missing = null;
             public string fileName = null;
             public double opt_abs = 0d; //important that this i 0
             public double opt_rel = 0d; //important that this i 0

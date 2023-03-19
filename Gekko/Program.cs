@@ -22779,9 +22779,11 @@ namespace Gekko
             //TODO TODO file should be path...
             //TODO TODO 
 
+            bool missingZero = false;
+            if (G.Equal(o.opt_missing, "zero")) missingZero = true;
             bool history = false;
             if (G.Equal(o.opt_type, "hist")) history = true;
-            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel, history);
+            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel, history, missingZero);
 
         }
 
@@ -30183,13 +30185,13 @@ namespace Gekko
             GekkoTime gt1 = new GekkoTime((Program.options.freq), t1, 1);
             GekkoTime gt2 = new GekkoTime((Program.options.freq), t2, 1);
 
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path, null, null, double.NaN, double.NaN, false);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN, false, false);
         }
 
         /// <summary>
@@ -30308,7 +30310,7 @@ namespace Gekko
         /// </summary>
         public static void Sam1()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false, false);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false, false, false);
         }
 
         /// <summary>
@@ -30316,7 +30318,7 @@ namespace Gekko
         /// </summary>
         public static void Sam2()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true, false);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true, false, false);
         }
 
         /// <summary>
@@ -30324,7 +30326,7 @@ namespace Gekko
         /// </summary>
         public static void Sam3()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true, false);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true, false, false);
         }
 
         /// <summary>
@@ -30354,10 +30356,10 @@ namespace Gekko
         /// <summary>
         /// Databank compare helper (GUI method)
         /// </summary>
-        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order, bool history)
+        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order, bool history, bool missingZero)
         {
             //Called in order to compare databanks, 5 last args inactive
-            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN, history);
+            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN, history, missingZero);
         }
 
         /// <summary>
@@ -30378,7 +30380,7 @@ namespace Gekko
         /// <param name="dump"></param>
         /// <param name="crit_abs"></param>
         /// <param name="crit_rel"></param>
-        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel, bool history)
+        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel, bool history, bool missingZero)
         {
             //TODO: could be more clearly coded, with 6 compareTypes (3 databank and 3 residuals), doing a 'variables == null' is not too pretty
             //TODO: error handling if var not found in one of the banks in residual check
@@ -30421,7 +30423,6 @@ namespace Gekko
             else
             {
                 new Error("Expected SORT to be alpha, abs or rel.");
-                //throw new GekkoException();
             }
 
             if (variables != null && variables.Count == 0)
@@ -30547,8 +30548,7 @@ namespace Gekko
             //28/6 2022: the above regarding file names and parts were a complete mess.
             //Tried to clean it up a bit, with the line below.
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(samFileName, null);
-
-            //using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, null, GekkoFileReadOrWrite.Write))
+            
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
             {
@@ -30612,6 +30612,14 @@ namespace Gekko
                         double var2 = tsGrund.GetDataSimple(t);
                         double var2_lag1 = tsGrund.GetDataSimple(t.Add(-1));
                         double var2_lag2 = tsGrund.GetDataSimple(t.Add(-2));
+
+                        if (missingZero)
+                        {
+                            if (G.isNumericalError(var1)) var1 = 0d;
+                            if (G.isNumericalError(var2)) var2 = 0d;
+                            if (G.isNumericalError(var2_lag1)) var2_lag1 = 0d;
+                            if (G.isNumericalError(var2_lag2)) var2_lag2 = 0d;
+                        }
 
                         //we check first both 0, both M, one non-M && one M.
 
