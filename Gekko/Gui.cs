@@ -1679,11 +1679,20 @@ namespace Gekko
             Globals.numberOfSkippedLines = 0;
             Program.AbortingReset();
             Globals.errorMemory = null;  //so that it is not recording all the time.   
+
+            if (Program.IsOrange())
+            {
+                Globals.traceSimple = new TraceSimple();
+            }
+
             if (Globals.pink)
             {
                 Globals.datopgek_errors = new List<string>();
                 Globals.datopgek_banks = new List<string>();
             }
+
+
+
             if (Globals.pink2)
             {
                 Globals.datopgek_otherBanks = new List<string>();
@@ -1722,7 +1731,7 @@ namespace Gekko
             gui.threadWorkerThread.SetApartmentState(ApartmentState.STA);
             gui.threadWorkerThread.CurrentCulture = CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
             gui.threadWorkerThread.Start();
-        }
+        }        
 
         // Stop Thread button is pressed
         private void btnStopThread_Click(object sender, System.EventArgs e)
@@ -2118,6 +2127,24 @@ namespace Gekko
                         text.MainNewLineTight();
                         text.MainAdd("-------------------------------------------------------");
                         text.MainNewLine();
+                    }
+                }
+
+                List<string> traceList = null;
+                if (Program.IsOrange()) traceList = Globals.traceSimple.Get();
+                if (traceList != null && traceList.Count > 0)
+                {
+                    using (Writeln text = new Writeln())
+                    {
+                        text.MainAdd("-----------------------------------------------------------");                        
+                        text.MainNewLineTight();
+                        foreach (string s in traceList)
+                        {
+                            text.MainAdd(s);
+                            text.MainNewLineTight();
+                        }
+                        text.MainAdd("-----------------------------------------------------------");
+                        text.MainNewLineTight();
                     }
                 }
             }

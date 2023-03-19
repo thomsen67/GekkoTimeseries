@@ -17,8 +17,6 @@
     Else, see <http://www.gnu.org/licenses/>.        
 */
 
-
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -69,20 +67,12 @@ namespace Gekko
         public static List<string> datopgek_sysCalls = null;
         public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
         public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
+        // ----- trace
+        public static TraceSimple traceSimple = null;
         // -------------------------------------------------
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.
         // -------------------------------------------------     
-
-        // -------------------------------------------------
-        // orange stuff start
-        // -------------------------------------------------
-
-        // -------------------------------------------------
-        // orange stuff start
-        // -------------------------------------------------
-
-
-
+        
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
 
