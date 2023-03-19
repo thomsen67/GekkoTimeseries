@@ -725,6 +725,7 @@ namespace Deploy2
 
         private static void GekcelFileHelper(int bitness)
         {
+            MessageBox.Show(@"Remember to change Gekko version inside c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Program.cs. Locate for instance label='Gekcel 3.1.14' in a <button> and change to the right Gekko version. Just do this 1 time in all per new Gekko version.");
             string path1 = null;
             if (bitness == 32)
             {

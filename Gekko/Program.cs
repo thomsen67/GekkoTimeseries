@@ -29419,13 +29419,11 @@ namespace Gekko
 
                 if (isRows && isCols)
                 {
-                    new Error("It seems that OPTION sheet rows/cols are both set to 'yes'");
-                    //throw new GekkoException();
+                    new Error("It seems that OPTION sheet rows/cols are both set to 'yes'");                    
                 }
                 if (G.Equal(oPrt.opt_rows, "yes") && G.Equal(oPrt.opt_cols, "yes"))
                 {
                     new Error("It seems that options <rows> and <cols> are used at the same time");
-                    //throw new GekkoException();
                 }
                 if (G.Equal(oPrt.opt_rows, "yes"))
                 {

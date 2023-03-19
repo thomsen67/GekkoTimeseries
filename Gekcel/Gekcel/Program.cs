@@ -86,7 +86,7 @@ namespace Gekcel
     <tabs>
       <tab id='tab1' label='Gekko'>        
         <group id='group3' label='Info'>   
-          <button id='button3a' imageMso='Info' size='large' label='Gekko/Gekcel' onAction='OnButtonPressed3' />  
+          <button id='button3a' imageMso='Info' size='large' label='Gekcel 3.1.14' onAction='OnButtonPressed3' />  
         </group>            
 <!-- 
         <group id='group1' label='Gekko reading'>              
