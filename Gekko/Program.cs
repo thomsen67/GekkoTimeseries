@@ -21991,7 +21991,10 @@ namespace Gekko
             GuiSetModelName();
 
             string workingFolder = Program.options.folder_working;
-            Program.options = new Options();  //resetting these, but letting working folder live on.            
+            string systemTrace = Program.options.system_trace;
+            Program.options = new Options();  //resetting these, but letting working folder and trace live on. 
+            if (!G.NullOrBlanks(workingFolder)) Program.options.folder_working = workingFolder;
+            if (!G.NullOrBlanks(systemTrace)) Program.options.system_trace = systemTrace;
 
             CrossThreadStuff.Mode();  //to show default color
 
@@ -22006,11 +22009,7 @@ namespace Gekko
             Globals.r_fileContent = null;
 
             Program.alias = null;
-
-            if (workingFolder != null && workingFolder != "")
-            {
-                Program.options.folder_working = workingFolder;
-            }
+            
             Globals.lastPrtOrMulprtTable = null;
             CrossThreadStuff.CopyButtonEnabled(false);
             //Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = false;  //this logic can be removed in a couple of years (maybe in 2015)
@@ -22246,6 +22245,9 @@ namespace Gekko
             }
             int n = 0;
             if (!skipWrite) n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+
+            if (Program.IsOrange()) Globals.traceSimple.Add("CLOSE (file written): " + removed.FileNameWithPath);
+
         }
 
         public static string ErrorHandling(string s, P p, bool noWindowShown)
