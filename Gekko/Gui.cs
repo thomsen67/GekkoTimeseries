@@ -1938,10 +1938,10 @@ namespace Gekko
                         text.MainAdd("-------------------------------------------------------");
                         text.MainNewLine();
                     }
-                }             
+                }
 
                 if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
-                {                    
+                {
                     using (Writeln text = new Writeln())
                     {
                         text.MainAdd("-----------------------------------------------------------");
@@ -1959,7 +1959,7 @@ namespace Gekko
                 }
 
                 if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
-                {                 
+                {
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
@@ -2000,7 +2000,7 @@ namespace Gekko
 
                 if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
                 {
-                 
+
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
@@ -2063,7 +2063,7 @@ namespace Gekko
 
                 if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
                 {
-                 
+
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                     using (Writeln txt = new Writeln())
@@ -2091,7 +2091,7 @@ namespace Gekko
 
                 if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
                 {
-                 
+
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     using (Writeln txt = new Writeln())
                     {
@@ -2132,20 +2132,28 @@ namespace Gekko
 
                 List<string> traceList = null;
                 if (Program.IsOrange()) traceList = Globals.traceSimple.Get();
-                if (traceList != null && traceList.Count > 0)
+                Table tab = new Table();
+                tab.CurRow.SetTopBorder(1, 1);
+                foreach (string s in traceList)
                 {
-                    using (Writeln text = new Writeln())
-                    {
-                        text.MainAdd("-----------------------------------------------------------");                        
-                        text.MainNewLineTight();
-                        foreach (string s in traceList)
-                        {
-                            text.MainAdd(s);
-                            text.MainNewLineTight();
-                        }
-                        text.MainAdd("-----------------------------------------------------------");
-                        text.MainNewLineTight();
-                    }
+                    tab.CurRow.SetText(1, s);
+                    tab.CurRow.SetText(2, "xx");
+                    tab.CurRow.Next();
+                }
+                tab.CurRow.SetBottomBorder(1, 1);
+                tab.CurRow.SetLeftBorder(1);
+                tab.CurRow.SetRightBorder(1);
+
+                int widthRemember = Program.options.print_width;
+                Program.options.print_width = int.MaxValue;
+                try
+                {
+                    List<string> ss = tab.Print();
+                    foreach (string s in ss) G.Writeln(s);
+                }
+                finally
+                {
+                    Program.options.print_width = widthRemember;
                 }
             }
         }
@@ -2215,9 +2223,12 @@ namespace Gekko
                 {
                     double ms = (DateTime.Now - p.startingTime).TotalMilliseconds;
                     if (ms > 1000 && !Globals.threadIsInProcessOfAborting)
-                    {  //to avoid UFunctions being shown here. Fix better when #980324532985 is done
+                    {
+                        //to avoid UFunctions being shown here. Fix better when #980324532985 is done
+                        string s = null;
+                        if (Globals.dataTrace == EDataTrace.None) s = ". (Tracing: see menu 'Data' --> 'Trace data').";
                         G.Writeln();
-                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms));
+                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s);
                         G.Writeln();
                     }
                 }
@@ -2970,6 +2981,30 @@ namespace Gekko
         {
             WindowOpenDatabanks wd = new WindowOpenDatabanks();
             wd.ShowDialog();
+        }
+
+        private void traceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.traceToolStripMenuItem.Checked = !this.traceToolStripMenuItem.Checked;
+            string s = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow at the right-side of the GUI bottom bar), and when the session ends, a report('trace') is shown.";
+            if (this.traceToolStripMenuItem.Checked)
+            {
+                Globals.dataTrace = EDataTrace.Simple;                
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd("Data tracing is activated.");
+                    txt.MoreAdd(s);
+                }                
+            }
+            else
+            {
+                Globals.dataTrace = EDataTrace.None;
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd("Data tracing is deactivated.");
+                    txt.MoreAdd(s);
+                }
+            }
         }
 
         //private void runStatusToolStripMenuItem_Click(object sender, EventArgs e)

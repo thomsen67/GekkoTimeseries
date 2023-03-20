@@ -113,6 +113,7 @@ namespace Gekko
             this.restoreUserSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewDatabanksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.traceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.allPPLOTUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -947,8 +948,7 @@ namespace Gekko
             // 
             // dataToolStripMenuItem
             // 
-            this.dataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewDatabanksToolStripMenuItem});
+            this.dataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { this.viewDatabanksToolStripMenuItem, this.traceToolStripMenuItem });
             this.dataToolStripMenuItem.Name = "dataToolStripMenuItem";
             this.dataToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.dataToolStripMenuItem.Text = "Data";
@@ -960,6 +960,13 @@ namespace Gekko
             this.viewDatabanksToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.viewDatabanksToolStripMenuItem.Text = "View databanks...";
             this.viewDatabanksToolStripMenuItem.Click += new System.EventHandler(this.viewDatabanksToolStripMenuItem_Click);
+            // 
+            // tracing
+            // 
+            this.traceToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.traceToolStripMenuItem.Text = "Trace data";
+            this.traceToolStripMenuItem.ToolTipText = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow \nat the right-side of the GUI bottom bar), and when the session ends, a report ('trace') is shown.";
+            this.traceToolStripMenuItem.Click += new System.EventHandler(this.traceToolStripMenuItem_Click);            
             // 
             // windowToolStripMenuItem
             // 
@@ -1890,6 +1897,7 @@ namespace Gekko
         private ToolStripMenuItem manualToolStripMenuItem;
         private ToolStripMenuItem dataToolStripMenuItem;
         private ToolStripMenuItem viewDatabanksToolStripMenuItem;
+        private ToolStripMenuItem traceToolStripMenuItem;
         private ToolStripMenuItem runStatusToolStripMenuItem;
         private ToolStripMenuItem windowToolStripMenuItem;
         private ToolStripMenuItem closeToolStripMenuItem1;

@@ -69,6 +69,12 @@ using System.Threading.Tasks;
 namespace Gekko
 {
 
+    public enum EDataTrace
+    {
+        None,
+        Simple
+    }
+
     public enum EWrapType
     {
         Writeln,  //normal
@@ -18523,12 +18529,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// If option system trace = simple.
+        /// If GUI data trace is activated.
         /// </summary>
         /// <returns></returns>
         public static bool IsOrange()
         {
-            return G.Equal(Program.options.system_trace, "simple");
+            return Globals.dataTrace == EDataTrace.Simple;
         }
 
         /// <summary>
@@ -21991,10 +21997,8 @@ namespace Gekko
             GuiSetModelName();
 
             string workingFolder = Program.options.folder_working;
-            string systemTrace = Program.options.system_trace;
             Program.options = new Options();  //resetting these, but letting working folder and trace live on. 
-            if (!G.NullOrBlanks(workingFolder)) Program.options.folder_working = workingFolder;
-            if (!G.NullOrBlanks(systemTrace)) Program.options.system_trace = systemTrace;
+            if (!G.NullOrBlanks(workingFolder)) Program.options.folder_working = workingFolder;            
 
             CrossThreadStuff.Mode();  //to show default color
 

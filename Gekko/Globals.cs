@@ -68,6 +68,7 @@ namespace Gekko
         public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
         public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
         // ----- trace
+        public static EDataTrace dataTrace = EDataTrace.None;
         public static TraceSimple traceSimple = null;
         // -------------------------------------------------
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.
