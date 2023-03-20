@@ -2551,7 +2551,7 @@ namespace Gekko
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
             List ml = GetRawListElements(ffh.realPathAndFileName);
-            if (Program.IsOrange()) Globals.traceSimple.Add("Listfile read: " + ffh.realPathAndFileName);
+            if (Program.IsDataTrace()) Globals.dataTraceContainer.Add(1, "Read list", ffh.prettyPathAndFileName);
             return ml;
         }
 
@@ -3512,7 +3512,7 @@ namespace Gekko
                 res.Flush();
                 res.Close();
 
-                if (Program.IsOrange()) Globals.traceSimple.Add("Listfile write: " + pathAndFilename);
+                if (Program.IsDataTrace()) Globals.dataTraceContainer.Add(2, "Write list", pathAndFilename);
             }
 
             string listfileName = G.TransformListfileName(varnameWithFreq);

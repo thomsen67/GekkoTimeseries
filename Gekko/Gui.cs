@@ -1680,9 +1680,9 @@ namespace Gekko
             Program.AbortingReset();
             Globals.errorMemory = null;  //so that it is not recording all the time.   
 
-            if (Program.IsOrange())
+            if (Program.IsDataTrace())
             {
-                Globals.traceSimple = new TraceSimple();
+                Globals.dataTraceContainer = new TraceSimple();
             }
 
             if (Globals.pink)
@@ -2131,29 +2131,45 @@ namespace Gekko
                 }
 
                 List<string> traceList = null;
-                if (Program.IsOrange()) traceList = Globals.traceSimple.Get();
-                Table tab = new Table();
-                tab.CurRow.SetTopBorder(1, 1);
-                foreach (string s in traceList)
+                if (Program.IsDataTrace())
                 {
-                    tab.CurRow.SetText(1, s);
-                    tab.CurRow.SetText(2, "xx");
-                    tab.CurRow.Next();
-                }
-                tab.CurRow.SetBottomBorder(1, 1);
-                tab.CurRow.SetLeftBorder(1);
-                tab.CurRow.SetRightBorder(1);
+                    traceList = Globals.dataTraceContainer.Get();
+                    if (traceList.Count > 0)
+                    {
+                        Table tab = new Table();
+                        tab.CurRow.SetTopBorder(1, 3);
+                        tab.CurRow.SetText(1, "DATA TRACE");
+                        tab.CurRow.SetBottomBorder(1, 3);
+                        tab.CurRow.Next();
+                        int count = -1;
+                        foreach (string s in traceList)
+                        {
+                            count++;
+                            if (count > 0) tab.CurRow.Next();
+                            string[] ss = s.Split('¤');
+                            tab.CurRow.SetText(1, ss[1]);
+                            tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
+                            tab.CurRow.SetText(3, ss[2]);
+                        }
+                        tab.CurRow.SetBottomBorder(1, 3);
+                        tab.CurRow.SetLeftBorder(1);
+                        tab.CurRow.SetRightBorder(3);
+                        tab.CurRow.Next();
+                        tab.CurRow.SetText(1, "Note: deactivate tracing in menu 'Data' --> 'Trace data'");
+                        tab.CurRow.MergeCols(1, 3);
 
-                int widthRemember = Program.options.print_width;
-                Program.options.print_width = int.MaxValue;
-                try
-                {
-                    List<string> ss = tab.Print();
-                    foreach (string s in ss) G.Writeln(s);
-                }
-                finally
-                {
-                    Program.options.print_width = widthRemember;
+                        int widthRemember = Program.options.print_width;
+                        Program.options.print_width = int.MaxValue;
+                        try
+                        {
+                            List<string> ss = tab.Print();
+                            foreach (string s in ss) G.Writeln(s);
+                        }
+                        finally
+                        {
+                            Program.options.print_width = widthRemember;
+                        }
+                    }
                 }
             }
         }
