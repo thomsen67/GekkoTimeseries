@@ -489,6 +489,8 @@ namespace Gekko
             bool seriesAreInRows = true;  //default for SHEET, opposite of default for PRT.
             bool hasNames = true; if (G.Equal(o.opt_names, "no")) hasNames = false;
             bool hasDates = true; if (G.Equal(o.opt_dates, "no")) hasDates = false;
+            string dateType = o.opt_datetype;
+            string dateFormat = o.opt_dateformat;
 
             if (type == EPrintTypes.Plot)
             {                
@@ -513,12 +515,8 @@ namespace Gekko
                     {
                         tab2 = printTable.Transpose();                        
                     }
-                    //
-                    //
-                    // BUG: the method does not handle <names=no> or <dates=no>... #yuadsf8adsfjs
-                    //
-                    //
-                    Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title, hasNames, hasDates, seriesAreInRows);
+                    
+                    Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title, hasNames, hasDates, seriesAreInRows, dateType, dateFormat);
                 }
                 else
                 {
@@ -555,7 +553,7 @@ namespace Gekko
 
                 if (Globals.excelDna)
                 {
-                    Program.PrtToExcelDna(printTable, false, false, null, hasNames, hasDates, seriesAreInRows);
+                    Program.PrtToExcelDna(printTable, false, false, null, hasNames, hasDates, seriesAreInRows, dateType, dateFormat);
                 }
                 else
                 {

@@ -86,7 +86,7 @@ namespace Gekcel
     <tabs>
       <tab id='tab1' label='Gekko'>        
         <group id='group3' label='Info'>   
-          <button id='button3a' imageMso='Info' size='large' label='Gekcel 3.1.14' onAction='OnButtonPressed3' />  
+          <button id='button3a' imageMso='Info' size='large' label='Gekcel 3.1.15' onAction='OnButtonPressed3' />  
         </group>            
 <!-- 
         <group id='group1' label='Gekko reading'>              
@@ -289,9 +289,14 @@ namespace Gekcel
             //    x1 = 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242;
             //    x2 = 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282;
             //    WRITE demo;
-                        
-            string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
-            string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+
+            string newpath = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\bin\Debug";
+            string demo = newpath + "\\demo.gbk";
+            string demo_orig = (new DirectoryInfo(newpath)).Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+
+            //THIS SUDDENTLY DOES NOT WORK...
+            //string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
+            //string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
             
             if (File.Exists(demo))
             {
@@ -310,8 +315,8 @@ namespace Gekcel
             //Next, handle the Gekcel.xlsm file, and inject VBA code into it.
             Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;
             Worksheet ws = (Worksheet)app.ActiveSheet;
-            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";
-            string excelFile_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
+            string excelFile = newpath + "\\Gekcel.xlsm";
+            string excelFile_orig = (new DirectoryInfo(newpath)).Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
             if (File.Exists(excelFile))
             {
                 try

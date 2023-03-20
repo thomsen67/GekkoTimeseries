@@ -4996,7 +4996,6 @@ namespace Gekko
             if (gt.freq != EFreq.D)
             {
                 new Error("toExcelDate() expects a daily date as input");
-                //throw new GekkoException();
             }
             int iy = gt.super;
             int im = gt.sub;

@@ -25216,7 +25216,7 @@ namespace Gekko
             }
         }
 
-        public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title, bool hasNames, bool hasDates, bool seriesAreInRows)
+        public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title, bool hasNames, bool hasDates, bool seriesAreInRows, string dateType, string dateFormat)
         {            
             int extraRows = 0;
             if (isStamp) extraRows++;
@@ -25230,14 +25230,14 @@ namespace Gekko
             if (seriesAreInRows)
             {
                 //SHEET style, names on rows, dates on cols
-                if (hasNames == false) startRow = 1;
-                if (hasDates == false) startCol = 1;
+                if (hasNames == false) startCol = 1;
+                if (hasDates == false) startRow = 1;
             }
             else
             {
                 //PRT style, dates on rows, names on cols
-                if (hasDates == false) startRow = 1;
-                if (hasNames == false) startCol = 1;                
+                if (hasDates == false) startCol = 1;
+                if (hasNames == false) startRow = 1;                
             }
 
             object[,] cells = new object[table.GetRowMaxNumber() + rowsOffset + extraRows - startRow, table.GetColMaxNumber() + colOffset - startCol];
@@ -25273,7 +25273,25 @@ namespace Gekko
                         }
                         else if (cell2.cellType == CellType.Date)
                         {
-                            cells[ii, jj] = cell2.date;
+                            if (G.Equal(dateType, "excel"))
+                            {
+                                cells[ii, jj] = GekkoTime.FromGekkoTimeToDateTime(cell2.date_hack, O.GetDateChoices.FlexibleStart).ToOADate();
+                            }
+                            else
+                            {
+                                bool isFirst = true;
+                                string format = SplitDateFormatInTwo(dateFormat, ref isFirst);                                
+                                if (IsGekkoDateFormat(format))
+                                {
+                                    cells[ii, jj] = cell2.date;
+                                }
+                                else
+                                {
+                                    string dateString = null; DateTime dt; string f;
+                                    GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(cell2.date_hack, isFirst, format, out dt, out f, out dateString);
+                                    cells[ii, jj] = dateString;
+                                }
+                            }
                         }
                         else if (cell2.cellType == CellType.Text)
                         {
