@@ -22026,8 +22026,10 @@ namespace Gekko
             Globals.globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
             Globals.globalPeriodTimeFilters2 = new List<GekkoTime>();
 
-            Globals.detectedRPath = null;  //we reset this, too
+            Globals.detectedRPath = null;  //we reset this, too            
             Globals.r_fileContent = null;
+            Globals.detectedPythonPath = null;
+            Globals.python_fileContent = null;
 
             Program.alias = null;
             
@@ -22061,6 +22063,7 @@ namespace Gekko
             Globals.expression = null;
             Globals.expressions = null;
             Globals.asbRecode_dict1 = null;
+            Globals.dataTraceContainer = null; //not really necessary
 
             RemoteInit();
 

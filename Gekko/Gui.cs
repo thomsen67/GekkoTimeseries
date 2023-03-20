@@ -2242,7 +2242,7 @@ namespace Gekko
                     {
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         string s = null;
-                        if (Globals.dataTrace == EDataTrace.None) s = ". (Tracing: see menu 'Data' --> 'Trace data').";
+                        if (Globals.dataTrace == EDataTrace.None) s = ". (To activate tracing, see menu 'Data' --> 'Trace data').";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s);
                         G.Writeln();
