@@ -22063,7 +22063,7 @@ namespace Gekko
             Globals.expression = null;
             Globals.expressions = null;
             Globals.asbRecode_dict1 = null;
-            Globals.dataTraceContainer = null; //not really necessary
+            Globals.dataTraceContainer = null; //not really necessary 
 
             RemoteInit();
 
