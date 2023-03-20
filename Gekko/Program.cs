@@ -2017,6 +2017,31 @@ namespace Gekko
             //    catch { };  //does not fail
             //}
 
+            //if(true && Globals.runningOnTTComputer)
+            //{
+            //    GekkoTime gt = new GekkoTime(EFreq.Q, 2020, 3);
+            //    string dateFormat = "yyyy-mm-dd last";
+            //    if (false)
+            //    {
+            //        object o = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart).ToOADate();
+            //    }
+            //    else
+            //    {
+            //        bool isFirst = true;
+            //        string format = SplitDateFormatInTwo(dateFormat, ref isFirst);
+            //        if (IsGekkoDateFormat(format))
+            //        {
+                        
+            //        }
+            //        else
+            //        {
+            //            string dateString = null; DateTime dt; string f;
+            //            GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out dateString);
+            //            object o = dateString;
+            //        }
+            //    }
+            //}
+
             if (false && Globals.runningOnTTComputer)
             {
                 new Writeln("M123AB7∆ÿ≈.TABEL_13224153" + " --> " + DstCodes("M123AB7∆ÿ≈.TABEL_13224153", true));
