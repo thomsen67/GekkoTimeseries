@@ -2131,7 +2131,7 @@ namespace Gekko
                 }
 
                 List<string> traceList = null;
-                if (Program.IsDataTrace())
+                if (Program.IsDataTrace() && Globals.dataTraceContainer != null)  //last condition should not be necessary
                 {
                     traceList = Globals.dataTraceContainer.Get();
                     if (traceList.Count > 0)

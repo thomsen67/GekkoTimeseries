@@ -22088,7 +22088,7 @@ namespace Gekko
             Globals.expression = null;
             Globals.expressions = null;
             Globals.asbRecode_dict1 = null;
-            Globals.dataTraceContainer = null; //not really necessary 
+            //Globals.dataTraceContainer = null; //not really necessary 
 
             RemoteInit();
 
@@ -25292,11 +25292,13 @@ namespace Gekko
                     {
                         int ii = i + rowsOffset + extraRows - startRow;
                         int jj = j + colOffset - startCol;
-                        if (cell2.cellType == CellType.Number)
-                        {
-                            cells[ii, jj] = cell2.number;
-                        }
-                        else if (cell2.cellType == CellType.Date)
+                        //
+                        // HACK HACK HACK HACK HACK
+                        // HACK HACK HACK HACK HACK .date_hack used, for some reason dates become string/text type
+                        // HACK HACK HACK HACK HACK                        
+
+
+                        if (!cell2.date_hack.IsNull()) 
                         {
                             if (G.Equal(dateType, "excel"))
                             {
@@ -25308,7 +25310,7 @@ namespace Gekko
                                 string format = SplitDateFormatInTwo(dateFormat, ref isFirst);                                
                                 if (IsGekkoDateFormat(format))
                                 {
-                                    cells[ii, jj] = cell2.date;
+                                    cells[ii, jj] = cell2.date_hack.ToString();
                                 }
                                 else
                                 {
@@ -25317,6 +25319,14 @@ namespace Gekko
                                     cells[ii, jj] = dateString;
                                 }
                             }
+                        }
+                        else if (cell2.cellType == CellType.Date)
+                        {
+                            cells[ii, jj] = cell2.date;
+                        }
+                        else if (cell2.cellType == CellType.Number)
+                        {
+                            cells[ii, jj] = cell2.number;
                         }
                         else if (cell2.cellType == CellType.Text)
                         {
