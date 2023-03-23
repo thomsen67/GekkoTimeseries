@@ -589,14 +589,20 @@ namespace Gekko
                         }
                     }
 
-                    if (errorIfTimeNotFound && helper.time.IsNull()) new Error("Unexpected");
+                    if (errorIfTimeNotFound && helper.time.IsNull())
+                    {
+                        new Error("Unexpected");
+                    }
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
                     else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
                 }
                 else
                 {
                     //without index
-                    if (errorIfTimeNotFound) new Error("Unexpected");
+                    if (errorIfTimeNotFound)
+                    {
+                        new Error("Unexpected");
+                    }
                     start = varname;
                     helper.resultingFullName = varname;
                 }
