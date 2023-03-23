@@ -25295,9 +25295,7 @@ namespace Gekko
                         //
                         // HACK HACK HACK HACK HACK
                         // HACK HACK HACK HACK HACK .date_hack used, for some reason dates become string/text type
-                        // HACK HACK HACK HACK HACK                        
-
-
+                        // HACK HACK HACK HACK HACK
                         if (!cell2.date_hack.IsNull()) 
                         {
                             if (G.Equal(dateType, "excel"))
@@ -33278,7 +33276,7 @@ namespace Gekko
         /// <param name="i"></param>
         /// <param name="willRemoveBlanks"></param>
         public void AddIfNotAlreadyThere(string s, T i, bool willRemoveBlanks)
-        {
+        {            
             string s2 = null;
             if (willRemoveBlanks) s2 = G.HandleBlanksRemove(s);
             else s2 = s;

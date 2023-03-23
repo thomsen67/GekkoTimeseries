@@ -38,9 +38,7 @@ namespace Gekko
 
     public class Globals
     {
-        public static bool stars = true; //#8ujklasdfas
-
-        public static bool decompVar = false;  //default: false
+        public static bool stars = true; //#8ujklasdfas        
 
         public const string smpl = "§¤£";  //this line must be at top
         public const string libraryDriveCheatString = "library___name___";
@@ -78,6 +76,9 @@ namespace Gekko
         public const string pivotHelper2 = "{normalize}";
 
         public const bool gams2cs = false;
+
+        public static bool decompVar = false;  //default: false
+        public static bool decompFixTimelessProblem = true;
 
         public const bool fixFor3_2 = false;
 

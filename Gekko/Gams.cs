@@ -591,17 +591,19 @@ namespace Gekko
 
                     if (errorIfTimeNotFound && helper.time.IsNull())
                     {
-                        new Error("Unexpected");
-                    }
+                        if (Globals.decompFixTimelessProblem) helper.time = new GekkoTime(EFreq.A, 2030, 1);
+                        else new Error("Unexpected");
+                    }                    
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
-                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]";
                 }
                 else
                 {
                     //without index
                     if (errorIfTimeNotFound)
-                    {
-                        new Error("Unexpected");
+                    {                        
+                        if (Globals.decompFixTimelessProblem) helper.time = new GekkoTime(EFreq.A, 2030, 1);
+                        else new Error("Unexpected");
                     }
                     start = varname;
                     helper.resultingFullName = varname;
@@ -795,8 +797,12 @@ namespace Gekko
                 string inputName = helper.dict_FromVarNumberToVarName[id];                
                 ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, inputName, true);
                 int aNumber = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
+                if (aNumber == -12345)
+                {                    
+                    new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
+                }
                 int i1 = helper2.time.Subtract(helper.tBasis);
-                int i2 = aNumber;
+                int i2 = aNumber;                
                 double d;
                 string toParse = "";
                 if (ss[1].Trim() == "")
@@ -823,8 +829,15 @@ namespace Gekko
                         new Error("Could not parse the number '" + toParse + "' as a floating-point value.");
                         throw;
                     }
-                }                
-                helper.a[i1][i2] = d;
+                }
+                try
+                {
+                    helper.a[i1][i2] = d;
+                }
+                catch
+                {
+                    new Error("Index out of range when reading GAMS scalar equation");
+                }
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Endogenous values read: " + G.Seconds(dt1));
 

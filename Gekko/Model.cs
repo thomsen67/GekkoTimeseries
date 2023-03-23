@@ -1182,11 +1182,30 @@ namespace Gekko
                 //
                 // NB: beware of OPTION series data missing, if it is set.
                 int index1 = -12345;
-                int index2 = -12345;                
-                double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);
-                for (int t = 0; t < n; t++)
+                int index2 = -12345;
+
+                if (ts.type == ESeriesType.Timeless)
                 {
-                    a[t][i] = data[index1 + t];
+                    if (Globals.decompFixTimelessProblem)
+                    {
+                        double data = ts.GetTimelessData();
+                        for (int t = 0; t < n; t++)
+                        {
+                            a[t][i] = data;
+                        }
+                    }
+                    else
+                    {
+                        new Error("Problem loading timeless variable '" + name + "' into GAMS scalar model");
+                    }
+                }
+                else
+                {
+                    double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);
+                    for (int t = 0; t < n; t++)
+                    {
+                        a[t][i] = data[index1 + t];
+                    }
                 }
             }            
         }

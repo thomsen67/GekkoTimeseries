@@ -1386,7 +1386,16 @@ namespace Gekko
                                         {
                                             new Error("DECOMP matrix invert problem");
                                         }
-                                        Series ts = dd.storage[x2];                                        
+                                        Series ts = null;
+                                        try
+                                        {
+                                            ts = dd.storage[x2];
+                                        }
+                                        catch
+                                        {
+                                            //exudl, forsøger her at finde en [-2], der er noget rotten
+                                            //omkring 2030. Måske lave en liste over de tidsløse
+                                        }
                                         double d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;
                                     }
