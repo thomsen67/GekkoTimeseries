@@ -1223,8 +1223,6 @@ namespace Gekko
         {
             GekkoDictionaryBlanks<int> endo = new GekkoDictionaryBlanks<int>();
             GekkoDictionaryBlanks<int> exo = new GekkoDictionaryBlanks<int>();
-            //GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            //GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Dictionary<int, string> endoReverse = new Dictionary<int, string>();  //just inverted
             Dictionary<int, string> exoReverse = new Dictionary<int, string>();  //just inverted
 
@@ -1243,9 +1241,7 @@ namespace Gekko
                 }
             }
 
-            //What about residuals here?????
-            //What about residuals here?????  they are not part of precedents
-            //What about residuals here?????
+            //residuals are not part of precedents here
 
             double[,] mEndo = null;
             double[,] mExo = null;
@@ -1307,29 +1303,35 @@ namespace Gekko
 
                             //see also #as7f3læaf9
                             GekkoTime tTemp = t;
-                            int add = 0;
-                                                        
-                            //if (modelGamsScalar.is2000Model)
-                            //{
-                            //    tTemp = new GekkoTime(EFreq.A, Globals.decomp2000, 1);
-                            //    add = t.Subtract(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
-                            //}
-
+                            int add = 0;                            
                             tTemp = modelGamsScalar.Maybe2000GekkoTime(t);
-                            add = t.Subtract(tTemp);
+                            add = t.Subtract(tTemp);                            
 
                             string eqName = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), tTemp);
                             if (k == 0) eqNames.Add(eqName);
                             int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(eqName);
 
                             List<TwoStrings> variables = new List<TwoStrings>();
-                            //foreach precedent variable
+                            
                             foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars)
                             {
+                                //foreach precedent variable
                                 string varName = modelGamsScalar.GetVarNameA(dp.variable);
+
+                                int add2 = 0;
+
+                                if (Globals.decompFixTimelessProblem && modelGamsScalar.isTimeless[dp.variable])
+                                {
+                                    if (Globals.runningOnTTComputer && add != 0) new Error("TTH: Expected add = 0 here");
+                                    add2 = t.Subtract(modelGamsScalar.tBasis);
+                                    //problem is that exudl gets a dp.date that seems fixed to first period.
+                                    //check hos this .precedents[eqNumber] list is made, perhaps indicate
+                                    //with .date = -12345 that the variable is timeless????
+                                }
+
                                 int date = dp.date;
-                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add, modelGamsScalar.tBasis);
-                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add - t.Subtract(modelGamsScalar.tBasis));
+                                string x1 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add + add2, modelGamsScalar.tBasis);
+                                string x2 = DecompFirst() + ":" + ConvertToTurtleName(varName, date + add + add2 - t.Subtract(modelGamsScalar.tBasis));
                                 TwoStrings two = new TwoStrings(x1, x2);
                                 variables.Add(two);
                             }
@@ -1469,15 +1471,7 @@ namespace Gekko
                     effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
                                                                        //the effect matrix is #endo x #exo    
                 }
-            }
-
-            //GekkoDictionary<string, string> names = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            //for (int row = 0; row < endo.Count; row++)
-            //{
-            //    for (int col = 0; col < exo.Count; col++)
-            //    {
-            //    }
-            //}
+            }            
 
             for (int row = 0; row < endo.Count(); row++)
             {
@@ -2612,6 +2606,10 @@ namespace Gekko
                                 if (Globals.decompFix || !G.isNumericalError(grad))
                                 {
                                     int lag2 = dp.date + timeIndex2;
+                                    if (Globals.decompFixTimelessProblem && modelGamsScalar.isTimeless[dp.variable])
+                                    {
+                                        lag2 = 0;
+                                    }
                                     string name = DecompFirst() + ":" + ConvertToTurtleName(varName, lag2);
                                     d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                     d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002

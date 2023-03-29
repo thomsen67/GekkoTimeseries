@@ -535,6 +535,8 @@ namespace Gekko
         /// </summary>
         public static ExtractTimeDimensionHelper ExtractTimeDimension(bool allowFast, EExtractTimeDimension settings, string varname, bool errorIfTimeNotFound)
         {
+            //NOTE: just remove last argument soon...!
+
             bool simple = false;
             ExtractTimeDimensionHelper helper = new ExtractTimeDimensionHelper();
 
@@ -589,22 +591,26 @@ namespace Gekko
                         }
                     }
 
-                    if (errorIfTimeNotFound && helper.time.IsNull())
-                    {
-                        if (Globals.decompFixTimelessProblem) helper.time = new GekkoTime(EFreq.A, 2030, 1);
-                        else new Error("Unexpected");
-                    }                    
+                    //if (errorIfTimeNotFound && helper.time.IsNull())
+                    //{
+                    //    if (Globals.decompFixTimelessProblem)
+                    //    {                            
+                    //        if(Globals.runningOnTTComputer) new Writeln("Timeless --> " + start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]");
+                    //    }
+                    //}                    
                     if (fullName.Count == 0) helper.resultingFullName = start;  //avoid an empty "x[]" name.
-                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]";
+                    else helper.resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName, false) + "]";                    
                 }
                 else
                 {
                     //without index
-                    if (errorIfTimeNotFound)
-                    {                        
-                        if (Globals.decompFixTimelessProblem) helper.time = new GekkoTime(EFreq.A, 2030, 1);
-                        else new Error("Unexpected");
-                    }
+                    //if (errorIfTimeNotFound)
+                    //{
+                    //    if (Globals.decompFixTimelessProblem)
+                    //    {                            
+                    //        if (Globals.runningOnTTComputer) new Writeln("Timeless --> " + varname);
+                    //    }
+                    //}
                     start = varname;
                     helper.resultingFullName = varname;
                 }
@@ -696,21 +702,28 @@ namespace Gekko
             int substatus2 = 0;
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
+            Dictionary<int, int> timeless = new Dictionary<int, int>();  //records timeless vars for later use in .isTimeless array.
             
             //read dictionary                        
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
                 }
-            }            
+            }
+
+            helper.isTimeless = new bool[helper.dict_FromVarNameToANumber.Count()];
+            foreach (int i in timeless.Keys)
+            {
+                helper.isTimeless[i] = true;
+            }
 
             helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count()];
             foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber.GetDictionaryForIteration())
@@ -801,7 +814,15 @@ namespace Gekko
                 {                    
                     new Error("When reading equation, could not find name '" + helper2.resultingFullName + "' in dictionary");
                 }
-                int i1 = helper2.time.Subtract(helper.tBasis);
+                int i1 = -12345;
+                if (Globals.decompFixTimelessProblem && helper2.time.IsNull())
+                {
+                    i1 = 0;
+                }
+                else
+                {
+                    i1 = helper2.time.Subtract(helper.tBasis);
+                }
                 int i2 = aNumber;                
                 double d;
                 string toParse = "";
@@ -924,6 +945,8 @@ namespace Gekko
             modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
             // -------------- raw codelines ---------
             modelGamsScalar.csCodeLines = csCodeLines;
+            // --------------
+            modelGamsScalar.isTimeless = helper.isTimeless;  //the a-vars that are timeless
             
             CalculatePrecedentsAndDependents(modelGamsScalar, modelGamsScalar.CountEqs(1));
 
@@ -1058,7 +1081,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
         {
             bool b = false;
             string line = null;
@@ -1141,7 +1164,7 @@ namespace Gekko
                     int n = -12345;
                     try
                     {
-                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                        n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based                        
                     }
                     catch
                     {
@@ -1150,9 +1173,16 @@ namespace Gekko
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     helper.dict_FromVarNumberToVarName[n] = ss2;
                     helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);                    
-                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, ss2, true);                 
-                    if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
-                    if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
+                    ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, ss2, true);
+                    if (helper2.time.IsNull())
+                    {
+                        if (!timeless.ContainsKey(helper.dict_FromVarNameToANumber.Count())) timeless.Add(helper.dict_FromVarNameToANumber.Count(), 1); //1 is just arbitrary
+                    }
+                    else
+                    {
+                        if (helper.t1.IsNull() || helper2.time.StrictlySmallerThan(helper.t1)) helper.t1 = helper2.time;
+                        if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
+                    }
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
                 }
             }
@@ -1165,13 +1195,21 @@ namespace Gekko
 
             for (int eqNumber = 0; eqNumber < bigN; eqNumber++)
             {
-                ModelScalarEquation l = new ModelScalarEquation();
-                modelGamsScalar.precedents.Add(l);
+                ModelScalarEquation equ = new ModelScalarEquation();
+                modelGamsScalar.precedents.Add(equ);
                 //foreach precedent variable
                 for (int i = 0; i < modelGamsScalar.bb[eqNumber].Length; i += 2)
-                {
+                {                    
                     PeriodAndVariable dp = new PeriodAndVariable(modelGamsScalar.bb[eqNumber][i], modelGamsScalar.bb[eqNumber][i + 1]);
-                    if (!l.vars.Contains(dp)) l.vars.Add(dp);  //avoid dublets
+                    if (Globals.runningOnTTComputer && Globals.decompFixTimelessProblem)
+                    {                        
+                        bool b = modelGamsScalar.isTimeless[dp.variable];
+                        if (b && dp.date != 0)
+                        {
+                            new Error("TTH: Expected timeless .date = 0");
+                        }
+                    }
+                    if (!equ.vars.Contains(dp)) equ.vars.Add(dp);  //avoid dublets
                 }
             }
 
@@ -1472,7 +1510,17 @@ namespace Gekko
                     }
                     string varname = helper.dict_FromVarNumberToVarName[number];
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
-                    int i1 = helper2.time.Subtract(helper.tBasis);
+
+                    int i1 = -12345;
+                    if (Globals.decompFixTimelessProblem && helper2.time.IsNull())
+                    {
+                        i1 = 0;  // --> points to first period, this should contain data, is put into helper.endo[].
+                    }
+                    else
+                    {
+                        i1 = helper2.time.Subtract(helper.tBasis);
+                    }                    
+
                     int i2 = helper.dict_FromVarNameToANumber.GetInt(helper2.resultingFullName);
 
                     int ii1 = helper.endo.Count;
@@ -4981,7 +5029,7 @@ namespace Gekko
         public GekkoDictionaryBlanks<int> dict_FromEqNameToEqChunkNumber = new GekkoDictionaryBlanks<int>();
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
-        //public List<List<PeriodAndVariable>> precedentsScalar = new List<List<PeriodAndVariable>>();
+        public bool[] isTimeless = null;
 
         public GekkoTime tBasis = GekkoTime.tNull;
         public GekkoTime t1 = GekkoTime.tNull;

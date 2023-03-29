@@ -771,7 +771,10 @@ namespace Gekko
         /// </summary>
         [ProtoMember(27)]
         public List<ModelScalarEquation> precedents = null;
-                
+
+        [ProtoMember(28)]
+        public bool[] isTimeless = null;
+
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
         /// <summary>

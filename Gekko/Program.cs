@@ -663,7 +663,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="ts"></param>
         public void Add(string s, Series ts)
-        {
+        {            
             this.storage.Add(s, ts);
         }
 
