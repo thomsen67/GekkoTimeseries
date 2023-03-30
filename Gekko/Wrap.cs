@@ -444,6 +444,7 @@ namespace Gekko
                 {
                     //get the last bit
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
+                    if (normalText2 == null) normalText2 = "";  //can be null
                     col = WrapText(textBox, normalText2, margin, col, lineWidth, color, type, mustAlsoPrintOnScreen);
                 }
             }

@@ -2998,7 +2998,7 @@ namespace Gekko
 
         /// <summary>
         /// Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
-        /// The positions are inclusive.
+        /// The positions are inclusive. Can return null!!!!
         /// </summary>
         /// <param name="s"></param>
         /// <param name="position1"></param>
