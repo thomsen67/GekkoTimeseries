@@ -86,10 +86,9 @@ namespace Gekko
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
-        public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
-        public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
-        public int interface_csv_ndec = 100;
-        public int interface_csv_pdec = 100;        
+            public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
+            public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
+            public int interface_csv_ndec = 100;        
         public string interface_debug = "dialog";  //or "none"  
         public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
         public string interface_errors = "normal";  // old | normal
@@ -98,6 +97,9 @@ namespace Gekko
         public bool interface_help_copylocal = true;        
         public string interface_mode = "mixed";  //sim, data, mixed. Mixed since 3.1.12.
         public string interface_mute = "no";  //yes, no
+        public string interface_prn_decimalseparator = "period";  //has to do with Windows interface, so ok here
+        public string interface_prn_delimiter = "blank";      //--> we put it next to the decimalseparator
+        public int interface_prn_ndec = 100;
         public bool interface_remote = false;  //remote control via remote.gcm
         public string interface_remote_file = "";
         public bool interface_sound = false;  //overall sound switch
@@ -351,9 +353,8 @@ namespace Gekko
             Add("INTERFACE ALIAS", Globals.xbool);
             Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");    //#kljsdfasfdlkj
             Add("INTERFACE CSV DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj
-            Add("INTERFACE CSV DELIMITER", Globals.xnameOrString, "semicolon", "comma");
+            Add("INTERFACE CSV DELIMITER", Globals.xnameOrString, "semicolon", "comma", "tab");
             Add("INTERFACE CSV NDEC", Globals.xint);
-            Add("INTERFACE CSV PDEC", Globals.xint);
             Add("INTERFACE DEBUG", Globals.xnameOrString, "none", "dialog");
             Add("INTERFACE EDIT STYLE", Globals.xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");
             Add("INTERFACE ERRORS", Globals.xnameOrString, "old", "normal");
@@ -362,6 +363,9 @@ namespace Gekko
             Add("INTERFACE HELP COPYLOCAL", Globals.xbool);
             Add("INTERFACE MODE", Globals.xnameOrString, "mixed", "sim", "data");
             Add("INTERFACE MUTE", Globals.xnameOrString, Globals.xbool);
+            Add("INTERFACE PRN DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj
+            Add("INTERFACE PRN DELIMITER", Globals.xnameOrString, "blank", "semicolon", "comma", "tab");
+            Add("INTERFACE PRN NDEC", Globals.xint);
             Add("INTERFACE REMOTE", Globals.xbool);
             Add("INTERFACE REMOTE FILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("INTERFACE SOUND", Globals.xbool);

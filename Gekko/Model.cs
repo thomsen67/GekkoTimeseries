@@ -1573,6 +1573,7 @@ namespace Gekko
                     int i1 = this.bb[eq][int.Parse(tokens[i + 4].s)];
                     int i2 = this.bb[eq][int.Parse(tokens[i + 12].s)];
                     GekkoTime gt = this.FromTimeIntegerToGekkoTime(i1);
+                    if (Globals.decompFixTimelessProblem && this.isTimeless[i2]) gt = t0;  //otherwise, this timeless variable will show with a large lag...
                     string varname = this.GetVarNameA(i2);
                     string varname2 = null;
                     if (showTime)

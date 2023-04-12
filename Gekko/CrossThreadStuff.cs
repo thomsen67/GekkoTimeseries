@@ -60,6 +60,20 @@ namespace Gekko
             }
         }
 
+        delegate string GetOutputWindowTextCallback();
+        public static string GetOutputWindowText()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                return Gui.gui.Invoke(new GetOutputWindowTextCallback(GetOutputWindowText), new object[] { }) as string;
+            }
+            else
+            {
+                return Gui.gui.textBoxMainTabUpper.Text;
+            }
+        }
+
         //weird delegate pattern, but it works!
         delegate void SetTextInputCallback(string text, string type2);
         /// <summary>

@@ -756,23 +756,38 @@ namespace Gekko
         // ============ helper methods for options, end
 
         /// <summary>
-        /// Helper method regarding path
+        /// Helper method regarding path. Seems to just check if path is legal. Allows '*' in filename.
         /// </summary>
-        /// <param name="fileName2"></param>
+        /// <param name="inputPathAndFilename"></param>
         /// <returns></returns>
-        public static string ResolvePath(string fileName2)
+        public static string ResolvePath(string inputPathAndFilename)
         {
             string rv = null;
             try
             {
                 //Wonder what this really does...? Maybe it check if the name is legal at all?
-                rv = Path.GetFullPath(fileName2);
+                bool star = false;
+                if (Path.GetFileName(inputPathAndFilename) != null && Path.GetFileName(inputPathAndFilename).Contains("*")) star = true;
+
+                string fileName3 = inputPathAndFilename;
+
+                if (star) //does not allow it if the PATH contains star(s)
+                {
+                    fileName3 = fileName3.Replace("*", "(STARSTARSTAR)");
+                }
+                
+                rv = Path.GetFullPath(fileName3);
+
+                if (star)
+                {
+                    rv = rv.Replace("(STARSTARSTAR)", "*");  //reverting
+                }
             }
             catch { };
             if (rv == null)
             {
-                new Warning("The path name seems invalid: '" + RemoveLibraryCheatString(fileName2) + "'");
-                rv = fileName2;
+                new Warning("The path name seems invalid: '" + RemoveLibraryCheatString(inputPathAndFilename) + "'");
+                rv = inputPathAndFilename;
             }
             return rv;
         }

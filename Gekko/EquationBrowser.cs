@@ -410,7 +410,7 @@ namespace Gekko
                         explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";  //see also #324lkj2342
                     }
                 }
-                vars2.Add(varnameWithoutFreq + "¤" + explanation);
+                vars2.Add(varnameWithoutFreq + "¤" + G.ReplaceWhitespaceWith1Blank(explanation));
 
                 // --------------------------------
                 // html print info on ENDO/EXO, freq, data period
@@ -737,8 +737,7 @@ namespace Gekko
             x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
             x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
-
-            //x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
+                        
             x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
             string s1 = null;

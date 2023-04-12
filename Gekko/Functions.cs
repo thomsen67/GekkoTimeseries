@@ -4,10 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Windows.Controls.Primitives;
+using static GAMS.GAMSOptions;
+using static Gekko.O;
+using System.Management;
+using static Gekko.Program;
 
 namespace Gekko
 {
-
+    public class GamsScalarHelper
+    {
+        public string zip_name = null;
+        public string raw_path = null;
+        public object[] raw_ignore = null;
+        public string fix_variable = null;
+        public string counts1 = "**** counts do not match";
+        public string counts2 = "**** unmatched free variables";
+        public string counts3 = "**** number of unmatched =e= rows";
+        public int? t1 = null;
+        public int? t2 = null;
+        public int? a1 = 18;
+        public int? a2 = 100;
+        public object[] cmd_lines = null;
+        public object[] gms_lines = null;
+    }
     public class RootHelper
     {
         public string rootFileName = null;
@@ -5003,6 +5023,345 @@ namespace Gekko
             DateTime dt = new DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
+        }
+
+        public static void gamsconvert(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            helper_GamsConvert(0, 0, null);
+        }
+
+        private static void helper_GamsConvert(int depth, int dif0, GamsScalarHelper settings)
+        {
+            int dif = 0;
+            string path = Program.options.folder_working;
+            if (depth == 0)
+            {
+                O.Cls("main");
+                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(path + "\\" + "gamsconvert.json"));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
+                {
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                }
+                catch (Exception e)
+                {
+                    new Error("The .json file does not seem correctly formatted. " + e.Message);
+                }
+
+                // -------------------------------------------------------------
+
+                settings = new GamsScalarHelper();
+                try { settings.zip_name = (string)jsonTree["zip_name"]; } catch { }
+                try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
+                try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
+                try { settings.fix_variable = (string)jsonTree["fix_variable"]; } catch { }
+                try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
+                try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
+                try { settings.counts3 = (string)jsonTree["counts3"]; } catch { }
+                try { settings.t1 = (int)jsonTree["t1"]; } catch { }
+                try { settings.t2 = (int)jsonTree["t2"]; } catch { }
+                try { settings.a1 = (int)jsonTree["a1"]; } catch { }
+                try { settings.a2 = (int)jsonTree["a2"]; } catch { }
+                try { settings.cmd_lines = (object[])jsonTree["cmd_lines"]; } catch { }
+                try { settings.gms_lines = (object[])jsonTree["gms_lines"]; } catch { }
+
+                // ============================================
+
+                if (settings.zip_name == null) new Error("You must indicate zip_name in gamsconvert.json");
+                if (settings.raw_path == null) new Error("You must indicate raw_path in gamsconvert.json");
+                if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
+                if (settings.fix_variable == null) new Error("You must indicate fix_variable in gamsconvert.json");
+                //if (settings.counts1 == null) new Error("");
+                //if (settings.counts2 == null) new Error("");
+                //if (settings.counts3 == null) new Error("");
+                if (settings.t1 == null) new Error("You must indicate t1 in gamsconvert.json");
+                if (settings.t2 == null) new Error("You must indicate t2 in gamsconvert.json");
+                //if (settings.a1 == null) Error("");
+                //if (settings.a2 == null) Error("");
+                if (settings.cmd_lines == null) new Error("You must indicate cmd_lines in gamsconvert.json");
+                if (settings.gms_lines == null) new Error("You must indicate gms_lines in gamsconvert.json");
+
+                // -------------------------------------------------------------
+
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd("The gamsConvert() function is a helper function for GAMS to produce a ");
+                    txt.MainAdd("scalar model for use in the Gekko DECOMP command.");
+                    txt.MainAdd("A GAMS scalar model is produced by the GAMS CONVERT command.");
+                }
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd("Settings:");
+                }
+                using (Writeln txt = new Writeln("- ", int.MaxValue, System.Drawing.Color.Empty, false, ETabs.Main))
+                {
+                    txt.MainOmitVeryFirstNewLine();
+                    txt.MainAdd("working folder (model folder) = " + Program.options.folder_working); txt.MainNewLineTight();
+                    txt.MainAdd("zip_name = " + settings.zip_name); txt.MainNewLineTight();
+                    txt.MainAdd("raw_path = " + settings.raw_path); txt.MainNewLineTight();
+                    txt.MainAdd("raw_ignore = "); txt.MainNewLineTight();
+                    foreach (string ox in settings.raw_ignore)
+                    {
+                        string x = ox as string;
+                        if (x == null) new Error("Expected raw_ignore elements to be all strings");
+                        txt.MainAdd("- " + x); txt.MainNewLineTight();
+                    }
+                    txt.MainAdd("fix_variable = " + settings.fix_variable); txt.MainNewLineTight();
+                    txt.MainAdd("counts1 = " + settings.counts1); txt.MainNewLineTight();
+                    txt.MainAdd("counts2 = " + settings.counts2); txt.MainNewLineTight();
+                    txt.MainAdd("counts3 = " + settings.counts3); txt.MainNewLineTight();
+                    txt.MainAdd("t1 = " + settings.t1); txt.MainNewLineTight();
+                    txt.MainAdd("t2 = " + settings.t2); txt.MainNewLineTight();
+                    txt.MainAdd("a1 = " + settings.a1); txt.MainNewLineTight();
+                    txt.MainAdd("a2 = " + settings.a2); txt.MainNewLineTight();
+                    txt.MainAdd("cmd_lines = "); txt.MainNewLineTight();
+                    foreach (string ox in settings.cmd_lines)
+                    {
+                        string x = ox as string;
+                        if (x == null) new Error("Expected cmd_lines elements to be all strings");
+                        txt.MainAdd("- " + x); txt.MainNewLineTight();
+                    }
+                    txt.MainAdd("gms_lines = "); txt.MainNewLineTight();
+                    foreach (string ox in settings.gms_lines)
+                    {
+                        string x = ox as string;
+                        if (x == null) new Error("Expected gms_lines elements to be all strings");
+                        txt.MainAdd("- " + x); txt.MainNewLineTight();
+                    }
+                }
+
+                Helper_GamsConvert2(path);
+
+            }
+
+            using (Writeln txt = new Writeln())
+            {
+                txt.MainAdd(""); txt.MainNewLineTight();
+                txt.MainAdd(""); txt.MainNewLineTight();
+                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd("DIFF = " + (dif0 + dif) + ", depth = " + depth); txt.MainNewLineTight();
+                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd(""); txt.MainNewLineTight();
+            }            
+
+            Pause(); new Writeln("-------------------- calling GAMS start ---------------------------------------");
+
+            using (Writeln txt = new Writeln())
+            {
+                using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsconvert" + depth + ".cmd"), null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s5 in settings.cmd_lines)
+                    {
+                        string s6 = (s5 as string).Replace("gamsconvert.gms", "gamsconvert" + depth + ".gms");
+                        sw.WriteLine(s6);
+                    }
+                }
+
+                string fail = null;
+
+                using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsconvert" + depth + ".gms"), null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s5 in settings.gms_lines)
+                    {
+                        string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString());
+                        if (dif0 > 0 && s6.Trim().ToLower().StartsWith("solve "))
+                        {                            
+                            int counter = 0;
+                            for (int? t = settings.t1; t <= settings.t2; t++)
+                            {
+                                for (int? a = settings.a1; a <= settings.a2; a++)
+                                {
+                                    sw.WriteLine(settings.fix_variable + ".fx['" + a + "', '" + t + "'] = 0;");
+                                    counter++;
+                                    if (counter == dif0 + dif)
+                                    {
+                                        goto Lbl;
+                                    }                                    
+                                }
+                            }
+                        Lbl:;
+                            if (counter != dif0 + dif)
+                            {
+                                fail = "Needed to fix " + (dif0 + dif) + " variables, but could only fix " + counter;
+                            }
+                        }
+                        sw.WriteLine(s6);
+                    }
+                }                
+            }            
+
+            DateTime t0 = DateTime.Now;
+
+            string s1 = CrossThreadStuff.GetOutputWindowText();
+            Program.ExecuteShellCommand("gamsconvert" + depth + ".cmd", false);
+            string s2 = CrossThreadStuff.GetOutputWindowText();
+            string s = s2.Substring(s1.Length);
+
+            Pause(); new Writeln("-------------------- calling GAMS end ---------------------------------------");
+
+            List<string> ss = Stringlist.ExtractLinesFromText(s);
+            try
+            {
+                for (int i = 0; i < ss.Count; i++)
+                {
+                    if (G.Contains(ss[i], settings.counts1))
+                    {
+                        if (G.Contains(ss[i + 1], settings.counts2) && G.Contains(ss[i + 2], settings.counts3))
+                        {
+                            string[] ss1 = ss[i + 1].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] ss2 = ss[i + 2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            string x1 = ss1[ss1.Length - 1];
+                            string x2 = ss2[ss2.Length - 1];
+                            int i1 = int.Parse(x1);
+                            int i2 = int.Parse(x2);
+                            dif = i1 - i2;
+                        }
+                        else
+                        {
+                            new Error("It seems the GAMS rows/cols do not match, but Gekko cannot extract the difference from the GAMS output, from the two lines following the line containing '" + settings.counts1 + "'.");
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            //Test date/time of gams.gms and dict.txt --> must be after start of ...
+
+            if (dif == 0)
+            {
+                string s5 = " (this is normal)";
+                if (depth > 1) s5 = " (in principle 1 iteration should be enough...)";
+                new Writeln("Created scalar model. Gekko used " + depth + " iterations" + s5 + ". Now packing " + settings.zip_name + ".");
+                if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder.");
+                if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder.");
+                if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created.");
+                if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created.");
+                try
+                {
+                    Zipper zipper = new Zipper(settings.zip_name);
+                    Program.WaitForFileCopy(Path.Combine(path, "gams.gms"), Path.Combine(zipper.tempFolder, "gams.gms"));
+                    Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
+
+                    bool isFolder = false;
+                    string rawpath = Program.CreateFullPathAndFileName(settings.raw_path);
+                    string temp = Path.GetFileName(rawpath);
+                    if (G.Equal(temp, "*.gms")) isFolder = true;
+                    if (temp.Contains("*") && !isFolder) new Error("Expected raw_path to use '*.gms' not '" + temp + "'");
+
+                    if (isFolder)
+                    {
+                        StringBuilder sb = new StringBuilder();                        
+                        string[] files = Directory.GetFiles(Path.GetDirectoryName(rawpath), temp, SearchOption.AllDirectories);
+                        if (files.Length == 0)
+                        {
+                            new Warning("Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
+                        }
+                        else
+                        {
+                            foreach (string file in files)
+                            {                                
+                                if (Path.GetFileNameWithoutExtension(file).StartsWith("gams", StringComparison.OrdinalIgnoreCase)) continue; //drop gams*.gms
+                                if (!G.Equal(Path.GetExtension(temp), Path.GetExtension(file))) continue;  //must be same extension
+                                bool ignore = false;
+                                foreach (object osi in settings.raw_ignore)
+                                {
+                                    string si = osi as string;
+                                    if (G.Equal(Path.GetFileName(file), si))
+                                    {
+                                        ignore = true;
+                                        break;
+                                    }
+                                }
+                                if (ignore) continue;
+                                string fileTxt = Program.GetTextFromFileWithWait(file);
+                                if (!fileTxt.Contains("..")) continue;
+                                sb.Append(fileTxt);
+                                sb.AppendLine();
+                            }
+                            using (FileStream fs = WaitForFileStream(Path.Combine(zipper.tempFolder, "raw.gms"), null, GekkoFileReadOrWrite.Write))
+                            using (StreamWriter res = G.GekkoStreamWriter(fs))
+                            {
+                                res.Write(sb);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(rawpath))
+                        {
+                            Program.WaitForFileCopy(rawpath, Path.Combine(zipper.tempFolder, "raw.gms"));
+                        }
+                        else
+                        {
+                            new Warning("Did not find raw.gms as this file path: " + rawpath);
+                        }
+                    }
+                    zipper.ZipAndCleanup();
+                    new Writeln("Zipping of " + settings.zip_name + " finished");
+                }
+                catch
+                {
+                    new Error("Something went wrong when zipping " + settings.zip_name);
+                }
+                new Writeln("Cleanup: deleting gams.gms and dict.txt.");
+                Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
+                Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
+            }
+            else
+            {
+
+                if (dif0 + dif >= 0)
+                {
+                    new Writeln("");
+                    string still = null;
+                    if (depth > 0) still = " still";
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The model row/columns " + still + " differ with " + dif + " --> Gekko will try to fix variables to remedy this.");
+                        txt.MainAdd("");
+                    }
+                    new Writeln("");
+                    helper_GamsConvert(depth + 1, dif0 + dif, settings);
+                }
+                else
+                {
+                    new Error("It seems there are " + dif + " more equations than variables, so some variables need to be unfixed. Gekko does not support that scenario (yet).");
+                }
+            }
+
+            Helper_GamsConvert2(path);
+
+            void Pause()
+            {
+                //System.Windows.Forms.MessageBox.Show("Press [Enter] to continue");
+            }
+        }
+
+        private static void Helper_GamsConvert2(string path)
+        {
+            //new Writeln("Gekko now deletes all gamsconvert*.cmd and gamsconvert*.gms in the '" + path + "' folder.");
+
+            int counter = 0;
+            foreach (string f in Directory.EnumerateFiles(path, "gamsconvert*.cmd"))
+            {
+                File.Delete(f);
+                counter++;
+            }
+
+            foreach (string f in Directory.EnumerateFiles(path, "gamsconvert*.gms"))
+            {
+                File.Delete(f);
+                counter++;
+            }
+
+            //new Writeln("Deleted " + counter + " files.");
+
+            if (counter > 0) new Writeln("Cleaned up gamsconvert*.cmd and gamsconvert*.gms files.");
         }
 
         public static IVariable fromexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

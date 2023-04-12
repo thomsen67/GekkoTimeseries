@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Gekko
 {
-        
+
     /// <summary>
     /// Class containing a library of functions used in many places
     /// </summary>
@@ -275,7 +275,7 @@ namespace Gekko
         /// <param name="i"></param>
         /// <returns></returns>
         public static string AddS(int i, string s, bool addIsAre)
-        {            
+        {
             if (i == 1)
             {
                 if (addIsAre) return "is " + i + " " + s;      //"is 1 file"
@@ -1204,15 +1204,15 @@ namespace Gekko
             return Chop_DimensionAddLast(inputName, inputIndex, true);
         }
 
-            /// <summary>
-            /// Removes last dimension. For instance, "x[40]" becomes "x", and "x[a, b, 40]" becomes "x[a, b]".
-            /// If no dimension like "x", the result will also be "x".
-            /// </summary>
-            /// <param name="inputName"></param>
-            /// <param name="inputIndex"></param>
-            /// <returns></returns>
-            public static string Chop_DimensionRemoveLast(string inputName)
-        {            
+        /// <summary>
+        /// Removes last dimension. For instance, "x[40]" becomes "x", and "x[a, b, 40]" becomes "x[a, b]".
+        /// If no dimension like "x", the result will also be "x".
+        /// </summary>
+        /// <param name="inputName"></param>
+        /// <param name="inputIndex"></param>
+        /// <returns></returns>
+        public static string Chop_DimensionRemoveLast(string inputName)
+        {
             string bank = null; string name = null; string freq = null; string[] indexes = null;
             G.Chop_Chop(inputName, out bank, out name, out freq, out indexes);
             string[] indexes2 = null;
@@ -2601,7 +2601,7 @@ namespace Gekko
             }
         }
 
-        
+
         /// <summary>
         /// Helper method for file access (writing). Writes in ANSI (code 1252), so the for instance זרו look nicer in old text editors like Kedit.
         /// </summary>
@@ -2997,8 +2997,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
-        /// The positions are inclusive. Can return null!!!!
+        /// BEWARE: can return null (= error)!! Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
+        /// The positions are inclusive.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="position1"></param>
@@ -3279,7 +3279,7 @@ namespace Gekko
                     count++;
                 return count + 1;
             }
-        }    
+        }
 
         /// <summary>
         /// Helper method for splitting csv lines
@@ -3329,7 +3329,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="p"></param>
         public static void ServiceMessage(string s, P p)
-        {            
+        {
             if (p == null)
             {
                 G.Write2(s);
@@ -3412,10 +3412,10 @@ namespace Gekko
                 sb.AppendLine("   " + Globals.userSettingsPath);
                 sb.AppendLine(" Temporary files (cached models, restore info, gnuplot data, etc.): ");
                 sb.AppendLine("   " + System.Windows.Forms.Application.LocalUserAppDataPath);
-                sb.AppendLine(" Excel version installed: Excel " + Program.GetExcelVersion(Program.eOfficeApp.eOfficeApp_Excel));                
+                sb.AppendLine(" Excel version installed: Excel " + Program.GetExcelVersion(Program.eOfficeApp.eOfficeApp_Excel));
 
                 try
-                {                    
+                {
                     if (false)
                     {
                         RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
@@ -3435,11 +3435,11 @@ namespace Gekko
                         foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
                     }
 
-                    sb.AppendLine(" Bitness: " + Program.Get64Bitness(0));                    
+                    sb.AppendLine(" Bitness: " + Program.Get64Bitness(0));
 
-                    if(Globals.runningOnTTComputer)
+                    if (Globals.runningOnTTComputer)
                     {
-                        sb.AppendLine(Program.IsJit());                        
+                        sb.AppendLine(Program.IsJit());
                     }
 
                     foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
@@ -3459,7 +3459,7 @@ namespace Gekko
                     sb.AppendLine(" Cache files size: " + G.UpdprtFormat((double)size / 1000000000d, 2, false) + " GB (" + G.UpdprtFormat(pct, 2, false) + "% of allocated " + G.UpdprtFormat((double)Globals.cacheFileMax / 1000000000d, 2, false) + " GB)");
                 }
                 catch { };  //fail silently               
-                
+
 
             }
             sb.AppendLine("==========================================================================");
@@ -3485,7 +3485,7 @@ namespace Gekko
                 //Program.ShowPeriodInStatusField("");                
             }
             return sb;
-        }        
+        }
 
         /// <summary>
         /// Pretty showing current frequency and period, like "Quarterly 2020q1-2024q4".
@@ -3501,7 +3501,7 @@ namespace Gekko
             string ss2 = f + " " + start + "-" + end + observations;
             if (lowerCaseFirstChar) ss2 = char.ToLower(ss2[0]) + ss2.Substring(1);
             return ss2;
-        }        
+        }
 
         /// <summary>
         /// Used for the gekkoInfo() in-built function
@@ -3708,7 +3708,7 @@ namespace Gekko
         /// <param name="val"></param>
         /// <returns></returns>
         public static String oddX0000Hack(String val)
-        {            
+        {
             String val1 = val.Replace('\x0000', '?');  //some odd hack regarding this odd character
             return val1;
         }
@@ -3734,7 +3734,7 @@ namespace Gekko
             if (val > Globals.missingVariableArtificialNumberLow && val < Globals.missingVariableArtificialNumberHigh)
                 return true;
             else return false;
-        }        
+        }
 
         /// <summary>
         /// Checks if input IsInfinity or IsNaN.
@@ -3812,7 +3812,7 @@ namespace Gekko
             O.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
             if (freq != null) freqPretty = " (" + ConvertFreq(freq).Pretty() + ")";
-            if(useQuotes) return "'" + varname + "'" + freqPretty;
+            if (useQuotes) return "'" + varname + "'" + freqPretty;
             else return varname + freqPretty;
         }
 
@@ -3872,7 +3872,7 @@ namespace Gekko
         /// <param name="onlyFirst"></param>
         /// <returns></returns>
         static public string ReplaceString(string str, string oldValue, string newValue, bool onlyFirst)
-        {            
+        {
             //Is always case-insensitive!
             StringComparison comparison = StringComparison.OrdinalIgnoreCase;
             StringBuilder sb = new StringBuilder();
@@ -3936,7 +3936,7 @@ namespace Gekko
             {
                 subend = "m" + gt.sub + "d" + gt.subsub;
             }
-            else if (gt.freq == EFreq.U) 
+            else if (gt.freq == EFreq.U)
             {
             }
             else throw new GekkoException();
@@ -3977,16 +3977,16 @@ namespace Gekko
             s = s.Replace(Globals.symbolGlueChar6, "[");  //--> fixme, this is a workaround, #098523            
             s = s.Replace(Globals.symbolGlueChar7, "[");
             s = s.Replace(Globals.symbolGlueChar1.ToString(), "");  //must be after symbolGlueChar7
-            
+
             //the following are probably obsolete in Gekko 3.0
             s = Regex.Replace(s, "s___er", "ser", RegexOptions.IgnoreCase);  //#098275432874
             s = Regex.Replace(s, "s___eries", "series", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____er", "ser", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____eries", "series", RegexOptions.IgnoreCase);
-            
+
             return s;
-        }        
-        
+        }
+
         /// <summary>
         /// Accepts names like a38, _xy, that is, "variable names".
         /// </summary>
@@ -4028,7 +4028,7 @@ namespace Gekko
         {
             if (s == null || s == "") return false;
             return IsIdent(s);
-        }   
+        }
 
         /// <summary>
         /// Check if a string is an integer, with special options. 
@@ -4119,8 +4119,8 @@ namespace Gekko
         /// <param name="value"></param>
         /// <returns></returns>
         public static bool ConvertToInt(out int rounded, double value)
-        {            
-            bool flag = true;            
+        {
+            bool flag = true;
             try
             {
                 rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
@@ -4130,7 +4130,7 @@ namespace Gekko
                 new Error("Could not convert the value '" + value + "' into an integer (32-bit integer at most)");
                 throw;  //will not happen
             }
-            double decimals = value - rounded;            
+            double decimals = value - rounded;
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 flag = false;
@@ -4284,6 +4284,16 @@ namespace Gekko
         {
             if (Path.GetExtension(fileName) == "") fileName += endingIncludingDot;  //ignore case
             return fileName;
+        }
+
+        /// <summary>
+        /// Replaces all whitespace like normal spaces, tabs, newlines etc. with 1 blank.
+        /// </summary>
+        /// <param name="s2"></param>
+        /// <returns></returns>
+        public static string ReplaceWhitespaceWith1Blank(string s2) {
+            string s = Regex.Replace(s2, @"\s+", " ");
+            return s;
         }
 
         /// <summary>

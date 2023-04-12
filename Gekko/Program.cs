@@ -1991,7 +1991,8 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
+        {           
+            
             //if (false && Globals.runningOnTTComputer)
             //{
             //    if (Globals.modelFileName == null) new Error("No model defined");
@@ -3493,7 +3494,16 @@ namespace Gekko
             //does not handle ';' inside a quoted string
 
             char delimiter = ';';
-            if (G.Equal(Program.options.interface_csv_delimiter, "comma")) delimiter = ',';
+            if (type == EDataFormat.Csv)
+            {
+                if (G.Equal(Program.options.interface_csv_delimiter, "comma")) delimiter = ',';
+                else if (G.Equal(Program.options.interface_csv_delimiter, "tab")) delimiter = '\t';
+            }
+            else if (type == EDataFormat.Prn)
+            {
+                if (G.Equal(Program.options.interface_prn_delimiter, "comma")) delimiter = ',';
+                else if (G.Equal(Program.options.interface_prn_delimiter, "tab")) delimiter = '\t';
+            }
 
             string freqHere = G.ConvertFreq(Program.options.freq);
 
@@ -3512,8 +3522,9 @@ namespace Gekko
             //#98045298375
             TableLight matrix = new TableLight();  //1-based coords. Could perhaps design a more lightweight version of cells for this if memory or speed becomes an issue. Perhaps with basic cell stuff, and then a field pointing to object with alignment etc. Or use inheritance.
 
-            if (type == EDataFormat.Prn)
+            if (type == EDataFormat.Prn && G.Equal(Program.options.interface_prn_delimiter, "blank"))
             {
+                //Cheating: changing blanks into ';'
                 string orientation = null;
                 List<string> lines2 = new List<string>();
                 bool first = true;
@@ -3875,10 +3886,22 @@ namespace Gekko
                                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
                                     {
                                         string s3 = cell.text;
-                                        if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+
+                                        if (oRead.Type == EDataFormat.Csv)
                                         {
-                                            s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
+                                            if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                            {
+                                                s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
+                                            }
                                         }
+                                        else
+                                        {
+                                            if (G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
+                                            {
+                                                s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
+                                            }
+                                        }                                        
+
                                         try
                                         {
                                             d = G.ParseIntoDouble(s3);
@@ -10194,6 +10217,9 @@ namespace Gekko
         /// <returns></returns>
         public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
+            //For Gekko 3.2, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
+            //Or make sure the label, source etc. objects are cleaned with ReplaceWhitespaceWith1Blank().
+
             bool danish = false;
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
@@ -14623,7 +14649,7 @@ namespace Gekko
         {
             // TODO: If file contains a subfolder (like "\sub1\xx.csv), this is ok for working folder, but when called with for
             // instance folder \command1, \command2 etc., it should not be allowed to glue these on for instance \sub1\xx.csv.
-            // Not super important. Maybe consider this for Gekko 4.0...
+            // Not super important. Maybe consider this for Gekko 3.2...
 
             //This method can be called with path = null or path = "", in that case it reduces to
             //only adding the working folder if file is without colon.
@@ -20741,13 +20767,11 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(file, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
-
                 for (int i = 0; i < xx.Length - 1; i++)
                 {
                     res.WriteLine(xx[i]);
                 }
                 res.Write(xx[xx.Length - 1]);
-
                 res.Flush();
             }
         }
@@ -20948,7 +20972,6 @@ namespace Gekko
             if (!Directory.Exists(path_zipFileName))
             {
                 new Error("The directory '" + path_zipFileName + "' does not seem to exist");
-                //throw new GekkoException();
             }
 
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
@@ -21381,24 +21404,31 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat dateFormat, bool cols, string dateformat)
+        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
         {
 
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
 
-            int prnWidth = 20;
+            int prnWidth = 0;  //can use non-blank separator
+            string oneBlank = "";
+            if (fileType == EdataFormat.Prn && G.Equal(Program.options.interface_prn_delimiter, "blank"))
+            {
+                //defalut for prn
+                prnWidth = 20;
+                oneBlank = " ";
+            }
 
             int i = 1;
             int j = 1;
             TableLight tab = new TableLight();
 
-            if (dateFormat == EdataFormat.Csv)
+            if (fileType == EdataFormat.Csv)
             {
                 G.Writeln2("Writing csv file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
                 filename = G.AddExtension(filename, ".csv");
             }
-            else if (dateFormat == EdataFormat.Prn)
+            else if (fileType == EdataFormat.Prn)
             {
                 G.Writeln2("Writing prn file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
                 filename = G.AddExtension(filename, ".prn");
@@ -21412,7 +21442,7 @@ namespace Gekko
             {
                 //Writing to csv/prn file                              
 
-                if (dateFormat == EdataFormat.Prn)
+                if (fileType == EdataFormat.Prn)
                 {
                     //file.Write(G.varFormat("name", prnWidth));
 
@@ -21432,7 +21462,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
 
-                    if (dateFormat == EdataFormat.Csv)
+                    if (fileType == EdataFormat.Csv)
                     {
                         string dateStringCsv = null;
                         if (IsGekkoDateFormat(format))
@@ -21447,7 +21477,7 @@ namespace Gekko
                     }
                     else
                     {
-                        tab.Add(i, j, new CellLight(G.varFormat(" " + t.ToString(), prnWidth))); j++;
+                        tab.Add(i, j, new CellLight(G.varFormat(oneBlank + t.ToString(), prnWidth))); j++;
                     }
                 }
 
@@ -21465,7 +21495,7 @@ namespace Gekko
                     GekkoTime tsEnd = ts.GetPeriodLast();
 
                     counter++;
-                    if (dateFormat == EdataFormat.Csv)
+                    if (fileType == EdataFormat.Csv)
                     {
                         tab.Add(i, j, new CellLight(s3)); j++;
                     }
@@ -21480,7 +21510,7 @@ namespace Gekko
                         {
                             if (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd))
                             {
-                                if (dateFormat == EdataFormat.Csv)
+                                if (fileType == EdataFormat.Csv)
                                 {
                                     //write nothing, indicates out-of-sample
                                     tab.Add(i, j, new CellLight("")); j++;
@@ -21493,8 +21523,8 @@ namespace Gekko
                             }
                             else
                             {
-                                string s = HandleFunnyNumbers(dateFormat == EdataFormat.Csv);
-                                if (dateFormat == EdataFormat.Csv)
+                                string s = HandleFunnyNumbers(fileType == EdataFormat.Csv);
+                                if (fileType == EdataFormat.Csv)
                                 {
                                     tab.Add(i, j, new CellLight(s)); j++;
                                 }
@@ -21508,55 +21538,57 @@ namespace Gekko
                         {
                             string s = null;
 
-                            bool fixProblem = true;
-
-                            if (fixProblem)
+                            if (true)
                             {
                                 s = data.ToString();
-                                if (Program.options.interface_csv_ndec < 20)
+                                if (fileType == EdataFormat.Csv)
                                 {
-                                    s = Program.NumberFormat(data, "f" + Program.options.interface_csv_ndec);
-                                }
-                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
-                                {
-                                    //ok                                        
-                                }
-                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-                                {
-                                    s = s.Replace(".", ",");
-                                }
-                                else
-                                {
-                                    new Error("#8423824: Unknown decimalseparator");
-                                }
-                            }
-                            else
-                            {
-                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
-                                {
-
+                                    if (Program.options.interface_csv_ndec < 20)
                                     {
-                                        //The 0:... is alignment inside a field.
-                                        s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
+                                        s = Program.NumberFormat(data, "f" + Program.options.interface_csv_ndec);
                                     }
                                 }
-                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                else if (fileType == EdataFormat.Prn)
                                 {
-                                    NumberFormatInfo nfi = new NumberFormatInfo();
-                                    nfi.NumberDecimalSeparator = ",";
-
+                                    if (Program.options.interface_prn_ndec < 20)
                                     {
-                                        s = string.Format(nfi, "{0:0.0000000000E+00}", data);
+                                        s = Program.NumberFormat(data, "f" + Program.options.interface_prn_ndec);
                                     }
                                 }
-                                else
+
+                                if (fileType == EdataFormat.Csv)
                                 {
-                                    new Error("#8423824: Unknown decimalseparator");
+                                    if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+                                    {
+                                        //ok                                        
+                                    }
+                                    else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                    {
+                                        s = s.Replace(".", ",");
+                                    }
+                                    else
+                                    {
+                                        new Error("#8423824: Unknown decimalseparator");
+                                    }
                                 }
-                            }
+                                else if (fileType == EdataFormat.Prn)
+                                {
+                                    if (G.Equal(Program.options.interface_prn_decimalseparator, "period"))
+                                    {
+                                        //ok                                        
+                                    }
+                                    else if (G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
+                                    {
+                                        s = s.Replace(".", ",");
+                                    }
+                                    else
+                                    {
+                                        new Error("#8423824: Unknown decimalseparator");
+                                    }
+                                }
+                            }                            
 
-
-                            if (dateFormat == EdataFormat.Csv)
+                            if (fileType == EdataFormat.Csv)
                             {
                                 tab.Add(i, j, new CellLight(s)); j++;
                             }
@@ -21565,11 +21597,11 @@ namespace Gekko
                                 //prn and gnuplot
                                 if (data < 0)
                                 {
-                                    tab.Add(i, j, new CellLight(G.varFormat(" " + s, prnWidth))); j++;
+                                    tab.Add(i, j, new CellLight(G.varFormat(oneBlank + s, prnWidth))); j++;
                                 }
                                 else
                                 {
-                                    tab.Add(i, j, new CellLight(G.varFormat("  " + s, prnWidth))); j++;
+                                    tab.Add(i, j, new CellLight(G.varFormat(oneBlank + oneBlank + s, prnWidth))); j++;
                                 }
                             }
                         }
@@ -21586,11 +21618,30 @@ namespace Gekko
             }
 
             string csvDelimiter = ";";
-            if (G.Equal(Program.options.interface_csv_delimiter, "comma")) csvDelimiter = ",";
-
-            if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+            if (fileType == EdataFormat.Csv)
             {
-                new Warning("Using comma both as decimal separator and field delimiter is not advised");
+                if (G.Equal(Program.options.interface_csv_delimiter, "comma")) csvDelimiter = ",";
+                else if (G.Equal(Program.options.interface_csv_delimiter, "tab")) csvDelimiter = "\t";
+            }
+            else if (fileType == EdataFormat.Prn)
+            {
+                if (G.Equal(Program.options.interface_prn_delimiter, "comma")) csvDelimiter = ",";
+                else if (G.Equal(Program.options.interface_prn_delimiter, "tab")) csvDelimiter = "\t";
+            }
+
+            if (fileType == EdataFormat.Csv)
+            {
+                if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                {
+                    new Warning("Using comma both as decimal separator and field delimiter for csv is not advised");
+                }
+            }
+            else if (fileType == EdataFormat.Prn)
+            {
+                if (G.Equal(Program.options.interface_prn_delimiter, "comma") && G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
+                {
+                    new Warning("Using comma both as decimal separator and field delimiter for prn is not advised");
+                }
             }
 
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -21598,12 +21649,12 @@ namespace Gekko
             {
                 for (int ii = 1; ii <= tab.GetRowMaxNumber(); ii++)
                 {
-                    if (ii == 1 && cols && dateFormat == EdataFormat.Prn) file.Write(" ");  //strange that this is necessary
+                    if (ii == 1 && cols && fileType == EdataFormat.Prn) file.Write(" ");  //strange that this is necessary
                     for (int jj = 1; jj <= tab.GetColMaxNumber(); jj++)
                     {
                         CellLight c = tab.Get(ii, jj);
                         if (c.type == ECellLightType.None) continue;  //skip
-                        if (dateFormat == EdataFormat.Csv)
+                        if (fileType == EdataFormat.Csv || (fileType == EdataFormat.Prn && !G.Equal(Program.options.interface_prn_delimiter, "blank")))
                         {
                             if (jj > 1) file.Write(csvDelimiter);
                             file.Write(c.text);

@@ -2501,7 +2501,7 @@ namespace Gekko
 
                 if (equationsByEqname.ContainsKey(eqnameGams))
                 {
-                    new Error("The equation name '" + eqnameGams + "' appears multiple times");
+                    new Error("The equation name '" + eqnameGams + "' appears multiple times. If the model is loaded from a .zip file, see the 'raw' equations inside the .zip (typically stored in raw.gms).");
                 }
                 else
                 {
@@ -4746,6 +4746,7 @@ namespace Gekko
         {
             using (Note n = new Note())
             {
+                n.MainAdd("In order for Gekko to read gdx files, you need to have GAMS installed on your pc (the GAMS version does not need to be licenced).");
                 n.MainAdd("You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
                 n.MainAdd("for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. In general, the");
                 n.MainAdd("GAMS component is pretty good at auto-detecting the location of GAMS on the pc,");
