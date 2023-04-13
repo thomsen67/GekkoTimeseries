@@ -30578,14 +30578,8 @@ namespace Gekko
             long lagCounter = 0;
 
             List<string> dif = new List<string>();
-
-            // =======================================
+            
             bool removeCurrentFreqFromNames = true;
-            //double crit = double.NaN;
-            //string type = "smart...";
-            //bool plot = true;
-            //int plotExtraPeriods = 0;            
-            // =======================================
 
             if (compareType == "abs" || compareType == "absolute")
             {
