@@ -118,14 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="textBox1.Text" xml:space="preserve">
-    <value>This utility performs a residual check, dividing the residuals into different types depending upon equation type and (optionally) model blocks. A 'check_residuals.zip' file is produced, containing 'residuals_[type].txt' files. The model and a databank must be loaded, the time period must be set, and a 'SIM&lt;res&gt;' must be run beforehand. 
+    <value>This utility performs a residual check, dividing the residuals into different types depending upon equation type and (optionally) model blocks. A 'check_residuals.zip' file is produced, containing 'residuals_[type].txt' files. The model and a databank must be loaded, the time period must be set, and a 'sim &lt;res&gt;' must be run beforehand. 
 Example:
 
-RESTART;                  [clears workspace]
-MODEL model08;            [load the model]
-READ data08;              [read into the primary bank]
-TIME 1990 2008;           [set the period]
-SIM&lt;res&gt;;                 [single-equation forecast]
+reset;                    //clears workspace
+model model08;            //load the model
+read data08;              //read into the primary bank
+time 1990 2008;           //set the period
+sim &lt;res&gt;;                //single-equation forecast
 
 The results can be sorted in three ways. Relative difference is often convenient. You may add a column with log-difference residuals -- convenient when checking logarithmic equations. Optionally, the results can be divided into model blocks ('Divide model blocks' checkbox).</value>
   </data>

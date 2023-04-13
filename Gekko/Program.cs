@@ -8098,7 +8098,8 @@ namespace Gekko
                     }
                     else
                     {
-                        s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00000000E+00}", value);
+                        if (Program.options.bugfix_sas) s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.000000E+0000}", value); //F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent)
+                        else s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00000000E+00}", value);
                     }
                 }
 
@@ -20643,7 +20644,6 @@ namespace Gekko
                 if (isCloseCommand)
                 {
                     new Error("Closed TSD databank was changed but cannot be written back");
-                    //throw new GekkoException();
                 }
             }
 
@@ -21448,11 +21448,15 @@ namespace Gekko
 
                     if (cols)
                     {
-                        tab.Add(i, j, new CellLight(G.varFormat("date", prnWidth))); j++;
+                        string x = "date";
+                        if (Program.options.bugfix_sas) x = "\"" + x.ToUpper() + "\""; //date --> "DATE"
+                        tab.Add(i, j, new CellLight(G.varFormat(x, prnWidth))); j++;
                     }
                     else
                     {
-                        tab.Add(i, j, new CellLight(G.varFormat("name", prnWidth))); j++;
+                        string x = "name";
+                        if (Program.options.bugfix_sas) x = "\"" + x.ToUpper() + "\""; //name --> "NAME"
+                        tab.Add(i, j, new CellLight(G.varFormat(x, prnWidth))); j++;
                     }
                 }
                 else
@@ -21477,7 +21481,23 @@ namespace Gekko
                     }
                     else
                     {
-                        tab.Add(i, j, new CellLight(G.varFormat(oneBlank + t.ToString(), prnWidth))); j++;
+                        string x = t.ToString();
+                        if (Program.options.bugfix_sas)
+                        {
+                            if (t.freq == EFreq.Q)
+                            {
+                                //2020q2 --> 202002
+                                x = "" + t.super + "0" + t.sub;
+                            }
+                            else if (t.freq == EFreq.M)
+                            {
+                                //2020m2 --> 202002
+                                //2020m11 --> 202011
+                                if (t.sub < 10) x = "" + t.super + "0" + t.sub;
+                                else x = "" + t.super + "" + t.sub;
+                            }
+                        }
+                        tab.Add(i, j, new CellLight(G.varFormat(oneBlank + x, prnWidth))); j++;
                     }
                 }
 
@@ -21501,7 +21521,9 @@ namespace Gekko
                     }
                     else
                     {
-                        tab.Add(i, j, new CellLight(G.varFormat(s3, prnWidth))); j++;
+                        string s4 = s3;
+                        if (Program.options.bugfix_sas) s4 = "\"" + s4.ToUpper() + "\""; //fY --> "FY"
+                        tab.Add(i, j, new CellLight(G.varFormat(s4, prnWidth))); j++;
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
@@ -22919,7 +22941,6 @@ namespace Gekko
             bool history = false;
             if (G.Equal(o.opt_type, "hist")) history = true;
             Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel, history, missingZero);
-
         }
 
         //Used for tables, don't use for other stuff!
@@ -30560,11 +30581,10 @@ namespace Gekko
 
             // =======================================
             bool removeCurrentFreqFromNames = true;
-            double crit = double.NaN;
-            string type = "smart...";
-            bool plot = true;
-            int plotExtraPeriods = 0;
-            bool residuals = false;
+            //double crit = double.NaN;
+            //string type = "smart...";
+            //bool plot = true;
+            //int plotExtraPeriods = 0;            
             // =======================================
 
             if (compareType == "abs" || compareType == "absolute")
@@ -30595,13 +30615,12 @@ namespace Gekko
 
             string samFileName = "";
 
-            if (!residuals)
+            if (variablesType == null)
             {
                 //i.e. we are doing a databank compare, not a residual compare
                 samFileName = "compare_databanks.txt";
                 if (fileName != null) samFileName = fileName;
                 if (!Path.HasExtension(samFileName)) samFileName = samFileName + ".txt";
-                path = Program.options.folder_working;
             }
             else
             {
@@ -30610,8 +30629,9 @@ namespace Gekko
                 {
                     s = "_" + block;
                 }
-                samFileName = "residuals" + s + variablesType + ".txt";
+                samFileName = "residuals" + s + variablesType + ".txt";                
             }
+            if (path != null) samFileName = Path.Combine(path, samFileName);
 
             List<string> onlyWork2 = new List<string>();
             List<string> onlyRef2 = new List<string>();
@@ -30702,10 +30722,7 @@ namespace Gekko
             differentTypeSeries2.Sort(StringComparer.OrdinalIgnoreCase);
             notFoundBoth2.Sort(StringComparer.OrdinalIgnoreCase);
 
-            bool dumpList = false;
-
-            int pcounter = 0;
-            string fullPathAndFileName = path;
+            bool dumpList = false;            
                         
             //28/6 2022: the above regarding file names and parts were a complete mess.
             //Tried to clean it up a bit, with the line below.
@@ -30842,8 +30859,8 @@ namespace Gekko
                     //if (max == 0) continue;  //don't show vars if they are identical
                     //if no <abs=...> or <rel=...> are given, crit_abs and crit_rel are = 0.
 
-                    if (crit_abs < 0) crit_abs = 0;
-                    if (crit_rel < 0) crit_rel = 0;
+                    if (G.isNumericalError(crit_abs) || crit_abs < 0d) crit_abs = 0d; //can be called with NaN
+                    if (G.isNumericalError(crit_rel) || crit_rel < 0d) crit_rel = 0d; //can be called with NaN
 
                     if (maxRel > crit_rel && maxAbs > crit_abs)
                     {

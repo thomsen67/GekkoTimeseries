@@ -121,12 +121,12 @@
     <value>This utility compares two databanks, and prints the comparison in the file 'compare_databanks.txt'. The databanks must be read into the primary and reference databanks beforehand, and the time period must be set.
 Example:
 
-RESTART;                  [clears the workspace]
-READ&lt;first&gt; data08;        [read into primary bank]
-READ&lt;ref&gt; data07;         [read into reference bank]
-TIME 1990 2008;           [set the period]
+reset;                    //clears the workspace
+read &lt;first&gt; data08;      //read into primary bank
+read &lt;ref&gt; data07;        //read into reference bank
+time 2020 2022;           //set the period
 
-The results can be sorted in three ways. Relative difference is often convenient.
+The results can be sorted in three ways. Relative difference is often convenient. Instead of using this utility, the COMPARE command can do the same (and more).
  </value>
   </data>
 </root>

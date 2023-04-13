@@ -38,6 +38,7 @@ namespace Gekko
         public bool bugfix_missing = true;         //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
         public bool bugfix_readfast = true;        //not mentioned in help.
         public bool bugfix_missingignore = false;  //not mentioned in help, set true for Gekko 3.2.
+        public bool bugfix_sas = false;            //not mentioned in help (used by KNR). For prn writes vars and name/date with CAPS and inside "", q and m are written as for instance 202003 instead of 2020q3. For csv, numbers are F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent). 
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -86,9 +87,9 @@ namespace Gekko
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
-            public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
-            public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
-            public int interface_csv_ndec = 100;        
+        public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
+        public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
+        public int interface_csv_ndec = 100;        
         public string interface_debug = "dialog";  //or "none"  
         public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
         public string interface_errors = "normal";  // old | normal
@@ -309,6 +310,7 @@ namespace Gekko
             Add("BUGFIX MISSING", Globals.xbool);
             Add("BUGFIX READFAST", Globals.xbool);
             Add("BUGFIX MISSINGIGNORE", Globals.xbool);
+            Add("BUGFIX SAS", Globals.xbool);
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
             Add("COPY RESPECT", Globals.xbool);
