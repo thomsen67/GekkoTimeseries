@@ -7930,6 +7930,8 @@ namespace Gekko
         /// <param name="isTsdx"></param>
         private static void WriteTsdRecord(GekkoTime per1_input, GekkoTime per2_input, StreamWriter res, Series ts, string name, bool isCaps, bool isTsdx)
         {
+            List<string> sas = new List<string>(); sas.Add(""); //hack            
+
             int index1 = -12345;
             int index2 = -12345;
             //TODO: can return null
@@ -8011,12 +8013,14 @@ namespace Gekko
             string varName2 = G.Chop_RemoveFreq(varName);
             if (varName.Length <= 16 && ts.meta.label != null && ts.meta.label.Length > 0)
             {
-                res.WriteLine(varName2 + G.Blanks(16 - varName2.Length) + ts.meta.label);
+                if (!Program.options.bugfix_sas) res.WriteLine(varName2 + G.Blanks(16 - varName2.Length) + ts.meta.label);
+                else { sas[sas.Count - 1] += varName2 + G.Blanks(16 - varName2.Length) + ts.meta.label; sas.Add(""); }
             }
             else
             {
                 //do not write label if name > 16 chars
-                res.WriteLine(varName2);
+                if (!Program.options.bugfix_sas) res.WriteLine(varName2);
+                else { sas[sas.Count - 1] += varName2; sas.Add(""); }
             }
 
             string stmp = "01/01/00";
@@ -8060,7 +8064,8 @@ namespace Gekko
                 nul = "  0         1111111";  //weekdays sun, mon, tue, wed, thu, fri, sat --> are active
             }
 
-            res.WriteLine("                " + src + stmp + "0000" + super1 + sub1 + super2 + sub2 + freq + nul); //time is set to 0000
+            if (!Program.options.bugfix_sas) res.WriteLine("                " + src + stmp + "0000" + super1 + sub1 + super2 + sub2 + freq + nul); //time is set to 0000
+            else { sas[sas.Count - 1] += "                " + src + stmp + "0000" + super1 + sub1 + super2 + sub2 + freq + nul; sas.Add(""); }
 
             for (int index = index1; index <= index2; index++)
             {
@@ -8108,15 +8113,32 @@ namespace Gekko
 
                 if (value < 0)
                 {
-                    res.Write(s);
+                    if (!Program.options.bugfix_sas) res.Write(s);
+                    else sas[sas.Count - 1] += s;
                 }
                 else
                 {
-                    res.Write(" " + s);
+                    if (!Program.options.bugfix_sas) res.Write(" " + s);
+                    else sas[sas.Count - 1] += " " + s;
                 }
-                if (count2 % 5 == 0 && index != index2) res.WriteLine();  //new line for each 5 numbers written
+                if (count2 % 5 == 0 && index != index2)
+                {
+                    if (!Program.options.bugfix_sas) res.WriteLine();  //new line for each 5 numbers written
+                    else sas.Add("");
+                }
             }
-            res.WriteLine();
+            if (!Program.options.bugfix_sas) res.WriteLine();
+            else sas.Add("");
+
+            if (Program.options.bugfix_sas)
+            {
+                foreach (string s5 in sas)
+                {
+                    if (G.NullOrBlanks(s5)) continue;
+                    string s6 = s5 + G.Blanks(80 - s5.Length);
+                    res.WriteLine(s6);
+                }
+            }
         }
 
         /// <summary>

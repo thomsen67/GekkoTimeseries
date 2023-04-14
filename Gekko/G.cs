@@ -1949,7 +1949,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Return this number of blanks.
+        /// Return this number of blanks. Will return "" if count <= 0.
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
