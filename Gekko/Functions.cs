@@ -5025,12 +5025,12 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
-        public static void gamsconvert(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            helper_GamsConvert(0, 0, null);
+            helper_GamsScalar(0, 0, null);
         }
 
-        private static void helper_GamsConvert(int depth, int dif0, GamsScalarHelper settings)
+        private static void helper_GamsScalar(int depth, int dif0, GamsScalarHelper settings)
         {
             int dif = 0;
             string path = Program.options.folder_working;
@@ -5326,7 +5326,7 @@ namespace Gekko
                         txt.MainAdd("");
                     }
                     new Writeln("");
-                    helper_GamsConvert(depth + 1, dif0 + dif, settings);
+                    helper_GamsScalar(depth + 1, dif0 + dif, settings);
                 }
                 else
                 {
