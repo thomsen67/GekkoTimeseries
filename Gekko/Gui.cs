@@ -325,9 +325,15 @@ namespace Gekko
             {
                 using (Note note = new Note())
                 {
-                    note.MainAdd("From Gekko 3.1.14 and on, [Tab] or [Ctrl+Space] activates autocomplete of series names. For instance, \"prt x\" + [Tab] will show series starting with 'x', and \"prt x[\" + [Tab] will show elements of the array-series 'x'. See more {a{here¤user_interface.htm}a}.");
-                    //
-                    //note.MoreAdd("");
+                    note.MainAdd("From Gekko 3.1.14 and on, [Tab] or [Ctrl+Space] activates autocomplete of series names. For instance, \"prt x\" + [Tab] will show series starting with 'x', and \"prt x[\" + [Tab] will show elements of the array-series 'x'. See more {a{here¤user_interface.htm}a}.");                    
+                }
+            }
+
+            if (Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17" || Globals.gekkoVersion == "3.1.18")
+            {
+                using (Note note = new Note())
+                {
+                    note.MainAdd("From Gekko 3.1.16 and on, a bug regarding option <missing=zero> in series statements was corrected. Only affects missing values.");
                 }
             }
 
