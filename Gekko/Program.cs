@@ -1991,8 +1991,12 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {           
-            
+        {
+
+            if (Globals.runningOnTTComputer)
+            {
+                new Writeln(Environment.UserName + " --- " + System.Security.Principal.WindowsIdentity.GetCurrent().Name);
+            }
             //if (false && Globals.runningOnTTComputer)
             //{
             //    if (Globals.modelFileName == null) new Error("No model defined");
@@ -8103,8 +8107,12 @@ namespace Gekko
                     }
                     else
                     {
-                        if (Program.options.bugfix_sas) s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.000000E+0000}", value); //F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent)
-                        else s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00000000E+00}", value);
+                        if (false)
+                        {
+                            if (Program.options.bugfix_sas) s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.000000E+0000}", value); //F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent)
+                            else s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00000000E+00}", value);
+                        }
+                        s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00000000E+00}", value);
                     }
                 }
 

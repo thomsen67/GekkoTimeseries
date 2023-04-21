@@ -5797,9 +5797,19 @@ namespace Gekko
         /// <param name="_t1"></param>
         /// <param name="_t2"></param>
         /// <returns></returns>
-        public static IVariable root(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static IVariable root(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
+            if (vars.Length > 1) new Error("Funtion root() only accepts 0 or 1 arguments");
+                        
             string rootFileName = "root.ini";
+            if (vars.Length == 1)
+            {
+                string s = O.ConvertToString(vars[0]);
+                if (G.Equal(s, "gekko")) rootFileName = "gekko.ini";
+                else if (G.Equal(s, "root")) rootFileName = "root.ini";
+                else new Error("Expected argument to be 'root' or 'gekko'");
+            }
+            
             string folder1 = Program.options.folder_working;
 
             //From working folder
@@ -5844,7 +5854,7 @@ namespace Gekko
                             string fileAndFolder2 = rootHelper2.roots[0];  //the first and deepest one
                             if (!G.Equal(fileAndFolder1, fileAndFolder2))
                             {
-                                new Error("The root.ini file determined from the Gekko working folder is '" + fileAndFolder1 + "', while the root.ini file determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
+                                new Error("The " + rootFileName + " file determined from the Gekko working folder is '" + fileAndFolder1 + "', while the " + rootFileName + " file determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
                             }
                         }
                     }

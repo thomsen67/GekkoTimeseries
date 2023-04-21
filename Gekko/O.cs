@@ -4638,7 +4638,7 @@ namespace Gekko
         /// <returns></returns>
         public static IVariable Conditional1Of3(GekkoSmpl smpl, IVariable x, IVariable logical)
         {
-            //Code located here to keep all conditional code in one place 
+            //Code located here to keep all conditional code in one place
             //logical is 1 for true, and false otherwise
             IVariable rv = null;
             if (x.Type() == EVariableType.Series)
