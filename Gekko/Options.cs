@@ -23,6 +23,7 @@ using System.Text;
 using System.Reflection;
 using System.Linq;
 using System.Windows.Forms;
+using Antlr.Runtime.Tree;
 
 namespace Gekko
 {
@@ -83,7 +84,8 @@ namespace Gekko
         public string gams_time_freq = "a";  //could be u for undated
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
-        public string gams_time_set = "t";  //name of the time set in GAMS                
+        public string gams_time_set = "t";  //name of the time set in GAMS
+        public int gams_trim = 0;  //trim vars/params with few elements  
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
@@ -352,6 +354,7 @@ namespace Gekko
             Add("GAMS TIME OFFSET", Globals.xint);
             Add("GAMS TIME PREFIX", Globals.xnameOrString);
             Add("GAMS TIME SET", Globals.xnameOrString);
+            Add("GAMS TRIM", Globals.xint);
             Add("INTERFACE ALIAS", Globals.xbool);
             Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");    //#kljsdfasfdlkj
             Add("INTERFACE CSV DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj

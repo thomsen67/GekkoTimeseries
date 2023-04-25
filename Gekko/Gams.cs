@@ -3766,7 +3766,6 @@ namespace Gekko
                     {
                         {
                             new Error("gdx io error");
-                            //throw new GekkoException();
                         }
                     }
                     int timeIndex = -12345;
@@ -3775,7 +3774,6 @@ namespace Gekko
                     if (uelHighest != 0)
                     {
                         new Error("Internal UEL problem (GDX)");
-                        //throw new GekkoException();
                     }
                     string[] uel = new string[uelCount + 1];
                     for (int u = 1; u <= uelCount; u++)
@@ -3806,8 +3804,6 @@ namespace Gekko
 
                         string label = null; int records = -12345; int userInfo = -12345;
                         gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
-
-
 
                         if (gdxDimensions == -1)
                         {
@@ -3932,8 +3928,7 @@ namespace Gekko
                                 tsSuperseries.meta.domains = domains;
                                 if (hasTimeDimension == 0) tsSuperseries.type = ESeriesType.Timeless;
                                 tsSuperseries.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
-                                if (varType == 1) tsSuperseries.meta.fix = EFixedType.Parameter;
-                                databank.AddIVariable(tsSuperseries.name, tsSuperseries);
+                                if (varType == 1) tsSuperseries.meta.fix = EFixedType.Parameter;                                
                             }
                             else
                             {
@@ -3945,7 +3940,6 @@ namespace Gekko
                                 tsSuperseries.meta.label = label;
                                 if (hasTimeDimension == 0) tsSuperseries.type = ESeriesType.Timeless;
                                 if (varType == 1) tsSuperseries.meta.fix = EFixedType.Parameter;
-                                databank.AddIVariable(tsSuperseries.name, tsSuperseries);
                             }
 
                             if (varType == 1)
@@ -3961,9 +3955,13 @@ namespace Gekko
 
                             Series tsSubseries = null;  //the subseries in one of the dimension coordinates
 
+                            int gdxElementCounter = 0;
+
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                             {
                                 //Reading the dimension coordinates
+
+                                gdxElementCounter++;                                
 
                                 int tt = -12345;
                                 //StringBuilder sb = new StringBuilder();
@@ -4119,6 +4117,15 @@ namespace Gekko
 
                             gdx.gdxDataReadDone();
 
+                            if (gdxElementCounter >= Program.options.gams_trim)  //option is 0 per default
+                            {
+                                //If this is skipped, the tsSuperseries just dies with its data (not transferred to the ram Gekko databank)
+                                databank.AddIVariable(tsSuperseries.name, tsSuperseries);
+                            }
+                            else
+                            {
+                                //skip it!
+                            }
                         }
                         else
                         {
