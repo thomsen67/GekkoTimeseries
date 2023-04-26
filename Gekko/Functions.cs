@@ -5025,6 +5025,25 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
+        public static void gamsscalarvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            if (Program.model?.modelGamsScalar.dict_FromANumberToVarName != null)
+            {
+                Zipper zipper = new Zipper("scalarvars.zip");
+                string[] x = Program.model.modelGamsScalar.dict_FromANumberToVarName.OrderBy(s => s, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToArray();
+                using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "vars.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s in x)
+                    {
+                        sw.WriteLine(s);
+                    }
+                }
+                zipper.ZipAndCleanup();
+            }
+            else new Error("It does not seem like a GAMS scalar model is loaded");
+        }
+
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             helper_GamsScalar(0, 0, null);

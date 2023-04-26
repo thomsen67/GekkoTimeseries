@@ -1634,7 +1634,7 @@ namespace Gekko
                 // Do something with the node.
                 TraverseNodes(node.ChildNodes);
             }
-        }        
+        }
 
         /// <summary>
         /// Read a raw GAMS model from a .gms/.gmy model. Deals with possible cached version etc. See also ReadGamsScalarModel().
@@ -1647,72 +1647,12 @@ namespace Gekko
 
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o.opt_dep);
             GekkoDictionary<string, string> dependents = tup.Item1;
-
             //
             // Should #dependents list be reflected in hash ?????
             //
-
-            //string dependentsHash = tup.Item2.ToString();
-            //string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
-
-            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-
-            //if (Program.options.model_cache == true)
-            //{
-            //    if (File.Exists(mdlFileNameAndPath))
-            //    {
-            //        try
-            //        {
-            //            DateTime dt1 = DateTime.Now;                        
-            //            modelGams = Program.ProtobufRead<ModelGams>(mdlFileNameAndPath);
-            //            model.loadedFromCacheFile = true;
-            //            G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            if (G.IsUnitTesting())
-            //            {
-            //                throw;
-            //            }
-            //            else
-            //            {
-            //                //do nothing, we then have to parse the file
-            //                model.loadedFromCacheFile = false;
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    model.loadedFromCacheFile = false;
-            //}
-
-            //if (model.loadedFromCacheFile)
-            //{
-            //    //do nothing, also no writing of .mdl file of course
-            //}
-            //else
-            {
-                model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
-                if (Globals.runningOnTTComputer) Sniff2(model);
-
-                DateTime t1 = DateTime.Now;
-
-                //try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                //{
-                //    DateTime dt1 = DateTime.Now;
-                                        
-                //    // ----- SERIALIZE
-                //    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-                //    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                //    Program.ProtobufWrite(model.modelGams, pathAndFilename);
-                //    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                //}
-                //catch (Exception e)
-                //{
-                //    //do nothing, not the end of the world if it fails
-                //}
-            }
+            model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
+            if (Globals.runningOnTTComputer) Sniff2(model);
+            DateTime t1 = DateTime.Now;
             return model;
         }
 

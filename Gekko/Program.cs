@@ -1993,7 +1993,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
 
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 new Writeln(Environment.UserName + " --- " + System.Security.Principal.WindowsIdentity.GetCurrent().Name);
             }
@@ -20992,7 +20992,6 @@ namespace Gekko
             string now = date1.ToString("T", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             return now;
         }
-
 
 
         //This is a general method for zipping the contents of a folder

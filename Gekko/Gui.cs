@@ -37,6 +37,8 @@ using System.Diagnostics;
 using System.Configuration;
 using System.Collections.ObjectModel;
 using System.Timers;
+using static Gekko.O;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Gekko
 {
@@ -2543,6 +2545,73 @@ namespace Gekko
         {
             SendKeys.SendWait("^v");
             //this.textBox2.SelectedText = Clipboard.GetText();
+        }
+
+        private void pasteGamsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //MessageBox.Show("pastegams -- " + Clipboard.GetText());
+            string c2 = Clipboard.GetText();
+            string c = c2;
+            string dots = null;
+            string ee = null;
+            string semi = null;
+            string dotsText = "e .. ";
+            if (!c.Contains(".."))
+            {
+                c = dotsText + c;
+                dots = "Added '" + dotsText + "' to equation";
+            }
+            if (c.Contains("=") && !G.Contains(c, "=e="))
+            {
+                c = G.Replace(c, "=", " =e= ", StringComparison.OrdinalIgnoreCase, 1);
+                ee = "Changed one '=' into '=e='";
+            }
+            if (!c.Contains(";"))
+            {
+                c = c + ";";
+                semi = "Added semicolon ';'";
+            }
+
+            string ss = null;
+            if (dots != null) ss += "\n" + dots;
+            if (ee != null) ss += "\n" + ee;
+            if (semi != null) ss += "\n" + semi;
+
+            string s = "";
+            bool good = true;
+            ModelGams modelGams = null;
+            try
+            {
+                modelGams = GamsModel.ReadGamsModelHelper(c, null, null, false, true, Program.model);
+                if (modelGams.equationsByVarname.Count == 0) good = false;
+            }
+            catch
+            {
+                //may fail
+                good = false;
+            }
+
+            if (good)
+            {
+                foreach (List<ModelGamsEquation> equs in modelGams.equationsByEqname.Values)
+                {
+                    foreach (ModelGamsEquation equ in equs)
+                    {
+                        s += equ.lhs + " = " + equ.rhs + ";";
+                    }
+                }
+            }
+
+            if (s == "")
+            {
+                MessageBox.Show("Failed to translate clipboard GAMS assignment/equation into Gekko syntax. Equation is:\n\n" + c + "\n\nYou may put the equation into a .gms file and load it with model<gms> to see the error message." + ss);
+            }
+            else
+            {
+                //if (dots != null) s = s.Substring(dotsText.Length); --> no, dots are not returned from translate
+                Clipboard.SetText(s);
+                SendKeys.SendWait("^v");
+            }
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)

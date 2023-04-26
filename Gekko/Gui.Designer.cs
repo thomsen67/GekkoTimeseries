@@ -34,7 +34,8 @@ namespace Gekko
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem(); 
+            this.pasteGamsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();            
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -242,6 +243,7 @@ namespace Gekko
             this.cutToolStripMenuItem,
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem,
+            this.pasteGamsToolStripMenuItem,
             this.toolStripSeparator2,
             this.selectAllToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
@@ -286,6 +288,14 @@ namespace Gekko
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.pasteToolStripMenuItem.Text = "Paste (Ctrl-V)";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
+            // 
+            // pasteToolStripMenuItem
+            // 
+            this.pasteGamsToolStripMenuItem.Name = "pasteGamsToolStripMenuItem";
+            this.pasteGamsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.pasteGamsToolStripMenuItem.Text = "Paste GAMS --> Gekko";
+            this.pasteGamsToolStripMenuItem.ToolTipText = "Tries to translate the clipboard from GAMS to Gekko syntax (assignments and equations only)";
+            this.pasteGamsToolStripMenuItem.Click += new System.EventHandler(this.pasteGamsToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -1856,6 +1866,7 @@ namespace Gekko
         private ToolStripMenuItem cutToolStripMenuItem;
         private ToolStripMenuItem copyToolStripMenuItem;
         private ToolStripMenuItem pasteToolStripMenuItem;
+        private ToolStripMenuItem pasteGamsToolStripMenuItem;
         private ToolStripMenuItem selectAllToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripSeparator toolStripSeparator2;

@@ -136,6 +136,8 @@ namespace Gekko
         /// </summary>
         public void Exe1(Exception e)
         {
+            string s = Thread.CurrentThread.Name;
+
             if (type == EWrapType.Error && this.throwExceptionForError && !G.IsDecompOrFindThread())
             {
                 //if throwExceptionForError == false, an exception is not thrown, and CrossThreadStuff.Wrap() will print the error below.
