@@ -5025,28 +5025,47 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
-        public static void gamsscalarvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {
-            if (Program.model?.modelGamsScalar.dict_FromANumberToVarName != null)
+            if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
+            string input1 = O.ConvertToString(input[0]);
+            if (G.Equal(input1, "pack"))
             {
-                Zipper zipper = new Zipper("scalarvars.zip");
-                string[] x = Program.model.modelGamsScalar.dict_FromANumberToVarName.OrderBy(s => s, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToArray();
-                using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "vars.txt"), null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    foreach (string s in x)
-                    {
-                        sw.WriteLine(s);
-                    }
-                }
-                zipper.ZipAndCleanup();
+                helper_GamsScalar(0, 0, null);
             }
-            else new Error("It does not seem like a GAMS scalar model is loaded");
-        }
+            else if (G.Equal(input1, "info"))
+            {
+                GekkoTime t = new GekkoTime(EFreq.A, 2030, 1);
+                if (Program.model?.modelGamsScalar.dict_FromANumberToVarName != null)
+                {
+                    Zipper zipper = new Zipper("info.zip");
+                    string[] x = Program.model.modelGamsScalar.dict_FromANumberToVarName.OrderBy(s => s, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToArray();
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "vars.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string s in x)
+                        {
+                            sw.WriteLine(s);
+                        }
+                    }
 
-        public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {
-            helper_GamsScalar(0, 0, null);
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "eqs.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string eq in Program.model.modelGamsScalar.dict_FromEqNumberToEqName)
+                        {
+                            if (!eq.Contains(t.ToString())) continue;
+                            string eqText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, false, t);
+                            sw.WriteLine(eqText);
+                            sw.WriteLine();
+                        }
+                    }
+                    zipper.ZipAndCleanup();
+                    new Writeln("Created info.zip with vars.txt and eqs.txt inside. Equations are from the year " + t.ToString());
+                }
+                else new Error("It does not seem like a GAMS scalar model is loaded");
+            }
+            else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");            
         }
 
         private static void helper_GamsScalar(int depth, int dif0, GamsScalarHelper settings)
