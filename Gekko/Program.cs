@@ -25334,7 +25334,7 @@ namespace Gekko
             if (ss != null && ss != "")
             {
                 System.Windows.Forms.Clipboard.SetText(ss, System.Windows.Forms.TextDataFormat.Text);
-                G.Writeln2("You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
+                G.Writeln2("You may now paste (Ctrl+V) cells into your spreadsheet (e.g. Excel)");
                 if (calledFromCopyButton)
                 {
                     G.Writeln("These are the cells from your last PRT/MULPRT/SHOW or table.");

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Data;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
 namespace Gekko
 {
@@ -4102,26 +4103,27 @@ namespace Gekko
         }
 
         /// <summary>
-        /// /// Handle indexers like x[...]
+        /// /// Handle indexers like x[...] $ (...) = ..., only LHS not RHS.
         /// </summary>
         /// <param name="logical"></param>
         /// <param name="smpl"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="lhsArray"></param>
+        /// <param name="rhs"></param>
         /// <param name="options"></param>
         /// <param name="indexes"></param>
-        public static void DollarIndexerSetData(IVariable logical, GekkoSmpl smpl, IVariable x, IVariable y, O.Assignment options, params IVariable[] indexes)
+        public static void DollarIndexerSetData(IVariable logical, GekkoSmpl smpl, IVariable lhsArray, IVariable rhs, O.Assignment options, params IVariable[] indexes)
         {
             //Only encountered on the LHS
             if (logical == null)
             {
-                x.IndexerSetData(smpl, y, options, indexes);
+                lhsArray.IndexerSetData(smpl, rhs, options, indexes);
             }
-            if (logical.Type() == EVariableType.Val)
+            //TTH 08052023: added else below
+            else if (logical.Type() == EVariableType.Val)
             {
                 if (IsTrue(((ScalarVal)logical).val))
                 {
-                    x.IndexerSetData(smpl, y, options, indexes);
+                    lhsArray.IndexerSetData(smpl, rhs, options, indexes);
                 }
                 else
                 {
@@ -4132,8 +4134,9 @@ namespace Gekko
             {
                 //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
-                IVariable z = Conditional1Of3(smpl, y, logical);
-                x.IndexerSetData(smpl, z, options, indexes);
+                //Here, x will be an .ArraySuper, corresponding to the "x" in "x[a]".                
+                IVariable z = Conditional1Of3(true, smpl, rhs, logical);
+                lhsArray.IndexerSetData(smpl, z, options, indexes);
             }
             else
             {
@@ -4630,16 +4633,21 @@ namespace Gekko
         // =========================================================================
 
         /// <summary>
-        /// Handle $-conditionals in expressions and assignments. [1 of 3].
+        /// Handle $-conditionals in expressions and assignments. [1 of 3]. The isLhs parameters denotes if the dollar
+        /// is on the left like y $ (...) = ... ; or on the right like y = x $ (...);.
         /// </summary>
+        /// <param name="isLhs"></param>
         /// <param name="smpl"></param>
         /// <param name="x"></param>
         /// <param name="logical"></param>
         /// <returns></returns>
-        public static IVariable Conditional1Of3(GekkoSmpl smpl, IVariable x, IVariable logical)
+        public static IVariable Conditional1Of3(bool isLhs, GekkoSmpl smpl, IVariable x, IVariable logical)
         {
             //Code located here to keep all conditional code in one place
             //logical is 1 for true, and false otherwise
+
+            bool skipIfFalse = isLhs && Program.options.bugfix_lhs_dollar;
+
             IVariable rv = null;
             if (x.Type() == EVariableType.Series)
             {
@@ -4657,7 +4665,8 @@ namespace Gekko
                         }
                         else
                         {
-                            rv_series.SetData(t, 0d);
+                            if (skipIfFalse) rv_series.SetData(t, Globals.skippedObservationArtificialNumber);
+                            else rv_series.SetData(t, 0d);
                         }
                     }
                 }
@@ -4668,13 +4677,16 @@ namespace Gekko
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
                         if (IsTrue(logical_val.val)) rv_series.SetData(t, x_series.GetData(smpl, t));
-                        else rv_series.SetData(t, 0d);
+                        else
+                        {
+                            if (skipIfFalse) rv_series.SetData(t, Globals.skippedObservationArtificialNumber);
+                            else rv_series.SetData(t, 0d);
+                        }
                     }
                 }
                 else
                 {
                     new Error("You cannot use the type " + x.Type().ToString().ToUpper() + " on right side in $-conditional");
-                    //throw new GekkoException();
                 }
             }
             else if (x.Type() == EVariableType.Val)
@@ -4689,7 +4701,11 @@ namespace Gekko
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
                         if (IsTrue(logical_series.GetData(smpl, t))) rv_series.SetData(t, x_val.val);
-                        else rv_series.SetData(t, 0d);
+                        else
+                        {
+                            if (skipIfFalse) rv_series.SetData(t, Globals.skippedObservationArtificialNumber);
+                            else rv_series.SetData(t, 0d);
+                        }
                     }
                 }
                 else if (logical.Type() == EVariableType.Val)
@@ -4701,19 +4717,18 @@ namespace Gekko
                     }
                     else
                     {
-                        rv = Globals.scalarVal0;
+                        if (skipIfFalse) rv = new ScalarVal(Globals.skippedObservationArtificialNumber);
+                        else rv = Globals.scalarVal0;
                     }
                 }
                 else
                 {
                     new Error("You cannot use the type " + x.Type().ToString().ToUpper() + " on right side in $-conditional");
-                    //throw new GekkoException();
                 }
             }
             else
             {
                 new Error("You cannot use the type " + x.Type().ToString().ToUpper() + " on left side in $-conditional");
-                //throw new GekkoException();
             }
             return rv;
         }
@@ -4730,25 +4745,16 @@ namespace Gekko
             double v = double.NaN;
             if (tmp.Type() == EVariableType.Series && (tmp as Series).type != ESeriesType.Timeless)
             {
-                if (Globals.holesFix)
+                double v2 = 0d;
+                Series tmp_series = tmp as Series;
+                foreach (GekkoTime t in smpl.Iterate12())
                 {
-                    double v2 = 0d;
-                    Series tmp_series = tmp as Series;
-                    foreach (GekkoTime t in smpl.Iterate12())
+                    double v3 = tmp_series.GetDataSimple(t);
+                    if (v3 == 1d)
                     {
-                        double v3 = tmp_series.GetDataSimple(t);
-                        if (v3 == 1d)
-                        {
-                            v = v3;
-                            break;
-                        }
+                        v = v3;
+                        break;
                     }
-                }
-                else
-                {
-                    new Error("$-conditional returns a (non-timeless) series, not a scalar. Time-varying logical conditions are not implemented in Gekko yet");
-
-                    //throw new GekkoException();
                 }
             }
             else

@@ -3953,10 +3953,8 @@ namespace Gekko
         public static string ReplaceLastOccurrence(string s, string find, string replace)
         {
             int place = s.LastIndexOf(find);
-
             if (place == -1)
                 return s;
-
             return s.Remove(place, find.Length).Insert(place, replace);
         }
 

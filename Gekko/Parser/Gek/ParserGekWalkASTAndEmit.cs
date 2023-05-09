@@ -1859,7 +1859,7 @@ namespace Gekko.Parser.Gek
                         else
                         {
                             //right-hand side, much easier
-                            node.Code.A("O.Conditional1Of3(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.A("O.Conditional1Of3(false, " + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     }

@@ -23,7 +23,7 @@ namespace Gekko
         // --------------------------------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Lookup, if $-condition is present.
+        /// Lookup, if $-condition is present. This is only for LHS lookups, not RHS.
         /// </summary>
         /// <param name="logical"></param>
         /// <param name="smpl"></param>
@@ -43,7 +43,8 @@ namespace Gekko
             {
                 Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, options);
             }
-            if (logical.Type() == EVariableType.Val)
+            //TTH 08052023: added else below
+            else if (logical.Type() == EVariableType.Val)
             {
                 if (IsTrue(((ScalarVal)logical).val))
                 {
@@ -58,7 +59,7 @@ namespace Gekko
             {
                 //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
-                IVariable y = Conditional1Of3(smpl, rhsExpression, logical);
+                IVariable y = Conditional1Of3(true, smpl, rhsExpression, logical);
                 Lookup(smpl, map, dbName, varname, freq, y, isLeftSideVariable, type, options);
             }
             else
@@ -1276,7 +1277,8 @@ namespace Gekko
                     {
                         case EVariableType.Series:
                             {
-                                Series rhs_series_beware = rhs as Series;
+                                Series rhs_series_beware = rhs as Series;                                
+
                                 string freq_rhs = G.ConvertFreq(rhs_series_beware.freq);
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
@@ -1326,6 +1328,8 @@ namespace Gekko
                                             // x = Series Normal or Light
                                             //---------------------------------------------------------
 
+                                            bool hasSkips = SeriesHasSkips(rhs_series_beware);
+
                                             if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                             {
                                                 //this runs fast
@@ -1333,9 +1337,10 @@ namespace Gekko
                                                 GekkoTime tt1 = GekkoTime.tNull;
                                                 GekkoTime tt2 = GekkoTime.tNull;
                                                 GekkoTime.ConvertFreqs(G.ConvertFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
-                                                                                                                                        //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-                                                                                                                                        //Now the smpl window runs from tt1 to tt2
-                                                                                                                                        //We copy in from that window
+                                                //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);                                                
+
+                                                //Now the smpl window runs from tt1 to tt2
+                                                //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
                                                     new Error("Frequency mismatch. Left-hand series is " + lhs_series.freq.Pretty() + ", whereas right-hand series is " + rhs_series_beware.freq.Pretty());
@@ -1355,11 +1360,12 @@ namespace Gekko
                                                 int index1, index2;
                                                 //may enlarge the array with NaNs first and last
                                                 double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware));
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware), hasSkips);
                                             }
                                             else
                                             {
                                                 //not so fast running, could be improved
+                                                if (hasSkips) new Error("The combination of series operator and left-side $-condition is not yet implemented.");
                                                 OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
                                             }
                                             //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
@@ -1430,13 +1436,11 @@ namespace Gekko
                                             if (isArraySubSeries)
                                             {
                                                 new Error("You cannot put an array-series inside an array-series");
-                                                //throw new GekkoException();
                                             }
 
                                             if (operatorType != ESeriesUpdTypes.none && operatorType != ESeriesUpdTypes.n)
                                             {
                                                 new Error("Operators cannot be used for array-series (yet)");
-                                                //throw new GekkoException();
                                             }
 
                                             lhs_series = rhs.DeepClone(null) as Series;
@@ -1457,7 +1461,6 @@ namespace Gekko
                                     default:
                                         {
                                             new Error("Expected SERIES to be 1 of 4 types");
-                                            //throw new GekkoException();
                                         }
                                         break;
                                 }
@@ -1662,6 +1665,20 @@ namespace Gekko
 
             return;
 
+        }
+
+        private static bool SeriesHasSkips(Series tsInput)
+        {            
+            if (tsInput.type != ESeriesType.Light) return false;  //normal series cannot have skips (we assume that...)            
+            if (tsInput.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) //can it ever be null?
+            {
+                if (Array.IndexOf(tsInput.GetDataSequenceUnsafePointerReadOnlyBEWARE(), Globals.skippedObservationArtificialNumber) != -1)
+                {
+                    //light series arrays are short in length fortunately
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void LookupHelperLeftside_message(GekkoSmpl smpl, EFreq lhs_series_freq, string varnameWithFreq)

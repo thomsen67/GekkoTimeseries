@@ -317,8 +317,6 @@ namespace Gekko
         public const bool UNITTESTFOLLOWUP = false;
         public const bool UNITTESTFOLLOWUP_important = false;
 
-        public static bool holesFix = true;
-
         public static string restartSnippet = "reset";
 
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
@@ -936,7 +934,8 @@ namespace Gekko
         public static double missingVariableArtificialNumber = 3e303d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
         public static double missingVariableArtificialNumberLow = 2.999e303d;
         public static double missingVariableArtificialNumberHigh = 3.001e303d;
-
+        public static double skippedObservationArtificialNumber = 3e302d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
+        
         public static char pxInternalDelimiter = '¤';
 
         public static GekkoDictionary<string, int> suggestions = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);

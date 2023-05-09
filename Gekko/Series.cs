@@ -912,18 +912,19 @@ namespace Gekko
 
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
-            this.SetDataSequence(gt1, gt2, input, inputOffset, false);
+            this.SetDataSequence(gt1, gt2, input, inputOffset, false, false);
         }
 
         /// <summary>
         /// For the given timeseries, this sets the data of the given period to array to the values given in the input array. An offset may be used.
+        /// If hasSkips == true, the code will search for and "skip" observations with value = Globals.skippedObservationArtificialNumber.
         /// </summary>
         /// <param name="gt1">Start of the time period.</param>
         /// <param name="gt2">End of the time period</param>
         /// <param name="input">The input.</param>
         /// <param name="inputOffset">The input offset.</param>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
-        public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset, bool replaceNaNWith0)
+        public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset, bool replaceNaNWith0, bool hasSkips)
         {
             // ------------------------------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() and ResizeDataArray() which are safe
@@ -932,7 +933,6 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #3");
-                //throw new GekkoException();
             }
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
@@ -965,16 +965,36 @@ namespace Gekko
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
 
-            //#afdsa78sdf7as89
-            System.Array.Copy(input, inputOffset, this.data.GetDataArray_ONLY_INTERNAL_USE(), index1, index2 - index1 + 1);
-
-            if (replaceNaNWith0)
+            double[] temp = null;
+            if (hasSkips || replaceNaNWith0)
             {
-                for (int i = index1; i <= index2; i++)  //=3, i<4, 
+                for (int i = 0; i < index2 - index1 + 1; i++)
                 {
-                    if (G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i])) this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = 0d;
+                    double z = input[i + inputOffset];
+                    if (replaceNaNWith0 && G.isNumericalError(z)) z = 0;
+                    if (z == Globals.skippedObservationArtificialNumber)
+                    {
+                        //do nothing, skip updating this observation
+                    }
+                    else
+                    {
+                        this.data.GetDataArray_ONLY_INTERNAL_USE()[i + index1] = z;
+                    }
                 }
             }
+            else
+            {
+                //#afdsa78sdf7as89
+                System.Array.Copy(input, inputOffset, this.data.GetDataArray_ONLY_INTERNAL_USE(), index1, index2 - index1 + 1);
+            }
+
+            //if (replaceNaNWith0)
+            //{
+            //    for (int i = index1; i <= index2; i++)  //=3, i<4, 
+            //    {
+            //        if (G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i])) this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = 0d;
+            //    }
+            //}
 
             //Adjust start and end data positions.
             if (index2 > this.meta.lastPeriodPositionInArray)

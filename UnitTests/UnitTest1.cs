@@ -1559,6 +1559,26 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
             //series condition ---
+                        
+            I("xx = 1; xx $ (b == 102) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            //TODO %x $ (...) = ... ;
+            // --> if false %x is not touched at all!
+            throw new Exception();
+
+            I("option bugfix lhs dollar = yes;");
+            I("xx = 1; xx $ (b == 102) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
 
             I("xx = 1; xx $ (b == 102) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);

@@ -2550,39 +2550,51 @@ namespace Gekko
         private void pasteGamsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //MessageBox.Show("pastegams -- " + Clipboard.GetText());
-            string c2 = Clipboard.GetText();
-            string c = c2;
+            string input = Clipboard.GetText();
+            if (G.NullOrBlanks(input))
+            {
+                MessageBox.Show("No text in clipboard");
+                return;
+            }
+            string txt = input;
             string dots = null;
             string ee = null;
             string semi = null;
-            string dotsText = "e .. ";
-            if (!c.Contains(".."))
+            string lhs = null;
+            string dotsText = "e_phoney .. ";
+            string lhsText = "y_phoney[t] = "; string lhsText2 = "y_phoney = ";
+            if (!txt.Contains("="))
             {
-                c = dotsText + c;
-                dots = "Added '" + dotsText + "' to equation";
+                txt = lhsText + txt;
+                lhs = "Added phoney '" + lhsText + "' to equation";
             }
-            if (c.Contains("=") && !G.Contains(c, "=e="))
+            if (!txt.Contains(".."))
             {
-                c = G.Replace(c, "=", " =e= ", StringComparison.OrdinalIgnoreCase, 1);
+                txt = dotsText + txt;
+                dots = "Added phoney '" + dotsText + "' to equation";
+            }
+            if (txt.Contains("=") && !G.Contains(txt, "=e="))
+            {
+                txt = G.Replace(txt, "=", " =e= ", StringComparison.OrdinalIgnoreCase, 1);
                 ee = "Changed one '=' into '=e='";
             }
-            if (!c.Contains(";"))
+            if (!txt.Contains(";"))
             {
-                c = c + ";";
+                txt = txt + ";";
                 semi = "Added semicolon ';'";
             }
 
-            string ss = null;
-            if (dots != null) ss += "\n" + dots;
-            if (ee != null) ss += "\n" + ee;
-            if (semi != null) ss += "\n" + semi;
+            string infoText = "\n";
+            if (dots != null) infoText += "\n" + dots;
+            if (ee != null) infoText += "\n" + ee;
+            if (semi != null) infoText += "\n" + semi;
 
-            string s = "";
+            string translatedText = "";
             bool good = true;
             ModelGams modelGams = null;
             try
             {
-                modelGams = GamsModel.ReadGamsModelHelper(c, null, null, false, true, Program.model);
+                modelGams = GamsModel.ReadGamsModelHelper(true, txt, null, null, false, true, Program.model);
                 if (modelGams.equationsByVarname.Count == 0) good = false;
             }
             catch
@@ -2593,23 +2605,29 @@ namespace Gekko
 
             if (good)
             {
+                int counter = -1;
                 foreach (List<ModelGamsEquation> equs in modelGams.equationsByEqname.Values)
                 {
+                    counter++;
                     foreach (ModelGamsEquation equ in equs)
                     {
-                        s += equ.lhs + " = " + equ.rhs + ";";
+                        if (counter > 0) translatedText += "\n\n";
+                        translatedText += equ.lhs?.Trim() + " = " + equ.rhs?.Trim() + ";";
                     }
                 }
             }
 
-            if (s == "")
+            if (translatedText == "")
             {
-                MessageBox.Show("Failed to translate clipboard GAMS assignment/equation into Gekko syntax. Equation is:\n\n" + c + "\n\nYou may put the equation into a .gms file and load it with model<gms> to see the error message." + ss);
+                MessageBox.Show("Failed to translate clipboard GAMS assignment/equation into Gekko syntax. Equation is:\n\n" + txt + "\n\nYou may put the equation into a .gms file and load it with model<gms> to see detailed error message." + infoText);
             }
             else
-            {
-                //if (dots != null) s = s.Substring(dotsText.Length); --> no, dots are not returned from translate
-                Clipboard.SetText(s);
+            {                
+                string output = translatedText;
+                if (semi != null) output = G.ReplaceLastOccurrence(output, ";", "");
+                output = output.Replace(dotsText, "").Replace(lhsText2, "").Trim();
+                //Clipboard.SetText(c2 + "   |||   " + s + "   |||   " + s2);
+                Clipboard.SetText(output);
                 SendKeys.SendWait("^v");
             }
         }

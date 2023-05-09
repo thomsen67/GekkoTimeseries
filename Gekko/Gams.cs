@@ -21,6 +21,7 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Security.Cryptography;
+using static Gekko.O;
 
 namespace Gekko
 {
@@ -895,7 +896,7 @@ namespace Gekko
                     IVariable nestedListOfDependents_opt_dep = null;
                     Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(nestedListOfDependents_opt_dep);
                     GekkoDictionary<string, string> dependents = tup.Item1;
-                    modelGams = GamsModel.ReadGamsModelHelper(Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
+                    modelGams = GamsModel.ReadGamsModelHelper(false, Stringlist.ExtractTextFromLines(gamsFoldedModel).ToString(), null, dependents, false, true, model);
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Get folded model: " + G.Seconds(dt1));
                 }
             }
@@ -1650,7 +1651,7 @@ namespace Gekko
             //
             // Should #dependents list be reflected in hash ?????
             //
-            model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
+            model.modelGams = ReadGamsModelHelper(false, textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
             if (Globals.runningOnTTComputer) Sniff2(model);
             DateTime t1 = DateTime.Now;
             return model;
@@ -1942,13 +1943,15 @@ namespace Gekko
 
         /// <summary>
         /// Read (parse) a .gms GAMS model, transforming it into Gekko-understandable equations.
-        /// Calls ReadGamsEquation() for each equation.
+        /// Calls ReadGamsEquation() for each equation. If allowAsssignments we can accept
+        /// something like "y[t] = 2 * x[t];" so it does not have to be
+        /// "e1[t] .. y[t] = 2 * x[t];" with double dots.
         /// </summary>
         /// <param name="textInputRaw"></param>
         /// <param name="fileName"></param>
         /// <param name="dependents"></param>
         /// <param name="o"></param>
-        public static ModelGams ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, bool dump, bool silent, Model model)
+        public static ModelGams ReadGamsModelHelper(bool allowAssignments, string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, bool dump, bool silent, Model model)
         {
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
@@ -1973,7 +1976,12 @@ namespace Gekko
 
             List<string> problems = new List<string>();
 
-            int counter = 0;            
+            int counter = 0;
+
+            //With allowAssignments == false, it is a little bit safer, since double dots ".." are used to identify 
+            //equations. This is done by going left and right of the "..".
+            //With allowAssignments == true, we use semicolon ";" to cut up the input string. This is done by going
+            //left of the ";" to look for the previous ";" (or start of string).
 
             foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
@@ -1982,17 +1990,22 @@ namespace Gekko
                     counter++;
                 }
 
-                if (tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == 0)
+                bool good = false;
+                if (allowAssignments)
                 {
-                    if (tok.Offset(2).s == "\\" || tok.Offset(2).s == "/")
+                    if (tok.s == ";")
                     {
-                        //this may be part of a path, $GDXIN ..\Data\ADAM\estbk_okt16.gdx
-                    }
-                    else
+                        good = true;
+                    }                    
+                }
+                else
+                {
+                    if ((tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == 0) && !(tok.Offset(2).s == "\\" || tok.Offset(2).s == "/"))
                     {
-                        eqCounter = ReadGamsEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, dump);
+                        good = true;
                     }
                 }
+                if (good) eqCounter = ReadGamsEquation(allowAssignments, sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, dump);
             }
             ModelGams modelGams = new ModelGams(model);
             modelGams.equationsByVarname = equationsByVarname;
@@ -2038,28 +2051,50 @@ namespace Gekko
             return modelGams;
         }
 
+        //public static string GetVariables(TokenHelper tok)
+        //{
+        //    string output = null;
+        //    return output;
+        //}
+
         /// <summary>
-        /// Read (parse) a .gms/.gmy GAMS equation, translating it into an equivalent Gekko equation.
+        /// Read (parse) a .gms/.gmy GAMS equation/assignment, translating it into an equivalent Gekko equation/assignment.
         /// The result is put into a ModelGamsEquation object.
         /// </summary>
-        private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
+        private static int ReadGamsEquation(bool allowAssignments, StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
         {
+            //if allowAssignments == true, we are at ";", else we are at "..".
+
             WalkTokensHelper wh = new WalkTokensHelper();
 
             int iEqStart = 0;
-            //searches for '..' with no blank between (could be improved)
-            //now we search backwards for start of line
-            for (int i2 = -1; i2 > -int.MaxValue; i2--)
+
+            if (allowAssignments)
             {
-                int iLineStart = -12345;
-                if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
-                {
-                    iEqStart = i2 + 1;
-                    break;
+                //now we search backwards for previous ";" (or start of tokens)
+                for (int i2 = -1; i2 > -int.MaxValue; i2--)
+                {                    
+                    if (tok.Offset(i2) == null || tok.Offset(i2)?.s == ";")
+                    {
+                        iEqStart = i2 + 1;
+                        break;
+                    }
+                }
+            }
+            else
+            {                
+                //now we search backwards for start of line
+                for (int i2 = -1; i2 > -int.MaxValue; i2--)
+                {                    
+                    if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
+                    {
+                        iEqStart = i2 + 1;
+                        break;
+                    }
                 }
             }
 
-            int i = iEqStart;
+            int i = iEqStart; //for allowAssignments this is previous ";", for !allowAssignments this is start of line
 
             //-----------------------------------------------
             //now we are ready for the equation definition
@@ -2072,6 +2107,8 @@ namespace Gekko
             //Tokenized in tree structure it looks like this:
 
             //e_pi(...) $ (...) .. pI(...)*qI(...) =E= vI(...);
+
+            //NOTE: for allowAssignments we cheat and ignore ".." and stuff before them --> only handles pI(...) = 1/qI(...) * vI(...) type assignment.
 
             //So the following:
             // eqname
@@ -2177,7 +2214,6 @@ namespace Gekko
                         if (!G.IsIdent(s7))
                         {
                             new Error("Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
-                            //throw new GekkoException();
                         }
                         i++;
 
@@ -2185,7 +2221,6 @@ namespace Gekko
                         if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
                         {
                             new Error("Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
-                            //throw new GekkoException();
                         }
                         i++;
                     }
@@ -2199,12 +2234,17 @@ namespace Gekko
             else
             {
                 new Error("Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
-                //throw new GekkoException();
             }
             i++;
             i++;
 
             //now ready for the contents of the equation
+
+            // "y[t] = x[t];" make sure there are not ".." in it
+            // Here i is at "y" in y[t] and iSemi is at ";".
+            // If no ".." we cannot have "=e=" but only "=".
+            // If no ".." and no "=" we have an "expression" (only RHS).
+            //
 
             //find lhs of equation -----------------------------------------
             int i1Start = i;
@@ -2225,9 +2265,7 @@ namespace Gekko
             if (iSemi == -12345)
             {
                 new Error("Could not find ending ';' in eq definition, " + tok.Offset(i).LineAndPosText());
-            }
-
-            int iEqEnd = iSemi;
+            }            
 
             lhsGams = tok.OffsetInterval(i1Start, i1End).ToString().Trim();
             lhsTokensGams = tok.OffsetInterval(i1Start, i1End);
@@ -2269,23 +2307,9 @@ namespace Gekko
             WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
             WalkTokensHelper wt2Gekko = new WalkTokensHelper();
             WalkTokensGekkoSyntax(rhsTokensGekko, wt2Gekko);
-            string rhsGekko = rhsTokensGekko.ToStringTrim();
+            string rhsGekko = rhsTokensGekko.ToStringTrim();       
+            
 
-            ////C# syntax
-
-            //TokenHelper lhsTokensCs = equation.lhsTokensGams.DeepClone(null);
-            //WalkTokensHandleParentheses(lhsTokensCs); //changes '[' and '{' into '('
-            //WalkTokensHelper wt1Cs= new WalkTokensHelper();
-            //Controlled controlledLhs = new Controlled();
-            //WalkTokensCsSyntax(lhsTokensCs, wt1Cs, controlledLhs);
-            //string lhsCs = lhsTokensCs.ToStringTrim();
-
-            //TokenHelper rhsTokensCs = equation.rhsTokensGams.DeepClone(null);
-            //WalkTokensHandleParentheses(rhsTokensCs); //changes '[' and '{' into '('
-            //WalkTokensHelper wt2Cs = new WalkTokensHelper();
-            //Controlled controlledRhs = new Controlled();
-            //WalkTokensCsSyntax(rhsTokensCs, wt2Cs, controlledRhs);
-            //string rhsCs = rhsTokensCs.ToStringTrim();
 
             if (true)
             {
@@ -2326,25 +2350,13 @@ namespace Gekko
                     sb2.AppendLine();
                     sb2.AppendLine("--------------------------------------");
                     sb2.AppendLine();
-
-                    //if (dollar2 != null)
-                    //{
-                    //    sb.Append("(" + lhs + ") $ (" + dollar2 + ")" + G.NL);  //always add parentheses
-                    //}
-                    //else
-                    //{
-                    //    sb.Append(lhs + " = " + G.NL);
-                    //}
                 }
             }
 
             if (true)
             {
                 equation.lhs = lhsGekko;
-                equation.rhs = rhsGekko;
-
-                //equation.lhsCs = lhsCs;
-                //equation.rhsCs = rhsCs;
+                equation.rhs = rhsGekko;                                
                 equation.conditionalsCs = conditionalsCs;
 
                 // ------------- conditionals ---------------
@@ -2972,7 +2984,6 @@ namespace Gekko
                                                         if (!ok)
                                                         {
                                                             new Error("Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
-                                                            //throw new GekkoException();
                                                         }
                                                         //if (plusMinus == "-") iNumber = -iNumber;
 
@@ -3896,6 +3907,7 @@ namespace Gekko
                             Series tsSubseries = null;  //the subseries in one of the dimension coordinates
 
                             int gdxElementCounter = 0;
+                            int gdxRealElementCounter = 0;
 
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                             {
@@ -4007,6 +4019,15 @@ namespace Gekko
                                     value = double.NaN;
                                 }
 
+                                if (value == 0d)
+                                {
+                                    //not counted
+                                }
+                                else
+                                {
+                                    gdxRealElementCounter++;  //skips 0's
+                                }
+
                                 if (tt == -12345)
                                 {
                                     tsSubseries.SetTimelessData(value);
@@ -4057,9 +4078,10 @@ namespace Gekko
 
                             gdx.gdxDataReadDone();
 
-                            if (gdxElementCounter >= Program.options.gams_trim)  //option is 0 per default
+                            if (gdxRealElementCounter >= Program.options.gams_trim)  //option is 0 per default
                             {
                                 //If this is skipped, the tsSuperseries just dies with its data (not transferred to the ram Gekko databank)
+                                //Note: will not just skip vars/params with 0 elements: elements that are clean 0 or GAMS eps are skipped, too.
                                 databank.AddIVariable(tsSuperseries.name, tsSuperseries);
                             }
                             else
