@@ -1559,33 +1559,24 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
             //series condition ---
-                        
+            
+            MessageBox.Show("TODO %x $ (...) = ... ;");            
+
             I("xx = 1; xx $ (b == 102) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
             _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
-
-            //TODO %x $ (...) = ... ;
-            // --> if false %x is not touched at all!
-            throw new Exception();
 
             I("option bugfix lhs dollar = yes;");
             I("xx = 1; xx $ (b == 102) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
-            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
             _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
             I("option bugfix lhs dollar = no;");
-
-            I("xx = 1; xx $ (b == 102) = 2;");
-            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
-            _AssertSeries(First(), "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
-            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
-            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
             I("xx = 1; xx $ (b == 103) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
@@ -1593,6 +1584,15 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("option bugfix lhs dollar = yes;");
+            I("xx = 1; xx $ (b == 103) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 1d, sharedDelta); //skip
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 1d, sharedDelta); //skip
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
 
             I("b3 = (0, 3, 1);");
             I("xx = 1; xx $ (b3) = 2;");
@@ -1602,7 +1602,35 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-            //in map ---
+            I("option bugfix lhs dollar = yes;");
+            I("b3 = (0, 3, 1);");
+            I("xx = 1; xx $ (b3) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);  //skip
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
+
+            //array-series
+                        
+            I("xxx = series(1); xxx[a] = 1; xxx[a] $ (b == 102) = 2;");
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+            I("option bugfix lhs dollar = yes;");
+            I("xxx = series(1); xxx[a] = 1; xxx[a] $ (b == 102) = 2;");
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xxx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
+
+            //in map ----------------------
 
             I("map #m = (xx = 1); #m.xx $ (b == 102) = 2;");
             Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
@@ -1612,6 +1640,16 @@ namespace UnitTests
             _AssertSeries(m, "xx", 2002, 2d, sharedDelta);
             _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
 
+            I("option bugfix lhs dollar = yes;");
+            I("map #m = (xx = 1); #m.xx $ (b == 102) = 2;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(m, "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2001, 1d, sharedDelta);  //skip
+            _AssertSeries(m, "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
+
             I("map #m = (xx = 1); #m.xx $ (b == 103) = 2;");
             m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
@@ -1619,6 +1657,16 @@ namespace UnitTests
             _AssertSeries(m, "xx", 2001, 2d, sharedDelta);
             _AssertSeries(m, "xx", 2002, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
             _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
+
+            I("option bugfix lhs dollar = yes;");
+            I("map #m = (xx = 1); #m.xx $ (b == 103) = 2;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(m, "xx", 2000, 1d, sharedDelta);  //skip
+            _AssertSeries(m, "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2002, 1d, sharedDelta);  //skip
+            _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
+            I("option bugfix lhs dollar = no;");
 
             //if ------------------------------------------------------------
 

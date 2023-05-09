@@ -1379,49 +1379,57 @@ namespace Gekko
                                             //---------------------------------------------------------
                                             // stuff below also handles array-timeseries just fine  
 
-                                            if (create)
+                                            if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null && rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0] == Globals.skippedObservationArtificialNumber)
                                             {
-                                                lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too                                                
-                                                lhs_series.name = varnameWithFreq; ;
-                                                double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
-                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
-                                                {
-                                                    temp[0] = 0d;
-                                                }
+                                                //skip updating anything at all
                                             }
                                             else
                                             {
-                                                double d = double.NaN;
-                                                if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) d = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0];
-                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(d))
-                                                {
-                                                    d = 0d;
-                                                }
 
-                                                if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
+                                                if (create)
                                                 {
-                                                    if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
+                                                    lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too                                                
+                                                    lhs_series.name = varnameWithFreq; ;
+                                                    double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
+                                                    if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
                                                     {
-                                                        foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq))
-                                                        {
-                                                            lhs_series.SetData(t, d);
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        foreach (GekkoTime t in smpl.Iterate12())
-                                                        {
-                                                            lhs_series.SetData(t, d);
-                                                        }
+                                                        temp[0] = 0d;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                                    double d = double.NaN;
+                                                    if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) d = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0];
+                                                    if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(d))
+                                                    {
+                                                        d = 0d;
+                                                    }
+
+                                                    if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
+                                                    {
+                                                        if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
+                                                        {
+                                                            foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq))
+                                                            {
+                                                                lhs_series.SetData(t, d);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            foreach (GekkoTime t in smpl.Iterate12())
+                                                            {
+                                                                lhs_series.SetData(t, d);
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                                    }
                                                 }
+                                                LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                             }
-                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                            LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
+                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);                                           
 
                                         }
                                         break;

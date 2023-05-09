@@ -974,7 +974,7 @@ namespace Gekko
                     if (replaceNaNWith0 && G.isNumericalError(z)) z = 0;
                     if (z == Globals.skippedObservationArtificialNumber)
                     {
-                        //do nothing, skip updating this observation
+                        //do nothing, skip updating this observation so the lhs keeps its value
                     }
                     else
                     {
