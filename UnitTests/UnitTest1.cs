@@ -1507,11 +1507,15 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _GdxWithoutTimeDomain()
+        public void _Test_GdxWithoutTimeDetectAuto()
         {
-            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38\\';");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read <gdx> adambk_domains.gdx;");
+            _AssertSeries(First(), "adam", new string[] { "bfinvmqfe", "1973" }, 2030, 0.153725d, sharedTableDelta); //BAD! This is actually bad, fundamentally mis-read as timeless series.
+            I("option gams time detect auto = yes;");
+            I("read <gdx> adambk_domains.gdx;");
+            _AssertSeries(First(), "adam", new string[] { "bfinvmqfe" }, 1973, 0.153725d, sharedTableDelta); //GOOD!
         }
 
         [TestMethod]

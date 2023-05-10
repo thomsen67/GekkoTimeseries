@@ -4123,11 +4123,15 @@ namespace Gekko
                         using (Warning txt = new Warning())
                         {
                             //#0897aef todo
-                            txt.MainAdd((paramsWithoutTimeDimensionCounter.Count() + varsWithoutTimeDimensionCounter.Count()) + " variables/parameters without time dimension encountered");                            
+                            txt.MainAdd((paramsWithoutTimeDimensionCounter.Count() + varsWithoutTimeDimensionCounter.Count()) + " variables/parameters without explicit time domain/dimension encountered");
                             txt.MoreAdd("There were " + paramsWithoutTimeDimensionCounter.Count() + " parameters and " + varsWithoutTimeDimensionCounter.Count() + " variables without a time dimension set '" + Program.options.gams_time_set + "' assigned as domain (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
                             txt.MoreAdd("This is ok if the GAMS variables/parameters are really timeless, but if not, there is a problem.");
                             txt.MoreNewLine();
-                            txt.MoreAdd("For Gekko to identify a time dimension for a given parameter or variable, the dimension needs to be defined over this time domain. For instance, if in GAMS IDE or GAMS Studio a variable x is shown as x[*, *], ");
+                            txt.MoreAdd("A quick fix regarding this can be to simply set 'option gams time detect auto = yes;', in which case Gekko for each parameter/variable tries to detect");
+                            txt.MoreAdd("a time dimensions automatically, even if the dimension is defined over the universal set '*'. Here, Gekko will look for time-like elements like, say, '2020', '2021', '2022' etc. in order");
+                            txt.MoreAdd("to guess if a particular dimension is a time dimension.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If you do not want to use 'option gams time detect auto', for Gekko to identify a time dimension for a given parameter or variable, the dimension needs to be defined over this time domain. For instance, if in GAMS IDE or GAMS Studio a variable x is shown as x[*, *], ");
                             txt.MoreAdd("this means the no domains (sets) are assigned to the dimensions. In contrast, if it is for instance shown as x[i, t] in GAMS, this means that the first dimension is assigned to the set i (#i in Gekko),");
                             txt.MoreAdd("whereas Gekko uses the second dimension as time dimension. In Gekko, a GAMS variable x[i, t] will show up as the 1-dimensional x[#i], because the time dimension is implicit.");
                             txt.MoreNewLine();
