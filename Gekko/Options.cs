@@ -81,12 +81,12 @@ namespace Gekko
         // ---
         public string gams_exe_folder = "";
         public bool gams_fast = true; //use low-level api        
-        public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
+        public bool gams_time_detect_auto = false;  //will test if a dim looks like time. 
         public string gams_time_freq = "a";  //could be u for undated
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS
-        public int gams_trim = 0;  //trim vars/params with few elements  
+        public int gams_trim = 0;  //trim vars/params from gdx with few elements  
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
