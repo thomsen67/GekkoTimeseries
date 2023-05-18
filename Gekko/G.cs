@@ -33,6 +33,7 @@ using Microsoft.Win32;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace Gekko
 {
@@ -3782,21 +3783,33 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int FindYear(int x)
+        public static int FindYear(int x, bool allowTwoDigits)
         {
+            string s = null;
+            if (allowTwoDigits) s = " or [0 - 199] -- the latter has 1900 added";
             if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd)
             {
                 return x;
             }
-            else if (x >= 0 && x <= 199)
+            else if (allowTwoDigits && (x >= 0 && x <= 199))
             {
                 return x + 1900;
             }
             else
             {
-                new Error("A year with value " + x + " was input. The allowable range for years is [" + Globals.possibleYearStart + "-" + Globals.possibleYearEnd + "] or [0-199] -- the latter has 1900 added.");
+                new Error("A year with value " + x + " was input. The allowable range for years is [" + Globals.possibleYearStart + "-" + Globals.possibleYearEnd + "]" + s + ".");
                 return -12345;  //will never return anything
             }
+        }
+
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static int FindYear(int x)
+        {
+            return FindYear(x, true);
         }
 
         /// <summary>

@@ -675,7 +675,7 @@ namespace Gekko.Parser.Gek
 
                     int line = node.Line;
 
-                    if (node.Text == "ASTIF" || node.Text == "ASTIFOLD")
+                    if (node.Text == "ASTIF" || node.Text == "ASTIFOLD" || node.Text == "ASTIF2")
                     {
                         line = GetLineRecursive(node[0]);
                     }
@@ -2137,7 +2137,23 @@ namespace Gekko.Parser.Gek
                         GetCodeFromAllChildren(node, node[2][0]);
                         node.Code.A("}");
                         if (node.Text == "ASTIFOLD") node.Code.A("O.UseOldIf(false);" + G.NL);
-
+                    }
+                    break;                
+                case "ASTIF2":
+                    {
+                        LinesForSpecialCommands(node);
+                        node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");
+                        GetCodeFromAllChildren(node, node[1][0]);
+                        node.Code.A("}");
+                        for (int i = 2; i < node.ChildrenCount() - 1; i += 2)
+                        {
+                            node.Code.A("else if(O.IsTrue(" + Globals.smpl + ", " + node[i].Code + ")) {");
+                            GetCodeFromAllChildren(node, node[i + 1][0]);
+                            node.Code.A("}");
+                        }
+                        node.Code.A("else {");
+                        GetCodeFromAllChildren(node, node[node.ChildrenCount() - 1][0]);
+                        node.Code.A("}");
                     }
                     break;
                 case "ASTFUNCTIONDEF2":

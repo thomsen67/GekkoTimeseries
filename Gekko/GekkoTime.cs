@@ -145,7 +145,7 @@ namespace Gekko
         public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //DO NOT CHANGE NAME! Think of it as a 'null' object (but it is a struct)
         public static GekkoTime tNotNull = new GekkoTime(EFreq.A, -23456, 1);  //DO NOT CHANGE NAME! Think of it as 'yes' (for instance in PRT <i>... which is different from PRT <i=2010q3>).
         public static DateTime unixTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                
+
         private static List<HolidayNames> holidayNames = null;  //use HolidayNames!!
         public static List<HolidayNames> HolidayNames
         {
@@ -159,7 +159,7 @@ namespace Gekko
                 holidays.Add(new HolidayNames(EHolidayName.Good_Friday, "Good_Friday", "Langfredag"));
                 holidays.Add(new HolidayNames(EHolidayName.Easter_Sunday, "Easter_Sunday", "Paaskedag"));
                 holidays.Add(new HolidayNames(EHolidayName.Easter_Monday, "Easter_Monday", "Anden_paaskedag"));
-                holidays.Add(new HolidayNames(EHolidayName.Labour_Day, "Labour_Day", "Foerste_maj"));                
+                holidays.Add(new HolidayNames(EHolidayName.Labour_Day, "Labour_Day", "Foerste_maj"));
                 holidays.Add(new HolidayNames(EHolidayName.General_Prayer_Day, "General_Prayer_Day", "Store_bededag"));
                 holidays.Add(new HolidayNames(EHolidayName.Ascension_Day, "Ascension_Day", "Kristi_himmelfartsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Whit_Sunday, "Whit_Sunday", "Pinsedag"));
@@ -235,7 +235,7 @@ namespace Gekko
             sub = (short)sub2;
             subsub = (short)1;
             FreqCheck();
-        }        
+        }
 
         private void FreqCheck()
         {
@@ -245,7 +245,7 @@ namespace Gekko
 
             //Sanity checks to follow
             //Problem is that TIME 2010m13 2012m0 can probably parse. If not, the check below is not necessary.            
-            
+
             if (freq == EFreq.A)
             {
                 //sub and subsub can be anything <= 1
@@ -292,7 +292,7 @@ namespace Gekko
                     new Error("Freq 'u' cannot have subperiod > 1");
                 }
             }
-        }        
+        }
 
         private GekkoTime(EFreq freq2, int super2, int sub2, bool check)
         {
@@ -312,7 +312,7 @@ namespace Gekko
         }
 
         public static int FromDateTimeToUnixDays(DateTime t)
-        {            
+        {
             //note this possibility for seconds: long unixSeconds = DateTimeOffset.Now.ToUnixTimeSeconds();
             int days = (t - GekkoTime.unixTimeOrigin).Days;
             return days;
@@ -335,7 +335,7 @@ namespace Gekko
                 sub = dt.Month;
             }
             else if (freq == EFreq.W)
-            {                
+            {
                 return ISOWeek.ToGekkoTime(dt);
             }
             else if (freq == EFreq.D)
@@ -503,17 +503,21 @@ namespace Gekko
         {
             return FromStringToGekkoTime(s, allowKForQuartersAndUForWeeks, true);
         }
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks, bool reportError)
+        {
+            return FromStringToGekkoTime(s, allowKForQuartersAndUForWeeks, reportError, true);
+        }
 
         /// <summary>
-        /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998.
+        /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. With allowTwoDigits==true, a string like "98" will be understood as 1998.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="allowKForQuartersAndUForWeeks"></param>
         /// <param name="reportError"></param>
         /// <returns></returns>
-        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks, bool reportError)
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks, bool reportError, bool allowTwoDigits)
         {
-            //To do the reverse: see G.FromDateToString()   
+            //To do the reverse: see G.FromDateToString()
 
             //trailing a or a1 accepted for annual: 2001a, 2001a1
             //trailing u accepted for undated: 2001u, 2001u1
@@ -535,7 +539,7 @@ namespace Gekko
                 if (b)
                 {
                     //happens often, so we do it fast
-                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i, allowTwoDigits), 1);
                 }
             }
 
@@ -545,7 +549,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 2), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i, allowTwoDigits), 1);
                 }
                 else
                 {
@@ -562,7 +566,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 1), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i, allowTwoDigits), 1);
                 }
                 else
                 {
@@ -587,7 +591,7 @@ namespace Gekko
                 int q1 = -12345;
                 try
                 {
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     q1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -609,7 +613,7 @@ namespace Gekko
                 int q1 = -12345;
                 try
                 {
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     q1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -635,7 +639,7 @@ namespace Gekko
                 {
                     string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
                     string[] temp2 = temp1[1].Split(new char[] { 'd', 'D' });
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     m1 = int.Parse(temp2[0]);
                     d = int.Parse(temp2[1]);
                 }
@@ -667,7 +671,7 @@ namespace Gekko
                 string[] temp1 = s.Split(new char[] { 'm', 'M' });
                 try
                 {
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     m1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -690,7 +694,7 @@ namespace Gekko
                 int w1 = -12345;
                 try
                 {
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     w1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -709,7 +713,7 @@ namespace Gekko
                 int w1 = -12345;
                 try
                 {
-                    y1 = G.FindYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]), allowTwoDigits);
                     w1 = int.Parse(temp1[1]);
                 }
                 catch

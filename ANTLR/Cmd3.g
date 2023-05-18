@@ -182,6 +182,10 @@ ASTNOT;
 ASTCOMPARE;
 ASTIFOLD;
 ASTIF;
+ASTIF2;
+ASTELSEIF;
+ASTELSEIFELSE;
+ASTELSEIFSTATEMENTS;
 ASTIFOPERATOR;
 ASTIFOPERATOR1;
 ASTIFOPERATOR;
@@ -1129,6 +1133,7 @@ Y2                    = 'Y2'                       ;
     EDIT = 'EDIT';
     EFTER            = 'EFTER'           ;
     ELSE             = 'ELSE'            ;
+    ELSEIF           = 'ELSEIF';
     END              = 'END'             ;
     ENDO             = 'ENDO'            ;
     ENGLISH          = 'ENGLISH';
@@ -1777,6 +1782,7 @@ d.Add("Y" ,Y);
                                         d.Add("EDIT" ,EDIT);
                                         d.Add("efter"   , EFTER     );
                                         d.Add("else"    , ELSE);
+                                        d.Add("elseif"    , ELSEIF);
                                         d.Add("end"     , END      );
                                         d.Add("endo"    , ENDO      );
                                         d.Add("english"              , ENGLISH);
@@ -3154,8 +3160,9 @@ help:					    HELP  name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} nam
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 //the latter, IF_OLD will soon be obsolete.
-if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))
-						  | IF_OLD leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIFOLD", ASTIFOLD, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))
+if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)?                               END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))
+                          | IF leftParen logical rightParen functionStatements (ELSEIF leftParen logical rightParen functionStatements)+ (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF2", ASTIF2, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) (logical ^(ASTELSEIFSTATEMENTS functionStatements))+ ^(ASTELSESTATEMENTS functionStatements2?))
+						  | IF_OLD leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIFOLD", ASTIFOLD, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))                          
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4463,6 +4470,7 @@ ident2: 					Ident |
   EFTER|
   ELEMENTS|
   ELSE|
+  ELSEIF|
   ENGLISH|
   ERROR|
   EXCEL|

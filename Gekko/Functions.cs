@@ -75,6 +75,64 @@ namespace Gekko
             GekkoTime gt = Program.ConvertFreq(dd, G.ConvertFreq(ff), null);
             return new ScalarDate(gt);
         }
+        public static void arraypack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2)
+        {
+            string aName = O.ConvertToString(iv1);
+            string lName = O.ConvertToString(iv2);
+            List<string> m = new List<string>();
+            EFreq freq = EFreq.None;
+            List<KeyValuePair<string, IVariable>> x = new List<KeyValuePair<string, IVariable>>();
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+            {
+                if (kvp.Value.Type() != EVariableType.Series) continue;
+                Series ts = kvp.Value as Series;
+                if (ts.dimensions > 0) continue;
+                x.Add(kvp);
+                if (freq == EFreq.None) freq = ts.freq;
+                else
+                {
+                    if (freq != ts.freq) new Error("Not all non-arrayseries in the first-position databank have the same frequency");
+                }
+            }
+            if (freq == EFreq.None) new Error("No non-arrayseries found in the first-position databank");
+            Series ats = new Series(freq, G.Chop_AddFreq(aName, freq));
+            ats.meta.domains = new string[] { lName };
+            ats.SetArrayTimeseries(2, true);
+            foreach (KeyValuePair<string, IVariable> kvp in x)
+            {                
+                ats.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(new string[] { G.Chop_RemoveFreq(kvp.Key) }, ats), kvp.Value);
+                Program.databanks.GetFirst().RemoveIVariable(kvp.Key);
+                m.Add(G.Chop_RemoveFreq(kvp.Key));
+            }
+            Program.databanks.GetFirst().Clear();
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(ats);
+            List mm = new List(m);
+            if (lName != "*") Program.databanks.GetFirst().AddIVariableWithOverwrite(lName, mm);            
+        }
+
+        public static void arrayunpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1)
+        {
+            string aName = O.ConvertToString(iv1);
+            IVariable iv = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(aName, Program.options.freq));
+            if (iv == null) new Error("Cound not find variable '" + aName + "' in the first-position databank");
+            Series ats = iv as Series;
+            if (ats == null) new Error("The variable '" + aName + "' is not a timeseries");
+            if (ats.type != ESeriesType.ArraySuper) new Error("The series '" + aName + "' is not an array-timeseries");
+            if (ats.dimensions != 1) new Error("Expected series '" + aName + "' to be 1-dimensional");
+            List<KeyValuePair<string, IVariable>> x = new List<KeyValuePair<string, IVariable>>();
+            foreach (KeyValuePair<MultidimItem, IVariable> kvp in ats.dimensionsStorage.storage)
+            {
+                MultidimItem map = kvp.Key;
+                string s = map.storage[0];
+                Series ts = kvp.Value as Series;
+                x.Add(new KeyValuePair<string, IVariable>(G.Chop_AddFreq(s, ts.freq), ts));
+            }
+            Program.databanks.GetFirst().Clear();
+            foreach (KeyValuePair<string, IVariable> kvp in x)
+            {
+                Program.databanks.GetFirst().AddIVariable(kvp.Key, kvp.Value);
+            }
+        }
 
         public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, IVariable iv3)
         {

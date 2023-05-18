@@ -3840,17 +3840,85 @@ namespace Gekko
                             //always fetched, since we use it for domains
                             gdx.gdxSymbolGetDomainX(i, ref domainStrings);
                             int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, domainStrings, gdxDimensions, gdx, timeIndex, i);
+                                                        
+                            if (timeDimNr == -12345)
+                            {
+                                if (Program.options.gams_time_detect_auto)
+                                {
+                                    EFreq?[] couldBeTime = new EFreq?[gdxDimensions];
+                                    for (d = 0; d < gdxDimensions; d++) couldBeTime[d] = null;
+
+                                    //Tasting the variable/parameter to see if time is there...
+                                    if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("gdx error");
+                                    while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
+                                    {
+                                        //a new record
+                                        for (d = 0; d < gdxDimensions; d++)
+                                        {
+                                            if (couldBeTime[d] != null && couldBeTime[d] == EFreq.None) continue;  //no need to see more
+                                            GekkoTime gt = GekkoTime.tNull;
+                                            string x = uel[index[d]];
+                                            if (x.Length >= 4)
+                                            {
+                                                int y = G.IntParse(x.Substring(0, 4));
+                                                if (y != -12345)
+                                                {
+                                                    //first 4 chars looks like a year                                                        
+                                                    try
+                                                    {
+                                                        //we are conditioning/screening before this try for efficienty reasons
+                                                        gt = GekkoTime.FromStringToGekkoTime(x, false, false, false);
+                                                    }
+                                                    catch { }
+
+                                                }
+                                            }
+
+
+                                            if (gt.IsNull())
+                                            {
+                                                couldBeTime[d] = EFreq.None;  //signals fail
+                                            }
+                                            else
+                                            {
+                                                if (couldBeTime[d] == null)
+                                                {
+                                                    couldBeTime[d] = gt.freq;  //first time a date is ecountered, put it in
+                                                }
+                                                else if (couldBeTime[d] != gt.freq)
+                                                {
+                                                    couldBeTime[d] = EFreq.None;  //signals fail
+                                                }
+                                            }
+                                        }
+                                    }
+                                    gdx.gdxDataReadDone();
+
+                                    int counter = 0;
+                                    int dFound = -12345;
+                                    for (d = 0; d < gdxDimensions; d++)
+                                    {
+                                        if (couldBeTime[d] != null && couldBeTime[d] != EFreq.None)
+                                        {
+                                            counter++;
+                                            dFound = d;
+                                        }
+                                    }
+
+                                    if (counter == 1)
+                                    {
+                                        timeDimNr = dFound;
+                                    }
+                                }                                
+                            }
 
                             if (timeDimNr == -12345)
                             {
                                 if (varType == 1) paramsWithoutTimeDimensionCounter.Add(varName);
-                                if (varType == 2) varsWithoutTimeDimensionCounter.Add(varName);
+                                else if (varType == 2) varsWithoutTimeDimensionCounter.Add(varName);
                             }
 
-                            if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
-                            {
-                                new Error("gdx error");
-                            }
+                            if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) new Error("gdx error");                            
 
                             int hasTimeDimension = 0;
                             if (timeDimNr != -12345) hasTimeDimension = 1;
@@ -3916,7 +3984,6 @@ namespace Gekko
                                 gdxElementCounter++;                                
 
                                 int tt = -12345;
-                                //StringBuilder sb = new StringBuilder();
                                 List<string> dims = new List<string>();
                                 for (d = 0; d < gdxDimensions; d++)
                                 {
@@ -4127,11 +4194,11 @@ namespace Gekko
                             txt.MoreAdd("There were " + paramsWithoutTimeDimensionCounter.Count() + " parameters and " + varsWithoutTimeDimensionCounter.Count() + " variables without a time dimension set '" + Program.options.gams_time_set + "' assigned as domain (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
                             txt.MoreAdd("This is ok if the GAMS variables/parameters are really timeless, but if not, there is a problem.");
                             txt.MoreNewLine();
-                            txt.MoreAdd("A quick fix regarding this can be to simply set 'option gams time detect auto = yes;', in which case Gekko for each parameter/variable tries to detect");
-                            txt.MoreAdd("a time dimensions automatically, even if the dimension is defined over the universal set '*'. Here, Gekko will look for time-like elements like, say, '2020', '2021', '2022' etc. in order");
-                            txt.MoreAdd("to guess if a particular dimension is a time dimension.");
+                            txt.MoreAdd("A quick fix regarding this can be to simply set 'option gams time detect auto = yes;', in which case Gekko tries to detect");
+                            txt.MoreAdd("a time dimension automatically, even if the dimension is defined over the universal set '*'. To do this, Gekko looks for time-like elements like, say, '2020', '2021', '2022' etc. in order");
+                            txt.MoreAdd("to guess if a particular dimension is a time dimension. This usually works pretty well.");
                             txt.MoreNewLine();
-                            txt.MoreAdd("If you do not want to use 'option gams time detect auto', for Gekko to identify a time dimension for a given parameter or variable, the dimension needs to be defined over this time domain. For instance, if in GAMS IDE or GAMS Studio a variable x is shown as x[*, *], ");
+                            txt.MoreAdd("If you do not want to use 'option gams time detect auto', the time dimensions need to be assigned a time domain (for instance defined over a set named 't'). For instance, if in GAMS IDE or GAMS Studio a variable x is shown as x[*, *], ");
                             txt.MoreAdd("this means the no domains (sets) are assigned to the dimensions. In contrast, if it is for instance shown as x[i, t] in GAMS, this means that the first dimension is assigned to the set i (#i in Gekko),");
                             txt.MoreAdd("whereas Gekko uses the second dimension as time dimension. In Gekko, a GAMS variable x[i, t] will show up as the 1-dimensional x[#i], because the time dimension is implicit.");
                             txt.MoreNewLine();
