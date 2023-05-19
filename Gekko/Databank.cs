@@ -91,6 +91,10 @@ namespace Gekko
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage;
+
+        [ProtoMember(2)]
+        public DatabankCacheParams cacheParameters = null;
+
         public string name = null;
 
         //TODO:
@@ -382,6 +386,91 @@ namespace Gekko
         public string GetStamp()
         {
             return this.date;  //has no stamp
+        }
+    }
+
+    [ProtoContract]
+    public class DatabankCacheParams
+    {
+        //Excel ---------------------------------------------------------------------------
+
+        [ProtoMember(1)]
+        public string cols;
+
+        [ProtoMember(2)]
+        public string sheet;
+
+        [ProtoMember(3)]
+        public string cell;
+
+        [ProtoMember(4)]
+        public string datecell;
+
+        [ProtoMember(5)]
+        public string namecell;
+
+        //At the moment, IMPORT<collapse=... method=...> does not use cache at all, so the following two are just placeholders
+        public string collapse;
+        public string method;
+
+        [ProtoMember(6)]
+        public string dateformat;
+
+        [ProtoMember(7)]
+        public string datetype;
+
+        //Px ---------------------------------------------------------------------------
+
+        [ProtoMember(8)]
+        public bool variablecode;
+
+        //Gdx ---------------------------------------------------------------------------       
+        [ProtoMember(9)]
+        public string option_gams_time_freq;
+
+        [ProtoMember(10)]
+        public string option_gams_time_set;
+
+        [ProtoMember(11)]
+        public string option_gams_time_prefix;
+
+        [ProtoMember(12)]
+        public double option_gams_time_offset;
+
+        [ProtoMember(13)]
+        public bool option_gams_time_detect_auto;
+
+        [ProtoMember(14)]
+        public int option_gams_trim;
+
+        /// <summary>
+        /// Tests if one object is equal (equal fields) to another.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsSame(DatabankCacheParams other)
+        {
+            if (other == null) return false;
+            //xlsx
+            if (!G.Equal(this.cols, other.cols)) return false;
+            if (!G.Equal(this.sheet, other.sheet)) return false;
+            if (!G.Equal(this.cell, other.cell)) return false;
+            if (!G.Equal(this.datecell, other.datecell)) return false;
+            if (!G.Equal(this.namecell, other.namecell)) return false;
+            if (!G.Equal(this.collapse, other.collapse)) return false;
+            if (!G.Equal(this.method, other.method)) return false;
+            if (!G.Equal(this.dateformat, other.dateformat)) return false;
+            if (!G.Equal(this.datetype, other.datetype)) return false;
+            //px
+            if (this.variablecode != other.variablecode) return false;
+            //gdx
+            if (!G.Equal(this.option_gams_time_freq, other.option_gams_time_freq)) return false;
+            if (!G.Equal(this.option_gams_time_set, other.option_gams_time_set)) return false;
+            if (!G.Equal(this.option_gams_time_prefix, other.option_gams_time_prefix)) return false;
+            if (this.option_gams_time_offset != other.option_gams_time_offset) return false;
+            if (this.option_gams_time_detect_auto != other.option_gams_time_detect_auto) return false;
+            if (this.option_gams_trim != other.option_gams_trim) return false;
+            return true;
         }
     }
 }

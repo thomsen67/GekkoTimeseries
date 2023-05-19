@@ -3150,7 +3150,7 @@ namespace Gekko
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
 
-            List<string> files = GetSplitCacheFileNames(k, fileName, "data", null, ref hash);
+            List<string> files = GetSplitCacheFileNames(k + 1, fileName, "data", null, ref hash); //the last filename is cache parameters
 
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
@@ -3175,6 +3175,9 @@ namespace Gekko
                 ProtobufWrite(x, files[i]);
                 return true;
             }).All(_ => _);
+
+            //write out the cache parameters object
+            ProtobufWrite(source.cacheParameters, files[k]);
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
@@ -3264,12 +3267,15 @@ namespace Gekko
 
             for (int i = 0; i < k; i++)
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);
+                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);                
+            }
+
+            for (int i = 0; i < k - 1; i++)
+            {                
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-
-            //if (print) new Writeln("Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);
+            
             t = DateTime.Now;
 
             Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
@@ -3277,9 +3283,8 @@ namespace Gekko
                 //See https://github.com/protobuf-net/protobuf-net/issues/668
                 //About double speed on TT pc, compared to no parallel  
 
-                int i = (int)index;
-                string fileName2 = files[i];
-                List<KeyValuePair<string, IVariable>> o = ProtobufRead<List<KeyValuePair<string, IVariable>>>(fileName2);
+                int i = (int)index;                
+                List<KeyValuePair<string, IVariable>> o = ProtobufRead<List<KeyValuePair<string, IVariable>>>(files[i]);
                 lists[i] = o;
                 TwoInts yearMinMax = twoIntss[i];
                 foreach (KeyValuePair<string, IVariable> kvp in lists[i])
@@ -3290,6 +3295,7 @@ namespace Gekko
             }, _ => { });
 
             Databank db = new Databank("temporary");
+
             DateTime t2 = DateTime.Now;
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
@@ -3300,11 +3306,14 @@ namespace Gekko
             }
             lists = null;  //free for GC
 
-            for (int i = 0; i < k; i++)
+            for (int i = 0; i < twoIntss.Count; i++)
             {
                 if (twoIntss[i].int1 < year1) year1 = twoIntss[i].int1;
                 if (twoIntss[i].int2 > year2) year2 = twoIntss[i].int2;
             }
+
+            //read cache parameters
+            db.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - 1]);
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
@@ -4817,12 +4826,38 @@ namespace Gekko
                 }
             }
 
-            if (cache_loadedFromProtobuf)
+            DatabankCacheParams cacheParametersHere = null;
+            if (true)
             {
-                //do nothing, also no writing of cache file of course
+                //We "record" the cache-relevant parameters
+                cacheParametersHere = new DatabankCacheParams();
+                //xlsx
+                cacheParametersHere.sheet = oRead.sheet;
+                cacheParametersHere.cols = oRead.Orientation;
+                cacheParametersHere.cell = offset.cell;
+                cacheParametersHere.datecell = offset.datecell;
+                cacheParametersHere.namecell = offset.namecell;
+                cacheParametersHere.dateformat = dateformat;
+                cacheParametersHere.datetype = datetype;
+                //px
+                cacheParametersHere.variablecode = oRead.isVariablecode;
+                //gdx
+                cacheParametersHere.option_gams_time_freq = Program.options.gams_time_freq;
+                cacheParametersHere.option_gams_time_set = Program.options.gams_time_set;
+                cacheParametersHere.option_gams_time_prefix = Program.options.gams_time_prefix;
+                cacheParametersHere.option_gams_time_offset = Program.options.gams_time_offset;
+                cacheParametersHere.option_gams_time_detect_auto = Program.options.gams_time_detect_auto;
+                cacheParametersHere.option_gams_trim = Program.options.gams_trim;
+            }            
+            
+            if (cache_loadedFromProtobuf && cacheParametersHere.IsSame(databankTemp.cacheParameters))
+            {
+                //do nothing, also no writing of cache file of course                
             }
             else
             {
+                //if cacheParameters are different, the file is read the hard way and afterwards a new cache file is written.
+                cache_loadedFromProtobuf = false;  //if cacheParameters fails, we must change this now (only for reporting)
                 if (true)  //read it the hard way
                 {
                     if (oRead.Type == EDataFormat.Pcim)
@@ -4871,6 +4906,7 @@ namespace Gekko
                 {
                     try //not the end of world if it fails
                     {
+                        databankTemp.cacheParameters = cacheParametersHere;  //will alter the hash code, so it includes these parameters
                         WriteParallelDatabank(Program.options.system_threads, databankTemp, fileRemember, hash, hashMs, readInfo);
                     }
                     catch (Exception e)
@@ -14045,31 +14081,26 @@ namespace Gekko
             if (o.readTo != null)
             {
                 new Error("IMPORT<collapse=...> does not work with IMPORT ... TO ...");
-                //throw new GekkoException();
             }
 
             if (o.opt_ref != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <ref>");
-                //throw new GekkoException();
             }
 
             if (o.opt_first != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <first>");
-                //throw new GekkoException();
             }
 
             if (o.opt_merge != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <merge>");
-                //throw new GekkoException();
             }
 
             if (o.opt_xls == null && o.opt_xlsx == null)
             {
-                new Error("IMPORT<collapse=...> should be used with xls- or xlsx-files");
-                //throw new GekkoException();
+                new Error("IMPORT<collapse=...> should be used with xls- or xlsx-files");                
             }
 
             string x = "xlsx";
