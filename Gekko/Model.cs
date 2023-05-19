@@ -614,6 +614,9 @@ namespace Gekko
         [ProtoMember(2)]
         public EFreq freq = EFreq.None; //Used for .modelGekko. The value .None means inactive. This is only relevant regarding the pchy() and similar functions
 
+        [ProtoMember(3)]
+        public ModelCommonCacheParameters cacheParameters =null;
+
         //not protobuffed
         public bool loadedFromCacheFile = false;  //not protobuffed
 
@@ -635,6 +638,31 @@ namespace Gekko
         public void SetModelSourceType(EModelType type)
         {
             this.type = type;
+        }
+    }
+
+    [ProtoContract]
+    public class ModelCommonCacheParameters
+    {
+        //Note: for Gekko models m2 type, the lists of endo/exo are included in the hash (added as text to the frm before hashing)
+        //For MODEL<dep=#m> we really should consider the #m list. In principle it should be baked into 
+        //    this object...
+        //
+        [ProtoMember(1)]
+        public string dep; //is flattened here, comma and semicolon-separated, no blanks.
+
+        [ProtoMember(2)]
+        public bool option_model_gams_dep_current;
+
+        [ProtoMember(3)]
+        public string option_model_gams_dep_method;
+
+        public bool EqualFields(ModelCommonCacheParameters other)
+        {
+            if (!G.Equal(this.dep, other.dep)) return false;
+            if (this.option_model_gams_dep_current != other.option_model_gams_dep_current) return false;
+            if (!G.Equal(this.option_model_gams_dep_method, other.option_model_gams_dep_method)) return false;
+            return true;
         }
     }
 

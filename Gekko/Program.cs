@@ -17550,6 +17550,7 @@ namespace Gekko
 
             //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
 
+            ModelCommonCacheParameters cacheParameters = null;
             if (Program.options.model_cache == true)
             {
                 try
@@ -17562,10 +17563,22 @@ namespace Gekko
                     double hashMs = 0d;
                     DateTime t0 = DateTime.Now;
                     Model modelTemp = Program.ReadParallelModelMaybe(modelHash);
-
-                    if (modelTemp == null)
+                                        
+                    if (true)
                     {
-                        //model.modelGamsScalar = new ModelGamsScalar(model);
+                        cacheParameters = new ModelCommonCacheParameters();
+                        if (o.opt_dep != null)
+                        {
+                            //Slack that we do this 2 times... :-(
+                            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GamsModel.GetDependentsGams(o.opt_dep);
+                            cacheParameters.dep = tup.Item2.ToString();
+                        }
+                        cacheParameters.option_model_gams_dep_current = Program.options.model_gams_dep_current;
+                        cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
+                    }
+
+                    if (modelTemp == null || !modelTemp.modelCommon.cacheParameters.EqualFields(cacheParameters))
+                    {                        
                         model.modelCommon.loadedFromCacheFile = false;
                     }
                     else
@@ -17636,6 +17649,8 @@ namespace Gekko
                     Program.model = model;
                 }
                 else new Error("No model defined");
+
+                model.modelCommon.cacheParameters = cacheParameters;
 
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {

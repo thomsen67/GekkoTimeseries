@@ -2683,7 +2683,6 @@ namespace Gekko
                     if (x.Type() != EVariableType.List)
                     {
                         new Error("#dependents sublist line " + c + ": should be of list type");
-                        //throw new GekkoException();
                     }
                     List x_list = x as List;
 
@@ -2708,7 +2707,6 @@ namespace Gekko
                     if (ss.Count < 2)
                     {
                         new Error("#dependents sublist line " + c + ": must have > 1 elements");
-                        //throw new GekkoException();
                     }
                     string lhs = ss[0];
                     for (int i = 1; i < ss.Count; i++)
@@ -2722,7 +2720,6 @@ namespace Gekko
                         if (temp != null)
                         {
                             new Error("#dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
-                            //throw new GekkoException();
                         }
                         dependents.Add(ss[i], lhs);
                     }
