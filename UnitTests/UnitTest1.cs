@@ -22670,7 +22670,7 @@ print(df2)
             // Testing IF and logical operators etc.
             I("RESET;");
 
-            //filtering
+            //filtering different cases, also with ELSEIF.
             I("%v = 0;");
             I("if(1==0); %v = 1; else; if(1==0);  %v = 2; else; if(1==0);  %v = 3; else;  %v = 4; end; end; end;");
             _AssertScalarVal(First(), "%v", 4d);
@@ -22683,7 +22683,6 @@ print(df2)
             I("%v = 0;");
             I("if(1==1); %v = 1; else; if(1==0);  %v = 2; else; if(1==0);  %v = 3; else;  %v = 4; end; end; end;");
             _AssertScalarVal(First(), "%v", 1d);
-
             I("%v = 0;");
             I("if(1==0); %v = 1; elseif(1==0);  %v = 2; elseif(1==0);  %v = 3; else;  %v = 4; end;;");
             _AssertScalarVal(First(), "%v", 4d);
@@ -22696,7 +22695,6 @@ print(df2)
             I("%v = 0;");
             I("if(1==1); %v = 1; elseif(1==0);  %v = 2; elseif(1==0);  %v = 3; else;  %v = 4; end;");
             _AssertScalarVal(First(), "%v", 1d);
-
 
             // FIXME FIXME FIXME
             // FIXME FIXME FIXME
