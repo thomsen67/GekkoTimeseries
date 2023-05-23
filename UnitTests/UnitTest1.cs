@@ -1555,7 +1555,7 @@ namespace UnitTests
             I("#i = a, b;");
 
             //$ on lhs ------------------------------------------------------------
-
+            
             I("xx = 1; xx $ (5 == 5) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
@@ -1601,8 +1601,6 @@ namespace UnitTests
 
             //series condition ---
             
-            MessageBox.Show("TODO %x $ (...) = ... ;");            
-
             I("xx = 1; xx $ (b == 102) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
@@ -1778,6 +1776,76 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
+            if (true)
+            {
+                //different circumstances when having $ on the left
+
+                I("option bugfix lhs dollar = yes;");
+                I("xx = 1; xx $ (b == 102) <2001 2002 dyn> = xx[-1] + 2;");
+
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                I("xx = 1; xx $ (b == 102) <2001 2002 d> = 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                I("xx = 1; clone; xx $ (b == 102) <2000 2002 m> = 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+                I("clear ref;");
+
+                I("xx = 1; xx $ (b == 102) <2001 2002> ^= 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                I("xx = 1; clone; xx $ (b == 102) <2000 2002> += 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+                I("clear ref;");
+
+                I("xx = 1; dif(xx) $ (b == 102) <2001 2002> = 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                I("xx = 1; xx $ (b == 102) <2000 2002 l> = 2;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, Math.Exp(2d), sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, Math.Exp(2d), sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                I("xx = 1; xx $ (b == 102) <2001 2002> = 0.02;");
+                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", 2002, Math.Exp(0.02d), sharedDelta);
+                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+                MessageBox.Show("$ on left: do VAL, timeless ts, array-subseries");
+
+                I("option bugfix lhs dollar = no;");
+
+                // end circumstances
+            }
         }
 
         [TestMethod]
@@ -9746,46 +9814,105 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Cache()
+        public void _Test_Cache_Databank()
         {
-            //But cache not active anymore...?
+            //Caching of databanks and models
 
-            //==================== TRUNCATE ===========================================
-            Databank work = First();
+            double cacheSize1 = Globals.cacheSize1;
+            Globals.cacheSize1 = 1000;
 
-            //One-by-one poses no problems ever
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("CREATE ts1, ts2;");
-            I("SERIES ts1 = 100;");
-            I("SERIES ts2 = 100;");
-            I("DELETE ts1;");
-            I("CREATE ts1;");
-            I("SERIES ts1 = 300;");
-            _AssertSeries(First(), "ts1", 2000, 300d, sharedDelta);
-            _AssertSeries(First(), "ts2", 2000, 100d, sharedDelta);
+            try
+            {
 
-            //One chunk is problematic
-            I(@"
-                RESET;
-                TIME 2000 2000;
-                CREATE ts1, ts2;
-                SERIES ts1 = 100;
-                SERIES ts2 = 100;
-                DELETE ts1;
-                CREATE ts1;
-                SERIES ts1 = 300;
-            ");
-            _AssertSeries(First(), "ts1", 2000, 300d, sharedDelta);
-            _AssertSeries(First(), "ts2", 2000, 100d, sharedDelta);
+                I("flush();"); // <-------------- !!
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 0;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsTrue(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 0;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsTrue(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 3;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
 
+                // ======== flush ===============
 
+                I("flush();"); // <-------------- !!
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 3;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 3;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
 
+                I("reset;");
+                I("option folder working " + Globals.ttPath2 + @"\regres\Databanks;");
+                I("option gams trim = 0;"); // <-------------- !!
+                I("read <gdx> testfix;");
+                Assert.IsTrue(Program.databanks.GetFirst().ContainsIVariable("d6!a"));
+
+            }
+            finally
+            {                
+                Globals.cacheSize1 = cacheSize1;
+            }
+        }
+
+        [TestMethod]
+        public void _Test_Cache_Model()
+        {
+            //Caching of databanks and models
+                        
+            I("flush();"); // <-------------- !!
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");            
+            I("model jul05;");
+            I("read \\..\\Databanks\\jul05;");
+            Globals.unitTestScreenOutput.Clear();
+            I("sim<2006 2010>;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("34/41/36.4 iterations"));
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
+            I("model jul05;");
+            I("read \\..\\Databanks\\jul05;");
+            Globals.unitTestScreenOutput.Clear();
+            I("sim<2006 2010>;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("34/41/36.4 iterations"));
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
+            I("option solve gauss reorder = yes;");
+            I("model jul05;");
+            I("read \\..\\Databanks\\jul05;");
+            Globals.unitTestScreenOutput.Clear();
+            I("sim<2006 2010>;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("27/33/29.4 iterations"));
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
+            I("option solve gauss reorder = yes;");
+            I("model jul05;");
+            I("read \\..\\Databanks\\jul05;");
+            Globals.unitTestScreenOutput.Clear();
+            I("sim<2006 2010>;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("27/33/29.4 iterations"));
         }
 
         [TestMethod]

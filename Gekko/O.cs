@@ -3295,7 +3295,6 @@ namespace Gekko
         /// <param name="o"></param>
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
         {
-
             MissingMemory missing = null;
             if (o.opt_missing != null)
             {

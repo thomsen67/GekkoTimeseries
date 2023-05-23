@@ -4826,36 +4826,37 @@ namespace Gekko
                 }
             }
 
-            DatabankCacheParams cacheParametersHere = null;
+            DatabankCacheParams cacheParameters = null; //See also for models #i9hkjhesf34rf
+
             if (true)
             {
                 //We "record" the cache-relevant parameters
-                cacheParametersHere = new DatabankCacheParams();
+                cacheParameters = new DatabankCacheParams();
                 //xlsx
-                cacheParametersHere.sheet = oRead.sheet;
-                cacheParametersHere.cols = oRead.Orientation;
-                cacheParametersHere.cell = offset.cell;
-                cacheParametersHere.datecell = offset.datecell;
-                cacheParametersHere.namecell = offset.namecell;
-                cacheParametersHere.dateformat = dateformat;
-                cacheParametersHere.datetype = datetype;
+                cacheParameters.sheet = oRead.sheet;
+                cacheParameters.cols = oRead.Orientation;
+                cacheParameters.cell = offset.cell;
+                cacheParameters.datecell = offset.datecell;
+                cacheParameters.namecell = offset.namecell;
+                cacheParameters.dateformat = dateformat;
+                cacheParameters.datetype = datetype;
                 //px
-                cacheParametersHere.variablecode = oRead.isVariablecode;
+                cacheParameters.variablecode = oRead.isVariablecode;
                 //gdx
-                cacheParametersHere.option_gams_time_freq = Program.options.gams_time_freq;
-                cacheParametersHere.option_gams_time_set = Program.options.gams_time_set;
-                cacheParametersHere.option_gams_time_prefix = Program.options.gams_time_prefix;
-                cacheParametersHere.option_gams_time_offset = Program.options.gams_time_offset;
-                cacheParametersHere.option_gams_time_detect_auto = Program.options.gams_time_detect_auto;
-                cacheParametersHere.option_gams_trim = Program.options.gams_trim;
+                cacheParameters.option_gams_time_freq = Program.options.gams_time_freq;
+                cacheParameters.option_gams_time_set = Program.options.gams_time_set;
+                cacheParameters.option_gams_time_prefix = Program.options.gams_time_prefix;
+                cacheParameters.option_gams_time_offset = Program.options.gams_time_offset;
+                cacheParameters.option_gams_time_detect_auto = Program.options.gams_time_detect_auto;
+                cacheParameters.option_gams_trim = Program.options.gams_trim;
             }            
             
-            if (cache_loadedFromProtobuf && cacheParametersHere.IsSame(databankTemp.cacheParameters))
+            if (cache_loadedFromProtobuf && cacheParameters.IsSame(databankTemp.cacheParameters))
             {
                 //do nothing, also no writing of cache file of course                
             }
             else
-            {
+            {                
                 //if cacheParameters are different, the file is read the hard way and afterwards a new cache file is written.
                 cache_loadedFromProtobuf = false;  //if cacheParameters fails, we must change this now (only for reporting)
                 if (true)  //read it the hard way
@@ -4906,7 +4907,7 @@ namespace Gekko
                 {
                     try //not the end of world if it fails
                     {
-                        databankTemp.cacheParameters = cacheParametersHere;  //will alter the hash code, so it includes these parameters
+                        databankTemp.cacheParameters = cacheParameters; //a cache hit must also match this object
                         WriteParallelDatabank(Program.options.system_threads, databankTemp, fileRemember, hash, hashMs, readInfo);
                     }
                     catch (Exception e)
@@ -17550,7 +17551,8 @@ namespace Gekko
 
             //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
 
-            ModelCommonCacheParameters cacheParameters = null;
+            ModelCacheParams cacheParameters = null; //See also for databanks #i9hkjhesf34rf
+
             if (Program.options.model_cache == true)
             {
                 try
@@ -17566,7 +17568,8 @@ namespace Gekko
                                         
                     if (true)
                     {
-                        cacheParameters = new ModelCommonCacheParameters();
+                        cacheParameters = new ModelCacheParams();
+                        cacheParameters.option_solve_gauss_reorder = Program.options.solve_gauss_reorder;
                         if (o.opt_dep != null)
                         {
                             //Slack that we do this 2 times... :-(
@@ -17577,11 +17580,7 @@ namespace Gekko
                         cacheParameters.option_model_gams_dep_method = Program.options.model_gams_dep_method;
                     }
 
-                    if (modelTemp == null || !modelTemp.modelCommon.cacheParameters.EqualFields(cacheParameters))
-                    {                        
-                        model.modelCommon.loadedFromCacheFile = false;
-                    }
-                    else
+                    if (modelTemp != null && modelTemp.modelCommon.cacheParameters.IsSame(cacheParameters))
                     {
                         model = modelTemp;
                         if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
@@ -17600,7 +17599,11 @@ namespace Gekko
                             model.modelGekko.modelInfo.fileName = ffh.prettyPathAndFileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                         }
                         model.modelCommon.loadedFromCacheFile = true;
-                        //timeCompile = "compile: " + G.Seconds(t1);
+                        //timeCompile = "compile: " + G.Seconds(t1);                        
+                    }
+                    else
+                    {
+                        model.modelCommon.loadedFromCacheFile = false;
                     }
                 }
                 catch (Exception e)
@@ -17626,7 +17629,7 @@ namespace Gekko
                 //no writing of .mdl file of course                
             }
             else
-            {
+            {                
                 EModelType modelType = EModelType.Gekko;
                 if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalar; else modelType = EModelType.GAMSRaw; }
 
@@ -17650,7 +17653,7 @@ namespace Gekko
                 }
                 else new Error("No model defined");
 
-                model.modelCommon.cacheParameters = cacheParameters;
+                model.modelCommon.cacheParameters = cacheParameters; //a cache hit must also match this object
 
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {

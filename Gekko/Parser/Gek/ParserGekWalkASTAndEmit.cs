@@ -3764,7 +3764,7 @@ ASTPLACEHOLDER [0]
                         //int leftSideType = 0;  //(0): none, (1): simple x = ..., (2): #m1.#m2.x = ... or #m[2][3] = ...
                         //bool isMapItem = (node?.Parent?.Text == "ASTASSIGNMENT" && node?.Parent?.Parent?.Text == "ASTMAPITEM") || (node?.Parent?.Parent.Text == "ASTASSIGNMENT" && node?.Parent?.Parent?.Parent.Text == "ASTMAPITEM");
                         bool isMapItem = SearchUpwardsInTree9(node);  //finds ASTMAPITEM and ASTFUNCTIONDEFCODE
-                        bool isLeftSide = node?.Parent.Text == "ASTLEFTSIDE";
+                        bool isLeftSide = node?.Parent.Text == "ASTLEFTSIDE" || (Globals.bugfixDollarOperator && node?.Parent.Text == "ASTDOLLAR" && node?.Parent?.Parent.Text == "ASTLEFTSIDE");
 
                         bool isLoneOnRightSide = node?.Parent.Text == "ASTASSIGNMENT";
 

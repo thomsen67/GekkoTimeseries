@@ -72,6 +72,8 @@ namespace Gekko
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.
         // -------------------------------------------------     
         // -------------------------------------------------     
+
+        public static bool bugfixDollarOperator = true;
         
         public const string pivotHelper1 = "{extra}";
         public const string pivotHelper2 = "{normalize}";
