@@ -889,6 +889,7 @@ namespace Gekko
             bool usingNewtonFairTaylor = false;
             if (Program.model.modelGekko.largestLeadOutsideRevertedPart > 0)
             {
+                if (G.Equal(Program.options.solve_forward_method, "stacked")) new Error("Option solve forward method = 'stacked' is no longer supported. Use 'fair' or 'nfair' instead.");
                 if (G.Equal(Program.options.solve_forward_method, "fair")) usingFairTaylor = true;
                 if (G.Equal(Program.options.solve_forward_method, "nfair")) usingNewtonFairTaylor = true;
                 if ((usingFairTaylor || usingNewtonFairTaylor) && G.Equal(Program.options.solve_forward_terminal, "growth"))

@@ -213,7 +213,7 @@ namespace Gekko
         public int solve_forward_nfair_itermax = 200;
         public int solve_forward_nfair_itermin = 0;
         public int solve_forward_nfair_updatefreq = 100; //Or 1        
-        public int solve_forward_stacked_horizon = 5;
+        //public int solve_forward_stacked_horizon = 5;
         public string solve_forward_terminal = "const";  //or exo or growth (growth does not work at the moment)
         public string solve_forward_terminal_feed = "internal";  //or external        
         public string solve_gauss_conv = "conv1";
@@ -486,7 +486,7 @@ namespace Gekko
             Add("SOLVE FORWARD NFAIR ITERMAX", Globals.xint);
             Add("SOLVE FORWARD NFAIR ITERMIN", Globals.xint);
             Add("SOLVE FORWARD NFAIR UPDATEFREQ", Globals.xint);
-            Add("SOLVE FORWARD STACKED HORIZON", Globals.xint);
+            //Add("SOLVE FORWARD STACKED HORIZON", Globals.xint);
             Add("SOLVE FORWARD METHOD", Globals.xnameOrString, "fair", "nfair", "none");
             Add("SOLVE FORWARD TERMINAL", Globals.xnameOrString, "exo", "const", "growth");
             Add("SOLVE FORWARD TERMINAL FEED", Globals.xnameOrString, "internal", "external");
