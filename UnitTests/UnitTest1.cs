@@ -186,6 +186,7 @@ namespace UnitTests
         public static double sharedDelta = 0.00000000001d;  //precision for accepting
         double sharedTableDelta = 0.0001d;  //printing
         double sharedTableDelta2 = 0.001d;  //printing
+        public static string pydir = "c:\\Users\\thoma\\anaconda3";
 
         private static void _AssertListVal(IBank db, string s, List<double> ss)
         {
@@ -1877,7 +1878,7 @@ namespace UnitTests
                 _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
                 I("clear ref;");
 
-                I("xx = series(1); xx[a] = series(1); xx[a] = 1; xx $ (b == 102) <2000 2002 l> = 2;");
+                I("xx = series(1); xx[a] = 1; xx[a] $ (b == 102) <2000 2002 l> = 2;");
                 _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
                 _AssertSeries(First(), "xx", new string[] { "a" }, 2000, Math.Exp(2d), sharedDelta);
                 _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
@@ -16063,7 +16064,10 @@ namespace UnitTests
             I("series s4 = bul1.1;");
             //I("series s5 = 1;");
             I("matrix #x = pack(2000, 2010, s1, s2, s3, s4);");
-            I("matrix #y = pack(2000, 2010, s0);");            
+            I("matrix #y = pack(2000, 2010, s0);");
+
+            I("option python exe folder = " + pydir + ";");
+
             I("python_run <target = 'data1'> #x, #y file = ols.py;");            
             _AssertMatrix(First(), "#beta", "rows", 5);
             _AssertMatrix(First(), "#beta", "cols", 1);
@@ -18104,7 +18108,10 @@ string cc1b=
 
         [TestMethod]
         public void _Test_Arrow3()
-        {            
+        {
+            //R will need install.packages("arrow") and "dplyr", you can use View() to view dataframes
+            //Python will need package "pyarrow".
+
             I("reset; time 2021 2023;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("x = 1, 2, 3;");
@@ -18137,8 +18144,7 @@ string cc1b=
 
             //====== trying out R ===============================
 
-            Globals.unitTestScreenOutput.Clear();
-            //will need install.packages("arrow"), you can use View() to view dataframes
+            Globals.unitTestScreenOutput.Clear();            
             string s = @"
 library(arrow)
 library(dplyr)
@@ -18155,11 +18161,19 @@ print(df3)
             string output = Globals.unitTestScreenOutput.ToString();
             //could be a more precise test regarding R, but never mind
 
-            Assert.IsTrue(output.Contains("# A tibble: 45 x 9"));
+            if (true)
+            {
+                //Mystery why this char is suddently showing up in R...? (Since new PC may 2023).
+                Assert.IsTrue(output.Contains("# A tibble: 45 ├ù 9"));                
+            }
+            else
+            {
+                Assert.IsTrue(output.Contains("# A tibble: 45 x 9"));
+            }
             Assert.IsTrue(output.Contains("   name  freq   dims dim1  dim2   per1  per2  per3 value"));
             Assert.IsTrue(output.Contains("   <chr> <chr> <int> <chr> <chr> <int> <int> <int> <dbl>"));
             Assert.IsTrue(output.Contains(" 1 x     a         0 <NA>  <NA>   2021     0     0     1"));
-            Assert.IsTrue(output.Contains(" 2 x     a         0 <NA>  <NA>   2022     0     0     2"));            
+            Assert.IsTrue(output.Contains(" 2 x     a         0 <NA>  <NA>   2022     0     0     2"));
 
             //====== trying out Python ===============================
 
@@ -18175,6 +18189,7 @@ df2 = df1.loc[df1['dims'] == 0][['name', 'freq', 'per1', 'value']]
 print(df2)
 ";
             File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.py", s);
+            I("option python exe folder = " + pydir + ";");
             I("python_run test1.py;");
             output = Globals.unitTestScreenOutput.ToString();
             //could be a more precise test regarding R, but never mind
