@@ -59,7 +59,24 @@ namespace Gekko
             {
                 //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
-                IVariable y = Conditional1Of3(true, smpl, rhsExpression, logical);
+                IVariable y = null;
+                if (Globals.bugfixDollarOperator)
+                {
+                    try
+                    {
+                        smpl.t0 = smpl.t0.Add(-Globals.smplOffset);
+                        y = Conditional1Of3(true, smpl, rhsExpression, logical);
+                    }
+                    finally
+                    {
+                        smpl.t0 = smpl.t0.Add(Globals.smplOffset);
+                    }                    
+                }
+                else
+                {
+                    y = Conditional1Of3(true, smpl, rhsExpression, logical);
+                }
+                
                 Lookup(smpl, map, dbName, varname, freq, y, isLeftSideVariable, type, options);
             }
             else
@@ -1365,7 +1382,7 @@ namespace Gekko
                                             else
                                             {
                                                 //not so fast running, could be improved
-                                                if (hasSkips) new Error("The combination of series operator and left-side $-condition is not yet implemented.");
+                                                //if (hasSkips) new Error("The combination of a series operator and a left-side $-condition involving series is not yet implemented (for instance y $ (z == 2) <d> = x; where z is a timeseries and <d> is an operator).");
                                                 OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
                                             }
                                             //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);

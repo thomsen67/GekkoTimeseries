@@ -249,7 +249,7 @@ namespace Gekko
 
         public static string isAProto = "Is_a_protobuffer_file";
 
-        public const int smplOffset = 2;       //<2026 2200 p> x = pch(@x); --> had to set it from 1 to 2...! 
+        public const int smplOffset = 2;       //<2026 2200 p> x = pch(@x); --> had to set it from 1 to 2...!
         public const int smplInitStart = 0;  //could be -2
         public const int smplInitEnd = 0;
 

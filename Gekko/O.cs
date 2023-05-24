@@ -3675,35 +3675,38 @@ namespace Gekko
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                double d = double.NaN;
-                if (operatorType == ESeriesUpdTypes.m)  //+
+                if (rhsData[i] != Globals.skippedObservationArtificialNumber) //skip if LHS $ tells it to skip
                 {
-                    lhsData[i] += rhsData[i];
-                }
-                else if (operatorType == ESeriesUpdTypes.d)  //+
-                {
-                    lhsData[i] = lhsData[i - 1] + rhsData[i];
-                }
-                else if (operatorType == ESeriesUpdTypes.q)  //*
-                {
-                    lhsData[i] *= 1 + rhsData[i] / 100d;
-                }
-                else if (operatorType == ESeriesUpdTypes.p)  //%
-                {
-                    lhsData[i] = lhsData[i - 1] * (1 + rhsData[i] / 100d);
-                }
-                else if (operatorType == ESeriesUpdTypes.mp)  //%
-                {
-                    lhsData[i] = lhsData[i - 1] * (lhsDataOriginal[i] / lhsDataOriginal[i - 1] + rhsData[i] / 100d);
-                }
-                else if (operatorType == ESeriesUpdTypes.dl)  //dlog(x) = ...
-                {
-                    //dlog(y) = x --> log(y) = log(y.1) + x --> y = y.1 * exp(x)
-                    lhsData[i] = lhsData[i - 1] * Math.Exp(rhsData[i]);
-                }
-                else if (operatorType == ESeriesUpdTypes.l)  //log(x) = ...
-                {
-                    lhsData[i] = Math.Exp(rhsData[i]);
+                    double d = double.NaN;
+                    if (operatorType == ESeriesUpdTypes.m)  //+
+                    {
+                        lhsData[i] += rhsData[i];
+                    }
+                    else if (operatorType == ESeriesUpdTypes.d)  //+
+                    {
+                        lhsData[i] = lhsData[i - 1] + rhsData[i];
+                    }
+                    else if (operatorType == ESeriesUpdTypes.q)  //*
+                    {
+                        lhsData[i] *= 1 + rhsData[i] / 100d;
+                    }
+                    else if (operatorType == ESeriesUpdTypes.p)  //%
+                    {
+                        lhsData[i] = lhsData[i - 1] * (1 + rhsData[i] / 100d);
+                    }
+                    else if (operatorType == ESeriesUpdTypes.mp)  //%
+                    {
+                        lhsData[i] = lhsData[i - 1] * (lhsDataOriginal[i] / lhsDataOriginal[i - 1] + rhsData[i] / 100d);
+                    }
+                    else if (operatorType == ESeriesUpdTypes.dl)  //dlog(x) = ...
+                    {
+                        //dlog(y) = x --> log(y) = log(y.1) + x --> y = y.1 * exp(x)
+                        lhsData[i] = lhsData[i - 1] * Math.Exp(rhsData[i]);
+                    }
+                    else if (operatorType == ESeriesUpdTypes.l)  //log(x) = ...
+                    {
+                        lhsData[i] = Math.Exp(rhsData[i]);
+                    }
                 }
                 i++;
             }

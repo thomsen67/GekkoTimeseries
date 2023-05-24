@@ -1845,7 +1845,18 @@ namespace Gekko.Parser.Gek
 
                             if (s.StartsWith("O.Lookup("))
                             {
-                                node.Code.A("O.DollarLookup(" + node[1].Code.ToString() + ", " + s.Substring("O.Lookup(".Length));
+                                if (Globals.bugfixDollarOperator)
+                                {   
+                                    string temp = "temp" + ++Globals.counter;
+                                    node.Code.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                    node.Code.A("IVariable " + temp + " = " + node[1].Code.ToString() + "; ");
+                                    node.Code.A(OperatorHelper(null, Globals.smplOffset)).End();
+                                    node.Code.A("O.DollarLookup(" + temp + ", " + s.Substring("O.Lookup(".Length));
+                                }
+                                else
+                                {
+                                    node.Code.A("O.DollarLookup(" + node[1].Code.ToString() + ", " + s.Substring("O.Lookup(".Length));
+                                }
                             }
                             else if (s.StartsWith("O.IndexerSetData("))
                             {
