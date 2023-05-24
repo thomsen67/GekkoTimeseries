@@ -1832,6 +1832,7 @@ namespace Gekko.Parser.Gek
                             //Both of these produce an IVARIABLE, but ASTDOLLARCONDITIONAL is still empty when ASTBANKVARNAME is encountered. 
                             //A solution could be to walk ASTDOLLARCONDITIONAL manually, and do the DollarLookup() from ASTBANKVARNAME. 
                             //But the hack is not that bad.
+                            //There are a couple of hacks following this hack, due to the expression needing to be evaluated over t0 to t3 where t0 needs to have 2 subtracted temporarily, cf. Globals.bugfixDollarOperator.
 
                             if (node.Parent.Parent.Text == "ASTASSIGNMENT")
                             {
@@ -1842,6 +1843,8 @@ namespace Gekko.Parser.Gek
                                     gparent.loopCodeCs = node[1].Code.ToString();
                                 }
                             }
+
+
 
                             if (s.StartsWith("O.Lookup("))
                             {
@@ -1860,7 +1863,18 @@ namespace Gekko.Parser.Gek
                             }
                             else if (s.StartsWith("O.IndexerSetData("))
                             {
-                                node.Code.A("O.DollarIndexerSetData(" + node[1].Code.ToString() + ", " + s.Substring("O.IndexerSetData(".Length));
+                                if (Globals.bugfixDollarOperator)
+                                {
+                                    string temp = "temp" + ++Globals.counter;
+                                    node.Code.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                    node.Code.A("IVariable " + temp + " = " + node[1].Code.ToString() + "; ");
+                                    node.Code.A(OperatorHelper(null, Globals.smplOffset)).End();
+                                    node.Code.A("O.DollarIndexerSetData(" + temp + ", " + s.Substring("O.IndexerSetData(".Length));
+                                }
+                                else
+                                {
+                                    node.Code.A("O.DollarIndexerSetData(" + node[1].Code.ToString() + ", " + s.Substring("O.IndexerSetData(".Length));
+                                }
                             }
                             else
                             {

@@ -4137,7 +4137,25 @@ namespace Gekko
                 //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
                 //Here, x will be an .ArraySuper, corresponding to the "x" in "x[a]".                
-                IVariable z = Conditional1Of3(true, smpl, rhs, logical);
+
+                IVariable z = null;
+                if (Globals.bugfixDollarOperator)
+                {
+                    try
+                    {
+                        smpl.t0 = smpl.t0.Add(-Globals.smplOffset);
+                        z = Conditional1Of3(true, smpl, rhs, logical);
+                    }
+                    finally
+                    {
+                        smpl.t0 = smpl.t0.Add(Globals.smplOffset);
+                    }
+                }
+                else
+                {
+                    z = Conditional1Of3(true, smpl, rhs, logical);
+                }
+
                 lhsArray.IndexerSetData(smpl, z, options, indexes);
             }
             else

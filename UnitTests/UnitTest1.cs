@@ -1779,8 +1779,10 @@ namespace UnitTests
             if (true)
             {
                 //different circumstances when having $ on the left
+                //TODO: Investigate VAL, timeless ts, array-subseries. Also expressions like one+one instead of 2, or 
 
                 I("option bugfix lhs dollar = yes;");
+
                 I("xx = 1; xx $ (b == 102) <2001 2002 dyn> = xx[-1] + 2;");
 
                 _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
@@ -1819,12 +1821,7 @@ namespace UnitTests
                 _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
                 I("clear ref;");
 
-                I("xx = 1; dif(xx) $ (b == 102) <2001 2002> = 2;");
-                _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
-                _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
-                _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
-                _AssertSeries(First(), "xx", 2002, 3d, sharedDelta);
-                _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+                //I("xx = 1; dif(xx) $ (b == 102) <2001 2002> = 2;"); not legal syntax!
 
                 I("xx = 1; xx $ (b == 102) <2000 2002 l> = 2;");
                 _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
@@ -1833,14 +1830,66 @@ namespace UnitTests
                 _AssertSeries(First(), "xx", 2002, Math.Exp(2d), sharedDelta);
                 _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-                I("xx = 1; xx $ (b == 102) <2001 2002> = 0.02;");
+                I("xx = 1; xx $ (b == 102) <2001 2002 dl> = 0.02;");
                 _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
                 _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
                 _AssertSeries(First(), "xx", 2001, 1d, sharedDelta); //skip
                 _AssertSeries(First(), "xx", 2002, Math.Exp(0.02d), sharedDelta);
                 _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-                MessageBox.Show("$ on left: do VAL, timeless ts, array-subseries");
+                //now with array-series
+
+                I("xx = series(1); xx[a] = 1; xx[a] $ (b == 102) <2001 2002 dyn> = xx[a][-1] + 2;");
+
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+                I("xx = series(1); xx[a] = 1; xx[a] $ (b == 102) <2001 2002 d> = 2;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+                I("xx = series(1); xx[a] = 1; clone; xx[a] $ (b == 102) <2000 2002 m> = 2;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+                I("clear ref;");
+
+                I("xx = series(1); xx[a] = 1; xx[a] $ (b == 102) <2001 2002> ^= 2;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+                I("xx = series(1); xx[a] = 1; clone; xx[a] $ (b == 102) <2000 2002> += 2;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, 3d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+                I("clear ref;");
+
+                I("xx = series(1); xx[a] = series(1); xx[a] = 1; xx $ (b == 102) <2000 2002 l> = 2;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, Math.Exp(2d), sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, Math.Exp(2d), sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+                I("xx = series(1); xx[a] = 1; xx[a] $ (b == 102) <2001 2002 dl> = 0.02;");
+                _AssertSeries(First(), "xx", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 1d, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2001, 1d, sharedDelta); //skip
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2002, Math.Exp(0.02d), sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2003, double.NaN, sharedDelta);
 
                 I("option bugfix lhs dollar = no;");
 

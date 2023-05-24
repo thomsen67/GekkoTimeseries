@@ -112,9 +112,9 @@ namespace Gekko
         // Protobuf tuning start
         // ------------------------------------------------------------        
         public static bool modelParallelProtobuf = true;
-        public const double cacheSize1 = 5e6;    //non-gbk
-        public const double cacheSize2 = 10e6;   //gbk
-        public const double cacheFileMax = 50e9; //bytes, flush always if over
+        public static double cacheSize1 = 5e6;    //non-gbk
+        public static double cacheSize2 = 10e6;   //gbk
+        public static double cacheFileMax = 50e9; //bytes, flush always if over
         //!!! --> See Program.options.system_threads = 5;
         public const int count1 = 32;  //dead weight of an object (guess, too low for series...)
         public const int count2 = 8;   //double value is 8 bytes
