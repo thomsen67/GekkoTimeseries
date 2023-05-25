@@ -2108,32 +2108,36 @@ namespace Gekko.Parser.Gek
 
                                 Tuple<string, string> tup = HandleOptionAndBlock(child, true);
 
-                                if (tup.Item1 == "Program.options.freq")
+                                if (tup.Item2 != "?")  //block solve ?; end; is just ignored.
                                 {
-                                    //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
-                                    int n = ++Globals.counter;
-                                    record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
-                                    alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
-                                    alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
-                                    play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                                  // global perStart
-                                    n = ++Globals.counter;
-                                    record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                                    play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
-                                    // global perEnd
-                                    n = ++Globals.counter;
-                                    record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                    play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                }
-                                else
-                                {
-                                    int n = ++Globals.counter;
-                                    record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
-                                    alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
-                                    alter += "O.PrintOptions(`" + tup.Item1 + "`);" + G.NL;       //O.PrintOptions(...)
-                                    alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
-                                    play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                                    play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+
+                                    if (tup.Item1 == "Program.options.freq")
+                                    {
+                                        //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
+                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
+                                        alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
+                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                                      // global perStart
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                                        // global perEnd
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
+                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
+                                        alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;       //O.PrintOptions(...)
+                                        alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
+                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                        play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+                                    }
                                 }
                             }
                             else
@@ -4085,18 +4089,17 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTOPTION":
                     {
-                        if (node[0].Text == "?")
+                        Tuple<string, string> tup = HandleOptionAndBlock(node, false);
+                        if (tup.Item2 == "?")
                         {
-                            node.Code.A("O.PrintOptions(null);");
+                            node.Code.A("O.PrintOptions(`" + tup.Item1 + "`, true);" + G.NL);
                         }
                         else
                         {
-                            Tuple<string, string> tup = HandleOptionAndBlock(node, false);
                             node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
-                            node.Code.A("O.PrintOptions(`" + tup.Item1 + "`);" + G.NL);
+                            node.Code.A("O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL);
                             node.Code.A("O.HandleOptions(`" + tup.Item1 + "`, 0, p);" + G.NL);
                         }
-
                     }
                     break;
                 case "ASTOPT1":  //PRT-type statement
@@ -5274,7 +5277,7 @@ ASTPLACEHOLDER [0]
             //Item1: the option variable, for instance Program.options.folder_working
             //Item2: the value as C# code (IVariable code)
 
-            string ss7 = null;
+            string ss7 = "";
             bool first = true;
             for (int i = 0; i < node.ChildrenCount() - 1; i++)
             {
@@ -5283,6 +5286,11 @@ ASTPLACEHOLDER [0]
                 s = node[i][0].Text.ToLower();
                 ss7 += s;
                 first = false;
+            }
+
+            if (node[node.ChildrenCount() - 1].Text == "?")
+            {
+                return new Tuple<string, string>("Program.options." + ss7.Replace(" ", "_"), "?");
             }
 
             //the list is short, ok to not use a Dictionary here
@@ -5307,7 +5315,7 @@ ASTPLACEHOLDER [0]
 
             if (rv == null || rv[1] == null)
             {
-                new Error("OPTION " + ss7 + " = ... does not exist");
+                new Error("The option: " + ss7 + " = ... does not exist");
             }
 
             if (!isBlock && rv[0] == "series dyn")

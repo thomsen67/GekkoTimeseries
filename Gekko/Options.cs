@@ -78,7 +78,7 @@ namespace Gekko
         public string folder_working = "";
         // ---
         public EFreq freq = EFreq.A;
-        // ---
+        // --- the following are all gdx
         public string gams_exe_folder = "";
         public bool gams_fast = true; //use low-level api        
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. 
@@ -691,12 +691,20 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Is it used=
+        /// </summary>
         public void Write()
         {
-            Write(null);
+            Write(null, true);
         }
 
-        public void Write(string optionName5)
+        /// <summary>
+        /// Writes a particular option value, or a list of option values (with question == true).
+        /// </summary>
+        /// <param name="optionName5"></param>
+        /// <param name="question"></param>
+        public void Write(string optionName5, bool question)
         {
             string optionName = null;
             if (optionName5 != null) optionName = optionName5.Replace("Program.options.", "");
@@ -721,11 +729,20 @@ namespace Gekko
                 if (name == "series_dyn")
                 {
                     continue;  //do not show this as an option
-                }                
-                
-                if (optionName != null && name != optionName) continue;
+                }
 
-                if (optionName == null && name.StartsWith("bugfix_")) continue;  //do not show bugfix options in list
+                if (question)
+                {
+                    if (name.StartsWith("bugfix_")) continue;  //do not show bugfix options in list
+                    string name2 = "OPTION_" + name + "_";
+                    string optionName2 = "OPTION_" + optionName + "_";
+                    if (optionName == "") optionName2 = "OPTION_";
+                    if (!name2.Contains(optionName2)) continue;  //the two lines above guard against bad matches
+                }
+                else
+                {
+                    if (name != optionName) continue;
+                }
 
                 line += "option ";
                 name = name.Replace("_", " ");
@@ -778,13 +795,20 @@ namespace Gekko
 
             lines.Sort(StringComparer.InvariantCulture);
 
-            G.Writeln();
-            foreach (string s in lines)
-            {       
-                G.Writeln(s);
-            }            
+            if (lines.Count == 0)
+            {
+                if (question) G.Writeln2("No options match this pattern.");
+            }
+            else
+            {
+                G.Writeln();
+                foreach (string s in lines)
+                {
+                    G.Writeln(s);
+                }
+            }
 
-            if (optionName == null)
+            if (question && optionName == "")
             {
                 StringBuilder sb = new StringBuilder();
                 if (true)
@@ -806,12 +830,12 @@ namespace Gekko
                     sb.AppendLine("you can see what options are possible at any location in the");
                     sb.AppendLine("option tree.");
                     sb.AppendLine();
-                    sb.AppendLine("To see what options are set, you may use 'OPTION ?', or you can also");
-                    sb.AppendLine("have only the first level of sub-options shown, by means of for instance");
-                    sb.AppendLine("'OPTION solve ?'. If you need to change a particular option, you may");
+                    sb.AppendLine("To see what options are set, you may use 'option ?', or you can also");
+                    sb.AppendLine("use '?' at deeper levels of the options, for instance ");
+                    sb.AppendLine("'option solve newton ?'. If you need to change a particular option, you may");
                     sb.AppendLine("copy-paste it from the listing and change the value. If unsure about");
                     sb.AppendLine("legal values for a particular option, try removing the current value");
-                    sb.AppendLine("and press [space]. For instance, consider 'OPTION solve method = gauss'.");
+                    sb.AppendLine("and press [space]. For instance, consider 'option solve method = gauss'.");
                     sb.AppendLine("Try removing 'gauss' and press [space]. This will pop up a small window");
                     sb.AppendLine("showing the legal choices.");
                 }

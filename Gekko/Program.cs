@@ -12761,7 +12761,7 @@ namespace Gekko
                         string antlrFile4 = antlrFile.Replace("Cmd3.g", "Cmd4.g");
                         string javaPath = "c:\\Thomas\\Software\\Java\\jre6\\bin\\java.exe";
                         string classPath = "c:\\Thomas\\Software\\ANTLR\\antlr-3.1.3.jar";
-                        string s = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 120000 -traceParser " + antlrFile;
+                        string s = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 300000 -traceParser " + antlrFile;
                         new Writeln("Start Cmd3.g");
                         Program.ExecuteShellCommand(s, false);
                         new Writeln("End Cmd3.g");

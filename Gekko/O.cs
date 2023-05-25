@@ -779,7 +779,7 @@ namespace Gekko
         private static void OptionCheck(string opt, string x_string)
         {
             List<string> possibilitiesLower = GetOption(opt);
-            if (possibilitiesLower.Count > 0 && !possibilitiesLower.Contains(x_string.ToLower())) new Error("'Option " + opt + "' cannot attain value = " + x_string + ". Legal values are: " + Stringlist.GetListWithCommas(possibilitiesLower) + ".");
+            if (possibilitiesLower.Count > 0 && !possibilitiesLower.Contains(x_string.ToLower())) new Error("The option: '" + opt + "' cannot attain value = " + x_string + ". Legal values are: " + Stringlist.GetListWithCommas(possibilitiesLower) + ".");
         }
 
         // ============ helper methods for options, end
@@ -841,9 +841,9 @@ namespace Gekko
         /// Print current options
         /// </summary>
         /// <param name="path"></param>
-        public static void PrintOptions(string path)
-        {
-            Program.options.Write(path);
+        public static void PrintOptions(string path, bool question)
+        {            
+            Program.options.Write(path, question);
         }
 
         /// <summary>

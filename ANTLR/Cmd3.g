@@ -3340,7 +3340,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 
 option:                     OPTION optionType1 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType1)
                           | OPTION optionType2 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType2)
-						  | OPTION question -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} question)
+						  | OPTION question    -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} question)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4038,32 +4038,8 @@ optionType1:   //These catch unquoted filenames. Because of parser problems, thi
 			   //would look like filenames.
 			   //In the long term (Gekko 4.0, it is perhaps best to make EQUAL ('=') mandatory).
                //See also #jsadklgasj4j
-			   /*
-			   DATABANK FILE GBK INTERNAL EQUAL? fileName ->  DATABANK FILE GBK INTERNAL fileName
-             | FOLDER BANK           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK fileName)
-             | FOLDER BANK1          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK1 fileName)
-             | FOLDER BANK2          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK2 fileName)
-             | FOLDER COMMAND        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND fileName)
-             | FOLDER COMMAND1       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND1 fileName)
-             | FOLDER COMMAND2       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND2 fileName)
-             | FOLDER HELP           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER HELP fileName)
-             | FOLDER MENU           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER MENU fileName)
-             | FOLDER MODEL          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER MODEL fileName)
-             | FOLDER PIPE           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER PIPE fileName)
-             | FOLDER TABLE          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE fileName)
-             | FOLDER TABLE1         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE1 fileName)
-             | FOLDER TABLE2         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE2 fileName)
-             | FOLDER WORKING        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER WORKING fileName)
-             | GAMS EXE FOLDER       EQUAL? fileName ->  ^(ASTPLACEHOLDER GAMS EXE FOLDER fileName)
-             | INTERFACE REMOTE FILE EQUAL? fileName ->  ^(ASTPLACEHOLDER INTERFACE REMOTE FILE fileName)
-             | MENU STARTFILE        EQUAL? fileName ->  ^(ASTPLACEHOLDER MENU STARTFILE fileName)
-             | PLOT USING            EQUAL? fileName ->  ^(ASTPLACEHOLDER PLOT USING fileName)
-             | PYTHON EXE FOLDER     EQUAL? fileName ->  ^(ASTPLACEHOLDER PYTHON EXE FOLDER fileName)
-             | R EXE FOLDER          EQUAL? fileName ->  ^(ASTPLACEHOLDER R EXE FOLDER fileName)
-			   ;
-			   */
 
-			                  DATABANK FILE GBK INTERNAL EQUAL? fileName ->  ^(ASTPLACEHOLDER DATABANK) ^(ASTPLACEHOLDER FILE) ^(ASTPLACEHOLDER GBK) ^(ASTPLACEHOLDER INTERNAL) fileName
+			   DATABANK FILE GBK INTERNAL EQUAL? fileName ->  ^(ASTPLACEHOLDER DATABANK) ^(ASTPLACEHOLDER FILE) ^(ASTPLACEHOLDER GBK) ^(ASTPLACEHOLDER INTERNAL) fileName
              | FOLDER BANK           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK) fileName
              | FOLDER BANK1          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK1) fileName
              | FOLDER BANK2          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK2) fileName
@@ -4084,11 +4060,13 @@ optionType1:   //These catch unquoted filenames. Because of parser problems, thi
              | PLOT USING            EQUAL? fileName ->  ^(ASTPLACEHOLDER PLOT) ^(ASTPLACEHOLDER USING) fileName
              | PYTHON EXE FOLDER     EQUAL? fileName ->  ^(ASTPLACEHOLDER PYTHON) ^(ASTPLACEHOLDER EXE) ^(ASTPLACEHOLDER FOLDER) fileName
              | R EXE FOLDER          EQUAL? fileName ->  ^(ASTPLACEHOLDER R) ^(ASTPLACEHOLDER EXE) ^(ASTPLACEHOLDER FOLDER) fileName
-			 ;
+		;
+
 optionType2:                
-                            ident+ EQUAL? name -> ident+ name
-                          | ident+ EQUAL? expression -> ident+ expression						  
-						    ;
+                          ident+ question -> ident+ question
+                        | ident+ EQUAL? name -> ident+ name
+                        | ident+ EQUAL? expression -> ident+ expression		                          
+						;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
