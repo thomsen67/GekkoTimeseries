@@ -435,7 +435,7 @@ namespace Gekko
         public static string xoptionSeriesMissing = "optionSeriesMissing";
         public static string xsint = "sint";  //signed int            
         // ----
-        public static List<List<string>> listSyntaxAlias = new List<List<string>>();
+        public static List<List<string>> listSyntaxAlias = new List<List<string>>(); //handles that 'dif' can also be 'diff' etc.
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
 
         public const string symbolTurtle = "___";

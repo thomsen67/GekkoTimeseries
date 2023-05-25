@@ -100,7 +100,7 @@ namespace Gekko
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;        
         public string interface_mode = "mixed";  //sim, data, mixed. Mixed since 3.1.12.
-        public string interface_mute = "no";  //yes, no
+        public string interface_mute = "no";  //yes, no (can be null which is used, therefore this is not a boolean)
         public string interface_prn_decimalseparator = "period";  //has to do with Windows interface, so ok here
         public string interface_prn_delimiter = "blank";      //--> we put it next to the decimalseparator
         public int interface_prn_ndec = 100;
@@ -369,7 +369,7 @@ namespace Gekko
             Add("INTERFACE EXCEL MODERNLOOK", Globals.xbool);
             Add("INTERFACE HELP COPYLOCAL", Globals.xbool);
             Add("INTERFACE MODE", Globals.xnameOrString, "mixed", "sim", "data");
-            Add("INTERFACE MUTE", Globals.xnameOrString, Globals.xbool);
+            Add("INTERFACE MUTE", Globals.xnameOrString, "yes", "no"); //Note: this is not a boolean because value = null is used in the program (mute has 3 values)
             Add("INTERFACE PRN DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj
             Add("INTERFACE PRN DELIMITER", Globals.xnameOrString, "blank", "semicolon", "comma", "tab");
             Add("INTERFACE PRN NDEC", Globals.xint);

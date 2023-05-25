@@ -5308,13 +5308,11 @@ ASTPLACEHOLDER [0]
             if (rv == null || rv[1] == null)
             {
                 new Error("OPTION " + ss7 + " = ... does not exist");
-                //throw new GekkoException();
             }
 
             if (!isBlock && rv[0] == "series dyn")
             {
                 new Error("You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
-                //throw new GekkoException();
             }
 
             string type = rv[1];
@@ -5365,7 +5363,7 @@ ASTPLACEHOLDER [0]
                 new Error("Option type problem");
             }
 
-            Tuple<string, string> tup = new Tuple<string, string>("Program.options." + ss7.Replace(" ", "_"), f + node[node.ChildrenCount() - 1].Code + ")");
+            Tuple<string, string> tup = new Tuple<string, string>("Program.options." + ss7.Replace(" ", "_"), f + "\"" + ss7 + "\"" + ", " + node[node.ChildrenCount() - 1].Code + ")");
             return tup;
         }
 

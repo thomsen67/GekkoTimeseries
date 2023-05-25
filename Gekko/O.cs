@@ -639,7 +639,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static bool XBool(IVariable x)
+        public static bool XBool(string opt, IVariable x)
         {
             string x_string = O.ConvertToString(x);
             if (G.Equal(x_string, "yes")) return true;
@@ -647,7 +647,6 @@ namespace Gekko
             else
             {
                 new Error("Value expected to be 'yes' or 'no', not '" + x_string + "'"); return false;
-                //throw new GekkoException();
             }
         }
 
@@ -656,7 +655,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static string XString(IVariable x)
+        public static string XString(string opt, IVariable x)
         {
             string x_string = O.ConvertToString(x);
             return x_string;
@@ -667,7 +666,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int XInt(IVariable x)
+        public static int XInt(string opt, IVariable x)
         {
             int x_int = O.ConvertToInt(x);
             if (x_int < 0)
@@ -682,7 +681,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int XSint(IVariable x)  //signed int
+        public static int XSint(string opt, IVariable x)  //signed int
         {
             int x_int = O.ConvertToInt(x);
             return x_int;
@@ -693,7 +692,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static double XVal(IVariable x)
+        public static double XVal(string opt, IVariable x)
         {
             double x_val = O.ConvertToVal(x);
             return x_val;
@@ -704,7 +703,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static string XVal2String(IVariable x)
+        public static string XVal2String(string opt, IVariable x)
         {
             double x_val = O.ConvertToVal(x);
             return x_val.ToString();
@@ -715,20 +714,31 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static string XNameOrString(IVariable x)
+        public static string XNameOrString(string opt, IVariable x)
         {
             string x_string = O.ConvertToString(x);
+            var zz = Globals.listSyntax;
+            OptionCheck(opt, x_string);
             return x_string;
         }
 
-        /// <summary>
-        /// Special helper method for OPTION command.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public static string XNameOrStringOrFilename(IVariable x)
+        private static List<string> GetOption(string opt)
         {
-            return XNameOrString(x);
+            //do as Dictionary?
+            List<string> result = null;
+            foreach (List<string> key in Globals.listSyntax)
+            {
+                if (opt == key[0])
+                {
+                    result = key;
+                    break;
+                }
+            }
+            if (result == null) new Error("Option " + opt + " does not exist.");  //should never happen
+            List<string> possibilities = new List<string>();
+            for (int i = 2; i < result.Count; i++) possibilities.Add(result[i].ToLower());
+            return possibilities;
+            return result;
         }
 
         /// <summary>
@@ -736,9 +746,20 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static EFreq XNameOrString2Freq(IVariable x)
+        public static string XNameOrStringOrFilename(string opt, IVariable x)
+        {
+            return XNameOrString(opt, x);
+        }
+
+        /// <summary>
+        /// Special helper method for OPTION command.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static EFreq XNameOrString2Freq(string opt, IVariable x)
         {
             string x_string = O.ConvertToString(x);
+            OptionCheck(opt, x_string);
             EFreq freq = G.ConvertFreq(x_string);
             return freq;
         }
@@ -748,10 +769,17 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static ESeriesMissing XOptionSeriesMissing(IVariable x)
+        public static ESeriesMissing XOptionSeriesMissing(string opt, IVariable x)
         {
             string x_string = O.ConvertToString(x);
+            OptionCheck(opt, x_string);
             return G.GetMissing(x_string);
+        }
+
+        private static void OptionCheck(string opt, string x_string)
+        {
+            List<string> possibilitiesLower = GetOption(opt);
+            if (possibilitiesLower.Count > 0 && !possibilitiesLower.Contains(x_string.ToLower())) new Error("'Option " + opt + "' cannot attain value = " + x_string + ". Legal values are: " + Stringlist.GetListWithCommas(possibilitiesLower) + ".");
         }
 
         // ============ helper methods for options, end

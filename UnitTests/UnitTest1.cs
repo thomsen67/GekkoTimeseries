@@ -9751,8 +9751,9 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _ProtocufNullObjectSize()
-        {                        
+        public void _Test_ProtocufNullObjectSize()
+        {
+            //See why this must validate here: #ddgfcs78yusdj. Used to signal a kind of null object.
             string path = Globals.ttPath2 + @"\regres\temp\protobuf_hdasf87fayd.data";
             ModelNull mn = new ModelNull();
             Program.ProtobufWrite(mn, path);
