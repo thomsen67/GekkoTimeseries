@@ -787,7 +787,7 @@ namespace Gekko
             if (optionName == null)
             {
                 StringBuilder sb = new StringBuilder();
-                if (true)
+                if (true) 
                 {
                     sb.AppendLine();
                     sb.AppendLine("Some tips on finding and setting options in Gekko.");
