@@ -1399,6 +1399,7 @@ namespace Gekko
                                             if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null && rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0] == Globals.skippedObservationArtificialNumber)
                                             {
                                                 //skip updating anything at all
+                                                Globals.bugfixLhsDollar++;
                                             }
                                             else
                                             {

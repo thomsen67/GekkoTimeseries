@@ -321,61 +321,23 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
 
-            G.WriteDirs("small", false);
+            G.WriteDirs("small", false);            
 
+            if (Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17" || Globals.gekkoVersion == "3.1.18")
+            {
+                using (Note note = new Note())
+                {
+                    note.MainAdd("Regarding series statements, the following is changed in Gekko 3.1.16 and on: Left-hand side $-conditions containing timeseries are treated differently (if encountered, you will se a warning). Additionally, a bug regarding option <missing=ignore> was corrected.");
+                }
+            }
+            
             if (Globals.gekkoVersion == "3.1.14" || Globals.gekkoVersion == "3.1.15" || Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17")
             {
                 using (Note note = new Note())
                 {
                     note.MainAdd("From Gekko 3.1.14 and on, [Tab] or [Ctrl+Space] activates autocomplete of series names. For instance, \"prt x\" + [Tab] will show series starting with 'x', and \"prt x[\" + [Tab] will show elements of the array-series 'x'. See more {a{here¤user_interface.htm}a}.");                    
                 }
-            }
-
-            if (Globals.gekkoVersion == "3.1.16" || Globals.gekkoVersion == "3.1.17" || Globals.gekkoVersion == "3.1.18")
-            {
-                using (Note note = new Note())
-                {
-                    note.MainAdd("From Gekko 3.1.16 and on, a bug regarding option <missing=zero> in series statements was corrected. Only affects missing values.");
-                }
-            }
-
-            if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13")
-            {
-                using (Note note = new Note())
-                {
-                    note.MainAdd("There are changes regarding collapse/aggregation of daily frequency timeseries, and regarding the yellow status bar (mixed mode).");
-                    //
-                    note.MoreAdd("Collapse: from Gekko 3.1.13 on, collapsing/aggregating from daily frequency to lower frequencies is strict, ");
-                    note.MoreAdd("implying that missing values (missing days) will result in missing values in the collapsed series. ");
-                    note.MoreNewLine();
-                    note.MoreAdd("In Gekko versions 3.1.1-3.1.12, {a{collapsing¤collapse.htm}a} (aggregating) from daily frequency timeseries to lower frequencies like for instance monthly,");
-                    note.MoreAdd("missing days were treated flexibly, that is, just skipped. This is changed in Gekko 3.1.13 and on, to make it");
-                    note.MoreAdd("consistent with the way weekly, monthly and quarterly frequency timeseries are collapsed,");
-                    note.MoreAdd("where collapsing is always strict (a missing value in the higher frequency timeseries will result in");
-                    note.MoreAdd("a missing value in the lower frequency timeseries). The change is breaking in the sense that existing");
-                    note.MoreAdd("programs written for Gekko 3.1.1-3.1.12 may suddently fail because of missing values after collapsing.");
-                    note.MoreAdd("To remedy this quickly, just set 'option collapse missing d = flex;' and your programs should run like before");
-                    note.MoreAdd("(or alternatively use the local option COLLAPSE <missing=flex>).");
-                    note.MoreNewLine();
-                    note.MoreAdd("-------------------------------------------------------");
-                    note.MoreNewLine();
-                    note.MoreAdd("Yellow status bar: from Gekko 3.1.12 on, the Gekko mode has be changed to 'mixed'. This is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");
-                    note.MoreAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");
-                    note.MoreAdd("Gekko has three {a{modes¤mode.htm}a}: mixed-mode (the most general), data-mode (for data management), and sim-mode (for modeling).");
-                    note.MoreAdd("The most particular of these three modes is sim-mode, where you must use {a{CREATE¤create.htm}a} to define a non-model timeseries,");
-                    note.MoreAdd("and where databank searching is deactivated. The other two modes are more similar, and the differences between data-mode and mixed-mode");
-                    note.MoreAdd("are limited. In contrast to mixed-mode, data-mode issues some warnings when using commands like READ, MULPRT, etc.");
-                    note.MoreAdd("Since these commands can still be useful in non-modeling programs, the default mode has been changed to 'mixed'.");
-                    note.MoreNewLine();
-                    note.MoreAdd("Note that it is entirely possible to do modeling in mixed-mode. Some users even prefer that, because of the added flexibility,");
-                    note.MoreAdd("and the possibility of doing data management and modeling using the same mode.");
-                    note.MoreAdd("There are some drawbacks to the flexibility, though. When doing modeling in mixed mode, the user may think that a statement like 'y = ... ;' changes a model variable y,");
-                    note.MoreAdd("but the user will not be alerted if y is not part of the model. Also, a statement like 'y = x;' may find x in an {a{OPEN¤open.htm}a} databank, if x is not");
-                    note.MoreAdd("present in the first-position (typically: Work) databank.");
-                    note.MoreNewLine();
-                    note.MoreAdd("Whether to use mixed-mode or alternate between sim- and data-mode is basically a question of taste, and perhaps habit.");
-                }
-            }
+            }            
 
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
@@ -1667,6 +1629,7 @@ namespace Gekko
 
             Globals.bugfixMissing1 = new List<string>();
             Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Globals.bugfixLhsDollar = 0;
 
             //Blinking icon when running a command
             //Not active/blinking when Gekko is idle
@@ -2238,6 +2201,30 @@ namespace Gekko
                 G.Writeln("    is not recommended though.", Globals.warningColor);                
 
                 G.Writeln();
+            }
+
+            if (Program.options.bugfix_lhs_dollar_warning && Globals.bugfixLhsDollar > 0)
+            {
+                Action<GAO> a = (gao) =>
+                {
+                    O.Cls("output");
+                    using (Writeln txt = new Writeln("", -12345, Color.Empty, false, ETabs.Output)) 
+                    {
+                        txt.MainAdd("Set 'bugfix lhs dollar warning = no;' to remove this warning.");
+                        txt.MainNewLine();
+                        txt.MainAdd("With assignments like 'y = 1; y $ (b == 100) = 2;' Gekko first sets the series y = 1, and afterwards changes y into 2 for the observations where b == 100.");
+                        txt.MainAdd("In Gekko < 3.1.16, y will be = 2 for those b observations that are == 100, and 0 otherwise. This changes in Gekko >= 3.1.16, where");
+                        txt.MainAdd("y will be = 2 for those b observations that are == 100, but will be untouched otherwise (that is, in this case = 1).");
+                        txt.MainAdd("This difference is most significant if y has been defined beforehand like in the example. If not, the difference in Gekko >= 3.1.16 will be a question of 0 versus missing value.");
+                        txt.MainNewLine();
+                        txt.MainAdd("To emulate Gekko < 3.1.16, you may set 'option bugfix lhs dollar = no;', which should revert to the old behavior.");
+                        txt.MainAdd("If you do not want to set this option (which is not really recommended in general), you may omit the option and use 'y = 1; y $ (b == 100) = 2; y $ (b <> 100) = 0;' to emulate the old behavior.");
+                        txt.MainAdd("Or alternatively use a right-hand side $: 'y = 1; y = 2 $ (b == 100);'.");
+                        txt.MainNewLine();
+                        txt.MainAdd("The change is made in order to make Gekko handle a left-hand side $ exactly like GAMS.");
+                    }                
+                };
+                new Warning("In Gekko >= 3.1.16, using $ on the left-hand side has changed behavior if the condition contains timeseries. In the job just run, this affects " + Globals.bugfixLhsDollar + " values/observations (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
             }
 
             if (p.hasBeenCmdFile)

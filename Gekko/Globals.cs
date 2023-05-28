@@ -101,7 +101,7 @@ namespace Gekko
 
         public static string versionInternal = "";
 
-        public static bool if_old_helper = false;
+        public static bool if_old_helper = false;        
 
         public const string languageDa = "da";
         public const string languageEn = "en";
@@ -984,6 +984,8 @@ namespace Gekko
 
         public static List<string> bugfixMissing1 = new List<string>();
         public static GekkoDictionary<string, string> bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public static int bugfixLhsDollar = 0;
 
     }
 

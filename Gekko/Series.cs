@@ -975,6 +975,7 @@ namespace Gekko
                     if (z == Globals.skippedObservationArtificialNumber)
                     {
                         //do nothing, skip updating this observation so the lhs keeps its value
+                        Globals.bugfixLhsDollar++;
                     }
                     else
                     {

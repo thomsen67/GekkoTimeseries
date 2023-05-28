@@ -3703,7 +3703,12 @@ namespace Gekko
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                if (rhsData[i] != Globals.skippedObservationArtificialNumber) //skip if LHS $ tells it to skip
+                if (rhsData[i] == Globals.skippedObservationArtificialNumber) 
+                {
+                    //skip if LHS $ tells it to skip
+                    Globals.bugfixLhsDollar++;
+                }
+                else 
                 {
                     double d = double.NaN;
                     if (operatorType == ESeriesUpdTypes.m)  //+
