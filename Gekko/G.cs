@@ -2609,8 +2609,28 @@ namespace Gekko
         /// <param name="fs2"></param>
         /// <returns></returns>
         public static StreamWriter GekkoStreamWriter(FileStream fs2)
+        {           
+            return new StreamWriter(fs2, G.GetEncoding());
+        }
+
+        /// <summary>
+        /// Get ANSI or UTF8 encoding depending upon 'option system character encoding'.
+        /// </summary>
+        /// <returns></returns>
+        public static Encoding GetEncoding()
         {
-            return new StreamWriter(fs2, Encoding.GetEncoding(1252));
+            Encoding encoding = null;
+            if (G.Equal(Program.options.system_write_encoding, "ansi"))
+            {
+                encoding = Encoding.GetEncoding("Windows-1252");                
+            }
+            else if (G.Equal(Program.options.system_write_encoding, "utf8"))
+            {
+                if (Program.options.system_write_utf8_bom) encoding = new UTF8Encoding(true);
+                else encoding = new UTF8Encoding(false);
+            }
+            else throw new GekkoException();
+            return encoding;
         }
 
         /// <summary>

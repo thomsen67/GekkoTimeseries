@@ -945,10 +945,10 @@ namespace Gekko
                     string text = null;
                     text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
                     text = text.Replace("temp" + rr, "gekkoplot");
-                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text, G.GetEncoding());
                     text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
                     text = text.Replace("temp" + rr, "gekkoplot");
-                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text, G.GetEncoding());
                     G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
 
                 }

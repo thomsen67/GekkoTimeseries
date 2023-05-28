@@ -65,6 +65,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using static Gekko.Program;
 
 namespace Gekko
 {
@@ -2762,7 +2763,7 @@ namespace Gekko
             sb.AppendLine("}");
             sb.AppendLine("return m;");
             sb.AppendLine("}");
-            File.WriteAllText("c:\\tools\\Model1.cs", sb.ToString());
+            File.WriteAllText("c:\\tools\\Model1.cs", sb.ToString(), G.GetEncoding());
 
             // ---------------------------------------
             // ---------------------------------------
@@ -2781,7 +2782,7 @@ namespace Gekko
             }
             sb.AppendLine("return m[0];");
             sb.AppendLine("}");
-            File.WriteAllText("c:\\tools\\Model2.cs", sb.ToString());
+            File.WriteAllText("c:\\tools\\Model2.cs", sb.ToString(), G.GetEncoding());
 
             new Writeln("See c:\\tools\\Model1.cs/Model2.cs for code");
 
@@ -3422,7 +3423,7 @@ namespace Gekko
                     {
                         //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
                         //detects if xlsm file is in read-only folder.
-                        Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName);
+                        Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName, false, G.GetEncoding());
                         Program.options.folder_working = xlsmPath;  //seems ok
                     }
                     catch (Exception e)
@@ -8589,7 +8590,7 @@ namespace Gekko
             try
             {
                 string fileSnapshot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoSnapshot.gcm";
-                StreamWriter sw2 = new StreamWriter(fileSnapshot);
+                StreamWriter sw2 = new StreamWriter(fileSnapshot, false, G.GetEncoding());
                 string s2 = CrossThreadStuff.GetInputWindowText();
                 sw2.Write(s2);
                 sw2.Flush();
@@ -8603,7 +8604,7 @@ namespace Gekko
             try
             {
                 string fileHistory = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoHistory.gcm";
-                StreamWriter sw1 = new StreamWriter(fileHistory);
+                StreamWriter sw1 = new StreamWriter(fileHistory, false, G.GetEncoding());
                 string s1 = Globals.commandMemory.storage.ToString();
                 sw1.Write(s1);
                 sw1.Flush();
@@ -10724,14 +10725,14 @@ namespace Gekko
                     vv = "RESET; MODEL m" + ii + ";\n READ<tsd> m;\n " + vvv + "SIM 2002 2100;\n " + vv + "\n PRT<2002 2005> sum e0 e1 e2;\n";
 
                     //ok that this is not G.GekkoStreamWriter()
-                    StreamWriter sw = new StreamWriter(Program.options.folder_working + "m" + ii + ".frm");
+                    StreamWriter sw = new StreamWriter(Program.options.folder_working + "m" + ii + ".frm", false, G.GetEncoding());
                     sw.Write(ss);
                     sw.Flush();
                     sw.Close();
 
                     //ok that this is not G.GekkoStreamWriter()
-                    StreamWriter sw2 = new StreamWriter(Program.options.folder_working + "m" + ii + "." + Globals.defaultCommandFileExtension);
-                    if (endoexo > 0) sw2 = new StreamWriter(Program.options.folder_working + "n" + ii + "." + Globals.defaultCommandFileExtension);
+                    StreamWriter sw2 = new StreamWriter(Program.options.folder_working + "m" + ii + "." + Globals.defaultCommandFileExtension, false, G.GetEncoding());
+                    if (endoexo > 0) sw2 = new StreamWriter(Program.options.folder_working + "n" + ii + "." + Globals.defaultCommandFileExtension, false, G.GetEncoding());
                     sw2.Write(vv);
                     sw2.Flush();
                     sw2.Close();
@@ -14353,58 +14354,105 @@ namespace Gekko
         /// <returns></returns>
         public static string GetTextFromFileWithWait(string filenameMaybeWithoutPath, bool convertAnyAnsiToUtf8)
         {
-            //Encoding encoding = Encoding.Default;
-            String original = String.Empty;
+            // QUESTION: Why must Encoding.Convert() be used at all, couldn't we just in second pass read with
+            //           ANSI encoding if UTF8 is not detected?? But anyway, ANSI is disappearing...
+            //
+            //The logic is as follows
+            //
+            // if "auto"
+            //     if convertAnyAnsiToUtf8 == true                (almost all calls to the method has this = true)
+            //         if tasted file seems UTF-8
+            //             will read file with Encoding.UTF8
+            //         else
+            //             will read file with Encoding.Default
+            //             then converts the bytes from ANSI to UTF-8 (with Encoding.Convert())
+            //         end
+            //         replace two funny html chars (nbsp-space and invisible hyphen)
+            //     else
+            //         will read file with Encoding.Default        (will be faster, no tasting/replacing, good for cache checks etc.)
+            //     end
+            // else if "ansi"
+            //     will read file with Encoding.ANSI
+            // else if "utf8"
+            //     will read file with Encoding.UTF8
+            // end            
 
             string filenameOriginal = filenameMaybeWithoutPath;
-
             //!usually it is already called with a full path, but never mind
             filenameMaybeWithoutPath = CreateFullPathAndFileName(filenameMaybeWithoutPath);
 
-            Encoding current = null;
-
-            bool utf8checker = false;
-            using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, null, GekkoFileReadOrWrite.Read))
+            if (G.Equal(Program.options.system_read_encoding, "auto"))
             {
-                if (convertAnyAnsiToUtf8) utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
-                fs.Position = 0;  //to rewind
-                Encoding encoding = Encoding.Default;
-                if (utf8checker) encoding = Encoding.UTF8;
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(fs, encoding))
+                string original = String.Empty;
+                Encoding current = null;
+                bool isTastedToBeUtf8 = false;
+                using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, null, GekkoFileReadOrWrite.Read))
                 {
-                    original = sr.ReadToEnd();
-                    current = sr.CurrentEncoding;
-                    sr.Close();
+                    if (convertAnyAnsiToUtf8) isTastedToBeUtf8 = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
+                    fs.Position = 0;  //to rewind
+                    Encoding encoding = Encoding.Default;
+                    if (isTastedToBeUtf8) encoding = Encoding.UTF8;
+                    using (System.IO.StreamReader sr = new System.IO.StreamReader(fs, encoding))
+                    {
+                        original = sr.ReadToEnd();
+                        current = sr.CurrentEncoding;
+                        sr.Close();
+                    }
                 }
-            }
 
-            if (convertAnyAnsiToUtf8)
-            {
-                string s = null;
-                if (utf8checker)
+                if (convertAnyAnsiToUtf8)
                 {
-                    s = original;
+                    string s = null;
+                    if (isTastedToBeUtf8)
+                    {
+                        s = original;
+                    }
+                    else
+                    {
+                        //Convert bytes from ANSI to UTF8
+                        byte[] encBytes = current.GetBytes(original);  //'current' will always be equal to 'encoding' I guess, but just for safety
+                        byte[] utf8Bytes = Encoding.Convert(current, Encoding.UTF8, encBytes);
+                        s = Encoding.UTF8.GetString(utf8Bytes);
+                    }
+
+                    s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space     (can arise when copy-paste from html)
+                    s = s.Replace(Convert.ToChar(173).ToString(), "");   //soft hyphen            (can arise when copy-paste from html)
+
+                    //the code below is probably too dangerous: what about newlines etc.??
+                    //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
+
+                    return s;
                 }
                 else
                 {
-                    //Convert bytes from ANSI to UTF8
-                    byte[] encBytes = current.GetBytes(original);  //'current' will always be equal to 'encoding' I guess, but just for safety
-                    byte[] utf8Bytes = Encoding.Convert(current, Encoding.UTF8, encBytes);
-                    s = Encoding.UTF8.GetString(utf8Bytes);
+                    return original;
                 }
-
-                s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space
-                s = s.Replace(Convert.ToChar(173).ToString(), "");  //soft hyphen
-
-                //the code below is probably too dangerous: what about newlines etc.??
-                //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
-
+            }
+            else if (G.Equal(Program.options.system_read_encoding, "ansi"))
+            {
+                string s = null;
+                using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, null, GekkoFileReadOrWrite.Read))
+                {
+                    using (System.IO.StreamReader sr = new System.IO.StreamReader(fs, Encoding.GetEncoding("Windows-1252"), false))
+                    {
+                        s = sr.ReadToEnd();
+                    }
+                }
                 return s;
             }
-            else
+            else if (G.Equal(Program.options.system_read_encoding, "utf8"))
             {
-                return original;
+                string s = null;
+                using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, null, GekkoFileReadOrWrite.Read))
+                {
+                    using (System.IO.StreamReader sr = new System.IO.StreamReader(fs, Encoding.UTF8, false))
+                    {
+                        s = sr.ReadToEnd();
+                    }
+                }
+                return s;
             }
+            else throw new GekkoException();
         }
 
         /// <summary>
@@ -29748,7 +29796,7 @@ namespace Gekko
                     string s2 = Path.GetDirectoryName(s);
                     string s3 = s2.Replace("\\Debug", "");
                     string s4 = s3.Replace("\\bin", "");
-                    StreamWriter sw = new StreamWriter(s4 + "\\Genr.cs");
+                    StreamWriter sw = new StreamWriter(s4 + "\\Genr.cs", false, G.GetEncoding());
                     sw.Write(Globals.lastDynamicCsCode);
                     sw.Flush();
                     sw.Close();
@@ -32708,9 +32756,12 @@ namespace Gekko
         public bool isLastRow = false;
     }
 
+    /// <summary>
+    /// From here?: https://stackoverflow.com/questions/7735369/get-the-encoding-of-an-string
+    /// </summary>
     public class Utf8Checker
-    {
-        public static bool Check(string fileName)
+    {        
+        public static bool IsUtf8(string fileName)
         {
             using (BufferedStream fstream = new BufferedStream(File.OpenRead(fileName)))
             {

@@ -544,7 +544,7 @@ namespace Gekko
                 }
                 if (makeNewFile)
                 {
-                    StreamWriter sw = new StreamWriter(file);
+                    StreamWriter sw = new StreamWriter(file, false, G.GetEncoding());
                     sw.WriteLine("This file is a non-critical system file that informs Gekko about last usage time/date.");
                     sw.Flush();
                     sw.Close();
@@ -641,7 +641,7 @@ namespace Gekko
                 try
                 {
                     //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
-                    Globals.screenOutput = new StreamWriter(Program.options.folder_working + "\\" + Globals.funnyFileName);
+                    Globals.screenOutput = new StreamWriter(Program.options.folder_working + "\\" + Globals.funnyFileName, false, G.GetEncoding());
                 }
                 catch (Exception e)
                 {
@@ -723,7 +723,7 @@ namespace Gekko
                     {
                         try
                         {
-                            File.WriteAllText(Path.Combine(Program.options.folder_working, "gekkooutput.txt"), Globals.excelDnaOutput.ToString());
+                            File.WriteAllText(Path.Combine(Program.options.folder_working, "gekkooutput.txt"), Globals.excelDnaOutput.ToString(), G.GetEncoding());
                         }
                         catch { }
                     }

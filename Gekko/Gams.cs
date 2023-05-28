@@ -792,7 +792,7 @@ namespace Gekko
 
             if (false)
             {
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(csCodeLines).ToString());
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(csCodeLines).ToString(), G.GetEncoding());
             }
 
             foreach (string line in values)

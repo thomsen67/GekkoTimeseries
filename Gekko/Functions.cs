@@ -4180,6 +4180,16 @@ namespace Gekko
             return new ScalarString(txt);
         }
 
+        public static IVariable isutf8file(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
+            if (ffh.realPathAndFileName == null) new Error("Could not find file: " + s1);
+            bool b = Utf8Checker.IsUtf8(ffh.realPathAndFileName);
+            if (b) return Globals.scalarVal1;
+            else return Globals.scalarVal0;
+        }
+
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));

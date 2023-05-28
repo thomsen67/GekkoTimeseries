@@ -3048,7 +3048,7 @@ namespace Gekko
 
                     if (false)
                     {
-                        StreamWriter sw = new StreamWriter(@"c:\Thomas\Desktop\gekko\testing\golden.csv");
+                        StreamWriter sw = new StreamWriter(@"c:\Thomas\Desktop\gekko\testing\golden.csv", false, G.GetEncoding());
                         double[] xx = new double[x.Length];
                         for (double a = 0d; a <= 2000d; a += 0.01d)
                         {

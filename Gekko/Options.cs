@@ -242,6 +242,9 @@ namespace Gekko
         //
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
+        public string system_read_encoding = "auto";  //[ansi | utf8 | auto] (ansi is windows-1252). Auto will taste the file to see if it is UTF-8. If not, it will convert 
+        public string system_write_encoding = "ansi"; // [ansi | utf8]        (ansi is windows-1252).        
+        public bool system_write_utf8_bom = false;  // BOM is "neither required nor recommended" (https://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G19273)        
         public int system_threads = 5; //cores+1 (augment for > 4 cores, count physical cores not logical cores).        
         // ---
         public string table_decimalseparator = "period";  //comma|period        
@@ -511,10 +514,16 @@ namespace Gekko
             Add("SOLVE PRINT DETAILS", Globals.xbool);
             Add("SOLVE PRINT ITER", Globals.xbool);
             Add("SOLVE STATIC", Globals.xbool);
+
             Add("STRING INTERPOLATE FORMAT VAL", Globals.xstring);
+            
             Add("SYSTEM CODE SPLIT", Globals.xint);
             Add("SYSTEM CLONE", Globals.xbool);
+            Add("SYSTEM READ ENCODING", Globals.xnameOrString, "ansi", "utf8", "auto"); // ansi should in principle be called windows-1252
+            Add("SYSTEM WRITE ENCODING", Globals.xnameOrString, "ansi", "utf8");        // ansi should in principle be called windows-1252            
+            Add("SYSTEM WRITE UTF8 BOM", Globals.xbool);
             Add("SYSTEM THREADS", Globals.xint);
+
             //Add("SYSTEM TRACE", Globals.xnameOrString, "none", "simple");
             Add("TABLE DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                  //#kljsdfasfdlkj
             Add("TABLE HTML DATAWIDTH", Globals.xval);

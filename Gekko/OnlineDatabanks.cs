@@ -272,7 +272,7 @@ namespace Gekko
                     }
                 }
 
-                Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
+                Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252"); //Same as: Encoding.GetEncoding(1252) ...?
 
                 //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
                 //Setting UTF8 here will fail!           

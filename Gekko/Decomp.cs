@@ -4595,7 +4595,7 @@ namespace Gekko
                 if (s != null) s = s.Substring(0, s.Length - "; ".Length);
                 sb.AppendLine(s);
             }
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString(), G.GetEncoding());
             //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
