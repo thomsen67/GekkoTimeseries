@@ -5813,15 +5813,22 @@ namespace UnitTests
 
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\temp';");
-            I("%s = '" + helper + " //made by Visual Studio" + "';");
+            I("%svs = '" + helper + " //made by Visual Studio" + "';");
 
             // =============================================
 
             //Test pre-cooked known ansi
             I("%bansi = isUtf8File('\\..\\meta\\ansi.txt');");
-            _AssertScalarVal(First(), "%bansi", 0d);
+            _AssertScalarVal(First(), "%bansi", 0d);          
             I("%s = readfile('\\..\\meta\\ansi.txt');");
             _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            I("option system read encoding = utf8;");
+            I("%s = readfile('\\..\\meta\\ansi.txt');");
+            Assert.AreNotEqual((First().GetIVariable("%s") as ScalarString).string2, "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            I("option system read encoding = ansi;");
+            I("%s = readfile('\\..\\meta\\ansi.txt');");
+            _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            I("option system read encoding = auto;"); //revert
 
             //Test pre-cooked known utf8
             I("%butf8 = isUtf8File('\\..\\meta\\utf8.txt');");
@@ -5830,16 +5837,16 @@ namespace UnitTests
             _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by VS Code");
 
             //Test Gekko-written ANSI            
-            I("writefile('ansi_2.txt', %s);");
+            I("writefile('ansi_2.txt', %svs);");
             I("%bansi_2 = isUtf8File('ansi_2.txt');");
             _AssertScalarVal(First(), "%bansi_2", 0d);
             byte[] bytesansi_2 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\ansi_2.txt");
-            Assert.AreEqual(bytesansi_2[6], 230);  //a
+            Assert.AreEqual(bytesansi_2[0], 230);  //a
 
             //Test Gekko-written UTF8 with BOM           
             I("option system write encoding = utf8;");
             I("option system write utf8 bom = yes;");
-            I("writefile('utf8_2.txt', %s);");
+            I("writefile('utf8_2.txt', %svs);");
             I("option system write encoding = ansi;"); //revert to default
             I("option system write utf8 bom = no;"); //revert to default
             I("%butf8_2 = isUtf8File('utf8_2.txt');");
@@ -5848,18 +5855,18 @@ namespace UnitTests
             Assert.AreEqual(bytesutf8_2[0], 239); //byte order mark (BOM) #1
             Assert.AreEqual(bytesutf8_2[1], 187); //byte order mark (BOM) #2
             Assert.AreEqual(bytesutf8_2[2], 191); //byte order mark (BOM) #3            
-            Assert.AreEqual(bytesutf8_2[9], 195); //æ1 (æ takes two bytes in utf8)
-            Assert.AreEqual(bytesutf8_2[10], 166); //æ2
+            Assert.AreEqual(bytesutf8_2[3], 195); //æ1 (æ takes two bytes in utf8)
+            Assert.AreEqual(bytesutf8_2[4], 166); //æ2
 
             //Test Gekko-written UTF8 without BOM           
             I("option system write encoding = utf8;");
-            I("writefile('utf8_3.txt', %s);");
+            I("writefile('utf8_3.txt', %svs);");
             I("option system write encoding = ansi;"); //revert to default            
             I("%butf8_3 = isUtf8File('utf8_3.txt');");
             _AssertScalarVal(First(), "%butf8_3", 1d);
             byte[] bytesutf8_3 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\utf8_3.txt");                    
-            Assert.AreEqual(bytesutf8_3[6], 195); //æ1 (æ takes two bytes in utf8)
-            Assert.AreEqual(bytesutf8_3[7], 166); //æ2
+            Assert.AreEqual(bytesutf8_3[0], 195); //æ1 (æ takes two bytes in utf8)
+            Assert.AreEqual(bytesutf8_3[1], 166); //æ2
 
         }
 
