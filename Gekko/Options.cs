@@ -243,7 +243,7 @@ namespace Gekko
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
         public string system_read_encoding = "auto";  //[ansi | utf8 | auto] (ansi is windows-1252). Auto will taste the file to see if it is UTF-8. If not, it will convert 
-        public string system_write_encoding = "ansi"; // [ansi | utf8]        (ansi is windows-1252).        
+        public string system_write_encoding = "ansi"; // [ansi | utf8]       (ansi is windows-1252). Set this to "utf8" for Gekko 3.2 or 4.0.
         public bool system_write_utf8_bom = false;  // BOM is "neither required nor recommended" (https://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G19273)        
         public int system_threads = 5; //cores+1 (augment for > 4 cores, count physical cores not logical cores).        
         // ---

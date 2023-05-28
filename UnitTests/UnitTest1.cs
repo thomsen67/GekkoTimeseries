@@ -5809,32 +5809,42 @@ namespace UnitTests
             //Denne er god (kinesisk eksempel): https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode
             //Denne er også god: https://realpython.com/python-encodings-guide/
 
-            string helper = "æøå $%@^½~ÆØÅ";
+            string helper_ansi = "æøå $%@^½~ÆØÅ";
+            string helper_utf8 = "æ汉øå $%@^~ÆØÅ";  //chinese U+6C49 at second pos (½ poses problems, wonder why...?)
 
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\temp';");
-            I("%svs = '" + helper + " //made by Visual Studio" + "';");
+            I("%svs = '" + helper_ansi + " //made by Visual Studio" + "';");
+
+            I("%bansi = isUtf8File('utf8_2.txt');");
 
             // =============================================
 
             //Test pre-cooked known ansi
             I("%bansi = isUtf8File('\\..\\meta\\ansi.txt');");
-            _AssertScalarVal(First(), "%bansi", 0d);          
-            I("%s = readfile('\\..\\meta\\ansi.txt');");
-            _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            _AssertScalarVal(First(), "%bansi", 0d);
+            I("%x = readfile('\\..\\meta\\ansi.txt');");
+            _AssertScalarString(First(), "%x", "%s = '" + helper_ansi + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
             I("option system read encoding = utf8;");
-            I("%s = readfile('\\..\\meta\\ansi.txt');");
-            Assert.AreNotEqual((First().GetIVariable("%s") as ScalarString).string2, "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            I("%x = readfile('\\..\\meta\\ansi.txt');");
+            Assert.AreNotEqual((First().GetIVariable("%x") as ScalarString).string2, "%s = '" + helper_ansi + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
             I("option system read encoding = ansi;");
-            I("%s = readfile('\\..\\meta\\ansi.txt');");
-            _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
+            I("%x = readfile('\\..\\meta\\ansi.txt');");
+            _AssertScalarString(First(), "%x", "%s = '" + helper_ansi + "'; //made by Kedit" + G.NL); //Kedit has a NL that cannot be avoided
             I("option system read encoding = auto;"); //revert
 
             //Test pre-cooked known utf8
             I("%butf8 = isUtf8File('\\..\\meta\\utf8.txt');");
             _AssertScalarVal(First(), "%butf8", 1d);
-            I("%s = readfile('\\..\\meta\\utf8.txt');");
-            _AssertScalarString(First(), "%s", "%s = '" + helper + "'; //made by VS Code");
+            I("%x = readfile('\\..\\meta\\utf8.txt');");
+            _AssertScalarString(First(), "%x", "%s = '" + helper_utf8 + "'; //made by VS Code");
+            I("option system read encoding = utf8;");
+            I("%x = readfile('\\..\\meta\\utf8.txt');");
+            _AssertScalarString(First(), "%x", "%s = '" + helper_utf8 + "'; //made by VS Code");
+            I("option system read encoding = ansi;");
+            I("%x = readfile('\\..\\meta\\utf8.txt');");
+            Assert.AreNotEqual((First().GetIVariable("%x") as ScalarString).string2, "%s = '" + helper_utf8 + "'; //made by VS Code");
+            I("option system read encoding = auto;"); //revert
 
             //Test Gekko-written ANSI            
             I("writefile('ansi_2.txt', %svs);");
@@ -5851,7 +5861,7 @@ namespace UnitTests
             I("option system write utf8 bom = no;"); //revert to default
             I("%butf8_2 = isUtf8File('utf8_2.txt');");
             _AssertScalarVal(First(), "%butf8_2", 1d);
-            byte[] bytesutf8_2 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\utf8_2.txt");            
+            byte[] bytesutf8_2 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\utf8_2.txt");
             Assert.AreEqual(bytesutf8_2[0], 239); //byte order mark (BOM) #1
             Assert.AreEqual(bytesutf8_2[1], 187); //byte order mark (BOM) #2
             Assert.AreEqual(bytesutf8_2[2], 191); //byte order mark (BOM) #3            
@@ -5864,10 +5874,34 @@ namespace UnitTests
             I("option system write encoding = ansi;"); //revert to default            
             I("%butf8_3 = isUtf8File('utf8_3.txt');");
             _AssertScalarVal(First(), "%butf8_3", 1d);
-            byte[] bytesutf8_3 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\utf8_3.txt");                    
+            byte[] bytesutf8_3 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\utf8_3.txt");
             Assert.AreEqual(bytesutf8_3[0], 195); //æ1 (æ takes two bytes in utf8)
             Assert.AreEqual(bytesutf8_3[1], 166); //æ2
 
+            //The following is a good test of UTF8 compatibility: the chinese char has been in and out of a file several times!
+            //read chinese, write chinese, read chinese
+            byte[] bytesutf8 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\\meta\utf8.txt");
+            Assert.AreEqual(bytesutf8[6], 195); //æ1 æ1 (æ takes two bytes in utf8)
+            Assert.AreEqual(bytesutf8[7], 166); //æ2 æ2
+            Assert.AreEqual(bytesutf8[8], 230); //汉1 (汉 takes three bytes in utf8, cf. https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode)
+            Assert.AreEqual(bytesutf8[9], 177); //汉2
+            Assert.AreEqual(bytesutf8[10], 137); //汉3
+            I("reset;");
+            I("run " + Globals.ttPath2 + @"\regres\meta\utf8.txt;");
+            _AssertScalarString(First(), "%s", helper_utf8);
+            I("option system write encoding = utf8;"); //to write the chinese char
+            I("#(listfile m) = (%s, %s);");
+            I("#m = #(listfile m);");
+            I("%m = #m[2];");
+            _AssertScalarString(First(), "%m", helper_utf8);
+            I("#(listfile m2) = (%m, %m);");
+            byte[] bytesutf8_4 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\m2.lst");            
+            Assert.AreEqual(bytesutf8_4[1], 195); //æ1 æ1 (æ takes two bytes in utf8)
+            Assert.AreEqual(bytesutf8_4[2], 166); //æ2 æ2
+            Assert.AreEqual(bytesutf8_4[3], 230); //汉1 (汉 takes three bytes in utf8, cf. https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode)
+            Assert.AreEqual(bytesutf8_4[4], 177); //汉2
+            Assert.AreEqual(bytesutf8_4[5], 137); //汉3
+            I("option system write encoding = ansi;"); //reverting            
         }
 
         [TestMethod]
