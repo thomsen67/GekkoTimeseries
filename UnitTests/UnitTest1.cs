@@ -5815,9 +5815,7 @@ namespace UnitTests
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("%svs = '" + helper_ansi + " //made by Visual Studio" + "';");
-
-            I("%bansi = isUtf8File('utf8_2.txt');");
-
+            
             // =============================================
 
             //Test pre-cooked known ansi
@@ -13344,7 +13342,7 @@ namespace UnitTests
             I("y1 $ (o == 1) = 100;");
             I("y2 $ (%o == 1) = 100;");
             _AssertSeries(First(), "y1!a", 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "y1!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2002, double.NaN, sharedDelta);
             _AssertSeries(First(), "y1!a", 2003, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", 2002, 100d, sharedDelta);
@@ -13359,7 +13357,7 @@ namespace UnitTests
             I("y1 $ (o[a] == 1) = 100;");
             I("y2 $ (o2[a] == 1) = 100;");
             _AssertSeries(First(), "y1!a", 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "y1!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2002, double.NaN, sharedDelta);
             _AssertSeries(First(), "y1!a", 2003, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", 2002, 100d, sharedDelta);
@@ -13377,7 +13375,7 @@ namespace UnitTests
             I("y1[#i] $ (o[#i] == 1) = 100;");
             I("y2[#i] $ (o2[#i] == 1) = 100;");
             _AssertSeries(First(), "y1!a", new string[] { "a" }, 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "y1!a", new string[] { "a" }, 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", new string[] { "a" }, 2002, double.NaN, sharedDelta);
             _AssertSeries(First(), "y1!a", new string[] { "a" }, 2003, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", new string[] { "a" }, 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", new string[] { "a" }, 2002, 100d, sharedDelta);
@@ -13385,7 +13383,7 @@ namespace UnitTests
             I("y3 = series(1);");            
             I("y3[#i] $ (o[#i] == 1 and o2[#i] == 1) = 100;");
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "y3!a", new string[] { "a" }, 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y3!a", new string[] { "a" }, 2002, double.NaN, sharedDelta);
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2003, 100d, sharedDelta);
 
             // e1 $ (...) .. y = x;

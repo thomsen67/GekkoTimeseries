@@ -327,7 +327,7 @@ namespace Gekko
             {
                 using (Note note = new Note())
                 {
-                    note.MainAdd("Regarding series statements, the following is changed in Gekko 3.1.16 and on: Left-hand side $-conditions containing timeseries are treated differently (if encountered, you will se a warning). Additionally, a bug regarding option <missing=ignore> was corrected.");
+                    note.MainAdd("Regarding series statements, the following is changed in Gekko 3.1.16 and on: left-hand side $-conditions containing timeseries are treated differently (if encountered, you will see a warning). Additionally, a bug regarding option <missing=ignore> was corrected.");
                 }
             }
             
