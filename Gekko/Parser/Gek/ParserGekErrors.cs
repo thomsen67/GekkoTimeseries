@@ -451,7 +451,7 @@ namespace Gekko.Parser.Gek
                             {
                                 using (Note txt = new Note())
                                 {
-                                    txt.MainAdd("The statement is valid Gekko 2.x syntax, and Gekko has translated it: see the link.");
+                                    txt.MainAdd("The statement is valid Gekko 2.x syntax; see the link for an auto-translated version of the statement.");
                                     if (is3_0)
                                     {
                                         txt.MoreAdd("Gekko has {a{translated¤translate.htm}a} the statement into the following valid Gekko 3.x code:");

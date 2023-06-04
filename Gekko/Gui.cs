@@ -2525,13 +2525,11 @@ namespace Gekko
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SendKeys.SendWait("^c");
-            //Clipboard.SetText(this.textBox2.SelectedText);
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SendKeys.SendWait("^v");
-            //this.textBox2.SelectedText = Clipboard.GetText();
         }
 
         private void pasteGamsToolStripMenuItem_Click(object sender, EventArgs e)
