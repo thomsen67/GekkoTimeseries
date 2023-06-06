@@ -2837,7 +2837,7 @@ namespace Gekko
                 int year = t.super;
                 int month = t.sub;
                 int day = t.subsub;
-                int daysInMonth = G.DaysInMonth(year, month);
+                int daysInMonth = GekkoTime.DaysInMonth(year, month);
                 double positionInMonth = 1d / daysInMonth / 2d + 1d / daysInMonth * (day - 1d);
                 double positionInYear = (month - 1d + positionInMonth) / 12d;
                 return new ScalarVal(year + positionInYear);
@@ -5088,7 +5088,7 @@ namespace Gekko
             int iy = gt.super;
             int im = gt.sub;
             int id = gt.subsub;
-            DateTime dt = G.GekkoDateTime(iy, im, id);
+            DateTime dt = GekkoTime.DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
         }

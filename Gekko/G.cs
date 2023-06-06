@@ -2958,44 +2958,7 @@ namespace Gekko
             else s = s.Replace("\"", "\"\"");
             return s;
         }
-
-        /// <summary>
-        /// Just makes sure an error message is issued if date makes no sense
-        /// </summary>
-        /// <returns></returns>
-        public static DateTime GekkoDateTime(int year, int month, int day)
-        {
-            DateTime dt = DateTime.MinValue;
-            try
-            {
-                dt = new DateTime(year, month, day);
-            }
-            catch
-            {
-                new Error("Invalid date encountered: year = " + year + ", month = " + month + ", day = " + day + ". Note that years < 1 or > 9999 are invalid.");
-                throw;  //probably not necessary
-            }
-            return dt;
-        }
-
-        /// <summary>
-        /// How many days does a certain month contain
-        /// </summary>
-        /// <param name="y"></param>
-        /// <param name="m"></param>
-        /// <returns></returns>
-        public static int DaysInMonth(int y, int m)
-        {
-            if (y >= 1 && y <= 9999)
-            {
-                return DateTime.DaysInMonth(y, m);
-            }
-            else
-            {
-                return 30;  //does not make any sense anyway, but undated freq can have periods outside 1..9999
-            }
-        }
-
+        
         /// <summary>
         /// Helper method.
         /// </summary>

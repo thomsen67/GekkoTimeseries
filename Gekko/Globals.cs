@@ -842,6 +842,7 @@ namespace Gekko
         public static int numberOfErrors = 0;
         public static int numberOfWarnings = 0;
         public static int numberOfSkippedLines = 0;
+        public static int numberOfDateErrors = 0;
 
         public static bool threadIsInProcessOfAborting = false;  //click on stop button
         public static bool applicationIsInProcessOfAborting = false;  //exit command issued

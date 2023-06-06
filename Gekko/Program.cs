@@ -6192,8 +6192,8 @@ namespace Gekko
 
                                 if (freq == EFreq.W)
                                 {
-                                    GekkoTime gtw1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d1, d1sub, d1subsub));
-                                    GekkoTime gtw2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d2, d2sub, d2subsub));
+                                    GekkoTime gtw1 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(d1, d1sub, d1subsub));
+                                    GekkoTime gtw2 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(d2, d2sub, d2subsub));
                                     obs = GekkoTime.Observations(gtw1, gtw2);
                                 }
                                 else
@@ -6275,8 +6275,8 @@ namespace Gekko
                                 GekkoTime gt2 = GekkoTime.tNull;
                                 if (freq == EFreq.W)
                                 {
-                                    gt1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d1, d1sub, d1subsub));
-                                    gt2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d2, d2sub, d2subsub));
+                                    gt1 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(d1, d1sub, d1subsub));
+                                    gt2 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(d2, d2sub, d2subsub));
                                 }
                                 else
                                 {
@@ -20560,7 +20560,6 @@ namespace Gekko
                         eo.excelData[i, j] = var1;
                     }
                 }
-
             }
 
             eo.fileName = fileName;
@@ -21883,8 +21882,8 @@ namespace Gekko
             }
             else if ((Program.options.freq == EFreq.W))
             {
-                per1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(yearStart, 1, 1));
-                per2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(yearEnd, 12, 31));
+                per1 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(yearStart, 1, 1));
+                per2 = ISOWeek.ToGekkoTime(GekkoTime.DateTime(yearEnd, 12, 31));
             }
             else if ((Program.options.freq == EFreq.D))
             {
@@ -28268,11 +28267,7 @@ namespace Gekko
         {
             using (Note n = new Note())
             {
-                n.MainAdd("You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
-                n.MainAdd("Gekko 3.0 and on uses 'engine = internal' instead of 'engine = excel'. The new engine is");
-                n.MainAdd("faster and more robust, but only supports .xslx, and not .xls files. In order to");
-                n.MainAdd("use .xls files, you must use 'engine = excel'. If you encounter unexpected errors, please");
-                n.MainAdd("try to see if 'engine = excel' solves them (requires Excel).");
+                n.MainAdd("Beware that if you are interacting with the old Excel .xls (not .xlsx) format, you must use 'option sheet engine = excel' (requires Excel installed on the pc).");
             }
         }
 
@@ -28539,7 +28534,6 @@ namespace Gekko
             bool useExcelDates = false;  //default
             bool isFirst = true;  //default
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
-
             if (G.Equal(datetype, "text")) useExcelDates = false;
             else if (G.Equal(datetype, "excel")) useExcelDates = true;
 
@@ -28987,12 +28981,36 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                if (!(e is GekkoException))
+                if (e is GekkoException)
                 {
+                    if (Globals.numberOfDateErrors > 0)
+                    {
+                        using (Error txt = new Error())
+                        {
+                            txt.ThrowNoException();
+                            txt.MainAdd("It seems there is an invalid mix of date formatting options, see more in the link.");
+                            txt.MoreAdd("For EXPORT<xlsx> or SHEET, some combinations of for instance <dateformat = 'yyyy-mm-dd'> or <datetype = 'excel'> are not possible.");
+                            txt.MoreAdd("This normally only happens with 'option sheet freq = pretty', where dates are 'prettified' and cannot be represented in, say, yyyy-mm-dd format (or as Excel dates).");
+                            txt.MoreAdd("To remedy this, there are two possibilities. Either (1) remove local option <dateformat = ...> and/or <datetype = ...>, after which you should be able to see what the output actually looks like.");
+                            txt.MoreAdd("Alternatively (2) set 'option sheet freq = simple', which should make the date format error go away (with this option, any auto-collapsing is suppressed, though). Note: the above comments also apply to WRITE<xlsx>.");
+
+                            //--- INPUT
+                            //option sheet collapse = ... ; <collapse>, <collapse=total>, <collapse=avg>
+                            //Mixed freqs...
+                            //--- FORMAT
+                            //option sheet freq = pretty;
+                            //<dateformat = 'yyyy-mm-dd'>
+                            //<datetype = 'excel'>
+                        }
+                    }
+                }
+                else 
+                {
+                    //Issued from xlsx component
                     if (e.Message != null && e.Message != "")
                     {
                         new Error(e.Message, false);
-                        WriteExcelError();
+                        WriteExcelError();                                                                      
                     }
                 }
                 throw;
@@ -29022,7 +29040,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method for dealing with Gekko dateformat options (may include "first" or "last").
+        /// Helper method for dealing with Gekko dateformat options (may include "first" or "last"). May return null.
         /// </summary>
         /// <param name="dateformat"></param>
         /// <param name="isFirst"></param>

@@ -327,7 +327,7 @@ namespace Gekko
             {
                 using (Note note = new Note())
                 {
-                    note.MainAdd("Regarding series statements, the following is changed in Gekko 3.1.16 and on: left-hand side $-conditions containing timeseries are treated differently (if encountered, you will see a warning). Additionally, a bug regarding option <missing=ignore> was corrected.");
+                    note.MainAdd("From Gekko 3.1.16 and on, left-hand side $-conditions containing timeseries are treated differently (if encountered, you will see a warning). Additionally, a bug regarding option <missing=ignore> was corrected.");
                 }
             }
             
@@ -1647,7 +1647,10 @@ namespace Gekko
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
             Globals.numberOfSkippedLines = 0;
+            Globals.numberOfDateErrors = 0;
+
             Program.AbortingReset();
+
             Globals.errorMemory = null;  //so that it is not recording all the time.   
 
             if (Program.IsDataTrace())

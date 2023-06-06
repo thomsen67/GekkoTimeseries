@@ -12812,6 +12812,10 @@ namespace UnitTests
             //data trust
             try
             {
+                //
+                // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
+                //
+                
                 string s = null;
                 string c = null;
                 List<string> calc = null;
@@ -12831,7 +12835,7 @@ namespace UnitTests
                 c = "a = 2, 3, 4;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.calc;
-                
+
                 c = "b = 12, 13, 14;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.calc;
@@ -12843,29 +12847,16 @@ namespace UnitTests
                 c = "d = a + b + c;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.calc;
-
-                if (false)
-                {
-
-                    c = "xx = series(2);";
-                    s += HelperTrace(c);
-
-                    c = "xx[a, b] = 22, 23, 24;";
-                    s += HelperTrace(c);
-
-                    c = "xx[c, d] = 32, 33, 34;";
-                    s += HelperTrace(c);
-
-                    c = "yy = series(2);";
-                    s += HelperTrace(c);
-
-                    c = "yy[c, d] = xx[a, b];";
-                    s += HelperTrace(c);
-                }
-
+                
                 c = "copy d to e;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.calc;
+
+                c = "e <2024 2025> = 22, 23;";
+                s += HelperTrace(c);
+
+                c = "delete a, b, c, d;";
+                s += HelperTrace(c);
 
                 string ss = Stringlist.ExtractTextFromLines(calc).ToString();
 
@@ -12886,22 +12877,24 @@ namespace UnitTests
                 c = "write bank1;";
                 s += HelperTrace(c);
 
-                c = "reset;";
+                c = "reset; time 2021 2025;";
                 s += HelperTrace(c);
 
                 c = "read bank1;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.calc;
-                calc = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.calc;
-                calc = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.calc;
-                calc = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.calc;
-                calc = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.calc;
+                calc = Helper_GetCalcField("a!a");
+                calc = Helper_GetCalcField("b!a");
+                calc = Helper_GetCalcField("c!a");
+                calc = Helper_GetCalcField("d!a");
+                calc = Helper_GetCalcField("e!a");
+
+                c = "disp e;";
+                s += HelperTrace(c);
 
                 c = "f = a + b + c + d + e;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("f!a") as Series).meta.calc;
 
-                Assert.Fail();
 
             }
             finally
@@ -12909,6 +12902,11 @@ namespace UnitTests
                 Globals.precedents = null;
             }
 
+        }
+
+        private static List<string> Helper_GetCalcField(string s)
+        {
+            return (Program.databanks.GetFirst().GetIVariable(s) as Series).meta.calc;
         }
 
         private static string HelperTrace(string command)

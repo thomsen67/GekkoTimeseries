@@ -492,6 +492,21 @@ namespace Gekko
             string dateType = o.opt_datetype;
             string dateFormat = o.opt_dateformat;
 
+            //if (type == EPrintTypes.Sheet)
+            //{
+            //    if (pretty == true)
+            //    {
+            //        using (Error txt = new Error())
+            //        {
+            //            txt.MainAdd("When writing to Excel while using 'option sheet freq = pretty;', <dateformat=...> cannot be <> 'gekko' and <datetype=...> cannot be <> 'text'.");
+                        
+            //            //dateformat must be null or 'gekko' 
+            //            //datetype must be null or 'text'
+            //        }
+            //        //Program.options.sheet_freq
+            //    }
+            //}
+
             if (type == EPrintTypes.Plot)
             {                
                 Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq, new PlotHelper(), smpl.p);
@@ -522,7 +537,7 @@ namespace Gekko
                 {
                     tab2 = printTable.Transpose();
                     ExcelOptions eo = Program.PrepareDataForExcel(tab2);
-                    Program.WriteExcel(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
+                    Program.WriteExcel(eo, o, IsMulprt(o), false, dateFormat, dateType);
                 }
                 return;
             }
@@ -785,7 +800,7 @@ namespace Gekko
                         counter++;
 
                         //DateTime dt2 = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
-                        DateTime dt = G.GekkoDateTime(t.super, t.sub, t.subsub);
+                        DateTime dt = GekkoTime.DateTime(t.super, t.sub, t.subsub);
                         GekkoTime tWeek = ISOWeek.ToGekkoTime(dt);
 
                         if (oldYear != -12345 && tWeek.super > oldYear && !freqs["d"])

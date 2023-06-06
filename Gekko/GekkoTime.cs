@@ -279,7 +279,7 @@ namespace Gekko
                 {
                     new Error("Freq 'd' wrong month: " + sub);
                 }
-                int maxDays = G.DaysInMonth(super, sub);  //see also #9832453429857
+                int maxDays = GekkoTime.DaysInMonth(super, sub);  //see also #9832453429857
                 if (subsub < 1 || subsub > maxDays)
                 {
                     new Error("Freq 'd' wrong day: " + subsub);
@@ -353,7 +353,7 @@ namespace Gekko
 
         public static DateTime FromExcelDateToDateTime(double data)
         {
-            return DateTime.FromOADate(data);
+            return System.DateTime.FromOADate(data);
         }
 
         public static void FromGekkoTimeToDifferentFormatsForWriting(GekkoTime gt, bool first, string format, out DateTime dt, out string f, out string date_as_string)
@@ -387,22 +387,22 @@ namespace Gekko
                 if (gt.sub == 1)
                 {
                     if (first) { m = 1; d = 1; }
-                    else { m = 3; d = G.DaysInMonth(y, m); }
+                    else { m = 3; d = GekkoTime.DaysInMonth(y, m); }
                 }
                 else if (gt.sub == 2)
                 {
                     if (first) { m = 4; d = 1; }
-                    else { m = 6; d = G.DaysInMonth(y, m); }
+                    else { m = 6; d = GekkoTime.DaysInMonth(y, m); }
                 }
                 else if (gt.sub == 3)
                 {
                     if (first) { m = 7; d = 1; }
-                    else { m = 9; d = G.DaysInMonth(y, m); }
+                    else { m = 9; d = GekkoTime.DaysInMonth(y, m); }
                 }
                 else
                 {
                     if (first) { m = 10; d = 1; }
-                    else { m = 12; d = G.DaysInMonth(y, m); }
+                    else { m = 12; d = GekkoTime.DaysInMonth(y, m); }
                 }
             }
             else if (gt.freq == EFreq.M)
@@ -410,7 +410,7 @@ namespace Gekko
                 if (format == null) f = "yyyy-mm";
                 m = gt.sub;
                 if (first) d = 1;
-                else d = G.DaysInMonth(y, m);
+                else d = GekkoTime.DaysInMonth(y, m);
             }
             else if (gt.freq == EFreq.W)
             {
@@ -453,7 +453,7 @@ namespace Gekko
             //format == 'gekko'                --> f = null
             //format == 'yyyy-mm-dd'-style     --> f = 'yyyy-mm-dd'-style
 
-            dt = G.GekkoDateTime(y, m, d);
+            dt = GekkoTime.DateTime(y, m, d);
             if (format == null)
             {
                 //Not sure if this is right, using f?? Probably ok.
@@ -474,7 +474,7 @@ namespace Gekko
             DateTime dt = new DateTime();
             try
             {
-                dt = DateTime.ParseExact(s, format.ToLower().Replace("m", "M"), null);
+                dt = System.DateTime.ParseExact(s, format.ToLower().Replace("m", "M"), null);
             }
             catch (Exception e)
             {
@@ -655,7 +655,7 @@ namespace Gekko
                     else return GekkoTime.tNull;
                 }
 
-                int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
+                int maxDays = GekkoTime.DaysInMonth(y1, m1); //see also #9832453429857
                 if (d < 1 || d > maxDays)
                 {
                     if (reportError) new Error("Illegal day in daily date");
@@ -778,58 +778,97 @@ namespace Gekko
             {
                 if (firstLast == O.GetDateChoices.FlexibleStart)
                 {
-                    return G.GekkoDateTime(gt.super, 1, 1);
+                    return GekkoTime.DateTime(gt.super, 1, 1);
                 }
                 else if (firstLast == O.GetDateChoices.FlexibleEnd)
                 {
-                    return G.GekkoDateTime(gt.super, 12, 31);
+                    return GekkoTime.DateTime(gt.super, 12, 31);
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return DateTime.MinValue;
+                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.Q)
             {
                 if (firstLast == O.GetDateChoices.FlexibleStart)
                 {
-                    return G.GekkoDateTime(gt.super, GekkoTime.FromQuarterToMonthStart(gt.sub), 1);
+                    return GekkoTime.DateTime(gt.super, GekkoTime.FromQuarterToMonthStart(gt.sub), 1);
                 }
                 else if (firstLast == O.GetDateChoices.FlexibleEnd)
                 {
                     int month = GekkoTime.FromQuarterToMonthEnd(gt.sub);
-                    return G.GekkoDateTime(gt.super, month, G.DaysInMonth(gt.super, month));
+                    return GekkoTime.DateTime(gt.super, month, GekkoTime.DaysInMonth(gt.super, month));
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return DateTime.MinValue;
+                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.M)
             {
                 if (firstLast == O.GetDateChoices.FlexibleStart)
                 {
-                    return G.GekkoDateTime(gt.super, gt.sub, 1);
+                    return GekkoTime.DateTime(gt.super, gt.sub, 1);
                 }
                 else if (firstLast == O.GetDateChoices.FlexibleEnd)
                 {
-                    return G.GekkoDateTime(gt.super, gt.sub, G.DaysInMonth(gt.super, gt.sub));
+                    return GekkoTime.DateTime(gt.super, gt.sub, GekkoTime.DaysInMonth(gt.super, gt.sub));
                 }
                 else
                 {
-                    new Error("Freq convertion problem"); return DateTime.MinValue;
+                    new Error("Freq convertion problem"); return System.DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.D)
             {
                 //for daily, firstLast has no effect
-                return G.GekkoDateTime(gt.super, gt.sub, gt.subsub);
+                return GekkoTime.DateTime(gt.super, gt.sub, gt.subsub);
             }
             else
             {
-                new Error("Freq convertion problem"); return DateTime.MinValue;
+                new Error("Freq convertion problem"); return System.DateTime.MinValue;
             }            
         }
+
+        /// <summary>
+        /// Just makes sure an error message is issued if date makes no sense
+        /// </summary>
+        /// <returns></returns>
+        public static DateTime DateTime(int year, int month, int day)
+        {
+            DateTime dt = System.DateTime.MinValue;
+            try
+            {
+                dt = new DateTime(year, month, day);
+            }
+            catch
+            {
+                Globals.numberOfDateErrors++;
+                new Error("Invalid date encountered"); //we do not show this: it is typically with -12345 which would just confuse users. : year = " + year + ", month = " + month + ", day = " + day + ". Note that years < 1 or > 9999 are invalid.");                
+                throw;  //probably not necessary
+            }
+            return dt;
+        }
+
+        /// <summary>
+        /// How many days does a certain month contain
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static int DaysInMonth(int y, int m)
+        {
+            if (y >= 1 && y <= 9999)
+            {
+                return System.DateTime.DaysInMonth(y, m);
+            }
+            else
+            {
+                return 30;  //does not make any sense anyway, but undated freq can have periods outside 1..9999
+            }
+        }
+
 
         /// <summary>
         /// Subtract a t, returns integer. For annual freq, the subtraction corresponds to "normal" integer subtraction, for instance 2020 with subtract 2015 is = 5.
@@ -886,8 +925,8 @@ namespace Gekko
                 }
                 else
                 {
-                    DateTime dt1 = G.GekkoDateTime(t1.super, t1.sub, t1.subsub);
-                    DateTime dt2 = G.GekkoDateTime(t2.super, t2.sub, t2.subsub);
+                    DateTime dt1 = GekkoTime.DateTime(t1.super, t1.sub, t1.subsub);
+                    DateTime dt2 = GekkoTime.DateTime(t2.super, t2.sub, t2.subsub);
                     return (dt2 - dt1).Days + 1;
                 }
             }
@@ -1081,25 +1120,25 @@ namespace Gekko
                     else if (t.freq == EFreq.Q)
                     {
                         //from Q to W
-                        DateTime dt = G.GekkoDateTime(t.super, GekkoTime.FromQuarterToMonthStart(t.sub), 1);
+                        DateTime dt = GekkoTime.DateTime(t.super, GekkoTime.FromQuarterToMonthStart(t.sub), 1);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.M)
                     {
                         //from M to W 
-                        DateTime dt = G.GekkoDateTime(t.super, t.sub, 1);
+                        DateTime dt = GekkoTime.DateTime(t.super, t.sub, 1);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.D)
                     {
                         //from D to W
-                        DateTime dt = G.GekkoDateTime(t.super, t.sub, t.subsub);
+                        DateTime dt = GekkoTime.DateTime(t.super, t.sub, t.subsub);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.U)
                     {
                         //from U to W
-                        DateTime dt = G.GekkoDateTime(t.super, 1, 1);
+                        DateTime dt = GekkoTime.DateTime(t.super, 1, 1);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                 }
@@ -1278,25 +1317,25 @@ namespace Gekko
                     {
                         //from Q to W
                         int month = GekkoTime.FromQuarterToMonthEnd(t.sub);
-                        DateTime dt = G.GekkoDateTime(t.super, month, G.DaysInMonth(t.super, month));
+                        DateTime dt = GekkoTime.DateTime(t.super, month, GekkoTime.DaysInMonth(t.super, month));
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.M)
                     {
                         //from M to W                         
-                        DateTime dt = G.GekkoDateTime(t.super, t.sub, G.DaysInMonth(t.super, t.sub));
+                        DateTime dt = GekkoTime.DateTime(t.super, t.sub, GekkoTime.DaysInMonth(t.super, t.sub));
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.D)
                     {
                         //from D to W
-                        DateTime dt = G.GekkoDateTime(t.super, t.sub, t.subsub);
+                        DateTime dt = GekkoTime.DateTime(t.super, t.sub, t.subsub);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                     else if (t.freq == EFreq.U)
                     {
                         //from U to W                        
-                        DateTime dt = G.GekkoDateTime(t.super, GekkoTimeStuff.numberOfMonths, 31);
+                        DateTime dt = GekkoTime.DateTime(t.super, GekkoTimeStuff.numberOfMonths, 31);
                         tt = ISOWeek.ToGekkoTime(dt);
                     }
                 }
@@ -1318,12 +1357,12 @@ namespace Gekko
                     {
                         //from Q to D sets last day of quarter
                         int month = GekkoTime.FromQuarterToMonthEnd(t.sub);
-                        tt = new GekkoTime(EFreq.D, t.super, month, G.DaysInMonth(t.super, month));
+                        tt = new GekkoTime(EFreq.D, t.super, month, GekkoTime.DaysInMonth(t.super, month));
                     }
                     else if (t.freq == EFreq.M)
                     {
                         //from M to D sets last day of month                        
-                        tt = new GekkoTime(EFreq.D, t.super, t.sub, G.DaysInMonth(t.super, t.sub));
+                        tt = new GekkoTime(EFreq.D, t.super, t.sub, GekkoTime.DaysInMonth(t.super, t.sub));
                     }
                     else if (t.freq == EFreq.W)
                     {
@@ -1371,7 +1410,7 @@ namespace Gekko
         /// <returns></returns>
         public static GekkoTime ISOWeekFirstDayInYear(int year)
         {            
-            DateTime dt = G.GekkoDateTime(year, 1, 1);
+            DateTime dt = GekkoTime.DateTime(year, 1, 1);
             GekkoTime tt = ISOWeek.ToGekkoTime(dt);
             return tt;
         }
@@ -1384,7 +1423,7 @@ namespace Gekko
         /// <returns></returns>
         public static GekkoTime ISOWeekLastDayInYear(int year)
         {            
-            DateTime dt = G.GekkoDateTime(year, GekkoTimeStuff.numberOfMonths, 31);
+            DateTime dt = GekkoTime.DateTime(year, GekkoTimeStuff.numberOfMonths, 31);
             GekkoTime tt = ISOWeek.ToGekkoTime(dt);
             return tt;
         }
@@ -1572,7 +1611,7 @@ namespace Gekko
             else if (this.freq == EFreq.D)
             {
                 //see also #98032743029847
-                DateTime dt1 = G.GekkoDateTime(this.super, this.sub, this.subsub);
+                DateTime dt1 = GekkoTime.DateTime(this.super, this.sub, this.subsub);
                 DateTime dt2 = dt1.AddDays(addedPeriods);
                 GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
                 return gt;
@@ -1729,7 +1768,7 @@ namespace Gekko
             }
             else if (name == EHolidayName.Leap_Day)
             {
-                if (DateTime.IsLeapYear(year))
+                if (System.DateTime.IsLeapYear(year))
                 {
                     gt = new GekkoTime(EFreq.D, year, 2, 29);
                 }
@@ -2151,10 +2190,10 @@ namespace Gekko
                 new Error("The day of week must be >=0 and <= 7"); //TTH change
             }
 
-            var jan4 = G.GekkoDateTime(year2, month: 1, day: 4);
+            var jan4 = GekkoTime.DateTime(year2, month: 1, day: 4);
             int correction = GetWeekday(jan4.DayOfWeek) + 3;
             int ordinal = (week * 7) + GetWeekday(dayOfWeek) - correction;
-            return G.GekkoDateTime(year2, month: 1, day: 1).AddDays(ordinal - 1);
+            return GekkoTime.DateTime(year2, month: 1, day: 1).AddDays(ordinal - 1);
         }
 
         private static int GetWeekOfYear(DateTime date)
