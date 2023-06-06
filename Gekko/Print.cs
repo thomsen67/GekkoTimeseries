@@ -785,7 +785,7 @@ namespace Gekko
                         counter++;
 
                         //DateTime dt2 = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
-                        DateTime dt = new DateTime(t.super, t.sub, t.subsub);
+                        DateTime dt = G.GekkoDateTime(t.super, t.sub, t.subsub);
                         GekkoTime tWeek = ISOWeek.ToGekkoTime(dt);
 
                         if (oldYear != -12345 && tWeek.super > oldYear && !freqs["d"])

@@ -5088,7 +5088,7 @@ namespace Gekko
             int iy = gt.super;
             int im = gt.sub;
             int id = gt.subsub;
-            DateTime dt = new DateTime(iy, im, id);
+            DateTime dt = G.GekkoDateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
         }

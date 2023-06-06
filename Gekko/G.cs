@@ -2960,6 +2960,25 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Just makes sure an error message is issued if date makes no sense
+        /// </summary>
+        /// <returns></returns>
+        public static DateTime GekkoDateTime(int year, int month, int day)
+        {
+            DateTime dt = DateTime.MinValue;
+            try
+            {
+                dt = new DateTime(year, month, day);
+            }
+            catch
+            {
+                new Error("Invalid date encountered: year = " + year + ", month = " + month + ", day = " + day + ". Note that years < 1 or > 9999 are invalid.");
+                throw;  //probably not necessary
+            }
+            return dt;
+        }
+
+        /// <summary>
         /// How many days does a certain month contain
         /// </summary>
         /// <param name="y"></param>

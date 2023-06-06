@@ -54,12 +54,7 @@ namespace Gekko
                 );
                 O.AdjustT0(smpl, 2);
                 if (ivTmpvar22.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, (new ScalarString("c_")).Concat(smpl, O.Lookup(smpl, null, null, "%name", null, ivTmpvar22, new LookupSettings(), EVariableType.Var, null)).Concat(smpl, new ScalarString("_")).Concat(smpl, O.IndexerSetData(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, i23
-                ), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null), i23
-                ), ivTmpvar22, o0, O.Lookup(smpl, null, null, "%col", null, null, new LookupSettings(), EVariableType.Var, null)
-                )), ivTmpvar22, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
-                ;
+                O.Dynamic1(smpl);                
                 return O.Dynamic2(smpl);
             };
             O.RunAssigmentMaybeDynamic(smpl, assign_24, check_24, o0);

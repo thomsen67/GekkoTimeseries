@@ -6192,8 +6192,8 @@ namespace Gekko
 
                                 if (freq == EFreq.W)
                                 {
-                                    GekkoTime gtw1 = ISOWeek.ToGekkoTime(new DateTime(d1, d1sub, d1subsub));
-                                    GekkoTime gtw2 = ISOWeek.ToGekkoTime(new DateTime(d2, d2sub, d2subsub));
+                                    GekkoTime gtw1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d1, d1sub, d1subsub));
+                                    GekkoTime gtw2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d2, d2sub, d2subsub));
                                     obs = GekkoTime.Observations(gtw1, gtw2);
                                 }
                                 else
@@ -6275,8 +6275,8 @@ namespace Gekko
                                 GekkoTime gt2 = GekkoTime.tNull;
                                 if (freq == EFreq.W)
                                 {
-                                    gt1 = ISOWeek.ToGekkoTime(new DateTime(d1, d1sub, d1subsub));
-                                    gt2 = ISOWeek.ToGekkoTime(new DateTime(d2, d2sub, d2subsub));
+                                    gt1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d1, d1sub, d1subsub));
+                                    gt2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(d2, d2sub, d2subsub));
                                 }
                                 else
                                 {
@@ -21883,8 +21883,8 @@ namespace Gekko
             }
             else if ((Program.options.freq == EFreq.W))
             {
-                per1 = ISOWeek.ToGekkoTime(new DateTime(yearStart, 1, 1));
-                per2 = ISOWeek.ToGekkoTime(new DateTime(yearEnd, 12, 31));
+                per1 = ISOWeek.ToGekkoTime(G.GekkoDateTime(yearStart, 1, 1));
+                per2 = ISOWeek.ToGekkoTime(G.GekkoDateTime(yearEnd, 12, 31));
             }
             else if ((Program.options.freq == EFreq.D))
             {
