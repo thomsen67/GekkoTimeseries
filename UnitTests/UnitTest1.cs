@@ -12802,7 +12802,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Trace()
         {
-            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            //Assert.Inconclusive(Globals.unitTestIntegrationMessage);
             //data lineage is a description of how data flows in its life cycle
             //traceability is the activity
             //data origin or provenance: where it comes from originally -->
@@ -12821,6 +12821,7 @@ namespace UnitTests
                 List<string> calc = null;
 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                Globals.useTrace = true;
                 Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 Globals.trace2 = new List<IVariable>();
 
@@ -12899,6 +12900,9 @@ namespace UnitTests
             }
             finally
             {
+                Globals.useTrace = false;
+                Globals.trace = null;
+                Globals.trace2 = null;
                 Globals.precedents = null;
             }
 
