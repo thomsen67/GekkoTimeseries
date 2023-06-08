@@ -12822,7 +12822,7 @@ namespace UnitTests
 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 Globals.useTrace = true;
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+                //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 Globals.trace2 = new List<IVariable>();
 
                 //TODO: maps, <dyn>
@@ -12901,7 +12901,7 @@ namespace UnitTests
             finally
             {
                 Globals.useTrace = false;
-                Globals.trace = null;
+                //Globals.trace = null;
                 Globals.trace2 = null;
                 Globals.precedents = null;
             }
@@ -12915,7 +12915,7 @@ namespace UnitTests
 
         private static string HelperTrace(string command)
         {
-            Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+            //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
             Globals.trace2 = new List<IVariable>();
             I(command);            
             //string s = null;
@@ -12926,7 +12926,7 @@ namespace UnitTests
             //}
             //s += "---------------------------------------------------------------------------";
             //s += G.NL;
-            Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+            //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
             Globals.trace2 = new List<IVariable>();
             return "";
         }

@@ -1286,6 +1286,30 @@ namespace Gekko
                             if (lhs_series.meta.source.StartsWith("<[code]>"))
                             {
                                 lhs_series.meta.source = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + lhs_series.meta.source.Replace("<[code]>", "");
+                                // ---------
+                                Trace2 trace2 = new Trace2();
+                                if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace();
+                                trace2.statement = lhs_series.meta.source.Replace("<[code]>", "");
+
+                                foreach (IVariable iv in Globals.trace2)
+                                {
+                                    Series iv_ts = iv as Series;
+                                    if (iv_ts == null) continue;
+                                    if (trace2.precedents == null) trace2.precedents = new List<Trace>();  //.precedents not done in constructor because quite a lot of these could have 0 elements --> better to store as null
+                                    trace2.precedents.Add(iv_ts.meta.trace);
+                                }                                
+                                
+                                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                {
+                                    //!!!!
+                                    //!!!!
+                                    //!!!!
+                                    //!!!! implement hashcode and equals for GekkoTime
+                                    //!!!!
+                                    //!!!!
+                                    if (lhs_series.meta.trace.storage.ContainsKey(t)) lhs_series.meta.trace.storage.Remove(t);
+                                    lhs_series.meta.trace.storage.Add(t, trace2);
+                                }
                             }
                         }
                     }

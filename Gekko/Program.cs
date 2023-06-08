@@ -302,15 +302,7 @@ namespace Gekko
     {
         public string method = "total";
         public string collapse_missing = null; // corresponds to collapse <strict|flex> = x!m = x!d;        
-    }
-
-    /// <summary>
-    /// Stores information regarding variable tracing
-    /// </summary>
-    public class Trace
-    {
-
-    }
+    }    
 
     /// <summary>
     /// Helper for FindFile(). Note: realPathAndFileName --> the real file that may be an unzipped file put in a temp folder. May be same as prettyPathAndFileName.
@@ -8634,7 +8626,7 @@ namespace Gekko
             Series rv_series = iv as Series;
 
             // PRECEDENTS PRECEDENTS PRECEDENTS 
-            // PRECEDENTS PRECEDENTS PRECEDENTS 
+            // PRECEDENTS PRECEDENTS PRECEDENTS for DECOMP
             // PRECEDENTS PRECEDENTS PRECEDENTS 
             if (alsoIncludePrecedents && Globals.precedents != null && rv_series != null)
             {
@@ -8644,60 +8636,52 @@ namespace Gekko
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
-            if (!Globals.useTrace) return;
-            //if (!Globals.useTrace || Globals.trace2 == null) return;
-            bool onlyTraceSeries = false;            
-            string x_lhs = "";
-            if (isLhs) x_lhs = "LHS";
-            string x_objectName = null;
-            if (rv_series != null) x_objectName = rv_series.GetName();
-            string x_bankOrMap = null;
+            if (Globals.useTrace)
+            {
+                //if (!Globals.useTrace || Globals.trace2 == null) return;
+                bool onlyTraceSeries = false;
+                string x_lhs = "";
+                if (isLhs) x_lhs = "LHS";
+                string x_objectName = null;
+                if (rv_series != null) x_objectName = rv_series.GetName();
+                string x_bankOrMap = null;
 
-            if (ib.BankType() == EBankType.Map)
-            {
-                x_bankOrMap = "map";
-            }
-            else
-            {
-                x_bankOrMap = ib.GetFileNameWithPath() + " " + ib.GetStamp();
-            }
-
-            if (!onlyTraceSeries || rv_series != null)
-            {
-                string x_source = null;
-                if (rv_series != null && rv_series.meta != null) x_source = rv_series.meta.source;
-                string s = "name: " + name + " // " + "bank: " + x_bankOrMap + " // " + "oname: " + x_objectName + " // " + "source: " + x_source + " // " + "lhs?: " + x_lhs;
-                if (isLhs)
+                if (ib.BankType() == EBankType.Map)
                 {
-                    if (rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
-                    rv_series.meta.calc.Add(s);
-                    foreach (IVariable iv2 in Globals.trace2)
-                    {
-                        if (iv2 == iv) continue;
-                        if (iv2.Type() != EVariableType.Series) continue;
-                        Series iv2_series = iv2 as Series;
-                        if (iv2_series.meta == null) continue;
-                        foreach (string s4 in iv2_series.meta.calc)
-                        {
-                            rv_series.meta.calc.Add("--" + s4);
-                        }
-                    }
+                    x_bankOrMap = "map";
+                }
+                else
+                {
+                    x_bankOrMap = ib.GetFileNameWithPath() + " " + ib.GetStamp();
                 }
 
-                if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
-                if (!Globals.trace2.Contains(iv)) Globals.trace2.Add(iv);
+                if (!onlyTraceSeries || rv_series != null)
+                {
+                    //string x_source = null;
+                    //if (rv_series != null && rv_series.meta != null) x_source = rv_series.meta.source;
+                    //string s = "name: " + name + " // " + "bank: " + x_bankOrMap + " // " + "oname: " + x_objectName + " // " + "source: " + x_source + " // " + "lhs?: " + x_lhs;
+                    //if (isLhs)
+                    //{
+                    //    if (rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
+                    //    rv_series.meta.calc.Add(s);
+                    //    foreach (IVariable iv2 in Globals.trace2)
+                    //    {
+                    //        if (iv2 == iv) continue;
+                    //        if (iv2.Type() != EVariableType.Series) continue;
+                    //        Series iv2_series = iv2 as Series;
+                    //        if (iv2_series.meta == null) continue;
 
-                //if (Globals.useTrace)
-                //{
-                //    if (rv_series != null && isLhs)
-                //    {
-                //        if (Globals.trace.Count > 0 && rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();                        
-                //        foreach (string ss in Globals.trace.Keys)
-                //        {                            
-                //            //rv_series.meta.calc.Add(ss);
-                //        }
-                //    }
-                //}
+
+                    //        foreach (string s4 in iv2_series.meta.calc)
+                    //        {
+                    //            rv_series.meta.calc.Add("--" + s4);
+                    //        }
+                    //    }
+                    //}
+
+                    //if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
+                    if (!Globals.trace2.Contains(iv)) Globals.trace2.Add(iv);
+                }
             }
         }
 
@@ -9808,9 +9792,9 @@ namespace Gekko
         /// </summary>
         /// <param name="db"></param>
         /// <param name="varnameWithFreq"></param>
-        public static void AddToPrecedents(Databank db, string varnameWithFreq)
-        {
-            string two = db.name + ":" + varnameWithFreq;
+        public static void AddToPrecedents(Databank db, string s)
+        {                    
+            string two = db.name + ":" + s;
             if (!Globals.precedents.ContainsKey(two))
             {
                 Globals.precedents.Add(two, 0);

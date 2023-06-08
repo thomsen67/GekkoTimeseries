@@ -2989,6 +2989,9 @@ namespace Gekko
         [ProtoMember(10)]
         public List<string> calc = null;
 
+        [ProtoMember(11)]
+        public Trace trace = null;
+
         [ProtoMember(7)]
         public string[] domains = null;
 
