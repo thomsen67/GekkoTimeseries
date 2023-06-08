@@ -933,13 +933,11 @@ namespace Gekko
                                 // %x = NULL
                                 //---------------------------------------------------------                            
                                 new Error("Null-value on right-hand side");
-                                //throw new GekkoException();
                             }
                             break;
                         default:
                             {
                                 new Error("Expected variable to be series, val, date, string, list, map or matrix");
-                                //throw new GekkoException();
                             }
                             break;
                     }
@@ -1287,8 +1285,8 @@ namespace Gekko
                             {
                                 lhs_series.meta.source = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + lhs_series.meta.source.Replace("<[code]>", "");
                                 // ---------
-                                Trace2 trace2 = new Trace2();
-                                if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace();
+                                Trace2 trace2 = new Trace2();                                
+                                if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
                                 trace2.statement = lhs_series.meta.source.Replace("<[code]>", "");
 
                                 foreach (IVariable iv in Globals.trace2)

@@ -2835,14 +2835,15 @@ namespace Gekko
                             tsCopy.meta.fixedNormal.data.Add(new GekkoTimeSpan(gts.tStart, gts.tEnd));
                         }
                     }
-                    if (this.meta.calc != null)
-                    {
-                        tsCopy.meta.calc = new List<string>();
-                        foreach (string s in this.meta.calc)
-                        {
-                            tsCopy.meta.calc.Add(s);
-                        }
-                    }
+                    
+                    //if (this.meta.calc != null)
+                    //{
+                    //    tsCopy.meta.calc = new List<string>();
+                    //    foreach (string s in this.meta.calc)
+                    //    {
+                    //        tsCopy.meta.calc.Add(s);
+                    //    }
+                    //}
                 }
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
@@ -2986,8 +2987,8 @@ namespace Gekko
         /// <summary>
         /// Stores traces of its composition, cf. Trace() method.
         /// </summary>
-        [ProtoMember(10)]
-        public List<string> calc = null;
+        //[ProtoMember(10)]
+        //public List<string> calc = null;
 
         [ProtoMember(11)]
         public Trace trace = null;

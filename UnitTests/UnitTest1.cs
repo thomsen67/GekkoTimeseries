@@ -12818,7 +12818,7 @@ namespace UnitTests
                 
                 string s = null;
                 string c = null;
-                List<string> calc = null;
+                string calc = null;
 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 Globals.useTrace = true;
@@ -12834,32 +12834,39 @@ namespace UnitTests
                 s += HelperTrace(c);
 
                 c = "a = 2, 3, 4;";
-                s += HelperTrace(c);
-                calc = Helper_GetCalcField("a!a");
+                s += HelperTrace(c);                         
 
                 c = "b = 12, 13, 14;";
                 s += HelperTrace(c);
-                calc = Helper_GetCalcField("b!a");
 
                 c = "c = a + b;";
                 s += HelperTrace(c);                
-                calc = Helper_GetCalcField("c!a");
 
                 c = "d = a + b + c;";
-                s += HelperTrace(c);                
-                calc = Helper_GetCalcField("d!a");
+                s += HelperTrace(c);
+
+                if (false)
+                {
+                    I("write sletmig;");
+                    I("read sletmig;");
+                }
+
+                Globals.unitTestScreenOutput.Clear();
+                Trace.Walker((Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace, 0);
+                string output = Globals.unitTestScreenOutput.ToString();
 
                 c = "copy d to e;";
-                s += HelperTrace(c);                
-                calc = Helper_GetCalcField("e!a");
+                s += HelperTrace(c);
 
                 c = "e <2024 2025> = 22, 23;";
-                s += HelperTrace(c);
+                s += HelperTrace(c);                
+
+                //Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
 
                 c = "delete a, b, c, d;";
                 s += HelperTrace(c);
 
-                string ss = Stringlist.ExtractTextFromLines(calc).ToString();
+                //string ss = Stringlist.ExtractTextFromLines(calc).ToString();
 
                 if (false)
                 {
@@ -12883,20 +12890,13 @@ namespace UnitTests
 
                 c = "read bank1;";
                 s += HelperTrace(c);
-                calc = Helper_GetCalcField("a!a");
-                calc = Helper_GetCalcField("b!a");
-                calc = Helper_GetCalcField("c!a");
-                calc = Helper_GetCalcField("d!a");
-                calc = Helper_GetCalcField("e!a");                
 
                 c = "disp e;";
                 s += HelperTrace(c);
 
                 c = "f = a + b + c + d + e;";
-                s += HelperTrace(c);                
-                calc = Helper_GetCalcField("f!a");
-
-
+                s += HelperTrace(c);                                
+                
             }
             finally
             {
@@ -12906,11 +12906,6 @@ namespace UnitTests
                 Globals.precedents = null;
             }
 
-        }
-
-        private static List<string> Helper_GetCalcField(string s)
-        {
-            return (Program.databanks.GetFirst().GetIVariable(s) as Series).meta.calc;
         }
 
         private static string HelperTrace(string command)

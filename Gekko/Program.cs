@@ -16190,12 +16190,12 @@ namespace Gekko
                 {
                     IVariable iv_clone = iv.DeepClone(truncateTemp);
                     Series ts_clone = iv_clone as Series;
-                    if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
+                    //if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
                     if (Globals.useTrace && ts_clone != null)
                     {
-                        ts_clone.meta.calc[0] += " // Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
+                        //ts_clone.meta.calc[0] += " // Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
                     }
                 }
             }
