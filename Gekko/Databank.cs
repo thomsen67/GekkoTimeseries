@@ -243,9 +243,8 @@ namespace Gekko
             {
                 this.storage.TryGetValue(variable, out iv);
             }
-            //What about 
-            Program.PrecedentsHelper(null, iv, this);
-            Program.Trace(variable, this, iv, isLhs);
+            //What about             
+            Program.Trace(iv, this, variable, isLhs, true); //both precedents for DECOMP and data tracing
             return iv;
         }    
 
@@ -330,7 +329,7 @@ namespace Gekko
                 ts.name = name;
             }
             AddIvariableHelper(name, x);
-            Program.Trace(name, this, x, true);
+            Program.Trace(x, this, name, true, false);
         }
 
         /// <summary>

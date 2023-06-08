@@ -2537,8 +2537,7 @@ namespace Gekko
                 }                
             }
 
-            Program.PrecedentsHelper(null, rv, this.GetParentDatabank());
-            Program.Trace("[" + miWildcard.ToString() + "]", this.GetParentDatabank(), rv, isLhs);
+            Program.Trace(rv, this.GetParentDatabank(), "[" + miWildcard.ToString() + "]", isLhs, true);  //both precedents for DECOMP and data tracing
 
             return rv;
         }        
@@ -2995,6 +2994,7 @@ namespace Gekko
 
         [ProtoMember(8)]
         public EFixedType fix = EFixedType.None; //for an array-superseries, if this type is .Parameter, the corresponding GDX variable is "parameter". If not, the corresponding GDX variable is "variable". So this field is also used to store information on GAMS/GDX types.
+        
         [ProtoMember(9)]
         public GekkoTimeSpans fixedNormal = null;  //only for EFixedType.Normal, setting the periods
 

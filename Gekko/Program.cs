@@ -4422,9 +4422,11 @@ namespace Gekko
 
                 string hash = null;
 
+                bool copyLocal2 = copyLocal && !Globals.excelDna;
+
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (copyLocal && !Globals.excelDna)
+                    if (copyLocal2)
                     {
                         //TODO
                         //TODO
@@ -4669,7 +4671,7 @@ namespace Gekko
                 }
 
                 //Cleanup of local files
-                if (copyLocal && !Globals.excelDna)
+                if (copyLocal2)
                 {
                     if (true)
                     {
@@ -5429,7 +5431,7 @@ namespace Gekko
             string unzippedFile = Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
 
             DateTime dt2 = DateTime.Now;
-            string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
+            string foundTsdFile = WaitForZipReadGbk(tempTsdxPath, file, unzippedFile, originalFilePath);
             G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
 
             //both protobuffers and tsd files
@@ -8618,37 +8620,33 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Precedents means which variables (often timeseries) are part of a given expression. This can be "recorded" when issuing
+        /// This method deals with tracing info (metadata). ||||| If last parameter == true,
+        /// predents for DECOMP are also done. Precedents means which variables (often timeseries) are part of a given expression. This can be "recorded" when issuing
         /// a given expression or statement, for instance the GetIVariable() method can report back that a certain variable has been
         /// used in the expression. Such variables are then stored in Globals.precedents (a Dictionary with string keys).
-        /// </summary>
-        /// <param name="variableName"></param>
-        /// <param name="iv"></param>
-        /// <param name="db"></param>
-        public static void PrecedentsHelper(string variableName, IVariable iv, Databank db)
-        {
-            if (Globals.precedents == null) return;
-            if (iv == null) return;
-            Series rv_series = iv as Series;
-            if (rv_series != null)
-            {
-                Program.AddToPrecedents(db, rv_series.GetName());
-            }
-        }
-
-        /// <summary>
-        /// Deals with tracing info (metadata)
         /// </summary>
         /// <param name="name"></param>
         /// <param name="ib"></param>
         /// <param name="iv"></param>
-        public static void Trace(string name, IBank ib, IVariable iv, bool isLhs)
+        public static void Trace(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
         {
-            if (!Globals.useTrace) return;
-            //if (!Globals.useTrace || Globals.trace2 == null) return;
-            bool onlyTraceSeries = false;
             if (iv == null) return;
             Series rv_series = iv as Series;
+
+            // PRECEDENTS PRECEDENTS PRECEDENTS 
+            // PRECEDENTS PRECEDENTS PRECEDENTS 
+            // PRECEDENTS PRECEDENTS PRECEDENTS 
+            if (alsoIncludePrecedents && Globals.precedents != null && rv_series != null)
+            {
+                Program.AddToPrecedents(ib as Databank, rv_series.GetName());
+            }
+
+            // TRACING TRACING TRACING TRACING 
+            // TRACING TRACING TRACING TRACING 
+            // TRACING TRACING TRACING TRACING 
+            if (!Globals.useTrace) return;
+            //if (!Globals.useTrace || Globals.trace2 == null) return;
+            bool onlyTraceSeries = false;            
             string x_lhs = "";
             if (isLhs) x_lhs = "LHS";
             string x_objectName = null;
@@ -21151,16 +21149,17 @@ namespace Gekko
 
         //
         /// <summary>
-        /// Only used for reading TSDX files, much more specific than WaitForZipRead()
+        /// Only used for reading .gbk/.tsdx files, much more specific than WaitForZipRead().
+        /// NOTE: Is actually not waiting. In most cases, the file has been copied beforehand because
+        /// of copylocal option.
         /// </summary>
         /// <param name="folder"></param>
         /// <param name="zipFileName"></param>
         /// <param name="inside"></param>
         /// <param name="originalFileName"></param>
         /// <returns></returns>
-        public static string WaitForZipRead_TSDX(string folder, string zipFileName, string inside, string originalFileName)
+        public static string WaitForZipReadGbk(string folder, string zipFileName, string inside, string originalFileName)
         {
-
             //is not actually waiting...
             int gap = Globals.waitFileGap;  //2 seconds
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
@@ -21179,7 +21178,15 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Error("Zip extraction failed: " + e.InnerException + " " + e.Message, false);
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("Zip extraction failed while trying to read a Gekko databank (.gbk or .tsdx file).");
+                    txt.MainAdd("This may be because the file is blocked by another program.");
+                    txt.MoreAdd("If 'option databank file copylocal' is = 'no', please try to set it = 'yes'.");
+                    txt.MoreAdd("When set to 'yes', Gekko will first make a local copy of the file before attempting to read it.");
+                    txt.MoreAdd("You may also just try to run your program again to see if the file has been unblocked.");
+                    txt.MoreAdd("The zip extractor provides the following technical error message: " + e.InnerException + " " + e.Message);
+                }
             }
 
             string xmlFile = "";
@@ -21215,7 +21222,6 @@ namespace Gekko
             if (xmlFile == "")
             {
                 new Error("Cannot find xml-file inside zip-file. Expected to find '" + "DatabankInfo.xml" + "' inside '" + originalFileName + "'");
-                //throw new GekkoException();
             }
 
             if (isProtobuf)
@@ -22476,7 +22482,7 @@ namespace Gekko
                 {
                     if (File.Exists(removed.FileNameWithPath))
                     {
-                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider running your code again.");
                         skipWrite = true;
                     }
                 }
@@ -22485,7 +22491,7 @@ namespace Gekko
                     string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath), null, null);
                     if (!(trueFileHash == removed.fileHash))
                     {
-                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' seems to have changed since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' seems to have changed since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider running your code again.");
                         skipWrite = true;
                     }
                 }

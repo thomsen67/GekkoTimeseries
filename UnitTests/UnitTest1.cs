@@ -12835,23 +12835,23 @@ namespace UnitTests
 
                 c = "a = 2, 3, 4;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.calc;
+                calc = Helper_GetCalcField("a!a");
 
                 c = "b = 12, 13, 14;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.calc;
+                calc = Helper_GetCalcField("b!a");
 
                 c = "c = a + b;";
-                s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.calc;
+                s += HelperTrace(c);                
+                calc = Helper_GetCalcField("c!a");
 
                 c = "d = a + b + c;";
-                s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.calc;
-                
+                s += HelperTrace(c);                
+                calc = Helper_GetCalcField("d!a");
+
                 c = "copy d to e;";
-                s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.calc;
+                s += HelperTrace(c);                
+                calc = Helper_GetCalcField("e!a");
 
                 c = "e <2024 2025> = 22, 23;";
                 s += HelperTrace(c);
@@ -12887,14 +12887,14 @@ namespace UnitTests
                 calc = Helper_GetCalcField("b!a");
                 calc = Helper_GetCalcField("c!a");
                 calc = Helper_GetCalcField("d!a");
-                calc = Helper_GetCalcField("e!a");
+                calc = Helper_GetCalcField("e!a");                
 
                 c = "disp e;";
                 s += HelperTrace(c);
 
                 c = "f = a + b + c + d + e;";
-                s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("f!a") as Series).meta.calc;
+                s += HelperTrace(c);                
+                calc = Helper_GetCalcField("f!a");
 
 
             }
