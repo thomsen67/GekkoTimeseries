@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Gekko
 {
@@ -33,26 +34,27 @@ namespace Gekko
             this.varnameWithFreq = s;
         }
 
-        public static void Walker(Dictionary<GekkoTime, Trace2> dict, int d)
-        {
-            //if (trace == null) return;
-            ////if (d >= 5) return;
-            //new Writeln("-- " + G.Blanks(d * 2) + trace.bankAndVarnameWithFreq);
-            ////Trace2 first = null;
-            //foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.precedents)             
-            //{
-            //    //if (first != null && kvp.Value == first) continue;
-            //    //if (first == null) first = kvp.Value;
-            //    Trace2 child = kvp.Value;
-            //    new Writeln("-- " + G.Blanks(d * 2) + kvp.Key.ToString() + ": " + child.assignment);
-            //    if (child.precedents != null)
-            //    {
-            //        foreach (Trace2 childTrace in child.precedents)
-            //        {
-            //            Walker(childTrace, d + 1);
-            //        }
-            //    }
-            //}
+        public static void Walker(Trace2 trace2, int d)
+        {            
+            using (Writeln txt = new Writeln())
+            {
+                txt.indent = G.Blanks(4 * d);
+                txt.MainAdd("Variable: " + trace2.bankAndVarnameWithFreq);
+                txt.MainNewLineTight();
+                txt.MainAdd("Stamp: " + trace2.assignment);
+                txt.MainNewLineTight();
+                txt.MainAdd("Stamp: " + trace2.stamp);
+                txt.MainNewLineTight();
+                txt.MainAdd("File: " + trace2.filenameAndPathAndLine);
+                txt.MainNewLineTight();
+            }
+            if (trace2.precedents != null)
+            {
+                foreach (Trace2 childTrace2 in trace2.precedents)
+                {
+                    Walker(childTrace2, d + 1);
+                }
+            }
         }
     }
 
@@ -66,10 +68,7 @@ namespace Gekko
         public DateTime stamp = DateTime.MinValue;
 
         [ProtoMember(3)]
-        public string filenameAndPath = null;
-
-        [ProtoMember(4)]
-        public int line = -12345;
+        public string filenameAndPathAndLine = null;
 
         [ProtoMember(5)]
         public string assignment = null;

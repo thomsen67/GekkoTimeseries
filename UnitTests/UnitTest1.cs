@@ -12840,23 +12840,30 @@ namespace UnitTests
                 s += HelperTrace(c);
 
                 c = "c = a + b;";
-                s += HelperTrace(c);                
+                s += HelperTrace(c);
 
                 c = "d = a + b + c;";
                 s += HelperTrace(c);
 
-                if (false)
+                if (true)
                 {
                     I("write sletmig;");
                     I("read sletmig;");
-                }                
-
-                c = "copy d to e;";
-                s += HelperTrace(c);
+                }
 
                 Globals.unitTestScreenOutput.Clear();
-                Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace.storage, 0);
+                Trace trace = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
+                //sort and merge these for DISP etc.
+                foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
+                {
+                    new Writeln("========== " + kvp.Key + " =======================");
+                    Trace.Walker(kvp.Value, 0);
+                }
                 string output = Globals.unitTestScreenOutput.ToString();
+                return;                       
+
+                c = "copy d to e;";
+                s += HelperTrace(c);                
 
                 c = "e <2024 2025> = 22, 23;";
                 s += HelperTrace(c);                

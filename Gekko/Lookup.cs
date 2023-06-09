@@ -1285,12 +1285,20 @@ namespace Gekko
                             {
                                 lhs_series.meta.source = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + lhs_series.meta.source.Replace("<[code]>", "");
                                 // ---------
-                                Trace2 trace2 = new Trace2();                                
+                                Trace2 trace2 = new Trace2();
+                                trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                                trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
+                                trace2.stamp = DateTime.Now;
                                 if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
                                 trace2.assignment = lhs_series.meta.source.Replace("<[code]>", "");
                                 
                                 //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                                 if (Globals.traceContainer.Count > 0) trace2.precedents = new List<Trace2>();
+
+                                //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
+                                //     Is datetime finegrained enough?
+                                //     This would guard against cycles in protobuf.
+                                
                                 foreach (IVariable iv in Globals.traceContainer)
                                 {
                                     Series iv_ts = iv as Series;
