@@ -1894,6 +1894,15 @@ namespace Gekko
             return new GekkoTime(EFreq.D, year, easterMonth, easterDay);
         }
 
+        // NOTE: It seems reflection is used and therefore Equals() checks the fields.
+        //       Using default probably means use of reflection and boxing, so could be slow
+        //       if used in a tight loop or something. For slower things probably ok.
+        //public override bool Equals(Object obj)
+        //{            
+        //}
+        //public override int GetHashCode()
+        //{         
+        //}
 
     }
 
@@ -1941,9 +1950,7 @@ namespace Gekko
         {
             new Error("Iterator problem"); throw new GekkoException();  //must throw explicitly here, else C# whines.
         }
-    }
-
-    
+    }    
 
     public class AllFreqsHelper
     {

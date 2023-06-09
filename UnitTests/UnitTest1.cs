@@ -12849,14 +12849,14 @@ namespace UnitTests
                 {
                     I("write sletmig;");
                     I("read sletmig;");
-                }
-
-                Globals.unitTestScreenOutput.Clear();
-                Trace.Walker((Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace, 0);
-                string output = Globals.unitTestScreenOutput.ToString();
+                }                
 
                 c = "copy d to e;";
                 s += HelperTrace(c);
+
+                Globals.unitTestScreenOutput.Clear();
+                Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
+                string output = Globals.unitTestScreenOutput.ToString();
 
                 c = "e <2024 2025> = 22, 23;";
                 s += HelperTrace(c);                
