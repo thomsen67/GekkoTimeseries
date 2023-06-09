@@ -262,7 +262,7 @@ namespace Gekko
 
         public static bool useTrace = false;
         //public static GekkoDictionary<string, Trace> trace = null;  //used for tracing/metadata
-        public static List<IVariable> trace2 = null;
+        public static List<IVariable> traceContainer = null;
 
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";

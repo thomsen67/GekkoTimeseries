@@ -33,26 +33,26 @@ namespace Gekko
             this.varnameWithFreq = s;
         }
 
-        public static void Walker(Trace trace, int d)
+        public static void Walker(Dictionary<GekkoTime, Trace2> dict, int d)
         {
-            if (trace == null) return;
-            //if (d >= 5) return;
-            new Writeln("-- " + G.Blanks(d * 2) + trace.mapOrBankName + ":" + trace.varnameWithFreq);
-            //Trace2 first = null;
-            foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)             
-            {
-                //if (first != null && kvp.Value == first) continue;
-                //if (first == null) first = kvp.Value;
-                Trace2 child = kvp.Value;
-                new Writeln("-- " + G.Blanks(d * 2) + kvp.Key.ToString() + ": " + child.statement);
-                if (child.precedents != null)
-                {
-                    foreach (Trace childTrace in child.precedents)
-                    {
-                        Walker(childTrace, d + 1);
-                    }
-                }
-            }
+            //if (trace == null) return;
+            ////if (d >= 5) return;
+            //new Writeln("-- " + G.Blanks(d * 2) + trace.bankAndVarnameWithFreq);
+            ////Trace2 first = null;
+            //foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.precedents)             
+            //{
+            //    //if (first != null && kvp.Value == first) continue;
+            //    //if (first == null) first = kvp.Value;
+            //    Trace2 child = kvp.Value;
+            //    new Writeln("-- " + G.Blanks(d * 2) + kvp.Key.ToString() + ": " + child.assignment);
+            //    if (child.precedents != null)
+            //    {
+            //        foreach (Trace2 childTrace in child.precedents)
+            //        {
+            //            Walker(childTrace, d + 1);
+            //        }
+            //    }
+            //}
         }
     }
 
@@ -60,10 +60,22 @@ namespace Gekko
     public class Trace2
     {
         [ProtoMember(1)]
-        public string statement = null;
+        public string bankAndVarnameWithFreq = null;
 
         [ProtoMember(2)]
-        public List<Trace> precedents = null;
+        public DateTime stamp = DateTime.MinValue;
+
+        [ProtoMember(3)]
+        public string filenameAndPath = null;
+
+        [ProtoMember(4)]
+        public int line = -12345;
+
+        [ProtoMember(5)]
+        public string assignment = null;
+
+        [ProtoMember(6)]
+        public List<Trace2> precedents = null;
 
         public Trace2()
         {

@@ -12823,7 +12823,7 @@ namespace UnitTests
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 Globals.useTrace = true;
                 //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                Globals.trace2 = new List<IVariable>();
+                Globals.traceContainer = new List<IVariable>();
 
                 //TODO: maps, <dyn>
 
@@ -12855,7 +12855,7 @@ namespace UnitTests
                 s += HelperTrace(c);
 
                 Globals.unitTestScreenOutput.Clear();
-                Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
+                Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace.storage, 0);
                 string output = Globals.unitTestScreenOutput.ToString();
 
                 c = "e <2024 2025> = 22, 23;";
@@ -12902,7 +12902,7 @@ namespace UnitTests
             {
                 Globals.useTrace = false;
                 //Globals.trace = null;
-                Globals.trace2 = null;
+                Globals.traceContainer = null;
                 Globals.precedents = null;
             }
 
@@ -12911,7 +12911,7 @@ namespace UnitTests
         private static string HelperTrace(string command)
         {
             //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-            Globals.trace2 = new List<IVariable>();
+            Globals.traceContainer = new List<IVariable>();
             I(command);            
             //string s = null;
             //s += command + G.NL;
@@ -12922,7 +12922,7 @@ namespace UnitTests
             //s += "---------------------------------------------------------------------------";
             //s += G.NL;
             //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-            Globals.trace2 = new List<IVariable>();
+            Globals.traceContainer = new List<IVariable>();
             return "";
         }
         

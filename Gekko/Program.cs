@@ -8680,7 +8680,7 @@ namespace Gekko
                     //}
 
                     //if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
-                    if (!Globals.trace2.Contains(iv)) Globals.trace2.Add(iv);
+                    if (!Globals.traceContainer.Contains(iv)) Globals.traceContainer.Add(iv);
                 }
             }
         }
