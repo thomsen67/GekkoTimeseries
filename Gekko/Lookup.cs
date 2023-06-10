@@ -1273,66 +1273,65 @@ namespace Gekko
 
                     if (!isArraySubSeries)
                     {
+                        string trace = null;
                         lhs_series.meta.stamp = Program.GetDateStamp();
-                        if (o?.opt_label != null) lhs_series.meta.label = O.ConvertToString(o.opt_label);
-                        if (o?.opt_source != null) lhs_series.meta.source = O.ConvertToString(o.opt_source);
-                        if (o?.opt_units != null) lhs_series.meta.units = O.ConvertToString(o.opt_units);
-                        if (o?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(o.opt_stamp);  //will override
+                        if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
+                        if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
+                        if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
+                        if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override
+                        if (o?.opt_trace != null) trace = o.opt_trace;  //machine generated
 
-                        if (!G.NullOrEmpty(lhs_series.meta.source))
+                        if (trace != null)
                         {
-                            if (lhs_series.meta.source.StartsWith("<[code]>"))
+
+                            if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
+                            // ---------
+                            Trace2 trace2 = new Trace2();
+                            trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                            trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
+                            trace2.stamp = DateTime.Now;                            
+                            trace2.assignment = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + trace;
+
+                            //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
+                            if (Globals.traceContainer.Count > 0) trace2.precedents = new List<Trace2>();
+
+                            //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
+                            //     Is datetime finegrained enough?
+                            //     This would guard against cycles in protobuf.
+
+                            foreach (IVariable iv in Globals.traceContainer)
                             {
-                                lhs_series.meta.source = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + lhs_series.meta.source.Replace("<[code]>", "");
-                                // ---------
-                                Trace2 trace2 = new Trace2();
-                                trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                                trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                                trace2.stamp = DateTime.Now;
-                                if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
-                                trace2.assignment = lhs_series.meta.source.Replace("<[code]>", "");
-                                
-                                //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
-                                if (Globals.traceContainer.Count > 0) trace2.precedents = new List<Trace2>();
+                                Series iv_ts = iv as Series;
+                                if (iv_ts == null) continue;
+                                //if (trace2.precedents == null) trace2.precedents = new List<Trace2>();  //.precedents not done in constructor because quite a lot of these could have 0 elements --> better to store as null
 
-                                //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
-                                //     Is datetime finegrained enough?
-                                //     This would guard against cycles in protobuf.
-                                
-                                foreach (IVariable iv in Globals.traceContainer)
+                                foreach (KeyValuePair<GekkoTime, Trace2> kvp in iv_ts.meta.trace.storage)
                                 {
-                                    Series iv_ts = iv as Series;
-                                    if (iv_ts == null) continue;
-                                    //if (trace2.precedents == null) trace2.precedents = new List<Trace2>();  //.precedents not done in constructor because quite a lot of these could have 0 elements --> better to store as null
-                                    
-                                    foreach (KeyValuePair<GekkoTime, Trace2> kvp in iv_ts.meta.trace.storage)
+                                    GekkoTime t = kvp.Key;  //not used: we generally do not trace back to individual precedents *periods*, which would be complicated and error-prone. Consider lags, movsum(), etc...
+                                    Trace2 childTrace2 = kvp.Value;
+                                    bool known = false;
+                                    foreach (Trace2 tempElement in trace2.precedents)
                                     {
-                                        GekkoTime t = kvp.Key;  //not used: we generally do not trace back to individual precedents *periods*, which would be complicated and error-prone. Consider lags, movsum(), etc...
-                                        Trace2 childTrace2 = kvp.Value;
-                                        bool known = false;
-                                        foreach (Trace2 tempElement in trace2.precedents)
+                                        if (Object.ReferenceEquals(childTrace2, tempElement))
                                         {
-                                            if (Object.ReferenceEquals(childTrace2, tempElement))
-                                            {
-                                                known = true; break;
-                                            }
+                                            known = true; break;
                                         }
-                                        if (!known) trace2.precedents.Add(childTrace2);
                                     }
+                                    if (!known) trace2.precedents.Add(childTrace2);
                                 }
+                            }
 
-                                //For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
-                                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                                {
-                                    //!!!!
-                                    //!!!!
-                                    //!!!!
-                                    //!!!! implement hashcode and equals for GekkoTime
-                                    //!!!!
-                                    //!!!!
-                                    if (lhs_series.meta.trace.storage.ContainsKey(t)) lhs_series.meta.trace.storage.Remove(t);
-                                    lhs_series.meta.trace.storage.Add(t, trace2);
-                                }
+                            //For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
+                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                            {
+                                //!!!!
+                                //!!!!
+                                //!!!!
+                                //!!!! implement hashcode and equals for GekkoTime
+                                //!!!!
+                                //!!!!
+                                if (lhs_series.meta.trace.storage.ContainsKey(t)) lhs_series.meta.trace.storage.Remove(t);
+                                lhs_series.meta.trace.storage.Add(t, trace2);
                             }
                         }
                     }

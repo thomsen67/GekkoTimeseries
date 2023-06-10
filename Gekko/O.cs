@@ -8378,7 +8378,6 @@ namespace Gekko
             public string opt_dl = null;
             public string opt_l = null;
 
-
             public string opt_keep = null;
             public IVariable opt_rownames = null;
             public IVariable opt_colnames = null;
@@ -8390,6 +8389,7 @@ namespace Gekko
             public string opt_dyn = null;            
             public string opt_lsfunc = null;  //left-side function
             public string opt_missing = null;
+            public string opt_trace = null;  //only machine generated
         }
 
         public class Accept
