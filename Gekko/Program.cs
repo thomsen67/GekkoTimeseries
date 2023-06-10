@@ -66,6 +66,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using static Gekko.Program;
+using System.Windows.Markup.Localizer;
 
 namespace Gekko
 {
@@ -170,6 +171,12 @@ namespace Gekko
         Decomp,
         Find,
         Unknown
+    }
+
+    public class DispTraceHelpler
+    {
+        public Trace2 trace2 = null;
+        public List<GekkoTime> dates = new List<GekkoTime>();
     }
 
     public class TraceSimple
@@ -8636,7 +8643,7 @@ namespace Gekko
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
-            if (Globals.useTrace)
+            if (Program.options.databank_trace)
             {
                 //if (!Globals.useTrace || Globals.trace2 == null) return;
                 bool onlyTraceSeries = false;
@@ -15177,6 +15184,43 @@ namespace Gekko
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
+                if (ts.meta.trace != null)
+                {
+                    Trace trace = ts.meta.trace;
+                    List<DispTraceHelpler> condensed = new List<DispTraceHelpler>();
+                    foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
+                    {
+                        bool known = false;
+                        foreach (DispTraceHelpler c in condensed)
+                        {
+                            if (Object.ReferenceEquals(c.trace2, kvp.Value))
+                            {
+                                c.dates.Add(kvp.Key);
+                                known = true; break;
+                            }
+                        }
+                        if (!known)
+                        {
+                            DispTraceHelpler dth = new DispTraceHelpler();
+                            dth.trace2 = kvp.Value;
+                            dth.dates.Add(kvp.Key);
+                            condensed.Add(dth);
+                        }
+                    }
+
+                    //Sort dates
+                    foreach (DispTraceHelpler c in condensed) c.dates.Sort(); //sort dates for each link                    
+                    condensed = condensed.OrderBy(x => x.dates[0]).ToList();  //links by first date
+
+                    foreach (DispTraceHelpler c in condensed)
+                    {
+                        List<string> temp2 = new List<string>();
+                        foreach (GekkoTime t in c.dates) temp2.Add(t.ToString());
+                        string s = "Trace " + Stringlist.GetListWithCommas(temp2) + ": " + c.trace2.assignment;
+                        G.Writeln(s);
+                    }
+                }
+
                 bool eqsPrinted = false;
                 List<MultidimItem> keys = null;
                 GekkoDictionary<string, string>[] temp = null;
@@ -16193,7 +16237,7 @@ namespace Gekko
                     //if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
-                    if (Globals.useTrace && ts_clone != null)
+                    if (Program.options.databank_trace && ts_clone != null)
                     {
                         //ts_clone.meta.calc[0] += " // Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
                     }

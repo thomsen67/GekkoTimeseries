@@ -3322,7 +3322,7 @@ namespace Gekko
         /// <param name="check_20"></param>
         /// <param name="o"></param>
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
-        {
+        {            
             MissingMemory missing = null;
             if (o.opt_missing != null)
             {
@@ -3335,6 +3335,8 @@ namespace Gekko
 
             try
             {
+                if (Program.options.databank_trace) Globals.traceContainer = new List<IVariable>();
+                
                 //check_20() just checks if the RHS is a timeseries or not. If not, there is no point
                 //in looping over periods anyway.
                 //
@@ -3358,6 +3360,8 @@ namespace Gekko
             }
             finally
             {
+                Globals.traceContainer = null;  //only traces assigns.
+
                 if (o.opt_missing != null)
                 {                    
                     if (Program.options.bugfix_missingignore == true)

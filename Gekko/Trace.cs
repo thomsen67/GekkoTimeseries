@@ -16,10 +16,10 @@ namespace Gekko
     public class Trace
     {
         [ProtoMember(1)]
-        public string mapOrBankName = null;
+        public string mapOrBankName = null;  //What is this used for ???
 
         [ProtoMember(2)]
-        public string varnameWithFreq = null;
+        public string varnameWithFreq = null;  //What is this used for ???
 
         [ProtoMember(3)]
         public Dictionary<GekkoTime, Trace2> storage = new Dictionary<GekkoTime, Trace2>();

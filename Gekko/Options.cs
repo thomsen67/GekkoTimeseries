@@ -55,6 +55,10 @@ namespace Gekko
         public bool databank_file_gbk_compress = true;        
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
+
+        public bool databank_trace = false;
+        public int databank_trace_depth = -1;
+
         // ---
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
@@ -329,6 +333,10 @@ namespace Gekko
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
             Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);
             Add("DATABANK SEARCH", Globals.xbool);
+
+            Add("DATABANK TRACE", Globals.xbool);
+            Add("DATABANK TRACE DEPTH", Globals.xint);
+
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
             Add("DECOMP PLOT ZOOM", Globals.xint);

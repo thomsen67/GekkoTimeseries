@@ -12819,9 +12819,9 @@ namespace UnitTests
                 string s = null;
                 string c = null;
                 string calc = null;
-
+                I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                Globals.useTrace = true;
+                I("OPTION databank trace = yes;");
                 //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 Globals.traceContainer = new List<IVariable>();
 
@@ -12907,8 +12907,7 @@ namespace UnitTests
             }
             finally
             {
-                Globals.useTrace = false;
-                //Globals.trace = null;
+                I("OPTION databank trace = no;");  //not really necessary to switch off...
                 Globals.traceContainer = null;
                 Globals.precedents = null;
             }

@@ -1225,7 +1225,7 @@ namespace Gekko
                                 e.MainAdd("OPTION databank create auto = yes;");
                                 e.MainNewLineTight();
                                 e.MainAdd("Alternatively, use 'MODE data;' or 'MODE mixed;'.");
-                            }                            
+                            }
                         }
                     }
 
@@ -1271,76 +1271,13 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    if (!isArraySubSeries)
-                    {
-                        string trace = null;
-                        lhs_series.meta.stamp = Program.GetDateStamp();
-                        if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
-                        if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
-                        if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
-                        if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override
-                        if (o?.opt_trace != null) trace = o.opt_trace;  //machine generated
-
-                        if (trace != null)
-                        {
-
-                            if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
-                            // ---------
-                            Trace2 trace2 = new Trace2();
-                            trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                            trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                            trace2.stamp = DateTime.Now;                            
-                            trace2.assignment = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + trace;
-
-                            //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
-                            if (Globals.traceContainer.Count > 0) trace2.precedents = new List<Trace2>();
-
-                            //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
-                            //     Is datetime finegrained enough?
-                            //     This would guard against cycles in protobuf.
-
-                            foreach (IVariable iv in Globals.traceContainer)
-                            {
-                                Series iv_ts = iv as Series;
-                                if (iv_ts == null) continue;
-                                //if (trace2.precedents == null) trace2.precedents = new List<Trace2>();  //.precedents not done in constructor because quite a lot of these could have 0 elements --> better to store as null
-
-                                foreach (KeyValuePair<GekkoTime, Trace2> kvp in iv_ts.meta.trace.storage)
-                                {
-                                    GekkoTime t = kvp.Key;  //not used: we generally do not trace back to individual precedents *periods*, which would be complicated and error-prone. Consider lags, movsum(), etc...
-                                    Trace2 childTrace2 = kvp.Value;
-                                    bool known = false;
-                                    foreach (Trace2 tempElement in trace2.precedents)
-                                    {
-                                        if (Object.ReferenceEquals(childTrace2, tempElement))
-                                        {
-                                            known = true; break;
-                                        }
-                                    }
-                                    if (!known) trace2.precedents.Add(childTrace2);
-                                }
-                            }
-
-                            //For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
-                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                            {
-                                //!!!!
-                                //!!!!
-                                //!!!!
-                                //!!!! implement hashcode and equals for GekkoTime
-                                //!!!!
-                                //!!!!
-                                if (lhs_series.meta.trace.storage.ContainsKey(t)) lhs_series.meta.trace.storage.Remove(t);
-                                lhs_series.meta.trace.storage.Add(t, trace2);
-                            }
-                        }
-                    }
+                    LookupHandleTrace(smpl, lhs_series, ib, varnameWithFreq, isArraySubSeries, o);
 
                     switch (rhs.Type())
                     {
                         case EVariableType.Series:
                             {
-                                Series rhs_series_beware = rhs as Series;                                
+                                Series rhs_series_beware = rhs as Series;
 
                                 string freq_rhs = G.ConvertFreq(rhs_series_beware.freq);
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
@@ -1374,7 +1311,7 @@ namespace Gekko
                                                         txt.MoreAdd("Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.7 to a");
                                                         txt.MoreAdd("Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the");
                                                         txt.MoreAdd("'Backwards incompatibility, or how to ignore' section in the above link.");
-                                                    }                                                    
+                                                    }
                                                 }
                                             }
                                         }
@@ -1737,6 +1674,77 @@ namespace Gekko
 
             return;
 
+        }
+
+        private static void LookupHandleTrace(GekkoSmpl smpl, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o)
+        {
+            if (!isArraySubSeries)
+            {
+                string trace = null;
+                lhs_series.meta.stamp = Program.GetDateStamp();
+                if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
+                if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
+                if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
+                if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override
+                if (o?.opt_trace != null) trace = o.opt_trace;  //machine generated
+
+                if (trace != null)
+                {
+
+                    if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ib.GetName(), varnameWithFreq);
+                    // ---------
+                    Trace2 trace2 = new Trace2();
+                    trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                    trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
+                    trace2.stamp = DateTime.Now;
+                    trace2.assignment = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + trace;
+
+                    //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
+                    if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
+                    {
+                        trace2.precedents = new List<Trace2>();
+
+                        //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
+                        //     Is datetime finegrained enough?
+                        //     This would guard against cycles in protobuf.
+
+                        foreach (IVariable iv in Globals.traceContainer)
+                        {
+                            Series iv_ts = iv as Series;
+                            if (iv_ts == null) continue;
+                            //if (trace2.precedents == null) trace2.precedents = new List<Trace2>();  //.precedents not done in constructor because quite a lot of these could have 0 elements --> better to store as null
+
+                            foreach (KeyValuePair<GekkoTime, Trace2> kvp in iv_ts.meta.trace.storage)
+                            {
+                                GekkoTime t = kvp.Key;  //not used: we generally do not trace back to individual precedents *periods*, which would be complicated and error-prone. Consider lags, movsum(), etc...
+                                Trace2 childTrace2 = kvp.Value;
+                                bool known = false;
+                                foreach (Trace2 tempElement in trace2.precedents)
+                                {
+                                    if (Object.ReferenceEquals(childTrace2, tempElement))
+                                    {
+                                        known = true; break;
+                                    }
+                                }
+                                if (!known) trace2.precedents.Add(childTrace2);
+                            }
+                        }
+                    }
+
+                    //For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
+                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    {
+                        //!!!!
+                        //!!!!
+                        //!!!!
+                        //!!!! implement hashcode and equals for GekkoTime
+                        //!!!!
+                        //!!!!
+                        if (lhs_series.meta.trace.storage.ContainsKey(t)) lhs_series.meta.trace.storage.Remove(t);
+                        lhs_series.meta.trace.storage.Add(t, trace2);
+                    }
+                }
+            }
         }
 
         private static bool SeriesHasSkips(Series tsInput)

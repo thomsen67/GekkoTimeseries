@@ -130,7 +130,7 @@ namespace Gekko
     [Serializable]
     [ProtoContract]
     //GekkoTime is an immutable struct for fast looping. Structs should be < 16 bytes to be effective (we have 3 x 4 = 12 bytes here)
-    public struct GekkoTime
+    public struct GekkoTime : IComparable<GekkoTime>
     {
         //use IsNull() to check for null. The fields are short, to reduce size since this is a struct (that also gets saved in GBK files).
         [ProtoMember(1)]
@@ -1904,6 +1904,12 @@ namespace Gekko
         //{         
         //}
 
+        public int CompareTo(GekkoTime other)
+        {         
+            if (this.EqualsGekkoTime(other)) return 0;
+            else if (this.StrictlySmallerThan(other)) return -1;
+            else return 1;
+        }
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>
