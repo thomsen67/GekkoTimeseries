@@ -10,11 +10,14 @@ namespace Gekko
 {
     /// <summary>
     /// Used for the .trace field of timeseries
-    /// </summary>
+    /// </summary>    
 
     [ProtoContract]
     public class Trace
     {
+        [ProtoMember(100)]
+        public X x = null;
+
         [ProtoMember(1)]
         public string mapOrBankName = null;  //What is this used for ???
 

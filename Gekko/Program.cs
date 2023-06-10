@@ -15184,6 +15184,17 @@ namespace Gekko
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
+                /*
+                 * 
+                 *  We have 10 GekkoTimes pointing to 3 Trace2 objects. These objects point to each other, but 
+                 *  Better to 
+                 * 
+                 * 
+                 * 
+                 
+
+                 */           
+
                 if (ts.meta.trace != null)
                 {
                     Trace trace = ts.meta.trace;
