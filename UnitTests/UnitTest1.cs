@@ -51,6 +51,7 @@ using Apache.Arrow;
 using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using Microsoft.Data.Analysis;
+using static Gekko.O;
 
 namespace UnitTests
 {
@@ -12848,20 +12849,42 @@ namespace UnitTests
                 trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace2;
                 Assert.IsTrue(trace2.precedents.Count == 1);
                 Assert.AreEqual(trace2.precedents[0].assignment, c3);
+                                
+                string c4 = "c = a + b;";
+                s += HelperTrace(c4);
+                trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 1);
+                Assert.AreEqual(trace2.precedents[0].assignment, c4);
+                Assert.IsTrue(trace2.precedents[0].precedents.Count == 3);
+                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
 
-                return;
-
-                c = "c = a + b;";
-                s += HelperTrace(c);
-
-                c = "d = a + b + c;";
-                s += HelperTrace(c);
+                string c5 = "d = a + b + c;";
+                s += HelperTrace(c5);
+                trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 1);
+                Assert.AreEqual(trace2.precedents[0].assignment, c5);                
+                Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
+                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+                Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
 
                 if (true)
                 {
                     I("write sletmig;");
                     I("read sletmig;");
                 }
+
+                trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 1);
+                Assert.AreEqual(trace2.precedents[0].assignment, c5);
+                Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
+                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+                Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
 
                 c = "copy d to e;";
                 s += HelperTrace(c);                

@@ -81,7 +81,7 @@ namespace Gekko
         {
             string s = this.assignment;
             if (G.NullOrEmpty(s)) s = "<Entry from .meta>";
-            return this.t1 + "-" + this.t2 + " = " + this.assignment;
+            return this.t1 + "-" + this.t2 + ": " + this.assignment;
         }
 
         public Trace2()
