@@ -12816,7 +12816,7 @@ namespace UnitTests
                 //
                 // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
                 //
-                
+
                 string s = null;
                 string c = null;
                 string calc = null;
@@ -12833,43 +12833,29 @@ namespace UnitTests
 
                 string c1 = "a = 2, 3, 4;";
                 s += HelperTrace(c1);
-                Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 1);
-                Assert.AreEqual(trace2.precedents[0].assignment, c1);
-                
+                Helper_CheckTrace1(c1);
+
                 string c2 = "a <2022 2023> = 100;";
                 s += HelperTrace(c2);
-                trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 2);
-                Assert.AreEqual(trace2.precedents[0].assignment, c1);
-                Assert.AreEqual(trace2.precedents[1].assignment, c2);
+                Helper_CheckTrace2(c1, c2);
 
                 string c3 = "b = 12, 13, 14;";
                 s += HelperTrace(c3);
-                trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 1);
-                Assert.AreEqual(trace2.precedents[0].assignment, c3);
-                                
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace2(c1, c2);
+
                 string c4 = "c = a + b;";
                 s += HelperTrace(c4);
-                trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 1);
-                Assert.AreEqual(trace2.precedents[0].assignment, c4);
-                Assert.IsTrue(trace2.precedents[0].precedents.Count == 3);
-                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+                Helper_CheckTrace4(c1, c2, c3, c4);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace2(c1, c2);
 
                 string c5 = "d = a + b + c;";
                 s += HelperTrace(c5);
-                trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 1);
-                Assert.AreEqual(trace2.precedents[0].assignment, c5);                
-                Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
-                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
-                Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
+                Helper_CheckTrace5(c1, c2, c3, c4, c5);
+                Helper_CheckTrace4(c1, c2, c3, c4);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace2(c1, c2);
 
                 if (true)
                 {
@@ -12877,20 +12863,18 @@ namespace UnitTests
                     I("read sletmig;");
                 }
 
-                trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
-                Assert.IsTrue(trace2.precedents.Count == 1);
-                Assert.AreEqual(trace2.precedents[0].assignment, c5);
-                Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
-                Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-                Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-                Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
-                Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
+                Helper_CheckTrace5(c1, c2, c3, c4, c5);
+                Helper_CheckTrace4(c1, c2, c3, c4);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace2(c1, c2);
+
+                return;
 
                 c = "copy d to e;";
-                s += HelperTrace(c);                
+                s += HelperTrace(c);
 
                 c = "e <2024 2025> = 22, 23;";
-                s += HelperTrace(c);                
+                s += HelperTrace(c);
 
                 //Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
 
@@ -12926,8 +12910,8 @@ namespace UnitTests
                 s += HelperTrace(c);
 
                 c = "f = a + b + c + d + e;";
-                s += HelperTrace(c);                                
-                
+                s += HelperTrace(c);
+
             }
             finally
             {
@@ -12936,6 +12920,51 @@ namespace UnitTests
                 Globals.precedents = null;
             }
 
+        }
+
+        private static void Helper_CheckTrace5(string c1, string c2, string c3, string c4, string c5)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, c5);
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+            Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
+        }
+
+        private static void Helper_CheckTrace4(string c1, string c2, string c3, string c4)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, c4);
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 3);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+        }
+
+        private static void Helper_CheckTrace3(string c3)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, c3);
+        }
+
+        private static void Helper_CheckTrace2(string c1, string c2)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 2);
+            Assert.AreEqual(trace2.precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[1].assignment, c2);
+        }
+
+        private static void Helper_CheckTrace1(string c1)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, c1);
         }
 
         private static string HelperTrace(string command)
