@@ -2991,7 +2991,7 @@ namespace Gekko
         //public List<string> calc = null;
 
         [ProtoMember(11)]
-        public Trace trace = null;
+        public Trace2 trace2 = null;
 
         [ProtoMember(7)]
         public string[] domains = null;

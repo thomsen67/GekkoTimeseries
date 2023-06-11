@@ -12827,17 +12827,29 @@ namespace UnitTests
 
                 //TODO: maps, <dyn>
 
-                c = "reset;";
-                s += HelperTrace(c);
-
                 c = "time 2021 2023;";
                 s += HelperTrace(c);
 
-                c = "a = 2, 3, 4;";
-                s += HelperTrace(c);                         
+                string c1 = "a = 2, 3, 4;";
+                s += HelperTrace(c1);
+                Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 1);
+                Assert.AreEqual(trace2.precedents[0].assignment, c1);
+                
+                string c2 = "a <2022 2023> = 100;";
+                s += HelperTrace(c2);
+                trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 2);
+                Assert.AreEqual(trace2.precedents[0].assignment, c1);
+                Assert.AreEqual(trace2.precedents[1].assignment, c2);
 
-                c = "b = 12, 13, 14;";
-                s += HelperTrace(c);
+                string c3 = "b = 12, 13, 14;";
+                s += HelperTrace(c3);
+                trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace2;
+                Assert.IsTrue(trace2.precedents.Count == 1);
+                Assert.AreEqual(trace2.precedents[0].assignment, c3);
+
+                return;
 
                 c = "c = a + b;";
                 s += HelperTrace(c);
@@ -12850,17 +12862,6 @@ namespace UnitTests
                     I("write sletmig;");
                     I("read sletmig;");
                 }
-
-                Globals.unitTestScreenOutput.Clear();
-                Trace trace = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
-                //sort and merge these for DISP etc.
-                foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
-                {
-                    new Writeln("========== " + kvp.Key + " =======================");
-                    Trace.Walker(kvp.Value, 0);
-                }
-                string output = Globals.unitTestScreenOutput.ToString();
-                return;                       
 
                 c = "copy d to e;";
                 s += HelperTrace(c);                

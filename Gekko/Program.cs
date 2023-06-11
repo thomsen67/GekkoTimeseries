@@ -15195,41 +15195,41 @@ namespace Gekko
 
                  */           
 
-                if (ts.meta.trace != null)
+                if (ts.meta.trace2 != null)
                 {
-                    Trace trace = ts.meta.trace;
-                    List<DispTraceHelpler> condensed = new List<DispTraceHelpler>();
-                    foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
-                    {
-                        bool known = false;
-                        foreach (DispTraceHelpler c in condensed)
-                        {
-                            if (Object.ReferenceEquals(c.trace2, kvp.Value))
-                            {
-                                c.dates.Add(kvp.Key);
-                                known = true; break;
-                            }
-                        }
-                        if (!known)
-                        {
-                            DispTraceHelpler dth = new DispTraceHelpler();
-                            dth.trace2 = kvp.Value;
-                            dth.dates.Add(kvp.Key);
-                            condensed.Add(dth);
-                        }
-                    }
+                    //Trace trace = null;
+                    //List<DispTraceHelpler> condensed = new List<DispTraceHelpler>();
+                    //foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
+                    //{
+                    //    bool known = false;
+                    //    foreach (DispTraceHelpler c in condensed)
+                    //    {
+                    //        if (Object.ReferenceEquals(c.trace2, kvp.Value))
+                    //        {
+                    //            c.dates.Add(kvp.Key);
+                    //            known = true; break;
+                    //        }
+                    //    }
+                    //    if (!known)
+                    //    {
+                    //        DispTraceHelpler dth = new DispTraceHelpler();
+                    //        dth.trace2 = kvp.Value;
+                    //        dth.dates.Add(kvp.Key);
+                    //        condensed.Add(dth);
+                    //    }
+                    //}
 
-                    //Sort dates
-                    foreach (DispTraceHelpler c in condensed) c.dates.Sort(); //sort dates for each link                    
-                    condensed = condensed.OrderBy(x => x.dates[0]).ToList();  //links by first date
+                    ////Sort dates
+                    //foreach (DispTraceHelpler c in condensed) c.dates.Sort(); //sort dates for each link                    
+                    //condensed = condensed.OrderBy(x => x.dates[0]).ToList();  //links by first date
 
-                    foreach (DispTraceHelpler c in condensed)
-                    {
-                        List<string> temp2 = new List<string>();
-                        foreach (GekkoTime t in c.dates) temp2.Add(t.ToString());
-                        string s = "Trace " + Stringlist.GetListWithCommas(temp2) + ": " + c.trace2.assignment;
-                        G.Writeln(s);
-                    }
+                    //foreach (DispTraceHelpler c in condensed)
+                    //{
+                    //    List<string> temp2 = new List<string>();
+                    //    foreach (GekkoTime t in c.dates) temp2.Add(t.ToString());
+                    //    string s = "Trace " + Stringlist.GetListWithCommas(temp2) + ": " + c.trace2.assignment;
+                    //    G.Writeln(s);
+                    //}
                 }
 
                 bool eqsPrinted = false;
