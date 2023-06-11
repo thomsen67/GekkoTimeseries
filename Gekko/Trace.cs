@@ -14,9 +14,7 @@ namespace Gekko
 
     [ProtoContract]
     public class Trace
-    {
-        [ProtoMember(100)]
-        public X x = null;
+    {       
 
         [ProtoMember(1)]
         public string mapOrBankName = null;  //What is this used for ???
@@ -25,8 +23,9 @@ namespace Gekko
         public string varnameWithFreq = null;  //What is this used for ???
 
         [ProtoMember(3)]
+        public Dictionary<GekkoTime, int> xstorage = new Dictionary<GekkoTime, int>(); //just for transfer
         public Dictionary<GekkoTime, Trace2> storage = new Dictionary<GekkoTime, Trace2>();
-        
+
         public Trace()
         {
             //just for protobuf
@@ -77,6 +76,7 @@ namespace Gekko
         public string assignment = null;
 
         [ProtoMember(6)]
+        public List<int> xprecedents = null;  //just for transfer
         public List<Trace2> precedents = null;
 
         public Trace2()
