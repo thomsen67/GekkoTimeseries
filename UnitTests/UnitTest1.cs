@@ -12835,38 +12835,44 @@ namespace UnitTests
                 s += HelperTrace(c1);
                 Helper_CheckTrace1(c1);
 
-                string c2 = "a <2022 2023> = 100;";
+                string c2 = "a <2022 2022> = 100;";
                 s += HelperTrace(c2);
                 Helper_CheckTrace2(c1, c2);
 
                 string c3 = "b = 12, 13, 14;";
                 s += HelperTrace(c3);
-                Helper_CheckTrace3(c3);
                 Helper_CheckTrace2(c1, c2);
+                Helper_CheckTrace3(c3);                
 
                 string c4 = "c = a + b;";
                 s += HelperTrace(c4);
-                Helper_CheckTrace4(c1, c2, c3, c4);
-                Helper_CheckTrace3(c3);
                 Helper_CheckTrace2(c1, c2);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace4(c1, c2, c3, c4);                
 
                 string c5 = "d = a + b + c;";
                 s += HelperTrace(c5);
-                Helper_CheckTrace5(c1, c2, c3, c4, c5);
-                Helper_CheckTrace4(c1, c2, c3, c4);
-                Helper_CheckTrace3(c3);
                 Helper_CheckTrace2(c1, c2);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace4(c1, c2, c3, c4);
+                Helper_CheckTrace5(c1, c2, c3, c4, c5);
+                                
+                I("write sletmig;");
+                I("read sletmig;");
+                
+                Helper_CheckTrace2(c1, c2);
+                Helper_CheckTrace3(c3);
+                Helper_CheckTrace4(c1, c2, c3, c4);
+                Helper_CheckTrace5(c1, c2, c3, c4, c5);
 
-                if (true)
-                {
-                    I("write sletmig;");
-                    I("read sletmig;");
-                }
+                I("delete a, b, c;");
+                                
+                Helper_CheckTrace5(c1, c2, c3, c4, c5);
+
+                I("write sletmig;");
+                I("read sletmig;");
 
                 Helper_CheckTrace5(c1, c2, c3, c4, c5);
-                Helper_CheckTrace4(c1, c2, c3, c4);
-                Helper_CheckTrace3(c3);
-                Helper_CheckTrace2(c1, c2);
 
                 return;
 
