@@ -12874,18 +12874,18 @@ namespace UnitTests
 
                 Helper_CheckTrace5(c1, c2, c3, c4, c5);
 
+                string c6 = "copy d to e;";                
+                s += HelperTrace(c6);
+                Helper_CheckTrace6(c1, c2, c3, c4, c5, c6);
+
+                //c = "e <2023 2024> = 22, 23;";
+                //s += HelperTrace(c);
+                
+
                 return;
-
-                c = "copy d to e;";
-                s += HelperTrace(c);
-
-                c = "e <2024 2025> = 22, 23;";
-                s += HelperTrace(c);
 
                 //Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
 
-                c = "delete a, b, c, d;";
-                s += HelperTrace(c);
 
                 //string ss = Stringlist.ExtractTextFromLines(calc).ToString();
 
@@ -12931,6 +12931,18 @@ namespace UnitTests
         private static void Helper_CheckTrace5(string c1, string c2, string c3, string c4, string c5)
         {
             Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, c5);
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
+            Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
+        }
+
+        private static void Helper_CheckTrace6(string c1, string c2, string c3, string c4, string c5, string c6)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, c5);
             Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);

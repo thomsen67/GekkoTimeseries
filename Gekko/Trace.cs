@@ -85,8 +85,29 @@ namespace Gekko
         }
 
         public Trace2()
+        {            
+            this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
+            //maybe here put it into dictionary with weak values
+            //but where does that dictionary live? In a databank, no?
+            //or maybe only make the dictionary when about 
+        }
+
+        public Trace2 DeepClone()
         {
-            //just for protobuf
+            Trace2 trace2 = new Trace2();  //also creates id
+            trace2.assignment=this.assignment;
+            trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
+            trace2.filenameAndPathAndLine= this.filenameAndPathAndLine;
+            trace2.periods = new List<GekkoTime>();
+            foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
+            trace2.t1 = this.t1;
+            trace2.t2 = this.t2;            
+            if (this.precedents != null)
+            {
+                trace2.precedents = new List<Trace2>();
+                foreach (Trace2 trace2Clone in this.precedents) trace2.precedents.Add(trace2Clone.DeepClone());
+            }
+            return trace2;
         }
     }
 }
