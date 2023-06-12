@@ -12944,12 +12944,14 @@ namespace UnitTests
         {
             Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
             Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, c5);
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
-            Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
+            Assert.AreEqual(trace2.precedents[0].assignment, "Copied e!a from d!a");
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c5);
+            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 4);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[2].assignment, c3);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[3].assignment, c4);
         }
 
         private static void Helper_CheckTrace4(string c1, string c2, string c3, string c4)

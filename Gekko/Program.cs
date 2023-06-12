@@ -16249,8 +16249,18 @@ namespace Gekko
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
                     if (Program.options.databank_trace && ts_clone != null)
-                    {
-                        //ts_clone.meta.calc[0] += " // Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
+                    {                        
+                        Trace2 trace_clone = new Trace2();
+                        trace_clone.assignment = "Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
+                        trace_clone.bankAndVarnameWithFreq = ts_clone.GetName();
+                        trace_clone.filenameAndPathAndLine = "Filename and line";
+                        trace_clone.t1 = o.t1;
+                        trace_clone.t2 = o.t2;
+                        trace_clone.precedents = new List<Trace2>();
+                        if (ts_clone.meta.trace2.precedents != null) trace_clone.precedents.AddRange(ts_clone.meta.trace2.precedents);
+                        ts_clone.meta.trace2 = new Trace2();
+                        ts_clone.meta.trace2.precedents = new List<Trace2>();
+                        ts_clone.meta.trace2.precedents.Add(trace_clone);
                     }
                 }
             }
