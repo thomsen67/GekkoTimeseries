@@ -12878,9 +12878,16 @@ namespace UnitTests
                 s += HelperTrace(c6);
                 Helper_CheckTrace6(c1, c2, c3, c4, c5, c6);
 
+                string c7 = "f = 1000;";
+                s += HelperTrace(c7);
+
+                string c8 = "copy <2021 2021> f to e;";  //only partial copy
+                s += HelperTrace(c8);
+                Helper_CheckTrace7(c1, c2, c3, c4, c5, c7);
+
                 //c = "e <2023 2024> = 22, 23;";
                 //s += HelperTrace(c);
-                
+
 
                 return;
 
@@ -12944,7 +12951,7 @@ namespace UnitTests
         {
             Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
             Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, "Copied e!a from d!a");
+            Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
             Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c5);
             Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 4);
@@ -12952,6 +12959,25 @@ namespace UnitTests
             Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[1].assignment, c2);
             Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[2].assignment, c3);
             Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[3].assignment, c4);
+        }
+
+        private static void Helper_CheckTrace7(string c1, string c2, string c3, string c4, string c5, string c7)
+        {
+            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
+            Assert.IsTrue(trace2.precedents.Count == 2);
+            Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
+            Assert.AreEqual(trace2.precedents[1].assignment, "Copied f!a into e!a (2021-2021)");
+            //---
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c5);
+            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 4);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[2].assignment, c3);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[3].assignment, c4);
+            //---
+            Assert.IsTrue(trace2.precedents[1].precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[1].precedents[0].assignment, c7);
         }
 
         private static void Helper_CheckTrace4(string c1, string c2, string c3, string c4)

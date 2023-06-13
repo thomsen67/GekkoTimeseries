@@ -16232,10 +16232,24 @@ namespace Gekko
                         if (iv_series.freq == existing_series.freq)
                         {
                             injectingToExistingSeries = true;
-
                             foreach (GekkoTime gt in new GekkoTimeIterator(truncateTemp))
                             {
                                 existing_series.SetData(gt, iv_series.GetDataSimple(gt));
+                            }
+                            if (Program.options.databank_trace)
+                            {
+                                Trace2 trace_clone = new Trace2();
+                                string s = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
+                                trace_clone.assignment = s;
+                                trace_clone.bankAndVarnameWithFreq = existing_series.GetName();
+                                trace_clone.filenameAndPathAndLine = "Filename and line";
+                                trace_clone.t1 = o.t1;
+                                trace_clone.t2 = o.t2;
+                                trace_clone.precedents = new List<Trace2>();                                
+                                if (iv_series.meta.trace2.precedents != null) trace_clone.precedents.AddRange(iv_series.meta.trace2.precedents);
+                                if (existing_series.meta.trace2.precedents == null) existing_series.meta.trace2.precedents = new List<Trace2>();
+                                existing_series.meta.trace2.precedents.Add(trace_clone);
+
                             }
                         }
                     }
@@ -16243,24 +16257,23 @@ namespace Gekko
 
                 if (!injectingToExistingSeries)
                 {
+                    //Brand new variable object is created
                     IVariable iv_clone = iv.DeepClone(truncateTemp);
-                    Series ts_clone = iv_clone as Series;
-                    //if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
+                    Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
-                    {                        
+                    {
                         Trace2 trace_clone = new Trace2();
-                        trace_clone.assignment = "Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
+                        string s = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
+                        trace_clone.assignment = s;
                         trace_clone.bankAndVarnameWithFreq = ts_clone.GetName();
                         trace_clone.filenameAndPathAndLine = "Filename and line";
                         trace_clone.t1 = o.t1;
                         trace_clone.t2 = o.t2;
                         trace_clone.precedents = new List<Trace2>();
                         if (ts_clone.meta.trace2.precedents != null) trace_clone.precedents.AddRange(ts_clone.meta.trace2.precedents);
-                        ts_clone.meta.trace2 = new Trace2();
-                        ts_clone.meta.trace2.precedents = new List<Trace2>();
-                        ts_clone.meta.trace2.precedents.Add(trace_clone);
+                        ts_clone.meta.trace2.precedents = new List<Trace2> { trace_clone };
                     }
                 }
             }
@@ -16270,7 +16283,7 @@ namespace Gekko
 
             G.Writeln2("Copied data for " + nOk + " variables" + si);
 
-        }
+        }        
 
         /// <summary>
         /// For READ/IMPORT, WRITE/EXPORT and COPY, handles the logic of "respecting" the given time period.
