@@ -5093,6 +5093,24 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
+        public static void printtrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            Series x_series = x as Series;
+            if (x_series == null) new Error("Variable is not series type and hence has no trace.");
+            if (x_series.meta == null) new Error("Series has no meta information.");
+            if (x_series.meta.trace == null) new Error("Series has no trace information.");
+            List<string> ss = new List<string>();
+            x_series.meta.trace.PrintRecursive(0, ss);
+            using (Writeln txt = new Writeln())
+            {
+                foreach (string s in ss)
+                {
+                    txt.MainAdd(s);
+                    txt.MainNewLineTight();
+                }
+            }
+        }
+
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {
             if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");

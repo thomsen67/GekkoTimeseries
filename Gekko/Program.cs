@@ -4499,6 +4499,7 @@ namespace Gekko
                     //
                     // when it is a simple read or import into an empty bank
                     // and there is not time-truncation, just set dataBank = dataBankTemp
+                    // Maybe for Gekko 4.0
                     //
                     //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
                     //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
@@ -4509,16 +4510,7 @@ namespace Gekko
                         databank.Clear();
                     }
 
-                    if (false && dates == null)
-                    {
-                        //foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
-                        //{
-                        //    if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
-                        //    IVariable iv = kvp.Value;
-                        //    databank.AddIVariable(kvp.Key, iv); //no need to deep clone kvp.Value
-                        //}
-                    }
-                    else
+                    if (true)
                     {
                         //Cannot do a simple deflate in this case: has to move stuff from deflated file into existing first databank
 
@@ -4610,7 +4602,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            //dimensions do not match, wipt existing out!
+                                            //dimensions do not match, wipe existing out!
                                             databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
                                         }
                                     }
@@ -4625,6 +4617,8 @@ namespace Gekko
                                     bool wipeExistingOut = false;
                                     MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
                                     MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
+                                    GekkoSmplSimple periods = dates?.GetPeriods(tsProtobuf.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
+
                                 }
                             }
                             else
@@ -5885,7 +5879,6 @@ namespace Gekko
                                 catch (Exception e)
                                 {
                                     new Error("Unexpected technical error while merging databanks");
-                                    //throw new GekkoException();
                                 }
                             }
                             else
@@ -5904,7 +5897,6 @@ namespace Gekko
                     }
                 }
             }
-
         }
 
         /// <summary>
@@ -16112,12 +16104,11 @@ namespace Gekko
                     newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
                     newTrace.filenameAndPathAndLine = "Filename and line";
                     newTrace.precedents = new List<Trace>();
-                    if (ts.meta.trace.precedents != null) newTrace.precedents.AddRange(ts.meta.trace.precedents);
-                    ts.meta.trace.precedents = new List<Trace> { newTrace };
+                    newTrace.PushIntoSeries(ts);
                 }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
-        }
+        }        
 
         /// <summary>
         /// COPY command. Uses Program.SearchFromTo() internally.

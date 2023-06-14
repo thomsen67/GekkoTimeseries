@@ -74,5 +74,28 @@ namespace Gekko
             }
             return trace2;
         }
+
+        public void PrintRecursive(int depth, List<string> output)
+        {
+            string s = this.bankAndVarnameWithFreq;
+            if (!this.t1.IsNull()) s += " " + this.t1 + "-" + this.t2;
+            s += ": ";
+            s += this.assignment;
+            output.Add("-" + G.Blanks(2 * depth) + s);
+            if (this.precedents != null)
+            {
+                foreach (Trace child in this.precedents) child.PrintRecursive(depth + 1, output);
+            }
+        }
+
+        /// <summary>
+        /// Puts the new trace on top of the series traces. (Reconnects the existing series trace(s) to the new trace).
+        /// </summary>
+        /// <param name="ts"></param>
+        public void PushIntoSeries(Series ts)
+        {
+            if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
+            ts.meta.trace.precedents = new List<Trace> { this };
+        }
     }
 }
