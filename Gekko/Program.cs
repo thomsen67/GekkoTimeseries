@@ -16217,18 +16217,14 @@ namespace Gekko
                             }
                             if (Program.options.databank_trace)
                             {
-                                Trace newTrace =  new Trace();
-                                string s = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
-                                newTrace.assignment = s;
+                                Trace newTrace = new Trace();                                
+                                newTrace.assignment = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = "Filename and line";
                                 newTrace.t1 = o.t1;
                                 newTrace.t2 = o.t2;
-                                newTrace.precedents = new List<Trace>();                                
-                                if (iv_series.meta.trace.precedents != null) newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
-                                if (existing_series.meta.trace.precedents == null) existing_series.meta.trace.precedents = new List<Trace>();
-                                existing_series.meta.trace.precedents.Add(newTrace);
-
+                                newTrace.precedents = new List<Trace>();
+                                newTrace.PushIntoSeries(existing_series, iv_series);
                             }
                         }
                     }
@@ -16249,9 +16245,8 @@ namespace Gekko
                         newTrace.filenameAndPathAndLine = "Filename and line";
                         newTrace.t1 = o.t1;
                         newTrace.t2 = o.t2;
-                        newTrace.precedents = new List<Trace>();
-                        if (ts_clone.meta.trace.precedents != null) newTrace.precedents.AddRange(ts_clone.meta.trace.precedents);
-                        ts_clone.meta.trace.precedents = new List<Trace> { newTrace };
+                        newTrace.precedents = new List<Trace>();                        
+                        newTrace.PushIntoSeries(ts_clone);
                     }
                 }
             }

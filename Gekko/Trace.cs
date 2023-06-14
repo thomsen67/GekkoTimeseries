@@ -89,13 +89,29 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Puts the new trace on top of the series traces. (Reconnects the existing series trace(s) to the new trace).
+        /// Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
         /// </summary>
         /// <param name="ts"></param>
         public void PushIntoSeries(Series ts)
         {
             if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
             ts.meta.trace.precedents = new List<Trace> { this };
+        }
+
+        /// <summary>
+        /// Puts the new trace on top of the series traces. 
+        /// First it puts any traces from the extraToAdd series.
+        /// Then it adds the existing series trace(s).
+        /// 
+        /// </summary>
+        /// <param name="extraToAdd"></param>
+        /// <param name="ts"></param>
+        /// <param name="newTrace"></param>
+        public void PushIntoSeries(Series ts, Series extraToAdd)
+        {
+            if (extraToAdd.meta.trace.precedents != null) this.precedents.AddRange(extraToAdd.meta.trace.precedents);            
+            if (ts.meta.trace.precedents == null) ts.meta.trace.precedents = new List<Trace>();
+            ts.meta.trace.precedents.Add(this);
         }
     }
 }
