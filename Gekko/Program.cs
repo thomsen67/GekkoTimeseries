@@ -175,7 +175,7 @@ namespace Gekko
 
     public class DispTraceHelpler
     {
-        public Trace2 trace2 = null;
+        public Trace trace2 = null;
         public List<GekkoTime> dates = new List<GekkoTime>();
     }
 
@@ -8635,7 +8635,7 @@ namespace Gekko
             // PRECEDENTS PRECEDENTS PRECEDENTS 
             // PRECEDENTS PRECEDENTS PRECEDENTS for DECOMP
             // PRECEDENTS PRECEDENTS PRECEDENTS 
-            if (alsoIncludePrecedents && Globals.precedents != null && rv_series != null)
+            if (alsoIncludePrecedents && Globals.precedentsContainer != null && rv_series != null)
             {
                 Program.AddToPrecedents(ib as Databank, rv_series.GetName());
             }
@@ -8643,9 +8643,8 @@ namespace Gekko
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
-            if (Program.options.databank_trace)
-            {
-                //if (!Globals.useTrace || Globals.trace2 == null) return;
+            if (Program.options.databank_trace && Globals.traceContainer != null)
+            {                
                 bool onlyTraceSeries = false;
                 string x_lhs = "";
                 if (isLhs) x_lhs = "LHS";
@@ -8663,30 +8662,7 @@ namespace Gekko
                 }
 
                 if (!onlyTraceSeries || rv_series != null)
-                {
-                    //string x_source = null;
-                    //if (rv_series != null && rv_series.meta != null) x_source = rv_series.meta.source;
-                    //string s = "name: " + name + " // " + "bank: " + x_bankOrMap + " // " + "oname: " + x_objectName + " // " + "source: " + x_source + " // " + "lhs?: " + x_lhs;
-                    //if (isLhs)
-                    //{
-                    //    if (rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
-                    //    rv_series.meta.calc.Add(s);
-                    //    foreach (IVariable iv2 in Globals.trace2)
-                    //    {
-                    //        if (iv2 == iv) continue;
-                    //        if (iv2.Type() != EVariableType.Series) continue;
-                    //        Series iv2_series = iv2 as Series;
-                    //        if (iv2_series.meta == null) continue;
-
-
-                    //        foreach (string s4 in iv2_series.meta.calc)
-                    //        {
-                    //            rv_series.meta.calc.Add("--" + s4);
-                    //        }
-                    //    }
-                    //}
-
-                    //if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
+                {   
                     if (!Globals.traceContainer.Contains(iv)) Globals.traceContainer.Add(iv);
                 }
             }
@@ -9802,9 +9778,9 @@ namespace Gekko
         public static void AddToPrecedents(Databank db, string s)
         {                    
             string two = db.name + ":" + s;
-            if (!Globals.precedents.ContainsKey(two))
+            if (!Globals.precedentsContainer.ContainsKey(two))
             {
-                Globals.precedents.Add(two, 0);
+                Globals.precedentsContainer.Add(two, 0);
             }
         }
 
@@ -15195,7 +15171,7 @@ namespace Gekko
 
                  */           
 
-                if (ts.meta.trace2 != null)
+                if (ts.meta.trace != null)
                 {
                     //Trace trace = null;
                     //List<DispTraceHelpler> condensed = new List<DispTraceHelpler>();
@@ -16123,10 +16099,22 @@ namespace Gekko
                 Series iv_series = iv as Series;
                 if (iv_series != null)
                 {
-                    //replaces the name, keeps freq. For instance, 
+                    //replaces the name, keeps freq.
                     iv_series.name = G.Chop_GetName(output.s2) + Globals.freqIndicator + G.ConvertFreq(iv_series.freq);
                 }
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
+
+                Series ts = iv as Series;
+                if (Program.options.databank_trace &&  ts != null)
+                {
+                    Trace newTrace = new Trace();
+                    newTrace.assignment = "Renamed " + output.s1 + " as " + output.s2;
+                    newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
+                    newTrace.filenameAndPathAndLine = "Filename and line";
+                    newTrace.precedents = new List<Trace>();
+                    if (ts.meta.trace.precedents != null) newTrace.precedents.AddRange(ts.meta.trace.precedents);
+                    ts.meta.trace.precedents = new List<Trace> { newTrace };
+                }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
         }
@@ -16238,17 +16226,17 @@ namespace Gekko
                             }
                             if (Program.options.databank_trace)
                             {
-                                Trace2 newTrace =  new Trace2();
+                                Trace newTrace =  new Trace();
                                 string s = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.assignment = s;
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = "Filename and line";
                                 newTrace.t1 = o.t1;
                                 newTrace.t2 = o.t2;
-                                newTrace.precedents = new List<Trace2>();                                
-                                if (iv_series.meta.trace2.precedents != null) newTrace.precedents.AddRange(iv_series.meta.trace2.precedents);
-                                if (existing_series.meta.trace2.precedents == null) existing_series.meta.trace2.precedents = new List<Trace2>();
-                                existing_series.meta.trace2.precedents.Add(newTrace);
+                                newTrace.precedents = new List<Trace>();                                
+                                if (iv_series.meta.trace.precedents != null) newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
+                                if (existing_series.meta.trace.precedents == null) existing_series.meta.trace.precedents = new List<Trace>();
+                                existing_series.meta.trace.precedents.Add(newTrace);
 
                             }
                         }
@@ -16264,16 +16252,15 @@ namespace Gekko
                     Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
                     {
-                        Trace2 newTrace = new Trace2();
-                        string s = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
-                        newTrace.assignment = s;
-                        newTrace.bankAndVarnameWithFreq = ts_clone.GetName();
+                        Trace newTrace = new Trace();                        
+                        newTrace.assignment = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
+                        newTrace.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
                         newTrace.filenameAndPathAndLine = "Filename and line";
                         newTrace.t1 = o.t1;
                         newTrace.t2 = o.t2;
-                        newTrace.precedents = new List<Trace2>();
-                        if (ts_clone.meta.trace2.precedents != null) newTrace.precedents.AddRange(ts_clone.meta.trace2.precedents);
-                        ts_clone.meta.trace2.precedents = new List<Trace2> { newTrace };
+                        newTrace.precedents = new List<Trace>();
+                        if (ts_clone.meta.trace.precedents != null) newTrace.precedents.AddRange(ts_clone.meta.trace.precedents);
+                        ts_clone.meta.trace.precedents = new List<Trace> { newTrace };
                     }
                 }
             }
@@ -26979,7 +26966,7 @@ namespace Gekko
                         o.hasCalculatedRef = true;
                     }
 
-                    Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    Globals.precedentsContainer = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     //Function call start --------------
                     O.AdjustSmplForDecomp(smpl, 0);
@@ -26990,7 +26977,7 @@ namespace Gekko
                     List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
                     if (true)
                     {
-                        List<string> ss = Globals.precedents.Keys.ToList<string>();
+                        List<string> ss = Globals.precedentsContainer.Keys.ToList<string>();
                         ss.Sort(StringComparer.OrdinalIgnoreCase);
                         foreach (string s in ss)
                         {
@@ -27009,7 +26996,7 @@ namespace Gekko
                         }
                     }
 
-                    Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary                
+                    Globals.precedentsContainer = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary                
 
                     Series y0a_series = y0a as Series;
                     if (y0a == null)
@@ -27255,7 +27242,7 @@ namespace Gekko
             finally
             {
                 //Important: makes sure is is *always* nulled after a DECOMP
-                Globals.precedents = null;
+                Globals.precedentsContainer = null;
             }
 
             if (funcCounter > 0)

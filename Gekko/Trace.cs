@@ -15,41 +15,6 @@ namespace Gekko
     [ProtoContract]
     public class Trace
     {
-
-        [ProtoMember(1)]
-        public List<Trace2> traces2 = new List<Trace2>();
-        public Trace()
-        {
-            //just for protobuf
-        }        
-
-        public static void Walker(Trace2 trace2, int d)
-        {            
-            using (Writeln txt = new Writeln())
-            {
-                txt.indent = G.Blanks(4 * d);
-                txt.MainAdd("Variable: " + trace2.bankAndVarnameWithFreq);
-                txt.MainNewLineTight();
-                txt.MainAdd("Stamp: " + trace2.assignment);
-                txt.MainNewLineTight();
-                txt.MainAdd("Stamp: " + trace2.stamp);
-                txt.MainNewLineTight();
-                txt.MainAdd("File: " + trace2.filenameAndPathAndLine);
-                txt.MainNewLineTight();
-            }
-            if (trace2.precedents != null)
-            {
-                foreach (Trace2 childTrace2 in trace2.precedents)
-                {
-                    Walker(childTrace2, d + 1);
-                }
-            }
-        }
-    }
-
-    [ProtoContract]
-    public class Trace2
-    {
         [ProtoMember(1)]
         public long id = 0;  //when assigned it is a random number > 1 and < long.MaxValue --> extremely unlikely to have collisions ever
 
@@ -72,7 +37,7 @@ namespace Gekko
         public string assignment = null;
 
         [ProtoMember(8)]        
-        public List<Trace2> precedents = null;
+        public List<Trace> precedents = null;
 
         [ProtoMember(9)]
         public List<GekkoTime> periods = new List<GekkoTime>();
@@ -84,7 +49,7 @@ namespace Gekko
             return this.t1 + "-" + this.t2 + ": " + this.assignment;
         }
 
-        public Trace2()
+        public Trace()
         {            
             this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
             //maybe here put it into dictionary with weak values
@@ -92,9 +57,9 @@ namespace Gekko
             //or maybe only make the dictionary when about 
         }
 
-        public Trace2 DeepClone()
+        public Trace DeepClone()
         {
-            Trace2 trace2 = new Trace2();  //also creates id
+            Trace trace2 = new Trace();  //also creates id
             trace2.assignment=this.assignment;
             trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
             trace2.filenameAndPathAndLine= this.filenameAndPathAndLine;
@@ -104,8 +69,8 @@ namespace Gekko
             trace2.t2 = this.t2;            
             if (this.precedents != null)
             {
-                trace2.precedents = new List<Trace2>();
-                foreach (Trace2 trace2Clone in this.precedents) trace2.precedents.Add(trace2Clone.DeepClone());
+                trace2.precedents = new List<Trace>();
+                foreach (Trace trace2Clone in this.precedents) trace2.precedents.Add(trace2Clone.DeepClone());
             }
             return trace2;
         }

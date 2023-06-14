@@ -3274,9 +3274,7 @@ namespace Gekko
                 smpl.t2 = Globals.globalPeriodEnd;
                 smpl.t3 = Globals.globalPeriodEnd.Add(Globals.smplInitEnd);
                 smpl.gekkoError = null;
-                //smpl.gekkoErrorI = 0;
                 smpl.bankNumber = 0;
-                //p.numberOfServiceMessages = 0;
                 smpl.p = p;
             }
         }

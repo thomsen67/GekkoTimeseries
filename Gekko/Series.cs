@@ -2836,9 +2836,9 @@ namespace Gekko
                         }
                     }
 
-                    if (this.meta.trace2 != null)
+                    if (this.meta.trace != null)
                     {
-                        tsCopy.meta.trace2 = this.meta.trace2.DeepClone();
+                        tsCopy.meta.trace = this.meta.trace.DeepClone();
                     }
 
                 }
@@ -2988,7 +2988,7 @@ namespace Gekko
         //public List<string> calc = null;
 
         [ProtoMember(11)]
-        public Trace2 trace2 = null;
+        public Trace trace = null;
 
         [ProtoMember(7)]
         public string[] domains = null;

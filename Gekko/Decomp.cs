@@ -2196,7 +2196,7 @@ namespace Gekko
             {  //resets Globals.precedents afterwards
                 DecompInitDict(d);
 
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.precedentsContainer = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                 //Function call start --------------
                 O.AdjustSmplForDecomp(smpl, 0);
@@ -2208,7 +2208,7 @@ namespace Gekko
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
 
-                List<string> ss = Globals.precedents.Keys.ToList<string>();
+                List<string> ss = Globals.precedentsContainer.Keys.ToList<string>();
                 ss.Sort(StringComparer.OrdinalIgnoreCase);
                 foreach (string s in ss)
                 {
@@ -2230,7 +2230,7 @@ namespace Gekko
                 //IMPORTANT
                 //IMPORTANT
                 //IMPORTANT
-                Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary
+                Globals.precedentsContainer = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary
                 //IMPORTANT
                 //IMPORTANT
                 //IMPORTANT
@@ -2472,7 +2472,7 @@ namespace Gekko
             finally
             {
                 //Important: makes sure is is *always* nulled after a DECOMP
-                Globals.precedents = null;
+                Globals.precedentsContainer = null;
             }
 
             return d;

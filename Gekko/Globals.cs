@@ -257,7 +257,7 @@ namespace Gekko
 
         public static int decompPerLag = -2;
 
-        public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
+        public static GekkoDictionary<string, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
 
         //public static bool useTrace = false;

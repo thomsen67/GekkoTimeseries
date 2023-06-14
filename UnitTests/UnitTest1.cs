@@ -12885,6 +12885,10 @@ namespace UnitTests
                 s += HelperTrace(c8);
                 Helper_CheckTrace7(c1, c2, c3, c4, c5, c7);
 
+                string c9 = "rename e as g;";
+                s += HelperTrace(c9);
+                Helper_CheckTrace8(c1, c2, c3, c4, c5, c7);
+
                 //c = "e <2023 2024> = 22, 23;";
                 //s += HelperTrace(c);
 
@@ -12930,14 +12934,14 @@ namespace UnitTests
             {
                 I("OPTION databank trace = no;");  //not really necessary to switch off...
                 Globals.traceContainer = null;
-                Globals.precedents = null;
+                Globals.precedentsContainer = null;
             }
 
         }
 
         private static void Helper_CheckTrace5(string c1, string c2, string c3, string c4, string c5)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, c5);
             Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
@@ -12949,7 +12953,7 @@ namespace UnitTests
 
         private static void Helper_CheckTrace6(string c1, string c2, string c3, string c4, string c5, string c6)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
             Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
@@ -12963,7 +12967,7 @@ namespace UnitTests
 
         private static void Helper_CheckTrace7(string c1, string c2, string c3, string c4, string c5, string c7)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 2);
             Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
             Assert.AreEqual(trace2.precedents[1].assignment, "Copied f!a into e!a (2021-2021)");
@@ -12980,9 +12984,32 @@ namespace UnitTests
             Assert.AreEqual(trace2.precedents[1].precedents[0].assignment, c7);
         }
 
+        private static void Helper_CheckTrace8(string c1, string c2, string c3, string c4, string c5, string c7)
+        {
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("g!a") as Series).meta.trace;
+
+            Assert.IsTrue(trace2.precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].assignment, "Renamed Work:e!a as Work:g!a");
+
+            Assert.IsTrue(trace2.precedents[0].precedents.Count == 2);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, "Copied d!a to e!a (clone)");
+            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, "Copied f!a into e!a (2021-2021)");
+            //---
+            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c5);
+            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents[0].precedents.Count == 4);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[0].assignment, c1);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[1].assignment, c2);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[2].assignment, c3);
+            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[3].assignment, c4);
+            //---
+            Assert.IsTrue(trace2.precedents[0].precedents[1].precedents.Count == 1);
+            Assert.AreEqual(trace2.precedents[0].precedents[1].precedents[0].assignment, c7);
+        }
+
         private static void Helper_CheckTrace4(string c1, string c2, string c3, string c4)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, c4);
             Assert.IsTrue(trace2.precedents[0].precedents.Count == 3);
@@ -12993,14 +13020,14 @@ namespace UnitTests
 
         private static void Helper_CheckTrace3(string c3)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, c3);
         }
 
         private static void Helper_CheckTrace2(string c1, string c2)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 2);
             Assert.AreEqual(trace2.precedents[0].assignment, c1);
             Assert.AreEqual(trace2.precedents[1].assignment, c2);
@@ -13008,7 +13035,7 @@ namespace UnitTests
 
         private static void Helper_CheckTrace1(string c1)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace2;
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace;
             Assert.IsTrue(trace2.precedents.Count == 1);
             Assert.AreEqual(trace2.precedents[0].assignment, c1);
         }

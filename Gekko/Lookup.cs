@@ -1687,26 +1687,26 @@ namespace Gekko
                 if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
                 if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override
                 
-                string trace = null;
-                if (o?.opt_trace != null) trace = o.opt_trace;  //machine generated
+                string traceString = null;
+                if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
 
-                if (trace != null)
+                if (traceString != null)
                 {
 
-                    if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2();
+                    if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace();
                     // ---------
-                    Trace2 trace2 = new Trace2();
-                    trace2.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                    trace2.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                    trace2.stamp = DateTime.Now;
-                    trace2.t1 = smpl.t1;
-                    trace2.t2 = smpl.t2;
-                    trace2.assignment = trace + ";";
-                    foreach (GekkoTime t in new GekkoTimeIterator(trace2.t1, trace2.t2)) trace2.periods.Add(t);  //add all
+                    Trace trace = new Trace();
+                    trace.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                    trace.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
+                    trace.stamp = DateTime.Now;
+                    trace.t1 = smpl.t1;
+                    trace.t2 = smpl.t2;
+                    trace.assignment = traceString + ";";
+                    foreach (GekkoTime t in new GekkoTimeIterator(trace.t1, trace.t2)) trace.periods.Add(t);  //add all
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
-                        trace2.precedents = new List<Trace2>();
+                        trace.precedents = new List<Trace>();
 
                         //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
                         //     Is datetime finegrained enough?
@@ -1716,32 +1716,32 @@ namespace Gekko
                         {
                             Series iv_ts = iv as Series;
                             if (iv_ts == null) continue;
-                            foreach (Trace2 kvp in iv_ts.meta.trace2.precedents)
+                            foreach (Trace kvp in iv_ts.meta.trace.precedents)
                             {
-                                Trace2 childTrace2 = kvp;
+                                Trace childTrace2 = kvp;
                                 bool known = false;
-                                foreach (Trace2 tempElement in trace2.precedents)
+                                foreach (Trace tempElement in trace.precedents)
                                 {
                                     if (Object.ReferenceEquals(childTrace2, tempElement))
                                     {
                                         known = true; break;
                                     }
                                 }
-                                if (!known) trace2.precedents.Add(childTrace2);
+                                if (!known) trace.precedents.Add(childTrace2);
                             }
                         }
                     }
 
-                    if (lhs_series.meta.trace2.precedents == null) lhs_series.meta.trace2.precedents = new List<Trace2>();
+                    if (lhs_series.meta.trace.precedents == null) lhs_series.meta.trace.precedents = new List<Trace>();
                     //remove these new periods from any previous traces
-                    foreach (Trace2 trace2_other in lhs_series.meta.trace2.precedents)
+                    foreach (Trace trace_other in lhs_series.meta.trace.precedents)
                     {
-                        foreach (GekkoTime t in trace2.periods)
+                        foreach (GekkoTime t in trace.periods)
                         {
-                            trace2_other.periods.Remove(t);
+                            trace_other.periods.Remove(t);
                         }
                     }
-                    lhs_series.meta.trace2.precedents.Add(trace2);
+                    lhs_series.meta.trace.precedents.Add(trace);
 
                     ////For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
                     //foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
