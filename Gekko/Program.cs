@@ -16238,17 +16238,17 @@ namespace Gekko
                             }
                             if (Program.options.databank_trace)
                             {
-                                Trace2 trace_clone = new Trace2();
+                                Trace2 newTrace =  new Trace2();
                                 string s = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
-                                trace_clone.assignment = s;
-                                trace_clone.bankAndVarnameWithFreq = existing_series.GetName();
-                                trace_clone.filenameAndPathAndLine = "Filename and line";
-                                trace_clone.t1 = o.t1;
-                                trace_clone.t2 = o.t2;
-                                trace_clone.precedents = new List<Trace2>();                                
-                                if (iv_series.meta.trace2.precedents != null) trace_clone.precedents.AddRange(iv_series.meta.trace2.precedents);
+                                newTrace.assignment = s;
+                                newTrace.bankAndVarnameWithFreq = existing_series.GetName();
+                                newTrace.filenameAndPathAndLine = "Filename and line";
+                                newTrace.t1 = o.t1;
+                                newTrace.t2 = o.t2;
+                                newTrace.precedents = new List<Trace2>();                                
+                                if (iv_series.meta.trace2.precedents != null) newTrace.precedents.AddRange(iv_series.meta.trace2.precedents);
                                 if (existing_series.meta.trace2.precedents == null) existing_series.meta.trace2.precedents = new List<Trace2>();
-                                existing_series.meta.trace2.precedents.Add(trace_clone);
+                                existing_series.meta.trace2.precedents.Add(newTrace);
 
                             }
                         }
@@ -16264,16 +16264,16 @@ namespace Gekko
                     Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
                     {
-                        Trace2 trace_clone = new Trace2();
+                        Trace2 newTrace = new Trace2();
                         string s = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
-                        trace_clone.assignment = s;
-                        trace_clone.bankAndVarnameWithFreq = ts_clone.GetName();
-                        trace_clone.filenameAndPathAndLine = "Filename and line";
-                        trace_clone.t1 = o.t1;
-                        trace_clone.t2 = o.t2;
-                        trace_clone.precedents = new List<Trace2>();
-                        if (ts_clone.meta.trace2.precedents != null) trace_clone.precedents.AddRange(ts_clone.meta.trace2.precedents);
-                        ts_clone.meta.trace2.precedents = new List<Trace2> { trace_clone };
+                        newTrace.assignment = s;
+                        newTrace.bankAndVarnameWithFreq = ts_clone.GetName();
+                        newTrace.filenameAndPathAndLine = "Filename and line";
+                        newTrace.t1 = o.t1;
+                        newTrace.t2 = o.t2;
+                        newTrace.precedents = new List<Trace2>();
+                        if (ts_clone.meta.trace2.precedents != null) newTrace.precedents.AddRange(ts_clone.meta.trace2.precedents);
+                        ts_clone.meta.trace2.precedents = new List<Trace2> { newTrace };
                     }
                 }
             }
