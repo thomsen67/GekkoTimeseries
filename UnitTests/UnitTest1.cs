@@ -12829,17 +12829,12 @@ namespace UnitTests
                 //
 
                 string s = null;
-                string c = null;
-                string calc = null;
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 I("OPTION databank trace = yes;");
-                //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 Globals.traceContainer = new List<IVariable>();
-
                 //TODO: maps, <dyn>
-
-                c = "time 2021 2023;";
+                string c = "time 2021 2023;";
                 s += HelperTrace(c);
                 // ---------------------------------
                 string c1 = "a = 2, 3, 4;";
@@ -12950,109 +12945,15 @@ namespace UnitTests
             x5b.m.Add(new String2(cImport2)); 
             x5b.m[0].m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
             return x5b;
-        }
-
-        private static void Helper_CheckTrace5(string c1, string c2, string c3, string c4, string c5)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, c5);
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 4);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
-            Assert.AreEqual(trace2.precedents[0].precedents[3].assignment, c4);
-        }
-
-        private static void Helper_CheckTrace6(string c1, string c2, string c3, string c4, string c5, string c6)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c5);
-            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 4);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[2].assignment, c3);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[3].assignment, c4);
-        }
-
-        private static void Helper_CheckTrace7(string c1, string c2, string c3, string c4, string c5, string c7)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 2);
-            Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
-            Assert.AreEqual(trace2.precedents[1].assignment, "Copied f!a into e!a (2021-2021)");
-            //---
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c5);
-            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 4);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[2].assignment, c3);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[3].assignment, c4);
-            //---
-            Assert.IsTrue(trace2.precedents[1].precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[1].precedents[0].assignment, c7);
-        }
-
-        private static void Helper_CheckTrace8(string c1, string c2, string c3, string c4, string c5, string c7)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("g!a") as Series).meta.trace;
-
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, "Renamed Work:e!a as Work:g!a");
-
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 2);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, "Copied d!a to e!a (clone)");
-            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, "Copied f!a into e!a (2021-2021)");
-            //---
-            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].assignment, c5);
-            Assert.IsTrue(trace2.precedents[0].precedents[0].precedents[0].precedents.Count == 4);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[2].assignment, c3);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].precedents[0].precedents[3].assignment, c4);
-            //---
-            Assert.IsTrue(trace2.precedents[0].precedents[1].precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].precedents[1].precedents[0].assignment, c7);
-        }
-
-        private static void Helper_CheckTrace4(string c1, string c2, string c3, string c4)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, c4);
-            Assert.IsTrue(trace2.precedents[0].precedents.Count == 3);
-            Assert.AreEqual(trace2.precedents[0].precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[0].precedents[1].assignment, c2);
-            Assert.AreEqual(trace2.precedents[0].precedents[2].assignment, c3);
-        }
-
-        private static void Helper_CheckTrace3(string c3)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, c3);
-        }
-
-        private static void Helper_CheckTrace2(string c1, string c2)
-        {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 2);
-            Assert.AreEqual(trace2.precedents[0].assignment, c1);
-            Assert.AreEqual(trace2.precedents[1].assignment, c2);
-        }
+        }        
 
         private static void Helper_CheckTrace(string name, String2 c1)
         {
             Trace trace2 = (Program.databanks.GetFirst().GetIVariable(name) as Series).meta.trace;
-            WalkTrace(trace2, c1, 0);            
+            Helper_WalkTrace(trace2, c1, 0);            
         }
 
-        public static void WalkTrace(Trace trace, String2 m, int depth)
+        public static void Helper_WalkTrace(Trace trace, String2 m, int depth)
         {
             Assert.AreEqual(trace.assignment, m.s);
             if (trace.precedents == null)
@@ -13064,7 +12965,7 @@ namespace UnitTests
                 Assert.AreEqual(trace.precedents.Count, m.m.Count);
                 for (int i = 0; i < trace.precedents.Count; i++)
                 {
-                    WalkTrace(trace.precedents[i], m.m[i], depth + 1);
+                    Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
                 }
             }
         }
@@ -13073,16 +12974,7 @@ namespace UnitTests
         {
             //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
             Globals.traceContainer = new List<IVariable>();
-            I(command);            
-            //string s = null;
-            //s += command + G.NL;
-            //foreach (KeyValuePair<string, Trace> kvp in Globals.trace)
-            //{
-            //    s += " --> " + kvp.Key + G.NL;
-            //}
-            //s += "---------------------------------------------------------------------------";
-            //s += G.NL;
-            //Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+            I(command);
             Globals.traceContainer = new List<IVariable>();
             return "";
         }
