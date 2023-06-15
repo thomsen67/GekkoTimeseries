@@ -12936,24 +12936,17 @@ namespace UnitTests
                 I("delete d;");
                 string c10 = "d = 5, 6, 7;";
                 s += HelperTrace(c10);
-                String2 x10 = new String2(null);
-                x10.m.Add(new String2(c10));                
-                Helper_CheckTrace("d!a", x10);
                 I("import <2022 2022> sletmig2;");
                 String2 x10a = new String2("Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk) (2022-2022)");
-                x10a.m.Add(x5a.m[0]);
+                x10a.m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
+                String2 x10 = new String2(null);
+                x10.m.Add(new String2(c10));
                 x10.m.Add(x10a);
-                //x10.m[1].m.AddRange(G.DeepCloneSlow<String2>(x5b).m);
                 Helper_CheckTrace("d!a", x10);
-
+                // ---------------------
                 I("prt d;");
                 I("d.printtrace();");
                 return;
-
-                
-                
-                
-
             }
             finally
             {
