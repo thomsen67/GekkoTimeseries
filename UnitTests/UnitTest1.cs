@@ -12917,60 +12917,22 @@ namespace UnitTests
                 Helper_CheckTrace("e!a", x6);
                 Helper_CheckTrace("d!a", x5b);
                 // ---------------------------------
-
                 string c8 = "copy <2021 2021> f to e;";  //only partial copy
                 string c8a = "Copied f!a into e!a (2021-2021)";
                 s += HelperTrace(c8);
                 String2 x8 = G.DeepCloneSlow<String2>(x6);
                 x8.m.Add(new String2(c8a));                
                 x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
+                Helper_CheckTrace("f!a", x7);
                 Helper_CheckTrace("e!a", x8);
-
-
-                
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
                 string c9 = "rename e as g;";
                 s += HelperTrace(c9);
-                Helper_CheckTrace8(c1, c2, c3, c4, c5, c7);
-
-                //c = "e <2023 2024> = 22, 23;";
-                //s += HelperTrace(c);
-
-
-                return;
-
-                //Trace.Walker((Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.trace, 0);
-
-
-                //string ss = Stringlist.ExtractTextFromLines(calc).ToString();
-
-                if (false)
-                {
-
-                    c = "#l = 1, 2, 3;";
-                    s += HelperTrace(c);
-
-                    c = "#m = map();";
-                    s += HelperTrace(c);
-
-                    c = "#m.x = x;";
-                    s += HelperTrace(c);
-
-                }
-
-                c = "write bank1;";
-                s += HelperTrace(c);
-
-                c = "reset; time 2021 2025;";
-                s += HelperTrace(c);
-
-                c = "read bank1;";
-                s += HelperTrace(c);
-
-                c = "disp e;";
-                s += HelperTrace(c);
-
-                c = "f = a + b + c + d + e;";
-                s += HelperTrace(c);
+                String2 x9 = Helper_Push(x8, "Renamed Work:e!a as Work:g!a");
+                Helper_CheckTrace("g!a", x9);
+                Helper_CheckTrace("f!a", x7);
+                Helper_CheckTrace("d!a", x5b);                
 
             }
             finally
