@@ -56,6 +56,7 @@ using static Gekko.O;
 namespace UnitTests
 {
 
+    [Serializable]
     public class String2
     {
         public string s = null;
@@ -12840,22 +12841,27 @@ namespace UnitTests
 
                 c = "time 2021 2023;";
                 s += HelperTrace(c);
-
+                // ---------------------------------
                 string c1 = "a = 2, 3, 4;";
                 s += HelperTrace(c1);
-                String2 target = new String2(null);
-                target.m.Add(new String2(c1));
-                Helper_CheckTrace("a!a", target);
-
+                String2 x1 = new String2(null);
+                x1.m.Add(new String2(c1));
+                Helper_CheckTrace("a!a", x1);
+                // ---------------------------------
                 string c2 = "a <2022 2022> = 100;";
                 s += HelperTrace(c2);
-                target.m.Add(new String2(c2));
-                Helper_CheckTrace("a!a", target);
-
+                String2 x2 = G.DeepCloneSlow<String2>(x1);
+                x2.m.Add(new String2(c2));
+                Helper_CheckTrace("a!a", x2);
+                // ---------------------------------
                 string c3 = "b = 12, 13, 14;";
                 s += HelperTrace(c3);
-                Helper_CheckTrace2(c1, c2);
-                Helper_CheckTrace3(c3);                
+                String2 x3 = new String2(null);
+                x3.m.Add(new String2(c3));
+                Helper_CheckTrace("a!a", x2);
+                Helper_CheckTrace("b!a", x3);
+                // ---------------------------------
+
 
                 string c4 = "c = a + b;";
                 s += HelperTrace(c4);

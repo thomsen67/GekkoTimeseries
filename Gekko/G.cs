@@ -34,6 +34,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Security.Policy;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Gekko
 {
@@ -3812,6 +3813,23 @@ namespace Gekko
         public static int FindYear(int x)
         {
             return FindYear(x, true);
+        }
+
+        /// <summary>
+        /// Deep clone of object -- beware that it may be SLOW! Needs [Serializable] decoration.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static T DeepCloneSlow<T>(T obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, obj);
+                ms.Position = 0;
+                return (T)formatter.Deserialize(ms);
+            }
         }
 
         /// <summary>
