@@ -12886,10 +12886,10 @@ namespace UnitTests
                 I("write sletmig1;");
                 I("read sletmig1;");
                 string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
-                String2 x2a = new String2(null); x2a.m.Add(new String2(cImport1)); x2a.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
-                String2 x3a = new String2(null); x3a.m.Add(new String2(cImport1)); x3a.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                String2 x4a = new String2(null); x4a.m.Add(new String2(cImport1)); x4a.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
-                String2 x5a = new String2(null); x5a.m.Add(new String2(cImport1)); x5a.m[0].m.AddRange(G.DeepCloneSlow<String2>(x5).m);
+                String2 x2a = Helper_Push(x2, cImport1);
+                String2 x3a = Helper_Push(x3, cImport1);
+                String2 x4a = Helper_Push(x4, cImport1);
+                String2 x5a = Helper_Push(x5, cImport1);
                 Helper_CheckTrace("a!a", x2a);
                 Helper_CheckTrace("b!a", x3a);
                 Helper_CheckTrace("c!a", x4a);
@@ -12903,20 +12903,31 @@ namespace UnitTests
                 String2 x5b = Helper_Push(x5a, "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk)");
                 Helper_CheckTrace("d!a", x5b);
                 // ---------------------------------
-
-                //Assert.AreEqual(trace2.precedents[0].assignment, "Copied d!a to e!a (clone)");
-
                 string c6 = "copy d to e;";
-                s += HelperTrace(c6);
-                Helper_CheckTrace6(c1, c2, c3, c4, c5, c6);
-
+                s += HelperTrace(c6);                
+                String2 x6 = Helper_Push(x5b, "Copied d!a to e!a (clone)");
+                Helper_CheckTrace("e!a", x6);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
                 string c7 = "f = 1000;";
                 s += HelperTrace(c7);
+                String2 x7 = new String2(null);
+                x7.m.Add(new String2(c7));
+                Helper_CheckTrace("f!a", x7);
+                Helper_CheckTrace("e!a", x6);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
 
                 string c8 = "copy <2021 2021> f to e;";  //only partial copy
+                string c8a = "Copied f!a into e!a (2021-2021)";
                 s += HelperTrace(c8);
-                Helper_CheckTrace7(c1, c2, c3, c4, c5, c7);
+                String2 x8 = G.DeepCloneSlow<String2>(x6);
+                x8.m.Add(new String2(c8a));                
+                x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
+                Helper_CheckTrace("e!a", x8);
 
+
+                
                 string c9 = "rename e as g;";
                 s += HelperTrace(c9);
                 Helper_CheckTrace8(c1, c2, c3, c4, c5, c7);
@@ -12973,7 +12984,9 @@ namespace UnitTests
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
         {
-            String2 x5b = new String2(null); x5b.m.Add(new String2(cImport2)); x5b.m[0].m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
+            String2 x5b = new String2(null); 
+            x5b.m.Add(new String2(cImport2)); 
+            x5b.m[0].m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
             return x5b;
         }
 
