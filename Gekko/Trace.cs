@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,39 +78,77 @@ namespace Gekko
 
         public void PrintRecursive(int depth, List<string> output)
         {
-            string s = this.bankAndVarnameWithFreq;
-            if (!this.t1.IsNull()) s += " " + this.t1 + "-" + this.t2;
-            s += ": ";
-            s += this.assignment;
-            output.Add("-" + G.Blanks(2 * depth) + s);
+            if (depth > 0)
+            {
+                string s = Text();
+                output.Add("-" + G.Blanks(2 * (depth - 1)) + s);
+            }
             if (this.precedents != null)
             {
                 foreach (Trace child in this.precedents) child.PrintRecursive(depth + 1, output);
             }
+            if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
+        }
+
+        public string Text()
+        {
+            string s = this.bankAndVarnameWithFreq;
+            if (!this.t1.IsNull()) s += " " + this.t1 + "-" + this.t2;
+            s += ": ";
+            s += this.assignment;
+            return s;
         }
 
         /// <summary>
-        /// Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
+        /// Type == 1 ---> Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
+        /// Used for copying a whole object. Type == 2 ---> ???
         /// </summary>
         /// <param name="ts"></param>
-        public void PushIntoSeries(Series ts)
+        public void PushIntoSeries(Series ts, int type)
         {
-            if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
-            ts.meta.trace.precedents = new List<Trace> { this };
+            //Could code for type 1 and 2 be merged somehow
+            if (ts.meta.trace == null) ts.meta.trace = new Trace();
+            if (type == 1)
+            {
+                this.precedents = new List<Trace>();
+                if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
+                ts.meta.trace.precedents = new List<Trace> { this };
+            }
+            else if (type == 2)
+            {
+                if (ts.meta.trace.precedents == null) ts.meta.trace.precedents = new List<Trace>();
+                foreach (Trace trace_other in ts.meta.trace.precedents)
+                {
+                    foreach (GekkoTime t in this.periods)
+                    {
+                        trace_other.periods.Remove(t);
+                    }
+                }
+                ts.meta.trace.precedents.Add(this);
+            }
+            else new Error("Trace");
         }
 
         /// <summary>
         /// Puts the new trace on top of the series traces. 
-        /// First it puts any traces from the extraToAdd series.
-        /// Then it adds the existing series trace(s).
-        /// 
+        /// First it puts any traces from the extraToAdd series (may remove periods from these).
+        /// Then it adds the existing series trace(s). Used for copy-inject into existing object.
         /// </summary>
         /// <param name="extraToAdd"></param>
         /// <param name="ts"></param>
         /// <param name="newTrace"></param>
         public void PushIntoSeries(Series ts, Series extraToAdd)
         {
-            if (extraToAdd.meta.trace.precedents != null) this.precedents.AddRange(extraToAdd.meta.trace.precedents);            
+            if (ts.meta.trace == null) ts.meta.trace = new Trace();
+            this.precedents = new List<Trace>();
+            if (extraToAdd.meta.trace.precedents != null) this.precedents.AddRange(extraToAdd.meta.trace.precedents);
+            foreach (Trace trace_other in ts.meta.trace.precedents)
+            {
+                foreach (GekkoTime t in this.periods)
+                {
+                    trace_other.periods.Remove(t);
+                }
+            }
             if (ts.meta.trace.precedents == null) ts.meta.trace.precedents = new List<Trace>();
             ts.meta.trace.precedents.Add(this);
         }

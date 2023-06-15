@@ -4554,9 +4554,9 @@ namespace Gekko
                                 //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
 
                                 Series tsExisting = GetTsExisting(databank, name);  //may be null
-                                Series tsProtobuf = iv as Series;  //cannot be null
+                                Series tsImported = iv as Series;  //cannot be null
 
-                                if (tsProtobuf.type == ESeriesType.ArraySuper)
+                                if (tsImported.type == ESeriesType.ArraySuper)
                                 {
                                     //---------------------------
                                     // handle array-timeseries
@@ -4564,15 +4564,15 @@ namespace Gekko
 
                                     if (tsExisting == null)
                                     {
-                                        databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
+                                        databank.AddIVariable(name, tsImported); //the sub-timeseries will follow automatically!
                                     }
                                     else
                                     {
-                                        if (tsExisting.dimensions == tsProtobuf.dimensions)
+                                        if (tsExisting.dimensions == tsImported.dimensions)
                                         {
                                             //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
                                             Multidim gmapExisting = tsExisting.dimensionsStorage;
-                                            Multidim gmapProtobuf = tsProtobuf.dimensionsStorage;
+                                            Multidim gmapProtobuf = tsImported.dimensionsStorage;
 
                                             foreach (KeyValuePair<MultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                             {
@@ -4587,23 +4587,23 @@ namespace Gekko
                                                 if (tsDimExisting == null)
                                                 {
                                                     //add this sub-series to the array-timeseries                                   
-                                                    tsProtobuf.Truncate(dates);
-                                                    gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsProtobuf);
+                                                    tsImported.Truncate(dates);
+                                                    gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsImported);
                                                 }
                                                 else
                                                 {
                                                     //now we need to merge the two series
                                                     //also see #98520983
                                                     bool shouldOverwriteLaterOn = false;
-                                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                                                    MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsImported, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsImported, shouldOverwriteLaterOn);
                                                 }
                                             }
                                         }
                                         else
                                         {
                                             //dimensions do not match, wipe existing out!
-                                            databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
+                                            databank.AddIVariableWithOverwrite(name, tsImported);  //the sub-timeseries will follow automatically!
                                         }
                                     }
                                 }
@@ -4615,10 +4615,21 @@ namespace Gekko
 
                                     //also see #98520983
                                     bool wipeExistingOut = false;
-                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
-                                    GekkoSmplSimple periods = dates?.GetPeriods(tsProtobuf.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
+                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsImported, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, wipeExistingOut);
+                                    GekkoSmplSimple periods = dates?.GetPeriods(tsImported.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
 
+                                    Trace newTrace = new Trace();
+                                    newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")";
+                                    newTrace.bankAndVarnameWithFreq = name;
+                                    newTrace.filenameAndPathAndLine = "Filename and line";
+                                    if (periods != null)
+                                    {
+                                        newTrace.t1 = periods.t1;
+                                        newTrace.t2 = periods.t2;
+                                    }
+                                    if (tsExisting != null) newTrace.PushIntoSeries(tsExisting, 1);
+                                    else newTrace.PushIntoSeries(tsImported, 1);
                                 }
                             }
                             else
@@ -15150,54 +15161,11 @@ namespace Gekko
                 }
 
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
-                foreach (string expl in expls) G.Writeln(expl);
-
-                /*
-                 * 
-                 *  We have 10 GekkoTimes pointing to 3 Trace2 objects. These objects point to each other, but 
-                 *  Better to 
-                 * 
-                 * 
-                 * 
-                 
-
-                 */           
+                foreach (string expl in expls) G.Writeln(expl);                
 
                 if (ts.meta.trace != null)
                 {
-                    //Trace trace = null;
-                    //List<DispTraceHelpler> condensed = new List<DispTraceHelpler>();
-                    //foreach (KeyValuePair<GekkoTime, Trace2> kvp in trace.storage)
-                    //{
-                    //    bool known = false;
-                    //    foreach (DispTraceHelpler c in condensed)
-                    //    {
-                    //        if (Object.ReferenceEquals(c.trace2, kvp.Value))
-                    //        {
-                    //            c.dates.Add(kvp.Key);
-                    //            known = true; break;
-                    //        }
-                    //    }
-                    //    if (!known)
-                    //    {
-                    //        DispTraceHelpler dth = new DispTraceHelpler();
-                    //        dth.trace2 = kvp.Value;
-                    //        dth.dates.Add(kvp.Key);
-                    //        condensed.Add(dth);
-                    //    }
-                    //}
-
-                    ////Sort dates
-                    //foreach (DispTraceHelpler c in condensed) c.dates.Sort(); //sort dates for each link                    
-                    //condensed = condensed.OrderBy(x => x.dates[0]).ToList();  //links by first date
-
-                    //foreach (DispTraceHelpler c in condensed)
-                    //{
-                    //    List<string> temp2 = new List<string>();
-                    //    foreach (GekkoTime t in c.dates) temp2.Add(t.ToString());
-                    //    string s = "Trace " + Stringlist.GetListWithCommas(temp2) + ": " + c.trace2.assignment;
-                    //    G.Writeln(s);
-                    //}
+                    PrintTrace(ts.meta.trace);
                 }
 
                 bool eqsPrinted = false;
@@ -15235,6 +15203,29 @@ namespace Gekko
 
                 G.Writeln("==========================================================================================");
                 if (note != null) G.Writeln(note);
+            }
+        }
+
+        private static void PrintTrace(Trace start)
+        {
+            using (Writeln txt = new Writeln())
+            {
+                txt.MainOmitVeryFirstNewLine();
+                foreach (Trace trace in start.precedents)
+                {
+                    if (trace.precedents != null && trace.precedents.Count > 0)
+                    {
+                        Action<GAO> a = (gao) =>
+                        {
+                            PrintTrace(trace);
+                        };
+                        G.Writeln(trace.Text() + " (" + G.GetLinkAction("unfold", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    }
+                    else
+                    {
+                        txt.MainAdd(trace.Text());
+                    }
+                }
             }
         }
 
@@ -16102,9 +16093,8 @@ namespace Gekko
                     Trace newTrace = new Trace();
                     newTrace.assignment = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
-                    newTrace.filenameAndPathAndLine = "Filename and line";
-                    newTrace.precedents = new List<Trace>();
-                    newTrace.PushIntoSeries(ts);
+                    newTrace.filenameAndPathAndLine = "Filename and line";                    
+                    newTrace.PushIntoSeries(ts, 1);
                 }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
@@ -16222,8 +16212,7 @@ namespace Gekko
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = "Filename and line";
                                 newTrace.t1 = o.t1;
-                                newTrace.t2 = o.t2;
-                                newTrace.precedents = new List<Trace>();
+                                newTrace.t2 = o.t2;                                
                                 newTrace.PushIntoSeries(existing_series, iv_series);
                             }
                         }
@@ -16244,9 +16233,8 @@ namespace Gekko
                         newTrace.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
                         newTrace.filenameAndPathAndLine = "Filename and line";
                         newTrace.t1 = o.t1;
-                        newTrace.t2 = o.t2;
-                        newTrace.precedents = new List<Trace>();                        
-                        newTrace.PushIntoSeries(ts_clone);
+                        newTrace.t2 = o.t2;                                              
+                        newTrace.PushIntoSeries(ts_clone, 1);
                     }
                 }
             }

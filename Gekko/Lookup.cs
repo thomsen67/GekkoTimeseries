@@ -1731,17 +1731,9 @@ namespace Gekko
                             }
                         }
                     }
-
-                    if (lhs_series.meta.trace.precedents == null) lhs_series.meta.trace.precedents = new List<Trace>();
+                    
                     //remove these new periods from any previous traces
-                    foreach (Trace trace_other in lhs_series.meta.trace.precedents)
-                    {
-                        foreach (GekkoTime t in trace.periods)
-                        {
-                            trace_other.periods.Remove(t);
-                        }
-                    }
-                    lhs_series.meta.trace.precedents.Add(trace);
+                    trace.PushIntoSeries(lhs_series, 2);
 
                     ////For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
                     //foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
@@ -1757,7 +1749,7 @@ namespace Gekko
                     //}
                 }
             }
-        }
+        }        
 
         private static bool SeriesHasSkips(Series tsInput)
         {            
