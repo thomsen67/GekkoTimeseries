@@ -65,6 +65,10 @@ namespace UnitTests
         {
             this.s = s;
         }
+        public string ToString()
+        {
+            return this.s + "   -----   [" + m.Count + " children]";
+        }
     }
 
     public class StringOrList
@@ -12878,8 +12882,8 @@ namespace UnitTests
                 Helper_CheckTrace("c!a", x4);
                 Helper_CheckTrace("d!a", x5);
                 // ---------------------------------                               
-                I("write sletmig1;");
-                I("read sletmig1;");
+                I("write sletmig1;"); //a, b, c, d  ... 2021-23
+                I("read sletmig1;"); //a, b, c, d  ... 2021-23
                 string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
                 String2 x2a = Helper_Push(x2, cImport1);
                 String2 x3a = Helper_Push(x3, cImport1);
@@ -12893,8 +12897,8 @@ namespace UnitTests
                 I("delete a, b, c;");
                 Helper_CheckTrace("d!a", x5a);
                 // ---------------------------------
-                I("write sletmig2;");
-                I("read sletmig2;");
+                I("write sletmig2;"); //d  ... 2021-23
+                I("read sletmig2;"); //d  ... 2021-23
                 String2 x5b = Helper_Push(x5a, "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk)");
                 Helper_CheckTrace("d!a", x5b);
                 // ---------------------------------
@@ -12927,7 +12931,28 @@ namespace UnitTests
                 String2 x9 = Helper_Push(x8, "Renamed Work:e!a as Work:g!a");
                 Helper_CheckTrace("g!a", x9);
                 Helper_CheckTrace("f!a", x7);
-                Helper_CheckTrace("d!a", x5b);                
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------
+                I("delete d;");
+                string c10 = "d = 5, 6, 7;";
+                s += HelperTrace(c10);
+                String2 x10 = new String2(null);
+                x10.m.Add(new String2(c10));                
+                Helper_CheckTrace("d!a", x10);
+                I("import <2022 2022> sletmig2;");
+                String2 x10a = new String2("Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk) (2022-2022)");
+                x10a.m.Add(x5a.m[0]);
+                x10.m.Add(x10a);
+                //x10.m[1].m.AddRange(G.DeepCloneSlow<String2>(x5b).m);
+                Helper_CheckTrace("d!a", x10);
+
+                I("prt d;");
+                I("d.printtrace();");
+                return;
+
+                
+                
+                
 
             }
             finally

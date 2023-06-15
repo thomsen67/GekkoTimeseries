@@ -4156,7 +4156,6 @@ namespace Gekko
         {
             //open = true if called with OPEN command              
 
-
             int n = 1;
             List<int> list = new List<int>();
             if (open)
@@ -4619,17 +4618,29 @@ namespace Gekko
                                     MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, wipeExistingOut);
                                     GekkoSmplSimple periods = dates?.GetPeriods(tsImported.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
 
-                                    Trace newTrace = new Trace();
-                                    newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")";
-                                    newTrace.bankAndVarnameWithFreq = name;
-                                    newTrace.filenameAndPathAndLine = "Filename and line";
-                                    if (periods != null)
+                                    if (Program.options.databank_trace)
                                     {
-                                        newTrace.t1 = periods.t1;
-                                        newTrace.t2 = periods.t2;
+                                        Trace newTrace = new Trace();
+                                        string period = null;
+                                        if (periods != null)
+                                        {
+                                            period = " (" + periods.t1 + "-" + periods.t2 + ")";
+                                            newTrace.t1 = periods.t1;
+                                            newTrace.t2 = periods.t2;
+                                        }
+                                        newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
+                                        newTrace.bankAndVarnameWithFreq = name;
+                                        newTrace.filenameAndPathAndLine = "Filename and line";
+                                        if (periods != null)
+                                        {                                            
+                                            newTrace.PushIntoSeries(tsExisting, tsImported);
+                                        }
+                                        else
+                                        {
+                                            if (tsExisting != null) newTrace.PushIntoSeries(tsExisting, 1);
+                                            else newTrace.PushIntoSeries(tsImported, 1);
+                                        }
                                     }
-                                    if (tsExisting != null) newTrace.PushIntoSeries(tsExisting, 1);
-                                    else newTrace.PushIntoSeries(tsImported, 1);
                                 }
                             }
                             else
