@@ -12865,6 +12865,15 @@ namespace UnitTests
 
                 string c4 = "c = a + b;";
                 s += HelperTrace(c4);
+                String2 x4 = new String2(null);
+                x4.m.Add(new String2(c4));
+                //x4.m[0].m.Add(G.DeepCloneSlow<String2>(x1.m[0]));
+                x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                x4.m[0].m.Add(G.DeepCloneSlow<String2>(x3.m[0]));
+                Helper_CheckTrace("a!a", x2);
+                Helper_CheckTrace("b!a", x3);                
+                Helper_CheckTrace("c!a", x4);
+
                 Helper_CheckTrace2(c1, c2);
                 Helper_CheckTrace3(c3);
                 Helper_CheckTrace4(c1, c2, c3, c4);                
