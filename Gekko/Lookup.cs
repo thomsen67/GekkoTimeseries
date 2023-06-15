@@ -1706,6 +1706,7 @@ namespace Gekko
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
+                        List<Trace> temp = new List<Trace>();
                         trace.precedents = new List<Trace>();
 
                         //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
@@ -1716,20 +1717,28 @@ namespace Gekko
                         {
                             Series iv_ts = iv as Series;
                             if (iv_ts == null) continue;
+                            if (Object.ReferenceEquals(iv_ts, lhs_series))
+                            {
+                                continue;  //do not point to your own trace!
+                            }
                             foreach (Trace kvp in iv_ts.meta.trace.precedents)
                             {
                                 Trace childTrace2 = kvp;
                                 bool known = false;
-                                foreach (Trace tempElement in trace.precedents)
+                                foreach (Trace tempElement in temp)
                                 {
                                     if (Object.ReferenceEquals(childTrace2, tempElement))
                                     {
                                         known = true; break;
                                     }
                                 }
-                                if (!known) trace.precedents.Add(childTrace2);
+                                if (!known)
+                                {
+                                    temp.Add(childTrace2);
+                                }
                             }
                         }
+                        if (temp.Count > 0) trace.precedents = temp;  //keep it null if no children
                     }
                     
                     //remove these new periods from any previous traces

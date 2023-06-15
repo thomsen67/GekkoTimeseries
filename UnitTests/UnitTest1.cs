@@ -56,6 +56,16 @@ using static Gekko.O;
 namespace UnitTests
 {
 
+    public class String2
+    {
+        public string s = null;
+        public List<String2> m = new List<String2>();
+        public String2(string s)
+        {
+            this.s = s;
+        }
+    }
+
     public class StringOrList
     {
         public string s = null;
@@ -12833,11 +12843,14 @@ namespace UnitTests
 
                 string c1 = "a = 2, 3, 4;";
                 s += HelperTrace(c1);
-                Helper_CheckTrace1(c1);
+                String2 target = new String2(null);
+                target.m.Add(new String2(c1));
+                Helper_CheckTrace("a!a", target);
 
                 string c2 = "a <2022 2022> = 100;";
                 s += HelperTrace(c2);
-                Helper_CheckTrace2(c1, c2);
+                target.m.Add(new String2(c2));
+                Helper_CheckTrace("a!a", target);
 
                 string c3 = "b = 12, 13, 14;";
                 s += HelperTrace(c3);
@@ -13033,11 +13046,27 @@ namespace UnitTests
             Assert.AreEqual(trace2.precedents[1].assignment, c2);
         }
 
-        private static void Helper_CheckTrace1(string c1)
+        private static void Helper_CheckTrace(string name, String2 c1)
         {
-            Trace trace2 = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.trace;
-            Assert.IsTrue(trace2.precedents.Count == 1);
-            Assert.AreEqual(trace2.precedents[0].assignment, c1);
+            Trace trace2 = (Program.databanks.GetFirst().GetIVariable(name) as Series).meta.trace;
+            WalkTrace(trace2, c1, 0);            
+        }
+
+        public static void WalkTrace(Trace trace, String2 m, int depth)
+        {
+            Assert.AreEqual(trace.assignment, m.s);
+            if (trace.precedents == null)
+            {
+                if (m.m.Count > 0) Assert.Fail();
+            }
+            else
+            {                
+                Assert.AreEqual(trace.precedents.Count, m.m.Count);
+                for (int i = 0; i < trace.precedents.Count; i++)
+                {
+                    WalkTrace(trace.precedents[i], m.m[i], depth + 1);
+                }
+            }
         }
 
         private static string HelperTrace(string command)
