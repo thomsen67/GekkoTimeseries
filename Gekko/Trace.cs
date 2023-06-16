@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,8 +38,8 @@ namespace Gekko
         [ProtoMember(7)]
         public string assignment = null;
 
-        [ProtoMember(8)]        
-        public List<Trace> precedents = null;
+        [ProtoMember(8)]
+        public Precedents precedents = new Precedents();
 
         [ProtoMember(9)]
         public List<GekkoTime> periods = new List<GekkoTime>();
@@ -67,12 +68,8 @@ namespace Gekko
             trace2.periods = new List<GekkoTime>();
             foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
             trace2.t1 = this.t1;
-            trace2.t2 = this.t2;            
-            if (this.precedents != null)
-            {
-                trace2.precedents = new List<Trace>();
-                foreach (Trace trace2Clone in this.precedents) trace2.precedents.Add(trace2Clone.DeepClone());
-            }
+            trace2.t2 = this.t2;
+            trace2.precedents = this.precedents.DeepClone();
             return trace2;
         }
 
@@ -85,7 +82,10 @@ namespace Gekko
             }
             if (this.precedents != null)
             {
-                foreach (Trace child in this.precedents) child.PrintRecursive(depth + 1, output);
+                if (this.precedents.Count() > 0)
+                {
+                    foreach (Trace child in this.precedents.storage) child.PrintRecursive(depth + 1, output);
+                }
             }
             if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
         }
@@ -110,19 +110,20 @@ namespace Gekko
             //Type == 2: Puts itself besides any exising precedent, as a sibling. Removes the date(s) from its siblings.
             if (ts.meta.trace == null) ts.meta.trace = new Trace();
             if (type == 1)
-            {   
-                this.precedents = new List<Trace>();
-                if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
-                ts.meta.trace.precedents = new List<Trace> { this };
+            {                   
+                this.precedents.AddRange(ts.meta.trace.precedents);
+                ts.meta.trace.precedents.storage = new List<Trace> { this };
             }
             else if (type == 2)
             {
-                if (ts.meta.trace.precedents == null) ts.meta.trace.precedents = new List<Trace>();
-                foreach (Trace trace_other in ts.meta.trace.precedents)
+                if (ts.meta.trace.precedents.Count() > 0)
                 {
-                    foreach (GekkoTime t in this.periods)
+                    foreach (Trace trace_other in ts.meta.trace.precedents.storage)
                     {
-                        trace_other.periods.Remove(t);
+                        foreach (GekkoTime t in this.periods)
+                        {
+                            trace_other.periods.Remove(t);
+                        }
                     }
                 }
                 ts.meta.trace.precedents.Add(this);
@@ -137,6 +138,48 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public List<Trace> storage = null;
+
+        public void AddRange(Precedents precedents)
+        {
+            
+            if (precedents.storage != null)
+            {
+                if (this.storage == null) this.storage = new List<Trace>();
+                this.storage.AddRange(precedents.storage);
+            }
+        }
+
+        public void Add(Trace trace)
+        {
+            if (this.storage == null) this.storage = new List<Trace>();
+            this.storage.Add(trace);
+        }
+
+        public int Count()
+        {
+            if (this.storage == null) return 0;
+            return this.storage.Count;
+        }
+
+        public Trace this[int i]
+        {
+            get { return this.storage[i]; }
+            set { this.storage[i] = value; }
+        }
+
+        public Precedents DeepClone()
+        {
+            Precedents precedents = new Precedents();            
+            if (this.storage != null)
+            {
+                precedents.storage = new List<Trace>();
+                foreach (Trace trace in this.storage)
+                {
+                    precedents.storage.Add(trace.DeepClone());
+                }
+            }
+            return precedents;
+        }
 
     }
 }

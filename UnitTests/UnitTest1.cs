@@ -12980,8 +12980,8 @@ namespace UnitTests
             }
             else
             {                
-                Assert.AreEqual(trace.precedents.Count, m.m.Count);
-                for (int i = 0; i < trace.precedents.Count; i++)
+                Assert.AreEqual(trace.precedents.Count(), m.m.Count);
+                for (int i = 0; i < trace.precedents.Count(); i++)
                 {
                     Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
                 }

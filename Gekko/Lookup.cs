@@ -1707,7 +1707,6 @@ namespace Gekko
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
                         List<Trace> temp = new List<Trace>();
-                        trace.precedents = new List<Trace>();
 
                         //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
                         //     Is datetime finegrained enough?
@@ -1721,7 +1720,7 @@ namespace Gekko
                             {
                                 continue;  //do not point to your own trace!
                             }
-                            foreach (Trace kvp in iv_ts.meta.trace.precedents)
+                            foreach (Trace kvp in iv_ts.meta.trace.precedents.storage)
                             {
                                 Trace childTrace2 = kvp;
                                 bool known = false;
@@ -1738,7 +1737,7 @@ namespace Gekko
                                 }
                             }
                         }
-                        if (temp.Count > 0) trace.precedents = temp;  //keep it null if no children
+                        if (temp.Count > 0) trace.precedents.storage = temp;  //keep it null if no children
                     }
                     
                     //remove these new periods from any previous traces
