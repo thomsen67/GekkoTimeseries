@@ -4633,7 +4633,7 @@ namespace Gekko
                                         newTrace.filenameAndPathAndLine = "Filename and line";
                                         if (periods != null)
                                         {                                            
-                                            newTrace.PushIntoSeries(tsExisting, tsImported);
+                                            newTrace.PushIntoSeries(tsExisting, tsImported?.meta?.trace);
                                         }
                                         else
                                         {
@@ -16224,7 +16224,7 @@ namespace Gekko
                                 newTrace.filenameAndPathAndLine = "Filename and line";
                                 newTrace.t1 = o.t1;
                                 newTrace.t2 = o.t2;                                
-                                newTrace.PushIntoSeries(existing_series, iv_series);
+                                newTrace.PushIntoSeries(existing_series, iv_series?.meta?.trace);
                             }
                         }
                     }

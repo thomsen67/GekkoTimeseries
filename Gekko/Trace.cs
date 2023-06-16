@@ -106,10 +106,11 @@ namespace Gekko
         /// <param name="ts"></param>
         public void PushIntoSeries(Series ts, int type)
         {
-            //Could code for type 1 and 2 be merged somehow
+            //Type == 1: Puts itself alone as a parent of existing, which becomes a child
+            //Type == 2: Puts itself besides any exising precedent, as a sibling. Removes the date(s) from its siblings.
             if (ts.meta.trace == null) ts.meta.trace = new Trace();
             if (type == 1)
-            {
+            {   
                 this.precedents = new List<Trace>();
                 if (ts.meta.trace.precedents != null) this.precedents.AddRange(ts.meta.trace.precedents);
                 ts.meta.trace.precedents = new List<Trace> { this };
@@ -132,16 +133,21 @@ namespace Gekko
         /// <summary>
         /// Puts the new trace on top of the series traces. 
         /// First it puts any traces from the extraToAdd series (may remove periods from these).
-        /// Then it adds the existing series trace(s). Used for copy-inject into existing object.
+        /// Then it adds the existing series trace(s). Used for copy-inject or import into existing object.
         /// </summary>
-        /// <param name="extraToAdd"></param>
+        /// <param name="extraTrace"></param>
         /// <param name="ts"></param>
         /// <param name="newTrace"></param>
-        public void PushIntoSeries(Series ts, Series extraToAdd)
+        public void PushIntoSeries(Series ts, Trace extraTrace)
         {
+            //
+            // thisTrace has extraTrace precedents put in
+            // for ts.meta.precedents the dates from thisTrace are removed
+            // then thisTrace is added to ts.meta.precedents as a sibling.
+            //
             if (ts.meta.trace == null) ts.meta.trace = new Trace();
             this.precedents = new List<Trace>();
-            if (extraToAdd.meta.trace.precedents != null) this.precedents.AddRange(extraToAdd.meta.trace.precedents);
+            if (extraTrace?.precedents != null) this.precedents.AddRange(extraTrace.precedents);
             foreach (Trace trace_other in ts.meta.trace.precedents)
             {
                 foreach (GekkoTime t in this.periods)
