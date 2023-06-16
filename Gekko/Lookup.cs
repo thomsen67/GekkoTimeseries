@@ -1720,20 +1720,23 @@ namespace Gekko
                             {
                                 continue;  //do not point to your own trace!
                             }
-                            foreach (Trace kvp in iv_ts.meta.trace.precedents.storage)
+                            if (iv_ts.meta.trace.precedents.Count() > 0)
                             {
-                                Trace childTrace2 = kvp;
-                                bool known = false;
-                                foreach (Trace tempElement in temp)
+                                foreach (Trace kvp in iv_ts.meta.trace.precedents.storage)
                                 {
-                                    if (Object.ReferenceEquals(childTrace2, tempElement))
+                                    Trace childTrace2 = kvp;
+                                    bool known = false;
+                                    foreach (Trace tempElement in temp)
                                     {
-                                        known = true; break;
+                                        if (Object.ReferenceEquals(childTrace2, tempElement))
+                                        {
+                                            known = true; break;
+                                        }
                                     }
-                                }
-                                if (!known)
-                                {
-                                    temp.Add(childTrace2);
+                                    if (!known)
+                                    {
+                                        temp.Add(childTrace2);
+                                    }
                                 }
                             }
                         }

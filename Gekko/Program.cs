@@ -15231,19 +15231,23 @@ namespace Gekko
             using (Writeln txt = new Writeln())
             {
                 txt.MainOmitVeryFirstNewLine();
-                foreach (Trace trace in start.precedents.storage)
+
+                if (start.precedents.Count() > 0)
                 {
-                    if (trace.precedents != null && trace.precedents.storage.Count > 0)
+                    foreach (Trace trace in start.precedents.storage)
                     {
-                        Action<GAO> a = (gao) =>
+                        if (trace.precedents.Count() > 0)
                         {
-                            PrintTrace(trace);
-                        };
-                        G.Writeln(trace.Text() + " (" + G.GetLinkAction("unfold", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
-                    }
-                    else
-                    {
-                        txt.MainAdd(trace.Text());
+                            Action<GAO> a = (gao) =>
+                            {
+                                PrintTrace(trace);
+                            };
+                            G.Writeln(trace.Text() + " (" + G.GetLinkAction("unfold", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                        }
+                        else
+                        {
+                            txt.MainAdd(trace.Text());
+                        }
                     }
                 }
             }

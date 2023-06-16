@@ -12974,17 +12974,10 @@ namespace UnitTests
         public static void Helper_WalkTrace(Trace trace, String2 m, int depth)
         {
             Assert.AreEqual(trace.assignment, m.s);
-            if (trace.precedents == null)
+            Assert.AreEqual(trace.precedents.Count(), m.m.Count);
+            for (int i = 0; i < trace.precedents.Count(); i++)
             {
-                if (m.m.Count > 0) Assert.Fail();
-            }
-            else
-            {                
-                Assert.AreEqual(trace.precedents.Count(), m.m.Count);
-                for (int i = 0; i < trace.precedents.Count(); i++)
-                {
-                    Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
-                }
+                Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
             }
         }
 

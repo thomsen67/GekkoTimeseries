@@ -80,13 +80,10 @@ namespace Gekko
                 string s = Text();
                 output.Add("-" + G.Blanks(2 * (depth - 1)) + s);
             }
-            if (this.precedents != null)
+            if (this.precedents.Count() > 0)
             {
-                if (this.precedents.Count() > 0)
-                {
-                    foreach (Trace child in this.precedents.storage) child.PrintRecursive(depth + 1, output);
-                }
-            }
+                foreach (Trace child in this.precedents.storage) child.PrintRecursive(depth + 1, output);
+            }            
             if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
         }
 
