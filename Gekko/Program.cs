@@ -15234,7 +15234,7 @@ namespace Gekko
 
                 if (start.precedents.Count() > 0)
                 {
-                    foreach (Trace trace in start.precedents.storage)
+                    foreach (Trace trace in start.precedents.GetStorageForIteration())
                     {
                         if (trace.precedents.Count() > 0)
                         {

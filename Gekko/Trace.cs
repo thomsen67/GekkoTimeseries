@@ -82,7 +82,7 @@ namespace Gekko
             }
             if (this.precedents.Count() > 0)
             {
-                foreach (Trace child in this.precedents.storage) child.PrintRecursive(depth + 1, output);
+                foreach (Trace child in this.precedents.GetStorageForIteration()) child.PrintRecursive(depth + 1, output);
             }            
             if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
         }
@@ -109,13 +109,14 @@ namespace Gekko
             if (type == 1)
             {                   
                 this.precedents.AddRange(ts.meta.trace.precedents);
-                ts.meta.trace.precedents.storage = new List<Trace> { this };
+                ts.meta.trace.precedents = new Precedents();
+                ts.meta.trace.precedents.Add(this);
             }
             else if (type == 2)
             {
                 if (ts.meta.trace.precedents.Count() > 0)
                 {
-                    foreach (Trace trace_other in ts.meta.trace.precedents.storage)
+                    foreach (Trace trace_other in ts.meta.trace.precedents.GetStorageForIteration())
                     {
                         foreach (GekkoTime t in this.periods)
                         {
@@ -150,6 +151,15 @@ namespace Gekko
         {
             if (this.storage == null) this.storage = new List<Trace>();
             this.storage.Add(trace);
+        }
+
+        /// <summary>
+        /// Only use this for iterators, to keep .storage encapsulated
+        /// </summary>
+        /// <returns></returns>
+        public List<Trace> GetStorageForIteration()
+        {
+            return this.storage;
         }
 
         public int Count()

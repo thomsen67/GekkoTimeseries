@@ -1722,7 +1722,7 @@ namespace Gekko
                             }
                             if (iv_ts.meta.trace.precedents.Count() > 0)
                             {
-                                foreach (Trace kvp in iv_ts.meta.trace.precedents.storage)
+                                foreach (Trace kvp in iv_ts.meta.trace.precedents.GetStorageForIteration())
                                 {
                                     Trace childTrace2 = kvp;
                                     bool known = false;
@@ -1740,7 +1740,17 @@ namespace Gekko
                                 }
                             }
                         }
-                        if (temp.Count > 0) trace.precedents.storage = temp;  //keep it null if no children
+                        if (temp.Count > 0)
+                        {
+
+                            //trace.precedents.storage = temp;  //keep it null if no children
+                            trace.precedents = new Precedents();
+                            foreach (Trace trace2 in temp)
+                            {
+                                trace.precedents.Add(trace2);
+                            }                            
+
+                        }
                     }
                     
                     //remove these new periods from any previous traces
