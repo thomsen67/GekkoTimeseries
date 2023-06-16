@@ -4631,9 +4631,11 @@ namespace Gekko
                                         newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
                                         newTrace.bankAndVarnameWithFreq = name;
                                         newTrace.filenameAndPathAndLine = "Filename and line";
+                                        newTrace.precedents = new List<Trace>();
+                                        if (tsImported?.meta?.trace?.precedents != null) newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
                                         if (periods != null)
                                         {                                            
-                                            newTrace.PushIntoSeries(tsExisting, tsImported?.meta?.trace);
+                                            newTrace.PushIntoSeries(tsExisting, 2);
                                         }
                                         else
                                         {
@@ -16223,8 +16225,10 @@ namespace Gekko
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = "Filename and line";
                                 newTrace.t1 = o.t1;
-                                newTrace.t2 = o.t2;                                
-                                newTrace.PushIntoSeries(existing_series, iv_series?.meta?.trace);
+                                newTrace.t2 = o.t2;
+                                newTrace.precedents = new List<Trace>();
+                                if (iv_series?.meta?.trace?.precedents != null) newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
+                                newTrace.PushIntoSeries(existing_series, 2);
                             }
                         }
                     }

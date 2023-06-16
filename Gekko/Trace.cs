@@ -128,35 +128,15 @@ namespace Gekko
                 ts.meta.trace.precedents.Add(this);
             }
             else new Error("Trace");
-        }
+        }        
+    }
 
-        /// <summary>
-        /// Puts the new trace on top of the series traces. 
-        /// First it puts any traces from the extraToAdd series (may remove periods from these).
-        /// Then it adds the existing series trace(s). Used for copy-inject or import into existing object.
-        /// </summary>
-        /// <param name="extraTrace"></param>
-        /// <param name="ts"></param>
-        /// <param name="newTrace"></param>
-        public void PushIntoSeries(Series ts, Trace extraTrace)
-        {
-            //
-            // thisTrace has extraTrace precedents put in
-            // for ts.meta.precedents the dates from thisTrace are removed
-            // then thisTrace is added to ts.meta.precedents as a sibling.
-            //
-            if (ts.meta.trace == null) ts.meta.trace = new Trace();
-            this.precedents = new List<Trace>();
-            if (extraTrace?.precedents != null) this.precedents.AddRange(extraTrace.precedents);
-            foreach (Trace trace_other in ts.meta.trace.precedents)
-            {
-                foreach (GekkoTime t in this.periods)
-                {
-                    trace_other.periods.Remove(t);
-                }
-            }
-            if (ts.meta.trace.precedents == null) ts.meta.trace.precedents = new List<Trace>();
-            ts.meta.trace.precedents.Add(this);
-        }
+
+    [ProtoContract]
+    public class Precedents
+    {
+        [ProtoMember(1)]
+        public List<Trace> storage = null;
+
     }
 }
