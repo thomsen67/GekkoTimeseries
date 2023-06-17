@@ -100,6 +100,8 @@ namespace Gekko
         
         IVariable DeepClone(GekkoSmplSimple truncate);
 
+        void DeepTrace(TraceHelper th);
+
         void DeepCount(Count count);
 
         void DeepTrim();

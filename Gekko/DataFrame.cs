@@ -130,6 +130,11 @@ namespace Gekko
             return new ScalarVal(this.val);
         }
 
+        public void DeepTrace(TraceHelper th)
+        {
+            //Do nothing
+        }
+
         public void DeepCount(Count count)
         {
             //do nothing

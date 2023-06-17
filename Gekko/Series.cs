@@ -2853,6 +2853,22 @@ namespace Gekko
             return tsCopy;
         }
 
+        public void DeepTrace(TraceHelper th)
+        {            
+            if (this.type == ESeriesType.ArraySuper)
+            {
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {
+                    kvp.Value.DeepTrace(th);
+                }
+            }
+            else
+            {
+                th.varCount++;
+                this.meta.trace.DeepTrace(th);
+            }
+        }
+
         /// <summary>
         /// Counting approx size
         /// </summary>

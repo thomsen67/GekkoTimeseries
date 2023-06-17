@@ -107,6 +107,11 @@ namespace Gekko
             new Error("Clone error"); return null;
         }
 
+        public void DeepTrace(TraceHelper th)
+        {
+            new Error("Trace error");
+        }
+
         public void DeepCount(Count count)
         {
             new Error("Count error"); return;

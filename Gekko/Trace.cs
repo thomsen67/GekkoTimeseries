@@ -46,9 +46,9 @@ namespace Gekko
 
         public string ToString()
         {
-            string s = this.assignment;
-            if (G.NullOrEmpty(s)) s = "<Entry from .meta>";
-            return this.t1 + "-" + this.t2 + ": " + this.assignment;
+            string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
+            if (G.NullOrEmpty(this.assignment)) s = "------- meta entry: " + this.bankAndVarnameWithFreq + " -------";
+            return s;
         }
 
         public Trace()
@@ -57,6 +57,20 @@ namespace Gekko
             //maybe here put it into dictionary with weak values
             //but where does that dictionary live? In a databank, no?
             //or maybe only make the dictionary when about 
+        }
+
+        public void DeepTrace(TraceHelper th)
+        {
+            th.traceCount++;
+            if (!th.dict.ContainsKey(this)) th.dict.Add(this, 0);
+            new Writeln("+ " + this.assignment);
+            if (this.precedents.Count() > 0)
+            {
+                foreach (Trace trace in this.precedents.GetStorage())
+                {
+                    trace.DeepTrace(th);
+                }
+            }
         }
 
         public Trace DeepClone()
@@ -130,6 +144,13 @@ namespace Gekko
         }        
     }
 
+    public class TraceHelper
+    {
+        public int varCount = 0;
+        public int traceCount = 0;
+        public Dictionary<Trace, int> dict = new Dictionary<Trace, int>();
+    }
+
 
     [ProtoContract]
     public class Precedents
@@ -198,5 +219,9 @@ namespace Gekko
             return precedents;
         }
 
+        public string ToString()
+        {
+            return "Traces = " + this.Count();
+        }
     }
 }

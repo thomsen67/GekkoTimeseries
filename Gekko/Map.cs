@@ -260,6 +260,10 @@ namespace Gekko
             }
             return temp;
         }
+        public void DeepTrace(TraceHelper th)
+        {
+            //Do nothing
+        }
 
         public void DeepCount(Count count)
         {

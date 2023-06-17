@@ -52,6 +52,7 @@ using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using Microsoft.Data.Analysis;
 using static Gekko.O;
+//using Microsoft.Office.Interop.Excel;
 
 namespace UnitTests
 {
@@ -12880,10 +12881,14 @@ namespace UnitTests
                 Helper_CheckTrace("a!a", x2);
                 Helper_CheckTrace("b!a", x3);
                 Helper_CheckTrace("c!a", x4);
-                Helper_CheckTrace("d!a", x5);
+                Helper_CheckTrace("d!a", x5);                
+                TraceHelper th1 = new TraceHelper();
+                Program.databanks.GetFirst().GetIVariable("d!a").DeepTrace(th1);                
                 // ---------------------------------                               
                 I("write sletmig1;"); //a, b, c, d  ... 2021-23
                 I("read sletmig1;"); //a, b, c, d  ... 2021-23
+                TraceHelper th2 = new TraceHelper();
+                Program.databanks.GetFirst().GetIVariable("d!a").DeepTrace(th2);
                 string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
                 String2 x2a = Helper_Push(x2, cImport1);
                 String2 x3a = Helper_Push(x3, cImport1);

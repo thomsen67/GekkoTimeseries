@@ -375,6 +375,11 @@ namespace Gekko
             return ss;
         }
 
+        public void DeepTrace(TraceHelper th)
+        {
+            //do nothing
+        }
+
         public void DeepCount(Count count)
         {
             count.n += Globals.count1;

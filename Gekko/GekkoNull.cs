@@ -122,6 +122,11 @@ namespace Gekko
             return gekkoNull;
         }
 
+        public void DeepTrace(TraceHelper th)
+        {
+            //Do nothing
+        }
+
         public void DeepCount(Count count)
         {
             //do nothing
