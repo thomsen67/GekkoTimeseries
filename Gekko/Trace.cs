@@ -141,7 +141,17 @@ namespace Gekko
                 ts.meta.trace.precedents.Add(this);
             }
             else new Error("Trace");
-        }        
+        }
+
+        public static TraceHelper CollectAllTraces(string bank)
+        {
+            TraceHelper th1 = new TraceHelper();
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetDatabank(bank).storage)
+            {
+                kvp.Value.DeepTrace(th1);
+            }
+            return th1;
+        }
     }
 
     public class TraceHelper
