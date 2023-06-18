@@ -62,7 +62,7 @@ namespace Gekko
         public void DeepTrace(TraceHelper th, Trace parent)
         {
             th.traceCount++;
-            if (!th.dict.ContainsKey(this)) th.dict.Add(this, parent);
+            if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
             new Writeln("+ " + this.assignment);
             if (this.precedents.Count() > 0)
             {
@@ -72,6 +72,26 @@ namespace Gekko
                 }
             }
         }
+
+        public static void RestoreTraceConnections(Databank databank)
+        {
+            if (databank.traces == null) return;
+            foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
+            {
+                kvp.Key.precedents = kvp.Value;
+            }
+            databank.traces = null;
+        }
+
+        public static void RemoveTraceConnections(Databank databank)
+        {
+            TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
+            databank.traces = th1.dict;
+            foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
+            {
+                kvp.Key.precedents = null;
+            }
+        }        
 
         public Trace DeepClone()
         {
@@ -143,10 +163,10 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        public static TraceHelper CollectAllTraces(string bank, int type) //type==0 just counts. Type==1 collects connections and records them. Type==2 reestablishes connections.
+        public static TraceHelper CollectAllTraces(Databank databank, int type) //type==0 just counts. Type==1 collects connections and records them. Type==2 reestablishes connections.
         {
             TraceHelper th1 = new TraceHelper();
-            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetDatabank(bank).storage)
+            foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
             {
                 kvp.Value.DeepTrace(th1);
             }
@@ -158,7 +178,7 @@ namespace Gekko
     {
         public int varCount = 0;
         public int traceCount = 0;
-        public Dictionary<Trace, Trace> dict = new Dictionary<Trace, Trace>();  //value is parent (may be null)
+        public Dictionary<Trace, Precedents> dict = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
     }
 
 

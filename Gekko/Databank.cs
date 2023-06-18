@@ -96,7 +96,7 @@ namespace Gekko
         public DatabankCacheParams cacheParameters = null;
 
         [ProtoMember(3)]
-        public Dictionary<Trace, Trace> traces = null;
+        public Dictionary<Trace, Precedents> traces = null;
 
         public string name = null;
 

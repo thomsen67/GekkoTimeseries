@@ -5584,7 +5584,6 @@ namespace Gekko
                     new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
                 }
 
-
                 ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                 //RuntimeTypeModel serializer = TypeModel.Create();
                 //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
@@ -5597,6 +5596,7 @@ namespace Gekko
                     {
                         iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                     }
+                    Gekko.Trace.RestoreTraceConnections(deserializedDatabank);
                     readInfo.variables = deserializedDatabank.storage.Count;
                     readInfo.startPerInFile = yearMinMax.int1;
                     readInfo.endPerInFile = yearMinMax.int2;
@@ -5607,29 +5607,24 @@ namespace Gekko
                     new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers). Message: " + e.Message + ". Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
                 }
             }
-
-            if (true)
+                        
+            try
             {
-                //Can do it fast, just swapping the deserialized bank instead of the current, with no copying around
-                try
-                {
-                    //discarding the old bank completely, and replacing with the new one
-                    deserializedDatabank.name = databank.name;
-                    Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
-                    //readInfo.databank = deserializedDatabank;  //since this pointer is altered
-                    databank = deserializedDatabank;  //since this pointer is altered
-                    databank.FileNameWithPath = originalFilePath;
-                    databank.FileNameWithPathPretty = originalFilePathPretty;
-                    databank.databankVersion = databankVersion;
-                }
-                catch (Exception e)
-                {
-                    new Error("Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
-                }
-
-                readInfo.startPerResultingBank = readInfo.startPerInFile;
-                readInfo.endPerResultingBank = readInfo.endPerInFile;
+                //discarding the old bank completely, and replacing with the new one
+                deserializedDatabank.name = databank.name;
+                Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
+                databank = deserializedDatabank;  //since this pointer is altered
+                databank.FileNameWithPath = originalFilePath;
+                databank.FileNameWithPathPretty = originalFilePathPretty;
+                databank.databankVersion = databankVersion;                
             }
+            catch (Exception e)
+            {
+                new Error("Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
+            }
+
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;
         }
 
         /// <summary>
@@ -20754,6 +20749,7 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
+                Gekko.Trace.RemoveTraceConnections(databank);
                 ProtobufWrite(databank, pathAndFilename2);
                 count = databank.storage.Count;  //must be before the finally
             }

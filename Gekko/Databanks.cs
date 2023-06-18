@@ -407,7 +407,6 @@ namespace Gekko
             if (!ok)
             {
                 new Error("Could not replace databank " + db2.name);
-                //throw new GekkoException();
             }
         }
 
