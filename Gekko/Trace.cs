@@ -59,16 +59,16 @@ namespace Gekko
             //or maybe only make the dictionary when about 
         }
 
-        public void DeepTrace(TraceHelper th)
+        public void DeepTrace(TraceHelper th, Trace parent)
         {
             th.traceCount++;
-            if (!th.dict.ContainsKey(this)) th.dict.Add(this, 0);
+            if (!th.dict.ContainsKey(this)) th.dict.Add(this, parent);
             new Writeln("+ " + this.assignment);
             if (this.precedents.Count() > 0)
             {
                 foreach (Trace trace in this.precedents.GetStorage())
                 {
-                    trace.DeepTrace(th);
+                    trace.DeepTrace(th, this);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        public static TraceHelper CollectAllTraces(string bank)
+        public static TraceHelper CollectAllTraces(string bank, int type) //type==0 just counts. Type==1 collects connections and records them. Type==2 reestablishes connections.
         {
             TraceHelper th1 = new TraceHelper();
             foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetDatabank(bank).storage)
@@ -158,7 +158,7 @@ namespace Gekko
     {
         public int varCount = 0;
         public int traceCount = 0;
-        public Dictionary<Trace, int> dict = new Dictionary<Trace, int>();
+        public Dictionary<Trace, Trace> dict = new Dictionary<Trace, Trace>();  //value is parent (may be null)
     }
 
 

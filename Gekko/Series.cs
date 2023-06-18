@@ -2865,7 +2865,7 @@ namespace Gekko
             else
             {
                 th.varCount++;
-                this.meta.trace.DeepTrace(th);
+                this.meta.trace.DeepTrace(th, null);
             }
         }
 

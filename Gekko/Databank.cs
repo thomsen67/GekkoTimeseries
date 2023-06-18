@@ -95,6 +95,9 @@ namespace Gekko
         [ProtoMember(2)]
         public DatabankCacheParams cacheParameters = null;
 
+        [ProtoMember(3)]
+        public Dictionary<Trace, Trace> traces = null;
+
         public string name = null;
 
         //TODO:

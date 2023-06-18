@@ -12883,20 +12883,35 @@ namespace UnitTests
                 Helper_CheckTrace("c!a", x4);
                 Helper_CheckTrace("d!a", x5);
                                 
-                TraceHelper th1 = Trace.CollectAllTraces("Work");
+                TraceHelper th1 = Trace.CollectAllTraces("Work", 0);
                 Assert.AreEqual(4, th1.varCount);
                 Assert.AreEqual(9, th1.dict.Count);
-                Assert.AreEqual(19, th1.traceCount);                
+                Assert.AreEqual(19, th1.traceCount);
+
+                foreach (KeyValuePair<Trace, Trace> kvp in th1.dict)
+                {
+                    kvp.Key.precedents = null;
+                }
+
+                Program.databanks.GetDatabank("Work").traces = th1.dict;
 
                 // ---------------------------------                               
                 I("write sletmig1;"); //a, b, c, d  ... 2021-23
                 I("read sletmig1;"); //a, b, c, d  ... 2021-23
 
-                TraceHelper th2 = Trace.CollectAllTraces("Work");
-                Assert.AreEqual(4, th2.varCount);
-                Assert.AreEqual(23, th2.dict.Count);
-                Assert.AreEqual(23, th2.traceCount);
+                var dict2 = Program.databanks.GetDatabank("Work").traces;
+                foreach (KeyValuePair<Trace, Trace> kvp in dict2)
+                {
+                    kvp.Key.precedents = new Precedents();
+                    if (kvp.Value != null) kvp.Key.precedents.Add(kvp.Value);
+                }
 
+                //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
+
+                TraceHelper th2 = Trace.CollectAllTraces("Work", 0);
+                Assert.AreEqual(4, th2.varCount);     //4  4
+                Assert.AreEqual(23, th2.dict.Count);  //23 8
+                Assert.AreEqual(23, th2.traceCount);  //23 8
 
                 string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
                 String2 x2a = Helper_Push(x2, cImport1);
