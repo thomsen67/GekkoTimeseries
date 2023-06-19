@@ -1992,6 +1992,99 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (true && Globals.runningOnTTComputer)
+            {
+                //
+                // meta
+                //   trace [---]
+                //     precedents
+                //       trace xx1   
+                //       trace xx2
+                //       trace xx3
+                //
+                // meta
+                //   trace [---]
+                //     precedents
+                //       trace xx1   
+                //       trace xx2
+                //       trace xx3
+                //         precedents
+                //           trace xx1 ---->
+                //           trace xx2 ---->
+                //
+
+                bool fix = true;
+
+                SeriesMetaInformation meta1 = new SeriesMetaInformation();
+                meta1.trace = new Trace();                
+                meta1.trace.precedents = new Precedents();
+                Trace xx1 = new Trace();
+                xx1.assignment = "xx1";
+                meta1.trace.precedents.Add(xx1);
+                Trace xx2 = new Trace();
+                xx2.assignment = "xx2";
+                meta1.trace.precedents.Add(xx2);
+                Trace xx3 = new Trace();
+                xx3.assignment = "xx3";
+                meta1.trace.precedents.Add(xx3);
+
+                xx3.precedents = new Precedents();
+                xx3.precedents.Add(xx1);
+                xx3.precedents.Add(xx2);
+
+                //Dictionary<Trace, Precedents> dict1 = new Dictionary<Trace, Precedents>();
+                List<KeyValuePair<Trace, Precedents>> dict1 = new List<KeyValuePair<Trace, Precedents>>();
+
+                if (fix)
+                {
+                    //dict1.Add(meta1.trace.precedents[2], meta1.trace.precedents[2].precedents);
+                    //dict1.Add(meta1.trace, meta1.trace.precedents);
+                    dict1.Add(new KeyValuePair<Trace, Precedents>(meta1.trace.precedents[2], meta1.trace.precedents[2].precedents));
+                    dict1.Add(new KeyValuePair<Trace, Precedents>(meta1.trace, meta1.trace.precedents));
+                    meta1.trace.precedents[2].precedents = null;
+                    meta1.trace.precedents = null;                    
+                }
+
+                Program.ProtobufWrite(meta1, @"c:\Thomas\Desktop\gekko\testing\meta.data");
+                SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");
+
+                Program.ProtobufWrite(dict1, @"c:\Thomas\Desktop\gekko\testing\dict.data");
+                List<KeyValuePair<Trace, Precedents>> dict2 = Program.ProtobufRead<List<KeyValuePair<Trace, Precedents>>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
+
+                if (fix)
+                {
+                    foreach (KeyValuePair<Trace, Precedents> kvp in dict1)
+                    {
+                        kvp.Key.precedents = kvp.Value;
+                    }
+
+                    foreach (KeyValuePair<Trace, Precedents> kvp in dict2)
+                    {
+                        kvp.Key.precedents = kvp.Value;
+                    }
+                }
+
+                meta1.trace.precedents[0].assignment = "yy1";
+                string s1 = meta1.trace.precedents[2].precedents[0].assignment;
+
+                //var zz1 = meta2.trace;
+                //var zz2 = dict2[1].Key;                
+                meta2.trace.precedents = dict2[1].Value;
+                meta2.trace.precedents[2].precedents = dict2[0].Value;
+
+
+                meta2.trace.precedents[0].assignment = "yy1";
+                string s2 = meta2.trace.precedents[2].precedents[0].assignment; //FAIL!
+
+                //
+                //  meta 
+                //
+                //
+                //
+
+
+
+            }
 
             if (false && Globals.runningOnTTComputer)
             {

@@ -80,17 +80,26 @@ namespace Gekko
             {
                 kvp.Key.precedents = kvp.Value;
             }
+
+            Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
+            Trace trace = c.meta.trace;
+
             databank.traces = null;
         }
 
         public static void RemoveTraceConnections(Databank databank)
         {
+            Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
+            Trace trace = c.meta.trace;
+
             TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
             databank.traces = th1.dict;
             foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
             {
                 kvp.Key.precedents = null;
             }
+            
+            Trace trace2 = c.meta.trace;
         }        
 
         public Trace DeepClone()
@@ -189,8 +198,7 @@ namespace Gekko
         private List<Trace> storage = null;
 
         public void AddRange(Precedents precedents)
-        {
-            
+        {            
             if (precedents.storage != null)
             {
                 if (this.storage == null) this.storage = new List<Trace>();
@@ -198,9 +206,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Add a Trace to precedents list. Cannot add a "meta entry" to a Trace. These can only be set for .trace in SeriesMetaInformation objects.
+        /// </summary>
+        /// <param name="trace"></param>
+        /// <exception cref="GekkoException"></exception>
         public void Add(Trace trace)
         {
             if (this.storage == null) this.storage = new List<Trace>();
+            if (G.NullOrBlanks(trace.assignment)) throw new GekkoException();
             this.storage.Add(trace);
         }
 
