@@ -5603,19 +5603,7 @@ namespace Gekko
                     // =============== restore trace links start
                     // ============================================
                     // 
-                    TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);
-                    //Dictionary<Trace, int> dict1 = th.dict2;
-                    //Trace[] dict1Inverted = new Trace[dict1.Count];
-                    //foreach (KeyValuePair<Trace, int> kvp in dict1)
-                    //{
-                    //    dict1Inverted[kvp.Value] = kvp.Key;
-                    //    kvp.Key.precedents.ToID(dict1);  //remove links
-                    //}
-                    //foreach (SeriesMetaInformation meta in th.metas)
-                    //{
-                    //    meta.ToID(dict1);
-                    //}
-                    //databank.traces2 = th.dict2;
+                    TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);                    
                     Trace[] dict2Inverted = new Trace[deserializedDatabank.traces2.Count];
                     foreach (KeyValuePair<Trace, int> kvp in deserializedDatabank.traces2) dict2Inverted[kvp.Value] = kvp.Key;
                     foreach (SeriesMetaInformation meta in th.metas)
