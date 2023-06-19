@@ -107,14 +107,12 @@ namespace Gekko
         {
             Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
             Trace trace = c.meta.trace;
-
             TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
             databank.traces = th1.dict;
             foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
             {
                 kvp.Key.precedents = null;
-            }
-            
+            }            
             Trace trace2 = c.meta.trace;
         }        
 

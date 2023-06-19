@@ -12859,10 +12859,10 @@ namespace UnitTests
             TraceHelper th = new TraceHelper();
             meta1.trace.DeepTrace(th, null);
             Dictionary<Trace, int> dict1 = th.dict2;
-            Trace[] list1 = new Trace[dict1.Count];
+            Trace[] dict1Inverted = new Trace[dict1.Count];
             foreach (KeyValuePair<Trace, int> kvp in dict1)
             {
-                list1[kvp.Value] = kvp.Key;
+                dict1Inverted[kvp.Value] = kvp.Key;
                 kvp.Key.precedents.ToID(dict1);  //remove links
             }
             meta1.ToID(dict1); //remove link from meta
@@ -12874,35 +12874,27 @@ namespace UnitTests
             //restore links
             if (true)
             {
-                meta1.FromID(list1);
-                foreach (KeyValuePair<Trace, int> kvp in dict1)
-                {
-                    //Could also use list1 for loop ???
-                    kvp.Key.precedents.FromID(list1);  //restore links
-                }
+                meta1.FromID(dict1Inverted);
+                foreach (Trace trace in dict1Inverted) trace.precedents.FromID(dict1Inverted);
                 meta1.traceID = -12345;
             }
 
             SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(path + @"\meta.data");
             Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(path + @"\dict.data");
-            Trace[] list2 = new Trace[dict2.Count];
-            foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
+            Trace[] dict2Inverted = new Trace[dict2.Count];
+            foreach (KeyValuePair<Trace, int> kvp in dict2) dict2Inverted[kvp.Value] = kvp.Key;
 
             //restore links
             if (true)
             {
-                meta2.FromID(list2);
-                foreach (KeyValuePair<Trace, int> kvp in dict2)
-                {
-                    //Could also use list2 for loop ???
-                    kvp.Key.precedents.FromID(list2);  //restore links
-                }
+                meta2.FromID(dict2Inverted);
+                foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);                
                 meta2.traceID = -12345;
             }
 
             dict1 = null;
             dict2 = null;
-            list2 = null;
+            dict2Inverted = null;
 
             string z1 = meta1.trace.precedents[0].assignment;  //xx1
             Assert.AreEqual("xx1", z1);
@@ -13076,7 +13068,162 @@ namespace UnitTests
                 Globals.precedentsContainer = null;
             }
 
-        }        
+        }
+
+        [TestMethod]
+        public void _Test_Trace_OLDDELETE()
+        {
+            //Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            //data lineage is a description of how data flows in its life cycle
+            //traceability is the activity
+            //data origin or provenance: where it comes from originally -->
+            //  how and why has it changed since that?
+            //when data flows, it will pick up some but not all characteristics from its previous states.
+            //"Data traceability is the actual exercise to track access, values, and changes to the data as they flow through their lineage."
+            //data trust
+            try
+            {
+                //
+                // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
+                //
+
+                string s = null;
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                I("OPTION databank trace = yes;");
+                Globals.traceContainer = new List<IVariable>();
+                //TODO: maps, <dyn>
+                string c = "time 2021 2023;";
+                s += HelperTrace(c);
+                // ---------------------------------
+                string c1 = "a = 2, 3, 4;";
+                s += HelperTrace(c1);
+                String2 x1 = new String2(null);
+                x1.m.Add(new String2(c1));
+                Helper_CheckTrace("a!a", x1);
+                // ---------------------------------
+                string c2 = "a <2022 2022> = 100;";
+                s += HelperTrace(c2);
+                String2 x2 = G.DeepCloneSlow<String2>(x1);
+                x2.m.Add(new String2(c2));
+                Helper_CheckTrace("a!a", x2);
+                // ---------------------------------
+                string c3 = "b = 12, 13, 14;";
+                s += HelperTrace(c3);
+                String2 x3 = new String2(null);
+                x3.m.Add(new String2(c3));
+                Helper_CheckTrace("a!a", x2);
+                Helper_CheckTrace("b!a", x3);
+                // ---------------------------------
+                string c4 = "c = a + b;";
+                s += HelperTrace(c4);
+                String2 x4 = new String2(null);
+                x4.m.Add(new String2(c4));
+                x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                Helper_CheckTrace("a!a", x2);
+                Helper_CheckTrace("b!a", x3);
+                Helper_CheckTrace("c!a", x4);
+                // ---------------------------------
+                string c5 = "d = a + b + c;";
+                s += HelperTrace(c5);
+                String2 x5 = new String2(null);
+                x5.m.Add(new String2(c5));
+                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
+                Helper_CheckTrace("a!a", x2);
+                Helper_CheckTrace("b!a", x3);
+                Helper_CheckTrace("c!a", x4);
+                Helper_CheckTrace("d!a", x5);
+
+                TraceHelper th1 = Trace.CollectAllTraces(Program.databanks.GetFirst(), 0);
+                Assert.AreEqual(4, th1.varCount);
+                Assert.AreEqual(9, th1.dict.Count);
+                Assert.AreEqual(19, th1.traceCount);
+
+                // ---------------------------------                               
+                I("write sletmig1;"); //a, b, c, d  ... 2021-23
+                I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
+
+                //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
+
+                TraceHelper th2 = Trace.CollectAllTraces(Program.databanks.GetFirst(), 0);
+                Assert.AreEqual(4, th2.varCount);     //4  4
+                Assert.AreEqual(23, th2.dict.Count);  //23 8
+                Assert.AreEqual(23, th2.traceCount);  //23 8
+
+                string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
+                String2 x2a = Helper_Push(x2, cImport1);
+                String2 x3a = Helper_Push(x3, cImport1);
+                String2 x4a = Helper_Push(x4, cImport1);
+                String2 x5a = Helper_Push(x5, cImport1);
+                Helper_CheckTrace("a!a", x2a);
+                Helper_CheckTrace("b!a", x3a);
+                Helper_CheckTrace("c!a", x4a);
+                Helper_CheckTrace("d!a", x5a);
+                // ---------------------------------                               
+                I("delete a, b, c;");
+                Helper_CheckTrace("d!a", x5a);
+                // ---------------------------------
+                I("write sletmig2;"); //d  ... 2021-23
+                I("read sletmig2;"); //d  ... 2021-23
+                String2 x5b = Helper_Push(x5a, "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk)");
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
+                string c6 = "copy d to e;";
+                s += HelperTrace(c6);
+                String2 x6 = Helper_Push(x5b, "Copied d!a to e!a (clone)");
+                Helper_CheckTrace("e!a", x6);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
+                string c7 = "f = 1000;";
+                s += HelperTrace(c7);
+                String2 x7 = new String2(null);
+                x7.m.Add(new String2(c7));
+                Helper_CheckTrace("f!a", x7);
+                Helper_CheckTrace("e!a", x6);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
+                string c8 = "copy <2021 2021> f to e;";  //only partial copy
+                string c8a = "Copied f!a into e!a (2021-2021)";
+                s += HelperTrace(c8);
+                String2 x8 = G.DeepCloneSlow<String2>(x6);
+                x8.m.Add(new String2(c8a));
+                x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
+                Helper_CheckTrace("f!a", x7);
+                Helper_CheckTrace("e!a", x8);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------------------
+                string c9 = "rename e as g;";
+                s += HelperTrace(c9);
+                String2 x9 = Helper_Push(x8, "Renamed Work:e!a as Work:g!a");
+                Helper_CheckTrace("g!a", x9);
+                Helper_CheckTrace("f!a", x7);
+                Helper_CheckTrace("d!a", x5b);
+                // ---------------------
+                I("delete d;");
+                string c10 = "d = 5, 6, 7;";
+                s += HelperTrace(c10);
+                I("import <2022 2022> sletmig2;");
+                String2 x10a = new String2("Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk) (2022-2022)");
+                x10a.m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
+                String2 x10 = new String2(null);
+                x10.m.Add(new String2(c10));
+                x10.m.Add(x10a);
+                Helper_CheckTrace("d!a", x10);
+                // ---------------------
+                I("prt d;");
+                I("d.printtrace();");
+                return;
+            }
+            finally
+            {
+                I("OPTION databank trace = no;");  //not really necessary to switch off...
+                Globals.traceContainer = null;
+                Globals.precedentsContainer = null;
+            }
+        }
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
         {
