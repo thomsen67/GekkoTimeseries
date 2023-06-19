@@ -67,6 +67,7 @@ namespace Gekko
         {
             th.traceCount++;
             if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
+            if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, th.dict2.Count);
             new Writeln("+ " + this.assignment);
             if (this.precedents.Count() > 0)
             {
@@ -192,6 +193,7 @@ namespace Gekko
         public int varCount = 0;
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> dict = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
+        public Dictionary<Trace, int> dict2 = new Dictionary<Trace, int>();
     }
 
 

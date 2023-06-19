@@ -2015,27 +2015,31 @@ namespace Gekko
 
                 bool fix = true;
 
-                Dictionary<Trace, int> dict1 = new Dictionary<Trace, int>();
+                //Dictionary<Trace, int> dict1 = new Dictionary<Trace, int>();
 
                 SeriesMetaInformation meta1 = new SeriesMetaInformation();
                 meta1.trace = new Trace(); 
-                dict1.Add(meta1.trace, dict1.Count);
+                //dict1.Add(meta1.trace, dict1.Count);
                 meta1.trace.precedents = new Precedents();
                 Trace xx1 = new Trace();
-                dict1.Add(xx1, dict1.Count);
+                //dict1.Add(xx1, dict1.Count);
                 xx1.assignment = "xx1";
                 meta1.trace.precedents.Add(xx1);
                 Trace xx2 = new Trace();
-                dict1.Add(xx2, dict1.Count);
+                //dict1.Add(xx2, dict1.Count);
                 xx2.assignment = "xx2";
                 meta1.trace.precedents.Add(xx2);
                 Trace xx3 = new Trace();
-                dict1.Add(xx3, dict1.Count);
+                //dict1.Add(xx3, dict1.Count);
                 xx3.assignment = "xx3";
                 meta1.trace.precedents.Add(xx3);
                 xx3.precedents = new Precedents();
                 xx3.precedents.Add(xx1);
-                xx3.precedents.Add(xx2);                                
+                xx3.precedents.Add(xx2);
+
+                TraceHelper th = new TraceHelper();
+                meta1.trace.DeepTrace(th, null);
+                Dictionary<Trace, int> dict1 = th.dict2;
 
                 if (fix)
                 {
