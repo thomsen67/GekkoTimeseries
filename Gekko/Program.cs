@@ -2045,13 +2045,9 @@ namespace Gekko
                 foreach (KeyValuePair<Trace, int> kvp in dict1)
                 {
                     list1[kvp.Value] = kvp.Key;
-                    kvp.Key.precedents.ToID(dict1);
+                    kvp.Key.precedents.ToID(dict1);  //remove links
                 }
-
-                //remove links
-                //meta1.trace.precedents[2].precedents.ToID(dict1);
-                //meta1.trace.precedents.ToID(dict1);
-                meta1.ToID(dict1);
+                meta1.ToID(dict1); //remove link from meta
 
                 //write bank
                 Program.ProtobufWrite(meta1, @"c:\Thomas\Desktop\gekko\testing\meta.data");
