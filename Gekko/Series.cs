@@ -3006,6 +3006,9 @@ namespace Gekko
         [ProtoMember(11)]
         public Trace trace = null;
 
+        [ProtoMember(12)]
+        public int traceID = -12345; //used to recreate connections after protobuf
+
         [ProtoMember(7)]
         public string[] domains = null;
 
@@ -3017,6 +3020,17 @@ namespace Gekko
 
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        
+
+        public void ToID(Dictionary<Trace, int> dict1)
+        {
+            this.traceID = dict1[this.trace];
+            this.trace = null;
+        }
+
+        public void FromID(Trace[] dict2)
+        {
+            this.trace = dict2[this.traceID];
+        }
 
         public void SetDirty(bool b1)
         {

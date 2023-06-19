@@ -17,8 +17,8 @@ namespace Gekko
     [ProtoContract]
     public class Trace
     {
-        [ProtoMember(1)]
-        public long id = 0;  //when assigned it is a random number > 1 and < long.MaxValue --> extremely unlikely to have collisions ever
+        //[ProtoMember(1)]
+        //public long id = 0;  //when assigned it is a random number > 1 and < long.MaxValue --> extremely unlikely to have collisions ever
 
         [ProtoMember(2)]
         public GekkoTime t1 = GekkoTime.tNull;
@@ -44,6 +44,10 @@ namespace Gekko
         [ProtoMember(9)]
         public List<GekkoTime> periods = new List<GekkoTime>();
 
+        //[ProtoMember(10)]
+        //public int ID = -12345; //used to recreate connections after protobuf
+
+
         public string ToString()
         {
             string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
@@ -53,7 +57,7 @@ namespace Gekko
 
         public Trace()
         {            
-            this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
+            //this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
             //maybe here put it into dictionary with weak values
             //but where does that dictionary live? In a databank, no?
             //or maybe only make the dictionary when about 
@@ -197,6 +201,9 @@ namespace Gekko
         [ProtoMember(1)]
         private List<Trace> storage = null;
 
+        [ProtoMember(2)]
+        public List<int> storageID = null;  //used to recreate connections after protobuf
+
         public void AddRange(Precedents precedents)
         {            
             if (precedents.storage != null)
@@ -235,6 +242,32 @@ namespace Gekko
         {
             if (m != null && m.Count == 0) this.storage = null; //so it does not take up space
             else this.storage = m;
+        }
+
+        public  void ToID(Dictionary<Trace, int> dict1)
+        {
+            this.storageID = new List<int>();
+            if (this.Count() > 0)
+            {
+                foreach (Trace trace in this.GetStorage())
+                {
+                    this.storageID.Add(dict1[trace]);
+                }
+            }
+            this.SetStorage(null);
+        }
+
+        public void FromID(Trace[] dict2)
+        {
+            if (this.storageID != null && this.storageID.Count > 0)
+            {
+                if (this.storage == null) this.storage = new List<Trace>();
+                foreach (int id in this.storageID)
+                {
+                    this.storage.Add(dict2[id]);
+                }
+            }
+            this.storageID = null;
         }
 
         public int Count()
