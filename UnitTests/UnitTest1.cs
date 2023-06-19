@@ -12814,7 +12814,114 @@ namespace UnitTests
             }
         }
 
-        
+        [TestMethod]
+        public void _Test_Trace2()
+        {
+            //
+            // meta
+            //   trace [---]
+            //     precedents
+            //       trace xx1   
+            //       trace xx2
+            //       trace xx3
+            //
+            // meta
+            //   trace [---]
+            //     precedents
+            //       trace xx1   
+            //       trace xx2
+            //       trace xx3
+            //         precedents
+            //           trace xx1 ---->
+            //           trace xx2 ---->
+            //
+
+            string path = Globals.ttPath2 + @"\regres\Databanks\temp";
+
+            SeriesMetaInformation meta1 = new SeriesMetaInformation();
+            meta1.trace = new Trace();
+            //dict1.Add(meta1.trace, dict1.Count);
+            meta1.trace.precedents = new Precedents();
+            Trace xx1 = new Trace();
+            xx1.assignment = "xx1";
+            meta1.trace.precedents.Add(xx1);
+            Trace xx2 = new Trace();
+            xx2.assignment = "xx2";
+            meta1.trace.precedents.Add(xx2);
+            Trace xx3 = new Trace();
+            xx3.assignment = "xx3";
+            meta1.trace.precedents.Add(xx3);
+            xx3.precedents = new Precedents();
+            xx3.precedents.Add(xx1);
+            xx3.precedents.Add(xx2);
+
+            //gather lists
+            TraceHelper th = new TraceHelper();
+            meta1.trace.DeepTrace(th, null);
+            Dictionary<Trace, int> dict1 = th.dict2;
+            Trace[] list1 = new Trace[dict1.Count];
+            foreach (KeyValuePair<Trace, int> kvp in dict1)
+            {
+                list1[kvp.Value] = kvp.Key;
+                kvp.Key.precedents.ToID(dict1);  //remove links
+            }
+            meta1.ToID(dict1); //remove link from meta
+
+            //write bank
+            Program.ProtobufWrite(meta1, path + @"\meta.data");
+            Program.ProtobufWrite(dict1, path + @"\dict.data");
+
+            //restore links
+            if (true)
+            {
+                meta1.FromID(list1);
+                foreach (KeyValuePair<Trace, int> kvp in dict1)
+                {
+                    //Could also use list1 for loop ???
+                    kvp.Key.precedents.FromID(list1);  //restore links
+                }
+                meta1.traceID = -12345;
+            }
+
+            SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(path + @"\meta.data");
+            Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(path + @"\dict.data");
+            Trace[] list2 = new Trace[dict2.Count];
+            foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
+
+            //restore links
+            if (true)
+            {
+                meta2.FromID(list2);
+                foreach (KeyValuePair<Trace, int> kvp in dict2)
+                {
+                    //Could also use list2 for loop ???
+                    kvp.Key.precedents.FromID(list2);  //restore links
+                }
+                meta2.traceID = -12345;
+            }
+
+            dict1 = null;
+            dict2 = null;
+            list2 = null;
+
+            string z1 = meta1.trace.precedents[0].assignment;  //xx1
+            Assert.AreEqual("xx1", z1);
+            meta1.trace.precedents[0].assignment = "yy1";
+            string s1 = meta1.trace.precedents[2].precedents[0].assignment; //yy1
+            Assert.AreEqual("yy1", s1);
+
+            string z2 = meta2.trace.precedents[0].assignment;  //xx1
+            Assert.AreEqual("xx1", z2);
+            meta2.trace.precedents[0].assignment = "yyy1";
+            string s2 = meta2.trace.precedents[2].precedents[0].assignment; //yyy1
+            Assert.AreEqual("yyy1", s2);
+
+            string ss1 = meta1.trace.precedents[2].precedents[0].assignment; //yy1
+            Assert.AreEqual("yy1", ss1);
+            string ss2 = meta2.trace.precedents[2].precedents[0].assignment; //yyy1
+            Assert.AreEqual("yyy1", ss2);
+        }
+
         [TestMethod]
         public void _Test_Trace()
         {

@@ -71,7 +71,7 @@ namespace Gekko
                 th.traceCount++;
                 if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
                 if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, th.dict2.Count);
-                new Writeln("+ " + this.assignment);
+                //new Writeln("+ " + this.assignment);
                 if (this.precedents.Count() > 0)
                 {
                     foreach (Trace trace in this.precedents.GetStorage())
