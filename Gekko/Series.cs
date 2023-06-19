@@ -2865,7 +2865,11 @@ namespace Gekko
             else
             {
                 th.varCount++;
-                this.meta.trace.DeepTrace(th, null);
+                th.metas.Add(this.meta);
+                if (th.type == ETraceHelper.GetAllStuff)
+                {
+                    this.meta.trace.DeepTrace(th, null);
+                }
             }
         }
 

@@ -98,6 +98,9 @@ namespace Gekko
         [ProtoMember(3)]
         public Dictionary<Trace, Precedents> traces = null;
 
+        [ProtoMember(4)]
+        public Dictionary<Trace, int> traces2 = null;
+
         public string name = null;
 
         //TODO:

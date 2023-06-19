@@ -67,6 +67,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Gekko.Program;
 using System.Windows.Markup.Localizer;
+using static alglib;
 
 namespace Gekko
 {
@@ -5597,7 +5598,38 @@ namespace Gekko
                     {
                         iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                     }
-                    Gekko.Trace.RestoreTraceConnections(deserializedDatabank);
+
+                    // ============================================
+                    // =============== restore trace links start
+                    // ============================================
+                    // 
+                    TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);
+                    //Dictionary<Trace, int> dict1 = th.dict2;
+                    //Trace[] dict1Inverted = new Trace[dict1.Count];
+                    //foreach (KeyValuePair<Trace, int> kvp in dict1)
+                    //{
+                    //    dict1Inverted[kvp.Value] = kvp.Key;
+                    //    kvp.Key.precedents.ToID(dict1);  //remove links
+                    //}
+                    //foreach (SeriesMetaInformation meta in th.metas)
+                    //{
+                    //    meta.ToID(dict1);
+                    //}
+                    //databank.traces2 = th.dict2;
+                    Trace[] dict2Inverted = new Trace[deserializedDatabank.traces2.Count];
+                    foreach (KeyValuePair<Trace, int> kvp in deserializedDatabank.traces2) dict2Inverted[kvp.Value] = kvp.Key;
+                    foreach (SeriesMetaInformation meta in th.metas)
+                    {
+                        meta.FromID(dict2Inverted);
+                        meta.traceID = -12345;
+                    }
+                    foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);
+                    deserializedDatabank.traces2 = null;
+                    // ============================================
+                    // =============== restore trace links start
+                    // ============================================
+
+
                     readInfo.variables = deserializedDatabank.storage.Count;
                     readInfo.startPerInFile = yearMinMax.int1;
                     readInfo.endPerInFile = yearMinMax.int2;
@@ -20750,8 +20782,45 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                Gekko.Trace.RemoveTraceConnections(databank);
-                ProtobufWrite(databank, pathAndFilename2);
+                // ==========================================
+                // ================ remove trace 1 start
+                // ==========================================
+                //gather lists
+                TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
+                Dictionary<Trace, int> dict1 = th.dict2;
+                Trace[] dict1Inverted = new Trace[dict1.Count];
+                foreach (KeyValuePair<Trace, int> kvp in dict1)
+                {
+                    dict1Inverted[kvp.Value] = kvp.Key;
+                    kvp.Key.precedents.ToID(dict1);  //remove links
+                }
+                foreach (SeriesMetaInformation meta in th.metas)
+                {
+                    meta.ToID(dict1);
+                }
+                databank.traces2 = th.dict2;
+                // ==========================================
+                // ================ remove trace 1 end
+                // ==========================================
+
+                ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
+
+                // ==========================================
+                // ================ remove trace 2 start
+                // ==========================================                
+                foreach (SeriesMetaInformation meta in th.metas)
+                {
+                    meta.FromID(dict1Inverted);
+                    meta.traceID = -12345;
+                }
+                foreach (Trace trace in dict1Inverted)
+                {
+                    trace.precedents.FromID(dict1Inverted);
+                }
+                // ==========================================
+                // ================ remove trace 2 end
+                // ==========================================
+
                 count = databank.storage.Count;  //must be before the finally
             }
             finally

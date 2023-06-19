@@ -66,7 +66,7 @@ namespace Gekko
 
         public void DeepTrace(TraceHelper th, Trace parent)
         {
-            if (th.type == ETraceHelper.PutInDictionary)
+            if (th.type == ETraceHelper.GetAllStuff)
             {
                 th.traceCount++;
                 if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
@@ -79,41 +79,62 @@ namespace Gekko
                         trace.DeepTrace(th, this);
                     }
                 }
-            }
-            else if (th.type == ETraceHelper.RemoveLinks)
-            {                
-            }
-            else if (th.type == ETraceHelper.RestoreLinks)
-            {
-            }
-            else throw new GekkoException();
+            }            
         }
 
         public static void RestoreTraceConnections(Databank databank)
         {
-            if (databank.traces == null) return;
-            foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
-            {
-                kvp.Key.precedents = kvp.Value;
-            }
+            //if (databank.traces == null) return;
+            //foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
+            //{
+            //    kvp.Key.precedents = kvp.Value;
+            //}
+            //Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
+            //Trace trace = c.meta.trace;
+            //databank.traces = null;
 
-            Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
-            Trace trace = c.meta.trace;
 
-            databank.traces = null;
         }
 
-        public static void RemoveTraceConnections(Databank databank)
+        public static void RemoveTraceConnections2(Databank databank)
         {
-            Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
-            Trace trace = c.meta.trace;
-            TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
-            databank.traces = th1.dict;
-            foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
-            {
-                kvp.Key.precedents = null;
-            }            
-            Trace trace2 = c.meta.trace;
+            //Trace[] dict1Inverted = new Trace[databank.traces2.Count];
+            //foreach (KeyValuePair<Trace, int> kvp in databank.traces2)
+            //{
+            //    dict1Inverted[kvp.Value] = kvp.Key;
+            //}
+            //meta1.FromID(dict1Inverted);
+            //foreach (Trace trace in dict1Inverted) trace.precedents.FromID(dict1Inverted);
+            //meta1.traceID = -12345;
+
+        }
+
+        public static void RemoveTraceConnections1(Databank databank)
+        {
+            //Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
+            //Trace trace = c.meta.trace;
+            //TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
+            //databank.traces = th1.dict;
+            //foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
+            //{
+            //    kvp.Key.precedents = null;
+            //}            
+            //Trace trace2 = c.meta.trace;
+
+            ////gather lists
+            //TraceHelper th = Trace.CollectAllTraces(databank);
+            //Dictionary<Trace, int> dict1 = th.dict2;
+            //Trace[] dict1Inverted = new Trace[dict1.Count];
+            //foreach (KeyValuePair<Trace, int> kvp in dict1)
+            //{
+            //    dict1Inverted[kvp.Value] = kvp.Key;
+            //    kvp.Key.precedents.ToID(dict1);  //remove links
+            //}
+            //foreach (SeriesMetaInformation meta in th.metas)
+            //{
+            //    meta.ToID(dict1);
+            //}
+            //databank.traces2 = th.dict2;
         }        
 
         public Trace DeepClone()
@@ -186,31 +207,32 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        public static TraceHelper CollectAllTraces(Databank databank, int type) //type==0 just counts. Type==1 collects connections and records them. Type==2 reestablishes connections.
-        {
+        public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
+        {            
             TraceHelper th1 = new TraceHelper();
+            th1.type = type;
             foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
             {
                 kvp.Value.DeepTrace(th1);
             }
             return th1;
-        }
+        }        
     }
 
     public enum ETraceHelper
     {
-        PutInDictionary,
-        RemoveLinks,
-        RestoreLinks
+        GetAllStuff,
+        OnlyGetMeta
     }
 
     public class TraceHelper
     {
-        public ETraceHelper type = ETraceHelper.PutInDictionary;
+        public ETraceHelper type = ETraceHelper.GetAllStuff;
         public int varCount = 0;
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> dict = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
         public Dictionary<Trace, int> dict2 = new Dictionary<Trace, int>();
+        public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
     }
 
 
