@@ -2055,8 +2055,14 @@ namespace Gekko
 
                 //restore links
                 meta1.FromID(list1);
-                meta1.trace.precedents.FromID(list1);
-                meta1.trace.precedents[2].precedents.FromID(list1);
+
+                foreach (KeyValuePair<Trace, int> kvp in dict1)
+                {                    
+                    kvp.Key.precedents.FromID(list1);  //restore links
+                }
+                //meta1.trace.precedents.FromID(list1);
+                //meta1.trace.precedents[2].precedents.FromID(list1);                
+                
                 meta1.traceID = -12345;
 
                 SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");                                
