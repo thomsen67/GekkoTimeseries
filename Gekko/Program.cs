@@ -2055,25 +2055,28 @@ namespace Gekko
                 Program.ProtobufWrite(dict1, @"c:\Thomas\Desktop\gekko\testing\dict.data");
                 Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
 
-                Trace[] list = new Trace[dict2.Count];
-                foreach (KeyValuePair<Trace, int> kvp in dict2) list[kvp.Value] = kvp.Key;
+                Trace[] list1 = new Trace[dict1.Count];
+                foreach (KeyValuePair<Trace, int> kvp in dict1) list1[kvp.Value] = kvp.Key;
+
+                Trace[] list2 = new Trace[dict2.Count];
+                foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
 
                 if (fix)
                 {
-                    meta1.FromID(list);
-                    meta1.trace.precedents.FromID(list);
-                    meta1.trace.precedents[2].precedents.FromID(list);
+                    meta1.FromID(list1);
+                    meta1.trace.precedents.FromID(list1);
+                    meta1.trace.precedents[2].precedents.FromID(list1);
                     meta1.traceID = -12345;
 
-                    meta2.FromID(list);
-                    meta2.trace.precedents.FromID(list);
-                    meta2.trace.precedents[2].precedents.FromID(list);
+                    meta2.FromID(list2);
+                    meta2.trace.precedents.FromID(list2);
+                    meta2.trace.precedents[2].precedents.FromID(list2);
                     meta2.traceID = -12345;
                 }
 
                 dict1 = null;
                 dict2 = null;
-                list = null;
+                list2 = null;
 
                 meta1.trace.precedents[0].assignment = "yy1";
                 string s1 = meta1.trace.precedents[2].precedents[0].assignment;

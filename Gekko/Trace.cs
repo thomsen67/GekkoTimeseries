@@ -261,7 +261,7 @@ namespace Gekko
         {
             if (this.storageID != null && this.storageID.Count > 0)
             {
-                if (this.storage == null) this.storage = new List<Trace>();
+                this.storage = new List<Trace>();
                 foreach (int id in this.storageID)
                 {
                     this.storage.Add(dict2[id]);
