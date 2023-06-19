@@ -2063,23 +2063,23 @@ namespace Gekko
                     meta1.FromID(list);
                     meta1.trace.precedents.FromID(list);
                     meta1.trace.precedents[2].precedents.FromID(list);
+                    meta1.traceID = -12345;
 
                     meta2.FromID(list);
                     meta2.trace.precedents.FromID(list);
                     meta2.trace.precedents[2].precedents.FromID(list);
+                    meta2.traceID = -12345;
                 }
+
+                dict1 = null;
+                dict2 = null;
+                list = null;
 
                 meta1.trace.precedents[0].assignment = "yy1";
                 string s1 = meta1.trace.precedents[2].precedents[0].assignment;
 
-                //var zz1 = meta2.trace;
-                //var zz2 = dict2[1].Key;                
-                //meta2.trace.precedents = dict2[1].Value;
-                //meta2.trace.precedents[2].precedents = dict2[0].Value;
-
-
                 meta2.trace.precedents[0].assignment = "yy1";
-                string s2 = meta2.trace.precedents[2].precedents[0].assignment; //FAIL!
+                string s2 = meta2.trace.precedents[2].precedents[0].assignment;
 
                 //
                 //  meta 
