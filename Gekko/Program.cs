@@ -2055,14 +2055,11 @@ namespace Gekko
 
                 //restore links
                 meta1.FromID(list1);
-
                 foreach (KeyValuePair<Trace, int> kvp in dict1)
                 {                    
+                    //Could also use list1 for loop ???
                     kvp.Key.precedents.FromID(list1);  //restore links
-                }
-                //meta1.trace.precedents.FromID(list1);
-                //meta1.trace.precedents[2].precedents.FromID(list1);                
-                
+                }                
                 meta1.traceID = -12345;
 
                 SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");                                
@@ -2070,10 +2067,16 @@ namespace Gekko
                 Trace[] list2 = new Trace[dict2.Count];
                 foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
 
+                //restore links
                 meta2.FromID(list2);
-                meta2.trace.precedents.FromID(list2);
-                meta2.trace.precedents[2].precedents.FromID(list2);
+                foreach (KeyValuePair<Trace, int> kvp in dict2)
+                {
+                    //Could also use list2 for loop ???
+                    kvp.Key.precedents.FromID(list2);  //restore links
+                }
                 meta2.traceID = -12345;
+
+
 
                 dict1 = null;
                 dict2 = null;
