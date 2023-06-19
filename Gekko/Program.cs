@@ -2054,13 +2054,16 @@ namespace Gekko
                 Program.ProtobufWrite(dict1, @"c:\Thomas\Desktop\gekko\testing\dict.data");
 
                 //restore links
-                meta1.FromID(list1);
-                foreach (KeyValuePair<Trace, int> kvp in dict1)
-                {                    
-                    //Could also use list1 for loop ???
-                    kvp.Key.precedents.FromID(list1);  //restore links
-                }                
-                meta1.traceID = -12345;
+                if (true)
+                {
+                    meta1.FromID(list1);
+                    foreach (KeyValuePair<Trace, int> kvp in dict1)
+                    {
+                        //Could also use list1 for loop ???
+                        kvp.Key.precedents.FromID(list1);  //restore links
+                    }
+                    meta1.traceID = -12345;
+                }
 
                 SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");                                
                 Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
@@ -2068,15 +2071,16 @@ namespace Gekko
                 foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
 
                 //restore links
-                meta2.FromID(list2);
-                foreach (KeyValuePair<Trace, int> kvp in dict2)
+                if (true)
                 {
-                    //Could also use list2 for loop ???
-                    kvp.Key.precedents.FromID(list2);  //restore links
+                    meta2.FromID(list2);
+                    foreach (KeyValuePair<Trace, int> kvp in dict2)
+                    {
+                        //Could also use list2 for loop ???
+                        kvp.Key.precedents.FromID(list2);  //restore links
+                    }
+                    meta2.traceID = -12345;
                 }
-                meta2.traceID = -12345;
-
-
 
                 dict1 = null;
                 dict2 = null;
