@@ -2018,7 +2018,7 @@ namespace Gekko
                 //Dictionary<Trace, int> dict1 = new Dictionary<Trace, int>();
 
                 SeriesMetaInformation meta1 = new SeriesMetaInformation();
-                meta1.trace = new Trace(); 
+                meta1.trace = new Trace();
                 //dict1.Add(meta1.trace, dict1.Count);
                 meta1.trace.precedents = new Precedents();
                 Trace xx1 = new Trace();
@@ -2037,64 +2037,55 @@ namespace Gekko
                 xx3.precedents.Add(xx1);
                 xx3.precedents.Add(xx2);
 
+                //gather lists
                 TraceHelper th = new TraceHelper();
                 meta1.trace.DeepTrace(th, null);
                 Dictionary<Trace, int> dict1 = th.dict2;
-
-                if (fix)
-                {
-                    //dict1.Add(meta1.trace.precedents[2], meta1.trace.precedents[2].precedents);
-                    //dict1.Add(meta1.trace, meta1.trace.precedents);
-                    //dict1.Add(new KeyValuePair<Trace, Precedents>(meta1.trace.precedents[2], meta1.trace.precedents[2].precedents));
-                    //dict1.Add(new KeyValuePair<Trace, Precedents>(meta1.trace, meta1.trace.precedents));
-                                        
-                    meta1.trace.precedents[2].precedents.ToID(dict1);
-                    meta1.trace.precedents.ToID(dict1);
-                    meta1.ToID(dict1);
-                }
-
-                Program.ProtobufWrite(meta1, @"c:\Thomas\Desktop\gekko\testing\meta.data");
-                SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");
-
-                Program.ProtobufWrite(dict1, @"c:\Thomas\Desktop\gekko\testing\dict.data");
-                Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
-
                 Trace[] list1 = new Trace[dict1.Count];
                 foreach (KeyValuePair<Trace, int> kvp in dict1) list1[kvp.Value] = kvp.Key;
+
+                //remove links
+                meta1.trace.precedents[2].precedents.ToID(dict1);
+                meta1.trace.precedents.ToID(dict1);
+                meta1.ToID(dict1);
+
+                //write bank
+                Program.ProtobufWrite(meta1, @"c:\Thomas\Desktop\gekko\testing\meta.data");
+                Program.ProtobufWrite(dict1, @"c:\Thomas\Desktop\gekko\testing\dict.data");
+
+                //restore links
+                meta1.FromID(list1);
+                meta1.trace.precedents.FromID(list1);
+                meta1.trace.precedents[2].precedents.FromID(list1);
+                meta1.traceID = -12345;
+
+                SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");
+                                
+                Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
 
                 Trace[] list2 = new Trace[dict2.Count];
                 foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
 
-                if (fix)
-                {
-                    meta1.FromID(list1);
-                    meta1.trace.precedents.FromID(list1);
-                    meta1.trace.precedents[2].precedents.FromID(list1);
-                    meta1.traceID = -12345;
+                meta2.FromID(list2);
+                meta2.trace.precedents.FromID(list2);
+                meta2.trace.precedents[2].precedents.FromID(list2);
+                meta2.traceID = -12345;
 
-                    meta2.FromID(list2);
-                    meta2.trace.precedents.FromID(list2);
-                    meta2.trace.precedents[2].precedents.FromID(list2);
-                    meta2.traceID = -12345;
-                }
 
                 dict1 = null;
                 dict2 = null;
                 list2 = null;
 
+                string z1 = meta1.trace.precedents[0].assignment;  //xx1
                 meta1.trace.precedents[0].assignment = "yy1";
-                string s1 = meta1.trace.precedents[2].precedents[0].assignment;
+                string s1 = meta1.trace.precedents[2].precedents[0].assignment; //yy1
 
-                meta2.trace.precedents[0].assignment = "yy1";
-                string s2 = meta2.trace.precedents[2].precedents[0].assignment;
+                string z2 = meta2.trace.precedents[0].assignment;  //xx1
+                meta2.trace.precedents[0].assignment = "yyy1";
+                string s2 = meta2.trace.precedents[2].precedents[0].assignment; //yyy1
 
-                //
-                //  meta 
-                //
-                //
-                //
-
-
+                string ss1 = meta1.trace.precedents[2].precedents[0].assignment; //yy1
+                string ss2 = meta2.trace.precedents[2].precedents[0].assignment; //yyy1
 
             }
 
