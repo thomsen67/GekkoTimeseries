@@ -2042,11 +2042,15 @@ namespace Gekko
                 meta1.trace.DeepTrace(th, null);
                 Dictionary<Trace, int> dict1 = th.dict2;
                 Trace[] list1 = new Trace[dict1.Count];
-                foreach (KeyValuePair<Trace, int> kvp in dict1) list1[kvp.Value] = kvp.Key;
+                foreach (KeyValuePair<Trace, int> kvp in dict1)
+                {
+                    list1[kvp.Value] = kvp.Key;
+                    kvp.Key.precedents.ToID(dict1);
+                }
 
                 //remove links
-                meta1.trace.precedents[2].precedents.ToID(dict1);
-                meta1.trace.precedents.ToID(dict1);
+                //meta1.trace.precedents[2].precedents.ToID(dict1);
+                //meta1.trace.precedents.ToID(dict1);
                 meta1.ToID(dict1);
 
                 //write bank
@@ -2059,10 +2063,8 @@ namespace Gekko
                 meta1.trace.precedents[2].precedents.FromID(list1);
                 meta1.traceID = -12345;
 
-                SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");
-                                
+                SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(@"c:\Thomas\Desktop\gekko\testing\meta.data");                                
                 Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(@"c:\Thomas\Desktop\gekko\testing\dict.data");
-
                 Trace[] list2 = new Trace[dict2.Count];
                 foreach (KeyValuePair<Trace, int> kvp in dict2) list2[kvp.Value] = kvp.Key;
 
@@ -2070,7 +2072,6 @@ namespace Gekko
                 meta2.trace.precedents.FromID(list2);
                 meta2.trace.precedents[2].precedents.FromID(list2);
                 meta2.traceID = -12345;
-
 
                 dict1 = null;
                 dict2 = null;
