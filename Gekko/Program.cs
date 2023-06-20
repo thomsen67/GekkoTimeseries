@@ -3147,7 +3147,7 @@ namespace Gekko
             return model;
         }
 
-        public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
+        public static void WriteParallelDatabank(int k, Databank databank, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
             int extra = 2;
             DateTime t = DateTime.Now;
@@ -3162,13 +3162,11 @@ namespace Gekko
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
-
-            // 111111111111111111111111111111111111111111111111111
+            
             TraceHelper th; Trace[] dict1Inverted;
-            Gekko.Trace.HandleTraceWrite(source, out th, out dict1Inverted);
-            // 111111111111111111111111111111111111111111111111111
+            Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
 
-            lists = SplitVarsInSameSizeParts(source.storage, k, print);
+            lists = SplitVarsInSameSizeParts(databank.storage, k, print);
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
                 try
@@ -3184,13 +3182,17 @@ namespace Gekko
             }).All(_ => _);
 
             //write out the cache parameters object
-            ProtobufWrite(source.cacheParameters, files[k + extra - 2]);
-            ProtobufWrite(source.traces, files[k + extra - 1]);
-
-            // 22222222222222222222222222222222222222222222
+            //read cache parameters
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            ProtobufWrite(databank.cacheParameters, files[k + extra - 2]);
+            ProtobufWrite(databank.traces, files[k + extra - 1]);
+                        
             Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
-            if (Globals.fixXxx) source.traces = null;
-            // 22222222222222222222222222222222222222222222
+            if (Globals.fixXxx) databank.traces = null;
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
@@ -3309,14 +3311,14 @@ namespace Gekko
                 return 0;
             }, _ => { });
 
-            Databank db = new Databank("temporary");
+            Databank databank = new Databank("temporary");
 
             DateTime t2 = DateTime.Now;
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
                 foreach (KeyValuePair<string, IVariable> kvp in list)
                 {
-                    db.storage.Add(kvp.Key, kvp.Value);
+                    databank.storage.Add(kvp.Key, kvp.Value);
                 }
             }
             lists = null;  //free for GC            
@@ -3328,16 +3330,19 @@ namespace Gekko
             }
 
             //read cache parameters
-            db.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            db.traces = ProtobufRead<Dictionary<Trace, int>>(files[k - extra + 1]);
-            // 33333333333333333333333333333333
-            Gekko.Trace.HandleTraceRead1(db);
-            // 33333333333333333333333333333333
-            if (Globals.fixXxx) db.traces = null;
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
+            databank.traces = ProtobufRead<Dictionary<Trace, int>>(files[k - extra + 1]);
+            Gekko.Trace.HandleTraceRead1(databank);
+            if (Globals.fixXxx) databank.traces = null;
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
-            return db;
+            return databank;
         }
 
         public static T ProtobufRead<T>(string fileName2)
