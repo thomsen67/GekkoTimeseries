@@ -166,7 +166,7 @@ namespace Gekko
             //throw new GekkoException();
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             return new ScalarDate(this.date);
         }

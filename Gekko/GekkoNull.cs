@@ -117,7 +117,7 @@ namespace Gekko
             new Error("Invalid operation on null/empty value");
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             return gekkoNull;
         }

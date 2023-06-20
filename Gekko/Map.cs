@@ -243,14 +243,14 @@ namespace Gekko
             }
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             Map temp = new Map();
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
                 if (!Object.ReferenceEquals(this, kvp.Value))  //if it contains itself
                 {
-                    temp.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate));
+                    temp.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate, cloneHelper));
                 }
                 else
                 {

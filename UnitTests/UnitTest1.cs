@@ -12994,19 +12994,10 @@ namespace UnitTests
                     I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
                     Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
                     Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
-
-                    Databank db = Program.databanks.GetFirst();                    
-
-                    //Test that the graph is really a DAG
-                    string temp = (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment;                    
-                    Assert.AreEqual("a = 2, 3, 4;", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
-                    Assert.AreEqual("a = 2, 3, 4;", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
-                    (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment = "Testing-123";
-                    Assert.AreEqual("Testing-123", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
-                    Assert.AreEqual("Testing-123", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
-                    (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment = temp;
-                    Assert.AreEqual("a = 2, 3, 4;", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
-                    Assert.AreEqual("a = 2, 3, 4;", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
+                    
+                    //Test that the graph is really a DAG                        
+                    Helper_TestDAG(Program.databanks.GetFirst()); //will have been around protobuf
+                    Helper_TestDAG(Program.databanks.GetRef());  //will have been cloned
 
                     //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
 
@@ -13086,6 +13077,20 @@ namespace UnitTests
                     Globals.cacheSize2 = csize;
                 }
             }
+        }
+
+        private static void Helper_TestDAG(Databank db)
+        {
+            string txt = "a = 2, 3, 4;";
+            string temp = (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment;
+            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
+            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
+            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment = "Testing-123";
+            Assert.AreEqual("Testing-123", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
+            Assert.AreEqual("Testing-123", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
+            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment = temp;
+            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment);
+            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].assignment);
         }
 
         //[TestMethod]

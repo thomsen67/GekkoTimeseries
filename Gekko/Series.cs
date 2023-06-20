@@ -2768,7 +2768,7 @@ namespace Gekko
         /// to the periods.
         /// </summary>
         /// <returns>The cloned Series object.</returns>
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             //Always make sure new fields are remembered in the DeepClone() method
 
@@ -2804,7 +2804,7 @@ namespace Gekko
                 {
                     MultidimItem item = kvp.Key.Clone();
                     item.parent = tsCopy;  //must be re-pointed
-                    Series subseries = kvp.Value.DeepClone(truncate) as Series;
+                    Series subseries = kvp.Value.DeepClone(truncate, cloneHelper) as Series;
                     subseries.mmi = item; //the sub-ser
                     tsCopy.dimensionsStorage.storage.Add(item, subseries);
                 }                
@@ -2838,7 +2838,7 @@ namespace Gekko
 
                     if (this.meta.trace != null)
                     {
-                        tsCopy.meta.trace = this.meta.trace.DeepClone();
+                        tsCopy.meta.trace = this.meta.trace.DeepClone(cloneHelper);
                     }
 
                 }

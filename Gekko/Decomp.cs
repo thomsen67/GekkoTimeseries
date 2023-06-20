@@ -1548,7 +1548,7 @@ namespace Gekko
                         {
                             new Error("Did not expect variable '" + name2 + "' to be an array-series");
                         }
-                        ts = (ts.DeepClone(null) as Series);
+                        ts = (ts.DeepClone(null, null) as Series);
                         ts.Lag(lag2);
                     }
                     else
@@ -1570,7 +1570,7 @@ namespace Gekko
                         {
                             new Error("Did not expect variable '" + name2 + "' to be an array-series");
                         }
-                        ts = (ts.DeepClone(null) as Series);
+                        ts = (ts.DeepClone(null, null) as Series);
                         ts.Lag(lag2);
                     }
                     else
@@ -2244,7 +2244,7 @@ namespace Gekko
                 Series y0_series = y0a_series;
                 if (y0a_series.type != ESeriesType.Light)
                 {
-                    y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                    y0_series = y0a.DeepClone(null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
                 d.cellsQuo.storage.Add(residualName, y0_series);
@@ -2270,7 +2270,7 @@ namespace Gekko
                     y0Ref_series = y0aRef_series;
                     if (y0aRef_series.type != ESeriesType.Light)
                     {
-                        y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                        y0Ref_series = y0aRef.DeepClone(null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                     }
                     d.cellsRef.storage.Add(residualName, y0Ref_series);
                 }

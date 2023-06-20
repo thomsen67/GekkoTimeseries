@@ -38,8 +38,9 @@ namespace Gekko
 
     public class Globals
     {
-        public static bool fixXxx = true;
-        
+        public static bool fixXxx1 = true;
+        public static bool fixXxx2 = true;
+
         public static bool stars = true; //#8ujklasdfas        
 
         public const string smpl = "§¤£";  //this line must be at top

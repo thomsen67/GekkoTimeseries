@@ -1469,7 +1469,7 @@ namespace Gekko
                 else
                 {
                     IVariable item = start_list.list[counter];
-                    x = item.DeepClone(null);  //necessary to clone?? Note sure... but safest to do
+                    x = item.DeepClone(null, null);  //necessary to clone?? Note sure... but safest to do
                 }
             }
         }
@@ -1584,7 +1584,7 @@ namespace Gekko
                             new Error("Empty list");
                             //throw new GekkoException();
                         }
-                        x = start_list.list[0].DeepClone(null);//x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
+                        x = start_list.list[0].DeepClone(null, null);//x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
 
                     }
                     else
@@ -6350,7 +6350,7 @@ namespace Gekko
             else
             {
                 //cloning is probably reasonably fast, given data stored in arrays
-                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null, null);
             }
             return x;
         }
@@ -6507,7 +6507,7 @@ namespace Gekko
             }
             else
             {
-                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null, null);
             }
             return x;
         }
@@ -6534,7 +6534,7 @@ namespace Gekko
             }
             else
             {
-                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null, null);
             }
             return x;
         }
@@ -6612,7 +6612,7 @@ namespace Gekko
             }
             else
             {
-                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null, null);
             }
             return x;
         }
@@ -9138,7 +9138,7 @@ namespace Gekko
                         Databank tobank = ts.meta.parentDatabank;
                         if (optionToBank_databank != null) tobank = optionToBank_databank;  //overriding if designated tobank is there
 
-                        tsNew = ts.DeepClone(null) as Series; //parentDatabank for tsNew will be null here 
+                        tsNew = ts.DeepClone(null, null) as Series; //parentDatabank for tsNew will be null here 
                         tsNew.name = opt_prefix + ts.name;
 
                         //Necessary, otherwise it only fails when trying to write the databank to file (better to catch the problem here)

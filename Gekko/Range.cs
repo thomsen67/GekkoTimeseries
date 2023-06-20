@@ -102,7 +102,7 @@ namespace Gekko
             new Error("You cannot use an indexer [] on a range"); return;
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             new Error("Clone error"); return null;
         }

@@ -107,7 +107,7 @@ namespace Gekko
                         List<IVariable> tmp = new List<Gekko.IVariable>();
                         for (int i = ival1 - 1; i <= ival2 - 1; i++)
                         {
-                            tmp.Add(this.list[i].DeepClone(null));
+                            tmp.Add(this.list[i].DeepClone(null, null));
                         }
                         List m = new List(tmp);
                         m.isNameList = this.isNameList;
@@ -518,7 +518,7 @@ namespace Gekko
                 {
                     new Error("List index [" + i + "] out of range 1.." + this.list.Count);
                 }
-                this.list[i - 1] = rhsExpression.DeepClone(null);
+                this.list[i - 1] = rhsExpression.DeepClone(null, null);
             }
             else
             {
@@ -526,7 +526,7 @@ namespace Gekko
             }
         }
 
-        public IVariable DeepClone(GekkoSmplSimple truncate)
+        public IVariable DeepClone(GekkoSmplSimple truncate, CloneHelper cloneHelper)
         {
             List<IVariable> temp = new List<IVariable>();
             if (this.list == null)
@@ -539,7 +539,7 @@ namespace Gekko
                 {
                     if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
                     {                        
-                        temp.Add(iv.DeepClone(truncate));
+                        temp.Add(iv.DeepClone(truncate, cloneHelper));
                     }
                     else
                     {

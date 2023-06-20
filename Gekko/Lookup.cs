@@ -1143,7 +1143,7 @@ namespace Gekko
                                 //---------------------------------------------------------         
                                 if (lhsType == EVariableType.List || lhsType == EVariableType.Var)
                                 {
-                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null, null));
                                     G.ServiceMessage("list " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
@@ -1160,7 +1160,7 @@ namespace Gekko
 
                                 if (lhsType == EVariableType.Map || lhsType == EVariableType.Var)
                                 {
-                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null, null));
                                     G.ServiceMessage("map " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
@@ -1176,7 +1176,7 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                 {
-                                    Matrix m = rhs.DeepClone(null) as Matrix;
+                                    Matrix m = rhs.DeepClone(null, null) as Matrix;
                                     if (o.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
                                     if (o.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
@@ -1266,7 +1266,7 @@ namespace Gekko
                     Series original = null;
                     if (keep || false)
                     {
-                        original = (Series)lhs_series.DeepClone(null);
+                        original = (Series)lhs_series.DeepClone(null, null);
                     }
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
@@ -1389,7 +1389,7 @@ namespace Gekko
 
                                                 if (create)
                                                 {
-                                                    lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too                                                
+                                                    lhs_series = rhs_series_beware.DeepClone(null, null) as Series;  //so that it becomes timeless, too                                                
                                                     lhs_series.name = varnameWithFreq; ;
                                                     double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
                                                     if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
@@ -1452,7 +1452,7 @@ namespace Gekko
                                                 new Error("Operators cannot be used for array-series (yet)");
                                             }
 
-                                            lhs_series = rhs.DeepClone(null) as Series;
+                                            lhs_series = rhs.DeepClone(null, null) as Series;
                                             lhs_series.name = varnameWithFreq;
                                             //!we need to make all the subseries point to the superseries, this pointer is used in DECOMP and other places
                                             foreach (KeyValuePair<MultidimItem, IVariable> kvp in lhs_series.dimensionsStorage.storage)

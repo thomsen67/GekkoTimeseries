@@ -174,6 +174,10 @@ namespace Gekko
         Unknown
     }
 
+    public class CloneHelper
+    {
+        public Dictionary<object, object> dict = new Dictionary<object, object>();
+    }
     public class DispTraceHelpler
     {
         public Trace trace2 = null;
@@ -683,7 +687,7 @@ namespace Gekko
             DecompDict dd = new DecompDict();
             foreach (KeyValuePair<string, Series> kvp in this.storage)
             {
-                dd.storage.Add(kvp.Key, kvp.Value.DeepClone(null) as Series);
+                dd.storage.Add(kvp.Key, kvp.Value.DeepClone(null, null) as Series);
             }
             return dd;
         }
@@ -3192,7 +3196,7 @@ namespace Gekko
             ProtobufWrite(databank.traces, files[k + extra - 1]);
                         
             Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
-            if (Globals.fixXxx) databank.traces = null;
+            if (Globals.fixXxx1) databank.traces = null;
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
@@ -3338,7 +3342,7 @@ namespace Gekko
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
             databank.traces = ProtobufRead<Dictionary<Trace, int>>(files[k - extra + 1]);
             Gekko.Trace.HandleTraceRead1(databank);
-            if (Globals.fixXxx) databank.traces = null;
+            if (Globals.fixXxx1) databank.traces = null;
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
@@ -14567,7 +14571,7 @@ namespace Gekko
         /// <param name="overlay"></param>
         public static void SmoothHelper(Series lhs, Series rhs, ESmoothTypes method, Series overlay)
         {
-            Series newSeriesTemp = rhs.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
+            Series newSeriesTemp = rhs.DeepClone(null, null) as Series;  //brand new object, not present in Work (yet)                
 
             GekkoTime realStart = rhs.GetRealDataPeriodFirst();
             GekkoTime realEnd = rhs.GetRealDataPeriodLast();
@@ -16274,7 +16278,7 @@ namespace Gekko
                 if (!injectingToExistingSeries)
                 {
                     //Brand new variable object is created
-                    IVariable iv_clone = iv.DeepClone(truncateTemp);
+                    IVariable iv_clone = iv.DeepClone(truncateTemp, null);
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
                     Series ts_clone = iv_clone as Series;
@@ -20772,7 +20776,7 @@ namespace Gekko
                         Series ts = kvp.Value as Series;
                         if (ts != null)
                         {
-                            Series tsClone = ts.DeepClone(null) as Series;
+                            Series tsClone = ts.DeepClone(null, null) as Series;
                             tsClone.Truncate(yr1, yr2);
                             databankWithFewerPeriods.Add(kvp.Key, tsClone);
                         }
@@ -20787,7 +20791,7 @@ namespace Gekko
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
 
                 Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
-                if (Globals.fixXxx) databank.traces = null;
+                if (Globals.fixXxx1) databank.traces = null;
 
                 count = databank.storage.Count;  //must be before the finally
             }
@@ -27040,7 +27044,7 @@ namespace Gekko
                     Series y0_series = y0a_series;
                     if (y0a_series.type != ESeriesType.Light)
                     {
-                        y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                        y0_series = y0a.DeepClone(null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                     }
 
                     Series y0aRef_series = null;
@@ -27064,7 +27068,7 @@ namespace Gekko
                         y0Ref_series = y0aRef_series;
                         if (y0aRef_series.type != ESeriesType.Light)
                         {
-                            y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+                            y0Ref_series = y0aRef.DeepClone(null, null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                         }
                     }
 

@@ -3573,7 +3573,7 @@ namespace Gekko
             Series ts; double sum; double n;
             Program.RebaseHelper1(gti, gti, iv, out ts, out sum, out n);
 
-            Series tsNew = ts.DeepClone(null) as Series;
+            Series tsNew = ts.DeepClone(null, null) as Series;
 
             Program.RebaseHelper2(tsNew, sum, n, indexValue);
 
@@ -6092,7 +6092,7 @@ namespace Gekko
         public static IVariable append(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x)
         {
             //FIX: type checks etc.!
-            List temp = ths.DeepClone(null) as List;
+            List temp = ths.DeepClone(null, null) as List;
             temp.Add(x);
             return temp;
         }
@@ -6102,7 +6102,7 @@ namespace Gekko
         {
             //FIX: type checks etc.!
             int i = O.ConvertToInt(index, true);
-            List temp = ths.DeepClone(null) as List;
+            List temp = ths.DeepClone(null, null) as List;
             if (i - 1 < 0 || i - 1 > temp.list.Count)
             {
                 new Error("Cannot insert at position " + i);
@@ -6124,7 +6124,7 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.List) FunctionError("extend", x);
             int i = O.ConvertToInt(index, true);
-            List temp = ths.DeepClone(null) as List;
+            List temp = ths.DeepClone(null, null) as List;
             if (i - 1 < 0 || i - 1 > temp.list.Count)
             {
                 new Error("Cannot insert at position " + i);
@@ -6133,7 +6133,7 @@ namespace Gekko
             if (x.Type() == EVariableType.List)
             {
                 List x_list = x as List;
-                temp = temp.DeepClone(null) as List;
+                temp = temp.DeepClone(null, null) as List;
                 temp.list.InsertRange(i - 1, x_list.list);
             }
             else
@@ -6151,7 +6151,7 @@ namespace Gekko
             if (x.Type() == EVariableType.List)
             {
                 List x_list = x as List;
-                temp = temp.DeepClone(null) as List;
+                temp = temp.DeepClone(null, null) as List;
                 temp.list.AddRange(x_list.list);
             }
             else

@@ -82,17 +82,34 @@ namespace Gekko
             }            
         }        
 
-        public Trace DeepClone()
+        public Trace DeepClone(CloneHelper cloneHelper)
         {
-            Trace trace2 = new Trace();  //also creates id
-            trace2.assignment=this.assignment;
-            trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
-            trace2.filenameAndPathAndLine= this.filenameAndPathAndLine;
-            trace2.periods = new List<GekkoTime>();
-            foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
-            trace2.t1 = this.t1;
-            trace2.t2 = this.t2;
-            trace2.precedents = this.precedents.DeepClone();
+            object known = null;
+            Trace trace2 = null;
+            if (cloneHelper != null)
+            {
+                cloneHelper.dict.TryGetValue(this, out known);
+            }
+            if (known == null)
+            {
+                trace2 = new Trace();  //also creates id
+                trace2.assignment = this.assignment;
+                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
+                trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
+                trace2.periods = new List<GekkoTime>();
+                foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
+                trace2.t1 = this.t1;
+                trace2.t2 = this.t2;
+                trace2.precedents = this.precedents.DeepClone(cloneHelper);
+                if (cloneHelper != null)
+                {
+                    cloneHelper.dict.Add(this, trace2);
+                }
+            }
+            else
+            {
+                trace2 = known as Trace;
+            }            
             return trace2;
         }
 
@@ -326,7 +343,7 @@ namespace Gekko
             set { this.storage[i] = value; }
         }
 
-        public Precedents DeepClone()
+        public Precedents DeepClone(CloneHelper cloneHelper)
         {
             Precedents precedents = new Precedents();            
             if (this.storage != null)
@@ -334,7 +351,7 @@ namespace Gekko
                 precedents.storage = new List<Trace>();
                 foreach (Trace trace in this.storage)
                 {
-                    precedents.storage.Add(trace.DeepClone());
+                    precedents.storage.Add(trace.DeepClone(cloneHelper));
                 }
             }
             return precedents;
