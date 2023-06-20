@@ -3149,10 +3149,11 @@ namespace Gekko
 
         public static void WriteParallelDatabank(int k, Databank source, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
+            int extra = 2;
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
 
-            List<string> files = GetSplitCacheFileNames(k + 1, fileName, "data", null, ref hash); //the last filename is cache parameters
+            List<string> files = GetSplitCacheFileNames(k + extra, fileName, "data", null, ref hash); //the last filename is cache parameters
 
             List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
@@ -3183,7 +3184,8 @@ namespace Gekko
             }).All(_ => _);
 
             //write out the cache parameters object
-            ProtobufWrite(source.cacheParameters, files[k]);
+            ProtobufWrite(source.cacheParameters, files[k + extra - 2]);
+            ProtobufWrite(source.traces, files[k + extra - 1]);
 
             // 22222222222222222222222222222222222222222222
             Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
@@ -3259,6 +3261,8 @@ namespace Gekko
             //
             // When we have a 1of1, just read it without parallel.foreach (same for write).
 
+            int extra = 2;
+
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
 
@@ -3281,7 +3285,7 @@ namespace Gekko
                 files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);                
             }
 
-            for (int i = 0; i < k - 1; i++)
+            for (int i = 0; i < k - extra; i++)
             {                
                 lists.Add(new List<KeyValuePair<string, IVariable>>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
@@ -3315,11 +3319,7 @@ namespace Gekko
                     db.storage.Add(kvp.Key, kvp.Value);
                 }
             }
-            lists = null;  //free for GC
-
-            // 33333333333333333333333333333333
-            Gekko.Trace.HandleTraceRead1(db);
-            // 33333333333333333333333333333333
+            lists = null;  //free for GC            
 
             for (int i = 0; i < twoIntss.Count; i++)
             {
@@ -3328,7 +3328,12 @@ namespace Gekko
             }
 
             //read cache parameters
-            db.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - 1]);
+            db.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
+            db.traces = ProtobufRead<Dictionary<Trace, int>>(files[k - extra + 1]);
+            // 33333333333333333333333333333333
+            Gekko.Trace.HandleTraceRead1(db);
+            // 33333333333333333333333333333333
+            if (Globals.fixXxx) db.traces = null;
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
