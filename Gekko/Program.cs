@@ -4717,8 +4717,11 @@ namespace Gekko
 
                         try
                         {
-                            File.SetAttributes(tsdxFile, FileAttributes.Normal);  //it may be read-only if original file is so
-                            File.Delete(tsdxFile);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                            if (tsdxFile != null)
+                            {
+                                File.SetAttributes(tsdxFile, FileAttributes.Normal);  //it may be read-only if original file is so
+                                File.Delete(tsdxFile);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                            }
                         }
                         catch (Exception e)
                         {
@@ -4859,6 +4862,8 @@ namespace Gekko
 
             if (true)
             {
+                //HMM TODO: Why do this if cache_loadedFromProtobuf==false  ??
+
                 //We "record" the cache-relevant parameters
                 cacheParameters = new DatabankCacheParams();
                 //xlsx

@@ -12918,7 +12918,7 @@ namespace UnitTests
         public void _Test_Trace()
         {
             double csize =  Globals.cacheSize2;
-            for (int i = 0; i < 2; i++)
+            if (true)
             {
                 try
                 {
@@ -12926,7 +12926,7 @@ namespace UnitTests
                     // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
                     //
 
-                    if (i == 0) Program.Flush();                    
+                    Program.Flush();                    
                     Globals.cacheSize2 = 1;  //set it to minimum, so that cache if produced when reading for i==0, and cache can be used in i==1
 
                     string s = null;
@@ -12987,6 +12987,7 @@ namespace UnitTests
                     // ---------------------------------                               
                     I("write sletmig1;"); //a, b, c, d  ... 2021-23
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
+                    I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
 
                     Databank db = Program.databanks.GetFirst();
 
