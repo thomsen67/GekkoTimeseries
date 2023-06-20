@@ -3162,8 +3162,12 @@ namespace Gekko
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
 
-            lists = SplitVarsInSameSizeParts(source.storage, k, print);
+            // 111111111111111111111111111111111111111111111111111
+            TraceHelper th; Trace[] dict1Inverted;
+            Gekko.Trace.HandleTraceWrite(source, out th, out dict1Inverted);
+            // 111111111111111111111111111111111111111111111111111
 
+            lists = SplitVarsInSameSizeParts(source.storage, k, print);
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
                 try
@@ -3180,6 +3184,11 @@ namespace Gekko
 
             //write out the cache parameters object
             ProtobufWrite(source.cacheParameters, files[k]);
+
+            // 22222222222222222222222222222222222222222222
+            Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
+            if (Globals.fixXxx) source.traces = null;
+            // 22222222222222222222222222222222222222222222
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
@@ -3307,6 +3316,10 @@ namespace Gekko
                 }
             }
             lists = null;  //free for GC
+
+            // 33333333333333333333333333333333
+            Gekko.Trace.HandleTraceRead1(db);
+            // 33333333333333333333333333333333
 
             for (int i = 0; i < twoIntss.Count; i++)
             {
@@ -20764,6 +20777,7 @@ namespace Gekko
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
 
                 Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
+                if (Globals.fixXxx) databank.traces = null;
 
                 count = databank.storage.Count;  //must be before the finally
             }
