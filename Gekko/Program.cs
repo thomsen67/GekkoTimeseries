@@ -5603,16 +5603,19 @@ namespace Gekko
                     // =============== restore trace links start
                     // ============================================
                     // 
-                    TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);                    
-                    Trace[] dict2Inverted = new Trace[deserializedDatabank.traces2.Count];
-                    foreach (KeyValuePair<Trace, int> kvp in deserializedDatabank.traces2) dict2Inverted[kvp.Value] = kvp.Key;
-                    foreach (SeriesMetaInformation meta in th.metas)
+                    if (deserializedDatabank.traces != null)
                     {
-                        meta.FromID(dict2Inverted);
-                        meta.traceID = -12345;
+                        TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);
+                        Trace[] dict2Inverted = new Trace[deserializedDatabank.traces.Count];
+                        foreach (KeyValuePair<Trace, int> kvp in deserializedDatabank.traces) dict2Inverted[kvp.Value] = kvp.Key;
+                        foreach (SeriesMetaInformation meta in th.metas)
+                        {
+                            meta.FromID(dict2Inverted);
+                            meta.traceID = -12345;
+                        }
+                        foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);
                     }
-                    foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);
-                    deserializedDatabank.traces2 = null;
+                    deserializedDatabank.traces = null;
                     // ============================================
                     // =============== restore trace links start
                     // ============================================
@@ -20786,7 +20789,7 @@ namespace Gekko
                 {
                     meta.ToID(dict1);
                 }
-                databank.traces2 = th.dict2;
+                databank.traces = th.dict2;
                 // ==========================================
                 // ================ remove trace 1 end
                 // ==========================================

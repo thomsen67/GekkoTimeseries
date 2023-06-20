@@ -2865,10 +2865,13 @@ namespace Gekko
             else
             {
                 th.varCount++;
-                th.metas.Add(this.meta);
-                if (th.type == ETraceHelper.GetAllStuff)
+                if (this.meta != null)
                 {
-                    this.meta.trace.DeepTrace(th, null);
+                    th.metas.Add(this.meta);
+                    if (this.meta.trace != null && th.type == ETraceHelper.GetAllStuff)
+                    {
+                        this.meta.trace.DeepTrace(th, null);
+                    }
                 }
             }
         }
@@ -3027,13 +3030,19 @@ namespace Gekko
 
         public void ToID(Dictionary<Trace, int> dict1)
         {
-            this.traceID = dict1[this.trace];
-            this.trace = null;
+            if (this.trace != null)
+            {
+                this.traceID = dict1[this.trace];
+                this.trace = null;
+            }
         }
 
         public void FromID(Trace[] dict2)
         {
-            this.trace = dict2[this.traceID];
+            if (this.traceID != -12345)
+            {
+                this.trace = dict2[this.traceID];
+            }
         }
 
         public void SetDirty(bool b1)
