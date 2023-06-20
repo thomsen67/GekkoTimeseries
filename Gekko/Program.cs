@@ -20754,11 +20754,11 @@ namespace Gekko
                 }
 
                 TraceHelper th; Trace[] dict1Inverted;
-                Gekko.Trace.HandleWrite(databank, out th, out dict1Inverted);
+                Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
 
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
 
-                Gekko.Trace.HandleTraceRead2(th, dict1Inverted);
+                Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
 
                 count = databank.storage.Count;  //must be before the finally
             }
