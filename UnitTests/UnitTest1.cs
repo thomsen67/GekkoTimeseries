@@ -12986,10 +12986,16 @@ namespace UnitTests
 
                     // ---------------------------------                               
                     I("write sletmig1;"); //a, b, c, d  ... 2021-23
+                    Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
+                    Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                    Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
+                    Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
+                    Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                    Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
 
-                    Databank db = Program.databanks.GetFirst();
+                    Databank db = Program.databanks.GetFirst();                    
 
                     //Test that the graph is really a DAG
                     string temp = (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].assignment;                    
