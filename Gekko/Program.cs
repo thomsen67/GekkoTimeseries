@@ -5599,27 +5599,7 @@ namespace Gekko
                         iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                     }
 
-                    // ============================================
-                    // =============== restore trace links start
-                    // ============================================
-                    // 
-                    if (deserializedDatabank.traces != null)
-                    {
-                        TraceHelper th = Gekko.Trace.CollectAllTraces(deserializedDatabank, ETraceHelper.OnlyGetMeta);
-                        Trace[] dict2Inverted = new Trace[deserializedDatabank.traces.Count];
-                        foreach (KeyValuePair<Trace, int> kvp in deserializedDatabank.traces) dict2Inverted[kvp.Value] = kvp.Key;
-                        foreach (SeriesMetaInformation meta in th.metas)
-                        {
-                            meta.FromID(dict2Inverted);
-                            meta.traceID = -12345;
-                        }
-                        foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);
-                    }
-                    deserializedDatabank.traces = null;
-                    // ============================================
-                    // =============== restore trace links start
-                    // ============================================
-
+                    Gekko.Trace.HandleTraceRead1(deserializedDatabank);
 
                     readInfo.variables = deserializedDatabank.storage.Count;
                     readInfo.startPerInFile = yearMinMax.int1;
@@ -5649,7 +5629,7 @@ namespace Gekko
 
             readInfo.startPerResultingBank = readInfo.startPerInFile;
             readInfo.endPerResultingBank = readInfo.endPerInFile;
-        }
+        }        
 
         /// <summary>
         /// Read the older .gbk databank format corresponding to Gekko 2.x.x.
@@ -20773,44 +20753,12 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                // ==========================================
-                // ================ remove trace 1 start
-                // ==========================================
-                //gather lists
-                TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
-                Dictionary<Trace, int> dict1 = th.dict2;
-                Trace[] dict1Inverted = new Trace[dict1.Count];
-                foreach (KeyValuePair<Trace, int> kvp in dict1)
-                {
-                    dict1Inverted[kvp.Value] = kvp.Key;
-                    kvp.Key.precedents.ToID(dict1);  //remove links
-                }
-                foreach (SeriesMetaInformation meta in th.metas)
-                {
-                    meta.ToID(dict1);
-                }
-                databank.traces = th.dict2;
-                // ==========================================
-                // ================ remove trace 1 end
-                // ==========================================
+                TraceHelper th; Trace[] dict1Inverted;
+                Gekko.Trace.HandleWrite(databank, out th, out dict1Inverted);
 
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
 
-                // ==========================================
-                // ================ remove trace 2 start
-                // ==========================================                
-                foreach (SeriesMetaInformation meta in th.metas)
-                {
-                    meta.FromID(dict1Inverted);
-                    meta.traceID = -12345;
-                }
-                foreach (Trace trace in dict1Inverted)
-                {
-                    trace.precedents.FromID(dict1Inverted);
-                }
-                // ==========================================
-                // ================ remove trace 2 end
-                // ==========================================
+                Gekko.Trace.HandleTraceRead2(th, dict1Inverted);
 
                 count = databank.storage.Count;  //must be before the finally
             }
@@ -20837,7 +20785,7 @@ namespace Gekko
                 }
             }
             return count;
-        }
+        }        
 
         /// <summary>
         /// Writes an object to protobuffer file

@@ -80,61 +80,6 @@ namespace Gekko
                     }
                 }
             }            
-        }
-
-        public static void RestoreTraceConnections(Databank databank)
-        {
-            //if (databank.traces == null) return;
-            //foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
-            //{
-            //    kvp.Key.precedents = kvp.Value;
-            //}
-            //Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
-            //Trace trace = c.meta.trace;
-            //databank.traces = null;
-
-
-        }
-
-        public static void RemoveTraceConnections2(Databank databank)
-        {
-            //Trace[] dict1Inverted = new Trace[databank.traces2.Count];
-            //foreach (KeyValuePair<Trace, int> kvp in databank.traces2)
-            //{
-            //    dict1Inverted[kvp.Value] = kvp.Key;
-            //}
-            //meta1.FromID(dict1Inverted);
-            //foreach (Trace trace in dict1Inverted) trace.precedents.FromID(dict1Inverted);
-            //meta1.traceID = -12345;
-
-        }
-
-        public static void RemoveTraceConnections1(Databank databank)
-        {
-            //Series c = Program.databanks.GetFirst().GetIVariable("c!a") as Series;
-            //Trace trace = c.meta.trace;
-            //TraceHelper th1 = Trace.CollectAllTraces(databank, 0);
-            //databank.traces = th1.dict;
-            //foreach (KeyValuePair<Trace, Precedents> kvp in databank.traces)
-            //{
-            //    kvp.Key.precedents = null;
-            //}            
-            //Trace trace2 = c.meta.trace;
-
-            ////gather lists
-            //TraceHelper th = Trace.CollectAllTraces(databank);
-            //Dictionary<Trace, int> dict1 = th.dict2;
-            //Trace[] dict1Inverted = new Trace[dict1.Count];
-            //foreach (KeyValuePair<Trace, int> kvp in dict1)
-            //{
-            //    dict1Inverted[kvp.Value] = kvp.Key;
-            //    kvp.Key.precedents.ToID(dict1);  //remove links
-            //}
-            //foreach (SeriesMetaInformation meta in th.metas)
-            //{
-            //    meta.ToID(dict1);
-            //}
-            //databank.traces2 = th.dict2;
         }        
 
         public Trace DeepClone()
@@ -216,7 +161,64 @@ namespace Gekko
                 kvp.Value.DeepTrace(th1);
             }
             return th1;
-        }        
+        }
+
+        /// <summary>
+        /// Before serializing a protobuf gbk, this method removes trace connections, and kind of packs the connections into a flat dict (databank.traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="th"></param>
+        /// <param name="dict1Inverted"></param>
+        public static void HandleWrite(Databank databank, out TraceHelper th, out Trace[] dict1Inverted)
+        {            
+            //gather lists
+            th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
+            Dictionary<Trace, int> dict1 = th.dict2;
+            dict1Inverted = new Trace[dict1.Count];
+            foreach (KeyValuePair<Trace, int> kvp in dict1)
+            {
+                dict1Inverted[kvp.Value] = kvp.Key;
+                kvp.Key.precedents.ToID(dict1);  //remove links
+            }
+            foreach (SeriesMetaInformation meta in th.metas)
+            {
+                meta.ToID(dict1);
+            }
+            databank.traces = th.dict2;
+        }
+
+
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        public static void HandleTraceRead1(Databank databank)
+        {
+            if (databank.traces != null)
+            {
+                TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMeta);
+                Trace[] dictInverted = new Trace[databank.traces.Count];
+                foreach (KeyValuePair<Trace, int> kvp in databank.traces) dictInverted[kvp.Value] = kvp.Key;
+                HandleTraceRead2(th, dictInverted);
+            }
+            databank.traces = null;
+        }
+
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
+        /// </summary>
+        public static void HandleTraceRead2(TraceHelper th, Trace[] dict1Inverted)
+        {                         
+            foreach (SeriesMetaInformation meta in th.metas)
+            {
+                meta.FromID(dict1Inverted);
+                meta.traceID = -12345;
+            }
+            foreach (Trace trace in dict1Inverted)
+            {
+                trace.precedents.FromID(dict1Inverted);
+            }
+        }
     }
 
     public enum ETraceHelper
