@@ -15212,11 +15212,11 @@ namespace Gekko
                 }
 
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
-                foreach (string expl in expls) G.Writeln(expl);                
+                foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace != null)
                 {
-                    PrintTrace(ts.meta.trace);
+                    PrintTrace(new List<Trace>() { ts.meta.trace });
                 }
 
                 bool eqsPrinted = false;
@@ -15257,30 +15257,82 @@ namespace Gekko
             }
         }
 
-        private static void PrintTrace(Trace start)
+        private static void PrintTraceHelper(Trace trace, int d, bool all, Writeln txt)
+        {            
+            string s = "+ " + G.Blanks(d * 2 - 2);
+            if (trace.assignment != null)
+            {
+                txt.MainAdd(s + trace.assignment);
+                txt.MainNewLineTight();
+            }            
+                        
+            if (trace.precedents.Count() > 0)
+            {                
+                foreach (Trace child in trace.precedents.GetStorage())
+                {
+                    PrintTraceHelper(child, d + 1, all, txt);
+                }
+            }
+        }
+
+        private static void PrintTrace(List<Trace> history)
+        {
+            if (history == null || history.Count == 0) return;
+            Trace trace = history[0];            
+
+            PrintTraceHelper(trace, false);
+
+
+            using (Writeln txt = new Writeln())
+            {
+                //txt.MainOmitVeryFirstNewLine();                
+                //PrintTraceHelper(trace, 0, true, txt);
+
+                //if (false)
+                //{
+                //    if (trace.precedents.Count() > 0)
+                //    {
+                //        foreach (Trace trace in trace.precedents.GetStorage())
+                //        {
+                //            string s = null;
+                //            s += "+" + G.Blanks(history.Count * 2 - 1);
+                //            if (trace.precedents.Count() > 0)
+                //            {
+                //                Action<GAO> a = (gao) =>
+                //                {
+                //                    List<Trace> historyClone = new List<Trace>();
+                //                    historyClone.AddRange(history);
+                //                    historyClone.Add(trace);
+                //                    PrintTrace(historyClone);
+                //                };
+                //                G.Writeln(s + trace.Text() + " (" + G.GetLinkAction("unfold", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                //            }
+                //            else
+                //            {
+                //                txt.MainAdd(s + trace.Text());
+                //            }
+                //        }
+                //    }
+                //}
+            }
+        }
+
+        private static void PrintTraceHelper(Trace trace, bool all)
         {
             using (Writeln txt = new Writeln())
             {
                 txt.MainOmitVeryFirstNewLine();
-
-                if (start.precedents.Count() > 0)
+                txt.MainAdd("Traces: ");
+                if (trace.precedents[0].precedents.Count() > 0)
                 {
-                    foreach (Trace trace in start.precedents.GetStorage())
+                    Action<GAO> a = (gao) =>
                     {
-                        if (trace.precedents.Count() > 0)
-                        {
-                            Action<GAO> a = (gao) =>
-                            {
-                                PrintTrace(trace);
-                            };
-                            G.Writeln(trace.Text() + " (" + G.GetLinkAction("unfold", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
-                        }
-                        else
-                        {
-                            txt.MainAdd(trace.Text());
-                        }
-                    }
+                         PrintTraceHelper(trace, true);
+                    };
+                    txt.MainAdd(" (" + G.GetLinkAction("show all", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 }
+                txt.MainNewLineTight();
+                PrintTraceHelper(trace, 0, all, txt);
             }
         }
 
