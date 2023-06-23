@@ -40,6 +40,7 @@ namespace Gekko
     {
         public static bool fixXxx1 = true;
         public static bool fixXxx2 = true;
+        public static short TraceVersion = 1;
 
         public static bool stars = true; //#8ujklasdfas        
 
@@ -57,10 +58,9 @@ namespace Gekko
 
         // -------------------------------------------------
         // pink stuff start
-        // -------------------------------------------------
-        public static bool pink = false;
-        public static bool pink2 = false;  //keeps track of .lst and .tsd, .prn, .csv files
-        public static bool pink3 = false;  //tracks SYS commands
+        // -------------------------------------------------        
+        public static bool pink2 = true;  //also keeps track of .lst and .tsd, .prn, .csv files
+        public static bool pink3 = true;  //also tracks SYS commands
         public static List<string> datopgek_errors = null;
         public static List<string> datopgek_banks = null;
         public static List<string> datopgek_otherBanks = null;

@@ -1698,7 +1698,6 @@ namespace Gekko
                     Trace trace = new Trace();
                     trace.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
                     trace.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                    trace.stamp = DateTime.Now;
                     trace.t1 = smpl.t1;
                     trace.t2 = smpl.t2;
                     trace.assignment = traceString + ";";

@@ -21,6 +21,9 @@ namespace Gekko
         //[ProtoMember(1)]
         //public long id = 0;  //when assigned it is a random number > 1 and < long.MaxValue --> extremely unlikely to have collisions ever
 
+        [ProtoMember(1)]
+        public short version = -12345;
+
         [ProtoMember(2)]
         public GekkoTime t1 = GekkoTime.tNull;
 
@@ -44,11 +47,7 @@ namespace Gekko
 
         [ProtoMember(9)]
         public List<GekkoTime> periods = new List<GekkoTime>();
-
-        //[ProtoMember(10)]
-        //public int ID = -12345; //used to recreate connections after protobuf
-
-
+        
         public string ToString()
         {
             string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
@@ -57,11 +56,13 @@ namespace Gekko
         }
 
         public Trace()
-        {            
+        {
             //this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
             //maybe here put it into dictionary with weak values
             //but where does that dictionary live? In a databank, no?
-            //or maybe only make the dictionary when about 
+            //or maybe only make the dictionary when about
+            this.stamp = DateTime.Now;
+            this.version = Globals.TraceVersion;
         }
 
         public void DeepTrace(TraceHelper th, Trace parent)
@@ -93,13 +94,17 @@ namespace Gekko
             if (known == null)
             {
                 trace2 = new Trace();  //also creates id
-                trace2.assignment = this.assignment;
-                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
-                trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
-                trace2.periods = new List<GekkoTime>();
-                foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
+                trace2.version = this.version;
                 trace2.t1 = this.t1;
                 trace2.t2 = this.t2;
+                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
+                trace2.stamp = this.stamp;
+                trace2.version = this.version;
+                trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
+                trace2.assignment = this.assignment;                
+                trace2.periods = new List<GekkoTime>();
+                foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
+                
                 trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 if (cloneHelper != null)
                 {

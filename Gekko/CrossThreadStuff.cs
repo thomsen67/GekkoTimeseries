@@ -672,6 +672,29 @@ namespace Gekko
             }
         }
 
+        delegate void SetPinkCallback();
+        public static void SetPink()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new SetPinkCallback(SetPink));
+            }
+            else
+            {
+                if (Program.options.bugfix_pink)
+                {
+                    Gui.gui.textBoxMainTabLower.BackColor = Color.MistyRose;
+                    Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.MistyRose;
+                }
+                else
+                {
+                    Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                    Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.White;
+                }
+            }
+        }
+
         // ======================================
         //            WinForms end
         // ======================================
@@ -680,7 +703,7 @@ namespace Gekko
         //            WPF start
         // ======================================
 
-        
+
         //weird delegate pattern, but it works!
         delegate void MergeButtonOkCallback(WindowDecomp w);
         public static void MergeButtonOk(WindowDecomp w)

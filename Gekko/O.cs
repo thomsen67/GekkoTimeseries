@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Data;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using System.Runtime.CompilerServices;
 
 namespace Gekko
 {
@@ -891,6 +892,10 @@ namespace Gekko
             else if (isBlock == 0 && G.Equal(s2, "solve_gauss_reorder"))
             {
                 new Note("Reorder: you must issue a MODEL statement afterwards, for this option to take effect. (In command files, place this option before any MODEL statements).");
+            }
+            else if (G.Equal(s2, "bugfix_pink"))
+            {
+                CrossThreadStuff.SetPink();
             }
             else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
             {
@@ -2584,7 +2589,7 @@ namespace Gekko
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = G.AddExtension(fileName, "." + "lst");                        
-            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
             }
@@ -3455,7 +3460,7 @@ namespace Gekko
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
 
-            if (Globals.pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.bugfix_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
             }

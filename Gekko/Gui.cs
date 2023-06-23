@@ -185,11 +185,8 @@ namespace Gekko
             //1.4.9 stuff
             version = G.PrintVersion(version, false);
 
-            string pink = "";
-            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (spring 2023)]";
-
-            this.Text = "Gekko " + version + pink;
-            this.Name = "Gekko " + version + pink;
+            this.Text = "Gekko " + version;
+            this.Name = "Gekko " + version;
 
             if (true)
             {
@@ -1658,7 +1655,7 @@ namespace Gekko
                 Globals.dataTraceContainer = new TraceSimple();
             }
 
-            if (Globals.pink)
+            if (Program.options.bugfix_pink)
             {
                 Globals.datopgek_errors = new List<string>();
                 Globals.datopgek_banks = new List<string>();
@@ -1892,13 +1889,13 @@ namespace Gekko
                 // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
 
                 bool blue = false;
-                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
-                if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
+                if (Program.options.bugfix_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
+                if (Program.options.bugfix_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
                 if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
                 if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
                 if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
 
-                if (Globals.pink && blue)
+                if (Program.options.bugfix_pink && blue)
                 {
                     using (Writeln text = new Writeln())
                     {
@@ -1913,7 +1910,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+                if (Program.options.bugfix_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
                 {
                     using (Writeln text = new Writeln())
                     {
@@ -1931,7 +1928,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
+                if (Program.options.bugfix_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
                 {
                     using (Writeln txt = new Writeln())
                     {
@@ -2088,7 +2085,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink && blue)
+                if (Program.options.bugfix_pink && blue)
                 {
                     using (Writeln text = new Writeln())
                     {

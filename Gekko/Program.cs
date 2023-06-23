@@ -4247,7 +4247,7 @@ namespace Gekko
 
                 string originalFileName = file;
 
-                if (Globals.pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
+                if (Program.options.bugfix_pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
                 {
                     Globals.datopgek_errors.Add("OPEN/READ/IMPORT of this file: " + originalFileName);
                 }
@@ -5226,7 +5226,7 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, false, true, o.p);
             fileName = ffh.realPathAndFileName;
 
-            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("SHEET<import> used this file: " + o.fileName);
             }
@@ -14554,7 +14554,7 @@ namespace Gekko
             }
             if (cancel) return;
 
-            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Running this command file: " + fileName);
             }            
@@ -15263,7 +15263,12 @@ namespace Gekko
             string s = "| " + G.Blanks(d * 2 - 2);
             if (trace.assignment != null)
             {
-                txt.MainAdd(s + trace.assignment);
+                string periods1 = trace.t1.ToString() + "-" + trace.t2.ToString() + "   : ";
+                string periods2 = null;
+                foreach (GekkoTime t in trace.periods) periods2 += t.ToString() + ", ";
+                periods2 += trace.stamp.ToString("MM/dd/yyyy HH:mm:ss");
+                if (trace.t1.IsNull()) periods1 = "[no period] : ";
+                txt.MainAdd(s + periods1 + trace.assignment + "                        [" + periods2 + "]");
                 txt.MainNewLineTight();
             }            
                         
@@ -15280,6 +15285,7 @@ namespace Gekko
         {
             using (Writeln txt = new Writeln())
             {
+                txt.lineWidth = int.MaxValue;
                 TraceHelper th = new TraceHelper();                
                 trace.DeepTrace(th, null);
                 int count = th.traceCount - 1;  //we do not count the entry with .assign == null.
@@ -20171,7 +20177,7 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = G.StripQuotes(fileName);
 
-            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
             }            
@@ -20717,7 +20723,7 @@ namespace Gekko
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
-            if (Globals.pink)
+            if (Program.options.bugfix_pink)
             {
                 if (pathAndFileNameResultingFile != null && (pathAndFileNameResultingFile.ToLower().Contains("g:\\datopgek3\\") || pathAndFileNameResultingFile.ToLower().Contains("g:/datopgek3/")))
                 {
