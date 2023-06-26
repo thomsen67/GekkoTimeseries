@@ -76,6 +76,24 @@ namespace Gekcel
         {         
         }
 
+        public static string GetVersionNumber()
+        {
+            MessageBox.Show("The following needs testing!! So debug it!!");
+            string p = (new DirectoryInfo(Directory.GetCurrentDirectory())).Parent.Parent.CreateSubdirectory("\\Gekko").CreateSubdirectory("\\Properties").FullName;
+            string ss = File.ReadAllText(p + "\\AssemblyInfo.cs");
+            int i = ss.IndexOf("AssemblyVersion(");
+            int i1 = ss.IndexOf("\"", i + 1);
+            int i2 = ss.IndexOf("\"", i1 + 1);
+            string s5 = ss.Substring(i1, i2 - i1);
+            if (!char.IsDigit(s5[0])) throw new Exception("!!!");
+            if (s5[1] != '.') throw new Exception("!!!");
+            if (!char.IsDigit(s5[2])) throw new Exception("!!!");
+            if (s5[3] != '.') throw new Exception("!!!");
+            if (!char.IsDigit(s5[4])) throw new Exception("!!!");
+            //last char is probably ok if present
+            return s5;
+        }
+
         public override string GetCustomUI(string RibbonID)
         {
             //do Link to guided tour in ribbon
@@ -86,7 +104,7 @@ namespace Gekcel
     <tabs>
       <tab id='tab1' label='Gekko'>        
         <group id='group3' label='Info'>   
-          <button id='button3a' imageMso='Info' size='large' label='Gekcel 3.1.15' onAction='OnButtonPressed3' />  
+          <button id='button3a' imageMso='Info' size='large' label='Gekcel " + GetVersionNumber() + @"' onAction='OnButtonPressed3' />  
         </group>            
 <!-- 
         <group id='group1' label='Gekko reading'>              
