@@ -42,7 +42,6 @@ namespace Gekko
         public bool bugfix_sas = false;            //not mentioned in help (used by KNR). For prn writes vars and name/date with CAPS and inside "", q and m are written as for instance 202003 instead of 2020q3. For csv, numbers are F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent). 
         public bool bugfix_lhs_dollar = true;      //not mentioned in help, if lhs condition is a series, just skips the 0 (false) values instead of setting them to 0. On the rhs, they are always set to 0. Does not affect non-series conditions like set membership.
         public bool bugfix_lhs_dollar_warning = true;  //see above...
-        public bool bugfix_pink = false;           //version for datopgek3
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -93,6 +92,12 @@ namespace Gekko
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS
         public int gams_trim = 0;  //trim vars/params from gdx with few elements  
+        // ---
+        // --- the following can only be called from gekko.ini next to gekko.exe
+        // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
+        public string global_datatrace = "none";  // none | simple
+        public bool global_pink = true;
+        // ---
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
@@ -325,7 +330,6 @@ namespace Gekko
             Add("BUGFIX SAS", Globals.xbool);
             Add("BUGFIX LHS DOLLAR", Globals.xbool);
             Add("BUGFIX LHS DOLLAR WARNING", Globals.xbool);
-            Add("BUGFIX PINK", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
@@ -359,6 +363,12 @@ namespace Gekko
             Add("FOLDER TABLE1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("FOLDER TABLE2", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("FOLDER WORKING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+
+            //Options here can only be in gekko.ini next to gekko.exe
+            //These options must start with 'global'
+            // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
+            Add("GLOBAL DATATRACE", Globals.xnameOrString, "none", "simple");
+            Add("GLOBAL PINK", Globals.xbool);
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies

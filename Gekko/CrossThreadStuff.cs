@@ -682,18 +682,44 @@ namespace Gekko
             }
             else
             {
-                if (Program.options.bugfix_pink)
+                if (Program.options.global_pink)
                 {
                     Gui.gui.textBoxMainTabLower.BackColor = Color.MistyRose;
                     Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.MistyRose;
+                    Program.options.global_datatrace = "simple";
+                    SetDatatrace();
+                    new Writeln("Activated special DST databank version (pink version). This version is intended for work in the g:\\datopgek3\\ folder and will -- among other things -- make sure that files on g:\\datopgek\\ are not tampered with.");                    
                 }
                 else
                 {
                     Gui.gui.textBoxMainTabLower.BackColor = Color.White;
                     Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.White;
+                    new Writeln("Deactivated special DST databank version.");
                 }
             }
         }
+
+        delegate void SetDatatraceCallback();
+        public static void SetDatatrace()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new SetDatatraceCallback(SetDatatrace));
+            }
+            else
+            {
+                if (Program.options.global_datatrace == "none")
+                {
+                    Gui.gui.traceToolStripMenuItem.Checked = false;
+                }
+                else if (Program.options.global_datatrace == "simple")
+                {
+                    Gui.gui.traceToolStripMenuItem.Checked = true;
+                }
+            }
+        }
+
 
         // ======================================
         //            WinForms end

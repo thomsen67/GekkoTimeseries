@@ -1929,7 +1929,7 @@ namespace Gekko
         private ToolStripMenuItem manualToolStripMenuItem;
         private ToolStripMenuItem dataToolStripMenuItem;
         private ToolStripMenuItem viewDatabanksToolStripMenuItem;
-        private ToolStripMenuItem traceToolStripMenuItem;
+        public ToolStripMenuItem traceToolStripMenuItem;
         private ToolStripMenuItem runStatusToolStripMenuItem;
         private ToolStripMenuItem windowToolStripMenuItem;
         private ToolStripMenuItem closeToolStripMenuItem1;

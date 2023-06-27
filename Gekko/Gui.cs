@@ -1655,20 +1655,18 @@ namespace Gekko
                 Globals.dataTraceContainer = new TraceSimple();
             }
 
-            if (Program.options.bugfix_pink)
+            if (Program.options.global_pink)
             {
                 Globals.datopgek_errors = new List<string>();
                 Globals.datopgek_banks = new List<string>();
             }
 
-
-
-            if (Globals.pink2)
+            if (Program.options.global_pink && Globals.pink2)
             {
                 Globals.datopgek_otherBanks = new List<string>();
                 Globals.datopgek_listfiles = new List<string>();
             }
-            if (Globals.pink3)
+            if (Program.options.global_pink && Globals.pink3)
             {
                 Globals.datopgek_sysCalls = new List<string>();
             }
@@ -1889,13 +1887,13 @@ namespace Gekko
                 // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
 
                 bool blue = false;
-                if (Program.options.bugfix_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
-                if (Program.options.bugfix_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
-                if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
-                if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
-                if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
+                if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
+                if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
+                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
+                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
+                if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
 
-                if (Program.options.bugfix_pink && blue)
+                if (Program.options.global_pink && blue)
                 {
                     using (Writeln text = new Writeln())
                     {
@@ -1910,7 +1908,7 @@ namespace Gekko
                     }
                 }
 
-                if (Program.options.bugfix_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+                if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
                 {
                     using (Writeln text = new Writeln())
                     {
@@ -1928,7 +1926,7 @@ namespace Gekko
                     }
                 }
 
-                if (Program.options.bugfix_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
+                if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
                 {
                     using (Writeln txt = new Writeln())
                     {
@@ -1968,7 +1966,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
+                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
                 {
 
                     using (Writeln txt = new Writeln())
@@ -2031,7 +2029,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
+                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
                 {
 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -2059,7 +2057,7 @@ namespace Gekko
                     }
                 }
 
-                if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
+                if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
                 {
 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -2085,7 +2083,7 @@ namespace Gekko
                     }
                 }
 
-                if (Program.options.bugfix_pink && blue)
+                if (Program.options.global_pink && blue)
                 {
                     using (Writeln text = new Writeln())
                     {
@@ -2125,7 +2123,7 @@ namespace Gekko
                         tab.CurRow.SetLeftBorder(1);
                         tab.CurRow.SetRightBorder(3);
                         tab.CurRow.Next();
-                        tab.CurRow.SetText(1, "Note: deactivate tracing in menu 'Data' --> 'Trace data'");
+                        tab.CurRow.SetText(1, "Cf. menu 'Data' --> 'Trace data'");
                         tab.CurRow.MergeCols(1, 3);
 
                         int widthRemember = Program.options.print_width;
@@ -2133,7 +2131,7 @@ namespace Gekko
                         try
                         {
                             List<string> ss = tab.Print();
-                            foreach (string s in ss) G.Writeln(s);
+                            foreach (string s in ss) G.Writeln(s, Color.Gray);
                         }
                         finally
                         {
@@ -2236,7 +2234,7 @@ namespace Gekko
                     {
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         string s = null;
-                        if (Globals.dataTrace == EDataTrace.None) s = ". (To activate tracing, see menu 'Data' --> 'Trace data').";
+                        if (G.Equal(Program.options.global_datatrace, "none")) s = ". (To activate tracing, see menu 'Data' --> 'Trace data').";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s);
                         G.Writeln();
@@ -3082,7 +3080,7 @@ namespace Gekko
             string s = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow at the right-side of the GUI bottom bar), and when the session ends, a report('trace') is shown.";
             if (this.traceToolStripMenuItem.Checked)
             {
-                Globals.dataTrace = EDataTrace.Simple;                
+                Program.options.global_datatrace = "simple";          
                 using (Writeln txt = new Writeln())
                 {
                     txt.MainAdd("Data tracing is activated.");
@@ -3091,7 +3089,7 @@ namespace Gekko
             }
             else
             {
-                Globals.dataTrace = EDataTrace.None;
+                Program.options.global_datatrace = "none";
                 using (Writeln txt = new Writeln())
                 {
                     txt.MainAdd("Data tracing is deactivated.");

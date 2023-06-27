@@ -2100,14 +2100,11 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     new Error("Internal error related to BLOCK");
-                                    //throw new GekkoException();
                                 }
                             }
                             else if (child.Text == "ASTBLOCKOPTION")
                             {
-
                                 Tuple<string, string> tup = HandleOptionAndBlock(child, true);
-
                                 if (tup.Item2 != "?")  //block solve ?; end; is just ignored.
                                 {
 
@@ -2143,7 +2140,6 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 new Error("Internal error related to BLOCK");
-                                //throw new GekkoException();
                             }
                         }
                         node.Code.A(record);

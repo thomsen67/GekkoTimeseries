@@ -4247,7 +4247,7 @@ namespace Gekko
 
                 string originalFileName = file;
 
-                if (Program.options.bugfix_pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
+                if (Program.options.global_pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
                 {
                     Globals.datopgek_errors.Add("OPEN/READ/IMPORT of this file: " + originalFileName);
                 }
@@ -5226,7 +5226,7 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, false, true, o.p);
             fileName = ffh.realPathAndFileName;
 
-            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("SHEET<import> used this file: " + o.fileName);
             }
@@ -14554,7 +14554,7 @@ namespace Gekko
             }
             if (cancel) return;
 
-            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Running this command file: " + fileName);
             }            
@@ -18819,7 +18819,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsDataTrace()
         {
-            return Globals.dataTrace == EDataTrace.Simple;
+            return G.Equal(Program.options.global_datatrace, "simple");
         }
 
         /// <summary>
@@ -20177,12 +20177,12 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = G.StripQuotes(fileName);
 
-            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
             }            
 
-            if (Globals.pink2)
+            if (Program.options.global_pink && Globals.pink2)
             {
                 if (writeType == EDatabankWriteType.Csv || writeType == EDatabankWriteType.Prn || writeType == EDatabankWriteType.Tsd)
                 {
@@ -20723,7 +20723,7 @@ namespace Gekko
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
-            if (Program.options.bugfix_pink)
+            if (Program.options.global_pink)
             {
                 if (pathAndFileNameResultingFile != null && (pathAndFileNameResultingFile.ToLower().Contains("g:\\datopgek3\\") || pathAndFileNameResultingFile.ToLower().Contains("g:/datopgek3/")))
                 {
@@ -22355,9 +22355,15 @@ namespace Gekko
             Globals.modelFileName = "";
             GuiSetModelName();
 
-            string workingFolder = Program.options.folder_working;
-            Program.options = new Options();  //resetting these, but letting working folder and trace live on. 
-            if (!G.NullOrBlanks(workingFolder)) Program.options.folder_working = workingFolder;            
+            //Remember some options, see #er89ljkhaf87
+            string folder_working = Program.options.folder_working;
+            bool global_pink = Program.options.global_pink;
+            string global_datatrace = Program.options.global_datatrace;
+            Program.options = new Options();  //resetting these
+            //Restoring some options
+            if (!G.NullOrBlanks(folder_working)) Program.options.folder_working = folder_working;
+            Program.options.global_pink = global_pink;
+            Program.options.global_datatrace = global_datatrace;
 
             CrossThreadStuff.Mode();  //to show default color
 

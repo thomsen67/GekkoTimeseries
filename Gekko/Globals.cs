@@ -59,6 +59,7 @@ namespace Gekko
         // -------------------------------------------------
         // pink stuff start
         // -------------------------------------------------        
+        //public static bool pink = false; //overall pink or not: pink2 and pink3 controls details.
         public static bool pink2 = true;  //also keeps track of .lst and .tsd, .prn, .csv files
         public static bool pink3 = true;  //also tracks SYS commands
         public static List<string> datopgek_errors = null;
@@ -69,7 +70,7 @@ namespace Gekko
         public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
         public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
         // ----- trace
-        public static EDataTrace dataTrace = EDataTrace.None;
+        //public static EDataTrace dataTrace = EDataTrace.None;
         public static TraceSimple dataTraceContainer = null;
         // -------------------------------------------------
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.

@@ -848,7 +848,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used for OPTION command.
+        /// Used for OPTION command. Note: called from dynamic code.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="isBlock"></param>
@@ -857,6 +857,7 @@ namespace Gekko
         public static void HandleOptions(string s, int isBlock, P p)
         {
             string s2 = s.Replace("Program.options.", "");
+                        
             if (G.Equal(s2, "freq"))
             {
                 //see also #89073589324
@@ -893,9 +894,13 @@ namespace Gekko
             {
                 new Note("Reorder: you must issue a MODEL statement afterwards, for this option to take effect. (In command files, place this option before any MODEL statements).");
             }
-            else if (G.Equal(s2, "bugfix_pink"))
+            else if (G.Equal(s2, "global_pink"))
             {
                 CrossThreadStuff.SetPink();
+            }
+            else if (G.Equal(s2, "global_datatrace"))
+            {
+                CrossThreadStuff.SetDatatrace();
             }
             else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
             {
@@ -911,6 +916,21 @@ namespace Gekko
             else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
             {
                 new Note("Timefilter type = 'avg' only works for PRT and MULPRT.");
+            }
+
+            // ----------------------------------------------
+            //Check this separately
+            if (s2.ToLower().StartsWith("global_"))
+            {
+                if (p != null)
+                {
+                    string file = p.GetExecutingGcmFile();
+                    string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
+                    if (!G.Equal(file, file3))
+                    {
+                        new Error("Options that are 'global' (that is, options with the pattern 'option global ... = ... ;') are only intended to be put inside a " + Globals.autoExecCmdFileName + " file in the same folder as the executing gekko.exe file. The gekko.exe file is placed in this folder: " + G.GetProgramDir() + ".");
+                    }
+                }
             }
         }
 
@@ -1884,12 +1904,8 @@ namespace Gekko
         /// <param name="p"></param>
         public static void Ini(P p)
         {
-            string s = "gekko.ini";
-
-            List<string> folders = new List<string>();
-            folders.Add(G.GetProgramDir());
-            FindFileHelper ffh1 = Program.FindFile(s, folders, false, false, false, true, null);  //also calls CreateFullPathAndFileName()
-            string fileName2 = ffh1.realPathAndFileName;
+            string s = Globals.autoExecCmdFileName;
+            string fileName2 = Program.FindFile(s, new List<string> { G.GetProgramDir() }, false, false, false, true, null).realPathAndFileName;
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
@@ -1897,13 +1913,13 @@ namespace Gekko
             else
             {
                 Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);                
                 Program.RunGekkoCommands("", fileName2, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
             }
 
-            folders = new List<string>();
+            List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
@@ -2589,7 +2605,7 @@ namespace Gekko
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = G.AddExtension(fileName, "." + "lst");                        
-            if (Program.options.bugfix_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
             }
@@ -2633,7 +2649,6 @@ namespace Gekko
             else
             {
                 new Error("type should be 'gekko', 'gekko2', 'rstudio', or 'rstudio2'");
-                //throw new GekkoException();
             }
         }
 
@@ -3460,11 +3475,11 @@ namespace Gekko
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
 
-            if (Program.options.bugfix_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
+            if (Program.options.global_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
             }
-            if (Globals.pink2 && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
+            if (Program.options.global_pink && Globals.pink2 && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
             {
                 Globals.datopgek_listfiles.Add(pathAndFilename);
             }
@@ -10335,7 +10350,7 @@ namespace Gekko
                     string ss = O.ConvertToString(s);
                     Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"));
 
-                    if (Globals.pink3)
+                    if (Program.options.global_pink && Globals.pink3)
                     {
                         Globals.datopgek_sysCalls.Add(ss);
                     }
