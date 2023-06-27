@@ -96,7 +96,7 @@ namespace Gekko
         // --- the following can only be called from gekko.ini next to gekko.exe
         // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
         public string global_datatrace = "none";  // none | simple
-        public bool global_pink = true;
+        public bool global_pink = false;
         // ---
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        

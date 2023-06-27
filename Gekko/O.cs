@@ -2608,6 +2608,7 @@ namespace Gekko
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
+                Program.DatopgekError();
             }
             List<string> folders = new List<string>();
             FindFileHelper ffh = Program.FindFile(fileName, folders, true, true, false, true, p);
@@ -3478,6 +3479,7 @@ namespace Gekko
             if (Program.options.global_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
+                Program.DatopgekError();
             }
             if (Program.options.global_pink && Globals.pink2 && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
             {

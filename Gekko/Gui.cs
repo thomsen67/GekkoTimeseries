@@ -1912,6 +1912,7 @@ namespace Gekko
                 {
                     using (Writeln text = new Writeln())
                     {
+                        text.color = Color.Blue; 
                         text.MainAdd("-----------------------------------------------------------");
                         text.MainNewLineTight();
                         text.MainAdd("WARNING: The run contained some access to files on g:\\datopgek:");
@@ -1930,6 +1931,7 @@ namespace Gekko
                 {
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
                         txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
@@ -1937,6 +1939,7 @@ namespace Gekko
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("// ----- Gekko code start -----");
                         txt.MainNewLine();
                         foreach (string s in Globals.datopgek_banks)
@@ -1956,7 +1959,7 @@ namespace Gekko
                             txt.MainNewLineTight();
                             txt.MainAdd("read <ref> '" + ss + "';");
                             txt.MainNewLineTight();
-                            txt.MainAdd("compare <1980 2021>;");
+                            txt.MainAdd("compare <2000 2022>; //or some other period...");
                             txt.MainNewLineTight();
                             txt.MainAdd("edit compare_databanks.txt;");
                             txt.MainNewLine();
@@ -1968,9 +1971,9 @@ namespace Gekko
 
                 if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
                 {
-
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
                         txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
@@ -1979,6 +1982,7 @@ namespace Gekko
 
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("// ----- Gekko code start -----");
                         txt.MainNewLine();
                         foreach (string s in Globals.datopgek_otherBanks)
@@ -2019,7 +2023,7 @@ namespace Gekko
                             txt.MainNewLineTight();
                             txt.MainAdd("read <ref " + ext + "> '" + ss + "';");
                             txt.MainNewLineTight();
-                            txt.MainAdd("compare <1980 2021>;");
+                            txt.MainAdd("compare <2000 2022>; //or some other period...");
                             txt.MainNewLineTight();
                             txt.MainAdd("edit compare_databanks.txt;");
                             txt.MainNewLine();
@@ -2031,11 +2035,11 @@ namespace Gekko
 
                 if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
                 {
-
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("The session wrote to listfiles (.lst) on g:\\datopgek3\\... . You may compare these with the original listfiles with extension .lst_gek2.");
                         txt.MainAdd("In Total Commander, you can mark the two files (.lst and .lst_gek2) and use Files --> Compare By Content...");
                         txt.MainNewLineTight();
@@ -2063,6 +2067,7 @@ namespace Gekko
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     using (Writeln txt = new Writeln())
                     {
+                        txt.color = Color.Blue;
                         txt.MainAdd("The session used the Gekko SYS command to call the Windows system. You may for instance want to check files copied 'manually' with the SYS command.");
                         txt.MainNewLineTight();
                         txt.MainAdd(" ----- SYS command contents: -----");
@@ -2130,6 +2135,7 @@ namespace Gekko
                         Program.options.print_width = int.MaxValue;
                         try
                         {
+                            G.Writeln();
                             List<string> ss = tab.Print();
                             foreach (string s in ss) G.Writeln(s, Color.Gray);
                         }

@@ -4250,6 +4250,7 @@ namespace Gekko
                 if (Program.options.global_pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
                 {
                     Globals.datopgek_errors.Add("OPEN/READ/IMPORT of this file: " + originalFileName);
+                    DatopgekError();
                 }
 
                 bool isGbk = true;
@@ -5229,6 +5230,7 @@ namespace Gekko
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("SHEET<import> used this file: " + o.fileName);
+                DatopgekError();
             }
 
             if (Program.IsDataTrace()) Globals.dataTraceContainer.Add(1, "Read", ffh.prettyPathAndFileName);
@@ -14557,6 +14559,7 @@ namespace Gekko
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Running this command file: " + fileName);
+                DatopgekError();
             }            
 
             RunHelper(o, fileName);
@@ -20180,7 +20183,8 @@ namespace Gekko
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
-            }            
+                DatopgekError();
+            }
 
             if (Program.options.global_pink && Globals.pink2)
             {
@@ -20427,6 +20431,11 @@ namespace Gekko
             {
                 Program.options.interface_alias = aliasRemember;
             }
+        }
+
+        public static void DatopgekError()
+        {
+            if (Globals.pinkStrict) new Error("Illegal access to g:\\datopgek\\ folder. " + Stringlist.GetListWithCommas(Globals.datopgek_errors));
         }
 
         /// <summary>
