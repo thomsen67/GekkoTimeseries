@@ -1701,7 +1701,7 @@ namespace Gekko
                     trace.t1 = smpl.t1;
                     trace.t2 = smpl.t2;
                     trace.assignment = traceString + ";";
-                    foreach (GekkoTime t in new GekkoTimeIterator(trace.t1, trace.t2)) trace.periods.Add(t);  //add all
+                    foreach (GekkoTime t in new GekkoTimeIterator(trace.t1, trace.t2)) trace.periods.Add(t, 0);  //add all
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {

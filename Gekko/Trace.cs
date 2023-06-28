@@ -46,7 +46,7 @@ namespace Gekko
         public Precedents precedents = new Precedents();
 
         [ProtoMember(9)]
-        public List<GekkoTime> periods = new List<GekkoTime>();
+        public Dictionary<GekkoTime, byte> periods = new Dictionary<GekkoTime, byte>();
         
         public string ToString()
         {
@@ -101,9 +101,9 @@ namespace Gekko
                 trace2.stamp = this.stamp;
                 trace2.version = this.version;
                 trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
-                trace2.assignment = this.assignment;                
-                trace2.periods = new List<GekkoTime>();
-                foreach (GekkoTime t in this.periods) trace2.periods.Add(t);
+                trace2.assignment = this.assignment;
+                trace2.periods = new Dictionary<GekkoTime, byte>();
+                foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods) trace2.periods.Add(kvp.Key, kvp.Value);
                 
                 trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 if (cloneHelper != null)
@@ -163,7 +163,7 @@ namespace Gekko
                 {
                     foreach (Trace trace_other in ts.meta.trace.precedents.GetStorage())
                     {
-                        foreach (GekkoTime t in this.periods)
+                        foreach (GekkoTime t in this.periods.Keys)
                         {
                             trace_other.periods.Remove(t);
                         }

@@ -4660,25 +4660,30 @@ namespace Gekko
                                         }
                                         newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
                                         newTrace.bankAndVarnameWithFreq = name;
-                                        newTrace.filenameAndPathAndLine = "Filename and line";                                        
+                                        newTrace.filenameAndPathAndLine = "Filename and line";
+
+                                        Series x = null;
+                                        int type = 1;
                                         if (periods != null)
                                         {
-                                            newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                            newTrace.PushIntoSeries(tsExisting, 2);
+                                            newTrace.precedents.AddRange(tsImported.meta.trace.precedents);                                            
+                                            x = tsExisting;
+                                            type = 2;
                                         }
                                         else
                                         {                                            
                                             if (tsExisting != null)
                                             {
                                                 newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                                newTrace.PushIntoSeries(tsExisting, 1);
+                                                x = tsExisting;
                                             }
                                             else
                                             {
-                                                //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                                newTrace.PushIntoSeries(tsImported, 1);
+                                                //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);                                                
+                                                x = tsImported;
                                             }
                                         }
+                                        newTrace.PushIntoSeries(x, type);
                                     }
                                 }
                             }
@@ -15268,7 +15273,7 @@ namespace Gekko
             {
                 string periods1 = trace.t1.ToString() + "-" + trace.t2.ToString() + "   : ";
                 string periods2 = null;
-                foreach (GekkoTime t in trace.periods) periods2 += t.ToString() + ", ";
+                foreach (GekkoTime t in trace.periods.Keys) periods2 += t.ToString() + ", ";
                 periods2 += trace.stamp.ToString("MM/dd/yyyy HH:mm:ss");
                 if (trace.t1.IsNull()) periods1 = "[no period] : ";
                 txt.MainAdd(s + periods1 + trace.assignment + "                        [" + periods2 + "]");

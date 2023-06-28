@@ -13065,8 +13065,8 @@ namespace UnitTests
                     x10.m.Add(new String2(c10));
                     x10.m.Add(x10a);
                     Helper_CheckTrace("d!a", x10);
-                    // ---------------------
-                    I("prt d;");
+                    // ---------------------                    
+                    I("disp d;");
                     I("d.printtrace();");
                 }
                 finally
