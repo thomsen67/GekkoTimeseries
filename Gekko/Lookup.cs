@@ -1693,15 +1693,12 @@ namespace Gekko
                 if (traceString != null)
                 {
 
-                    if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace();
+                    if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ETraceType.Parent);
                     // ---------
-                    Trace trace = new Trace();
+                    Trace trace = new Trace(smpl.t1, smpl.t2);
                     trace.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
                     trace.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                    trace.t1 = smpl.t1;
-                    trace.t2 = smpl.t2;
                     trace.assignment = traceString + ";";
-                    foreach (GekkoTime t in new GekkoTimeIterator(trace.t1, trace.t2)) trace.periods.Add(t, 0);  //add all
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
@@ -1744,7 +1741,7 @@ namespace Gekko
                             trace.precedents.SetStorage(temp);  //keep it null if no children                            
                         }
                     }
-                    
+
                     //remove these new periods from any previous traces
                     trace.PushIntoSeries(lhs_series, 2);
 

@@ -12839,16 +12839,16 @@ namespace UnitTests
             string path = Globals.ttPath2 + @"\regres\Databanks\temp";
 
             SeriesMetaInformation meta1 = new SeriesMetaInformation();
-            meta1.trace = new Trace();
+            meta1.trace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
             //dict1.Add(meta1.trace, dict1.Count);
             meta1.trace.precedents = new Precedents();
-            Trace xx1 = new Trace();
+            Trace xx1 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
             xx1.assignment = "xx1";
             meta1.trace.precedents.Add(xx1);
-            Trace xx2 = new Trace();
+            Trace xx2 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
             xx2.assignment = "xx2";
             meta1.trace.precedents.Add(xx2);
-            Trace xx3 = new Trace();
+            Trace xx3 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
             xx3.assignment = "xx3";
             meta1.trace.precedents.Add(xx3);
             xx3.precedents = new Precedents();

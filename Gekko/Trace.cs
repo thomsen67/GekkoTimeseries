@@ -14,6 +14,12 @@ namespace Gekko
     /// <summary>
     /// Used for the .trace field of timeseries
     /// </summary>    
+    /// 
+    public enum ETraceType
+    {
+        Parent,
+        Child
+    }
 
     [ProtoContract]
     public class Trace
@@ -25,10 +31,10 @@ namespace Gekko
         public short version = -12345;
 
         [ProtoMember(2)]
-        public GekkoTime t1 = GekkoTime.tNull;
+        private GekkoTime t1 = GekkoTime.tNull;
 
         [ProtoMember(3)]
-        public GekkoTime t2 = GekkoTime.tNull;
+        private GekkoTime t2 = GekkoTime.tNull;
 
         [ProtoMember(4)]
         public string bankAndVarnameWithFreq = null;
@@ -47,15 +53,27 @@ namespace Gekko
 
         [ProtoMember(9)]
         public Dictionary<GekkoTime, byte> periods = new Dictionary<GekkoTime, byte>();
-        
-        public string ToString()
+
+        private Trace()
         {
-            string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
-            if (G.NullOrEmpty(this.assignment)) s = "------- meta entry: " + this.bankAndVarnameWithFreq + " -------";
-            return s;
+            //for protobuf
         }
 
-        public Trace()
+        /// <summary>
+        /// Construct a parent trace. For this, .t1 and .t2 will be null.
+        /// </summary>
+        /// <param name="type"></param>
+        public Trace(ETraceType type)
+        {
+            if (type == ETraceType.Child) new Error("Trace constructor problem");
+        }
+
+        /// <summary>
+        /// Child trace. Also sets stamp, traceversion and .t1 and .t2 (fills .periods with this range).
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        public Trace(GekkoTime t1, GekkoTime t2)
         {
             //this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
             //maybe here put it into dictionary with weak values
@@ -63,7 +81,30 @@ namespace Gekko
             //or maybe only make the dictionary when about
             this.stamp = DateTime.Now;
             this.version = Globals.TraceVersion;
+            this.t1 = t1;
+            this.t2 = t2;
+            if (!this.t1.IsNull() && !this.t2.IsNull())
+            {
+                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t, 0);  //add all
+            }
         }
+
+        public GekkoTime GetT1()
+        {
+            return this.t1;
+        }
+
+        public GekkoTime GetT2()
+        {
+            return this.t1;
+        }        
+        
+        public string ToString()
+        {
+            string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
+            if (G.NullOrEmpty(this.assignment)) s = "------- meta entry: " + this.bankAndVarnameWithFreq + " -------";
+            return s;
+        }        
 
         public void DeepTrace(TraceHelper th, Trace parent)
         {
@@ -93,7 +134,7 @@ namespace Gekko
             }
             if (known == null)
             {
-                trace2 = new Trace();  //also creates id
+                trace2 = new Trace();
                 trace2.version = this.version;
                 trace2.t1 = this.t1;
                 trace2.t2 = this.t2;
@@ -184,7 +225,7 @@ namespace Gekko
             }
             return th1;
         }
-        
+
         /// <summary>
         /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
         /// </summary>
@@ -198,7 +239,7 @@ namespace Gekko
                 foreach (KeyValuePair<Trace, int> kvp in databank.traces) dictInverted[kvp.Value] = kvp.Key;
                 HandleTraceRead2(th.metas, dictInverted);
                 databank.traces = null;
-            }            
+            }
         }
 
         /// <summary>
