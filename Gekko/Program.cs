@@ -4652,26 +4652,11 @@ namespace Gekko
                                     {
                                         Trace newTrace = new Trace();
                                         string period = null;
-                                        if (periods != null)
-                                        {
-                                            period = " (" + periods.t1 + "-" + periods.t2 + ")";
-                                            newTrace.t1 = periods.t1;
-                                            newTrace.t2 = periods.t2;
-                                        }
-                                        newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
-                                        newTrace.bankAndVarnameWithFreq = name;
-                                        newTrace.filenameAndPathAndLine = "Filename and line";
-
                                         Series x = null;
                                         int type = 1;
-                                        if (periods != null)
+
+                                        if (periods == null)
                                         {
-                                            newTrace.precedents.AddRange(tsImported.meta.trace.precedents);                                            
-                                            x = tsExisting;
-                                            type = 2;
-                                        }
-                                        else
-                                        {                                            
                                             if (tsExisting != null)
                                             {
                                                 newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
@@ -4683,6 +4668,19 @@ namespace Gekko
                                                 x = tsImported;
                                             }
                                         }
+                                        else
+                                        {
+                                            period = " (" + periods.t1 + "-" + periods.t2 + ")";
+                                            newTrace.t1 = periods.t1;
+                                            newTrace.t2 = periods.t2;
+                                            newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
+                                            x = tsExisting;
+                                            type = 2;
+                                        }
+                                        newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
+                                        newTrace.bankAndVarnameWithFreq = name;
+                                        newTrace.filenameAndPathAndLine = "Filename and line";
+
                                         newTrace.PushIntoSeries(x, type);
                                     }
                                 }
