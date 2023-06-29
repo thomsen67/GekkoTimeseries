@@ -12880,9 +12880,9 @@ namespace UnitTests
             }
 
             SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(path + @"\meta.data");
-            Dictionary<Trace, TraceID> dict2 = Program.ProtobufRead<Dictionary<Trace, TraceID>>(path + @"\dict.data");
+            Dictionary<Trace, byte> dict2 = Program.ProtobufRead<Dictionary<Trace, byte>>(path + @"\dict.data");
             Dictionary<TraceID, Trace> dict2Inverted = new Dictionary<TraceID, Trace>();
-            foreach (KeyValuePair<Trace, TraceID> kvp in dict2) dict2Inverted[kvp.Value] = kvp.Key;
+            foreach (Trace trace in dict2.Keys) dict2Inverted[trace.id] = trace;
 
             //restore links
             if (true)
