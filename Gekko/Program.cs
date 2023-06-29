@@ -4653,7 +4653,7 @@ namespace Gekko
                                         Trace newTrace = null; // new Trace();  //periods.t1, periods.t2
                                         string period = null;
                                         Series x = null;
-                                        int type = 1;
+                                        ETracePushType type = ETracePushType.NewParent;
 
                                         if (periods == null)
                                         {
@@ -4675,7 +4675,7 @@ namespace Gekko
                                             period = " (" + periods.t1 + "-" + periods.t2 + ")";                                            
                                             newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
                                             x = tsExisting;
-                                            type = 2;
+                                            type = ETracePushType.Sibling;
                                         }
                                         newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
                                         newTrace.bankAndVarnameWithFreq = name;
@@ -15270,13 +15270,12 @@ namespace Gekko
             {
                 string periods1 = trace.GetT1().ToString() + "-" + trace.GetT2().ToString() + "   : ";
                 string periods2 = null;
-                foreach (GekkoTime t in trace.periods.Keys) periods2 += t.ToString() + ", ";
-                periods2 += trace.stamp.ToString("MM/dd/yyyy HH:mm:ss");
+                periods2 += "[" + trace.PeriodsAndStamp() + "]";
                 if (trace.GetT1().IsNull()) periods1 = "[no period] : ";
                 txt.MainAdd(s + periods1 + trace.assignment + "                        [" + periods2 + "]");
                 txt.MainNewLineTight();
-            }            
-                        
+            }
+
             if (trace.precedents.Count() > 0)
             {                
                 foreach (Trace child in trace.precedents.GetStorage())
@@ -16181,7 +16180,7 @@ namespace Gekko
                     newTrace.assignment = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
                     newTrace.filenameAndPathAndLine = "Filename and line";                    
-                    newTrace.PushIntoSeries(ts, 1);
+                    newTrace.PushIntoSeries(ts, ETracePushType.NewParent);
                 }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
@@ -16299,7 +16298,7 @@ namespace Gekko
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = "Filename and line";                                
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
-                                newTrace.PushIntoSeries(existing_series, 2);
+                                newTrace.PushIntoSeries(existing_series, ETracePushType.Sibling);
                             }
                         }
                     }
@@ -16318,7 +16317,7 @@ namespace Gekko
                         newTrace.assignment = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
                         newTrace.filenameAndPathAndLine = "Filename and line";
-                        newTrace.PushIntoSeries(ts_clone, 1);
+                        newTrace.PushIntoSeries(ts_clone, ETracePushType.NewParent);
                     }
                 }
             }

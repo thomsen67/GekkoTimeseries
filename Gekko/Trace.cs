@@ -21,6 +21,12 @@ namespace Gekko
         Child
     }
 
+    public enum ETracePushType
+    {
+        Sibling,
+        NewParent
+    }
+
     [ProtoContract]
     public class Trace
     {
@@ -56,7 +62,7 @@ namespace Gekko
 
         private Trace()
         {
-            //for protobuf
+            //Only for protobuf and DeepClone()
         }
 
         /// <summary>
@@ -96,13 +102,14 @@ namespace Gekko
 
         public GekkoTime GetT2()
         {
-            return this.t1;
+            return this.t2;
         }        
         
         public string ToString()
         {
-            string s = this.t1 + "-" + this.t2 + ": " + this.assignment;
-            if (G.NullOrEmpty(this.assignment)) s = "------- meta entry: " + this.bankAndVarnameWithFreq + " -------";
+            string s = null;
+            if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.bankAndVarnameWithFreq + " -------";
+            else s = this.t1 + "-" + this.t2 + ": " + this.assignment;
             return s;
         }        
 
@@ -173,40 +180,66 @@ namespace Gekko
             if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
         }
 
+        /// <summary>
+        /// Pretty print periods and stamp.
+        /// </summary>
+        /// <returns></returns>
+        public string PeriodsAndStamp()
+        {
+            string s = null;
+            foreach (GekkoTime t in this.periods.Keys) s += t.ToString() + ", ";
+            s += this.stamp.ToString("MM/dd/yyyy HH:mm:ss");
+            return s;
+        }
+
+        /// <summary>
+        /// Returns .Parent if .assignment == null.
+        /// </summary>
+        /// <returns></returns>
+        public ETraceType GetTraceType()
+        {
+            ETraceType x = ETraceType.Child;
+            if (this.assignment == null) x = ETraceType.Parent;
+            return x;
+        }
+
         public string Text()
         {
             string s = this.bankAndVarnameWithFreq;
             if (!this.t1.IsNull()) s += " " + this.t1 + "-" + this.t2;
             s += ": ";
             s += this.assignment;
+            s += "              " + this.PeriodsAndStamp();
             return s;
         }
 
         /// <summary>
-        /// Type == 1 ---> Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
-        /// Used for copying a whole object. Type == 2 ---> ???
+        /// Type == NewParent ---> Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
+        /// Type == Sibling ---> Puts it among siblings. Removes the date(s) from its siblings.
         /// </summary>
         /// <param name="ts"></param>
-        public void PushIntoSeries(Series ts, int type)
+        public void PushIntoSeries(Series ts, ETracePushType type)
         {
-            //Type == 1: Puts itself alone as a parent of existing, which becomes a child
-            //Type == 2: Puts itself besides any exising precedent, as a sibling. Removes the date(s) from its siblings.
-            if (ts.meta.trace == null) ts.meta.trace = new Trace();
-            if (type == 1)
+            if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
+            if (type == ETracePushType.NewParent)
             {                   
                 this.precedents.AddRange(ts.meta.trace.precedents);
                 ts.meta.trace.precedents = new Precedents();
                 ts.meta.trace.precedents.Add(this);
             }
-            else if (type == 2)
+            else if (type == ETracePushType.Sibling)
             {
                 if (ts.meta.trace.precedents.Count() > 0)
                 {
-                    foreach (Trace trace_other in ts.meta.trace.precedents.GetStorage())
+                    if (ts.meta.trace.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
+                    foreach (Trace sibling in ts.meta.trace.precedents.GetStorage())
                     {
+                        //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
+                        //So the siblings all belong to the same timeseries, and therefore it is ok
+                        //to remove periods.
                         foreach (GekkoTime t in this.periods.Keys)
-                        {
-                            trace_other.periods.Remove(t);
+                        {                            
+                            sibling.periods.Remove(t);
                         }
                     }
                 }
