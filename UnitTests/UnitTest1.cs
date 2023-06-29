@@ -12865,7 +12865,7 @@ namespace UnitTests
                 dict1Inverted[kvp.Value] = kvp.Key;
                 kvp.Key.precedents.ToID();  //remove links
             }
-            meta1.ToID(dict1); //remove link from meta
+            meta1.ToID(); //remove link from meta
 
             //write bank
             Program.ProtobufWrite(meta1, path + @"\meta.data");

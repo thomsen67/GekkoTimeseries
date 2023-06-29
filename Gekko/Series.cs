@@ -3028,11 +3028,11 @@ namespace Gekko
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        
 
-        public void ToID(Dictionary<Trace, TraceID> dict1)
+        public void ToID()
         {
             if (this.trace != null)
             {
-                this.traceID = dict1[this.trace];
+                this.traceID = this.trace.id;
                 this.trace = null;
             }
         }

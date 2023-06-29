@@ -343,7 +343,7 @@ namespace Gekko
             }
             foreach (SeriesMetaInformation meta in th.metas)
             {
-                meta.ToID(dict1);
+                meta.ToID();
             }
             databank.traces = th.dict2.Keys.ToList();
         }
