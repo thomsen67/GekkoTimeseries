@@ -21,24 +21,10 @@ namespace Gekko
         NewParent
     }
 
-    [ProtoContract]
-    public class TraceID
+    public enum ETraceHelper
     {
-        /// <summary>
-        /// Note: resolution is about 0.01 s.
-        /// </summary>
-        [ProtoMember(1)]        
-        public DateTime stamp = DateTime.Now;
-
-        /// <summary>
-        /// Used to distinguish traces, especially if these are pruned off. 
-        /// When Gekko starts up, the counter starts at a random position between 0 and uint.MaxValue (4.3e9) and augments by 1 for each new trace.
-        /// If the same Gekko session is used, there can be no collisions (cannot perform 4.3e9 calculations in less than 0.01s).
-        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-9).
-        /// (Even if it did happen and 2 traces had same TraceId, the name of the variable could probably distinguish).
-        /// </summary>
-        [ProtoMember(2)]
-        public uint counter = ++Globals.traceCounter; 
+        GetAllStuff,
+        OnlyGetMeta
     }
 
     [ProtoContract]
@@ -56,10 +42,10 @@ namespace Gekko
         [ProtoMember(4)]
         public string bankAndVarnameWithFreq = null;        
 
-        [ProtoMember(6)]
+        [ProtoMember(5)]
         public string filenameAndPathAndLine = null;
 
-        [ProtoMember(7)]
+        [ProtoMember(6)]
         public string assignment = null;
 
         /// <summary>
@@ -70,10 +56,10 @@ namespace Gekko
         /// See maybe https://github.com/mbuchetics/RangeTree for ideas. But this tree is only for searching though.
         /// Perhaps allow combo of intervals (for > 3 dates) and single dates.
         /// </summary>
-        [ProtoMember(8)]        
+        [ProtoMember(7)]        
         public Periods periods = new Periods();
 
-        [ProtoMember(9)]
+        [ProtoMember(8)]
         public Precedents precedents = new Precedents();        
 
         private Trace()
@@ -364,10 +350,24 @@ namespace Gekko
         }
     }
 
-    public enum ETraceHelper
+    [ProtoContract]
+    public class TraceID
     {
-        GetAllStuff,
-        OnlyGetMeta
+        /// <summary>
+        /// Note: resolution is about 0.01 s.
+        /// </summary>
+        [ProtoMember(1)]
+        public DateTime stamp = DateTime.Now;
+
+        /// <summary>
+        /// Used to distinguish traces, especially if these are pruned off. 
+        /// When Gekko starts up, the counter starts at a random position between 0 and uint.MaxValue (4.3e9) and augments by 1 for each new trace.
+        /// If the same Gekko session is used, there can be no collisions (cannot perform 4.3e9 calculations in less than 0.01s).
+        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-9).
+        /// (Even if it did happen and 2 traces had same TraceId, the name of the variable could probably distinguish).
+        /// </summary>
+        [ProtoMember(2)]
+        public uint counter = ++Globals.traceCounter;
     }
 
     public class TraceHelper
