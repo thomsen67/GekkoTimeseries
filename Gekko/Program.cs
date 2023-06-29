@@ -3340,7 +3340,7 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            databank.traces = ProtobufRead<Dictionary<Trace, TraceID>>(files[k - extra + 1]);
+            databank.traces = ProtobufRead<List<Trace>>(files[k - extra + 1]);
             Gekko.Trace.HandleTraceRead1(databank);
             if (Globals.fixXxx1) databank.traces = null;
 

@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static alglib;
 
 namespace Gekko
@@ -303,7 +304,7 @@ namespace Gekko
             {
                 TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMeta);
                 Dictionary<TraceID, Trace> dictInverted = new Dictionary<TraceID, Trace>();
-                foreach (KeyValuePair<Trace, TraceID> kvp in databank.traces) dictInverted[kvp.Value] = kvp.Key;
+                foreach (Trace kvp in databank.traces) dictInverted[kvp.id] = kvp;
                 HandleTraceRead2(th.metas, dictInverted);
                 databank.traces = null;
             }
@@ -345,7 +346,7 @@ namespace Gekko
             {
                 meta.ToID(dict1);
             }
-            databank.traces = th.dict2;
+            databank.traces = th.dict2.Keys.ToList();
         }
     }
 
