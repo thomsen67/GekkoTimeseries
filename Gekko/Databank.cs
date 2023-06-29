@@ -96,7 +96,7 @@ namespace Gekko
         public DatabankCacheParams cacheParameters = null;
 
         [ProtoMember(3)]
-        public Dictionary<Trace, int> traces = null; //when writing, this is where all the Trace's go.
+        public Dictionary<Trace, TraceID> traces = null; //when writing, this is where all the Trace's go.
 
         public string name = null;
 

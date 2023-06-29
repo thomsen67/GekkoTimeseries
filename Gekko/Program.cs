@@ -3167,7 +3167,7 @@ namespace Gekko
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
             
-            TraceHelper th; Trace[] dict1Inverted;
+            TraceHelper th; Dictionary<TraceID, Trace> dict1Inverted;
             Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
 
             lists = SplitVarsInSameSizeParts(databank.storage, k, print);
@@ -3340,7 +3340,7 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            databank.traces = ProtobufRead<Dictionary<Trace, int>>(files[k - extra + 1]);
+            databank.traces = ProtobufRead<Dictionary<Trace, TraceID>>(files[k - extra + 1]);
             Gekko.Trace.HandleTraceRead1(databank);
             if (Globals.fixXxx1) databank.traces = null;
 
@@ -20818,7 +20818,7 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                TraceHelper th; Trace[] dict1Inverted;
+                TraceHelper th; Dictionary<TraceID, Trace> dict1Inverted;
                 Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
 
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)

@@ -3014,7 +3014,7 @@ namespace Gekko
         public Trace trace = null;
 
         [ProtoMember(12)]
-        public int traceID = -12345; //used to recreate connections after protobuf
+        public TraceID traceID = null;
 
         [ProtoMember(7)]
         public string[] domains = null;
@@ -3028,7 +3028,7 @@ namespace Gekko
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        
 
-        public void ToID(Dictionary<Trace, int> dict1)
+        public void ToID(Dictionary<Trace, TraceID> dict1)
         {
             if (this.trace != null)
             {
@@ -3037,9 +3037,9 @@ namespace Gekko
             }
         }
 
-        public void FromID(Trace[] dict2)
+        public void FromID(Dictionary<TraceID, Trace> dict2)
         {
-            if (this.traceID != -12345)
+            if (this.traceID != null)
             {
                 this.trace = dict2[this.traceID];
             }

@@ -120,7 +120,7 @@ namespace Gekko
             {
                 th.traceCount++;
                 if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
-                if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, th.dict2.Count);
+                if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, this.id);
                 //new Writeln("+ " + this.assignment);
                 if (this.precedents.Count() > 0)
                 {
@@ -302,8 +302,8 @@ namespace Gekko
             if (databank.traces != null)
             {
                 TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMeta);
-                Trace[] dictInverted = new Trace[databank.traces.Count];
-                foreach (KeyValuePair<Trace, int> kvp in databank.traces) dictInverted[kvp.Value] = kvp.Key;
+                Dictionary<TraceID, Trace> dictInverted = new Dictionary<TraceID, Trace>();
+                foreach (KeyValuePair<Trace, TraceID> kvp in databank.traces) dictInverted[kvp.Value] = kvp.Key;
                 HandleTraceRead2(th.metas, dictInverted);
                 databank.traces = null;
             }
@@ -312,14 +312,13 @@ namespace Gekko
         /// <summary>
         /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
         /// </summary>
-        public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Trace[] dict1Inverted)
+        public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Dictionary<TraceID, Trace> dict1Inverted)
         {                         
             foreach (SeriesMetaInformation meta in metas)
             {
                 meta.FromID(dict1Inverted);
-                meta.traceID = -12345;
             }
-            foreach (Trace trace in dict1Inverted)
+            foreach (Trace trace in dict1Inverted.Values)
             {
                 trace.precedents.FromID(dict1Inverted);
             }
@@ -331,13 +330,13 @@ namespace Gekko
         /// <param name="databank"></param>
         /// <param name="th"></param>
         /// <param name="dict1Inverted"></param>
-        public static void HandleTraceWrite(Databank databank, out TraceHelper th, out Trace[] dict1Inverted)
+        public static void HandleTraceWrite(Databank databank, out TraceHelper th, out Dictionary<TraceID, Trace> dict1Inverted)
         {
             //gather lists
             th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
-            Dictionary<Trace, int> dict1 = th.dict2;
-            dict1Inverted = new Trace[dict1.Count];
-            foreach (KeyValuePair<Trace, int> kvp in dict1)
+            Dictionary<Trace, TraceID> dict1 = th.dict2;
+            dict1Inverted = new Dictionary<TraceID, Trace>();
+            foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
             {
                 dict1Inverted[kvp.Value] = kvp.Key;
                 kvp.Key.precedents.ToID(dict1);  //remove links
@@ -368,6 +367,21 @@ namespace Gekko
         /// </summary>
         [ProtoMember(2)]
         public uint counter = ++Globals.traceCounter;
+
+        public override bool Equals(object o)
+        {
+            TraceID other = o as TraceID;
+            if (other != null && this.stamp == other.stamp && this.counter == other.counter) return true;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + this.stamp.GetHashCode();
+            hash = hash * 31 + this.counter.GetHashCode();
+            return hash;
+        }
     }
 
     public class TraceHelper
@@ -376,7 +390,7 @@ namespace Gekko
         public int varCount = 0;
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> dict = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
-        public Dictionary<Trace, int> dict2 = new Dictionary<Trace, int>();
+        public Dictionary<Trace, TraceID> dict2 = new Dictionary<Trace, TraceID>();
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
     }
 
@@ -388,7 +402,7 @@ namespace Gekko
         private List<Trace> storage = null;
 
         [ProtoMember(2)]
-        public List<int> storageID = null;  //used to recreate connections after protobuf
+        public List<TraceID> storageID = null;  //used to recreate connections after protobuf
 
         public void AddRange(Precedents precedents)
         {            
@@ -430,26 +444,31 @@ namespace Gekko
             else this.storage = m;
         }
 
-        public  void ToID(Dictionary<Trace, int> dict1)
+        public  void ToID(Dictionary<Trace, TraceID> dict1)
         {
-            this.storageID = new List<int>();
+            this.storageID = new List<TraceID>();
             if (this.Count() > 0)
             {
                 foreach (Trace trace in this.GetStorage())
                 {
-                    this.storageID.Add(dict1[trace]);
+                    this.storageID.Add(trace.id);
                 }
             }
             this.SetStorage(null);
         }
 
-        public void FromID(Trace[] dict2)
+        public void FromID(Dictionary<TraceID, Trace> dict2)
         {
             if (this.storageID != null && this.storageID.Count > 0)
             {
                 this.storage = new List<Trace>();
-                foreach (int id in this.storageID)
+                foreach (TraceID id in this.storageID)
                 {
+                    //bool b = dict2.TryGetValue(id, out _);
+                    //if(!b)
+                    //{
+
+                    //}
                     this.storage.Add(dict2[id]);
                 }
             }

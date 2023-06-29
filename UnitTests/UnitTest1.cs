@@ -12858,9 +12858,9 @@ namespace UnitTests
             //gather lists
             TraceHelper th = new TraceHelper();
             meta1.trace.DeepTrace(th, null);
-            Dictionary<Trace, int> dict1 = th.dict2;
-            Trace[] dict1Inverted = new Trace[dict1.Count];
-            foreach (KeyValuePair<Trace, int> kvp in dict1)
+            Dictionary<Trace, TraceID> dict1 = th.dict2;
+            Dictionary<TraceID, Trace> dict1Inverted = new Dictionary<TraceID, Trace>();
+            foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
             {
                 dict1Inverted[kvp.Value] = kvp.Key;
                 kvp.Key.precedents.ToID(dict1);  //remove links
@@ -12875,21 +12875,21 @@ namespace UnitTests
             if (true)
             {
                 meta1.FromID(dict1Inverted);
-                foreach (Trace trace in dict1Inverted) trace.precedents.FromID(dict1Inverted);
-                meta1.traceID = -12345;
+                foreach (Trace trace in dict1Inverted.Values) trace.precedents.FromID(dict1Inverted);
+                meta1.traceID = null;
             }
 
             SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(path + @"\meta.data");
-            Dictionary<Trace, int> dict2 = Program.ProtobufRead<Dictionary<Trace, int>>(path + @"\dict.data");
-            Trace[] dict2Inverted = new Trace[dict2.Count];
-            foreach (KeyValuePair<Trace, int> kvp in dict2) dict2Inverted[kvp.Value] = kvp.Key;
+            Dictionary<Trace, TraceID> dict2 = Program.ProtobufRead<Dictionary<Trace, TraceID>>(path + @"\dict.data");
+            Dictionary<TraceID, Trace> dict2Inverted = new Dictionary<TraceID, Trace>();
+            foreach (KeyValuePair<Trace, TraceID> kvp in dict2) dict2Inverted[kvp.Value] = kvp.Key;
 
             //restore links
             if (true)
             {
                 meta2.FromID(dict2Inverted);
-                foreach (Trace trace in dict2Inverted) trace.precedents.FromID(dict2Inverted);                
-                meta2.traceID = -12345;
+                foreach (Trace trace in dict2Inverted.Values) trace.precedents.FromID(dict2Inverted);
+                meta2.traceID = null;
             }
 
             dict1 = null;
@@ -12996,11 +12996,16 @@ namespace UnitTests
                     Assert.AreEqual(9, th1.dict.Count);
                     Assert.AreEqual(19, th1.traceCount);
 
+                    Trace trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
+
                     // ---------------------------------
                     // ---------------------------------
                     I("write sletmig1;"); //a, b, c, d  ... 2021-23
                     Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
+
+                    Trace trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
+
                     Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
                     Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
                     Globals.unitTestScreenOutput.Clear();
