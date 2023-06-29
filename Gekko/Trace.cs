@@ -2,8 +2,10 @@
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -25,6 +27,38 @@ namespace Gekko
     {
         Sibling,
         NewParent
+    }
+
+    [ProtoContract]
+    public class Periods
+    {
+        private Dictionary<GekkoTime, byte> storage = null;
+        
+        public void Add(GekkoTime t)
+        {
+            if (this.storage == null) this.storage = new Dictionary<GekkoTime, byte>();
+            this.storage.Add(t, 0);
+        }
+        public void Remove(GekkoTime t)
+        {
+            if (this.storage == null) return;
+            this.storage.Remove(t);
+        }
+
+        public int Count()
+        {
+            if (this.storage == null) return 0;
+            return this.storage.Count;
+        }
+
+        /// <summary>
+        /// Only for iterators! REMEMBER to put an "if (xxx.periods.Count() > 0) {... " before iterating!!
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<GekkoTime, byte> GetStorage()
+        {
+            return this.storage;
+        }
     }
 
     [ProtoContract]
@@ -58,7 +92,7 @@ namespace Gekko
         public Precedents precedents = new Precedents();
 
         [ProtoMember(9)]
-        public Dictionary<GekkoTime, byte> periods = new Dictionary<GekkoTime, byte>();
+        public Periods periods = new Periods();
 
         private Trace()
         {
@@ -91,7 +125,7 @@ namespace Gekko
             this.t2 = t2;
             if (!this.t1.IsNull() && !this.t2.IsNull())
             {
-                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t, 0);  //add all
+                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t);  //add all
             }
         }
 
@@ -150,9 +184,11 @@ namespace Gekko
                 trace2.version = this.version;
                 trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
                 trace2.assignment = this.assignment;
-                trace2.periods = new Dictionary<GekkoTime, byte>();
-                foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods) trace2.periods.Add(kvp.Key, kvp.Value);
-                
+                trace2.periods = new Periods();
+                if (this.periods.Count() > 0)
+                {
+                    foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods.GetStorage()) trace2.periods.Add(kvp.Key);
+                }                
                 trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 if (cloneHelper != null)
                 {
@@ -187,7 +223,10 @@ namespace Gekko
         public string PeriodsAndStamp()
         {
             string s = null;
-            foreach (GekkoTime t in this.periods.Keys) s += t.ToString() + ", ";
+            if (this.periods.Count() > 0)
+            {
+                foreach (GekkoTime t in this.periods.GetStorage().Keys) s += t.ToString() + ", ";
+            }        
             s += this.stamp.ToString("MM/dd/yyyy HH:mm:ss");
             return s;
         }
@@ -232,20 +271,50 @@ namespace Gekko
                 if (ts.meta.trace.precedents.Count() > 0)
                 {
                     if (ts.meta.trace.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
+                    List<Trace> toRemove = new List<Trace>();
                     foreach (Trace sibling in ts.meta.trace.precedents.GetStorage())
                     {
                         //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
                         //So the siblings all belong to the same timeseries, and therefore it is ok
                         //to remove periods.
-                        foreach (GekkoTime t in this.periods.Keys)
-                        {                            
-                            sibling.periods.Remove(t);
+                        if (this.periods.Count() > 0)
+                        {
+                            int countStart = sibling.periods.Count();
+                            foreach (GekkoTime t in this.periods.GetStorage().Keys)
+                            {
+                                sibling.periods.Remove(t);
+                            }
+                            if (countStart > 0 && sibling.periods.Count() == 0)
+                            {
+                                //last period has been removed
+                                toRemove.Add(sibling);
+                            }
+                        }
+                    }
+                    if (toRemove.Count > 0)
+                    {
+                        foreach (Trace remove in toRemove)
+                        {
+                            remove.RemoveFromSeries(ts);
                         }
                     }
                 }
                 ts.meta.trace.precedents.Add(this);
             }
             else new Error("Trace");
+        }
+
+        /// <summary>
+        /// Removes a particular trace from ts.meta.trace in a Series. Happens when a new Trace shadows other older traces.
+        /// </summary>
+        /// <param name="ts"></param>
+        public void RemoveFromSeries(Series ts)
+        {
+            if (ts.meta.trace == null) return;
+            if (ts.meta.trace.precedents.Count() > 0)
+            {                
+                ts.meta.trace.precedents.GetStorage().Remove(this);
+            }
         }
 
         public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
@@ -314,8 +383,6 @@ namespace Gekko
             }
             databank.traces = th.dict2;
         }
-
-
     }
 
     public enum ETraceHelper
@@ -366,7 +433,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use this with care. For instance for iterators.
+        /// Only for iterators! REMEMBER to put an "if (xxx.precedents.Count() > 0) {... " before iterating!!
         /// </summary>
         /// <returns></returns>
         public List<Trace> GetStorage()
