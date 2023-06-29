@@ -12862,7 +12862,7 @@ namespace UnitTests
             meta1.trace.DeepTrace(th, null);
             //Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID, Trace> dict1Inverted = new Dictionary<TraceID, Trace>();
-            foreach (Trace trace in th.dict.Keys)
+            foreach (Trace trace in th.traces.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -12871,7 +12871,7 @@ namespace UnitTests
 
             //write bank
             Program.ProtobufWrite(meta1, path + @"\meta.data");
-            Program.ProtobufWrite(th.dict.Keys.ToList(), path + @"\dict.data");
+            Program.ProtobufWrite(th.traces.Keys.ToList(), path + @"\dict.data");
 
             //restore links
             if (true)
@@ -12995,7 +12995,7 @@ namespace UnitTests
 
                     TraceHelper th1 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllStuff);
                     Assert.AreEqual(4, th1.varCount);
-                    Assert.AreEqual(9, th1.dict.Count);
+                    Assert.AreEqual(9, th1.traces.Count);
                     Assert.AreEqual(19, th1.traceCount);
 
                     Trace trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
@@ -13023,7 +13023,7 @@ namespace UnitTests
 
                     TraceHelper th2 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllStuff);
                     Assert.AreEqual(4, th2.varCount);     //4  4
-                    Assert.AreEqual(13, th2.dict.Count);  //23 8
+                    Assert.AreEqual(13, th2.traces.Count);  //23 8
                     Assert.AreEqual(23, th2.traceCount);  //23 8
 
                     string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
