@@ -122,7 +122,6 @@ namespace Gekko
                 th.traceCount++;
                 if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
                 if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, this.id);
-                //new Writeln("+ " + this.assignment);
                 if (this.precedents.Count() > 0)
                 {
                     foreach (Trace trace in this.precedents.GetStorage())
@@ -340,7 +339,7 @@ namespace Gekko
             foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
             {
                 dict1Inverted[kvp.Value] = kvp.Key;
-                kvp.Key.precedents.ToID(dict1);  //remove links
+                kvp.Key.precedents.ToID();  //remove links
             }
             foreach (SeriesMetaInformation meta in th.metas)
             {
@@ -445,7 +444,7 @@ namespace Gekko
             else this.storage = m;
         }
 
-        public  void ToID(Dictionary<Trace, TraceID> dict1)
+        public  void ToID()
         {
             this.storageID = new List<TraceID>();
             if (this.Count() > 0)
@@ -464,12 +463,7 @@ namespace Gekko
             {
                 this.storage = new List<Trace>();
                 foreach (TraceID id in this.storageID)
-                {
-                    //bool b = dict2.TryGetValue(id, out _);
-                    //if(!b)
-                    //{
-
-                    //}
+                {                    
                     this.storage.Add(dict2[id]);
                 }
             }

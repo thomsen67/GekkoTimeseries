@@ -12863,7 +12863,7 @@ namespace UnitTests
             foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
             {
                 dict1Inverted[kvp.Value] = kvp.Key;
-                kvp.Key.precedents.ToID(dict1);  //remove links
+                kvp.Key.precedents.ToID();  //remove links
             }
             meta1.ToID(dict1); //remove link from meta
 
