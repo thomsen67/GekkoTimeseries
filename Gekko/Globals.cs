@@ -614,7 +614,7 @@ namespace Gekko
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
 
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
-        public static uint traceCounter = 2 * (uint)Globals.random.Next();  //Will be between 0 and uint.MaxValue (4.3e9). Never mind it is always even. NOT possible to add two draws, then distribution is not even.
+        public static long traceCounter = G.NextLong(Globals.random, 1, long.MaxValue - 1); //we are throwing half of these away...
 
         public static string[] convergenceCheckVariables = new string[1];
         public static bool initializeDataArrayWithNaN = true;

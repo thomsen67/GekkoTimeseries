@@ -191,7 +191,7 @@ namespace Gekko
             {
                 foreach (GekkoTime t in this.periods.GetStorage().Keys) s += t.ToString() + ", ";
             }
-            s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + " | " + this.id.counter;
+            s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
         }
 
@@ -365,7 +365,7 @@ namespace Gekko
         /// (Even if it did happen and 2 traces had same TraceId, the name of the variable could probably distinguish).
         /// </summary>
         [ProtoMember(2)]
-        public uint counter = ++Globals.traceCounter;
+        public long counter = ++Globals.traceCounter;
 
         public override bool Equals(object o)
         {
