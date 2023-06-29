@@ -40,7 +40,7 @@ namespace Gekko
     {
         public static bool fixXxx1 = true;
         public static bool fixXxx2 = true;
-        public static short TraceVersion = 1;
+        public static short TraceVersion = 1;        
 
         public static bool stars = true; //#8ujklasdfas        
 
@@ -614,6 +614,7 @@ namespace Gekko
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
 
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
+        public static uint traceCounter = 2 * (uint)Globals.random.Next();  //Will be between 0 and uint.MaxValue (4.3e9). Never mind it is always even. NOT possible to add two draws, then distribution is not even.
 
         public static string[] convergenceCheckVariables = new string[1];
         public static bool initializeDataArrayWithNaN = true;

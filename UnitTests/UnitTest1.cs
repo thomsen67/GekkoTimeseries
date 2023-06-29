@@ -12938,11 +12938,13 @@ namespace UnitTests
                     string c = "time 2021 2023;";
                     I(c);
                     // ---------------------------------
+                    // ---------------------------------
                     string c1 = "a = 2, 3, 4;";
                     I(c1);
                     String2 x1 = new String2(null);
                     x1.m.Add(new String2(c1));
                     Helper_CheckTrace("a!a", x1);
+                    // ---------------------------------
                     // ---------------------------------
                     string c2_ = "a <2022 2022> = 123;";
                     I(c2_);
@@ -12950,11 +12952,13 @@ namespace UnitTests
                     x2_.m.Add(new String2(c2_));
                     Helper_CheckTrace("a!a", x2_);
                     // ---------------------------------
+                    // ---------------------------------
                     string c2 = "a <2022 2022> = 100;";  //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
                     I(c2);
                     String2 x2 = G.DeepCloneSlow<String2>(x1);
                     x2.m.Add(new String2(c2));
                     Helper_CheckTrace("a!a", x2);
+                    // ---------------------------------
                     // ---------------------------------
                     string c3 = "b = 12, 13, 14;";
                     I(c3);
@@ -12962,6 +12966,7 @@ namespace UnitTests
                     x3.m.Add(new String2(c3));
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);
+                    // ---------------------------------
                     // ---------------------------------
                     string c4 = "c = a + b;";
                     I(c4);
@@ -12972,6 +12977,7 @@ namespace UnitTests
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);
                     Helper_CheckTrace("c!a", x4);
+                    // ---------------------------------
                     // ---------------------------------
                     string c5 = "d = a + b + c;";
                     I(c5);
@@ -12990,7 +12996,8 @@ namespace UnitTests
                     Assert.AreEqual(9, th1.dict.Count);
                     Assert.AreEqual(19, th1.traceCount);
 
-                    // ---------------------------------                               
+                    // ---------------------------------
+                    // ---------------------------------
                     I("write sletmig1;"); //a, b, c, d  ... 2021-23
                     Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
@@ -13021,7 +13028,8 @@ namespace UnitTests
                     Helper_CheckTrace("b!a", x3a);
                     Helper_CheckTrace("c!a", x4a);
                     Helper_CheckTrace("d!a", x5a);
-                    // ---------------------------------                               
+                    // ---------------------------------
+                    // ---------------------------------
                     I("delete a, b, c;");
                     Helper_CheckTrace("d!a", x5a);
                     // ---------------------------------
@@ -13030,11 +13038,13 @@ namespace UnitTests
                     String2 x5b = Helper_Push(x5a, "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk)");
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
+                    // ---------------------------------
                     string c6 = "copy d to e;";
                     I(c6);
                     String2 x6 = Helper_Push(x5b, "Copied d!a to e!a (clone)");
                     Helper_CheckTrace("e!a", x6);
                     Helper_CheckTrace("d!a", x5b);
+                    // ---------------------------------
                     // ---------------------------------
                     string c7 = "f = 1000;";
                     I(c7);
@@ -13043,6 +13053,7 @@ namespace UnitTests
                     Helper_CheckTrace("f!a", x7);
                     Helper_CheckTrace("e!a", x6);
                     Helper_CheckTrace("d!a", x5b);
+                    // ---------------------------------
                     // ---------------------------------
                     string c8 = "copy <2021 2021> f to e;";  //only partial copy
                     string c8a = "Copied f!a into e!a (2021-2021)";
@@ -13054,13 +13065,15 @@ namespace UnitTests
                     Helper_CheckTrace("e!a", x8);
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
+                    // ---------------------------------
                     string c9 = "rename e as g;";
                     I(c9);
                     String2 x9 = Helper_Push(x8, "Renamed Work:e!a as Work:g!a");
                     Helper_CheckTrace("g!a", x9);
                     Helper_CheckTrace("f!a", x7);
                     Helper_CheckTrace("d!a", x5b);
-                    // ---------------------
+                    // ---------------------------------
+                    // ---------------------------------
                     I("delete d;");
                     string c10 = "d = 5, 6, 7;";
                     I(c10);
@@ -13071,7 +13084,8 @@ namespace UnitTests
                     x10.m.Add(new String2(c10));
                     x10.m.Add(x10a);
                     Helper_CheckTrace("d!a", x10);
-                    // ---------------------                    
+                    // ---------------------------------
+                    // // ---------------------------------
                     I("disp d;");
                     I("d.printtrace();");
                 }

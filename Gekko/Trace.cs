@@ -1,14 +1,6 @@
-﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using static alglib;
 
 namespace Gekko
@@ -30,45 +22,30 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class Periods
+    public class TraceID
     {
-        private Dictionary<GekkoTime, byte> storage = null;
-        
-        public void Add(GekkoTime t)
-        {
-            if (this.storage == null) this.storage = new Dictionary<GekkoTime, byte>();
-            this.storage.Add(t, 0);
-        }
-        public void Remove(GekkoTime t)
-        {
-            if (this.storage == null) return;
-            this.storage.Remove(t);
-        }
-
-        public int Count()
-        {
-            if (this.storage == null) return 0;
-            return this.storage.Count;
-        }
+        /// <summary>
+        /// Note: resolution is about 0.01 s.
+        /// </summary>
+        [ProtoMember(1)]        
+        public DateTime stamp = DateTime.Now;
 
         /// <summary>
-        /// Only for iterators! REMEMBER to put an "if (xxx.periods.Count() > 0) {... " before iterating!!
+        /// Used to distinguish traces, especially if these are pruned off. 
+        /// When Gekko starts up, the counter starts at a random position between 0 and uint.MaxValue (4.3e9) and augments by 1 for each new trace.
+        /// If the same Gekko session is used, there can be no collisions (cannot perform 4.3e9 calculations in less than 0.01s).
+        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-9).
+        /// (Even if it did happen and 2 traces had same TraceId, the name of the variable could probably distinguish).
         /// </summary>
-        /// <returns></returns>
-        public Dictionary<GekkoTime, byte> GetStorage()
-        {
-            return this.storage;
-        }
+        [ProtoMember(2)]
+        public uint counter = ++Globals.traceCounter; 
     }
 
     [ProtoContract]
     public class Trace
     {
-        //[ProtoMember(1)]
-        //public long id = 0;  //when assigned it is a random number > 1 and < long.MaxValue --> extremely unlikely to have collisions ever
-
         [ProtoMember(1)]
-        public short version = -12345;
+        public TraceID id = new TraceID();
 
         [ProtoMember(2)]
         private GekkoTime t1 = GekkoTime.tNull;
@@ -77,10 +54,7 @@ namespace Gekko
         private GekkoTime t2 = GekkoTime.tNull;
 
         [ProtoMember(4)]
-        public string bankAndVarnameWithFreq = null;
-
-        [ProtoMember(5)]
-        public DateTime stamp = DateTime.MinValue;
+        public string bankAndVarnameWithFreq = null;        
 
         [ProtoMember(6)]
         public string filenameAndPathAndLine = null;
@@ -88,11 +62,19 @@ namespace Gekko
         [ProtoMember(7)]
         public string assignment = null;
 
-        [ProtoMember(8)]
-        public Precedents precedents = new Precedents();
+        /// <summary>
+        /// The "active" left-hand side periods for the current trace (that is, what the trace determines). 
+        /// At some point, the periods inside should be compacted. For instance a list of GekkoTimes 1966-2022 is a
+        /// waste of space. Some kind of interval logic could be implemented. For instance, updating 2000-2010 over the 
+        /// 1966-2022 interval would break 1966-2022 into --> 1966-1999 and 2011-2022. Would save a lot of space.
+        /// See maybe https://github.com/mbuchetics/RangeTree for ideas. But this tree is only for searching though.
+        /// Perhaps allow combo of intervals (for > 3 dates) and single dates.
+        /// </summary>
+        [ProtoMember(8)]        
+        public Periods periods = new Periods();
 
         [ProtoMember(9)]
-        public Periods periods = new Periods();
+        public Precedents precedents = new Precedents();        
 
         private Trace()
         {
@@ -119,8 +101,7 @@ namespace Gekko
             //maybe here put it into dictionary with weak values
             //but where does that dictionary live? In a databank, no?
             //or maybe only make the dictionary when about
-            this.stamp = DateTime.Now;
-            this.version = Globals.TraceVersion;
+                        
             this.t1 = t1;
             this.t2 = t2;
             if (!this.t1.IsNull() && !this.t2.IsNull())
@@ -176,12 +157,9 @@ namespace Gekko
             if (known == null)
             {
                 trace2 = new Trace();
-                trace2.version = this.version;
                 trace2.t1 = this.t1;
                 trace2.t2 = this.t2;
-                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
-                trace2.stamp = this.stamp;
-                trace2.version = this.version;
+                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;                
                 trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
                 trace2.assignment = this.assignment;
                 trace2.periods = new Periods();
@@ -226,8 +204,8 @@ namespace Gekko
             if (this.periods.Count() > 0)
             {
                 foreach (GekkoTime t in this.periods.GetStorage().Keys) s += t.ToString() + ", ";
-            }        
-            s += this.stamp.ToString("MM/dd/yyyy HH:mm:ss");
+            }
+            s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + " | " + this.id.counter;
             return s;
         }
 
@@ -259,6 +237,7 @@ namespace Gekko
         /// <param name="ts"></param>
         public void PushIntoSeries(Series ts, ETracePushType type)
         {
+            if (this.assignment == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
@@ -506,6 +485,38 @@ namespace Gekko
         public string ToString()
         {
             return "Traces = " + this.Count();
+        }
+    }
+
+    [ProtoContract]
+    public class Periods
+    {
+        private Dictionary<GekkoTime, byte> storage = null;
+
+        public void Add(GekkoTime t)
+        {
+            if (this.storage == null) this.storage = new Dictionary<GekkoTime, byte>();
+            this.storage.Add(t, 0);
+        }
+        public void Remove(GekkoTime t)
+        {
+            if (this.storage == null) return;
+            this.storage.Remove(t);
+        }
+
+        public int Count()
+        {
+            if (this.storage == null) return 0;
+            return this.storage.Count;
+        }
+
+        /// <summary>
+        /// Only for iterators! REMEMBER to put an "if (xxx.periods.Count() > 0) {... " before iterating!!
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<GekkoTime, byte> GetStorage()
+        {
+            return this.storage;
         }
     }
 }
