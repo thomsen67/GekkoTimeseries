@@ -52,6 +52,8 @@ using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using Microsoft.Data.Analysis;
 using static Gekko.O;
+//using Microsoft.Office.Interop.Excel;
+using System.Linq;
 
 namespace UnitTests
 {
@@ -12858,9 +12860,9 @@ namespace UnitTests
             //gather lists
             TraceHelper th = new TraceHelper();
             meta1.trace.DeepTrace(th, null);
-            Dictionary<Trace, byte> dict1 = th.dict2;
+            //Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID, Trace> dict1Inverted = new Dictionary<TraceID, Trace>();
-            foreach (Trace trace in dict1.Keys)
+            foreach (Trace trace in th.dict.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -12869,7 +12871,7 @@ namespace UnitTests
 
             //write bank
             Program.ProtobufWrite(meta1, path + @"\meta.data");
-            Program.ProtobufWrite(dict1, path + @"\dict.data");
+            Program.ProtobufWrite(th.dict.Keys.ToList(), path + @"\dict.data");
 
             //restore links
             if (true)
@@ -12880,9 +12882,9 @@ namespace UnitTests
             }
 
             SeriesMetaInformation meta2 = Program.ProtobufRead<SeriesMetaInformation>(path + @"\meta.data");
-            Dictionary<Trace, byte> dict2 = Program.ProtobufRead<Dictionary<Trace, byte>>(path + @"\dict.data");
+            List<Trace> dict2 = Program.ProtobufRead<List<Trace>>(path + @"\dict.data");
             Dictionary<TraceID, Trace> dict2Inverted = new Dictionary<TraceID, Trace>();
-            foreach (Trace trace in dict2.Keys) dict2Inverted[trace.id] = trace;
+            foreach (Trace trace in dict2) dict2Inverted[trace.id] = trace;
 
             //restore links
             if (true)
@@ -12892,7 +12894,7 @@ namespace UnitTests
                 meta2.traceID = null;
             }
 
-            dict1 = null;
+            //dict1 = null;
             dict2 = null;
             dict2Inverted = null;
 
