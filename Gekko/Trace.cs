@@ -121,7 +121,7 @@ namespace Gekko
             {
                 th.traceCount++;
                 if (!th.dict.ContainsKey(this)) th.dict.Add(this, this.precedents);
-                if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, this.id);
+                if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, 0);
                 if (this.precedents.Count() > 0)
                 {
                     foreach (Trace trace in this.precedents.GetStorage())
@@ -334,12 +334,12 @@ namespace Gekko
         {
             //gather lists
             th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
-            Dictionary<Trace, TraceID> dict1 = th.dict2;
+            Dictionary<Trace, byte> dict1 = th.dict2;
             dict1Inverted = new Dictionary<TraceID, Trace>();
-            foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
+            foreach (Trace trace in dict1.Keys)
             {
-                dict1Inverted[kvp.Value] = kvp.Key;
-                kvp.Key.precedents.ToID();  //remove links
+                dict1Inverted[trace.id] = trace;
+                trace.precedents.ToID();  //remove links
             }
             foreach (SeriesMetaInformation meta in th.metas)
             {
@@ -390,7 +390,7 @@ namespace Gekko
         public int varCount = 0;
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> dict = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
-        public Dictionary<Trace, TraceID> dict2 = new Dictionary<Trace, TraceID>();
+        public Dictionary<Trace, byte> dict2 = new Dictionary<Trace, byte>();
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
     }
 

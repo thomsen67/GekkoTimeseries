@@ -12858,12 +12858,12 @@ namespace UnitTests
             //gather lists
             TraceHelper th = new TraceHelper();
             meta1.trace.DeepTrace(th, null);
-            Dictionary<Trace, TraceID> dict1 = th.dict2;
+            Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID, Trace> dict1Inverted = new Dictionary<TraceID, Trace>();
-            foreach (KeyValuePair<Trace, TraceID> kvp in dict1)
+            foreach (Trace trace in dict1.Keys)
             {
-                dict1Inverted[kvp.Value] = kvp.Key;
-                kvp.Key.precedents.ToID();  //remove links
+                dict1Inverted[trace.id] = trace;
+                trace.precedents.ToID();  //remove links
             }
             meta1.ToID(); //remove link from meta
 
