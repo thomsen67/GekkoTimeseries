@@ -12944,7 +12944,13 @@ namespace UnitTests
                     x1.m.Add(new String2(c1));
                     Helper_CheckTrace("a!a", x1);
                     // ---------------------------------
-                    string c2 = "a <2022 2022> = 100;";
+                    string c2_ = "a <2022 2022> = 123;";
+                    I(c2_);
+                    String2 x2_ = G.DeepCloneSlow<String2>(x1);
+                    x2_.m.Add(new String2(c2_));
+                    Helper_CheckTrace("a!a", x2_);
+                    // ---------------------------------
+                    string c2 = "a <2022 2022> = 100;";  //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
                     I(c2);
                     String2 x2 = G.DeepCloneSlow<String2>(x1);
                     x2.m.Add(new String2(c2));
