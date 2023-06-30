@@ -29,24 +29,21 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class Trace
+    public class TraceContents
     {
         [ProtoMember(1)]
-        public TraceID id = new TraceID();
-
-        [ProtoMember(2)]
         private GekkoTime t1 = GekkoTime.tNull;
 
-        [ProtoMember(3)]
+        [ProtoMember(2)]
         private GekkoTime t2 = GekkoTime.tNull;
 
-        [ProtoMember(4)]
-        public string bankAndVarnameWithFreq = null;        
+        [ProtoMember(3)]
+        public string bankAndVarnameWithFreq = null;
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public string filenameAndPathAndLine = null;
 
-        [ProtoMember(6)]
+        [ProtoMember(5)]
         public string assignment = null;
 
         /// <summary>
@@ -57,45 +54,8 @@ namespace Gekko
         /// See maybe https://github.com/mbuchetics/RangeTree for ideas. But this tree is only for searching though.
         /// Perhaps allow combo of intervals (for > 3 dates) and single dates.
         /// </summary>
-        [ProtoMember(7)]        
+        [ProtoMember(6)]
         public Periods periods = new Periods();
-
-        [ProtoMember(8)]
-        public Precedents precedents = new Precedents();        
-
-        private Trace()
-        {
-            //Only for protobuf and DeepClone()
-        }
-
-        /// <summary>
-        /// Construct a parent trace. For this, .t1 and .t2 will be null.
-        /// </summary>
-        /// <param name="type"></param>
-        public Trace(ETraceType type)
-        {
-            if (type == ETraceType.Child) new Error("Trace constructor problem");
-        }
-
-        /// <summary>
-        /// Child trace. Also sets stamp, traceversion and .t1 and .t2 (fills .periods with this range).
-        /// </summary>
-        /// <param name="t1"></param>
-        /// <param name="t2"></param>
-        public Trace(GekkoTime t1, GekkoTime t2)
-        {
-            //this.id = G.NextLong(Globals.random, 1, long.MaxValue - 1);  //collision is extremely unlikely
-            //maybe here put it into dictionary with weak values
-            //but where does that dictionary live? In a databank, no?
-            //or maybe only make the dictionary when about
-                        
-            this.t1 = t1;
-            this.t2 = t2;
-            if (!this.t1.IsNull() && !this.t2.IsNull())
-            {
-                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t);  //add all
-            }
-        }
 
         public GekkoTime GetT1()
         {
@@ -105,13 +65,82 @@ namespace Gekko
         public GekkoTime GetT2()
         {
             return this.t2;
-        }        
+        }
+
+        public TraceContents DeepClone()
+        {
+            TraceContents trace2 = new TraceContents();
+            trace2.t1 = this.t1;
+            trace2.t2 = this.t2;
+            trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
+            trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
+            trace2.assignment = this.assignment;
+            trace2.periods = new Periods();
+            if (this.periods.Count() > 0)
+            {
+                foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods.GetStorage()) trace2.periods.Add(kvp.Key);
+            }
+            return trace2;
+        }
+
+        public TraceContents()
+        {
+            //for protobuf
+        }
+
+        public TraceContents(GekkoTime t1, GekkoTime t2)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+            if (!this.t1.IsNull() && !this.t2.IsNull())
+            {
+                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t);  //add all
+            }
+        }
+    }
+
+    [ProtoContract]
+    public class Trace
+    {
+        [ProtoMember(1)]
+        public TraceID id = new TraceID();
+
+        [ProtoMember(2)]
+        public TraceContents contents = null;
+
+        [ProtoMember(3)]
+        public Precedents precedents = new Precedents();        
+
+        private Trace()
+        {
+            //Only for protobuf and DeepClone()
+        }
+
+        /// <summary>
+        /// Construct a parent trace. For this, .contents will be == null.
+        /// </summary>
+        /// <param name="type"></param>
+        public Trace(ETraceType type)
+        {
+            if (type == ETraceType.Child) new Error("Trace constructor problem");            
+        }
+
+        /// <summary>
+        /// Child trace. Also sets stamp, traceversion and .t1 and .t2 (fills .periods with this range).
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        public Trace(GekkoTime t1, GekkoTime t2)
+        {
+            this.contents = new TraceContents(t1, t2);            
+        }
+        
         
         public string ToString()
         {
             string s = null;
-            if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.bankAndVarnameWithFreq + " -------";
-            else s = this.t1 + "-" + this.t2 + ": " + this.assignment;
+            if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
+            else s = this.contents.GetT1() + "-" + this.contents.GetT2() + ": " + this.contents.assignment;
             return s;
         }        
 
@@ -143,16 +172,10 @@ namespace Gekko
             if (known == null)
             {
                 trace2 = new Trace();
-                trace2.t1 = this.t1;
-                trace2.t2 = this.t2;
-                trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;                
-                trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
-                trace2.assignment = this.assignment;
-                trace2.periods = new Periods();
-                if (this.periods.Count() > 0)
+                if (this.contents != null)
                 {
-                    foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods.GetStorage()) trace2.periods.Add(kvp.Key);
-                }                
+                    trace2.contents = this.contents.DeepClone();
+                }
                 trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 if (cloneHelper != null)
                 {
@@ -187,9 +210,9 @@ namespace Gekko
         public string PeriodsAndStamp()
         {
             string s = null;
-            if (this.periods.Count() > 0)
+            if (this.contents.periods.Count() > 0)
             {
-                foreach (GekkoTime t in this.periods.GetStorage().Keys) s += t.ToString() + ", ";
+                foreach (GekkoTime t in this.contents.periods.GetStorage().Keys) s += t.ToString() + ", ";
             }
             s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
@@ -202,16 +225,16 @@ namespace Gekko
         public ETraceType GetTraceType()
         {
             ETraceType x = ETraceType.Child;
-            if (this.assignment == null) x = ETraceType.Parent;
+            if (this.contents == null) x = ETraceType.Parent;
             return x;
         }
 
         public string Text()
         {
-            string s = this.bankAndVarnameWithFreq;
-            if (!this.t1.IsNull()) s += " " + this.t1 + "-" + this.t2;
+            string s = this.contents.bankAndVarnameWithFreq;
+            if (!this.contents.GetT1().IsNull()) s += " " + this.contents.GetT1() + "-" + this.contents.GetT2();
             s += ": ";
-            s += this.assignment;
+            s += this.contents.assignment;
             s += "              " + this.PeriodsAndStamp();
             return s;
         }
@@ -223,7 +246,7 @@ namespace Gekko
         /// <param name="ts"></param>
         public static void PushIntoSeries(Series ts, Trace ths, ETracePushType type)
         {
-            if (ths.assignment == null) new Error("PushIntoSeries problem");
+            if (ths.contents.assignment == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
@@ -242,14 +265,14 @@ namespace Gekko
                         //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
                         //So the siblings all belong to the same timeseries, and therefore it is ok
                         //to remove periods.
-                        if (ths.periods.Count() > 0)
+                        if (ths.contents.periods.Count() > 0)
                         {
-                            int countStart = sibling.periods.Count();
-                            foreach (GekkoTime t in ths.periods.GetStorage().Keys)
+                            int countStart = sibling.contents.periods.Count();
+                            foreach (GekkoTime t in ths.contents.periods.GetStorage().Keys)
                             {
-                                sibling.periods.Remove(t);
+                                sibling.contents.periods.Remove(t);
                             }
-                            if (countStart > 0 && sibling.periods.Count() == 0)
+                            if (countStart > 0 && sibling.contents.periods.Count() == 0)
                             {
                                 //last period has been removed
                                 toRemove.Add(sibling);
@@ -429,7 +452,7 @@ namespace Gekko
         public void Add(Trace trace)
         {
             if (this.storage == null) this.storage = new List<Trace>();
-            if (G.NullOrBlanks(trace.assignment)) throw new GekkoException();
+            if (trace.contents == null) throw new GekkoException();
             this.storage.Add(trace);
         }
 

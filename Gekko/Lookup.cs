@@ -1696,9 +1696,9 @@ namespace Gekko
                     if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ETraceType.Parent);
                     // ---------
                     Trace trace = new Trace(smpl.t1, smpl.t2);
-                    trace.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                    trace.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
-                    trace.assignment = traceString + ";";
+                    trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                    trace.contents.filenameAndPathAndLine = smpl?.p.GetExecutingGcmFile();
+                    trace.contents.assignment = traceString + ";";
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {

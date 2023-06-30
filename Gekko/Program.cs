@@ -4677,9 +4677,9 @@ namespace Gekko
                                             x = tsExisting;
                                             type = ETracePushType.Sibling;
                                         }
-                                        newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
-                                        newTrace.bankAndVarnameWithFreq = name;
-                                        newTrace.filenameAndPathAndLine = null;
+                                        newTrace.contents.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
+                                        newTrace.contents.bankAndVarnameWithFreq = name;
+                                        newTrace.contents.filenameAndPathAndLine = null;
                                         Gekko.Trace.PushIntoSeries(x, newTrace, type);
                                     }
                                 }
@@ -15266,13 +15266,13 @@ namespace Gekko
         {
             if (!all && d > 1) return;
             string s = "| " + G.Blanks(d * 2 - 2);
-            if (trace.assignment != null)
+            if (trace.contents != null)
             {
-                string periods1 = trace.GetT1().ToString() + "-" + trace.GetT2().ToString() + "   : ";
+                string periods1 = trace.contents.GetT1().ToString() + "-" + trace.contents.GetT2().ToString() + "   : ";
                 string periods2 = null;
                 periods2 += "[" + trace.PeriodsAndStamp() + "]";
-                if (trace.GetT1().IsNull()) periods1 = "[no period] : ";
-                txt.MainAdd(s + periods1 + trace.assignment + "                        [" + periods2 + "]");
+                if (trace.contents.GetT1().IsNull()) periods1 = "[no period] : ";
+                txt.MainAdd(s + periods1 + trace.contents.assignment + "                        [" + periods2 + "]");
                 txt.MainNewLineTight();
             }
 
@@ -16177,9 +16177,9 @@ namespace Gekko
                 if (Program.options.databank_trace &&  ts != null)
                 {
                     Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-                    newTrace.assignment = "Renamed " + output.s1 + " as " + output.s2;
-                    newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
-                    newTrace.filenameAndPathAndLine = null;
+                    newTrace.contents.assignment = "Renamed " + output.s1 + " as " + output.s2;
+                    newTrace.contents.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
+                    newTrace.contents.filenameAndPathAndLine = null;
                     Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -16294,9 +16294,9 @@ namespace Gekko
                             if (Program.options.databank_trace)
                             {
                                 Trace newTrace = new Trace(o.t1, o.t2);                                
-                                newTrace.assignment = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
-                                newTrace.bankAndVarnameWithFreq = existing_series.GetName();
-                                newTrace.filenameAndPathAndLine = null;
+                                newTrace.contents.assignment = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
+                                newTrace.contents.bankAndVarnameWithFreq = existing_series.GetName();
+                                newTrace.contents.filenameAndPathAndLine = null;
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
                                 Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
@@ -16314,9 +16314,9 @@ namespace Gekko
                     if (Program.options.databank_trace && ts_clone != null)
                     {
                         Trace newTrace = new Trace(o.t1, o.t2);                        
-                        newTrace.assignment = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
-                        newTrace.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
-                        newTrace.filenameAndPathAndLine = null;
+                        newTrace.contents.assignment = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
+                        newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
+                        newTrace.contents.filenameAndPathAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
                 }
