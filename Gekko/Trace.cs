@@ -294,7 +294,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
         /// </summary>
         /// <param name="databank"></param>
         public static void HandleTraceRead1(Databank databank)
@@ -303,14 +303,14 @@ namespace Gekko
             {
                 TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMeta);
                 Dictionary<TraceID, Trace> dictInverted = new Dictionary<TraceID, Trace>();
-                foreach (Trace kvp in databank.traces) dictInverted[kvp.id] = kvp;
+                foreach (Trace trace in databank.traces) dictInverted[trace.id] = trace;
                 HandleTraceRead2(th.metas, dictInverted);
                 databank.traces = null;
             }
         }
 
         /// <summary>
-        /// After deserializing a protobuf gbk, this method restores trace connections from flat dict (databank.traces).
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
         /// </summary>
         public static void HandleTraceRead2(List<SeriesMetaInformation> metas, Dictionary<TraceID, Trace> dict1Inverted)
         {                         
@@ -325,7 +325,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Before serializing a protobuf gbk, this method removes trace connections, and kind of packs the connections into a flat dict (databank.traces).
+        /// Before serializing a protobuf gbk, this method removes trace connections, and kind of packs the connections into a flat list (databank.traces).
         /// </summary>
         /// <param name="databank"></param>
         /// <param name="th"></param>
@@ -390,6 +390,12 @@ namespace Gekko
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> traces = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
+    }
+
+    public class PrecedentsCouple
+    {
+        public Trace trace = null;
+        public TraceID traceID = null;
     }
 
 
