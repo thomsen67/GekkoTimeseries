@@ -2884,9 +2884,9 @@ namespace Gekko
                 if (this.meta != null)
                 {
                     th.metas.Add(this.meta);
-                    if (this.meta.trace != null && th.type == ETraceHelper.GetAllStuff)
+                    if (this.meta.trace != null && (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths))
                     {
-                        this.meta.trace.DeepTrace(th, null);
+                        this.meta.trace.DeepTrace(th, null, 0);
                     }
                 }
             }

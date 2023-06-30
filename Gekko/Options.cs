@@ -56,7 +56,7 @@ namespace Gekko
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
 
-        public bool databank_trace = false;
+        public bool databank_trace = true;
         public int databank_trace_depth = -1;
 
         // ---

@@ -15291,7 +15291,7 @@ namespace Gekko
             {
                 txt.lineWidth = int.MaxValue;
                 TraceHelper th = new TraceHelper();                
-                trace.DeepTrace(th, null);
+                trace.DeepTrace(th, null, 0);
                 int count = th.traceCount - 1;  //we do not count the entry with .assign == null.
                 
                 if (!all) txt.MainOmitVeryFirstNewLine();

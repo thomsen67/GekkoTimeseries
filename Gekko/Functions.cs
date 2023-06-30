@@ -5093,7 +5093,46 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
-        public static void printtrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            Databank db = Program.databanks.GetDatabank(x.ConvertToString());
+            TraceHelper th = Trace.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
+            int max = 10000;
+            int[] depths = new int[max];
+            foreach (KeyValuePair<Trace, int> kvp in th.tracesDepth)
+            {
+                depths[Math.Min(kvp.Value, max - 1)]++;
+            }
+
+            /*
+             * 
+             * public int varCount
+             * public int traceCount
+             * public Dictionary<Trace, Precedents> traces
+             * public List<SeriesMetaInformation> metas
+             * 
+             */
+            using (Writeln txt = new Writeln())
+            {
+                txt.MainAdd("Counted " + th.varCount + " series, with " + (th.traces.Count - th.metas.Count) + " traces.");
+            }
+            using (Writeln txt = new Writeln())
+            {
+                for (int i = 0; i < max; i++)
+                {
+                    string extra = null;
+                    if (depths[i] == 0) break;
+                    if (i == 0 && !Globals.runningOnTTComputer) continue;
+                    if (i == 0 && Globals.runningOnTTComputer) extra = "    <--- TTH";
+                    txt.MainAdd("Dept: " + (i - 1) + ", traces: " + depths[i] + extra);
+                    txt.MainNewLineTight();
+                }
+                txt.MainAdd("");
+            }
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.varCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
+        }
+
+        public static void traceprint(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Series x_series = x as Series;
             if (x_series == null) new Error("Variable is not series type and hence has no trace.");

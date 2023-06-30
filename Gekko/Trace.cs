@@ -25,8 +25,9 @@ namespace Gekko
 
     public enum ETraceHelper
     {
-        GetAllStuff,
-        OnlyGetMeta
+        GetAllMetasAndTracesAndDepths,
+        GetAllMetasAndTraces,
+        OnlyGetMetas
     }
         
     [ProtoContract]
@@ -154,18 +155,22 @@ namespace Gekko
             return s;
         }        
 
-        public void DeepTrace(TraceHelper th, Trace parent)
+        public void DeepTrace(TraceHelper th, Trace parent, int depth)
         {
-            if (th.type == ETraceHelper.GetAllStuff)
+            if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
                 th.traceCount++;
                 if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);
-                //if (!th.dict2.ContainsKey(this)) th.dict2.Add(this, 0);
+                if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
+                {
+                    if (!th.tracesDepth.ContainsKey(this)) th.tracesDepth.Add(this, depth);
+                    else if (depth < th.tracesDepth[this]) th.tracesDepth[this] = depth;                    
+                }
                 if (this.precedents.Count() > 0)
                 {
                     foreach (Trace trace in this.precedents.GetStorage())
                     {
-                        trace.DeepTrace(th, this);
+                        trace.DeepTrace(th, this, depth + 1);
                     }
                 }
             }            
@@ -334,7 +339,7 @@ namespace Gekko
         {
             if (databank.traces != null)
             {
-                TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMeta);
+                TraceHelper th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
                 Dictionary<TraceID, Trace> dictInverted = new Dictionary<TraceID, Trace>();
                 foreach (Trace trace in databank.traces) dictInverted[trace.id] = trace;
                 HandleTraceRead2(th.metas, dictInverted);
@@ -366,7 +371,7 @@ namespace Gekko
         public static void HandleTraceWrite(Databank databank, out TraceHelper th, out Dictionary<TraceID, Trace> dict1Inverted)
         {
             //gather lists
-            th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllStuff);
+            th = Gekko.Trace.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
             dict1Inverted = new Dictionary<TraceID, Trace>();
             foreach (Trace trace in th.traces.Keys)
             {
@@ -378,6 +383,7 @@ namespace Gekko
                 meta.ToID();
             }
             databank.traces = th.traces.Keys.ToList();
+            if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
         }
     }
 
@@ -423,10 +429,11 @@ namespace Gekko
 
     public class TraceHelper
     {
-        public ETraceHelper type = ETraceHelper.GetAllStuff;
-        public int varCount = 0;
-        public int traceCount = 0;
+        public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
+        public int varCount = 0; //number of series found (probably often equatl to meta count)
+        public int traceCount = 0; //will include combinations, traces will not
         public Dictionary<Trace, Precedents> traces = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
+        public Dictionary<Trace, int> tracesDepth = new Dictionary<Trace, int>(); //value is depth
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
     }
 

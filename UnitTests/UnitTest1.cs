@@ -12859,7 +12859,7 @@ namespace UnitTests
 
             //gather lists
             TraceHelper th = new TraceHelper();
-            meta1.trace.DeepTrace(th, null);
+            meta1.trace.DeepTrace(th, null, 0);
             //Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID, Trace> dict1Inverted = new Dictionary<TraceID, Trace>();
             foreach (Trace trace in th.traces.Keys)
@@ -12993,7 +12993,7 @@ namespace UnitTests
                     Helper_CheckTrace("c!a", x4);
                     Helper_CheckTrace("d!a", x5);
 
-                    TraceHelper th1 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllStuff);
+                    TraceHelper th1 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                     Assert.AreEqual(4, th1.varCount);
                     Assert.AreEqual(9, th1.traces.Count);
                     Assert.AreEqual(19, th1.traceCount);
@@ -13021,7 +13021,7 @@ namespace UnitTests
 
                     //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
 
-                    TraceHelper th2 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllStuff);
+                    TraceHelper th2 = Trace.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                     Assert.AreEqual(4, th2.varCount);     //4  4
                     Assert.AreEqual(13, th2.traces.Count);  //23 8
                     Assert.AreEqual(23, th2.traceCount);  //23 8
@@ -13094,7 +13094,7 @@ namespace UnitTests
                     // ---------------------------------
                     // // ---------------------------------
                     I("disp d;");
-                    I("d.printtrace();");
+                    I("d.traceprint();");
                 }
                 finally
                 {
