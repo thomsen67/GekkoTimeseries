@@ -12845,13 +12845,13 @@ namespace UnitTests
             //dict1.Add(meta1.trace, dict1.Count);
             meta1.trace.precedents = new Precedents();
             Trace xx1 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-            xx1.contents.assignment = "xx1";
+            xx1.contents.text = "xx1";
             meta1.trace.precedents.Add(xx1);
             Trace xx2 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-            xx2.contents.assignment = "xx2";
+            xx2.contents.text = "xx2";
             meta1.trace.precedents.Add(xx2);
             Trace xx3 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-            xx3.contents.assignment = "xx3";
+            xx3.contents.text = "xx3";
             meta1.trace.precedents.Add(xx3);
             xx3.precedents = new Precedents();
             xx3.precedents.Add(xx1);
@@ -12898,21 +12898,21 @@ namespace UnitTests
             dict2 = null;
             dict2Inverted = null;
 
-            string z1 = meta1.trace.precedents[0].contents.assignment;  //xx1
+            string z1 = meta1.trace.precedents[0].contents.text;  //xx1
             Assert.AreEqual("xx1", z1);
-            meta1.trace.precedents[0].contents.assignment = "yy1";
-            string s1 = meta1.trace.precedents[2].precedents[0].contents.assignment; //yy1
+            meta1.trace.precedents[0].contents.text = "yy1";
+            string s1 = meta1.trace.precedents[2].precedents[0].contents.text; //yy1
             Assert.AreEqual("yy1", s1);
 
-            string z2 = meta2.trace.precedents[0].contents.assignment;  //xx1
+            string z2 = meta2.trace.precedents[0].contents.text;  //xx1
             Assert.AreEqual("xx1", z2);
-            meta2.trace.precedents[0].contents.assignment = "yyy1";
-            string s2 = meta2.trace.precedents[2].precedents[0].contents.assignment; //yyy1
+            meta2.trace.precedents[0].contents.text = "yyy1";
+            string s2 = meta2.trace.precedents[2].precedents[0].contents.text; //yyy1
             Assert.AreEqual("yyy1", s2);
 
-            string ss1 = meta1.trace.precedents[2].precedents[0].contents.assignment; //yy1
+            string ss1 = meta1.trace.precedents[2].precedents[0].contents.text; //yy1
             Assert.AreEqual("yy1", ss1);
-            string ss2 = meta2.trace.precedents[2].precedents[0].contents.assignment; //yyy1
+            string ss2 = meta2.trace.precedents[2].precedents[0].contents.text; //yyy1
             Assert.AreEqual("yyy1", ss2);
         }
 
@@ -13109,15 +13109,15 @@ namespace UnitTests
         private static void Helper_TestDAG(Databank db)
         {
             string txt = "a = 2, 3, 4;";
-            string temp = (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment;
-            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment);
-            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.assignment);
-            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment = "Testing-123";
-            Assert.AreEqual("Testing-123", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment);
-            Assert.AreEqual("Testing-123", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.assignment);
-            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment = temp;
-            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.assignment);
-            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.assignment);
+            string temp = (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text;
+            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text);
+            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.text);
+            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text = "Testing-123";
+            Assert.AreEqual("Testing-123", (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text);
+            Assert.AreEqual("Testing-123", (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.text);
+            (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text = temp;
+            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace.precedents[0].precedents[0].contents.text);
+            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0].precedents[0].contents.text);
         }
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
@@ -13137,7 +13137,7 @@ namespace UnitTests
         public static void Helper_WalkTrace(Trace trace, String2 m, int depth)
         {
             if (m.s == null) Assert.IsTrue(trace.contents == null);
-            else Assert.AreEqual(trace.contents.assignment, m.s);
+            else Assert.AreEqual(trace.contents.text, m.s);
             Assert.AreEqual(trace.precedents.Count(), m.m.Count);
             for (int i = 0; i < trace.precedents.Count(); i++)
             {

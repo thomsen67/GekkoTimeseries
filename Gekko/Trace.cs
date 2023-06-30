@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
-using static alglib;
+//using System.Windows.Forms;
+//using static alglib;
 
 namespace Gekko
 {
@@ -28,7 +28,7 @@ namespace Gekko
         GetAllStuff,
         OnlyGetMeta
     }
-
+        
     [ProtoContract]
     public class TraceContents
     {
@@ -44,8 +44,11 @@ namespace Gekko
         [ProtoMember(4)]
         public string filenameAndPathAndLine = null;
 
+        /// <summary>
+        /// An extra char in this .text will take up 2 bytes or 16 bits.
+        /// </summary>
         [ProtoMember(5)]
-        public string assignment = null;
+        public string text = null;
 
         /// <summary>
         /// The "active" left-hand side periods for the current trace (that is, what the trace determines). 
@@ -75,7 +78,7 @@ namespace Gekko
             trace2.t2 = this.t2;
             trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
             trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
-            trace2.assignment = this.assignment;
+            trace2.text = this.text;
             trace2.periods = new Periods();
             if (this.periods.Count() > 0)
             {
@@ -147,7 +150,7 @@ namespace Gekko
         {
             string s = null;
             if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
-            else s = this.contents.GetT1() + "-" + this.contents.GetT2() + ": " + this.contents.assignment;
+            else s = this.contents.GetT1() + "-" + this.contents.GetT2() + ": " + this.contents.text;
             return s;
         }        
 
@@ -226,7 +229,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Returns .Parent if .assignment == null.
+        /// Returns .Parent if .contents == null.
         /// </summary>
         /// <returns></returns>
         public ETraceType GetTraceType()
@@ -241,7 +244,7 @@ namespace Gekko
             string s = this.contents.bankAndVarnameWithFreq;
             if (!this.contents.GetT1().IsNull()) s += " " + this.contents.GetT1() + "-" + this.contents.GetT2();
             s += ": ";
-            s += this.contents.assignment;
+            s += this.contents.text;
             s += "              " + this.PeriodsAndStamp();
             return s;
         }
@@ -253,7 +256,7 @@ namespace Gekko
         /// <param name="ts"></param>
         public static void PushIntoSeries(Series ts, Trace ths, ETracePushType type)
         {
-            if (ths.contents.assignment == null) new Error("PushIntoSeries problem");
+            if (ths.contents.text == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
@@ -425,8 +428,11 @@ namespace Gekko
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> traces = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
-    }    
+    }
 
+    /// <summary>
+    /// Is basically a List&lt;Trace>.
+    /// </summary>
     [ProtoContract]
     public class Precedents
     {
@@ -437,7 +443,7 @@ namespace Gekko
         /// Pretty innocuous: using this, we can set .storage = null before protobuf.
         /// </summary>
         [ProtoMember(2)]
-        public List<TraceID> storageIDTemporary = null;  //used to recreate connections after protobuf
+        public List<TraceID> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
 
         public void AddRange(Precedents precedents)
         {            
