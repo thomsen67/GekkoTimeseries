@@ -7309,6 +7309,17 @@ namespace Gekko
                 lhs.Stamp();
                 lhs.SetDirty(true);
 
+
+                if (Program.options.databank_trace)
+                {
+                    Trace newTrace = new Trace(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
+                    newTrace.contents.text = "Smoothed from " + rhs.GetName();
+                    newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
+                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.precedents.AddRange(rhs.meta.trace.precedents);
+                    Gekko.Trace.PushIntoSeries(lhs, newTrace, ETracePushType.NewParent);
+                }
+
                 G.ServiceMessage("Smoothed " + lhs.GetName() + " from " + rhs.GetName() + ", method = " + method.ToString().ToLower(), p);
             }            
         }
@@ -9186,6 +9197,14 @@ namespace Gekko
 
                     count++;
 
+                    if (Program.options.databank_trace)
+                    {
+                        Trace newTrace = new Trace(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
+                        newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
+                        newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
+                        newTrace.contents.filenameAndPathAndLine = null;
+                        Gekko.Trace.PushIntoSeries(tsNew, newTrace, ETracePushType.NewParent);
+                    }
                 }
                 G.ServiceMessage("Rebased " + count + " series", p);
             }            

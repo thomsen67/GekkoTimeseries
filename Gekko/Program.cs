@@ -23597,7 +23597,6 @@ namespace Gekko
             if (lhs.list.Count != rhs.list.Count)
             {
                 new Error("" + lhs.list.Count + " items on left, " + rhs.list.Count + " items on right");
-                //throw new GekkoException();
             }
 
             List<string> xlhs = O.Restrict(lhs, true, false, true, true);
@@ -23627,6 +23626,16 @@ namespace Gekko
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
+
+                if (Program.options.databank_trace)
+                {
+                    Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
+                    newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
+                    newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
+                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
+                    Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                }
 
                 G.ServiceMessage("Interpolated " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);
             }
