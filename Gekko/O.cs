@@ -8545,6 +8545,14 @@ namespace Gekko
                     ts.Truncate(this.t1, this.t2);
                     counter++;
                     ts.Stamp();
+                    if (Program.options.databank_trace)
+                    {
+                        Trace newTrace = new Trace(this.t1, this.t2);
+                        newTrace.contents.text = "Truncated series";
+                        newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
+                        newTrace.contents.filenameAndPathAndLine = null;
+                        Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                    }
                 }
                 if (counter == 0)
                 {
