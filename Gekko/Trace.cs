@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using static alglib;
 
 namespace Gekko
@@ -403,6 +404,11 @@ namespace Gekko
             return false;
         }
 
+        public override string ToString()
+        {
+            return this.stamp.ToString() + "|" + this.counter;
+        }
+
         public override int GetHashCode()
         {
             int hash = 17;
@@ -427,8 +433,11 @@ namespace Gekko
         [ProtoMember(1)]
         private List<Trace> storage = null;
 
+        /// <summary>
+        /// Pretty innocuous: using this, we can set .storage = null before protobuf.
+        /// </summary>
         [ProtoMember(2)]
-        public List<TraceID> storageID = null;  //used to recreate connections after protobuf
+        public List<TraceID> storageIDTemporary = null;  //used to recreate connections after protobuf
 
         public void AddRange(Precedents precedents)
         {            
@@ -472,12 +481,12 @@ namespace Gekko
 
         public  void ToID()
         {
-            this.storageID = new List<TraceID>();
+            this.storageIDTemporary = new List<TraceID>();
             if (this.Count() > 0)
             {
                 foreach (Trace trace in this.GetStorage())
                 {
-                    this.storageID.Add(trace.id);
+                    this.storageIDTemporary.Add(trace.id);
                 }
             }
             this.SetStorage(null);
@@ -485,15 +494,18 @@ namespace Gekko
 
         public void FromID(Dictionary<TraceID, Trace> dict2)
         {
-            if (this.storageID != null && this.storageID.Count > 0)
+            if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
             {
                 this.storage = new List<Trace>();
-                foreach (TraceID id in this.storageID)
-                {                    
-                    this.storage.Add(dict2[id]);
+                foreach (TraceID id in this.storageIDTemporary)
+                {
+                    if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
+                    Trace trace = null; dict2.TryGetValue(id, out trace);
+                    if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
+                    this.storage.Add(trace);
                 }
             }
-            this.storageID = null;
+            this.storageIDTemporary = null;
         }
 
         public int Count()
