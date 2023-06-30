@@ -614,7 +614,7 @@ namespace Gekko
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
 
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
-        public static long traceCounter = G.NextLong(Globals.random, 1, long.MaxValue - 1); //we are throwing half of these away...
+        public static long traceCounter = G.NextLong(Globals.random, 1, (long)(0.99d * (double)long.MaxValue)); //we are throwing half of these away...long.MaxValue is 9e18, so when starting, there are about 9e16 possible calculations before it would overflow. That should be enough!!
 
         public static string[] convergenceCheckVariables = new string[1];
         public static bool initializeDataArrayWithNaN = true;

@@ -358,11 +358,11 @@ namespace Gekko
         public DateTime stamp = DateTime.Now;
 
         /// <summary>
-        /// Used to distinguish traces, especially if these are pruned off. 
-        /// When Gekko starts up, the counter starts at a random position between 0 and uint.MaxValue (4.3e9) and augments by 1 for each new trace.
-        /// If the same Gekko session is used, there can be no collisions (cannot perform 4.3e9 calculations in less than 0.01s).
-        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-9).
-        /// (Even if it did happen and 2 traces had same TraceId, the name of the variable could probably distinguish).
+        /// Used to distinguish traces, especially if these are pruned off. Will be numerically > 0, and when counter is < 0 it means that the trace is stored in en external file (pruned off).
+        /// When Gekko starts up, the counter starts at a random position between 1 and 99% of long.MaxValue (9e18) and augments by 1 for each new trace.
+        /// If the same Gekko session is used, there can be no collisions realistically, neither any overflow (that would demand > 9e16 calculations).
+        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-19).
+        /// Should never happen.
         /// </summary>
         [ProtoMember(2)]
         public long counter = ++Globals.traceCounter;
@@ -392,12 +392,16 @@ namespace Gekko
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
     }
 
-    public class PrecedentsCouple
+    /// <summary>
+    /// If trace is present, traceId is always = trace.id.
+    /// We may have (1): trace and traceID (normal), (2) trace==null 
+    /// and traceID &lt; 0 (trace is stored in external file), or (3) trace==null and traceID > 0 (used for protobuf).
+    /// </summary>
+    public class TraceCouple
     {
         public Trace trace = null;
         public TraceID traceID = null;
     }
-
 
     [ProtoContract]
     public class Precedents
