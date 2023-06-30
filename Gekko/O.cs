@@ -7357,7 +7357,26 @@ namespace Gekko
                     return;
                 }
 
-                SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);
+                Series ts_lhs = SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);                               
+                
+                if (Program.options.databank_trace)
+                {
+                    Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());                    
+                    newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
+                    newTrace.contents.filenameAndPathAndLine = null;
+                    int counter = 0;
+                    foreach (IVariable iv in this.rhs.list)
+                    {
+                        Series ts_rhs = iv as Series;
+                        if (ts_rhs != null)
+                        {
+                            newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
+                            counter++;
+                        }
+                    }
+                    newTrace.contents.text = "Spliced from " + counter + " series";
+                    Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                }
             }
 
             /// <summary>
@@ -7651,14 +7670,7 @@ namespace Gekko
                 try { basisEnd = data[n].t[1]; } catch { };
                 foreach (GekkoTime t in new GekkoTimeIterator(basisStart, basisEnd))
                 {
-                    //if (isLog)
-                    //{
-                    //    rv.SetData(t, Math.Exp((data[n].x as Series).GetDataSimple(t)));  //just a copy
-                    //}
-                    //else
-                    //{
-                        rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy
-                    //}
+                    rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy                    
                 }
 
                 //right
