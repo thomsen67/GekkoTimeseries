@@ -16178,7 +16178,7 @@ namespace Gekko
                 {
                     Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
                     newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
-                    newTrace.contents.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
+                    newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                     newTrace.contents.filenameAndPathAndLine = null;
                     Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
@@ -16295,7 +16295,7 @@ namespace Gekko
                             {
                                 Trace newTrace = new Trace(o.t1, o.t2);                                
                                 newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
-                                newTrace.contents.bankAndVarnameWithFreq = existing_series.GetName();
+                                newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                 newTrace.contents.filenameAndPathAndLine = null;
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
                                 Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
@@ -16315,7 +16315,7 @@ namespace Gekko
                     {
                         Trace newTrace = new Trace(o.t1, o.t2);                        
                         newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
-                        newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
+                        newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
                         newTrace.contents.filenameAndPathAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
@@ -23324,9 +23324,17 @@ namespace Gekko
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
-
+                
+                if (Program.options.databank_trace)
+                {
+                    Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
+                    newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
+                    newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
+                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
+                    Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                }
                 G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);
-
             }
             return;
         }

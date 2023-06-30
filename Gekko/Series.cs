@@ -177,6 +177,22 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Returns a string like "b1:y2"
+        /// </summary>
+        /// <returns></returns>
+        public string GetNameAndParentDatabank()
+        {
+            string rv = null;
+            string name = this.GetName();
+            string parentDatabank = null;
+            Databank db = this.GetParentDatabank();
+            if (db != null) parentDatabank = db.GetName();
+            if (parentDatabank == null) rv = name;
+            else rv = parentDatabank + ":" + name;
+            return rv;
+        }
+
+        /// <summary>
         /// Gets databank that the series, subseries or array-series resides in.
         /// 
         /// </summary>
