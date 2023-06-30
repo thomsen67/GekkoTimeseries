@@ -99,6 +99,12 @@ namespace Gekko
         }
     }
 
+    /// <summary>    
+    /// We may have: 
+    /// (1) contents != null and id.counter > 0 (normal).
+    /// (2) contents == null and id.counter &lt; 0 (pruned off to external file).
+    /// (3) contents == null and id.counter > 0 (temporarily prepared for protobuf).
+    /// </summary>
     [ProtoContract]
     public class Trace
     {
@@ -413,18 +419,7 @@ namespace Gekko
         public int traceCount = 0;
         public Dictionary<Trace, Precedents> traces = new Dictionary<Trace, Precedents>();  //value is parent (may be null)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
-    }
-
-    /// <summary>
-    /// If trace is present, traceId is always = trace.id.
-    /// We may have (1): trace and traceID (normal), (2) trace==null 
-    /// and traceID &lt; 0 (trace is stored in external file), or (3) trace==null and traceID > 0 (used for protobuf).
-    /// </summary>
-    public class TraceCouple
-    {
-        public Trace trace = null;
-        public TraceID traceID = null;
-    }
+    }    
 
     [ProtoContract]
     public class Precedents
