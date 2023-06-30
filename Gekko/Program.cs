@@ -4680,7 +4680,7 @@ namespace Gekko
                                         newTrace.assignment = "Imported data (" + ffh.realPathAndFileName + ")" + period;
                                         newTrace.bankAndVarnameWithFreq = name;
                                         newTrace.filenameAndPathAndLine = null;
-                                        newTrace.PushIntoSeries(x, type);
+                                        Gekko.Trace.PushIntoSeries(x, newTrace, type);
                                     }
                                 }
                             }
@@ -16180,7 +16180,7 @@ namespace Gekko
                     newTrace.assignment = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.bankAndVarnameWithFreq = ts.GetParentDatabank().GetName() + Globals.freqIndicator + ts.GetName();
                     newTrace.filenameAndPathAndLine = null;
-                    newTrace.PushIntoSeries(ts, ETracePushType.NewParent);
+                    Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
@@ -16298,7 +16298,7 @@ namespace Gekko
                                 newTrace.bankAndVarnameWithFreq = existing_series.GetName();
                                 newTrace.filenameAndPathAndLine = null;
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
-                                newTrace.PushIntoSeries(existing_series, ETracePushType.Sibling);
+                                Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
                         }
                     }
@@ -16317,7 +16317,7 @@ namespace Gekko
                         newTrace.assignment = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.bankAndVarnameWithFreq = ts_clone.GetParentDatabank().GetName() + Globals.freqIndicator + ts_clone.GetName();
                         newTrace.filenameAndPathAndLine = null;
-                        newTrace.PushIntoSeries(ts_clone, ETracePushType.NewParent);
+                        Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
                 }
             }

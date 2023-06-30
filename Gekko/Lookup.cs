@@ -1743,7 +1743,7 @@ namespace Gekko
                     }
 
                     //remove these new periods from any previous traces
-                    trace.PushIntoSeries(lhs_series, ETracePushType.Sibling);
+                    Trace.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);
 
                     ////For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
                     //foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))

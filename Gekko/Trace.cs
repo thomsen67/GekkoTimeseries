@@ -221,15 +221,15 @@ namespace Gekko
         /// Type == Sibling ---> Puts it among siblings. Removes the date(s) from its siblings.
         /// </summary>
         /// <param name="ts"></param>
-        public void PushIntoSeries(Series ts, ETracePushType type)
+        public static void PushIntoSeries(Series ts, Trace ths, ETracePushType type)
         {
-            if (this.assignment == null) new Error("PushIntoSeries problem");
+            if (ths.assignment == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
-                this.precedents.AddRange(ts.meta.trace.precedents);
+                ths.precedents.AddRange(ts.meta.trace.precedents);
                 ts.meta.trace.precedents = new Precedents();
-                ts.meta.trace.precedents.Add(this);
+                ts.meta.trace.precedents.Add(ths);
             }
             else if (type == ETracePushType.Sibling)
             {
@@ -242,10 +242,10 @@ namespace Gekko
                         //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
                         //So the siblings all belong to the same timeseries, and therefore it is ok
                         //to remove periods.
-                        if (this.periods.Count() > 0)
+                        if (ths.periods.Count() > 0)
                         {
                             int countStart = sibling.periods.Count();
-                            foreach (GekkoTime t in this.periods.GetStorage().Keys)
+                            foreach (GekkoTime t in ths.periods.GetStorage().Keys)
                             {
                                 sibling.periods.Remove(t);
                             }
@@ -260,11 +260,11 @@ namespace Gekko
                     {
                         foreach (Trace remove in toRemove)
                         {
-                            remove.RemoveFromSeries(ts);
+                            Trace.RemoveFromSeries(ts, remove);
                         }
                     }
                 }
-                ts.meta.trace.precedents.Add(this);
+                ts.meta.trace.precedents.Add(ths);
             }
             else new Error("Trace");
         }
@@ -273,12 +273,12 @@ namespace Gekko
         /// Removes a particular trace from ts.meta.trace in a Series. Happens when a new Trace shadows other older traces.
         /// </summary>
         /// <param name="ts"></param>
-        public void RemoveFromSeries(Series ts)
+        public static void RemoveFromSeries(Series ts, Trace ths)
         {
             if (ts.meta.trace == null) return;
             if (ts.meta.trace.precedents.Count() > 0)
             {                
-                ts.meta.trace.precedents.GetStorage().Remove(this);
+                ts.meta.trace.precedents.GetStorage().Remove(ths);
             }
         }
 
