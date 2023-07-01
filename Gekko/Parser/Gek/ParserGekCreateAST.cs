@@ -1327,20 +1327,6 @@ namespace Gekko.Parser.Gek
 
                 if (ast.Text.Contains(Globals.parserExpressionSeparator.ToString()))
                 {
-                    //if (Globals.useTrace)
-                    //{
-                    //    //if needed, we could decorate ASTREAD... etc with the command.
-                    //    //maybe not necessary.
-                    //    //if (ast.Text.StartsWith("ASTREAD" + Globals.parserExpressionSeparator))
-                    //    //{
-                    //    //    flag = true;
-                    //    //}
-                    //    //else if (ast.Text.StartsWith("ASTCOPY" + Globals.parserExpressionSeparator))
-                    //    //{
-                    //    //    flag = true;
-                    //    //}
-                    //}
-
                     if (ast.Text.StartsWith("ASTMETA" + Globals.parserExpressionSeparator))  //Handles SERIES, that is ASTGENR/ASTUPD
                     {
                         flag = true;
@@ -1401,6 +1387,43 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTSMOOTH" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTSPLICE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTTRUNCATE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTREBASE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTREAD" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTRENAME" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTCOPY" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTCOLLAPSE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTINTERPOLATE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
+                    //#jasdf89uoasfjd
                 }                
                 
                 if (flag)

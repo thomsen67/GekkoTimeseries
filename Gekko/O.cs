@@ -6763,6 +6763,7 @@ namespace Gekko
             public GekkoTime t2 = GekkoTime.tNull;
             public string fileName = null;
             public string readTo = null;
+            public string gekkocode = null;
             public string opt_px = null; //pc-axis
             public string opt_tsd = null;
             public string opt_tsdx = null;
@@ -6815,6 +6816,7 @@ namespace Gekko
                         oRead.t1 = truncate.t1;
                         oRead.t2 = truncate.t2;
                     }
+                    oRead.gekkocode = this.gekkocode;
                     oRead.dateformat = this.opt_dateformat;
                     oRead.datetype = this.opt_datetype;
                     oRead.sheet = this.opt_sheet;
@@ -7250,17 +7252,17 @@ namespace Gekko
         }
 
         public class Smooth
-        {            
-
+        {
             public List names0;
             public List names1;
             public List names2;
-
+            public string gekkocode = null;
             public string opt_spline = null;
             public string opt_geometric = null;
             public string opt_linear = null;
             public string opt_repeat = null;
-            public string opt_overlay = null;
+            public string opt_overlay = null;            
+
             public P p = null;
             public void Exe()
             {
@@ -7309,11 +7311,10 @@ namespace Gekko
                 lhs.Stamp();
                 lhs.SetDirty(true);
 
-
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = "Smoothed from " + rhs.GetName();
+                    newTrace.contents.text = this.gekkocode + ";";
                     newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
                     newTrace.contents.filenameAndPathAndLine = null;
                     newTrace.precedents.AddRange(rhs.meta.trace.precedents);
@@ -7341,6 +7342,7 @@ namespace Gekko
             public List names2 = null; //old remove
             public List lhs = null;
             public List rhs = null;
+            public string gekkocode = null;
             public string opt_first = null; //pos 1
             public string opt_last = null; //pos n --> default
             public double opt_n = double.NaN; //specific n
@@ -7374,7 +7376,8 @@ namespace Gekko
                             counter++;
                         }
                     }
-                    newTrace.contents.text = "Spliced from " + counter + " series";
+                    //newTrace.contents.text = "Spliced from " + counter + " series";
+                    newTrace.contents.text = this.gekkocode + ";";
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -8485,6 +8488,7 @@ namespace Gekko
             public string opt_respect = null;
             public List names1 = null;
             public List names2 = null;
+            public string gekkocode = null;
             public string opt_bank = null;
             public string opt_frombank = null;
             public string opt_tobank = null;
@@ -8532,6 +8536,7 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List names = null;
+            public string gekkocode = null;
 
             public void Exe()
             {
@@ -8548,7 +8553,7 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(this.t1, this.t2);
-                        newTrace.contents.text = "Truncated series";
+                        newTrace.contents.text = this.gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                         newTrace.contents.filenameAndPathAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
@@ -8565,10 +8570,9 @@ namespace Gekko
 
         public class Rename
         {
-
             public List names0 = null;
             public List names1 = null;
-
+            public string gekkocode = null;
             public string opt_bank = null;
             public string opt_frombank = null;
             public string opt_tobank = null;
@@ -9137,6 +9141,7 @@ namespace Gekko
             public List names = null;
             public GekkoTime t1 = GekkoTime.tNull;
             public GekkoTime t2 = GekkoTime.tNull;
+            public string gekkocode = null;
             public string opt_prefix = null;
             public string opt_bank = null;  //obsolete
             public string opt_frombank = null;
@@ -9220,7 +9225,8 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
-                        newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
+                        newTrace.contents.text = this.gekkocode + ";";
+                        //newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
                         newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
                         newTrace.contents.filenameAndPathAndLine = null;
                         Gekko.Trace.PushIntoSeries(tsNew, newTrace, ETracePushType.NewParent);
@@ -10186,11 +10192,12 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
+            public string gekkocode = null;
             public string opt_missing = null;  //strict|flex
             public P p = null;
             public void Exe()
             {                
-                Program.Collapse(this.lhs, this.rhs, this.type, this.opt_missing, this.p);                
+                Program.Collapse(this.lhs, this.rhs, this.type, this.opt_missing, this.gekkocode, this.p);                
             }
         }
 
@@ -10199,10 +10206,11 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
+            public string gekkocode = null;
             public P p = null;
             public void Exe()
             {
-                Program.Interpolate(this.lhs, this.rhs, this.type, this.p);
+                Program.Interpolate(this.lhs, this.rhs, this.type, this.gekkocode, this.p);
             }
         }
         

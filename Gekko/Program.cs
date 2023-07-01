@@ -4677,7 +4677,8 @@ namespace Gekko
                                             x = tsExisting;
                                             type = ETracePushType.Sibling;
                                         }
-                                        newTrace.contents.text = "Imported data (" + ffh.realPathAndFileName + ")" + period;
+                                        newTrace.contents.text = oRead.gekkocode + ";";
+                                        //newTrace.contents.text = "Imported data (" + ffh.realPathAndFileName + ")" + period;
                                         newTrace.contents.bankAndVarnameWithFreq = name;
                                         newTrace.contents.filenameAndPathAndLine = null;
                                         Gekko.Trace.PushIntoSeries(x, newTrace, type);
@@ -16177,7 +16178,8 @@ namespace Gekko
                 if (Program.options.databank_trace &&  ts != null)
                 {
                     Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-                    newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
+                    newTrace.contents.text = o.gekkocode + ";";
+                    //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                     newTrace.contents.filenameAndPathAndLine = null;
                     Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
@@ -16192,7 +16194,6 @@ namespace Gekko
         /// <param name="o"></param>
         public static void Copy(O.Copy o)
         {
-
             if (o.type == "ASTPLACEHOLDER") o.type = null;
             EVariableType type = EVariableType.Var;
             if (o.type != null) type = G.GetVariableType(o.type);
@@ -16293,8 +16294,9 @@ namespace Gekko
                             }
                             if (Program.options.databank_trace)
                             {
-                                Trace newTrace = new Trace(o.t1, o.t2);                                
-                                newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
+                                Trace newTrace = new Trace(o.t1, o.t2);
+                                newTrace.contents.text = o.gekkocode + ";";
+                                //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                 newTrace.contents.filenameAndPathAndLine = null;
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
@@ -16313,8 +16315,9 @@ namespace Gekko
                     Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
                     {
-                        Trace newTrace = new Trace(o.t1, o.t2);                        
-                        newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
+                        Trace newTrace = new Trace(o.t1, o.t2);
+                        newTrace.contents.text = o.gekkocode + ";";
+                        //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
                         newTrace.contents.filenameAndPathAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
@@ -23285,7 +23288,7 @@ namespace Gekko
 
 
 
-        public static void Collapse(List lhs, List rhs, string method, string missing, P p)
+        public static void Collapse(List lhs, List rhs, string method, string missing, string gekkocode, P p)
         {
 
             if (lhs.list.Count != rhs.list.Count)
@@ -23328,7 +23331,8 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
+                    newTrace.contents.text = gekkocode + ";";
+                    //newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                     newTrace.contents.filenameAndPathAndLine = null;
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
@@ -23592,7 +23596,7 @@ namespace Gekko
         }
 
 
-        public static void Interpolate(List lhs, List rhs, string method, P p)
+        public static void Interpolate(List lhs, List rhs, string method, string gekkocode, P p)
         {
             if (lhs.list.Count != rhs.list.Count)
             {
@@ -23630,7 +23634,8 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
+                    newTrace.contents.text = gekkocode + ";";
+                    //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                     newTrace.contents.filenameAndPathAndLine = null;
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
@@ -32584,7 +32589,7 @@ namespace Gekko
         public string datetype = null;
         public string sheet = null;
         public bool isVariablecode = false;
-
+        public string gekkocode;
         public string FileName
         {
             get { return fileName; }

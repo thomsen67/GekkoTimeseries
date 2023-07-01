@@ -2866,7 +2866,8 @@ closeall:					CLOSEALL -> ^({token("ASTCLOSEALL", ASTCLOSEALL, input.LT(1).Line)
 // COLLAPSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-collapse:				    COLLAPSE collapseOpt1? seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER collapseMethod?) ^(ASTPLACEHOLDER collapseOpt1?));
+collapse:                   collapse2 -> ^({token("ASTCOLLAPSE¤"+($collapse2.text), ASTCOLLAPSE, input.LT(1).Line)} collapse2);
+collapse2:				    COLLAPSE collapseOpt1? seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER collapseMethod?) ^(ASTPLACEHOLDER collapseOpt1?);
 collapseMethod:			    name;
 collapseOpt1:				ISNOTQUAL | leftAngle collapseOpt1h* RIGHTANGLE -> ^(ASTOPT1 collapseOpt1h*);
 collapseOpt1h:				MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)							
@@ -2895,7 +2896,8 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames2)? -> ^({token("ASTCOPY", ASTCOPY, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames2?);
+copy:                       copy2 -> ^({token("ASTCOPY¤"+($copy2.text), ASTCOPY, input.LT(1).Line)} copy2);
+copy2:                      COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames2)? -> ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames2?;
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES_TYPE2 dates?) copyOpt1h*)
@@ -3202,9 +3204,9 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 // INTERPOLATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 interpolateMethod?);
+interpolate:                interpolate2 -> ^({token("ASTINTERPOLATE¤"+($interpolate2.text), ASTINTERPOLATE, input.LT(1).Line)} interpolate2);
+interpolate2:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 interpolateMethod? -> seqOfBankvarnames seqOfBankvarnames2 interpolateMethod?;
 interpolateMethod:			name;
-//interpolateMethod:			REPEAT | PRORATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ITERSHOW
@@ -3634,7 +3636,8 @@ python_runOpt1h:                MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesN
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rebase:                     REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, input.LT(1).Line)} seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
+rebase:                     rebase2 -> ^({token("ASTREBASE¤"+($rebase2.text), ASTREBASE, input.LT(1).Line)} rebase2);
+rebase2:                    REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?;
 rebaseDate1:                expression;
 rebaseDate2:                expression;
 rebaseOpt1:                 ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
@@ -3649,7 +3652,8 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //obs
 // RENAME
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames2 -> ^({token("ASTRENAME", ASTRENAME, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames2 renameOpt1?);
+rename:                     rename2 -> ^({token("ASTRENAME¤"+($rename2.text), ASTRENAME, input.LT(1).Line)} rename2);
+rename2:                    RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames2 -> ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames2 renameOpt1?;
 renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
 renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
 						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
@@ -3665,8 +3669,8 @@ asOrToBank:					ASBANK | TOBANK;
 // READ and IMPORT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-read:                       readHelper   readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, input.LT(1).Line)} readHelper readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
-						    ;
+read:                       read2 -> ^({token("ASTREAD¤"+($read2.text), ASTREAD, input.LT(1).Line)} read2);
+read2:                      readHelper readOpt1? fileNameStar (TO nameOrStar)? -> readHelper readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?)						    ;
 
 readHelper:                 READ | IMPORT;
 
@@ -3776,7 +3780,8 @@ simOpt1h:                   FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
 // SMOOTH
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames2 smoothOpt2? seqOfBankvarnames3? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} ^(ASTPLACEHOLDER smoothOpt2?) seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3?);
+smooth:                     smooth2 -> ^({token("ASTSMOOTH¤"+($smooth2.text), ASTSMOOTH, input.LT(1).Line)} smooth2);
+smooth2:                    SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames2 smoothOpt2? seqOfBankvarnames3? -> ^(ASTPLACEHOLDER smoothOpt2?) seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3?;
 smoothOpt2:                 smoothOpt2h;  //can only choose 1
 smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesNo?)
                           | REPEAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_REPEAT yesNo?)
@@ -3789,16 +3794,8 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 // SPLICE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 expression seqOfBankvarnames3 -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 expression     )
-//                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 seqOfBankvarnames3            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 )  //no date
-//						    ;
-//spliceOpt1:                 ISNOTQUAL
-//						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
-//                            ;
-//spliceOpt1h:                KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
-//spliceOptions:              FIRST | LAST;
-
-splice:                     SPLICE spliceOpt1? seqOfBankvarnames EQUAL expression+ -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} ^(ASTPLACEHOLDER spliceOpt1?) seqOfBankvarnames expression+);
+splice:                     splice2 -> ^({token("ASTSPLICE¤"+($splice2.text), ASTSPLICE, input.LT(1).Line)} splice2);
+splice2:                    SPLICE spliceOpt1? seqOfBankvarnames EQUAL expression+ -> ^(ASTPLACEHOLDER spliceOpt1?) seqOfBankvarnames expression+;
 spliceOpt1:                 ISNOTQUAL
 						  | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
                             ;
@@ -3983,7 +3980,8 @@ return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETU
 // TRUNCATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-truncate:                   TRUNCATE truncateOpt1? seqOfBankvarnames -> ^({token("ASTTRUNCATE", ASTTRUNCATE, input.LT(1).Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames);
+truncate:                   truncate2 -> ^({token("ASTTRUNCATE¤"+($truncate2.text), ASTTRUNCATE, input.LT(1).Line)} truncate2);
+truncate2:                  TRUNCATE truncateOpt1? seqOfBankvarnames -> ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames;
 truncateOpt1:               ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
 truncateOpt1h:              dates -> ^(ASTDATES dates);
 
