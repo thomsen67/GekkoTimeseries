@@ -43,13 +43,19 @@ namespace Gekko
         public string bankAndVarnameWithFreq = null;
 
         [ProtoMember(4)]
-        public string filenameAndPathAndLine = null;
+        public string commandFileAndLine = null;
 
         /// <summary>
         /// An extra char in this .text will take up 2 bytes or 16 bits.
         /// </summary>
         [ProtoMember(5)]
         public string text = null;
+
+        /// <summary>
+        /// For instance the file from where data was imported. Will often be null.
+        /// </summary>
+        [ProtoMember(6)]
+        public string dataFile = null;
 
         /// <summary>
         /// The "active" left-hand side periods for the current trace (that is, what the trace determines). 
@@ -78,8 +84,9 @@ namespace Gekko
             trace2.t1 = this.t1;
             trace2.t2 = this.t2;
             trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
-            trace2.filenameAndPathAndLine = this.filenameAndPathAndLine;
+            trace2.commandFileAndLine = this.commandFileAndLine;
             trace2.text = this.text;
+            trace2.dataFile = this.dataFile;
             trace2.periods = new Periods();
             if (this.periods.Count() > 0)
             {
@@ -343,7 +350,7 @@ namespace Gekko
                 Dictionary<TraceID, Trace> dictInverted = new Dictionary<TraceID, Trace>();
                 foreach (Trace trace in databank.traces) dictInverted[trace.id] = trace;
                 HandleTraceRead2(th.metas, dictInverted);
-                databank.traces = null;
+                databank.traces = null;  //important!
             }
         }
 

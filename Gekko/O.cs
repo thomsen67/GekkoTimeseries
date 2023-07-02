@@ -7316,7 +7316,7 @@ namespace Gekko
                     Trace newTrace = new Trace(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
                     newTrace.contents.text = this.gekkocode + ";";
                     newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
-                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.contents.commandFileAndLine = null;
                     newTrace.precedents.AddRange(rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(lhs, newTrace, ETracePushType.NewParent);
                 }
@@ -7365,7 +7365,7 @@ namespace Gekko
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());                    
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.contents.commandFileAndLine = null;
                     int counter = 0;
                     foreach (IVariable iv in this.rhs.list)
                     {
@@ -8555,7 +8555,7 @@ namespace Gekko
                         Trace newTrace = new Trace(this.t1, this.t2);
                         newTrace.contents.text = this.gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
-                        newTrace.contents.filenameAndPathAndLine = null;
+                        newTrace.contents.commandFileAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                     }
                 }
@@ -9228,7 +9228,7 @@ namespace Gekko
                         newTrace.contents.text = this.gekkocode + ";";
                         //newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
                         newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
-                        newTrace.contents.filenameAndPathAndLine = null;
+                        newTrace.contents.commandFileAndLine = null;
                         Gekko.Trace.PushIntoSeries(tsNew, newTrace, ETracePushType.NewParent);
                     }
                 }

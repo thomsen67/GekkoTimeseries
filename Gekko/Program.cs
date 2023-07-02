@@ -3196,7 +3196,7 @@ namespace Gekko
             ProtobufWrite(databank.traces, files[k + extra - 1]);
                         
             Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
-            if (Globals.fixXxx1) databank.traces = null;
+            databank.traces = null;  //important!
 
             List<string> sfiles = new List<string>();
             foreach (string file in files)
@@ -3342,7 +3342,7 @@ namespace Gekko
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
             databank.traces = ProtobufRead<List<Trace>>(files[k - extra + 1]);
             Gekko.Trace.HandleTraceRead1(databank);
-            if (Globals.fixXxx1) databank.traces = null;
+            databank.traces = null;  //important!
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
             readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
@@ -4650,8 +4650,7 @@ namespace Gekko
 
                                     if (Program.options.databank_trace)
                                     {
-                                        Trace newTrace = null; // new Trace();  //periods.t1, periods.t2
-                                        string period = null;
+                                        Trace newTrace = null;
                                         Series x = null;
                                         ETracePushType type = ETracePushType.NewParent;
 
@@ -4672,15 +4671,14 @@ namespace Gekko
                                         else
                                         {
                                             newTrace = new Trace(periods.t1, periods.t2);
-                                            period = " (" + periods.t1 + "-" + periods.t2 + ")";                                            
                                             newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
                                             x = tsExisting;
                                             type = ETracePushType.Sibling;
                                         }
                                         newTrace.contents.text = oRead.gekkocode + ";";
-                                        //newTrace.contents.text = "Imported data (" + ffh.realPathAndFileName + ")" + period;
+                                        newTrace.contents.dataFile = ffh.realPathAndFileName;
                                         newTrace.contents.bankAndVarnameWithFreq = name;
-                                        newTrace.contents.filenameAndPathAndLine = null;
+                                        newTrace.contents.commandFileAndLine = null;
                                         Gekko.Trace.PushIntoSeries(x, newTrace, type);
                                     }
                                 }
@@ -16181,7 +16179,7 @@ namespace Gekko
                     newTrace.contents.text = o.gekkocode + ";";
                     //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
-                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.contents.commandFileAndLine = null;
                     Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -16298,7 +16296,7 @@ namespace Gekko
                                 newTrace.contents.text = o.gekkocode + ";";
                                 //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
-                                newTrace.contents.filenameAndPathAndLine = null;
+                                newTrace.contents.commandFileAndLine = null;
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
                                 Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
@@ -16319,7 +16317,7 @@ namespace Gekko
                         newTrace.contents.text = o.gekkocode + ";";
                         //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
-                        newTrace.contents.filenameAndPathAndLine = null;
+                        newTrace.contents.commandFileAndLine = null;
                         Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
                 }
@@ -20822,12 +20820,10 @@ namespace Gekko
                 }
 
                 TraceHelper th; Dictionary<TraceID, Trace> dict1Inverted;
-                Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
-
+                Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
-
-                Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
-                if (Globals.fixXxx1) databank.traces = null;
+                Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
+                databank.traces = null;  //important!
 
                 count = databank.storage.Count;  //must be before the finally
             }
@@ -23334,7 +23330,7 @@ namespace Gekko
                     newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.contents.commandFileAndLine = null;
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
@@ -23637,7 +23633,7 @@ namespace Gekko
                     newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.filenameAndPathAndLine = null;
+                    newTrace.contents.commandFileAndLine = null;
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
