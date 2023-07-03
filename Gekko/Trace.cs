@@ -65,7 +65,7 @@ namespace Gekko
         /// See maybe https://github.com/mbuchetics/RangeTree for ideas. But this tree is only for searching though.
         /// Perhaps allow combo of intervals (for > 3 dates) and single dates.
         /// </summary>
-        [ProtoMember(6)]
+        [ProtoMember(7)]
         public Periods periods = new Periods();
 
         public GekkoTime GetT1()
@@ -257,6 +257,9 @@ namespace Gekko
             if (!this.contents.GetT1().IsNull()) s += " " + this.contents.GetT1() + "-" + this.contents.GetT2();
             s += ": ";
             s += this.contents.text;
+            if (this.contents.bankAndVarnameWithFreq != null) s += ", lhs=" + this.contents.bankAndVarnameWithFreq;
+            if (this.contents.dataFile != null) s += ", data=" + this.contents.dataFile;
+            if (this.contents.commandFileAndLine != null) s += ", gcm=" + this.contents.commandFileAndLine;
             s += "              " + this.PeriodsAndStamp();
             return s;
         }

@@ -13026,7 +13026,7 @@ namespace UnitTests
                     Assert.AreEqual(13, th2.traces.Count);  //23 8
                     Assert.AreEqual(23, th2.traceCount);  //23 8
 
-                    string cImport1 = "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig1.gbk)";
+                    string cImport1 = "read sletmig1;";
                     String2 x2a = Helper_Push(x2, cImport1);
                     String2 x3a = Helper_Push(x3, cImport1);
                     String2 x4a = Helper_Push(x4, cImport1);
@@ -13042,13 +13042,13 @@ namespace UnitTests
                     // ---------------------------------
                     I("write sletmig2;"); //d  ... 2021-23
                     I("read sletmig2;"); //d  ... 2021-23
-                    String2 x5b = Helper_Push(x5a, "Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk)");
+                    String2 x5b = Helper_Push(x5a, "read sletmig2;");
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
                     // ---------------------------------
                     string c6 = "copy d to e;";
                     I(c6);
-                    String2 x6 = Helper_Push(x5b, "Copied d!a to e!a (clone)");
+                    String2 x6 = Helper_Push(x5b, "copy d to e;");
                     Helper_CheckTrace("e!a", x6);
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
@@ -13063,7 +13063,7 @@ namespace UnitTests
                     // ---------------------------------
                     // ---------------------------------
                     string c8 = "copy <2021 2021> f to e;";  //only partial copy
-                    string c8a = "Copied f!a into e!a (2021-2021)";
+                    string c8a = "copy <2021 2021> f to e;";
                     I(c8);
                     String2 x8 = G.DeepCloneSlow<String2>(x6);
                     x8.m.Add(new String2(c8a));
@@ -13075,7 +13075,7 @@ namespace UnitTests
                     // ---------------------------------
                     string c9 = "rename e as g;";
                     I(c9);
-                    String2 x9 = Helper_Push(x8, "Renamed Work:e!a as Work:g!a");
+                    String2 x9 = Helper_Push(x8, "rename e as g;");
                     Helper_CheckTrace("g!a", x9);
                     Helper_CheckTrace("f!a", x7);
                     Helper_CheckTrace("d!a", x5b);
@@ -13085,7 +13085,7 @@ namespace UnitTests
                     string c10 = "d = 5, 6, 7;";
                     I(c10);
                     I("import <2022 2022> sletmig2;");
-                    String2 x10a = new String2("Imported data (" + Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig2.gbk) (2022-2022)");
+                    String2 x10a = new String2("import <2022 2022> sletmig2;");
                     x10a.m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
                     String2 x10 = new String2(null);
                     x10.m.Add(new String2(c10));
