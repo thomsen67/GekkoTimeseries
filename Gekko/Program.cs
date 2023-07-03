@@ -15266,12 +15266,8 @@ namespace Gekko
             if (!all && d > 1) return;
             string s = "| " + G.Blanks(d * 2 - 2);
             if (trace.contents != null)
-            {
-                string periods1 = trace.contents.GetT1().ToString() + "-" + trace.contents.GetT2().ToString() + "   : ";
-                string periods2 = null;
-                periods2 += "[" + trace.PeriodsAndStamp() + "]";
-                if (trace.contents.GetT1().IsNull()) periods1 = "[no period] : ";
-                txt.MainAdd(s + periods1 + trace.contents.text + "                        [" + periods2 + "]");
+            {                 
+                txt.MainAdd(s + trace.Text());
                 txt.MainNewLineTight();
             }
 

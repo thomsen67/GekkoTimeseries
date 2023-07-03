@@ -253,14 +253,15 @@ namespace Gekko
 
         public string Text()
         {
-            string s = this.contents.bankAndVarnameWithFreq;
-            if (!this.contents.GetT1().IsNull()) s += " " + this.contents.GetT1() + "-" + this.contents.GetT2();
+            string s = null;
+            if (!this.contents.GetT1().IsNull()) s += "" + this.contents.GetT1() + "-" + this.contents.GetT2();
             s += ": ";
             s += this.contents.text;
-            if (this.contents.bankAndVarnameWithFreq != null) s += ", lhs=" + this.contents.bankAndVarnameWithFreq;
-            if (this.contents.dataFile != null) s += ", data=" + this.contents.dataFile;
-            if (this.contents.commandFileAndLine != null) s += ", gcm=" + this.contents.commandFileAndLine;
-            s += "              " + this.PeriodsAndStamp();
+            s += "          ";
+            if (this.contents.bankAndVarnameWithFreq != null) s += " || lhs=" + this.contents.bankAndVarnameWithFreq;
+            if (this.contents.dataFile != null) s += " || data=" + this.contents.dataFile;
+            if (this.contents.commandFileAndLine != null) s += " || gcm=" + this.contents.commandFileAndLine;
+            s += " || " + this.PeriodsAndStamp();
             return s;
         }
 
