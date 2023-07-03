@@ -16290,7 +16290,7 @@ namespace Gekko
                             if (Program.options.databank_trace)
                             {
                                 Trace newTrace = new Trace(o.t1, o.t2);
-                                newTrace.contents.text = o.gekkocode + ";"; //-minus-
+                                newTrace.contents.text = o.gekkocode + ";";
                                 //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                 newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
@@ -16311,7 +16311,7 @@ namespace Gekko
                     if (Program.options.databank_trace && ts_clone != null)
                     {
                         Trace newTrace = new Trace(o.t1, o.t2);
-                        newTrace.contents.text = o.gekkocode + ";"; //-minus-
+                        newTrace.contents.text = o.gekkocode + ";";
                         //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
