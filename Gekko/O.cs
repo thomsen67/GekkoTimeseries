@@ -9229,7 +9229,7 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
-                        newTrace.contents.text = this.gekkocode + ";"; //-minus-
+                        newTrace.contents.text = this.gekkocode + ";";
                         //newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
                         newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);

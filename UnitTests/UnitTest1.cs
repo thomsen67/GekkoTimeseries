@@ -12854,6 +12854,76 @@ namespace UnitTests
             //We skip testing of periods here
 
             //====================================================
+            // COPY1 (inject)
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");
+            I("y = 2;");
+            I("copy <2001q2 2002q3> x1 to y;");
+            y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+            tracec = y.meta.trace.precedents[1].contents; // <---------------------- note the 1 here!
+            Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("copy <2001q2 2002q3> x1 to y;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.GetT2());
+            //We skip testing of periods here
+
+            //====================================================
+            // COPY2 (new object)
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");            
+            I("copy x1 to y;");
+            y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("copy x1 to y;", tracec.text);
+            Assert.AreEqual(GekkoTime.tNull, tracec.GetT1());
+            Assert.AreEqual(GekkoTime.tNull, tracec.GetT2());
+            //We skip testing of periods here
+
+
+            //====================================================
+            // INTERPOLATE
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");
+            I("interpolate y!m = x1;");
+            y = Program.databanks.GetFirst().GetIVariable("y!m") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!m", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("interpolate y!m = x1;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.M, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.M, 2002, 12), tracec.GetT2());
+            //We skip testing of periods here
+
+            //====================================================
+            // READ
+            //====================================================            
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("y = 2;");
+            I("write sletmig;");
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("read sletmig;");
+            y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("y!q", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(Globals.ttPath2 + "\\regres\\Databanks\\temp\\sletmig.gbk", tracec.dataFile);
+            Assert.AreEqual("read sletmig;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+            //We skip testing of periods here
+
+            //====================================================
             // REBASE
             //====================================================
             I("reset; option freq q; time 2001q1 2002q4;");
@@ -12867,6 +12937,22 @@ namespace UnitTests
             Assert.AreEqual("rebase y 2001q4;", tracec.text);
             Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
             Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+            //We skip testing of periods here
+
+            //====================================================
+            // RENAME
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");
+            I("rename x1 as y;");
+            y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("rename x1 as y;", tracec.text);
+            Assert.AreEqual(GekkoTime.tNull, tracec.GetT1());
+            Assert.AreEqual(GekkoTime.tNull, tracec.GetT2());
             //We skip testing of periods here
 
             //====================================================

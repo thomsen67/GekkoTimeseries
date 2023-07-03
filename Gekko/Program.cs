@@ -4675,7 +4675,7 @@ namespace Gekko
                                             x = tsExisting;
                                             type = ETracePushType.Sibling;
                                         }
-                                        newTrace.contents.text = oRead.gekkocode + ";"; //-minus-
+                                        newTrace.contents.text = oRead.gekkocode + ";";
                                         newTrace.contents.dataFile = ffh.realPathAndFileName;
                                         newTrace.contents.bankAndVarnameWithFreq = name;
                                         newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
@@ -16173,7 +16173,7 @@ namespace Gekko
                 if (Program.options.databank_trace &&  ts != null)
                 {
                     Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-                    newTrace.contents.text = o.gekkocode + ";"; //-minus-
+                    newTrace.contents.text = o.gekkocode + ";";
                     //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
@@ -23627,7 +23627,7 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = gekkocode + ";"; //-minus-
+                    newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
