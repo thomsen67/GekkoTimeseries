@@ -7315,7 +7315,7 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = this.gekkocode + ";"; //-minus-
+                    newTrace.contents.text = this.gekkocode + ";";
                     newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                     newTrace.precedents.AddRange(rhs.meta.trace.precedents);
@@ -7378,7 +7378,7 @@ namespace Gekko
                         }
                     }
                     //newTrace.contents.text = "Spliced from " + counter + " series";
-                    newTrace.contents.text = this.gekkocode + ";"; //-minus-
+                    newTrace.contents.text = this.gekkocode + ";";
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -8556,7 +8556,7 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(this.t1, this.t2);
-                        newTrace.contents.text = this.gekkocode + ";"; //-minus-
+                        newTrace.contents.text = this.gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                         Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
