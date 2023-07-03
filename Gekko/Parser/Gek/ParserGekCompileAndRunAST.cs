@@ -219,7 +219,7 @@ namespace Gekko.Parser.Gek
                         G.Writeln("              " + G.ReplaceGlueSymbols(problemLine), Color.Blue);
                     }
                     else
-                    {
+                    {                        
                         //file or text block user input (>1 line)
                         string xx = "Running";
                         if (lexer == true) xx = "Problem parsing/lexing";

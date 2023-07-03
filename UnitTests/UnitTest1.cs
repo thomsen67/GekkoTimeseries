@@ -12817,7 +12817,64 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Trace2()
+        public void _Test_TraceCommands()
+        {
+            Series y;
+            TraceContents tracec;
+
+            //====================================================
+            // ASSIGN
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("y = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("y = 2;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+            //We skip testing of periods here
+
+            //====================================================
+            // COLLAPSE
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");
+            I("collapse y!a = x1;");
+            y = Program.databanks.GetFirst().GetIVariable("y!a") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!a", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("collapse y!a = x1;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.A, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.A, 2002, 1), tracec.GetT2());
+            //We skip testing of periods here
+
+
+            //====================================================
+            // COLLAPSE
+            //====================================================
+            I("reset; option freq q; time 2001q1 2002q4;");
+            I("x1 = 2;");
+            I("collapse y!a = x1;");
+            I("disp y!a;");
+            y = Program.databanks.GetFirst().GetIVariable("y!a") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("Work:y!a", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("collapse y!a = x1;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.A, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.A, 2002, 1), tracec.GetT2());
+            //We skip testing of periods here
+
+        }
+
+        [TestMethod]
+        public void _Test_TraceLowLevel()
         {
             //
             // meta
@@ -12917,7 +12974,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Trace()
+        public void _Test_TraceBasics()
         {
             double csize =  Globals.cacheSize2;
             if (true)

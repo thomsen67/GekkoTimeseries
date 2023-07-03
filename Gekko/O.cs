@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Data;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System.Runtime.CompilerServices;
+using static alglib;
 
 namespace Gekko
 {
@@ -924,7 +925,7 @@ namespace Gekko
             {
                 if (p != null)
                 {
-                    string file = p.GetExecutingGcmFile();
+                    string file = p.GetExecutingGcmFile(false);
                     string file3 = Path.Combine(G.GetProgramDir(), Globals.autoExecCmdFileName);
                     if (!G.Equal(file, file3))
                     {
@@ -3340,7 +3341,7 @@ namespace Gekko
         /// <param name="assign_20"></param>
         /// <param name="check_20"></param>
         /// <param name="o"></param>
-        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o, P p)
         {            
             MissingMemory missing = null;
             if (o.opt_missing != null)
@@ -7314,9 +7315,9 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = this.gekkocode + ";";
+                    newTrace.contents.text = this.gekkocode + ";"; //-minus-
                     newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
-                    newTrace.contents.commandFileAndLine = null;
+                    newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                     newTrace.precedents.AddRange(rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(lhs, newTrace, ETracePushType.NewParent);
                 }
@@ -7365,7 +7366,7 @@ namespace Gekko
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());                    
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.commandFileAndLine = null;
+                    newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                     int counter = 0;
                     foreach (IVariable iv in this.rhs.list)
                     {
@@ -7377,7 +7378,7 @@ namespace Gekko
                         }
                     }
                     //newTrace.contents.text = "Spliced from " + counter + " series";
-                    newTrace.contents.text = this.gekkocode + ";";
+                    newTrace.contents.text = this.gekkocode + ";"; //-minus-
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -8496,6 +8497,7 @@ namespace Gekko
             public string opt_print = null;
             public string opt_type = null;
             public string type = null;
+            public P p = null;
 
             public void Exe()
             {
@@ -8537,6 +8539,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List names = null;
             public string gekkocode = null;
+            public P p = null;
 
             public void Exe()
             {
@@ -8553,9 +8556,9 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(this.t1, this.t2);
-                        newTrace.contents.text = this.gekkocode + ";";
+                        newTrace.contents.text = this.gekkocode + ";"; //-minus-
                         newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
-                        newTrace.contents.commandFileAndLine = null;
+                        newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                         Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                     }
                 }
@@ -8580,6 +8583,7 @@ namespace Gekko
             public string opt_type = null;
 
             public string type = null;
+            public P p = null;
 
             public void Exe()
             {
@@ -9225,10 +9229,10 @@ namespace Gekko
                     if (Program.options.databank_trace)
                     {
                         Trace newTrace = new Trace(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
-                        newTrace.contents.text = this.gekkocode + ";";
+                        newTrace.contents.text = this.gekkocode + ";"; //-minus-
                         //newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
                         newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
-                        newTrace.contents.commandFileAndLine = null;
+                        newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                         Gekko.Trace.PushIntoSeries(tsNew, newTrace, ETracePushType.NewParent);
                     }
                 }

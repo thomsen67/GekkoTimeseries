@@ -1266,6 +1266,7 @@ namespace Gekko.Parser.Gek
                         GetCodeFromAllChildren(node, node[1]);
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
@@ -3534,7 +3535,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(sb2);
                                 node.Code.A("};" + G.NL);  //end of action
 
-                                node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                                node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ", p);" + G.NL);
                                                                                                 
                                 if (node?[0]?[0]?[1]?.Text == "ASTVARNAME" && node?[0]?[0]?[1]?[0]?[0]?.Text == "ASTHASH" && (node?[3]?.Text == "ASTPLACEHOLDER" || G.Equal(node?[3]?.Text, "list")))
                                 {
@@ -4551,6 +4552,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                         if (node[3] != null) node.Code.A(node[2].Code); //options
                         node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -5044,6 +5046,7 @@ ASTPLACEHOLDER [0]
                         GetCodeFromAllChildren(node, node[0]);  //options
                         node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

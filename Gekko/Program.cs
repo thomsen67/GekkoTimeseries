@@ -4675,10 +4675,10 @@ namespace Gekko
                                             x = tsExisting;
                                             type = ETracePushType.Sibling;
                                         }
-                                        newTrace.contents.text = oRead.gekkocode + ";";
+                                        newTrace.contents.text = oRead.gekkocode + ";"; //-minus-
                                         newTrace.contents.dataFile = ffh.realPathAndFileName;
                                         newTrace.contents.bankAndVarnameWithFreq = name;
-                                        newTrace.contents.commandFileAndLine = null;
+                                        newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                                         Gekko.Trace.PushIntoSeries(x, newTrace, type);
                                     }
                                 }
@@ -8684,7 +8684,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="ib"></param>
         /// <param name="iv"></param>
-        public static void Trace(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
+        public static void RecordANewTrace(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
         {
             if (iv == null) return;
             Series rv_series = iv as Series;
@@ -8720,6 +8720,8 @@ namespace Gekko
 
                 if (!onlyTraceSeries || rv_series != null)
                 {   
+                    //looks up in list, but the list should be rather short, and equality is by reference/pointer.
+                    //but maybe for many precedents, a dict would be better. Ideally a list for < 20 elements, and a dict otherwise.
                     if (!Globals.traceContainer.Contains(iv)) Globals.traceContainer.Add(iv);
                 }
             }
@@ -16132,7 +16134,6 @@ namespace Gekko
         /// <param name="o"></param>
         public static void Rename(O.Rename o)
         {
-
             if (o.type == "ASTPLACEHOLDER") o.type = null;
             EVariableType type = EVariableType.Var;
             if (o.type != null) type = G.GetVariableType(o.type);
@@ -16172,10 +16173,10 @@ namespace Gekko
                 if (Program.options.databank_trace &&  ts != null)
                 {
                     Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
-                    newTrace.contents.text = o.gekkocode + ";";
+                    newTrace.contents.text = o.gekkocode + ";"; //-minus-
                     //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
-                    newTrace.contents.commandFileAndLine = null;
+                    newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                     Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
             }
@@ -16289,10 +16290,10 @@ namespace Gekko
                             if (Program.options.databank_trace)
                             {
                                 Trace newTrace = new Trace(o.t1, o.t2);
-                                newTrace.contents.text = o.gekkocode + ";";
+                                newTrace.contents.text = o.gekkocode + ";"; //-minus-
                                 //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
-                                newTrace.contents.commandFileAndLine = null;
+                                newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
                                 Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
@@ -16310,10 +16311,10 @@ namespace Gekko
                     if (Program.options.databank_trace && ts_clone != null)
                     {
                         Trace newTrace = new Trace(o.t1, o.t2);
-                        newTrace.contents.text = o.gekkocode + ";";
+                        newTrace.contents.text = o.gekkocode + ";"; //-minus-
                         //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
-                        newTrace.contents.commandFileAndLine = null;
+                        newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                         Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
                 }
@@ -23326,7 +23327,7 @@ namespace Gekko
                     newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.commandFileAndLine = null;
+                    newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
@@ -23626,10 +23627,10 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
-                    newTrace.contents.text = gekkocode + ";";
+                    newTrace.contents.text = gekkocode + ";"; //-minus-
                     //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
-                    newTrace.contents.commandFileAndLine = null;
+                    newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                     newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
                     Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
@@ -32656,37 +32657,48 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Returns the currently executing gcm file (and line after "¤"). Will not return functions/procedures,
+        /// If simple==true, simply returns what is on the stack (may be null or not useful). Accepts function/procedure lines.
+        /// If simple==false, returns the currently executing gcm file (but not the line "¤"). Will not return functions/procedures,
         /// these are considered "free floating". May return null (among other things if root() is called from GUI),
-        /// and beware when calling that the P p object may be null.
+        /// and beware when calling that the P p object may be null. NOTE1: will check for file existence, so this
+        /// will be slow.
         /// </summary>
         /// <returns></returns>
-        public string GetExecutingGcmFile()
+        public string GetExecutingGcmFile(bool simple)
         {
             string command = null;
-
-            try
-            {
-                int max = this.GetDepth();
-                for (int i = max; i >= 1; i--)
+            if (simple)
+            {                
+                try
                 {
-                    command = this.GetStack(i);
-                    if (IsFunctionOrProcedure(command))
-                    {
-                        //not good, continue
-                    }
-                    else
-                    {
-                        string[] ss = command.Split('¤');
-                        if (ss.Length == 2 && File.Exists(ss[0])) return ss[0];
-                    }
-                }                
+                    command = this.GetStack(this.GetDepth());
+                }
+                catch { } //do not choke on this
+                return command;
             }
-            catch { } //do not choke on this
-
-            return null;
+            else
+            {
+                try
+                {
+                    int max = this.GetDepth();
+                    for (int i = max; i >= 1; i--)
+                    {
+                        command = this.GetStack(i);
+                        if (IsFunctionOrProcedure(command))
+                        {
+                            //not good, continue
+                        }
+                        else
+                        {
+                            string[] ss = command.Split('¤');
+                            if (ss.Length == 2 && File.Exists(ss[0])) return ss[0];
+                        }
+                    }
+                }
+                catch { } //do not choke on this
+                return null;
+            }            
         }
-
 
         public bool IsSimple()
         {

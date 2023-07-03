@@ -6000,7 +6000,7 @@ namespace Gekko
 
                 //now we test that the executing gcm (if any) is consistent with this root
                 P p = smpl.p;
-                string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(); //p may be null, and method may return null                    
+                string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false); //p may be null, and method may return null                    
                 if (gcm != null)
                 {
                     string folder2 = Path.GetDirectoryName(gcm);

@@ -1679,8 +1679,7 @@ namespace Gekko
         private static void LookupHandleTrace(GekkoSmpl smpl, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o)
         {
             if (!isArraySubSeries)
-            {
-                
+            {                
                 lhs_series.meta.stamp = Program.GetDateStamp();
                 if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
                 if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
@@ -1692,22 +1691,16 @@ namespace Gekko
 
                 if (traceString != null)
                 {
-
                     if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ETraceType.Parent);
                     // ---------
                     Trace trace = new Trace(smpl.t1, smpl.t2);
                     trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                    trace.contents.commandFileAndLine = smpl?.p.GetExecutingGcmFile();
+                    trace.contents.commandFileAndLine = smpl?.p?.GetExecutingGcmFile(true);
                     trace.contents.text = traceString + ";";
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
                         List<Trace> temp = new List<Trace>();
-
-                        //!!!! Maybe make sure that no Trace2 points to a Trace2 that is *younger*
-                        //     Is datetime finegrained enough?
-                        //     This would guard against cycles in protobuf.
-
                         foreach (IVariable iv in Globals.traceContainer)
                         {
                             Series iv_ts = iv as Series;

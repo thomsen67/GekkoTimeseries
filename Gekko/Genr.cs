@@ -57,7 +57,7 @@ namespace Gekko
                 O.Dynamic1(smpl);                
                 return O.Dynamic2(smpl);
             };
-            O.RunAssigmentMaybeDynamic(smpl, assign_24, check_24, o0);
+            O.RunAssigmentMaybeDynamic(smpl, assign_24, check_24, o0, p);
 
             //[[commandEnd]]0
         }
