@@ -13001,7 +13001,7 @@ namespace UnitTests
                     Trace trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
 
                     // ---------------------------------
-                    // ---------------------------------
+                    // ---------------------------------                    
                     I("write sletmig1;"); //a, b, c, d  ... 2021-23
                     Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
@@ -13041,14 +13041,15 @@ namespace UnitTests
                     Helper_CheckTrace("d!a", x5a);
                     // ---------------------------------
                     I("write sletmig2;"); //d  ... 2021-23
-                    I("read sletmig2;"); //d  ... 2021-23
-                    String2 x5b = Helper_Push(x5a, "read sletmig2;");
+                    string c5b = "read sletmig2;";
+                    I(c5b); //d  ... 2021-23
+                    String2 x5b = Helper_Push(x5a, c5b);
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
                     // ---------------------------------
                     string c6 = "copy d to e;";
                     I(c6);
-                    String2 x6 = Helper_Push(x5b, "copy d to e;");
+                    String2 x6 = Helper_Push(x5b, c6);
                     Helper_CheckTrace("e!a", x6);
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
@@ -13062,11 +13063,10 @@ namespace UnitTests
                     Helper_CheckTrace("d!a", x5b);
                     // ---------------------------------
                     // ---------------------------------
-                    string c8 = "copy <2021 2021> f to e;";  //only partial copy
-                    string c8a = "copy <2021 2021> f to e;";
+                    string c8 = "copy <2021 2021> f to e;";  //only partial copy                    
                     I(c8);
                     String2 x8 = G.DeepCloneSlow<String2>(x6);
-                    x8.m.Add(new String2(c8a));
+                    x8.m.Add(new String2(c8));
                     x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
                     Helper_CheckTrace("f!a", x7);
                     Helper_CheckTrace("e!a", x8);
@@ -13075,7 +13075,7 @@ namespace UnitTests
                     // ---------------------------------
                     string c9 = "rename e as g;";
                     I(c9);
-                    String2 x9 = Helper_Push(x8, "rename e as g;");
+                    String2 x9 = Helper_Push(x8, c9);
                     Helper_CheckTrace("g!a", x9);
                     Helper_CheckTrace("f!a", x7);
                     Helper_CheckTrace("d!a", x5b);
@@ -13084,8 +13084,9 @@ namespace UnitTests
                     I("delete d;");
                     string c10 = "d = 5, 6, 7;";
                     I(c10);
-                    I("import <2022 2022> sletmig2;");
-                    String2 x10a = new String2("import <2022 2022> sletmig2;");
+                    string c10a = "import <2022 2022> sletmig2;";
+                    I(c10a);
+                    String2 x10a = new String2(c10a);
                     x10a.m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
                     String2 x10 = new String2(null);
                     x10.m.Add(new String2(c10));
