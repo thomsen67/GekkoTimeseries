@@ -1704,7 +1704,7 @@ namespace Gekko
                         foreach (IVariable iv in Globals.traceContainer)
                         {
                             Series iv_ts = iv as Series;
-                            if (iv_ts == null) continue;
+                            if (iv_ts?.meta?.trace == null) continue;
                             if (Object.ReferenceEquals(iv_ts, lhs_series))
                             {
                                 continue;  //do not point to your own trace!

@@ -193,8 +193,11 @@ namespace Gekko
             else
             {
                 Gui.gui.textBoxMainTabLower.ReadOnly = b;
-                if (b) Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;
-                else Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                if (!Program.options.global_pink)
+                {
+                    if (b) Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;
+                    else Gui.gui.textBoxMainTabLower.BackColor = Color.White;
+                }
             }
         }
 
@@ -245,7 +248,7 @@ namespace Gekko
             {
 
                 if (G.Equal(Program.options.interface_mode, "sim"))
-                {                    
+                {
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb(Globals.GekkoModeGreen.R, Globals.GekkoModeGreen.G, Globals.GekkoModeGreen.B);
                 }
                 else if (G.Equal(Program.options.interface_mode, "data"))
@@ -256,7 +259,10 @@ namespace Gekko
                 {
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb(Globals.GekkoModeYellow.R, Globals.GekkoModeYellow.G, Globals.GekkoModeYellow.B);
                 }
-                else Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+                else
+                {
+                    if (!Program.options.global_pink) Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+                }
 
             }
         }
