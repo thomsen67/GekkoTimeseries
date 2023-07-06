@@ -2050,7 +2050,7 @@ namespace Gekko
     }
 
     [ProtoContract]
-    //For use with VPRT, and fixing in timeseriesries
+    //For use with VPRT, and fixing in timeseries
     public class GekkoTimeSpan
     {
         [ProtoMember(1)]
@@ -2107,8 +2107,32 @@ namespace Gekko
             s = s.Substring(0, s.Length - ", ".Length);
             return s;
         }
-    }    
+    }
 
+    [ProtoContract]
+    /// <summary>
+    /// For use with Trace
+    /// </summary>
+    public class GekkoTimeSpanSimple
+    {
+        [ProtoMember(1)]
+        public GekkoTime tStart;
+        [ProtoMember(2)]
+        public GekkoTime tEnd;
+
+        public GekkoTimeSpanSimple()
+        {
+            //only because of protobuf
+        }
+
+        public GekkoTimeSpanSimple(GekkoTime t1, GekkoTime t2)
+        {
+            this.tStart = t1;
+            this.tEnd = t2;
+        }        
+    }
+
+    
     /// <summary>
     /// Taken from .NET Core here: https://github.com/dotnet/runtime/blob/b41f1c5f2fde25d752d857a54c3af24145060cdd/src/libraries/System.Private.CoreLib/src/System/Globalization/ISOWeek.cs
     /// </summary>

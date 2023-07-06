@@ -88,10 +88,16 @@ namespace Gekko
             trace2.text = this.text;
             trace2.dataFile = this.dataFile;
             trace2.periods = new Periods();
+
             if (this.periods.Count() > 0)
             {
-                foreach (KeyValuePair<GekkoTime, byte> kvp in this.periods.GetStorage()) trace2.periods.Add(kvp.Key);
+                trace2.periods.Initialize();
+                foreach (GekkoTimeSpanSimple gtss in this.periods.GetStorage())
+                {
+                    trace2.periods.Add(new GekkoTimeSpanSimple(gtss.tStart, gtss.tEnd));
+                }
             }
+
             return trace2;
         }
 
@@ -105,8 +111,9 @@ namespace Gekko
             this.t1 = t1;
             this.t2 = t2;
             if (!this.t1.IsNull() && !this.t2.IsNull())
-            {
-                foreach (GekkoTime t in new GekkoTimeIterator(this.t1, this.t2)) this.periods.Add(t);  //add all
+            {                
+                this.periods = new Periods();
+                this.periods.Add(new GekkoTimeSpanSimple(this.t1, this.t2));
             }
         }
     }
@@ -234,7 +241,7 @@ namespace Gekko
             string s = null;
             if (this.contents.periods.Count() > 0)
             {
-                foreach (GekkoTime t in this.contents.periods.GetStorage().Keys) s += t.ToString() + ", ";
+                foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.tStart + "-" + gtss.tEnd + ", ";
             }
             s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
@@ -567,32 +574,34 @@ namespace Gekko
     [ProtoContract]
     public class Periods
     {
-        private Dictionary<GekkoTime, byte> storage = null;
+        private List<GekkoTimeSpanSimple> storage = null;
 
-        public void Add(GekkoTime t)
+        /// <summary>
+        /// Beware: only for iterating.
+        /// </summary>
+        /// <returns></returns>
+        public List<GekkoTimeSpanSimple> GetStorage()
         {
-            if (this.storage == null) this.storage = new Dictionary<GekkoTime, byte>();
-            this.storage.Add(t, 0);
+            return this.storage;
         }
-        public void Remove(GekkoTime t)
+
+        /// <summary>
+        /// Beware: use with care.
+        /// </summary>
+        /// <returns></returns>
+        public void Initialize()
         {
-            if (this.storage == null) return;
-            this.storage.Remove(t);
+            this.storage = new List<GekkoTimeSpanSimple>();
+        }
+
+        public void Add(GekkoTimeSpanSimple x)
+        {
+            this.storage.Add(x);
         }
 
         public int Count()
         {
-            if (this.storage == null) return 0;
             return this.storage.Count;
-        }
-
-        /// <summary>
-        /// Only for iterators! REMEMBER to put an "if (xxx.periods.Count() > 0) {... " before iterating!!
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<GekkoTime, byte> GetStorage()
-        {
-            return this.storage;
         }
     }
 }
