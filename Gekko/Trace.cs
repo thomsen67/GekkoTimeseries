@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 //using System.Windows.Forms;
 //using static alglib;
 
@@ -94,7 +95,7 @@ namespace Gekko
                 trace2.periods.Initialize();
                 foreach (GekkoTimeSpanSimple gtss in this.periods.GetStorage())
                 {
-                    trace2.periods.Add(new GekkoTimeSpanSimple(gtss.tStart, gtss.tEnd));
+                    trace2.periods.Add(new GekkoTimeSpanSimple(gtss.t1, gtss.t2));
                 }
             }
 
@@ -241,7 +242,7 @@ namespace Gekko
             string s = null;
             if (this.contents.periods.Count() > 0)
             {
-                foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.tStart + "-" + gtss.tEnd + ", ";
+                foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.t1 + "-" + gtss.t2 + ", ";
             }
             s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
@@ -292,33 +293,76 @@ namespace Gekko
                 if (ts.meta.trace.precedents.Count() > 0)
                 {
                     if (ts.meta.trace.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
-                    List<Trace> toRemove = new List<Trace>();
+                    
                     foreach (Trace sibling in ts.meta.trace.precedents.GetStorage())
                     {
                         //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
                         //So the siblings all belong to the same timeseries, and therefore it is ok
                         //to remove periods.
-                        if (ths.contents.periods.Count() > 0)
-                        {
-                            int countStart = sibling.contents.periods.Count();
-                            foreach (GekkoTime t in ths.contents.periods.GetStorage().Keys)
+                        //ths is the new trace that is going to be added
+
+                        if (sibling.contents.periods.Count() > 0)
+                        {                            
+                            foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
                             {
-                                sibling.contents.periods.Remove(t);
+                                if (ths.contents.periods.Count() > 0)
+                                {
+                                    //int countStart = sibling.contents.periods.Count();
+
+                                    List<GekkoTimeSpanSimple> temp = new List<GekkoTimeSpanSimple>();
+
+                                    foreach (GekkoTimeSpanSimple thsSpan in ths.contents.periods.GetStorage())
+                                    {
+                                        // Four possibilities
+                                        //
+                                        //             =============                  === is siblingSpan (existing), --- is thsSpan (new one)
+                                        //  -----                         -----       A. Outside (left or right)
+                                        //          -----        -----                B. Cut from left or right                                
+                                        //                 ----                       C. Separate in two
+                                        //          -------------------               D. Shadow and remove
+                                        //
+                                        // The code below removes the --- from the ===, so removes periods from siblingSpan
+                                        //
+                                        if (thsSpan.t2.StrictlySmallerThan(siblingSpan.t1) || thsSpan.t1.StrictlyLargerThan(siblingSpan.t2))
+                                        {
+                                            //A, nothing happens
+                                            temp.Add(siblingSpan);
+                                        }
+                                        else if (thsSpan.t1.SmallerThanOrEqual(siblingSpan.t1) && thsSpan.t2.LargerThanOrEqual(siblingSpan.t2))
+                                        {
+                                            //D, remove --> nothing added
+                                        }
+                                        else if (thsSpan.t1.SmallerThanOrEqual(siblingSpan.t1) && thsSpan.t2.StrictlySmallerThan(siblingSpan.t2))
+                                        {
+                                            //B left
+                                            temp.Add(new GekkoTimeSpanSimple(thsSpan.t2.Add(1), siblingSpan.t2));
+                                        }
+                                        else if (thsSpan.t1.StrictlyLargerThan(siblingSpan.t1) && thsSpan.t2.LargerThanOrEqual(siblingSpan.t2))
+                                        {
+                                            //B right
+                                            temp.Add(new GekkoTimeSpanSimple(siblingSpan.t1, thsSpan.t1.Add(-1)));
+                                        }
+                                        else if (thsSpan.t1.StrictlyLargerThan(siblingSpan.t1) && thsSpan.t2.StrictlySmallerThan(siblingSpan.t2))
+                                        {
+                                            //C cut in two
+                                            temp.Add(new GekkoTimeSpanSimple(siblingSpan.t1, thsSpan.t1.Add(-1)));
+                                            temp.Add(new GekkoTimeSpanSimple(thsSpan.t2.Add(1), siblingSpan.t2));
+                                        }
+                                        else new Error("Wrong logic regarding time spans");
+                                    }
+                                    //if (countStart > 0 && sibling.contents.periods.Count() == 0)
+                                    //{
+                                    //    //last period has been removed
+                                    //    toRemove.Add(sibling);
+                                    //}
+                                }
                             }
-                            if (countStart > 0 && sibling.contents.periods.Count() == 0)
-                            {
-                                //last period has been removed
-                                toRemove.Add(sibling);
-                            }
+                            if (temp.Count() == 0) temp = null;
+                            sibling.contents.periods.SetStorage(temp);
                         }
                     }
-                    if (toRemove.Count > 0)
-                    {
-                        foreach (Trace remove in toRemove)
-                        {
-                            Trace.RemoveFromSeries(ts, remove);
-                        }
-                    }
+                    
+
                 }
                 ts.meta.trace.precedents.Add(ths);
             }
@@ -586,6 +630,15 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Use with care
+        /// </summary>
+        /// <param name="storage"></param>
+        public void SetStorage(List<GekkoTimeSpanSimple> storage)
+        {
+            this.storage = storage;
+        }
+
+        /// <summary>
         /// Beware: use with care.
         /// </summary>
         /// <returns></returns>
@@ -601,6 +654,7 @@ namespace Gekko
 
         public int Count()
         {
+            if (this.storage == null) return 0;
             return this.storage.Count;
         }
     }

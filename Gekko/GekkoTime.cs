@@ -2116,9 +2116,9 @@ namespace Gekko
     public class GekkoTimeSpanSimple
     {
         [ProtoMember(1)]
-        public GekkoTime tStart;
+        public GekkoTime t1;
         [ProtoMember(2)]
-        public GekkoTime tEnd;
+        public GekkoTime t2;
 
         public GekkoTimeSpanSimple()
         {
@@ -2127,8 +2127,10 @@ namespace Gekko
 
         public GekkoTimeSpanSimple(GekkoTime t1, GekkoTime t2)
         {
-            this.tStart = t1;
-            this.tEnd = t2;
+            if (t1.StrictlyLargerThan(t2)) new Error("Time span problem");
+            this.t1 = t1;
+            this.t2 = t2;
+
         }        
     }
 
