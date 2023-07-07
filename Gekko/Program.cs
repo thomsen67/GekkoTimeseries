@@ -16173,7 +16173,7 @@ namespace Gekko
                 Series ts = iv as Series;
                 if (Program.options.databank_trace &&  ts != null)
                 {
-                    Trace newTrace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
+                    Trace newTrace = new Trace(true);
                     newTrace.contents.text = o.gekkocode + ";";
                     //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
