@@ -152,7 +152,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Child trace. Also sets stamp, traceversion and .t1 and .t2 (fills .periods with this range).
+        /// Child trace. Also sets stamp, traceversion and .t1 and .t2 (and fills .periods with this range).
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -301,17 +301,16 @@ namespace Gekko
                         //to remove periods.
                         //ths is the new trace that is going to be added
 
-                        if (sibling.contents.periods.Count() > 0)
+                        if (ths.contents.periods.Count() != 1) new Error("Problem with time spans");
+
+                        if (ths.contents.periods.Count() > 0)
                         {                            
-                            foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
-                            {
-                                if (ths.contents.periods.Count() > 0)
+                            foreach (GekkoTimeSpanSimple thsSpan in ths.contents.periods.GetStorage()) //Can there ever be > 1 of these??
+                            {                                
+                                if (sibling.contents.periods.Count() > 0)
                                 {
-                                    //int countStart = sibling.contents.periods.Count();
-
                                     List<GekkoTimeSpanSimple> temp = new List<GekkoTimeSpanSimple>();
-
-                                    foreach (GekkoTimeSpanSimple thsSpan in ths.contents.periods.GetStorage())
+                                    foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
                                     {
                                         // Four possibilities
                                         //
@@ -349,20 +348,13 @@ namespace Gekko
                                             temp.Add(new GekkoTimeSpanSimple(thsSpan.t2.Add(1), siblingSpan.t2));
                                         }
                                         else new Error("Wrong logic regarding time spans");
-                                    }
-                                    //if (countStart > 0 && sibling.contents.periods.Count() == 0)
-                                    //{
-                                    //    //last period has been removed
-                                    //    toRemove.Add(sibling);
-                                    //}
+                                    }                                    
+                                    if (temp.Count() == 0) temp = null;
+                                    sibling.contents.periods.SetStorage(temp);
                                 }
-                            }
-                            if (temp.Count() == 0) temp = null;
-                            sibling.contents.periods.SetStorage(temp);
+                            }                            
                         }
                     }
-                    
-
                 }
                 ts.meta.trace.precedents.Add(ths);
             }
@@ -649,6 +641,7 @@ namespace Gekko
 
         public void Add(GekkoTimeSpanSimple x)
         {
+            if (storage == null) storage = new List<GekkoTimeSpanSimple>();
             this.storage.Add(x);
         }
 
