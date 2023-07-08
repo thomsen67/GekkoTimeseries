@@ -22907,7 +22907,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Flushes all cache files. I
+        /// Flushes all cache files. Default is "hard" flush.
         /// </summary>
         public static void Flush()
         {

@@ -318,7 +318,7 @@ namespace Gekko
 
                     if (ths.contents.periods.Count() != 1) new Error("Problem with time spans");
                     //if (ths.contents.periods.Count() > 0) { foreach (GekkoTimeSpanSimple thsSpan in ths.contents.periods.GetStorage()) {                                
-                    GekkoTimeSpanSimple thsSpan = ths.contents.periods.Get(0);
+                    GekkoTimeSpanSimple thsSpan = ths.contents.periods[0];
 
                     if (!thsSpan.IsNull()) //if null --> cannot shadow anything
                     {
@@ -665,9 +665,10 @@ namespace Gekko
             return this.storage;
         }
 
-        public GekkoTimeSpanSimple Get(int i)
+        public GekkoTimeSpanSimple this[int i]
         {
-            return this.storage[i];
+            get { return this.storage[i]; }
+            set { this.storage[i] = value; }
         }
 
         /// <summary>
