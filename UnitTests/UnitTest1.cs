@@ -12882,8 +12882,8 @@ namespace UnitTests
             Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
             Assert.AreEqual(null, tracec.dataFile);
             Assert.AreEqual("copy x1 to y;", tracec.text);
-            Assert.AreEqual(GekkoTime.tNull, tracec.GetT1());
-            Assert.AreEqual(GekkoTime.tNull, tracec.GetT2());
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
             //We skip testing of periods here
 
 
@@ -13031,16 +13031,16 @@ namespace UnitTests
             string path = Globals.ttPath2 + @"\regres\Databanks\temp";
 
             SeriesMetaInformation meta1 = new SeriesMetaInformation();
-            meta1.trace = new Trace(GekkoTime.tNull, GekkoTime.tNull);
+            meta1.trace = new Trace(true);
             //dict1.Add(meta1.trace, dict1.Count);
             meta1.trace.precedents = new Precedents();
-            Trace xx1 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
+            Trace xx1 = new Trace(true);
             xx1.contents.text = "xx1";
             meta1.trace.precedents.Add(xx1);
-            Trace xx2 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
+            Trace xx2 = new Trace(true);
             xx2.contents.text = "xx2";
             meta1.trace.precedents.Add(xx2);
-            Trace xx3 = new Trace(GekkoTime.tNull, GekkoTime.tNull);
+            Trace xx3 = new Trace(true);
             xx3.contents.text = "xx3";
             meta1.trace.precedents.Add(xx3);
             xx3.precedents = new Precedents();

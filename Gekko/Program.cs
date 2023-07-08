@@ -16311,7 +16311,7 @@ namespace Gekko
                     Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
                     {
-                        Trace newTrace = new Trace(o.t1, o.t2);
+                        Trace newTrace = new Trace(ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast());
                         newTrace.contents.text = o.gekkocode + ";";
                         //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();

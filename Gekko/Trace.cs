@@ -170,6 +170,8 @@ namespace Gekko
         /// <param name="t2"></param>
         public Trace(GekkoTime t1, GekkoTime t2)
         {
+            if (t1.IsNull() || t2.IsNull()) 
+                new Error("Trace time error");
             this.contents = new TraceContents(t1, t2);            
         }
 
@@ -381,6 +383,7 @@ namespace Gekko
                                 {
                                     siblingsToRemove.Add(sibling);
                                 }
+                                sibling.contents.periods.SetStorage(spansTemp);
                             }
 
                             //}}
