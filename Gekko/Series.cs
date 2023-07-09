@@ -2553,7 +2553,7 @@ namespace Gekko
                 }                
             }
 
-            Program.RecordANewTrace(rv, this.GetParentDatabank(), "[" + miWildcard.ToString() + "]", isLhs, true);  //both precedents for DECOMP and data tracing
+            Program.RegisterANewTracePrecedent(rv, this.GetParentDatabank(), "[" + miWildcard.ToString() + "]", isLhs, true);  //both precedents for DECOMP and data tracing
 
             return rv;
         }        
@@ -2712,7 +2712,6 @@ namespace Gekko
                     if (this.freq != EFreq.U && IsLagOrLead(i))
                     {
                         new Error("You cannot use index in range -99..99 on a left-hand side series, unless it is of undated freq");
-                        //throw new GekkoException();
                     }
 
                     if (this.freq == EFreq.A || this.freq == EFreq.U)
@@ -2720,6 +2719,7 @@ namespace Gekko
                         double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                         GekkoTime t = new GekkoTime(this.freq, i, 1);
                         this.SetData(t, d);
+                        O.LookupHandleTrace(t, t, this, this.GetParentDatabank(), this.GetName(), false, options, smpl.p);
                         if (Program.options.series_failsafe)
                         {
                             //only for debugging                        
@@ -2728,8 +2728,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("You cannot []-index a " + this.freq.Pretty() + " SERIES with [" + i + "]");
-                        //throw new GekkoException();
+                        new Error("You cannot []-index a " + this.freq.Pretty() + " series with [" + i + "]");
                     }
                 }
                 else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
@@ -2737,6 +2736,7 @@ namespace Gekko
                     double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
                     GekkoTime t = ((ScalarDate)(indexes[0])).date;
                     this.SetData(t, d);  //will fail with an error if freqs do not match
+                    O.LookupHandleTrace(t, t, this, this.GetParentDatabank(), this.GetName(), false, options, smpl.p);
                     if (Program.options.series_failsafe)
                     {
                         //only for debugging                        
@@ -2746,7 +2746,6 @@ namespace Gekko
                 else
                 {
                     new Error("A normal series " + this.GetNameAndFreqPretty(true) + " on the left-hand side must be []-indexed with date or val");
-                    //throw new GekkoException();
                 }
             }
         }

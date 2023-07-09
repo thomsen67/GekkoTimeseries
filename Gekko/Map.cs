@@ -61,7 +61,7 @@ namespace Gekko
         {
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);
-            Program.RecordANewTrace(iv, this, variable, isLhs, false);
+            Program.RegisterANewTracePrecedent(iv, this, variable, isLhs, false);
             return iv;
         }
 

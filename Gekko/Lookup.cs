@@ -1271,7 +1271,8 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    LookupHandleTrace(smpl, lhs_series, ib, varnameWithFreq, isArraySubSeries, o);
+                    LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
+                    LookupHandleTrace(smpl.t1, smpl.t2, lhs_series, ib, varnameWithFreq, isArraySubSeries, o, smpl.p);
 
                     switch (rhs.Type())
                     {
@@ -1676,16 +1677,10 @@ namespace Gekko
 
         }
 
-        private static void LookupHandleTrace(GekkoSmpl smpl, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o)
+        public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o, P p)
         {
             if (!isArraySubSeries)
-            {                
-                lhs_series.meta.stamp = Program.GetDateStamp();
-                if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
-                if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
-                if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
-                if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override
-                
+            {
                 string traceString = null;
                 if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
 
@@ -1693,9 +1688,9 @@ namespace Gekko
                 {
                     if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ETraceType.Parent);
                     // ---------
-                    Trace trace = new Trace(smpl.t1, smpl.t2);
+                    Trace trace = new Trace(t1, t2);
                     trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                    trace.contents.commandFileAndLine = smpl?.p?.GetExecutingGcmFile(true);
+                    trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                     trace.contents.text = traceString + ";";
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
@@ -1733,26 +1728,23 @@ namespace Gekko
                         {
                             trace.precedents.SetStorage(temp);  //keep it null if no children                            
                         }
-                    }
-
-                    //remove these new periods from any previous traces
-                    Trace.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);
-
-                    ////For y = x1 + x2, this links each period of y.meta.trace to object Trace2("y = x1 + x2")
-                    //foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                    //{
-                    //    //!!!!
-                    //    //!!!!
-                    //    //!!!!
-                    //    //!!!! implement hashcode and equals for GekkoTime
-                    //    //!!!!
-                    //    //!!!!
-                    //    //if (lhs_series.meta.traces2.storage.ContainsKey(t)) lhs_series.meta.traces2.storage.Remove(t);
-                    //    //lhs_series.meta.traces2.storage.Add(t, trace2);
-                    //}
+                    }                    
+                    Trace.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);                    
                 }
             }
-        }        
+        }
+
+        private static void LookupHandleMetaStuff(Series lhs_series, bool isArraySubSeries, Assignment o)
+        {
+            if (!isArraySubSeries)
+            {
+                lhs_series.meta.stamp = Program.GetDateStamp();
+                if (o?.opt_label != null) lhs_series.meta.label = o.opt_label;
+                if (o?.opt_source != null) lhs_series.meta.source = o.opt_source;
+                if (o?.opt_units != null) lhs_series.meta.units = o.opt_units;
+                if (o?.opt_stamp != null) lhs_series.meta.stamp = o.opt_stamp; //will override                                
+            }
+        }
 
         private static bool SeriesHasSkips(Series tsInput)
         {            

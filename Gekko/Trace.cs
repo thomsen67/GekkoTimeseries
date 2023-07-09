@@ -259,13 +259,20 @@ namespace Gekko
         /// Pretty print periods and stamp.
         /// </summary>
         /// <returns></returns>
-        public string PeriodsAndStamp()
+        public string PrintPeriods()
         {
             string s = null;
             if (this.contents.periods.Count() > 0)
             {
+                s += "pers=";
                 foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.t1 + "-" + gtss.t2 + ", ";
             }
+            return s;
+        }
+
+        public string PrintStamp()
+        {
+            string s = null;            
             s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
         }
@@ -284,14 +291,15 @@ namespace Gekko
         public string Text()
         {
             string s = null;
-            if (!this.contents.GetT1().IsNull()) s += "" + this.contents.GetT1() + "-" + this.contents.GetT2();
-            s += ": ";
+            s += "" + this.contents.GetT1() + "-" + this.contents.GetT2() + "";
+            s += " --> ";
             s += this.contents.text;
             s += "          ";
+             s += " || " + this.PrintPeriods();
             if (this.contents.bankAndVarnameWithFreq != null) s += " || lhs=" + this.contents.bankAndVarnameWithFreq;
             if (this.contents.dataFile != null) s += " || data=" + this.contents.dataFile;
             if (this.contents.commandFileAndLine != null) s += " || gcm=" + this.contents.commandFileAndLine;
-            s += " || " + this.PeriodsAndStamp();
+            s += " || " + this.PrintStamp();
             return s;
         }
 
@@ -654,6 +662,7 @@ namespace Gekko
     [ProtoContract]
     public class Periods
     {
+        [ProtoMember(1)]
         private List<GekkoTimeSpanSimple> storage = null;
 
         /// <summary>

@@ -13113,7 +13113,9 @@ namespace UnitTests
         {
             Trace trace1, trace2;
             Series y;
-            
+ 
+            // Different variations START
+
             I("reset; time 2000 2010;");
             I("x <2004 2006> = 1;");
             I("x <2003 2003> = 2;");
@@ -13186,6 +13188,8 @@ namespace UnitTests
             Assert.AreEqual(2007, trace2.contents.periods[0].t1.super);
             Assert.AreEqual(2007, trace2.contents.periods[0].t2.super);
 
+            // Different variations END
+
             //full shadowing
 
             I("reset; time 2000 2010;");
@@ -13243,7 +13247,23 @@ namespace UnitTests
             x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, x.meta.trace.precedents.Count()); //x has 1 trace when found via series object
 
+            // Test of series indexer
 
+            I("reset; time 2000 2010;");
+            I("x <2004 2006> = 1;");
+            I("x[2005] = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            Assert.AreEqual(2, trace1.contents.periods.Count());
+            Assert.AreEqual(2004, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t2.super);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
         }
 
         [TestMethod]
@@ -13260,8 +13280,7 @@ namespace UnitTests
 
                     Program.Flush();                    
                     Globals.cacheSize2 = 1;  //set it to minimum, so that cache if produced when reading for i==0, and cache can be used in i==1
-
-                    string s = null;
+                                        
                     I("reset;");
                     I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     I("OPTION databank trace = yes;");
@@ -13336,7 +13355,19 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
 
-                    Trace trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace;
+                    I("d.traceprint();");
+                    I("c.traceprint();");
+                    I("a.traceprint();");
+
+                    Trace trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace.precedents[0].precedents[0];
+                    Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
+                    Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
+                    Assert.AreEqual(2021, trace2.contents.GetT1().super);
+                    Assert.AreEqual(2023, trace2.contents.GetT2().super);                    
+                    Assert.AreEqual(2021, trace2.contents.periods[0].t1.super);
+                    Assert.AreEqual(2023, trace2.contents.periods[0].t2.super);
+                    Assert.AreEqual("d = a + b + c;", trace2.contents.text);
+                    //.dataFile is not tested, since it is null here anyway
 
                     Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
                     Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));

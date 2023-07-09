@@ -8685,7 +8685,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="ib"></param>
         /// <param name="iv"></param>
-        public static void RecordANewTrace(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
+        public static void RegisterANewTracePrecedent(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
         {
             if (iv == null) return;
             Series rv_series = iv as Series;
