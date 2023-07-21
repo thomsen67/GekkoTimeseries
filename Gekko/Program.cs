@@ -4657,7 +4657,18 @@ namespace Gekko
 
                                         if (periods == null)
                                         {
-                                            newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
+                                            GekkoTime t1 = tsImported.GetRealDataPeriodFirst();
+                                            GekkoTime t2 = tsImported.GetRealDataPeriodLast();
+                                            if (t1.IsNull())
+                                            {
+                                                //can happen that a series is empty of data
+                                                newTrace = new Trace(true);
+                                            }
+                                            else
+                                            {
+                                                newTrace = new Trace(t1, t2);
+                                            }
+                                            
                                             if (tsExisting != null)
                                             {                                                
                                                 newTrace.precedents.AddRange(tsImported.meta.trace.precedents);

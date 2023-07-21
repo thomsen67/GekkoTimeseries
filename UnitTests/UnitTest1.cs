@@ -7397,11 +7397,11 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Browser()
+        public void _Test_Browser_SMEC()
         {            
             Program.Flush(); //wipes out existing cached models
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser\SMEC';");
             Globals.browserLimit = true;
             I("DOC<browser>;");
             Globals.browserLimit = false;
@@ -7412,7 +7412,18 @@ namespace UnitTests
         {
             Program.Flush(); //wipes out existing cached models
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser_MONA';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser\MONA';");
+            Globals.browserLimit = true;
+            I("DOC<browser>;");
+            Globals.browserLimit = false;
+        }
+
+        [TestMethod]
+        public void _Test_Browser_ADAM()
+        {
+            Program.Flush(); //wipes out existing cached models
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser\ADAM';");
             Globals.browserLimit = true;
             I("DOC<browser>;");
             Globals.browserLimit = false;
