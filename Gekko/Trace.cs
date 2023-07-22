@@ -95,7 +95,10 @@ namespace Gekko
                 trace2.periods.Initialize();
                 foreach (GekkoTimeSpanSimple gtss in this.periods.GetStorage())
                 {
-                    trace2.periods.Add(new GekkoTimeSpanSimple(gtss.t1, gtss.t2));
+                    GekkoTimeSpanSimple temp = new GekkoTimeSpanSimple(); //We use this constructor because .t1 and .t2 may or may not be null.
+                    temp.t1 = gtss.t1;
+                    temp.t2 = gtss.t2;
+                    trace2.periods.Add(temp);
                 }
             }
 

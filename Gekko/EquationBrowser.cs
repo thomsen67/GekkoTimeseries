@@ -257,8 +257,13 @@ namespace Gekko
                 {
                     vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
                 }
+                else if (settings_index_filename.ToLower().Contains("adam"))
+                {
+                    vars = new List<string> { "fy", "ul", "pcp", "tg" };
+                }
                 else
                 {
+                    //smec
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
                 }
                 Globals.browserLimit = false;  //for safety
@@ -409,7 +414,7 @@ namespace Gekko
                         if (varExpl2.Trim().StartsWith("Series: " + varnameWithoutFreq, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
                         explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";  //see also #324lkj2342
                     }
-                }
+                }                
                 vars2.Add(varnameWithoutFreq + "¤" + G.ReplaceWhitespaceWith1Blank(explanation));
 
                 // --------------------------------

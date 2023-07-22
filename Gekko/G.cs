@@ -4354,6 +4354,7 @@ namespace Gekko
         /// <param name="s2"></param>
         /// <returns></returns>
         public static string ReplaceWhitespaceWith1Blank(string s2) {
+            if (s2 == null) return s2;  //regex below does not accept null
             string s = Regex.Replace(s2, @"\s+", " ");
             return s;
         }

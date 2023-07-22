@@ -4676,7 +4676,7 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
+                                                //newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
                                                 x = tsImported;                                                
                                             }
                                         }
