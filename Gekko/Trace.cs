@@ -426,7 +426,24 @@ namespace Gekko
                             List<Trace> tempTrace = new List<Trace>();
                             foreach (Trace sibling in ts.meta.trace.precedents.GetStorage())
                             {
-                                if (!siblingsToRemove.Contains(sibling)) tempTrace.Add(sibling);
+                                if (sibling == null)
+                                {
+                                    if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
+                                    {
+                                        //do nothing, we do not want two nulls 
+                                    }
+                                    else
+                                    {
+                                        tempTrace.Add(null);
+                                    }                                    
+                                }
+                                else
+                                {
+                                    if (!siblingsToRemove.Contains(sibling))
+                                    {
+                                        tempTrace.Add(sibling);
+                                    }
+                                }
                             }
                             if (tempTrace.Count == 0) tempTrace = null;
                             ts.meta.trace.precedents.SetStorage(tempTrace);
@@ -438,18 +455,18 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        /// <summary>
-        /// Removes a particular trace from ts.meta.trace in a Series. Happens when a new Trace shadows other older traces.
-        /// </summary>
-        /// <param name="ts"></param>
-        public static void RemoveFromSeries(Series ts, Trace ths)
-        {
-            if (ts.meta.trace == null) return;
-            if (ts.meta.trace.precedents.Count() > 0)
-            {                
-                ts.meta.trace.precedents.GetStorage().Remove(ths);
-            }
-        }
+        ///// <summary>
+        ///// Removes a particular trace from ts.meta.trace in a Series. Happens when a new Trace shadows other older traces.
+        ///// </summary>
+        ///// <param name="ts"></param>
+        //public static void RemoveFromSeries(Series ts, Trace ths)
+        //{
+        //    if (ts.meta.trace == null) return;
+        //    if (ts.meta.trace.precedents.Count() > 0)
+        //    {                
+        //        ts.meta.trace.precedents.GetStorage().Remove(ths);
+        //    }
+        //}
 
         public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
         {            
