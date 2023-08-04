@@ -68,6 +68,7 @@ using System.Threading.Tasks;
 using static Gekko.Program;
 using System.Windows.Markup.Localizer;
 using static alglib;
+//using Microsoft.Office.Interop.Excel;
 
 namespace Gekko
 {
@@ -4470,7 +4471,7 @@ namespace Gekko
                         file = localFileThatShouldBeDeletedPathAndFilename;
                     }
 
-                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
@@ -4850,7 +4851,7 @@ namespace Gekko
         /// <param name="tempTsdxPath"></param>
         /// <param name="NaNCounter"></param>
         /// <returns></returns>
-        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, P p, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //file may be == null, if we are calling from Gekcel (import <xlsx> gekcel).
 
@@ -4962,7 +4963,7 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Px)
                     {
-                        Program.ReadPxHelper(databankTemp, oRead, readInfo, file);
+                        Program.ReadPxHelper(databankTemp, oRead, readInfo, file, p);
                     }
                     else if (oRead.Type == EDataFormat.Flat)
                     {
@@ -6870,7 +6871,7 @@ namespace Gekko
         /// <param name="oRead"></param>
         /// <param name="readInfo"></param>
         /// <param name="fileLocal"></param>
-        public static void ReadPxHelper(Databank databank, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string fileLocal)
+        public static void ReadPxHelper(Databank databank, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string fileLocal, P p)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -6883,7 +6884,7 @@ namespace Gekko
             GekkoTime startYear;
             GekkoTime endYear;
             string warning = null;
-            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, oRead.isVariablecode, out vars, out warning, out startYear, out endYear);
+            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, oRead.isVariablecode, p, out vars, out warning, out startYear, out endYear);
             if (warning != null) new Warning(warning);
 
             readInfo.startPerInFile = startYear.super;
@@ -7084,7 +7085,7 @@ namespace Gekko
         /// <summary>
         /// Read the .px data file format (used by Statistics Denmark and others)
         /// </summary>
-        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, P p, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
         {
             string variablecodeNote = null;
 
@@ -7735,10 +7736,11 @@ namespace Gekko
 
                     Series ts = null;
 
+                    string name3 = null;
                     if (true)
                     {
                         string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
-                        string name3 = G.Chop_AddFreq(name2, freq);
+                        name3 = G.Chop_AddFreq(name2, freq);
                         ts = new Series(G.ConvertFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
@@ -7749,13 +7751,25 @@ namespace Gekko
                     if (true)
                     {
                         int offset = 0;
-
                         ts.SetDataSequence(gt_start, gt_end, data, j * totalDatesIncludingHoles + offset);  //the last is the offset
                         ts.Trim();  //to save ram
                         if (gt0.IsNull()) gt0 = gt_start;
                         if (gt1.IsNull()) gt1 = gt_end;
                         if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                         if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
+                    }
+
+                    if (Program.options.databank_trace)
+                    {
+                        if (isDownload)
+                        {                                                         
+                            Trace newTrace = new Trace(gt_start, gt_end);                                                        
+                            newTrace.contents.text = "download...";  //.gekkocode
+                            newTrace.contents.dataFile = null;
+                            newTrace.contents.bankAndVarnameWithFreq = name3;
+                            newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                        }
                     }
 
                     //put in the timeseries

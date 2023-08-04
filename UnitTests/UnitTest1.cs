@@ -12898,6 +12898,23 @@ namespace UnitTests
             Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
             //We skip testing of periods here
 
+            //====================================================
+            // DOWNLOAD
+            //====================================================
+
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("download 'https://api.statbank.dk/v1/data' statbank0.json;");            
+            _AssertSeries(First(), "pris6_varegr_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
+            y = Program.databanks.GetFirst().GetIVariable("pris6_varegr_011100_enhed_100!m") as Series;
+            tracec = y.meta.trace.precedents[0].contents;
+            Assert.AreEqual("pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
+            Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+            Assert.AreEqual(null, tracec.dataFile);
+            Assert.AreEqual("download 'https://api.statbank.dk/v1/data' statbank0.json;", tracec.text);
+            Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 1), tracec.GetT1());
+            Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 4), tracec.GetT2());
+            //We skip testing of periods here
 
             //====================================================
             // INTERPOLATE
