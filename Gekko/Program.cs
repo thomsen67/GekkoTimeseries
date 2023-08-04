@@ -15279,17 +15279,24 @@ namespace Gekko
         {
             if (!all && d > 1) return;
             string s = "| " + G.Blanks(d * 2 - 2);
-            if (trace.contents != null)
-            {                 
-                txt.MainAdd(s + trace.Text());
+            if (trace == null)
+            {
+                txt.MainAdd(s + "----------");
                 txt.MainNewLineTight();
             }
-
-            if (trace.precedents.Count() > 0)
-            {                
-                foreach (Trace child in trace.precedents.GetStorage())
+            else
+            {
+                if (trace.contents != null)
                 {
-                    PrintTraceHelper(child, d + 1, all, txt);
+                    txt.MainAdd(s + trace.Text());
+                    txt.MainNewLineTight();
+                }
+                if (trace.precedents.Count() > 0)
+                {
+                    foreach (Trace child in trace.precedents.GetStorage())
+                    {
+                        PrintTraceHelper(child, d + 1, all, txt);
+                    }
                 }
             }
         }
@@ -16307,6 +16314,7 @@ namespace Gekko
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                 newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
                                 newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
+
                                 Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
                         }

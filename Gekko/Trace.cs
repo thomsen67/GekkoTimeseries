@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 //using System.Windows.Forms;
@@ -135,6 +136,10 @@ namespace Gekko
     }
 
     /// <summary>    
+    /// Trace
+    /// x.id (TraceID), is a DateTime and random long.
+    /// x.contents (TraceContents), has .t1 and .t2 and .periods, where periods is list of time ranges.
+    /// x.precedents (TracePrecedents), basically a List&lt;Trace>
     /// We may have: 
     /// (1) contents != null and id.counter > 0 (normal).
     /// (2) contents == null and id.counter &lt; 0 (pruned off to external file).
@@ -150,7 +155,13 @@ namespace Gekko
         public TraceContents contents = null;
 
         [ProtoMember(3)]
-        public Precedents precedents = new Precedents();        
+        public Precedents precedents = new Precedents();
+
+        ///// <summary>
+        ///// Starts out as 0. May overflow in principle which is allright. Used to distinguish between chunks of traces from "physical" series objects, for presentation purposes.
+        ///// </summary>
+        //[ProtoMember(4)]
+        //public ushort objectNumber = 0;
 
         private Trace()
         {
@@ -210,6 +221,7 @@ namespace Gekko
                 {
                     foreach (Trace trace in this.precedents.GetStorage())
                     {
+                        if (trace == null) continue;
                         trace.DeepTrace(th, this, depth + 1);
                     }
                 }
@@ -253,7 +265,17 @@ namespace Gekko
             }
             if (this.precedents.Count() > 0)
             {
-                foreach (Trace child in this.precedents.GetStorage()) child.PrintRecursive(depth + 1, output);
+                foreach (Trace child in this.precedents.GetStorage())
+                {
+                    if (child == null)
+                    {
+                        output.Add("-" + G.Blanks(2 * (depth - 1)) + "----------");
+                    }
+                    else
+                    {
+                        child.PrintRecursive(depth + 1, output);
+                    }
+                }
             }            
             if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
         }
@@ -578,7 +600,7 @@ namespace Gekko
         public void Add(Trace trace)
         {
             if (this.storage == null) this.storage = new List<Trace>();
-            if (trace.contents == null) throw new GekkoException();
+            if (trace != null && trace.contents == null) throw new GekkoException();
             this.storage.Add(trace);
         }
 
@@ -608,7 +630,18 @@ namespace Gekko
             {
                 foreach (Trace trace in this.GetStorage())
                 {
-                    this.storageIDTemporary.Add(trace.id);
+                    TraceID temp = null;
+                    if (trace == null)
+                    {
+                        temp = new TraceID();
+                        temp.counter = long.MinValue;  //negative, signals null
+                        temp.stamp = DateTime.MinValue;
+                    }
+                    else
+                    {
+                        temp = trace.id;
+                    }
+                    this.storageIDTemporary.Add(temp);
                 }
             }
             this.SetStorage(null);
@@ -621,10 +654,17 @@ namespace Gekko
                 this.storage = new List<Trace>();
                 foreach (TraceID id in this.storageIDTemporary)
                 {
-                    if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
-                    Trace trace = null; dict2.TryGetValue(id, out trace);
-                    if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
-                    this.storage.Add(trace);
+                    if (id.counter == long.MinValue)
+                    {
+                        this.storage.Add(null);
+                    }
+                    else
+                    {
+                        if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
+                        Trace trace = null; dict2.TryGetValue(id, out trace);
+                        if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
+                        this.storage.Add(trace);
+                    }
                 }
             }
             this.storageIDTemporary = null;
@@ -650,7 +690,14 @@ namespace Gekko
                 precedents.storage = new List<Trace>();
                 foreach (Trace trace in this.storage)
                 {
-                    precedents.storage.Add(trace.DeepClone(cloneHelper));
+                    if (trace == null)
+                    {
+                        precedents.Add(null);
+                    }
+                    else
+                    {
+                        precedents.storage.Add(trace.DeepClone(cloneHelper));
+                    }
                 }
             }
             return precedents;

@@ -13335,6 +13335,7 @@ namespace UnitTests
                     String2 x4 = new String2(null);
                     x4.m.Add(new String2(c4));
                     x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                    x4.m[0].m.Add(null);
                     x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);
@@ -13346,7 +13347,9 @@ namespace UnitTests
                     String2 x5 = new String2(null);
                     x5.m.Add(new String2(c5));
                     x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                    x5.m[0].m.Add(null);
                     x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                    x5.m[0].m.Add(null);
                     x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);
@@ -13509,12 +13512,19 @@ namespace UnitTests
 
         public static void Helper_WalkTrace(Trace trace, String2 m, int depth)
         {
-            if (m.s == null) Assert.IsTrue(trace.contents == null);
-            else Assert.AreEqual(trace.contents.text, m.s);
-            Assert.AreEqual(trace.precedents.Count(), m.m.Count);
-            for (int i = 0; i < trace.precedents.Count(); i++)
+            if (trace == null)
             {
-                Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
+                Assert.IsNull(m);
+            }
+            else
+            {
+                if (m.s == null) Assert.IsTrue(trace.contents == null);
+                else Assert.AreEqual(trace.contents.text, m.s);
+                Assert.AreEqual(trace.precedents.Count(), m.m.Count);
+                for (int i = 0; i < trace.precedents.Count(); i++)
+                {
+                    Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
+                }
             }
         }
         

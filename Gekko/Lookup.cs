@@ -1696,8 +1696,10 @@ namespace Gekko
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
                         List<Trace> temp = new List<Trace>();
+                        int counter1 = -1;
                         foreach (IVariable iv in Globals.traceContainer)
                         {
+                            counter1++;
                             Series iv_ts = iv as Series;
                             if (iv_ts?.meta?.trace == null) continue;
                             if (Object.ReferenceEquals(iv_ts, lhs_series))
@@ -1706,8 +1708,9 @@ namespace Gekko
                             }
                             if (iv_ts.meta.trace.precedents.Count() > 0)
                             {
+                                int counter2 = -1;
                                 foreach (Trace kvp in iv_ts.meta.trace.precedents.GetStorage())
-                                {
+                                {                                    
                                     Trace childTrace2 = kvp;
                                     bool known = false;
                                     foreach (Trace tempElement in temp)
@@ -1719,6 +1722,11 @@ namespace Gekko
                                     }
                                     if (!known)
                                     {
+                                        counter2++;
+                                        if (counter2 == 0 && temp.Count > 0 && temp[temp.Count - 1] != null)
+                                        {
+                                            temp.Add(null);  //divider
+                                        }
                                         temp.Add(childTrace2);
                                     }
                                 }
