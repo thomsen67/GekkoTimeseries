@@ -7127,6 +7127,7 @@ namespace Gekko
             public string fileName2 = null;  //dump file (px for statistikbanken, csv for jobindsats)            
             public string opt_array = null;  //arrays yes or no (statistikbanken)
             public string opt_key = null;  //only used for jobindsats
+            public string gekkocode = null;
             public P p = null;
             public void Exe()
             {

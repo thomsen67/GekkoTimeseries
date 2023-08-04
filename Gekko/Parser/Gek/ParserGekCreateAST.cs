@@ -1371,6 +1371,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTDOWNLOAD" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
                     else if (ast.Text.StartsWith("ASTINDEXERELEMENT" + Globals.parserExpressionSeparator))
                     {
                         flag = true;

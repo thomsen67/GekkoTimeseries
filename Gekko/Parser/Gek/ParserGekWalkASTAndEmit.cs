@@ -2847,6 +2847,7 @@ namespace Gekko.Parser.Gek
                         if (node[2] != null) node.Code.A(node[2].Code); //px file dump
                         if (node[3] != null) node.Code.A(node[3].Code); //options
                         node.Code.A("o" + Num(node) + ".p = p;");
+                        node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

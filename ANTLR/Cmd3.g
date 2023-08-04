@@ -3058,7 +3058,8 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 // DOWNLOAD
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-download:                   DOWNLOAD downloadOpt1? url fileName? (DUMP '=' fileName2)? -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, input.LT(1).Line)} url ^(ASTHANDLEFILENAME fileName?) ^(ASTHANDLEFILENAME2 fileName2?) downloadOpt1?);
+download:                   download2 -> ^({token("ASTDOWNLOAD¤"+($download2.text), ASTDOWNLOAD, input.LT(1).Line)} download2);
+download2:                  DOWNLOAD downloadOpt1? url fileName? (DUMP '=' fileName2)? -> url ^(ASTHANDLEFILENAME fileName?) ^(ASTHANDLEFILENAME2 fileName2?) downloadOpt1?;
 downloadOpt1:               ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
 downloadOpt1h:              ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
                           | KEY EQUAL expression -> ^(ASTOPT_STRING_KEY expression)

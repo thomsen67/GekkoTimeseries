@@ -176,6 +176,12 @@ namespace Gekko
         Unknown
     }
 
+    public class DownloadHelper
+    {
+        public string gekkoCode = null;
+        public string dataFile = null;
+    }
+
     public class CloneHelper
     {
         public Dictionary<object, object> dict = new Dictionary<object, object>();
@@ -6884,7 +6890,7 @@ namespace Gekko
             GekkoTime startYear;
             GekkoTime endYear;
             string warning = null;
-            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, oRead.isVariablecode, p, out vars, out warning, out startYear, out endYear);
+            ReadPx(databank, oRead.array, null, null, null, null, pxLinesText, oRead.isVariablecode, p, out vars, out warning, out startYear, out endYear);
             if (warning != null) new Warning(warning);
 
             readInfo.startPerInFile = startYear.super;
@@ -7085,7 +7091,7 @@ namespace Gekko
         /// <summary>
         /// Read the .px data file format (used by Statistics Denmark and others)
         /// </summary>
-        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, P p, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(Databank databank, string array, DownloadHelper downloadHelper, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, bool isVariablecode, P p, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
         {
             string variablecodeNote = null;
 
@@ -7761,11 +7767,11 @@ namespace Gekko
 
                     if (Program.options.databank_trace)
                     {
-                        if (isDownload)
+                        if (downloadHelper != null)
                         {                                                         
-                            Trace newTrace = new Trace(gt_start, gt_end);                                                        
-                            newTrace.contents.text = "download...";  //.gekkocode
-                            newTrace.contents.dataFile = null;
+                            Trace newTrace = new Trace(gt_start, gt_end);
+                            newTrace.contents.text = downloadHelper.gekkoCode + ";";
+                            newTrace.contents.dataFile = downloadHelper.dataFile;
                             newTrace.contents.bankAndVarnameWithFreq = name3;
                             newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                             Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
@@ -7780,7 +7786,7 @@ namespace Gekko
             }
 
             string downloadOrImport = "Read";
-            if (isDownload) downloadOrImport = "Downloaded";
+            if (downloadHelper != null) downloadOrImport = "Downloaded";
 
             G.Writeln("--> " + downloadOrImport + " " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
 
