@@ -4658,47 +4658,84 @@ namespace Gekko
 
                                     if (Program.options.databank_trace)
                                     {
-                                        Trace newTrace = null;
-                                        Series x = null;
-                                        ETracePushType type = ETracePushType.NewParent;
+                                        //When arriving here, it is a READ/IMPORT, not OPEN.
+                                        //There are these combinations:
+                                        //
+                                        // gbk or non-gbk
+                                        // no period or <...>-period
+                                        // series x already exists
+                                        //
+                                        // If non-gbk, we always do a "PARENT"
+                                        // Also for the below B, C and D.
+                                        // Only A is a raw copy, like in OPEN<edit>.
+                                        // ---------------------------------------------
+                                        //           |    no period           period
+                                        // ---------------------------------------------
+                                        // no exist  |      A                   B
+                                        // exist     |      C                   D             (only for gbk read<merge> or import)
+                                        // ---------------------------------------------                                        
+                                        // 
 
-                                        if (periods == null)
+                                        if (isGbk && tsExisting == null && periods == null)
                                         {
-                                            GekkoTime t1 = tsImported.GetRealDataPeriodFirst();
-                                            GekkoTime t2 = tsImported.GetRealDataPeriodLast();
-                                            if (t1.IsNull())
-                                            {
-                                                //can happen that a series is empty of data
-                                                newTrace = new Trace(true);
-                                            }
-                                            else
-                                            {
-                                                newTrace = new Trace(t1, t2);
-                                            }
-                                            
-                                            if (tsExisting != null)
-                                            {                                                
-                                                newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                                x = tsExisting;
-                                            }
-                                            else
-                                            {
-                                                //newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
-                                                x = tsImported;                                                
-                                            }
+                                            //do nothing, just use the raw trace.
+                                            //Maybe decorate the trace with info on which databank (.gbk) the series was fetched from...? Perhaps even also gcm and line regarding the READ statement?
                                         }
                                         else
                                         {
-                                            newTrace = new Trace(periods.t1, periods.t2);
-                                            newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                            x = tsExisting;
-                                            type = ETracePushType.Sibling;
+                                            //All other get a trace with "read ... ;".
+
+                                            Trace newTrace = null;
+                                            Series x = null;                                            
+
+                                            if (periods == null)
+                                            {
+                                                GekkoTime t1 = tsImported.GetRealDataPeriodFirst();
+                                                GekkoTime t2 = tsImported.GetRealDataPeriodLast();
+                                                if (t1.IsNull())
+                                                {
+                                                    //can happen that a series is empty of data
+                                                    newTrace = new Trace(true);
+                                                }
+                                                else
+                                                {
+                                                    newTrace = new Trace(t1, t2);
+                                                }
+
+                                                if (tsExisting != null)
+                                                {
+                                                    //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
+                                                    x = tsExisting;
+                                                }
+                                                else
+                                                {
+                                                    //newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
+                                                    x = tsImported;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                newTrace = new Trace(periods.t1, periods.t2);
+                                                
+                                                //x = tsExisting;
+                                                if (tsExisting != null)
+                                                {                                                    
+                                                    x = tsExisting;
+                                                    //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
+                                                }
+                                                else
+                                                {                                                 
+                                                    x = tsImported;
+                                                }
+
+                                                
+                                            }
+                                            newTrace.contents.text = oRead.gekkocode + ";";
+                                            newTrace.contents.dataFile = ffh.realPathAndFileName;
+                                            newTrace.contents.bankAndVarnameWithFreq = name;
+                                            newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                            Gekko.Trace.PushIntoSeries(x, newTrace, ETracePushType.NewParent);
                                         }
-                                        newTrace.contents.text = oRead.gekkocode + ";";
-                                        newTrace.contents.dataFile = ffh.realPathAndFileName;
-                                        newTrace.contents.bankAndVarnameWithFreq = name;
-                                        newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                        Gekko.Trace.PushIntoSeries(x, newTrace, type);
                                     }
                                 }
                             }

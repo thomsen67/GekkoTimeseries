@@ -54,6 +54,7 @@ using Microsoft.Data.Analysis;
 using static Gekko.O;
 //using Microsoft.Office.Interop.Excel;
 using System.Linq;
+using System.Drawing;
 
 namespace UnitTests
 {
@@ -13139,10 +13140,114 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePeriodsShadowing()
         {
-            Trace trace1, trace2;
+            Trace trace1, trace2, trace11;
             Series y;
- 
-            // Different variations START
+
+            I("reset; time 2000 2010;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("x <2004 2006> = 1;");
+            I("write trace2;");
+
+            // A
+            // | 2004 - 2006-- > x <2004 2006> = 1;           || pers = 2004 - 2004, 2006 - 2006,
+            // | 2005 - 2005-- > x <2005 2005> = 2;           || pers=2005-2005,  
+            I("reset; time 2000 2010;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
+            I("read trace2;");
+            I("x <2005 2005> = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            Assert.AreEqual(2, trace1.contents.periods.Count());
+            Assert.AreEqual("x <2004 2006> = 1;", trace1.contents.text);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t2.super);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual("x <2005 2005> = 2;", trace2.contents.text);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+
+            // B
+            // | 2005 - 2006-- > read <2005 2006> trace2;     || pers = 2006 - 2006,
+            // |   2004 - 2006-- > x <2004 2006> = 1;         || pers = 2004 - 2006,
+            // | 2005 - 2005-- > x <2005 2005> = 2;           || pers = 2005 - 2005,            
+            I("read <2005 2006> trace2;");
+            I("x <2005 2005> = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            trace11 = y.meta.trace.precedents[0].precedents[0];
+            Assert.AreEqual("read <2005 2006> trace2;", trace1.contents.text);            
+            Assert.AreEqual(1, trace1.contents.periods.Count());            
+            Assert.AreEqual(2006, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual("x <2004 2006> = 1;", trace11.contents.text);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual("x <2005 2005> = 2;", trace2.contents.text);
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+
+            // C
+            // | 2004 - 2006-- > x <2004 2006> = 1;           || pers = 2004 - 2004, 2006 - 2006,
+            // | 2005 - 2005-- > x <2005 2005> = 2;           || pers=2005-2005,  
+            I("reset; time 2000 2010;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");                        
+            I("x <2003 2007> = 3;");
+            I("read <merge> trace2;");
+            I("x <2005 2005> = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            Assert.AreEqual(2, trace1.contents.periods.Count());
+            Assert.AreEqual("x <2004 2006> = 1;", trace1.contents.text);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t2.super);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual("x <2005 2005> = 2;", trace2.contents.text);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+
+            // D
+            // | 2005 - 2006-- > read <2005 2006> trace2;     || pers = 2006 - 2006,
+            // |   2004 - 2006-- > x <2004 2006> = 1;         || pers = 2004 - 2006,
+            // | 2005 - 2005-- > x <2005 2005> = 2;           || pers = 2005 - 2005,
+            I("reset; time 2000 2010;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");                        
+            I("x <2003 2007> = 3;");
+            I("read <2005 2006 merge> trace2;");
+            I("x <2005 2005> = 2;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            trace11 = y.meta.trace.precedents[0].precedents[0];
+            Assert.AreEqual("read <2005 2006> trace2;", trace1.contents.text);
+            Assert.AreEqual(1, trace1.contents.periods.Count());
+            Assert.AreEqual(2006, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual("x <2004 2006> = 1;", trace11.contents.text);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual("x <2005 2005> = 2;", trace2.contents.text);
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+
+
+
+
+
+
+
+
+
+
+            // ========== Different variations START
 
             I("reset; time 2000 2010;");
             I("x <2004 2006> = 1;");
@@ -13216,9 +13321,9 @@ namespace UnitTests
             Assert.AreEqual(2007, trace2.contents.periods[0].t1.super);
             Assert.AreEqual(2007, trace2.contents.periods[0].t2.super);
 
-            // Different variations END
+            // ========== Different variations END
 
-            //full shadowing
+            // ========== full shadowing
 
             I("reset; time 2000 2010;");
             I("x <2004 2006> = 1;");
@@ -13230,7 +13335,7 @@ namespace UnitTests
             Assert.AreEqual(2004, trace1.contents.periods[0].t1.super);
             Assert.AreEqual(2006, trace1.contents.periods[0].t2.super);
 
-            //timeless traces
+            // ========== timeless traces
 
             Series x;
             Trace trace3;
@@ -13275,7 +13380,7 @@ namespace UnitTests
             x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, x.meta.trace.precedents.Count()); //x has 1 trace when found via series object
 
-            // Test of series indexer
+            // ========== Test of series indexer
 
             I("reset; time 2000 2010;");
             I("x <2004 2006> = 1;");
@@ -13292,6 +13397,33 @@ namespace UnitTests
             Assert.AreEqual(1, trace2.contents.periods.Count());
             Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
             Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+
+            // ========== Test of databank read/write, open/close                       
+
+            I("reset; time 2000 2010;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("open <edit> trace1;");
+            I("x <2004 2006> = 1;");
+            I("close *;");
+            I("open <edit> trace1;");
+            I("x <2005 2005> = 2;");
+            I("close *;");
+            I("open <first> trace1;");
+            y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            Assert.AreEqual(2, y.meta.trace.precedents.Count());
+            trace1 = y.meta.trace.precedents[0];
+            Assert.AreEqual(2, trace1.contents.periods.Count());
+            Assert.AreEqual(2004, trace1.contents.periods[0].t1.super);
+            Assert.AreEqual(2004, trace1.contents.periods[0].t2.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t1.super);
+            Assert.AreEqual(2006, trace1.contents.periods[1].t2.super);
+            trace2 = y.meta.trace.precedents[1];
+            Assert.AreEqual(1, trace2.contents.periods.Count());
+            Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
+            Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
+            I("close *;");
+
+            
         }
 
         [TestMethod]
