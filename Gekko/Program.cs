@@ -4700,41 +4700,53 @@ namespace Gekko
                                                 else
                                                 {
                                                     newTrace = new Trace(t1, t2);
-                                                }
-
-                                                if (tsExisting != null)
-                                                {
-                                                    //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                                    x = tsExisting;
-                                                }
-                                                else
-                                                {
-                                                    //newTrace = new Trace(tsImported.GetRealDataPeriodFirst(), tsImported.GetRealDataPeriodLast());
-                                                    x = tsImported;
-                                                }
+                                                }                                                
                                             }
                                             else
                                             {
                                                 newTrace = new Trace(periods.t1, periods.t2);
-                                                
-                                                //x = tsExisting;
-                                                if (tsExisting != null)
-                                                {                                                    
-                                                    x = tsExisting;
-                                                    //newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
-                                                }
-                                                else
-                                                {                                                 
-                                                    x = tsImported;
-                                                }
+                                            }
+                                            
+                                            if (tsExisting != null)
+                                            {
+                                                //There is already a series with same name, only happens with read<merge> or import.
+                                                //for instance:
+                                                //  reset; time 2001 2003;
+                                                //  x1 = 2;
+                                                //  read <merge> bank;    //where in the bank x1 <2002 2002> = 1
+                                                //
+                                                //should become:
+                                                //
+                                                // | x1 = 2,                2001-2001, 2003-2003
+                                                // | read <merge> bank;     2002-2002
+                                                // |   x1 <2002 2002> = 1
 
+                                                //tsExisting has x = 2
+                                                newTrace.contents.text = oRead.gekkocode + ";"; //read <merge>
+                                                newTrace.contents.dataFile = ffh.realPathAndFileName;
+                                                newTrace.contents.bankAndVarnameWithFreq = name;
+                                                newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                                Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.NewParent);  //x = 1
+                                                //Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.NewParent);
+                                                
                                                 
                                             }
-                                            newTrace.contents.text = oRead.gekkocode + ";";
-                                            newTrace.contents.dataFile = ffh.realPathAndFileName;
-                                            newTrace.contents.bankAndVarnameWithFreq = name;
-                                            newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                            Gekko.Trace.PushIntoSeries(x, newTrace, ETracePushType.NewParent);
+                                            else
+                                            {
+                                                //for instance:                                                
+                                                //  reset;
+                                                //  read <2001 2020 merge> bank;  //where in the bank x1 = 1
+                                                //
+                                                //should become:
+                                                //                                                
+                                                // | read <merge> bank;     2002-2002
+                                                // |   x1 <2002 2002> = 1
+                                                newTrace.contents.text = oRead.gekkocode + ";";
+                                                newTrace.contents.dataFile = ffh.realPathAndFileName;
+                                                newTrace.contents.bankAndVarnameWithFreq = name;
+                                                newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                                Gekko.Trace.PushIntoSeries(tsImported, newTrace, ETracePushType.NewParent);
+                                            }
                                         }
                                     }
                                 }
