@@ -4726,10 +4726,18 @@ namespace Gekko
                                                 newTrace.contents.dataFile = ffh.realPathAndFileName;
                                                 newTrace.contents.bankAndVarnameWithFreq = name;
                                                 newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.NewParent);  //x = 1
+                                                if (dates == null)
+                                                {
+                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling); //x = 1
+                                                }
+                                                else
+                                                {
+                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling);
+                                                    Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.NewParentOnlyForLast);                                                    
+                                                }
                                                 //Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.NewParent);
-                                                
-                                                
+
+
                                             }
                                             else
                                             {

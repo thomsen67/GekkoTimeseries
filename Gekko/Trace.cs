@@ -22,7 +22,8 @@ namespace Gekko
     public enum ETracePushType
     {
         Sibling,
-        NewParent
+        NewParent,
+        NewParentOnlyForLast
     }
 
     public enum ETraceHelper
@@ -341,6 +342,13 @@ namespace Gekko
             {                   
                 ths.precedents.AddRange(ts.meta.trace.precedents);
                 ts.meta.trace.precedents = new Precedents();
+                ts.meta.trace.precedents.Add(ths);
+            }
+            else if (type == ETracePushType.NewParentOnlyForLast)
+            {
+                int n = ts.meta.trace.precedents.Count();
+                ths.precedents.Add(ts.meta.trace.precedents[n - 1]);  //only last one
+                ts.meta.trace.precedents.GetStorage().RemoveAt(n - 1);
                 ts.meta.trace.precedents.Add(ths);
             }
             else if (type == ETracePushType.Sibling)
