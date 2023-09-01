@@ -22,8 +22,7 @@ namespace Gekko
     public enum ETracePushType
     {
         Sibling,
-        NewParent,
-        NewParentOnlyForLast
+        NewParent
     }
 
     public enum ETraceHelper
@@ -334,32 +333,24 @@ namespace Gekko
         /// Type == Sibling ---> Puts it among siblings. Removes the date(s) from its siblings.
         /// </summary>
         /// <param name="ts"></param>
-        public static void PushIntoSeries(Series ts, Trace ths, ETracePushType type)
+        public static void PushIntoSeries(Series ts, Trace trace, ETracePushType type)
         {
-            if (ths.contents.text == null) new Error("PushIntoSeries problem");
+            if (trace.contents.text == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace == null) ts.meta.trace = new Trace(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
-                ths.precedents.AddRange(ts.meta.trace.precedents);
+                trace.precedents.AddRange(ts.meta.trace.precedents);
                 ts.meta.trace.precedents = new Precedents();
-                ts.meta.trace.precedents.Add(ths);
-            }
-            else if (type == ETracePushType.NewParentOnlyForLast)
-            {
-                int n = ts.meta.trace.precedents.Count();
-                ths.precedents.Add(ts.meta.trace.precedents[n - 1]);  //only last one
-                ts.meta.trace.precedents.GetStorage().RemoveAt(n - 1);
-                ts.meta.trace.precedents.Add(ths);
-            }
+                ts.meta.trace.precedents.Add(trace);
+            }            
             else if (type == ETracePushType.Sibling)
             {
                 if (ts.meta.trace.precedents.Count() > 0)
                 {
                     if (ts.meta.trace.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
 
-                    if (ths.contents.periods.Count() != 1) new Error("Problem with time spans");
-                    //if (ths.contents.periods.Count() > 0) { foreach (GekkoTimeSpanSimple thsSpan in ths.contents.periods.GetStorage()) {                                
-                    GekkoTimeSpanSimple thsSpan = ths.contents.periods[0];
+                    if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
+                    GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
 
                     if (!thsSpan.IsNull()) //if null --> cannot shadow anything
                     {
@@ -426,8 +417,6 @@ namespace Gekko
                                 }
                                 sibling.contents.periods.SetStorage(spansTemp);
                             }
-
-                            //}}
                         }
                         if (siblingsToRemove.Count > 0)
                         {
@@ -458,7 +447,7 @@ namespace Gekko
                         }
                     }
                 }
-                ts.meta.trace.precedents.Add(ths);
+                ts.meta.trace.precedents.Add(trace);
             }
             else new Error("Trace");
         }

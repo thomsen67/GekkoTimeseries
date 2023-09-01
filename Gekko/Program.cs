@@ -4726,18 +4726,33 @@ namespace Gekko
                                                 newTrace.contents.dataFile = ffh.realPathAndFileName;
                                                 newTrace.contents.bankAndVarnameWithFreq = name;
                                                 newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                if (dates == null)
+                                                if (!isGbk || dates != null)
                                                 {
-                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling); //x = 1
+                                                    //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
+                                                    if (tsImported.meta?.trace?.precedents != null)
+                                                    {
+                                                        newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
+                                                    }
+                                                    Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.Sibling);
                                                 }
                                                 else
                                                 {
-                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling);
-                                                    Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.NewParentOnlyForLast);                                                    
+                                                    //No READ or IMPORT reported as trace, but rather the traces of the read/imported series
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY  why ony precedents[0]? What if there are precedents[1] etc?
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    //WHY
+                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling); //x = 1
                                                 }
-                                                //Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.NewParent);
-
-
                                             }
                                             else
                                             {
