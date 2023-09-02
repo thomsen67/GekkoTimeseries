@@ -2851,9 +2851,9 @@ namespace Gekko
                         }
                     }
 
-                    if (this.meta.trace != null)
+                    if (this.meta.trace2 != null)
                     {
-                        tsCopy.meta.trace = this.meta.trace.DeepClone(cloneHelper);
+                        tsCopy.meta.trace2 = this.meta.trace2.DeepClone(cloneHelper);
                     }
 
                 }
@@ -2883,9 +2883,9 @@ namespace Gekko
                 if (this.meta != null)
                 {
                     th.metas.Add(this.meta);
-                    if (this.meta.trace != null && (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths))
+                    if (this.meta.trace2 != null && (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths))
                     {
-                        this.meta.trace.DeepTrace(th, null, 0);
+                        this.meta.trace2.DeepTrace(th, null, 0);
                     }
                 }
             }
@@ -3015,21 +3015,22 @@ namespace Gekko
         /// the bank needs to be rewritten. Should not be put into protobuffer.
         /// </summary>        
         [ProtoMember(5)]
-        public string stamp;                
+        public string stamp;   
+        
         [ProtoMember(6)]        
         public string units;
 
         /// <summary>
         /// Stores traces of its composition, cf. Trace() method.
         /// </summary>
-        //[ProtoMember(10)]
-        //public List<string> calc = null;
-
         [ProtoMember(11)]
-        public Trace trace = null;
+        public Trace2 trace2 = null;  //trace2 because it is experimental
 
         [ProtoMember(12)]
-        public TraceID traceID = null;
+        public TraceID2 traceID2 = null; //traceID2 because it is experimental
+
+        //[ProtoMember(13)] reserved for .trace
+        //[ProtoMember(14)] reserved for .traceId
 
         [ProtoMember(7)]
         public string[] domains = null;
@@ -3045,18 +3046,18 @@ namespace Gekko
 
         public void ToID()
         {
-            if (this.trace != null)
+            if (this.trace2 != null)
             {
-                this.traceID = this.trace.id;
-                this.trace = null;
+                this.traceID2 = this.trace2.id;
+                this.trace2 = null;
             }
         }
 
-        public void FromID(Dictionary<TraceID, Trace> dict2)
+        public void FromID(Dictionary<TraceID2, Trace2> dict2)
         {
-            if (this.traceID != null)
+            if (this.traceID2 != null)
             {
-                this.trace = dict2[this.traceID];
+                this.trace2 = dict2[this.traceID2];
             }
         }
 

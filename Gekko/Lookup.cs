@@ -1686,9 +1686,9 @@ namespace Gekko
 
                 if (traceString != null)
                 {
-                    if (lhs_series.meta.trace == null) lhs_series.meta.trace = new Trace(ETraceType.Parent);
+                    if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Parent);
                     // ---------
-                    Trace trace = new Trace(t1, t2);
+                    Trace2 trace = new Trace2(t1, t2);
 
                     if (ib != null) trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
                     else trace.contents.bankAndVarnameWithFreq = varnameWithFreq;  //what if ib is MAP???
@@ -1697,25 +1697,25 @@ namespace Gekko
                     //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                     if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                     {
-                        List<Trace> temp = new List<Trace>();
+                        List<Trace2> temp = new List<Trace2>();
                         int counter1 = -1;
                         foreach (IVariable iv in Globals.traceContainer)
                         {
                             counter1++;
                             Series iv_ts = iv as Series;
-                            if (iv_ts?.meta?.trace == null) continue;
+                            if (iv_ts?.meta?.trace2 == null) continue;
                             if (Object.ReferenceEquals(iv_ts, lhs_series))
                             {
                                 continue;  //do not point to your own trace!
                             }
-                            if (iv_ts.meta.trace.precedents.Count() > 0)
+                            if (iv_ts.meta.trace2.precedents.Count() > 0)
                             {
                                 int counter2 = -1;
-                                foreach (Trace kvp in iv_ts.meta.trace.precedents.GetStorage())
+                                foreach (Trace2 kvp in iv_ts.meta.trace2.precedents.GetStorage())
                                 {                                    
-                                    Trace childTrace2 = kvp;
+                                    Trace2 childTrace2 = kvp;
                                     bool known = false;
-                                    foreach (Trace tempElement in temp)
+                                    foreach (Trace2 tempElement in temp)
                                     {
                                         if (Object.ReferenceEquals(childTrace2, tempElement))
                                         {
@@ -1739,7 +1739,7 @@ namespace Gekko
                             trace.precedents.SetStorage(temp);  //keep it null if no children                            
                         }
                     }                    
-                    Trace.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);                    
+                    Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);                    
                 }
             }
         }

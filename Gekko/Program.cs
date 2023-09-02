@@ -188,7 +188,7 @@ namespace Gekko
     }
     public class DispTraceHelpler
     {
-        public Trace trace2 = null;
+        public Trace2 trace2 = null;
         public List<GekkoTime> dates = new List<GekkoTime>();
     }
 
@@ -3175,8 +3175,8 @@ namespace Gekko
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
             
-            TraceHelper th; Dictionary<TraceID, Trace> dict1Inverted;
-            Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted);
+            TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
+            Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted);
 
             lists = SplitVarsInSameSizeParts(databank.storage, k, print);
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
@@ -3203,7 +3203,7 @@ namespace Gekko
             ProtobufWrite(databank.cacheParameters, files[k + extra - 2]);
             ProtobufWrite(databank.traces, files[k + extra - 1]);
                         
-            Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted);
+            Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
             databank.traces = null;  //important!
 
             List<string> sfiles = new List<string>();
@@ -3348,8 +3348,8 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            databank.traces = ProtobufRead<List<Trace>>(files[k - extra + 1]);
-            Gekko.Trace.HandleTraceRead1(databank);
+            databank.traces = ProtobufRead<List<Trace2>>(files[k - extra + 1]);
+            Gekko.Trace2.HandleTraceRead1(databank);
             databank.traces = null;  //important!
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
@@ -4685,7 +4685,7 @@ namespace Gekko
                                         {
                                             //All other get a trace with "read ... ;".
 
-                                            Trace newTrace = null;
+                                            Trace2 newTrace = null;
                                             Series x = null;                                            
 
                                             if (periods == null)
@@ -4695,16 +4695,16 @@ namespace Gekko
                                                 if (t1.IsNull())
                                                 {
                                                     //can happen that a series is empty of data
-                                                    newTrace = new Trace(true);
+                                                    newTrace = new Trace2(true);
                                                 }
                                                 else
                                                 {
-                                                    newTrace = new Trace(t1, t2);
+                                                    newTrace = new Trace2(t1, t2);
                                                 }                                                
                                             }
                                             else
                                             {
-                                                newTrace = new Trace(periods.t1, periods.t2);
+                                                newTrace = new Trace2(periods.t1, periods.t2);
                                             }
                                             
                                             if (tsExisting != null)
@@ -4729,11 +4729,11 @@ namespace Gekko
                                                 if (!isGbk || dates != null)
                                                 {
                                                     //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
-                                                    if (tsImported.meta?.trace?.precedents != null)
+                                                    if (tsImported.meta?.trace2?.precedents != null)
                                                     {
-                                                        newTrace.precedents.AddRange(tsImported.meta.trace.precedents);
+                                                        newTrace.precedents.AddRange(tsImported.meta.trace2.precedents);
                                                     }
-                                                    Gekko.Trace.PushIntoSeries(tsExisting, newTrace, ETracePushType.Sibling);
+                                                    Gekko.Trace2.PushIntoSeries(tsExisting, newTrace, ETracePushType.Sibling);
                                                 }
                                                 else
                                                 {
@@ -4751,7 +4751,7 @@ namespace Gekko
                                                     //WHY
                                                     //WHY
                                                     //WHY
-                                                    Gekko.Trace.PushIntoSeries(tsExisting, tsImported.meta.trace.precedents[0], ETracePushType.Sibling); //x = 1
+                                                    Gekko.Trace2.PushIntoSeries(tsExisting, tsImported.meta.trace2.precedents[0], ETracePushType.Sibling); //x = 1
                                                 }
                                             }
                                             else
@@ -4768,7 +4768,7 @@ namespace Gekko
                                                 newTrace.contents.dataFile = ffh.realPathAndFileName;
                                                 newTrace.contents.bankAndVarnameWithFreq = name;
                                                 newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                Gekko.Trace.PushIntoSeries(tsImported, newTrace, ETracePushType.NewParent);
+                                                Gekko.Trace2.PushIntoSeries(tsImported, newTrace, ETracePushType.NewParent);
                                             }
                                         }
                                     }
@@ -5725,7 +5725,7 @@ namespace Gekko
                         iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                     }
 
-                    Gekko.Trace.HandleTraceRead1(deserializedDatabank);
+                    Gekko.Trace2.HandleTraceRead1(deserializedDatabank);
 
                     readInfo.variables = deserializedDatabank.storage.Count;
                     readInfo.startPerInFile = yearMinMax.int1;
@@ -7841,12 +7841,12 @@ namespace Gekko
                     {
                         if (downloadHelper != null)
                         {                                                         
-                            Trace newTrace = new Trace(gt_start, gt_end);
+                            Trace2 newTrace = new Trace2(gt_start, gt_end);
                             newTrace.contents.text = downloadHelper.gekkoCode + ";";
                             newTrace.contents.dataFile = downloadHelper.dataFile;
                             newTrace.contents.bankAndVarnameWithFreq = name3;
                             newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                            Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                            Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                         }
                     }
 
@@ -15324,9 +15324,9 @@ namespace Gekko
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
-                if (ts.meta.trace != null)
+                if (ts.meta.trace2 != null)
                 {                    
-                    PrintTraceHelper(ts.meta.trace, false);
+                    PrintTraceHelper(ts.meta.trace2, false);
                 }
 
                 bool eqsPrinted = false;
@@ -15367,7 +15367,7 @@ namespace Gekko
             }
         }
 
-        private static void PrintTraceHelper(Trace trace, int d, bool all, Writeln txt)
+        private static void PrintTraceHelper(Trace2 trace, int d, bool all, Writeln txt)
         {
             if (!all && d > 1) return;
             string s = "| " + G.Blanks(d * 2 - 2);
@@ -15385,7 +15385,7 @@ namespace Gekko
                 }
                 if (trace.precedents.Count() > 0)
                 {
-                    foreach (Trace child in trace.precedents.GetStorage())
+                    foreach (Trace2 child in trace.precedents.GetStorage())
                     {
                         PrintTraceHelper(child, d + 1, all, txt);
                     }
@@ -15393,7 +15393,7 @@ namespace Gekko
             }
         }
 
-        private static void PrintTraceHelper(Trace trace, bool all)
+        private static void PrintTraceHelper(Trace2 trace, bool all)
         {
             using (Writeln txt = new Writeln())
             {
@@ -16283,12 +16283,12 @@ namespace Gekko
                 Series ts = iv as Series;
                 if (Program.options.databank_trace &&  ts != null)
                 {
-                    Trace newTrace = new Trace(true);
+                    Trace2 newTrace = new Trace2(true);
                     newTrace.contents.text = o.gekkocode + ";";
                     //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                     newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                    Gekko.Trace.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                    Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                 }
             }
             G.Writeln2("Renamed " + outputs.Count + " variables");
@@ -16400,14 +16400,14 @@ namespace Gekko
                             }
                             if (Program.options.databank_trace)
                             {
-                                Trace newTrace = new Trace(o.t1, o.t2);
+                                Trace2 newTrace = new Trace2(o.t1, o.t2);
                                 newTrace.contents.text = o.gekkocode + ";";
                                 //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                 newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                 newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                                newTrace.precedents.AddRange(iv_series.meta.trace.precedents);
+                                newTrace.precedents.AddRange(iv_series.meta.trace2.precedents);
 
-                                Gekko.Trace.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
+                                Gekko.Trace2.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                             }
                         }
                     }
@@ -16422,12 +16422,12 @@ namespace Gekko
                     Series ts_clone = iv_clone as Series;
                     if (Program.options.databank_trace && ts_clone != null)
                     {
-                        Trace newTrace = new Trace(ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast());
+                        Trace2 newTrace = new Trace2(ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast());
                         newTrace.contents.text = o.gekkocode + ";";
                         //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                         newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                        Gekko.Trace.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
+                        Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                     }
                 }
             }
@@ -20928,10 +20928,10 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                TraceHelper th; Dictionary<TraceID, Trace> dict1Inverted;
-                Gekko.Trace.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
+                TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
+                Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
                 ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
-                Gekko.Trace.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
+                Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
                 databank.traces = null;  //important!
 
                 count = databank.storage.Count;  //must be before the finally
@@ -23435,13 +23435,13 @@ namespace Gekko
                 
                 if (Program.options.databank_trace)
                 {
-                    Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
+                    Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
                     newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                    newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
-                    Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                    newTrace.precedents.AddRange(ts_rhs.meta.trace2.precedents);
+                    Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
                 G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);
             }
@@ -23738,13 +23738,13 @@ namespace Gekko
 
                 if (Program.options.databank_trace)
                 {
-                    Trace newTrace = new Trace(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
+                    Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
                     newTrace.contents.text = gekkocode + ";";
                     //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                     newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                     newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                    newTrace.precedents.AddRange(ts_rhs.meta.trace.precedents);
-                    Gekko.Trace.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                    newTrace.precedents.AddRange(ts_rhs.meta.trace2.precedents);
+                    Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                 }
 
                 G.ServiceMessage("Interpolated " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);

@@ -414,7 +414,7 @@
     <Compile Include="StringTokenizer.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="Trace.cs" />
+    <Compile Include="Trace2.cs" />
     <Compile Include="Translate.cs" />
     <Compile Include="GuiTspUtilitiesData.cs">
       <SubType>Form</SubType>

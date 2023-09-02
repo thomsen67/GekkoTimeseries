@@ -39,7 +39,7 @@ namespace Gekko
         public DatabankCacheParams cacheParameters = null;
 
         [ProtoMember(3)]
-        public List<Trace> traces = null; //when writing, this is where all the Trace's go.
+        public List<Trace2> traces = null; //when writing, this is where all the Trace's go.
 
         public string name = null;
 

@@ -5096,10 +5096,10 @@ namespace Gekko
         public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
-            TraceHelper th = Trace.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
             int max = 10000;
             int[] depths = new int[max];
-            foreach (KeyValuePair<Trace, int> kvp in th.tracesDepth)
+            foreach (KeyValuePair<Trace2, int> kvp in th.tracesDepth)
             {
                 depths[Math.Min(kvp.Value, max - 1)]++;
             }
@@ -5137,9 +5137,9 @@ namespace Gekko
             Series x_series = x as Series;
             if (x_series == null) new Error("Variable is not series type and hence has no trace.");
             if (x_series.meta == null) new Error("Series has no meta information.");
-            if (x_series.meta.trace == null) new Error("Series has no trace information.");
+            if (x_series.meta.trace2 == null) new Error("Series has no trace information.");
             List<string> ss = new List<string>();
-            x_series.meta.trace.PrintRecursive(0, ss);
+            x_series.meta.trace2.PrintRecursive(0, ss);
             using (Writeln txt = new Writeln())
             {
                 foreach (string s in ss)

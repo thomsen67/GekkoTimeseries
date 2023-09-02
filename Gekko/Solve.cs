@@ -804,12 +804,12 @@ namespace Gekko
 
             if (G.Equal(o.opt_after, "yes"))
             {
-                Efter(o.t1, o.t2);
+                Efter(o.t1, o.t2, o.p);
                 return;
             }
             else if (G.Equal(o.opt_res, "yes"))
             {
-                SolveCommon.Res(o.t1, o.t2);
+                SolveCommon.Res(o.t1, o.t2, o.p);
                 return;
             }
 
@@ -837,7 +837,7 @@ namespace Gekko
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
 
-            SimFast(o.t1, o.t2, so);
+            SimFast(o.t1, o.t2, so, o.p);
 
             string after = null;
             if (Program.model.modelGekko.runAfter != null)
@@ -857,12 +857,11 @@ namespace Gekko
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBoxMainTabUpper.ResumeLayout();
         }
 
-        public static void SimFast(GekkoTime tStart, GekkoTime tEnd, SimOptions so)
+        public static void SimFast(GekkoTime tStart, GekkoTime tEnd, SimOptions so, P p)
         {
             if (GekkoTime.Observations(tStart, tEnd) < 1)
             {
                 new Error("start period must be before end period");
-                //throw new GekkoException();
             }
 
             Globals.simCounter = 0;
@@ -1272,7 +1271,7 @@ namespace Gekko
                                 Program.IterLink(output, " ", "here", "");
                                 G.Writeln();
                             }
-                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
+                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers, p);
                             Program.LinkContainer lc1;
                             Program.LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
@@ -1347,7 +1346,7 @@ namespace Gekko
                                 G.Writeln();
                             }
                             //write the stuff back to databank
-                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
+                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers, p);
                             Program.LinkContainer lc1;
                             Program.LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
@@ -1391,7 +1390,7 @@ namespace Gekko
                         if (Program.model.modelGekko.simulateResults[1] == 12345)
                         {
                             //abort NaN
-                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
+                            double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers, p);
 
                             int eqNumber = (int)Program.model.modelGekko.simulateResults[2];
                             EquationHelper eh = Program.model.modelGekko.equations[eqNumber];
@@ -1546,7 +1545,7 @@ namespace Gekko
 
             if (Globals.alwaysEnablcPackForSimulation)  //this is mostly for debugging, "packsim" activates the link showing up always.
             {
-                double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a, NAN, bNumberPointers, endoNoLagPointers);
+                double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a, NAN, bNumberPointers, endoNoLagPointers, p);
                 Program.LinkContainer lc1;
                 Program.LinkContainer lc2;
                 UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
@@ -1556,7 +1555,7 @@ namespace Gekko
             else
             {
                 //This is faster, so the "pack" link is not shown as default.
-                SolveDataInOut.FromAToDatabank(tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a, bNumberPointers, endoNoLagPointers);
+                SolveDataInOut.FromAToDatabank(tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a, bNumberPointers, endoNoLagPointers, p);
             }
 
             if (ec.simInitEndoMissingValueHelper != null)
@@ -1594,7 +1593,7 @@ namespace Gekko
             return;
         }
 
-        public static void Res(GekkoTime tStart, GekkoTime tEnd)
+        public static void Res(GekkoTime tStart, GekkoTime tEnd, P p)
         {
             //remember current values
             bool SimulateUseCurrentPeriodEndogenousRemember = Program.options.solve_data_init;
@@ -1609,7 +1608,7 @@ namespace Gekko
             so.method = "res";
             try
             {
-                SolveCommon.SimFast(tStart, tEnd, so);
+                SolveCommon.SimFast(tStart, tEnd, so, p);
             }
             catch (Exception e)
             {
@@ -1626,7 +1625,7 @@ namespace Gekko
         }
 
 
-        public static void Efter(GekkoTime tStart, GekkoTime tEnd)
+        public static void Efter(GekkoTime tStart, GekkoTime tEnd, P p)
         {
             //ErrorIfDatabanksSwapped();
             bool SimulateUseCurrentPeriodEndogenousRemember = Program.options.solve_data_init;
@@ -1635,7 +1634,7 @@ namespace Gekko
             so.method = "reverted";
             try
             {
-                SimFast(tStart, tEnd, so);
+                SimFast(tStart, tEnd, so, p);
             }
             finally
             {
@@ -1773,12 +1772,12 @@ namespace Gekko
         }
 
 
-        public static double[,] FromAToDatabankWhileRememberingOldDatabank(GekkoTime tStart0, GekkoTime tStart, GekkoTime tEnd, bool debug, Databank work, int obsWithLags, int obsSimPeriod, double[,] a, double[] NAN, int[] bNumberPointers, int[] endoNoLagPointers)
+        public static double[,] FromAToDatabankWhileRememberingOldDatabank(GekkoTime tStart0, GekkoTime tStart, GekkoTime tEnd, bool debug, Databank work, int obsWithLags, int obsSimPeriod, double[,] a, double[] NAN, int[] bNumberPointers, int[] endoNoLagPointers, P p)
         {
             double[,] a2 = new double[a.GetLength(0), a.GetLength(1)];
             Array.Copy(a, a2, a.Length);
             FromDatabankToA(tStart0, tEnd, work, obsWithLags, a2, NAN);  //NOTE: put into a2 array (will be equal to a array as it were at the beginning)
-            FromAToDatabank(tStart, tEnd, debug, work, obsWithLags, obsSimPeriod, a, bNumberPointers, endoNoLagPointers);
+            FromAToDatabank(tStart, tEnd, debug, work, obsWithLags, obsSimPeriod, a, bNumberPointers, endoNoLagPointers, p);
             return a2;
         }
 
@@ -1907,7 +1906,7 @@ namespace Gekko
             return;
         }
 
-        public static void FromAToDatabank(GekkoTime tStart, GekkoTime tEnd, bool debug, Databank work, int obsWithLags, int obsSimPeriod, double[,] a, int[] bNumberPointers, int[] endoNoLagPointers)
+        public static void FromAToDatabank(GekkoTime tStart, GekkoTime tEnd, bool debug, Databank work, int obsWithLags, int obsSimPeriod, double[,] a, int[] bNumberPointers, int[] endoNoLagPointers, P p)
         {
             //TODO: this loop could be speed-optimized. Having the list of Series pre-done would help,
             //      instead of this looping. Maybe even a list of pointers to x[]-arrays pre-done.
@@ -1919,12 +1918,11 @@ namespace Gekko
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
                 //    dirty and protect, cf. //#98726527
                 new Error("You are trying to simulate with a first-position databank ('" + work.name + "') that is non-editable");
-                //throw new GekkoException();
             }
             DateTime dt4 = DateTime.Now;
 
-            string s = O.ShowDatesAsString(tStart, tEnd);
-            string src = s + "SIM " + Path.GetFileName(Program.model.modelGekko.modelInfo.fileName) + " (hash " + Program.model.modelGekko.modelHashTrue + ")";            //string stamp = Program.GetDateStampCache();
+            //string s = O.ShowDatesAsString(tStart, tEnd);
+            string src = "Solve (sim) " + Path.GetFileName(Program.model.modelGekko.modelInfo.fileName) + ", hash = " + Program.model.modelGekko.modelHashTrue + "";    //string stamp = Program.GetDateStampCache();
             foreach (ATypeData atd in Program.model.modelGekko.varsAType.Values)
             {
                 string var = atd.varName;
@@ -1955,7 +1953,12 @@ namespace Gekko
                     {
                         if (endoNoLagPointers[b] == 1)
                         {
-                            ts.meta.source = src;
+                            Trace2 trace = new Trace2(tStart, tEnd);
+                            trace.contents.text = src;
+                            trace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
+                            trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling);                            
+                            //ts.meta.source = src;
                             ts.Stamp();
                             ts.SetDirty(true);
                         }
