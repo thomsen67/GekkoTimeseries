@@ -199,9 +199,10 @@ namespace Gekko
         /// Remember that a divider trace can be == null!
         /// </summary>
         /// <returns></returns>
-        public bool IsInvisibleTrace()
-        {            
-            return this.contents == null;
+        public static bool IsInvisibleTrace(Trace2 trace)
+        {
+            if (trace == null) return false;
+            return trace.contents == null;
         }
 
         public string ToString()
@@ -216,13 +217,26 @@ namespace Gekko
         {
             if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
-                th.traceCount++;
+                th.traceCount++;                
                 if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);
                 if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
                 {
                     if (!th.tracesDepth.ContainsKey(this)) th.tracesDepth.Add(this, depth);
                     else if (depth < th.tracesDepth[this]) th.tracesDepth[this] = depth;                    
                 }
+
+                //Maybe some time only use the 'x' objects...
+                if (!Trace2.IsInvisibleTrace(this))
+                {
+                    th.xtraceCount++;
+                    if (!th.xtraces.ContainsKey(this)) th.xtraces.Add(this, this.precedents);
+                    if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
+                    {
+                        if (!th.xtracesDepth.ContainsKey(this)) th.xtracesDepth.Add(this, depth);
+                        else if (depth < th.xtracesDepth[this]) th.xtracesDepth[this] = depth;
+                    }
+                }
+
                 if (this.precedents.Count() > 0)
                 {
                     foreach (Trace2 trace in this.precedents.GetStorage())
@@ -575,7 +589,7 @@ namespace Gekko
                     //txt.lineWidth = int.MaxValue;
                     TraceHelper th = new TraceHelper();
                     trace.DeepTrace(th, null, 0);
-                    int count = th.traceCount - 1;  //we do not count the entry with .assign == null.
+                    int count = th.xtraceCount;  //we do not count the entry with .assign == null.
                     //if (!all) txt.MainOmitVeryFirstNewLine();
                     string s = "Traces";
                     if (all) s = count + " " + "traces";
@@ -612,7 +626,7 @@ namespace Gekko
 
             if (all)
             {
-                if (trace == null || !trace.IsInvisibleTrace())
+                if (!Trace2.IsInvisibleTrace(trace))
                 {
                     Action<GAO> a = (gao) =>
                     {
@@ -631,7 +645,7 @@ namespace Gekko
             }
             else
             {
-                if (!trace.IsInvisibleTrace())
+                if (!Trace2.IsInvisibleTrace(trace))
                 {
                     TwoStrings s2 = trace.Text(false);
                     G.Write(s + s2.s1);
@@ -691,10 +705,17 @@ namespace Gekko
     {
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
         public int varCount = 0; //number of series found (probably often equatl to meta count)
+        public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
+        // ??? do we really need these, can we just use the 'x' ?
+        // ??? do we really need these, can we just use the 'x' ?
+        // ??? do we really need these, can we just use the 'x' ?
         public int traceCount = 0; //will include combinations, traces will not
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
         public Dictionary<Trace2, int> tracesDepth = new Dictionary<Trace2, int>(); //value is depth
-        public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
+        // --- the following is without "invisible" traces (the ones directly on meta objects)
+        public int xtraceCount = 0; //will include combinations, traces will not
+        public Dictionary<Trace2, Precedents> xtraces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
+        public Dictionary<Trace2, int> xtracesDepth = new Dictionary<Trace2, int>(); //value is depth
     }
 
     /// <summary>
