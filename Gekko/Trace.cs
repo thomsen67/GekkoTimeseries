@@ -217,23 +217,17 @@ namespace Gekko
         {
             if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
-                th.traceCount++;                
-                if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);
-                if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
-                {
-                    if (!th.tracesDepth.ContainsKey(this)) th.tracesDepth.Add(this, depth);
-                    else if (depth < th.tracesDepth[this]) th.tracesDepth[this] = depth;                    
-                }
-
-                //Maybe some time only use the 'x' objects...
+                th.traceCountIncludeInvisible++; //only for testing               
+                if (!th.tracesIncludeInvisible.ContainsKey(this)) th.tracesIncludeInvisible.Add(this, this.precedents);
+                                
                 if (!Trace2.IsInvisibleTrace(this))
                 {
-                    th.xtraceCount++;
-                    if (!th.xtraces.ContainsKey(this)) th.xtraces.Add(this, this.precedents);
+                    th.traceCount++;
+                    if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);
                     if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
                     {
-                        if (!th.xtracesDepth.ContainsKey(this)) th.xtracesDepth.Add(this, depth);
-                        else if (depth < th.xtracesDepth[this]) th.xtracesDepth[this] = depth;
+                        if (!th.tracesDepth.ContainsKey(this)) th.tracesDepth.Add(this, depth);
+                        else if (depth < th.tracesDepth[this]) th.tracesDepth[this] = depth;
                     }
                 }
 
@@ -319,7 +313,7 @@ namespace Gekko
         public string PrintStamp()
         {
             string s = null;            
-            s += this.id.stamp.ToString("MM/dd/yyyy HH:mm:ss") + "|" + this.id.counter;
+            s += this.id.stamp.ToString("dd/MM/yyyy HH:mm:ss") + "|" + this.id.counter;
             return s;
         }
 
@@ -334,31 +328,23 @@ namespace Gekko
             return x;
         }
 
-        public TwoStrings Text(bool unfold)
-        {
-            //string s = null;
-            //s += "" + this.contents.GetT1() + "-" + this.contents.GetT2() + "";
-            //s += " --> ";
-            //s += this.contents.text;
-            //s += "          ";
-            // s += " || " + this.PrintPeriods();
-            //if (this.contents.bankAndVarnameWithFreq != null) s += " || lhs=" + this.contents.bankAndVarnameWithFreq;
-            //if (this.contents.dataFile != null) s += " || data=" + this.contents.dataFile;
-            //if (this.contents.commandFileAndLine != null) s += " || gcm=" + this.contents.commandFileAndLine;
-            //s += " || " + this.PrintStamp();
-            
+        public TwoStrings Text(bool unfold, int d)
+        {            
             string s1 = null;
             string s2 = null;
             if (!unfold)
             {
                 s1 = this.contents.text;
                 string period = this.contents.GetT1() + "-" + this.contents.GetT2();
-                s2 += "   -->   period:" + period;
+                int len = "---".Length;
+                if (s1 != null) len = s1.Length;
+                s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;
                 string active = this.PrintPeriods();
                 if (!G.Equal(period, active))
                 {
                     s2 += " (active:" + active + ")";
                 }
+                s2 += ", " + this.id.stamp.ToString("dd-MM-yyyy HH:mm:ss");
             }
             else
             {
@@ -565,7 +551,7 @@ namespace Gekko
             //gather lists
             th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
             dict1Inverted = new Dictionary<TraceID2, Trace2>();
-            foreach (Trace2 trace in th.traces.Keys)
+            foreach (Trace2 trace in th.tracesIncludeInvisible.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -574,7 +560,7 @@ namespace Gekko
             {
                 meta.ToID();
             }
-            databank.traces = th.traces.Keys.ToList();
+            databank.traces = th.tracesIncludeInvisible.Keys.ToList();
             if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
         }
 
@@ -589,10 +575,10 @@ namespace Gekko
                     //txt.lineWidth = int.MaxValue;
                     TraceHelper th = new TraceHelper();
                     trace.DeepTrace(th, null, 0);
-                    int count = th.xtraceCount;  //we do not count the entry with .assign == null.
+                    int count = th.traceCount;  //we do not count the entry with .assign == null.
                     //if (!all) txt.MainOmitVeryFirstNewLine();
                     string s = "Traces";
-                    if (all) s = count + " " + "traces";
+                    if (all) s = count + " " + "traces (click [] to see more info)";
                     if (!all)
                     {
                         if (trace.precedents[0].precedents.Count() > 0)
@@ -630,14 +616,26 @@ namespace Gekko
                 {
                     Action<GAO> a = (gao) =>
                     {
-                        G.Writeln2("!!!");
+                        G.Writeln();
+                        G.Writeln("Trace:     " + trace.contents.text);
+                        G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
+                        G.Writeln("Active:    " + trace.PrintPeriods());
+                        if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
+                        if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
+                        if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
+                        G.Writeln("Stamp:     " + trace.id.stamp.ToString("dd-MM-yyyy HH:mm:ss"));
+                        G.Writeln("ID:        " + trace.id.counter);
                     };
-                    string more = " " + G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
+                    string more = G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
                     G.Write(more);
                 }
+                s = G.Blanks(d * 2 - 2);
             }
-
-            s = G.Blanks(d * 2 - 2);
+            else
+            {
+                s = "| ";
+            }
+            
             if (trace == null)
             {
                 G.Write(s);
@@ -647,7 +645,7 @@ namespace Gekko
             {
                 if (!Trace2.IsInvisibleTrace(trace))
                 {
-                    TwoStrings s2 = trace.Text(false);
+                    TwoStrings s2 = trace.Text(false, d);
                     G.Write(s + s2.s1);
                     G.Writeln(s2.s2, Globals.MiddleGray);
                 }
@@ -706,16 +704,15 @@ namespace Gekko
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
         public int varCount = 0; //number of series found (probably often equatl to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
-        // ??? do we really need these, can we just use the 'x' ?
-        // ??? do we really need these, can we just use the 'x' ?
-        // ??? do we really need these, can we just use the 'x' ?
+        // ----------
+        // --- the following is for stats etc. ("real" traces)
         public int traceCount = 0; //will include combinations, traces will not
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
         public Dictionary<Trace2, int> tracesDepth = new Dictionary<Trace2, int>(); //value is depth
-        // --- the following is without "invisible" traces (the ones directly on meta objects)
-        public int xtraceCount = 0; //will include combinations, traces will not
-        public Dictionary<Trace2, Precedents> xtraces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
-        public Dictionary<Trace2, int> xtracesDepth = new Dictionary<Trace2, int>(); //value is depth
+        // ----------
+        // --- these are needed for gbk write/read, and for testing
+        public int traceCountIncludeInvisible = 0; //will include combinations, traces will not
+        public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)        
     }
 
     /// <summary>

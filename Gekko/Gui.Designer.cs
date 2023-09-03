@@ -994,7 +994,7 @@ namespace Gekko
             // tracing
             // 
             this.traceToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.traceToolStripMenuItem.Text = "Trace data";
+            this.traceToolStripMenuItem.Text = "Program tracing";
             this.traceToolStripMenuItem.ToolTipText = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow \nat the right-side of the GUI bottom bar), and when the session ends, a report ('trace') is shown.";
             this.traceToolStripMenuItem.Click += new System.EventHandler(this.traceToolStripMenuItem_Click);            
             // 

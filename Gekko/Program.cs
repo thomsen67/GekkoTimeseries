@@ -15325,8 +15325,15 @@ namespace Gekko
                 foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace2 != null)
-                {                    
-                    Trace2.PrintTraceHelper(ts.meta.trace2, false);
+                {
+                    try
+                    {
+                        Trace2.PrintTraceHelper(ts.meta.trace2, false);
+                    }
+                    catch
+                    {
+                        G.Writeln("<Trace printing failed...>");
+                    }
                 }
 
                 bool eqsPrinted = false;

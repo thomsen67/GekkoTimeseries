@@ -13138,7 +13138,7 @@ namespace UnitTests
             meta1.trace2.DeepTrace(th, null, 0);
             //Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID2, Trace2> dict1Inverted = new Dictionary<TraceID2, Trace2>();
-            foreach (Trace2 trace in th.traces.Keys)
+            foreach (Trace2 trace in th.tracesIncludeInvisible.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -13147,7 +13147,7 @@ namespace UnitTests
 
             //write bank
             Program.ProtobufWrite(meta1, path + @"\meta.data");
-            Program.ProtobufWrite(th.traces.Keys.ToList(), path + @"\dict.data");
+            Program.ProtobufWrite(th.tracesIncludeInvisible.Keys.ToList(), path + @"\dict.data");
 
             //restore links
             if (true)
@@ -13750,8 +13750,8 @@ namespace UnitTests
 
                     TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                     Assert.AreEqual(4, th1.varCount);
-                    Assert.AreEqual(9, th1.traces.Count);
-                    Assert.AreEqual(19, th1.traceCount);
+                    Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
+                    Assert.AreEqual(19, th1.traceCountIncludeInvisible);
 
                     Trace2 trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
 
@@ -13790,8 +13790,8 @@ namespace UnitTests
 
                     TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                     Assert.AreEqual(4, th2.varCount);     //4  4
-                    Assert.AreEqual(9, th2.traces.Count);  //23 8
-                    Assert.AreEqual(19, th2.traceCount);  //23 8
+                    Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
+                    Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
                                         
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);

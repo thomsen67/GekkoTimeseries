@@ -5108,23 +5108,15 @@ namespace Gekko
             {
                 depths[Math.Min(kvp.Value, max - 1)]++;
             }
-
-            /*
-             * 
-             * public int varCount
-             * public int traceCount
-             * public Dictionary<Trace, Precedents> traces
-             * public List<SeriesMetaInformation> metas
-             * 
-             */
+            
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.varCount + " series with " + (th.traces.Count - th.metas.Count) + " traces in total.");
+                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.varCount + " series with " + (th.traces.Count) + " traces in total.");
             }
             using (Writeln txt = new Writeln())
             {
                 txt.MainOmitVeryFirstNewLine();
-                for (int i = 0; i < max; i++)
+                for (int i = 1; i < max; i++)
                 {
                     string extra = null;
                     if (depths[i] == 0) break;

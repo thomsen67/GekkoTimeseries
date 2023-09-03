@@ -395,7 +395,7 @@ namespace Gekko
         {
             if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
-                Globals.runningOnTTComputer = true;  //for some debugging                
+                //Globals.runningOnTTComputer = true;  //for some debugging                
                 G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
             }
 
@@ -2111,7 +2111,7 @@ namespace Gekko
                     {
                         Table tab = new Table();
                         tab.CurRow.SetTopBorder(1, 3);
-                        tab.CurRow.SetText(1, "DATA TRACE");
+                        tab.CurRow.SetText(1, "PROGRAM TRACE");
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.Next();
                         int count = -1;
@@ -2128,7 +2128,7 @@ namespace Gekko
                         tab.CurRow.SetLeftBorder(1);
                         tab.CurRow.SetRightBorder(3);
                         tab.CurRow.Next();
-                        tab.CurRow.SetText(1, "Cf. menu 'Data' --> 'Trace data'");
+                        tab.CurRow.SetText(1, "Cf. menu 'Data' --> 'Program tracing'");
                         tab.CurRow.MergeCols(1, 3);
 
                         int widthRemember = Program.options.print_width;
@@ -3089,7 +3089,7 @@ namespace Gekko
                 Program.options.global_datatrace = "simple";          
                 using (Writeln txt = new Writeln())
                 {
-                    txt.MainAdd("Data tracing is activated.");
+                    txt.MainAdd("Program tracing is activated.");
                     txt.MoreAdd(s);
                 }                
             }
@@ -3098,7 +3098,7 @@ namespace Gekko
                 Program.options.global_datatrace = "none";
                 using (Writeln txt = new Writeln())
                 {
-                    txt.MainAdd("Data tracing is deactivated.");
+                    txt.MainAdd("Program tracing is deactivated.");
                     txt.MoreAdd(s);
                 }
             }
