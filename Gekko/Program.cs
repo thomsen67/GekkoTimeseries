@@ -15326,7 +15326,7 @@ namespace Gekko
 
                 if (ts.meta.trace2 != null)
                 {                    
-                    PrintTraceHelper(ts.meta.trace2, false);
+                    Trace2.PrintTraceHelper(ts.meta.trace2, false);
                 }
 
                 bool eqsPrinted = false;
@@ -15365,63 +15365,7 @@ namespace Gekko
                 G.Writeln("==========================================================================================");
                 if (note != null) G.Writeln(note);
             }
-        }
-
-        private static void PrintTraceHelper(Trace2 trace, int d, bool all, Writeln txt)
-        {
-            if (!all && d > 1) return;
-            string s = "| " + G.Blanks(d * 2 - 2);
-            if (trace == null)
-            {
-                txt.MainAdd(s + "----------");
-                txt.MainNewLineTight();
-            }
-            else
-            {
-                if (trace.contents != null)
-                {
-                    txt.MainAdd(s + trace.Text());
-                    txt.MainNewLineTight();
-                }
-                if (trace.precedents.Count() > 0)
-                {
-                    foreach (Trace2 child in trace.precedents.GetStorage())
-                    {
-                        PrintTraceHelper(child, d + 1, all, txt);
-                    }
-                }
-            }
-        }
-
-        private static void PrintTraceHelper(Trace2 trace, bool all)
-        {
-            using (Writeln txt = new Writeln())
-            {
-                txt.lineWidth = int.MaxValue;
-                TraceHelper th = new TraceHelper();                
-                trace.DeepTrace(th, null, 0);
-                int count = th.traceCount - 1;  //we do not count the entry with .assign == null.
-                
-                if (!all) txt.MainOmitVeryFirstNewLine();
-                string s = "Traces";
-                if (all) s = count + " " + "traces";                
-                if (!all)
-                {
-                    if (trace.precedents[0].precedents.Count() > 0)
-                    {
-                        Action<GAO> a = (gao) =>
-                        {
-                            PrintTraceHelper(trace, true);
-                        };
-                        s += " (" + G.GetLinkAction("show " + count, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
-                    }
-                }
-                s += ":";
-                txt.MainAdd(s);
-                txt.MainNewLineTight();
-                PrintTraceHelper(trace, 0, all, txt);
-            }
-        }
+        }        
 
         /// <summary>
         /// DISP for Gekko equations

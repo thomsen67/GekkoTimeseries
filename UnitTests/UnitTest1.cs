@@ -13761,9 +13761,9 @@ namespace UnitTests
                     Globals.unitTestScreenOutput.Clear();
                     I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
 
-                    I("d.traceprint();");
-                    I("c.traceprint();");
-                    I("a.traceprint();");
+                    //I("d.traceprint();");
+                    //I("c.traceprint();");
+                    //I("a.traceprint();");
 
                     Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2.precedents[0];
                     Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
@@ -13856,7 +13856,7 @@ namespace UnitTests
                     // ---------------------------------
                     // // ---------------------------------
                     I("disp d;");
-                    I("d.traceprint();");
+                    //I("d.traceprint();");
                 }
                 finally
                 {
