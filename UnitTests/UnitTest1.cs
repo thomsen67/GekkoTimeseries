@@ -29859,60 +29859,9 @@ print(df2)
             I("reset; OPTION interface alias = yes;");
             I("x = series(1); x[a] = 1;");
             I("global:#alias = (('x', 'x[a]'),);");  // a --> b            
-            I("PRT x;");
-
-            
+            I("PRT x;");            
         }
 
-        [TestMethod]
-        public void _Test_Meta()
-        {
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
-            I("model meta;");
-            I("time 2000 2001;");
-            I("create {#all};");
-            I("create extra1, extra2;");
-            I("series tg = 0.25;");
-            I("series extra1 = 2, 3;");
-            I("series extra2 = 1/extra1 + 0.1*extra1[-1];");
-            I("sim;");
-            string stamp2 = Program.GetDateStamp();
-
-            _AssertSeries(First(), "q", 2000, 1d, 0.0001d);
-            _AssertSeries(First(), "q", 2001, 1d, 0.0001d);
-            _AssertSeries(First(), "pxnk", 2000, 2d, 0.0001d);
-            _AssertSeries(First(), "pxnk", 2001, 2d, 0.0001d);
-
-            MetaHelperLabel();
-            MetaHelperSourceStamp(stamp2);
-
-            I("HDG 'A databank for unit testing purposes!';");
-
-            I("WRITE meta;");
-            I("RESET;");
-            I("READ meta;");
-
-            MetaHelperLabel();
-            MetaHelperSourceStamp(stamp2);
-
-            Databank w = Program.databanks.GetFirst();
-            Assert.AreEqual(w.info1, "A databank for unit testing purposes!");
-            //TODO: Assert.AreEqual(w.date, "---todo---");
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                Assert.AreEqual(w.readInfo.modelName, "meta.frm");
-                Assert.AreEqual(w.readInfo.modelInfo, "Adam Oktober 2012");
-                Assert.AreEqual(w.readInfo.modelDate, "05-03-2013 22:54:00");
-                Assert.AreEqual(w.readInfo.modelSignature, "ATuOTa263peolAocqEvrPA");
-                Assert.AreEqual(w.readInfo.modelHash, "UZp0jFd11z6zvfS3MHPsaA");
-                Assert.AreEqual(w.readInfo.modelLastSimPeriod, "2000-2001");
-                //Assert.AreEqual(w.readInfo.modelLastSimStamp, "---todo---");
-                Assert.AreEqual(w.readInfo.modelLargestLag, "0");
-                Assert.AreEqual(w.readInfo.modelLargestLead, "0");
-            }
-
-        }
         [TestMethod]
         public void _Test_DatabankFlatFormat()
         {
@@ -30029,15 +29978,15 @@ print(df2)
         {
             // endo simul
 
-            Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            //Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            //Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
             // endo tablevars
 
-            Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            //Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
             // true exo

@@ -1679,67 +1679,70 @@ namespace Gekko
 
         public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o, P p)
         {
-            if (!isArraySubSeries)
+            if (Program.options.databank_trace)
             {
-                string traceString = null;
-                if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
-
-                if (traceString != null)
+                if (!isArraySubSeries)
                 {
-                    if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Parent);
-                    // ---------
-                    Trace2 trace = new Trace2(t1, t2);
+                    string traceString = null;
+                    if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
 
-                    if (ib != null) trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                    else trace.contents.bankAndVarnameWithFreq = varnameWithFreq;  //what if ib is MAP???
-                    trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                    trace.contents.text = traceString + ";";
-                    //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
-                    if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
+                    if (traceString != null)
                     {
-                        List<Trace2> temp = new List<Trace2>();
-                        int counter1 = -1;
-                        foreach (IVariable iv in Globals.traceContainer)
+                        if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Parent);
+                        // ---------
+                        Trace2 trace = new Trace2(t1, t2);
+
+                        if (ib != null) trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
+                        else trace.contents.bankAndVarnameWithFreq = varnameWithFreq;  //what if ib is MAP???
+                        trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.contents.text = traceString + ";";
+                        //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
+                        if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                         {
-                            counter1++;
-                            Series iv_ts = iv as Series;
-                            if (iv_ts?.meta?.trace2 == null) continue;
-                            if (Object.ReferenceEquals(iv_ts, lhs_series))
+                            List<Trace2> temp = new List<Trace2>();
+                            int counter1 = -1;
+                            foreach (IVariable iv in Globals.traceContainer)
                             {
-                                continue;  //do not point to your own trace!
-                            }
-                            if (iv_ts.meta.trace2.precedents.Count() > 0)
-                            {
-                                int counter2 = -1;
-                                foreach (Trace2 kvp in iv_ts.meta.trace2.precedents.GetStorage())
-                                {                                    
-                                    Trace2 childTrace2 = kvp;
-                                    bool known = false;
-                                    foreach (Trace2 tempElement in temp)
+                                counter1++;
+                                Series iv_ts = iv as Series;
+                                if (iv_ts?.meta?.trace2 == null) continue;
+                                if (Object.ReferenceEquals(iv_ts, lhs_series))
+                                {
+                                    continue;  //do not point to your own trace!
+                                }
+                                if (iv_ts.meta.trace2.precedents.Count() > 0)
+                                {
+                                    int counter2 = -1;
+                                    foreach (Trace2 kvp in iv_ts.meta.trace2.precedents.GetStorage())
                                     {
-                                        if (Object.ReferenceEquals(childTrace2, tempElement))
+                                        Trace2 childTrace2 = kvp;
+                                        bool known = false;
+                                        foreach (Trace2 tempElement in temp)
                                         {
-                                            known = true; break;
+                                            if (Object.ReferenceEquals(childTrace2, tempElement))
+                                            {
+                                                known = true; break;
+                                            }
                                         }
-                                    }
-                                    if (!known)
-                                    {
-                                        counter2++;
-                                        if (counter2 == 0 && temp.Count > 0 && temp[temp.Count - 1] != null)
+                                        if (!known)
                                         {
-                                            temp.Add(null);  //divider
+                                            counter2++;
+                                            if (counter2 == 0 && temp.Count > 0 && temp[temp.Count - 1] != null)
+                                            {
+                                                temp.Add(null);  //divider
+                                            }
+                                            temp.Add(childTrace2);
                                         }
-                                        temp.Add(childTrace2);
                                     }
                                 }
                             }
+                            if (temp.Count > 0)
+                            {
+                                trace.precedents.SetStorage(temp);  //keep it null if no children                            
+                            }
                         }
-                        if (temp.Count > 0)
-                        {
-                            trace.precedents.SetStorage(temp);  //keep it null if no children                            
-                        }
-                    }                    
-                    Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);                    
+                        Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);
+                    }
                 }
             }
         }

@@ -245,7 +245,7 @@ namespace Gekko
                         if (previous.id == 0) seemsAfterVariable = false;  //something like delete[*]
                         bool looksLikeWildcard = true;
                         string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2, false);
-                        for (int i7 = 0; i7 < s.Length; i7++)
+                        for (int i7 = 0;i7 < s.Length; i7++)
                         {
                             char c7 = s[i7];
                             if (G.IsLetterOrDigitOrUnderscore(c7) || c7 == '*' || c7 == '?')

@@ -5093,7 +5093,12 @@ namespace Gekko
             return new ScalarVal(ed);
         }
 
-        public static void tracestats(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
+
+        public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
@@ -5114,18 +5119,19 @@ namespace Gekko
              */
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Counted " + th.varCount + " series, with " + (th.traces.Count - th.metas.Count) + " traces.");
+                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.varCount + " series with " + (th.traces.Count - th.metas.Count) + " traces in total.");
             }
             using (Writeln txt = new Writeln())
             {
+                txt.MainOmitVeryFirstNewLine();
                 for (int i = 0; i < max; i++)
                 {
                     string extra = null;
                     if (depths[i] == 0) break;
                     if (i == 0 && !Globals.runningOnTTComputer) continue;
-                    if (i == 0 && Globals.runningOnTTComputer) extra = "    <--- TTH";
+                    if (i == 0 && Globals.runningOnTTComputer) extra = "    <--- only TTH";
                     txt.MainAdd("Dept: " + (i - 1) + ", traces: " + depths[i] + extra);
-                    txt.MainNewLineTight();
+                    txt.MainNewLineTight();                    
                 }
                 txt.MainAdd("");
             }
