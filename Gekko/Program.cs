@@ -176,6 +176,15 @@ namespace Gekko
         Unknown
     }
 
+    /// <summary>
+    /// Helpler for laspeyres indices
+    /// </summary>
+    public class SeriesAndBool
+    {
+        public Series ts = null;
+        public bool b = false;
+    }
+
     public class DownloadHelper
     {
         public string gekkoCode = null;
@@ -10876,24 +10885,21 @@ namespace Gekko
         /// </summary>
         /// <param name="tStart0"></param>
         /// <param name="tEnd"></param>
-        /// <param name="varsX"></param>
+        /// <param name="vars_string"></param>
         /// <returns></returns>
-        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> varsX, List<Series> varsX_series, List<bool> neg, EFreq freq)
+        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> vars_string, List<SeriesAndBool> vars_data, EFreq freq)
         {
-            if (varsX != null && varsX_series != null) new Error("Series error");
-            
-            List<Series> series_list = null;
-            List<bool> negx = null;
-            if (varsX_series != null)
+            if (vars_string != null && vars_data != null) new Error("Series error");
+
+            List<SeriesAndBool> xvars = null;
+            if (vars_data != null)
             {
-                series_list = varsX_series;
-                negx = neg;
+                xvars = vars_data;
             }
             else
             {
-                series_list = new List<Series>();
-                negx = new List<bool>();
-                foreach (string var in varsX)
+                xvars = new List<SeriesAndBool>();
+                foreach (string var in vars_string)
                 {
                     string var2 = var;
                     bool negative = false;
@@ -10904,15 +10910,17 @@ namespace Gekko
                     }
                     Series temp = O.GetIVariableFromString(G.Chop_AddFreq(var2, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
                     if (temp == null) new Error("Variable '" + var2 + "' does not exist");  //is this if necessary?
-                    series_list.Add(temp);
-                    negx.Add(negative);
+                    SeriesAndBool x = new SeriesAndBool();
+                    x.ts = temp;
+                    x.b = negative;
+                    xvars.Add(x);
                 }
             }
 
             int obs = GekkoTime.Observations(tStart0, tEnd);
-            double[,] aX = new double[varsX.Count, obs];
+            double[,] aX = new double[vars_string.Count, obs];
             int id = -1;
-            for (int ii = 0; ii < series_list.Count; ii++)
+            foreach(SeriesAndBool sab in xvars)
             {
                 id++;
                 int length = -12345;
@@ -10921,9 +10929,9 @@ namespace Gekko
                 double[] x = null;
 
                 //Hmmm, Annual?? What about quarters/months??
-                x = series_list[ii].GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
+                x = sab.ts.GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
                 length = index2 - index1 + 1;
-                if (negx[ii])
+                if (sab.b)
                 {
                     double[] xNew = new double[x.Length];
                     for (int i = 0; i < x.Length; i++)
@@ -20124,8 +20132,8 @@ namespace Gekko
                 }
             }
 
-            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, null, freq);
-            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, null, freq);
+            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, freq);
+            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, freq);
             int obs = GekkoTime.Observations(tStart, tEnd);
             int obs2 = GekkoTime.Observations(tStart, indexYear);
 
@@ -20287,6 +20295,7 @@ namespace Gekko
                 Helper(freq, annualX, s);
             }
 
+            
 
             // --------------------- info start ---------------------------------------------------------------
             //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
