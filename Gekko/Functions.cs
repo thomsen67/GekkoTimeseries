@@ -1044,7 +1044,7 @@ namespace Gekko
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
+            IVariable result = Program.Laspeyres("laspchain", plist, xlist, null, null, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
 
@@ -1064,7 +1064,7 @@ namespace Gekko
         public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
+            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, null, null, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
 

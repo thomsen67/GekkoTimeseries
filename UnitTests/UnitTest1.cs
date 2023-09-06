@@ -30280,7 +30280,7 @@ print(df2)
             I("x2 = 27, 25, 27, 24,              23, 25, 27, 24,              22, 22, 25, 23;");
             I("#x = x1, x2;");
             I("#p = p1, p2;");
-            //I("#m = laspchainq(#x, #p, 2020, 'dst');");
+            I("#m = laspchainq(#x, #p, 2020, 'dst');");
 
             //I("print #m.price, #m.quantity, #m.price_lag;");
 

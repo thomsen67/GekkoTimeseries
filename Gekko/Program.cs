@@ -10918,7 +10918,7 @@ namespace Gekko
             }
 
             int obs = GekkoTime.Observations(tStart0, tEnd);
-            double[,] aX = new double[vars_string.Count, obs];
+            double[,] aX = new double[xvars.Count, obs];
             int id = -1;
             foreach(SeriesAndBool sab in xvars)
             {
@@ -10929,6 +10929,10 @@ namespace Gekko
                 double[] x = null;
 
                 //Hmmm, Annual?? What about quarters/months??
+                if (sab.ts.freq != freq)
+                {
+                    new Error("Expected " + freq.Pretty().ToLower() + " frequency, got " + sab.ts.freq.Pretty().ToLower());
+                }
                 x = sab.ts.GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
                 length = index2 - index1 + 1;
                 if (sab.b)
@@ -20074,7 +20078,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes.
+        /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
+        /// direct data (list1_data/list2_data).
         /// </summary>
         /// <param name="function"></param>
         /// <param name="list1"></param>
@@ -20083,14 +20088,12 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
+        public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
         {
             EFreq freq = EFreq.A;
-            
-            if (!(Program.options.freq == EFreq.A))
-            {             
-                new Error("Functions laspchain() and laspfixed() only work for annual frequency at the moment");
-            }
+
+            if (list1 != null && list1_data != null) new Error("Series error");
+            if (list2 != null && list2_data != null) new Error("Series error");
 
             int indexYearI = -12345;
             int counter = -1;
@@ -20111,29 +20114,44 @@ namespace Gekko
                 new Error("with index year in Laspeyres function: seems outside time period");
             }
 
-            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
-            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
+            double[,] aX = null;
+            double[,] aP = null;
 
-            if (varsP.Count == 0 || varsX.Count == 0)
+            if (list1 != null)
             {
-                new Error("List with 0 elements not permitted");
-            }
+                List<string> varsP = null;
+                List<string> varsX = null;
+                varsP = Stringlist.GetListOfStringsFromList((List)list1);
+                varsX = Stringlist.GetListOfStringsFromList((List)list2);
+                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, freq);
+                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, freq);
 
-            if (varsP.Count != varsX.Count)
-            {
-                new Error("The lists should have same number of elements");
-            }
-
-            foreach (string s in varsP)
-            {
-                if (s.StartsWith("-"))
+                if (varsP.Count == 0 || varsX.Count == 0)
                 {
-                    new Error("'" + s + "': Please use subtraction in quantity list only");
+                    new Error("List with 0 elements not permitted");
+                }
+
+                if (varsP.Count != varsX.Count)
+                {
+                    new Error("The lists should have same number of elements");
+                }
+
+                foreach (string s in varsP)
+                {
+                    if (s.StartsWith("-"))
+                    {
+                        new Error("'" + s + "': Please use subtraction in quantity list only");
+                    }
                 }
             }
+            else
+            {
+                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list1_data, freq);
+                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list2_data, freq);
+            }
 
-            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, freq);
-            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, freq);
+            int n = aX.GetLength(0);  //number of vars
+
             int obs = GekkoTime.Observations(tStart, tEnd);
             int obs2 = GekkoTime.Observations(tStart, indexYear);
 
@@ -20148,7 +20166,7 @@ namespace Gekko
                 {
                     double sum = 0d;
                     double sum1 = 0d;
-                    for (int j = 0; j < varsX.Count; j++)
+                    for (int j = 0; j < n; j++)
                     {
                         sum += aX[j, i] * aP[j, i];
                         if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
@@ -20170,7 +20188,7 @@ namespace Gekko
                 {
                     double sum = 0d;
                     double sum1 = 0d;
-                    for (int j = 0; j < varsX.Count; j++)
+                    for (int j = 0; j < n; j++)
                     {
                         sum += aX[j, i] * aP[j, i];
                         sum1 += aX[j, i] * aP[j, indexYearI];
@@ -20284,8 +20302,8 @@ namespace Gekko
 
             double[,] xx = new double[5, obs];
 
-            List<Series> annualP = new List<Series>();
-            List<Series> annualX = new List<Series>();
+            List<SeriesAndBool> annualP = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualX = new List<SeriesAndBool>();
             foreach (string s in varsP)
             {
                 Helper(freq, annualP, s);
@@ -20295,7 +20313,21 @@ namespace Gekko
                 Helper(freq, annualX, s);
             }
 
-            
+            GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
+            GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
+            Map map = Laspeyres(function, null, null, annualP, annualX, indexYear, tStart_annual, tEnd_annual) as Map;
+
+            Series pLag = new Series(EFreq.Q, null);
+
+            Program.InterpolateHelper(pLag, map.GetIVariable("p!a") as Series, "repeat");
+
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
+            {
+                for (int i = 0; i < annualP.Count; i++)
+                {
+                    //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q
+                }
+            }            
 
             // --------------------- info start ---------------------------------------------------------------
             //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
@@ -20319,7 +20351,8 @@ namespace Gekko
             //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q
 
             //Jeg skal ikke kloge mig på dette udtryk.Men hvis man ganger nævneren over, smager det da helt
-            //klart af ”foregående års priser” gange med ”indeværende års mængder”. (Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
+            //klart af ”foregående års priser” gange med ”indeværende års mængder”.
+            //(Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
             // --------------------- info end -----------------------------------------------------------------
 
 
@@ -20398,16 +20431,25 @@ namespace Gekko
             //m.AddIVariable(q.GetName(), q);
             return m;
 
-            void Helper(EFreq freq, List<Series> m, string s)
+            void Helper(EFreq freq, List<SeriesAndBool> m, string s)
             {
+                bool negative = false;
+                string var2 = s;
+                if (s.StartsWith("-"))
+                {
+                    var2 = var2.Substring(1);
+                    negative = true;
+                }
                 Series ts_lhs = new Series(EFreq.A, null);
                 Series ts_rhs = O.GetIVariableFromString(G.Chop_AddFreq(s, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
                 CollapseHelper helper = new CollapseHelper();
                 helper.method = "avg";
                 CollapseHelper(ts_lhs, ts_rhs, helper);
-                m.Add(ts_lhs);
+                SeriesAndBool sab = new SeriesAndBool();
+                sab.ts = ts_lhs;
+                sab.b = negative;
+                m.Add(sab);
             }
-
         }        
 
         /// <summary>
