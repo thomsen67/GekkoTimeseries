@@ -20302,15 +20302,17 @@ namespace Gekko
 
             double[,] xx = new double[5, obs];
 
+            List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyX = new List<SeriesAndBool>();
             List<SeriesAndBool> annualP = new List<SeriesAndBool>();
             List<SeriesAndBool> annualX = new List<SeriesAndBool>();
             foreach (string s in varsP)
             {
-                Helper(freq, annualP, s);
+                Helper(freq, annualP, quarterlyP, s);
             }
             foreach (string s in varsX)
             {
-                Helper(freq, annualX, s);
+                Helper(freq, annualX, quarterlyX, s);
             }
 
             GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
@@ -20321,13 +20323,22 @@ namespace Gekko
 
             Program.InterpolateHelper(pLag, map.GetIVariable("p!a") as Series, "repeat");
 
+            Series p = new Series(freq, null);
+            Series q = new Series(freq, null);
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
             {
-                for (int i = 0; i < annualP.Count; i++)
+                //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q               
+                double y = 0d;
+                double v = 0d;
+                for (int i = 0; i < quarterlyP.Count; i++)
                 {
-                    //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q
+                    y += quarterlyP[i].ts.GetDataSimple(t.Add(-1)) * quarterlyX[i].ts.GetDataSimple(t);
+                    v += quarterlyP[i].ts.GetDataSimple(t) * quarterlyX[i].ts.GetDataSimple(t);
                 }
-            }            
+                y = y / pLag.GetDataSimple(t);
+                q.SetData(t, y);
+                p.SetData(t, v / y);
+            }
 
             // --------------------- info start ---------------------------------------------------------------
             //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
@@ -20355,83 +20366,12 @@ namespace Gekko
             //(Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
             // --------------------- info end -----------------------------------------------------------------
 
-
-            //Seems [3, ...] is not used
-
-            //if (G.Equal(function, "laspchain"))
-            //{
-            //    double index = 1d;
-            //    xx[4, 0] = 1d;
-            //    for (int i = 0; i < obs; i++)
-            //    {
-            //        double sum = 0d;
-            //        double sum1 = 0d;
-            //        for (int j = 0; j < varsX.Count; j++)
-            //        {
-            //            sum += aX[j, i] * aP[j, i];
-            //            if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
-            //        }
-            //        xx[0, i] = sum;  //total cost
-            //        xx[1, i] = sum1;  //total cost at previous period prices
-            //        if (i > 0)
-            //        {
-            //            xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
-            //            index = index * xx[2, i];
-            //            xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
-            //                                                 //xx[4,...] is the quantity index
-            //        }
-            //    }
-            //}
-            //else if (G.Equal(function, "laspfixed"))
-            //{
-            //    for (int i = 0; i < obs; i++)
-            //    {
-            //        double sum = 0d;
-            //        double sum1 = 0d;
-            //        for (int j = 0; j < varsX.Count; j++)
-            //        {
-            //            sum += aX[j, i] * aP[j, i];
-            //            sum1 += aX[j, i] * aP[j, indexYearI];
-            //        }
-            //        xx[0, i] = sum;  //total cost
-            //        xx[1, i] = sum1;  //total cost at index period prices
-            //        xx[4, i] = sum1; //xx[4,...] is the quantity index
-            //    }
-            //}
-            //else
-            //{
-            //    throw new GekkoException();
-            //}
-
-            //Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
-            //Series q = new Series(EFreq.A, "q!a");
-
-            //double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
-            //counter = -1;
-            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            //{
-            //    counter++;
-
-            //    if (true)  //price = 1 in index year
-            //    {
-            //        q.SetData(t, xx[4, counter] * priceInIndexYear);
-            //        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
-            //    }
-            //    else
-            //    {
-            //        //FIXME
-            //        //4 skal være = 0 in index
-            //        q.SetData(t, xx[4, counter] / xx[4, indexYearI] * xx[0, indexYearI]);
-            //        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
-            //    }
-            //}
-
             Map m = new Map();
-            //m.AddIVariable(p.GetName(), p);
-            //m.AddIVariable(q.GetName(), q);
+            m.AddIVariable("p!q", p);
+            m.AddIVariable("q!q", q);
             return m;
 
-            void Helper(EFreq freq, List<SeriesAndBool> m, string s)
+            void Helper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, string s)
             {
                 bool negative = false;
                 string var2 = s;
@@ -20445,10 +20385,16 @@ namespace Gekko
                 CollapseHelper helper = new CollapseHelper();
                 helper.method = "avg";
                 CollapseHelper(ts_lhs, ts_rhs, helper);
-                SeriesAndBool sab = new SeriesAndBool();
-                sab.ts = ts_lhs;
-                sab.b = negative;
-                m.Add(sab);
+
+                SeriesAndBool sab1 = new SeriesAndBool();
+                sab1.ts = ts_rhs;
+                sab1.b = negative;
+                x.Add(sab1);
+
+                SeriesAndBool sab2 = new SeriesAndBool();
+                sab2.ts = ts_lhs;
+                sab2.b = negative;
+                x_annual.Add(sab2);
             }
         }        
 

@@ -30281,7 +30281,8 @@ print(df2)
             I("#x = x1, x2;");
             I("#p = p1, p2;");
             I("#m = laspchainq(#x, #p, 2020, 'dst');");
-
+            I("prt #m.p, #m.q;");
+            Assert.Inconclusive();
             //I("print #m.price, #m.quantity, #m.price_lag;");
 
 
