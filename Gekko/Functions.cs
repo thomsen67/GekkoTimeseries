@@ -1048,6 +1048,13 @@ namespace Gekko
             return result;
         }
 
+        public static IVariable laspchainq(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date, IVariable options)
+        {
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            IVariable result = Program.LaspeyresQ("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), options, t1, t2);
+            return result;
+        }
+
         //legacy: do not delete yet
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
         {

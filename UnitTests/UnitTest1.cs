@@ -30244,6 +30244,56 @@ print(df2)
         [TestMethod]
         public void _Test_PriceIndexFunctions()
         {
+
+            // Quarterly
+            // Quarterly
+            // Quarterly
+            // Quarterly
+            // Quarterly
+
+            // This is from the laspchanq.cmd function (Morten Werner):
+            //           #m.price         %    #m.quantity         %   #m.price_lag         %
+            //2020                                                                            
+            //q1                M         M              M         M              M         M
+            //q2                M         M              M         M              M         M
+            //q3                M         M              M         M              M         M
+            //q4                M         M              M         M              M         M
+            //                                                                                 
+            //2021                                                                            
+            //q1           0.9807         M        56.9818         M         1.0000         M
+            //q2           0.9869      0.63        58.9341      3.43         1.0000      0.00
+            //q3           1.1176     13.25        58.2681     -1.13         1.0000      0.00
+            //q4           1.0123     -9.43        57.2185     -1.80         1.0000      0.00
+            //                                                                                 
+            //2022                                                                            
+            //q1           0.9288     -8.24        58.4192      2.10         1.0245      2.45
+            //q2           0.9018     -2.91        57.0861     -2.28         1.0245      0.00
+            //q3           1.0649     18.09        55.2433     -3.23         1.0245      0.00
+            //q4           0.9565    -10.18        56.1190      1.59         1.0245      0.00 
+
+            I("reset;");
+            I("option freq q;");
+            I("time 2020 2022;");
+            I("p1 = 1.50, 1.48, 1.44, 1.53,      1.45, 1.56, 1.45, 1.52,      1.57, 1.56, 1.47, 1.56;");
+            I("p2 = 1.47, 1.53, 1.53, 1.57,      1.61, 1.64, 1.66, 1.59,      1.61, 1.56, 1.53, 1.52;");
+            I("x1 = 10, 11, 12, 10,              13, 11, 14, 13,              12, 11, 14, 12;");
+            I("x2 = 27, 25, 27, 24,              23, 25, 27, 24,              22, 22, 25, 23;");
+            I("#x = x1, x2;");
+            I("#p = p1, p2;");
+            //I("#m = laspchainq(#x, #p, 2020, 'dst');");
+
+            //I("print #m.price, #m.quantity, #m.price_lag;");
+
+
+
+
+
+
+
+
+
+
+
             UData u = null;
 
             //testing chain index
@@ -30292,7 +30342,7 @@ print(df2)
             I("RESET;");
             I("TIME 98 2002;");
             I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");            
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
             I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
             I("create fy, py;");
             //from dec09 databank
@@ -30320,7 +30370,7 @@ print(df2)
 
             I("MAP #m = laspchain(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
             I("xx_p = #m.p;");
-            I("xx_x = #m.q;");                       
+            I("xx_x = #m.q;");
 
             I("CREATE dif_p, dif_x;");
             I("SERIES dif_p = py/xx_p;");
@@ -30339,7 +30389,7 @@ print(df2)
             I("RESET;");
             I("TIME 98 2002;");
             I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");            
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
             I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
             I("create fy, py;");
             //from jul05 databank
@@ -30380,11 +30430,11 @@ print(df2)
             }
 
             // ----------- not using explicit map
-                        
+
             I("zz_x = laspfixed(#pris, #mgd, 2000).q;");  //direct pick out of .q field.
             I("SERIES dif_zz = fy/zz_x;");
             for (int i = 1998; i <= 2002; i++)
-            {                
+            {
                 u = Data("dif_zz", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
             }
 
@@ -30395,8 +30445,9 @@ print(df2)
             for (int i = 1998; i <= 2002; i++)
             {
                 u = Data("dif_ww", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
-            }           
+            }
 
+            
         }
 
         [TestMethod]

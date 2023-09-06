@@ -10872,55 +10872,68 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method for Laspeyres chain index method, cf. Laspeyres() method.
+        /// Helper method for Laspeyres chain index method, cf. Laspeyres() method. Either called 
         /// </summary>
         /// <param name="tStart0"></param>
         /// <param name="tEnd"></param>
         /// <param name="varsX"></param>
         /// <returns></returns>
-        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> varsX)
+        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> varsX, List<Series> varsX_series, List<bool> neg, EFreq freq)
         {
+            if (varsX != null && varsX_series != null) new Error("Series error");
+            
+            List<Series> series_list = null;
+            List<bool> negx = null;
+            if (varsX_series != null)
+            {
+                series_list = varsX_series;
+                negx = neg;
+            }
+            else
+            {
+                series_list = new List<Series>();
+                negx = new List<bool>();
+                foreach (string var in varsX)
+                {
+                    string var2 = var;
+                    bool negative = false;
+                    if (var.StartsWith("-"))
+                    {
+                        var2 = var2.Substring(1);
+                        negative = true;
+                    }
+                    Series temp = O.GetIVariableFromString(G.Chop_AddFreq(var2, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                    if (temp == null) new Error("Variable '" + var2 + "' does not exist");  //is this if necessary?
+                    series_list.Add(temp);
+                    negx.Add(negative);
+                }
+            }
+
             int obs = GekkoTime.Observations(tStart0, tEnd);
             double[,] aX = new double[varsX.Count, obs];
             int id = -1;
-            foreach (string var in varsX)
+            for (int ii = 0; ii < series_list.Count; ii++)
             {
                 id++;
                 int length = -12345;
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x = null;
-                string var2 = var;
-                bool negative = false;
-                if (var.StartsWith("-"))
-                {
-                    var2 = var2.Substring(1);
-                    negative = true;
-                }
 
-                Series ts = O.GetIVariableFromString(G.Chop_AddFreq(var2, EFreq.A), O.ECreatePossibilities.NoneReportError, true) as Series;
-
-                if (ts == null)
+                //Hmmm, Annual?? What about quarters/months??
+                x = series_list[ii].GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
+                length = index2 - index1 + 1;
+                if (negx[ii])
                 {
-                    new Error("Variable '" + var2 + "' does not exist");
-                    //throw new GekkoException();
-                }
-                else
-                {
-                    //Hmmm, Annual?? What about quarters/months??
-                    x = ts.GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
-                    length = index2 - index1 + 1;
-                    if (negative)
+                    double[] xNew = new double[x.Length];
+                    for (int i = 0; i < x.Length; i++)
                     {
-                        double[] xNew = new double[x.Length];
-                        for (int i = 0; i < x.Length; i++)
-                        {
-                            //NaN and +/- Infinity pass ok through this
-                            xNew[i] = -x[i];
-                        }
-                        x = xNew;  //points to this temp array: otherwise real timeseries data will be overridden
+                        //NaN and +/- Infinity pass ok through this
+                        xNew[i] = -x[i];
                     }
+                    x = xNew;  //points to this temp array: otherwise real timeseries data will be overridden
                 }
+
                 Buffer.BlockCopy(x, 8 * index1, aX, 8 * id * obs, 8 * length);  //TODO: what if out of bounds regarding x???
                 //I guess after this loop is done, the whole of a[,] will be filled with data or NaN.
                 //It should not be possible that there is a 0 left originating from "double[,] a = new double[vars, obs];"
@@ -20064,11 +20077,11 @@ namespace Gekko
         /// <returns></returns>
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
         {
+            EFreq freq = EFreq.A;
+            
             if (!(Program.options.freq == EFreq.A))
-            {
-                //G.Writeln();
-                new Error("Index functions only work for annual frequency at the moment");
-                //throw new GekkoException();
+            {             
+                new Error("Functions laspchain() and laspfixed() only work for annual frequency at the moment");
             }
 
             int indexYearI = -12345;
@@ -20111,8 +20124,8 @@ namespace Gekko
                 }
             }
 
-            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX);
-            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP);
+            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, null, freq);
+            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, null, freq);
             int obs = GekkoTime.Observations(tStart, tEnd);
             int obs2 = GekkoTime.Observations(tStart, indexYear);
 
@@ -20132,13 +20145,13 @@ namespace Gekko
                         sum += aX[j, i] * aP[j, i];
                         if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
                     }
-                    xx[0, i] = sum;  //total cost
+                    xx[0, i] = sum;   //total cost
                     xx[1, i] = sum1;  //total cost at previous period prices
                     if (i > 0)
                     {
-                        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
+                        xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.index year for year: C(plag) / C(p).lag
                         index = index * xx[2, i];
-                        xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
+                        xx[4, i] = index;                    //lasp.index multiplied (1 i start period)
                                                              //xx[4,...] is the quantity index
                     }
                 }
@@ -20155,7 +20168,7 @@ namespace Gekko
                         sum1 += aX[j, i] * aP[j, indexYearI];
                     }
                     xx[0, i] = sum;  //total cost
-                    xx[1, i] = sum1;  //total cost at index period prices
+                    xx[1, i] = sum1; //total cost at index period prices
                     xx[4, i] = sum1; //xx[4,...] is the quantity index
                 }
             }
@@ -20192,6 +20205,201 @@ namespace Gekko
             m.AddIVariable(q.GetName(), q);
             return m;
         }
+
+        /// <summary>
+        /// Use for Gekko functions laspchainq() Laspeyres indexes.
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="list1"></param>
+        /// <param name="list2"></param>
+        /// <param name="indexYear"></param>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <returns></returns>
+        public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
+        {
+            EFreq freq = EFreq.Q;
+            
+            //if (!(Program.options.freq == EFreq.A))
+            //{
+            //    //G.Writeln();
+            //    new Error("Index functions only work for annual frequency at the moment");
+            //}
+
+            //if (indexYear.freq != EFreq.Q) new Error("The index period is of " + indexYear.freq.Pretty().ToLower() + " frequency, expected quarterly.");
+
+            //int indexYearI = -12345;
+            //int counter = -1;
+            //bool found = false;
+            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            //{
+            //    counter++;
+            //    if (t.EqualsGekkoTime(indexYear))
+            //    {
+            //        found = true;
+            //        indexYearI = counter;
+            //        break;
+            //    }
+            //}
+
+            //if (!found)
+            //{
+            //    new Error("with index period in Laspeyres function: seems outside time period");
+            //}
+
+            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
+            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
+
+            if (varsP.Count == 0 || varsX.Count == 0)
+            {
+                new Error("List with 0 elements not permitted");
+            }
+
+            if (varsP.Count != varsX.Count)
+            {
+                new Error("The lists should have same number of elements");
+            }
+
+            foreach (string s in varsP)
+            {
+                if (s.StartsWith("-"))
+                {
+                    new Error("'" + s + "': Please use subtraction in quantity list only");
+                }
+            }
+
+            //double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, freq);
+            //double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, freq);
+            
+            int obs = GekkoTime.Observations(tStart, tEnd);
+            //int obs2 = GekkoTime.Observations(tStart, indexYear);
+
+            double[,] xx = new double[5, obs];
+
+            List<Series> annualP = new List<Series>();
+            List<Series> annualX = new List<Series>();
+            foreach (string s in varsP)
+            {
+                Helper(freq, annualP, s);
+            }
+            foreach (string s in varsX)
+            {
+                Helper(freq, annualX, s);
+            }
+
+
+            // --------------------- info start ---------------------------------------------------------------
+            //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
+            //følgende(her for to varer, bemærk at!a betyder år og!q kvartaler):
+
+            //Lad p1!q og p2!q være to serier med kvartalspriser.
+            //Lad q1!q og q2!q være to serier med kvartalsmængder.
+
+            //Alle collapses(gennemsnit), så vi får:
+
+            //p1!a og p2!a er serier med årspriser.
+            //q1!a og q2!a er serier med årsmængder.
+
+            //Nu køres en almindelig Laspeyres-kæde(indbygget Gekko-funktion) på årsserierne p1!a, p2!a, q1!a
+            //og q2!a.Dette giver aggregaterne p!a og q!a (der vil gælde, at p!a * q!a = p1!a * q1!a + p2!a*q2!a).
+
+            //Vi danner p_lag!a = p!a[-1]og interpolerer(repeat) p_lag!q ud fra p_lag!a.
+
+            //Vi kan nu beregne den aggregerede kvartalsmængde q!q som:
+
+            //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q
+
+            //Jeg skal ikke kloge mig på dette udtryk.Men hvis man ganger nævneren over, smager det da helt
+            //klart af ”foregående års priser” gange med ”indeværende års mængder”. (Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
+            // --------------------- info end -----------------------------------------------------------------
+
+
+            //Seems [3, ...] is not used
+
+            //if (G.Equal(function, "laspchain"))
+            //{
+            //    double index = 1d;
+            //    xx[4, 0] = 1d;
+            //    for (int i = 0; i < obs; i++)
+            //    {
+            //        double sum = 0d;
+            //        double sum1 = 0d;
+            //        for (int j = 0; j < varsX.Count; j++)
+            //        {
+            //            sum += aX[j, i] * aP[j, i];
+            //            if (i > 0) sum1 += aX[j, i] * aP[j, i - 1];
+            //        }
+            //        xx[0, i] = sum;  //total cost
+            //        xx[1, i] = sum1;  //total cost at previous period prices
+            //        if (i > 0)
+            //        {
+            //            xx[2, i] = xx[1, i] / xx[0, i - 1];  //lasp.indexet år for år: C(plag) / C(p).lag
+            //            index = index * xx[2, i];
+            //            xx[4, i] = index;                    //lasp.indexet ganget op (1 i startperiode)
+            //                                                 //xx[4,...] is the quantity index
+            //        }
+            //    }
+            //}
+            //else if (G.Equal(function, "laspfixed"))
+            //{
+            //    for (int i = 0; i < obs; i++)
+            //    {
+            //        double sum = 0d;
+            //        double sum1 = 0d;
+            //        for (int j = 0; j < varsX.Count; j++)
+            //        {
+            //            sum += aX[j, i] * aP[j, i];
+            //            sum1 += aX[j, i] * aP[j, indexYearI];
+            //        }
+            //        xx[0, i] = sum;  //total cost
+            //        xx[1, i] = sum1;  //total cost at index period prices
+            //        xx[4, i] = sum1; //xx[4,...] is the quantity index
+            //    }
+            //}
+            //else
+            //{
+            //    throw new GekkoException();
+            //}
+
+            //Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
+            //Series q = new Series(EFreq.A, "q!a");
+
+            //double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
+            //counter = -1;
+            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            //{
+            //    counter++;
+
+            //    if (true)  //price = 1 in index year
+            //    {
+            //        q.SetData(t, xx[4, counter] * priceInIndexYear);
+            //        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+            //    }
+            //    else
+            //    {
+            //        //FIXME
+            //        //4 skal være = 0 in index
+            //        q.SetData(t, xx[4, counter] / xx[4, indexYearI] * xx[0, indexYearI]);
+            //        p.SetData(t, xx[0, counter] / xx[4, counter] / priceInIndexYear);
+            //    }
+            //}
+
+            Map m = new Map();
+            //m.AddIVariable(p.GetName(), p);
+            //m.AddIVariable(q.GetName(), q);
+            return m;
+
+            void Helper(EFreq freq, List<Series> m, string s)
+            {
+                Series ts_lhs = new Series(EFreq.A, null);
+                Series ts_rhs = O.GetIVariableFromString(G.Chop_AddFreq(s, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                CollapseHelper helper = new CollapseHelper();
+                helper.method = "avg";
+                CollapseHelper(ts_lhs, ts_rhs, helper);
+                m.Add(ts_lhs);
+            }
+
+        }        
 
         /// <summary>
         /// WRITE/EXPORT command.
