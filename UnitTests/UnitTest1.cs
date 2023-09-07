@@ -55,6 +55,8 @@ using static Gekko.O;
 //using Microsoft.Office.Interop.Excel;
 using System.Linq;
 using System.Drawing;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+//using System.Windows.Documents;
 
 namespace UnitTests
 {
@@ -162,14 +164,14 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Ref));
             Program.CreateTempFilesFolder();
             Program.CreateTempFilesFolder2();
-            string s = Globals.localTempFilesLocation;            
+            string s = Globals.localTempFilesLocation;
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {
                 MessageBox.Show("Tried to delete this folder: " + s + "\nBUT WE DO NOT ALLOW THAT (does not contain 'AppData')");
             }
             else
-            {                
-                G.DeleteFolder(Globals.localTempFilesLocation, true);                
+            {
+                G.DeleteFolder(Globals.localTempFilesLocation, true);
             }
             //We set a default regarding this folder -- not good if the string is empty
             //and we try to write a file etc.
@@ -177,7 +179,7 @@ namespace UnitTests
             Globals.globalPeriodStart = new GekkoTime(EFreq.A, 2000, 1);
             Globals.globalPeriodEnd = new GekkoTime(EFreq.A, 2010, 1);
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
-            Program.InitUfunctionsAndArithmeticsAndMore();            
+            Program.InitUfunctionsAndArithmeticsAndMore();
         }
 
         // Use ClassCleanup to run code after all tests in a class have run
@@ -564,7 +566,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Compare()
         {
-            
+
             I("reset;");
             I("time 2001 2002;");
             I("yy = series(1);");
@@ -587,7 +589,7 @@ namespace UnitTests
             I("%s = readfile('compare_databanks.txt');");
             string ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
-            
+
             I("compare<dump>;");
             I("p #dif;");
             I("p <n m q> {#dif};");
@@ -967,7 +969,7 @@ namespace UnitTests
             I("compare <2003 2003 pch = 0.68 type=hist>;");
             I("%s = readfile('compare_databanks.txt');");
             ss5 = (First().GetIVariable("%s") as ScalarString).ConvertToString();
-            Assert.IsTrue(ss5.Contains("Out of the 7 common series, there are differences regarding 7 of them"));            
+            Assert.IsTrue(ss5.Contains("Out of the 7 common series, there are differences regarding 7 of them"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("There are many missing values"));
 
             //
@@ -1456,7 +1458,7 @@ namespace UnitTests
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
-            DatabanksTestHelper8();            
+            DatabanksTestHelper8();
             I("WRITE <gdx> xx1 file=sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
@@ -1530,7 +1532,7 @@ namespace UnitTests
         public void _Test_GdxWithoutTimeDetectAuto()
         {
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");            
+            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");
             I("read <gdx> adambk_domains.gdx;");
 
             //read <gdx option|gams|exe|folder = 'c:\\Program Files\\GAMS\\38'> adambk_domains.gdx;
@@ -1549,7 +1551,7 @@ namespace UnitTests
             I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");
             I("read jul05;");
             I("arraypack('ADAM', '#adamvars');"); //last arg can be '*'
-            I("write <gdx> gdxtest1;"); 
+            I("write <gdx> gdxtest1;");
             I("read <gdx> gdxtest1;");
             I("arrayunpack('ADAM');");  //assumes 1-gekkodim, moves all out in a list, deletes ADAM at last (ok with ADAM[adam]).            
             I("read <ref> jul05;");
@@ -1575,7 +1577,7 @@ namespace UnitTests
             I("#i = a, b;");
 
             //$ on lhs ------------------------------------------------------------
-            
+
             I("xx = 1; xx $ (5 == 5) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
@@ -3045,7 +3047,7 @@ namespace UnitTests
             I("xac = 100;");
             I("xad = 200;");
             I("xbc = 300;");
-            I("xbd = 400;");            
+            I("xbd = 400;");
             I("#i = a, b;");
             I("#j = c, d;");
             I("y0 = sum({#i});");
@@ -3067,9 +3069,9 @@ namespace UnitTests
 
             //Testing print of these sums
             I("prt sum({#i});");
-            table = Globals.lastPrtOrMulprtTable;            
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum({#i})");  //why not (1,2)?
-            Assert.AreEqual(table.Get(3, 2).number,  30d);                       //why not (2,2)?
+            Assert.AreEqual(table.Get(3, 2).number, 30d);                       //why not (2,2)?
 
             I("prt sum(x{#i});");
             table = Globals.lastPrtOrMulprtTable;
@@ -3083,9 +3085,9 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 1000d);
 
             I("prt sum({#i}{#j});");
-            table = Globals.lastPrtOrMulprtTable;            
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum({#i}{#j})");
-            Assert.AreEqual(table.Get(3, 2).number, -1000d); 
+            Assert.AreEqual(table.Get(3, 2).number, -1000d);
 
 
         }
@@ -3220,7 +3222,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
-        }        
+        }
 
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()
@@ -3258,7 +3260,7 @@ namespace UnitTests
             I("xxby = (14,15,16);");
 
             I("CLONE;");
-            
+
             // --------- simple stupid test regarding unfolding, also if {#m} list containing array-series
 
             I("#deleteme = zz, xx;");
@@ -3993,7 +3995,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 7).number, 41d, 0.0001);
             Assert.AreEqual(table.Get(5, 8).number, 38d, 0.0001);
             Assert.AreEqual(table.Get(5, 9).number, 42d, 0.0001);
-            
+
 
             //------------- more tests of labels ------------
 
@@ -4036,7 +4038,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2z");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3z");
             }
-                        
+
             I("reset;");
             I("time 2001 2003;");
             I("#a = a1, a2;");
@@ -4072,7 +4074,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a2z]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a3z]");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "f(xx, 'a3z')");
-            
+
 
             //test that indexers and labels work also when the variable (#set) is a function argument.
             I("reset;");
@@ -4172,7 +4174,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
             }
 
-            
+
             //testing {}-name indexed with #m: {...}[#m]
             I("reset; time 2001 2002;");
             I("a = series(1);");
@@ -4450,7 +4452,7 @@ namespace UnitTests
                 {
                     Assert.AreEqual(table.Get(11, 8).number, 3015d / 3d);
                     Assert.AreEqual(table.Get(11, 9).number, (3015d / 3006d - 1d) * 100d, deltaHere);
-                }                
+                }
 
                 Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "q2");
                 Assert.AreEqual(table.Get(12, 6).number, 1002d);
@@ -4598,7 +4600,7 @@ namespace UnitTests
             // -----------------------------
             // M + D (M alone is tested otherwhere)
             // -----------------------------
-                        
+
             //                   x!d         %            x!m         %
             //2001m12                                  2.0000         M
             //d1            100.0000         M
@@ -4617,7 +4619,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x!m");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001m12");
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "d1");            ;
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "d1"); ;
             Assert.AreEqual(table.Get(2, 4).number, 2d);
             Assert.AreEqual(table.Get(3, 2).number, 100d);
         }
@@ -5834,7 +5836,7 @@ namespace UnitTests
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("%svs = '" + helper_ansi + " //made by Visual Studio" + "';");
-            
+
             // =============================================
 
             //Test pre-cooked known ansi
@@ -5912,7 +5914,7 @@ namespace UnitTests
             I("%m = #m[2];");
             _AssertScalarString(First(), "%m", helper_utf8);
             I("#(listfile m2) = (%m, %m);");
-            byte[] bytesutf8_4 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\m2.lst");            
+            byte[] bytesutf8_4 = File.ReadAllBytes(Globals.ttPath2 + @"\regres\temp\m2.lst");
             Assert.AreEqual(bytesutf8_4[1], 195); //æ1 æ1 (æ takes two bytes in utf8)
             Assert.AreEqual(bytesutf8_4[2], 166); //æ2 æ2
             Assert.AreEqual(bytesutf8_4[3], 230); //汉1 (汉 takes three bytes in utf8, cf. https://stackoverflow.com/questions/643694/what-is-the-difference-between-utf-8-and-unicode)
@@ -6033,10 +6035,10 @@ namespace UnitTests
             //--------------------------------------------------------
 
             I("RESET;");
-            I("TIME 2001 2003;");            
+            I("TIME 2001 2003;");
             I("BLOCK freq q; xx = 2; END;");
             _AssertSeries(First(), "xx!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 1, 2, sharedDelta);            
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 1, 2, sharedDelta);
             _AssertSeries(First(), "xx!q", EFreq.Q, 2003, 4, 2, sharedDelta);
             _AssertSeries(First(), "xx!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
             I("yy = 3;");
@@ -6045,7 +6047,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy!a", EFreq.A, 2003, 1, 3, sharedDelta);
             _AssertSeries(First(), "yy!a", EFreq.A, 2004, 1, double.NaN, sharedDelta);
 
-            I("RESET; option freq q; time 2001q3 2002q2;");            
+            I("RESET; option freq q; time 2001q3 2002q2;");
             I("BLOCK freq a; yy = 3; END;");
             _AssertSeries(First(), "yy!a", EFreq.A, 2000, 1, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy!a", EFreq.A, 2001, 1, 3, sharedDelta);
@@ -6780,7 +6782,7 @@ namespace UnitTests
             //In principle, Gekko should be able to run regardless of freq settings
 
             Gekko.Table tab = null; int counter = -12345;
-            
+
             //value on rhs -----------------------                 
 
             I("reset; time 2001 2003;");
@@ -6788,7 +6790,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 2d, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 2d, sharedDelta);
-            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);            
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
             I("x!q <m>= 10;"); //should run over 2001q1-2003q4       
             _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 12d, sharedDelta);
@@ -6796,7 +6798,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
             I("PRT <n> pch(x!q);"); //should show 2001q1-2003q4
             tab = Globals.lastPrtOrMulprtTable; counter = 0;
-            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!q)");            
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!q)");
             TestCell(ref counter, tab, 2, 1, CellType.Text, "2001");
             TestCell(ref counter, tab, 3, 1, CellType.Text, "q1");
             TestCell(ref counter, tab, 3, 2, CellType.Number, double.NaN, sharedDelta);
@@ -6817,7 +6819,7 @@ namespace UnitTests
             I("PRT <n> pch(x!a);"); //should show 2001-2003
             tab = Globals.lastPrtOrMulprtTable; counter = 0;
             TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!a)");
-            TestCell(ref counter, tab, 2, 1, CellType.Text, "2001");            
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2001");
             TestCell(ref counter, tab, 2, 2, CellType.Number, double.NaN, sharedDelta);
             TestCell(ref counter, tab, 3, 1, CellType.Text, "2002");
             TestCell(ref counter, tab, 3, 2, CellType.Number, 0d, sharedDelta);
@@ -6941,7 +6943,7 @@ namespace UnitTests
             TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
 
             // --------------- Test of weekly W frequency start --------------- 
-                        
+
             GekkoTime gt = GekkoTime.ConvertFreqsFirst(EFreq.W, new GekkoTime(EFreq.D, 2021, 9, 30), null);
 
 
@@ -7296,7 +7298,7 @@ namespace UnitTests
             I("%max = max(2, 1, 3, m(), 4);");
             _AssertScalarVal(First(), "%max", double.NaN);
 
-            I("RESET; time 2001 2003;");            
+            I("RESET; time 2001 2003;");
             I("%min = min(2001q4, 2002q1);");
             _AssertScalarDate(First(), "%min", EFreq.Q, 2001, 4);
             I("%max = max(2001q4, 2002q1);");
@@ -7399,7 +7401,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Browser_SMEC()
-        {            
+        {
             Program.Flush(); //wipes out existing cached models
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser\SMEC';");
@@ -7475,7 +7477,7 @@ namespace UnitTests
                     _AssertSeries(First(), "g", 2005, 0.5 * y + 100d, sharedDelta);
                 }
                 else if (i == 1)
-                {                    
+                {
                     _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
                     double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
                     double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
@@ -7484,7 +7486,7 @@ namespace UnitTests
                     double ylead1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2006, 1));
                     double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
                     double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
-                    _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);                    
+                    _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
                 }
                 else if (i == 2)
                 {
@@ -7498,7 +7500,7 @@ namespace UnitTests
                     double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
                     _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
                 }
-            }            
+            }
         }
 
 
@@ -7824,7 +7826,7 @@ namespace UnitTests
         public void _Test_Translate()
         {
             //se ras2008_2015.gcm
-                        
+
             T("analyze #m;",
               "analyze {#m};");
 
@@ -7890,7 +7892,7 @@ namespace UnitTests
             T("export <%t1 %t2> %x file = %y;",
               "export <%t1 %t2> {%x} file = %y;");
             T("export <%t1 %t2> #m file = %y;",
-              "export <%t1 %t2> {#m} file = %y;");            
+              "export <%t1 %t2> {#m} file = %y;");
             //T("export<2020 2020 ser> xx.txt;",  --> hmm not legal in 2.4
             //  "export<2020 2020 flat> xx.txt;");
             T("export<2020 2020 series> xx.txt;",
@@ -7954,7 +7956,7 @@ namespace UnitTests
 
             T("option interface Table printcodes = yes;",
               "option interface Table operators = yes;");
-            
+
             T("ols y = #m;",
               "ols y = {#m};");
             T("ols y = a, b, c;",
@@ -8203,7 +8205,7 @@ namespace UnitTests
               "prt #d;");
             T("matrix?#d;",
               "prt #d;");
-            
+
             T("export xx;",
               "export<all> xx;");
             T("export<> xx;",
@@ -8287,7 +8289,7 @@ namespace UnitTests
         {
             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid2_4Syntax(code_2_4)) throw new GekkoException();
             Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
-            string translated = Translate_2_4_to_3_0.Translate(code_2_4, info);         
+            string translated = Translate_2_4_to_3_0.Translate(code_2_4, info);
             if (!allowIllegal3_0Syntax && !Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
             Assert.AreEqual(translated, code_3_0);
         }
@@ -8689,7 +8691,7 @@ namespace UnitTests
                     if (i == 0) I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3;");
                     else I("ts0a = splice(ts1, 2005, 2006, ts2, 2009, 2010, ts3);");
 
-                    if(i==0) I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3a;"); //ts3a ok with explicit time
+                    if (i == 0) I("splice ts0a = ts1 2005 2006 ts2 2009 2010 ts3a;"); //ts3a ok with explicit time
                     else I("ts0a = splice(ts1, 2005, 2006, ts2, 2009, 2010, ts3a);");
 
                     if (i == 0) I("splice ts0a = ts1 2005 ts2 2009 ts3;");
@@ -8773,7 +8775,7 @@ namespace UnitTests
             I("x1 = 1, 1.1, m(), m();");
             I("x2 = m(), 5.0, 5.1, 5.2;");
             I("splice <type = rel1> y = x1 x2;");
-            _AssertSeries(First(), "y", 2001, 5d/1.1d, sharedDelta);
+            _AssertSeries(First(), "y", 2001, 5d / 1.1d, sharedDelta);
 
             I("reset; time 2001 2004;");
             I("x1 = 1, 1.1, m(), m();");
@@ -8836,7 +8838,7 @@ namespace UnitTests
             //- if gcm has none --> good
             //- if gcm is the same as working folder --> good
             //- else --> bad
-                        
+
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(Globals.rootError2));
 
             I("RESET;");
@@ -8868,7 +8870,7 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear(); FAIL("global$(1==1)=1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("global $ (1==1) = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             //
-            Globals.unitTestScreenOutput.Clear(); FAIL("global.a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));            
+            Globals.unitTestScreenOutput.Clear(); FAIL("global.a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             //
             Globals.unitTestScreenOutput.Clear(); FAIL("global!a = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             //
@@ -8889,7 +8891,7 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear(); FAIL("global^= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("global ^= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             //
-            Globals.unitTestScreenOutput.Clear(); FAIL("global<2001 2002>= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));            
+            Globals.unitTestScreenOutput.Clear(); FAIL("global<2001 2002>= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002>= 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("global<2001 2002> = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002> = 1;" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
@@ -8972,7 +8974,7 @@ namespace UnitTests
         public void _Test_DownloadJobindsats()
         {
             Databank work = First();
-            I("RESET;"); 
+            I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("%key = ' " + Private.jobindsatsKey + "';");
 
@@ -8985,8 +8987,8 @@ namespace UnitTests
 
             I("%s = 'https://api.jobindsats.dk/v1/data/Y36C01/json?';");
             I("DOWNLOAD <key = %key> %s input.json dump = output.json;");
-                       
-        }        
+
+        }
 
         [TestMethod]
         public void _Test_DownloadDst()
@@ -10046,7 +10048,7 @@ namespace UnitTests
 
             }
             finally
-            {                
+            {
                 Globals.cacheSize1 = cacheSize1;
             }
         }
@@ -10055,11 +10057,11 @@ namespace UnitTests
         public void _Test_Cache_Model()
         {
             //Caching of databanks and models
-                        
+
             I("flush();"); // <-------------- !!
 
             I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");            
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models';");
             I("model jul05;");
             I("read \\..\\Databanks\\jul05;");
             Globals.unitTestScreenOutput.Clear();
@@ -11078,7 +11080,7 @@ namespace UnitTests
             //force
 
         }
-        
+
         [TestMethod]
         public void _Test_ExcelTransposed()
         {
@@ -11414,7 +11416,7 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 12.0000d, 0.0001);
-            
+
             // --------------- y<m> ----------------------------------
 
             I("decomp <2002 2002 m> y from e_y endo y;");
@@ -11505,7 +11507,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c | [0]");
             Assert.AreEqual(table.Get(i, 2).number, 3.0010d, 0.0001);
             i++;
-           
+
         }
 
         private static int Helper_residual2(Gekko.Table table, int j, int i, double reduce)
@@ -11526,7 +11528,7 @@ namespace UnitTests
             return i;
         }
 
-        
+
         [TestMethod]
         public void _Test_DecompBig()
         {
@@ -11544,7 +11546,7 @@ namespace UnitTests
             I("time 2015 2016;");
             //hmmm, qc_a[#a] er defineret over #a, mens npop[#a_] er defineret over #a_, dvs. har også a15t100 og tot.
             I("npop.setdomains(('#a',));");
-            
+
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // ShowDecompTable();  //will show the following decomp table and then abort
@@ -11601,7 +11603,7 @@ namespace UnitTests
             I("y = series(1);");
             I("z = series(2);");
             I("w = series(2);");
-            I("v = series(2);");            
+            I("v = series(2);");
             I("x.setdomains(('#i',));");
             I("y.setdomains(('#j',));");
             I("z.setdomains(('#j', '#i'));");
@@ -11660,7 +11662,7 @@ namespace UnitTests
                 I("OPTION freq q;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
                 I("model lilleq;");
-                I("read <first> lilleq;");                
+                I("read <first> lilleq;");
                 I("jrc <1999 2001> = 0;");
                 I("dc <1999 2001> = 0;");
                 I("zc  <1999 2001> = 0;");
@@ -11668,9 +11670,9 @@ namespace UnitTests
                 I("sim;");
                 I("clone;");
                 I("g += 10;");
-                I("sim;");                
+                I("sim;");
                 //ShowDecompTable();  //will show the following decomp table and then abort
-                I("decomp <m> y from e_y endo y;");                                
+                I("decomp <m> y from e_y endo y;");
                 //TODO: better test!!
                 //TODO: better test!!
                 //TODO: better test!!
@@ -11819,7 +11821,7 @@ namespace UnitTests
             I("z2 = 0, 1, 0;");
             I("z3 = 1, 2, 5;");
             Gekko.Table table = null;
-            
+
             I("decomp <2002 2003 d> y from e1, e2, e3 endo y, c, g;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
@@ -12441,7 +12443,7 @@ namespace UnitTests
             I("y <2000 2003> = 500, 504, 536, 540;");
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
-                        
+
             I("decomp <2002 2002> y;");
             Thread.Sleep(1000);  //seems it otherwise may progress too fast 
             Assert.AreEqual(Globals.itemHandler.Items[0].Name, "e1");
@@ -12452,9 +12454,9 @@ namespace UnitTests
             Assert.AreEqual(Globals.itemHandler.Items[1].Vars, "y[-1], y, y[+1], c");
             Assert.AreEqual(Globals.itemHandler.Items[2].Name, "e2[-1]");
             Assert.AreEqual(Globals.itemHandler.Items[2].Dep, "");
-            Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");            
+            Assert.AreEqual(Globals.itemHandler.Items[2].Vars, "y[-2], y[-1], y, c[-1]");
 
-            Gekko.Table table = null;                       
+            Gekko.Table table = null;
 
             //ModelGamsScalar.FlushAAndRArrays();
             //modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
@@ -12478,7 +12480,7 @@ namespace UnitTests
             //   y1    1.71            y[-1]    1.71
             //   y3    1.71            y[+2]    1.71
             //
-            
+
             //ShowDecompTable();  //will show the following decomp table and then abort
             I("decomp <2002 2002 d> y from e1, e2 endo y, c rows vars cols time;");
             table = Globals.lastDecompTable;
@@ -12493,7 +12495,7 @@ namespace UnitTests
             // ----------------------------------------
             // 2001-2002, multiplier
             // ----------------------------------------
-            
+
             //ShowDecompTable();  //will show the following decomp table and then abort
             I("decomp <2001 2002 dyn m missing=zero> y from e1, e2 endo y, c rows vars cols time;");
             table = Globals.lastDecompTable;
@@ -12544,11 +12546,11 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
 
             // ----------------------------------------
             // subset of time period, 2001-2001, multiplier, showing lags/leads
@@ -12571,7 +12573,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
 
             // ----------------------------------------
             // subset of time period, 2002-2002, multiplier, showing lags/leads
@@ -12591,7 +12593,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
@@ -12735,11 +12737,11 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_DecompSimul5()
-        {            
+        {
             for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
             {
                 if (f == 0) Program.Flush();
-                
+
                 //
                 // Test of big MAKRO model
                 //
@@ -12891,7 +12893,7 @@ namespace UnitTests
             //====================================================
             I("reset; option freq q; time 2001q1 2002q4;");
             I("option databank trace = yes;");
-            I("x1 = 2;");            
+            I("x1 = 2;");
             I("copy x1 to y;");
             y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
             tracec = y.meta.trace2.precedents[0].contents;
@@ -12910,7 +12912,7 @@ namespace UnitTests
             I("reset;");
             I("option databank trace = yes;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("download 'https://api.statbank.dk/v1/data' statbank0.json;");            
+            I("download 'https://api.statbank.dk/v1/data' statbank0.json;");
             _AssertSeries(First(), "pris6_varegr_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
             y = Program.databanks.GetFirst().GetIVariable("pris6_varegr_011100_enhed_100!m") as Series;
             tracec = y.meta.trace2.precedents[0].contents;
@@ -13004,7 +13006,7 @@ namespace UnitTests
             I("reset; option freq a; time 2006 2010;");
             I("option databank trace = yes;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("model jul05;"); 
+            I("model jul05;");
             I("read jul05tsdx;");
             y = Program.databanks.GetFirst().GetIVariable("enl!a") as Series;
             Assert.AreEqual(null, y.meta.trace2);
@@ -13380,7 +13382,7 @@ namespace UnitTests
             Assert.AreEqual(1, trace2.contents.periods.Count());
             Assert.AreEqual(2005, trace2.contents.periods[0].t1.super);
             Assert.AreEqual(2005, trace2.contents.periods[0].t2.super);
-            I("close *;");            
+            I("close *;");
 
             // -----------------------------------------------------------
             // -----------------------------------------------------------
@@ -13660,7 +13662,7 @@ namespace UnitTests
             Assert.AreEqual("read <2005 2006 merge tsd> trace2;", trace2.contents.text);
             Assert.AreEqual(1, trace2.contents.periods.Count());
             Assert.AreEqual(2006, trace2.contents.periods[0].t1.super);
-            Assert.AreEqual(2006, trace2.contents.periods[0].t2.super);            
+            Assert.AreEqual(2006, trace2.contents.periods[0].t2.super);
             Assert.AreEqual("x <2005 2005> = 2;", trace3.contents.text);
             Assert.AreEqual(1, trace3.contents.periods.Count());
             Assert.AreEqual(2005, trace3.contents.periods[0].t1.super);
@@ -13672,7 +13674,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceBasics()
         {
-            double csize =  Globals.cacheSize2;
+            double csize = Globals.cacheSize2;
             if (true)
             {
                 try
@@ -13681,9 +13683,9 @@ namespace UnitTests
                     // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
                     //
 
-                    Program.Flush();                    
+                    Program.Flush();
                     Globals.cacheSize2 = 1;  //set it to minimum, so that cache if produced when reading for i==0, and cache can be used in i==1
-                                        
+
                     I("reset;");
                     I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     I("OPTION databank trace = yes;");
@@ -13769,7 +13771,7 @@ namespace UnitTests
                     Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
                     Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
                     Assert.AreEqual(2021, trace2.contents.GetT1().super);
-                    Assert.AreEqual(2023, trace2.contents.GetT2().super);                    
+                    Assert.AreEqual(2023, trace2.contents.GetT2().super);
                     Assert.AreEqual(2021, trace2.contents.periods[0].t1.super);
                     Assert.AreEqual(2023, trace2.contents.periods[0].t2.super);
                     Assert.AreEqual("d = a + b + c;", trace2.contents.text);
@@ -13781,7 +13783,7 @@ namespace UnitTests
                     I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
                     Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
                     Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
-                    
+
                     //Test that the graph is really a DAG                        
                     Helper_TestDAG(Program.databanks.GetFirst()); //will have been around protobuf
                     Helper_TestDAG(Program.databanks.GetRef());  //will have been cloned
@@ -13792,7 +13794,7 @@ namespace UnitTests
                     Assert.AreEqual(4, th2.varCount);     //4  4
                     Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
                     Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
-                                        
+
                     Helper_CheckTrace("a!a", x2);
                     Helper_CheckTrace("b!a", x3);
                     Helper_CheckTrace("c!a", x4);
@@ -13884,16 +13886,16 @@ namespace UnitTests
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
         {
-            String2 x5b = new String2(null); 
-            x5b.m.Add(new String2(cImport2)); 
+            String2 x5b = new String2(null);
+            x5b.m.Add(new String2(cImport2));
             x5b.m[0].m.AddRange(G.DeepCloneSlow<String2>(x5a).m);
             return x5b;
-        }        
+        }
 
         private static void Helper_CheckTrace(string name, String2 c1)
         {
             Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable(name) as Series).meta.trace2;
-            Helper_WalkTrace(trace2, c1, 0);            
+            Helper_WalkTrace(trace2, c1, 0);
         }
 
         public static void Helper_WalkTrace(Trace2 trace, String2 m, int depth)
@@ -13913,7 +13915,7 @@ namespace UnitTests
                 }
             }
         }
-        
+
         [TestMethod]
         public void _Test_DecompSimul4()
         {
@@ -13923,7 +13925,7 @@ namespace UnitTests
             int i = 0;
 
             I("flush();");
-            I("reset;");            
+            I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("model <gms> simul4.zip;");
             // ----------------            
@@ -14000,7 +14002,7 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | g | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 1.5000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [-2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
@@ -14012,12 +14014,12 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);            
-            
+            Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+
 
             // ----------------------------------------
             // subset of time period, 2001-2001, multiplier, showing lags/leads
@@ -14041,8 +14043,8 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
-            
-            
+
+
 
             // ----------------------------------------
             // subset of time period, 2002-2002, multiplier, showing lags/leads
@@ -14066,7 +14068,7 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "x | y | [+1]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-                      
+
 
             // ----------------------------------------
             // 2002-2002, difference, showing lags/leads
@@ -14108,11 +14110,11 @@ namespace UnitTests
             I("#m1.x = 300, 301;");
             I("#m1.x[2001] = 302;");
             Assert.Inconclusive();
-        }        
+        }
 
         [TestMethod]
         public void _Test_MultiDimSets()
-        {            
+        {
             I("RESET; time 2000 2000;");
             I("#i = (('a', '10'), ('a', '11'), ('b', '10'), ('b', '11'));");
             I("#i0 = (('a', '11'), ('b', '10'));");
@@ -14149,7 +14151,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", new string[2] { "b", "11" }, 2000, 103, sharedDelta);
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.IsTrue(x.dimensionsStorage.storage.Count == 4);
-                        
+
             I("x0[#dim1, #dim2] $ (#i0[#dim1, #dim2]) = o[#dim1, #dim2];");
             _AssertSeries(First(), "x0!a", new string[2] { "a", "11" }, 2000, 101, sharedDelta);
             _AssertSeries(First(), "x0!a", new string[2] { "b", "10" }, 2000, 102, sharedDelta);
@@ -14282,7 +14284,7 @@ namespace UnitTests
             I("reset; time 2001 2001;");
             I("#i = a, b, c;");
             I("#i0 = a, c;");
-            I("x = series(1);");            
+            I("x = series(1);");
             I("x[a] = 1;");
             I("x[b] = 2;");
             I("x[c] = 3;");
@@ -14311,10 +14313,10 @@ namespace UnitTests
             I("i00 = series(2);");
             I("i00[a, x] = 1;"); //now it is a timeseries
             I("i00[b, z] = 1;");
-            I("i00[c, y] = 1;");            
+            I("i00[c, y] = 1;");
             //the i00 series is implicitly converted to a scalar value
             I("y5 = sum((#i, #j) $ (i00[#i, #j]), x[#i, #j]);");
-            _AssertSeries(First(), "y5!a", 2001, 6d, sharedDelta);            
+            _AssertSeries(First(), "y5!a", 2001, 6d, sharedDelta);
         }
 
         [TestMethod]
@@ -14365,7 +14367,7 @@ namespace UnitTests
             _AssertSeries(First(), "y2!a", new string[] { "a" }, 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", new string[] { "a" }, 2002, 100d, sharedDelta);
             _AssertSeries(First(), "y2!a", new string[] { "a" }, 2003, 100d, sharedDelta);
-            I("y3 = series(1);");            
+            I("y3 = series(1);");
             I("y3[#i] $ (o[#i] == 1 and o2[#i] == 1) = 100;");
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2002, double.NaN, sharedDelta);
@@ -14712,7 +14714,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrd>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <xrd> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -14815,7 +14817,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xm>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <xm> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -14845,7 +14847,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <m>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <m> ctot from e_c endo ctot rows vars, #a cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -14967,7 +14969,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xd>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <xd> ctot from e_c endo ctot rows vars cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -15025,7 +15027,7 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
             Assert.AreEqual(table.Get(i, 3).number, ((5d + 4d + 11d) / 99d) * 100d, sharedTableDelta);
-                        
+
             // =======
             // =======
             // =======
@@ -15050,7 +15052,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xrd>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <xrd> ctot from e_c endo ctot rows vars cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -15062,7 +15064,7 @@ namespace UnitTests
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
             Assert.AreEqual(table.Get(i, 3).number, 4d + 3d - 2d, sharedTableDelta);
-            
+
             // -----------------------------------------------------------------------
             // <rd>
             // -----------------------------------------------------------------------
@@ -15115,7 +15117,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <xm>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <xm> ctot from e_c endo ctot rows vars cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -15137,7 +15139,7 @@ namespace UnitTests
             // -----------------------------------------------------------------------
             // <m>
             // -----------------------------------------------------------------------
-            
+
             I("decomp <m> ctot from e_c endo ctot rows vars cols time;");
             table = Globals.lastDecompTable;
             i = 1;
@@ -15194,7 +15196,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, (3d + 1d - 6d) / 101d * 100d, sharedTableDelta);
             Assert.AreEqual(table.Get(i, 3).number, (4d + 2d + 3d) / 110d * 100d, sharedTableDelta);
 
-        }        
+        }
 
         public static string Helper_Text1(int m, string s)
         {
@@ -15212,7 +15214,7 @@ namespace UnitTests
         public void _Test_DecompOperators2()
         {
             //Really good and comprehensive test of scalar model and .frm model (compiled into scalar).
-            
+
             //TODO TODO TODO
             //TODO TODO TODO
             //TODO TODO TODO Test this with merge too. Also where the lag is not present in the first eq but stated in the second.
@@ -15228,7 +15230,7 @@ namespace UnitTests
             {
                 if (f == 0) I("flush();");  //only flush 1 time in all
                 for (int m = 0; m < 2; m++)
-                {                    
+                {
                     I("reset;");
                     I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                     if (m == 0)
@@ -15249,7 +15251,7 @@ namespace UnitTests
                     }
                     else
                     {
-                        I("model agesimple3.frm;");                        
+                        I("model agesimple3.frm;");
                         I("time 2018 2022;");
                         //---
                         I("c18 = 112, 110, 114, 111, 115;");
@@ -15260,7 +15262,7 @@ namespace UnitTests
                         I("res = -6, -3, 4, -3, 5;");
                         I("ctot = c18[-1] + c18 + 1 + res;");
                         Assert.IsTrue(Program.model.DecompType() == EModelType.GAMSScalar);
-                    }                    
+                    }
 
                     I("time 2022 2022;");
 
@@ -15276,7 +15278,7 @@ namespace UnitTests
                     i = 1;
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2022");
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Helper_Text2(m, "ctot | <null> | [0]"));                     
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Helper_Text2(m, "ctot | <null> | [0]"));
                     Assert.AreEqual(table.Get(i, 2).number, 276d, sharedTableDelta2);
                     i++;
                     Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Helper_Text2(m, "c | 18 | [-1]"));
@@ -15715,7 +15717,7 @@ namespace UnitTests
             I("clone;");
             I("@z[i, az] = 300; ");
 
-            s = ".........................................|";            
+            s = ".........................................|";
             suggestions = Gui.StartIntellisenseHelper("prt", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after t            
             Assert.AreEqual(2, suggestions.Count);
             Assert.IsTrue(suggestions[0].s1 == "prt1");
@@ -15753,7 +15755,7 @@ namespace UnitTests
 
             s = ".............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt xa ", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after a
-            Assert.AreEqual(0, suggestions.Count);            
+            Assert.AreEqual(0, suggestions.Count);
 
             s = "............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt xa,", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after ,
@@ -15831,7 +15833,7 @@ namespace UnitTests
             s = "...................................................|";
             suggestions = Gui.StartIntellisenseHelper("prt work : xa ", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(1, suggestions.Count);
-            Assert.IsTrue(suggestions[0].s1 == "xa1");            
+            Assert.IsTrue(suggestions[0].s1 == "xa1");
 
             s = "...................................................|";
             suggestions = Gui.StartIntellisenseHelper("prt work : xa,", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
@@ -15896,7 +15898,7 @@ namespace UnitTests
             s = ".............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt y[  ", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(0, suggestions.Count);
-            
+
             s = "............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt y[,", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(0, suggestions.Count); //we do not allow this, could be misplaced comma.
@@ -15932,7 +15934,7 @@ namespace UnitTests
             // ------------------------------------------------------------------------------------
             // ------------ with indexes 2 dim
             // ------------------------------------------------------------------------------------
-            
+
             s = "............................................|";
             suggestions = Gui.StartIntellisenseHelper("prt z[", Gui.EIntellisenseType.Tab, null, 0, s.IndexOf("|") - offset);  //cursor right after x                        
             Assert.AreEqual(2, suggestions.Count);
@@ -16245,7 +16247,7 @@ namespace UnitTests
             output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(266, output.iterations);
             Assert.AreEqual(15162, output.evals);
-            Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-6);            
+            Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-6);
         }
 
         [TestMethod]
@@ -16256,7 +16258,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> small.zip;");
-                        
+
             //A good test of reading and writing from GAMS scalar model a array.
             Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
             Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
@@ -16284,10 +16286,10 @@ namespace UnitTests
             //      is probably due to protobuf and too little ram or something similar. Annoying 
             //      that it does not report ram issue instead. Try to run several times.
 
-            for (int i = 0; i < 2; i++) 
+            for (int i = 0; i < 2; i++)
             {
                 Globals.unitTestScreenOutput.Clear();
-                if (i==0) I("flush();");  //test without or with cache
+                if (i == 0) I("flush();");  //test without or with cache
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
                 I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
@@ -16481,14 +16483,14 @@ namespace UnitTests
             // -----------------------
 
         }
-        
+
         [TestMethod]
         public void _Test_GAMSVariableParameterType()
         {
             I("reset;");
             I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");            
-            I("v = series(1);");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("v = series(1);");
             I("v.setFixType('variable');");
             I("v[a] = 2;");
             I("p = series(1);");
@@ -16510,7 +16512,7 @@ namespace UnitTests
             File.Delete(Globals.ttPath2 + @"\regres\models\jul05__info.zip");
             I("RESET;");
             I("flush();");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("model jul05;");
             Assert.IsTrue(File.Exists(Globals.ttPath2 + @"\regres\models\jul05__info.zip"));
             Assert.IsTrue(Program.databanks.GetGlobal().storage.Count == 8);  //#all, #endo, #exo, etc.
@@ -16612,7 +16614,7 @@ namespace UnitTests
 
                 I("RESET;");
                 I("function val f(val %x1, val %x2, val %x3); return %x1 + %x2 + %x3; end;");
-                I("%sum = f(4, 7, 100);");                
+                I("%sum = f(4, 7, 100);");
                 _AssertScalarVal(First(), "%sum", 111d, sharedDelta);
 
                 I("RESET;");
@@ -16724,7 +16726,7 @@ namespace UnitTests
             if (true)
             {
                 //test interaction with optional parameters   
-                
+
                 //OPTIONAL TIME, AND CALLED
                 //OPTIONAL TIME, AND CALLED
                 //OPTIONAL TIME, AND CALLED                
@@ -16732,8 +16734,8 @@ namespace UnitTests
                 I("RESET;");
                 I("procedure f <date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100; %z = %x1 + %x2 + %x3; end;");
                 I("f <2001 2003> 4;");
-                _AssertScalarVal(First(), "%z", 111d, sharedDelta);                
-                
+                _AssertScalarVal(First(), "%z", 111d, sharedDelta);
+
                 I("RESET;");
                 I("procedure f <date %t1, date %t2>, val %x1, val %x2 'Tast' = 7, val %x3 'Tast' = 100; %z = %x1 + %x2 + %x3; end;");
                 I("f 4;");
@@ -16889,7 +16891,7 @@ namespace UnitTests
             I("y = 1, 3, 2, 5, 6;");
             I("x1 = 1, 2, 3, 4, 5;");
             I("x2 = 1, 0, 2, 1, 2;");
-            Globals.unitTestScreenOutput.Clear();            
+            Globals.unitTestScreenOutput.Clear();
             I("OLS y = x1, x2;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.51579"));  //stupid test...
 
@@ -17053,7 +17055,7 @@ namespace UnitTests
             I("series s4 = bul1.1;");
             //I("series s5 = 1;");
             I("matrix #x = pack(2000, 2010, s1, s2, s3, s4);");
-            I("matrix #y = pack(2000, 2010, s0);");            
+            I("matrix #y = pack(2000, 2010, s0);");
             I("r_run <target = 'data1'>  #x, #y file = ols.r;");
             I("PRT #beta;");
             _AssertMatrix(First(), "#beta", "rows", 5);
@@ -17124,7 +17126,7 @@ namespace UnitTests
             //Multiple R-squared:  0.625,	Adjusted R-squared:  0.3751
             //F-statistic:   2.5 on 4 and 6 DF,  p-value: 0.1516
 
-           
+
             // ----------------------------------
             // Then new simpler syntax
             // ----------------------------------
@@ -17149,7 +17151,7 @@ namespace UnitTests
 
             I("option python exe folder = " + pydir + ";");
 
-            I("python_run <target = 'data1'> #x, #y file = ols.py;");            
+            I("python_run <target = 'data1'> #x, #y file = ols.py;");
             _AssertMatrix(First(), "#beta", "rows", 5);
             _AssertMatrix(First(), "#beta", "cols", 1);
             _AssertMatrix(First(), "#beta", 1, 1, 0.0298039, 0.000001d);
@@ -17160,7 +17162,7 @@ namespace UnitTests
             I("s0fit = #yfit[.., 1].unpack(2000, 2010);"); //TODO: check s0fit
 
             //testing without target            
-            I("python_run #x, #y file = ols2.py;");            
+            I("python_run #x, #y file = ols2.py;");
             _AssertMatrix(First(), "#beta2", "rows", 5);
             _AssertMatrix(First(), "#beta2", "cols", 1);
             _AssertMatrix(First(), "#beta2", 1, 1, 0.0298039, 0.000001d);
@@ -17426,14 +17428,14 @@ namespace UnitTests
             _AssertSeries(First(), "gdp_true", 2005, 1325794d, sharedDelta);
 
         }
-        
+
 
         private static List<string> _GetListOfStrings(string s)
         {
             IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + s);
             List list = iv as List;
             return Stringlist.GetListOfStringsFromList(list);
-        }       
+        }
 
         private static void _AssertHelperList(string s, List<string> ss)
         {
@@ -17740,7 +17742,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Library()
         {
-            
+
             //function string f1(string %x1); return 'px_f1_' + %x1; end;
             //function string f1(string %x1, string %x2); return 'px_f1_' + %x1 + %x2; end;
             //
@@ -17962,7 +17964,7 @@ namespace UnitTests
                 I("%y4 = readfile('" + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\sub\data2.txt');");
                 _AssertScalarString(First(), "%y4", "lib1datasubdata2\r\n");
                 I("delete x!a;");
-                I("read <csv> "+ Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data.csv;");
+                I("read <csv> " + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data.csv;");
                 _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
                 I("delete x!a;");
                 I("read <csv> lib1.zip\\data\\data.csv;");  //local path to the zip
@@ -18052,7 +18054,7 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib1.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm line 102 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'f()', c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm (run-time error in line 32)"));
-            
+
             // -------------------------------
 
             I("RESET;");
@@ -18063,7 +18065,7 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib2.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm line 72 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'f()', c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm (run-time error in line 12)"));
-            
+
 
             //------------------------------------            
             // syntax errors:
@@ -18079,7 +18081,7 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm (run-time error in line 102)"));
-            
+
             // -------------------------------
 
             I("RESET;");
@@ -18091,12 +18093,12 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm, line 72"));
             Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib4.gcm line 3 calling -->"));
-            Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm (run-time error in line 72)"));           
+            Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm (run-time error in line 72)"));
 
 
         }
 
-    [TestMethod]
+        [TestMethod]
         public void _Test_StackTrace2()
         {
             if (false)
@@ -18110,7 +18112,7 @@ namespace UnitTests
             }
 
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
 
             // ------------------
             // Command files
@@ -18126,14 +18128,14 @@ namespace UnitTests
     [   5]:   ¤;  
               ^
               ^";
-string cc1b=
-@"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c1.gcm, line 1
+            string cc1b =
+            @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c1.gcm, line 1
     [   1]:   run cc1;";
 
             string cc1a =
 @"    Call stack: Command line calling -->
-    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";   
-            
+    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";
+
             Assert.IsTrue(c1.Contains(cc1));
             Assert.IsTrue(c1.Contains(cc1b));
             Assert.IsTrue(c1.Contains(cc1a));
@@ -18184,7 +18186,7 @@ string cc1b=
             Assert.IsTrue(c4.Contains(cc4));
 
             // =====================================================
-            
+
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c5;");
             string c5 = Globals.unitTestScreenOutput.ToString();
@@ -18204,7 +18206,7 @@ string cc1b=
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run m1;");
-            string m1 = Globals.unitTestScreenOutput.ToString();            
+            string m1 = Globals.unitTestScreenOutput.ToString();
             string mm1 =
 @"*** ERROR: Parsing user input block, line 5 pos 16
            Model lexer error: Exception of type 'Antlr.Runtime.NoViableAltException' was thrown.
@@ -18217,7 +18219,7 @@ string cc1b=
     Call stack: Command line calling -->
     c:\Thomas\Gekko\regres\StackTrace\m1.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\mm1.gcm (run-time error in line 5)";
-            
+
             Assert.IsTrue(m1.Contains(mm1));
 
             // ====================================================
@@ -18237,8 +18239,8 @@ string cc1b=
     Call stack: Command line calling -->
     c:\Thomas\Gekko\regres\StackTrace\m2.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\mm2.gcm (run-time error in line 5)";
-            
-            Assert.IsTrue(m2.Contains(mm2));            
+
+            Assert.IsTrue(m2.Contains(mm2));
         }
 
         private static void CompareTwoStrings(string w1, string w2)
@@ -18266,7 +18268,7 @@ string cc1b=
         [TestMethod]
         public void _Test_StackTrace1()
         {
-            I("RESET;"); 
+            I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
             string s = null;
             string ss = null;
@@ -18389,7 +18391,7 @@ string cc1b=
             I("RESET;");
             Globals.unitTestScreenOutput = new StringBuilder();
             Globals.errorHelper = "3";
-            FAIL("RUN x1;"); 
+            FAIL("RUN x1;");
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #3" + G.NL
@@ -18731,7 +18733,7 @@ string cc1b=
 
             I("reset;");
             I("time 2001 2001;");
-            I("a = 100;");            
+            I("a = 100;");
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("#m = a;");
@@ -18767,7 +18769,7 @@ string cc1b=
             _AssertSeries(First(), "m", 2001, 1d, sharedDelta);
 
             FAIL("m = 01,;");  //becomes string
-                        
+
             FAIL("#m = 2;");
 
             I("#m = 2,;");
@@ -18783,7 +18785,7 @@ string cc1b=
 
             I("m = 2,;");
             _AssertSeries(First(), "m", 2001, 2d, sharedDelta);
-                        
+
             FAIL("#m = 2.5;");
 
             I("#m = 2.5,;");
@@ -18799,7 +18801,7 @@ string cc1b=
 
             I("m = 2.5,;");
             _AssertSeries(First(), "m", 2001, 2.5d, sharedDelta);
-                        
+
             FAIL("#m = 1e5;");
 
             I("#m = 1e5,;");
@@ -18814,7 +18816,7 @@ string cc1b=
             _AssertSeries(First(), "m", 2001, 100000d, sharedDelta);
 
             FAIL("m = 1e5,;");
-                        
+
             FAIL("#m = 2001q1;");
 
             I("#m = 2001q1,;");
@@ -18841,7 +18843,7 @@ string cc1b=
             FAIL("for string %x = a; end;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(msg));
 
-            I("for string %x = a,; end;");            
+            I("for string %x = a,; end;");
 
             Globals.unitTestScreenOutput.Clear();
             FAIL("for val %x = 1; end;");
@@ -18877,7 +18879,7 @@ string cc1b=
         [TestMethod]
         public void _Test_OverloadAndPrompt()
         {
-            
+
             // -------- 0 required, 2 optional
 
             I("RESET;");
@@ -19000,7 +19002,7 @@ string cc1b=
             _AssertSeries(First(), "z2!a", 2001, 106d, sharedDelta);
 
             FAIL("z3 = f?();");  //prompting only allowed for val, date, string types (not even name)
-            
+
             // -------- test of NAME type
 
             I("RESET;");
@@ -19052,11 +19054,11 @@ string cc1b=
 
         [TestMethod]
         public void _Test_Arrow1()
-        {            
+        {
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("READ " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2\jul05;");            
-            Databank db1 = Gekko.Program.databanks.GetFirst();            
+            I("READ " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2\jul05;");
+            Databank db1 = Gekko.Program.databanks.GetFirst();
             int t1 = 1998;
             int t2 = 2079;
             int n = t2 - t1 + 1;
@@ -19072,7 +19074,7 @@ string cc1b=
             {
                 dates.Add(t.super.ToString());
             }
-            recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));            
+            recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
             int counter = 0;
             foreach (KeyValuePair<string, IVariable> kvp in db1.storage)
             {
@@ -19094,7 +19096,7 @@ string cc1b=
                 //hmmm...?
                 df1.Columns["AAA"][3] = 777d;  //--> not fed back to recordBatch1 it seems
             }
-            Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");                        
+            Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
             RecordBatch recordBatch2 = Arrow.ReadArrow(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
             DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
             Databank db2 = new Databank(null);
@@ -19225,7 +19227,7 @@ string cc1b=
 
             //====== trying out R ===============================
 
-            Globals.unitTestScreenOutput.Clear();            
+            Globals.unitTestScreenOutput.Clear();
             string s = @"
 library(arrow)
 library(dplyr)
@@ -19237,7 +19239,7 @@ df3 <- select(filter(df, dims == 0), c(name, freq, per1, per2, per3, value))
 print(df3)
 
 ";
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);            
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);
             I("r_run test1.r;");
             string output = Globals.unitTestScreenOutput.ToString();
             //could be a more precise test regarding R, but never mind
@@ -19245,7 +19247,7 @@ print(df3)
             if (true)
             {
                 //Mystery why this char is suddently showing up in R...? (Since new PC may 2023).
-                Assert.IsTrue(output.Contains("# A tibble: 45 ├ù 9"));                
+                Assert.IsTrue(output.Contains("# A tibble: 45 ├ù 9"));
             }
             else
             {
@@ -19326,7 +19328,7 @@ print(df2)
         [TestMethod]
         public void _Test_FunctionsInBuilt()
         {
-            
+
             Databank work = First();
             //simplest possible
             I("RESET;");
@@ -19569,7 +19571,7 @@ print(df2)
 
             //truncate()
             I("RESET; TIME 2011 2015;");
-            I("#m = truncate(2001, 2010);");            
+            I("#m = truncate(2001, 2010);");
             Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0].Type(), EVariableType.Null);
             Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1].Type(), EVariableType.Null);
             I("RESET; TIME 2011 2015;");
@@ -20210,7 +20212,8 @@ print(df2)
                 b = true;
                 //Assert.Fail(); // Must not accept this ---> hmmm this does not work: Assert.Fail() will fail itself.....
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 //By calling this, we emulate the cleanup done in the 'real' Gekko when exceptions are thrown
                 Program.GekkoExceptionCleanup(new P());  //new P() is a bit of a hack to make it work here (I() method does the same thing with new P())
             };
@@ -20395,7 +20398,7 @@ print(df2)
 
         [TestMethod]
         public void _Test_Table()
-        {                                 
+        {
             //Pretty good check of both syntax and results, both when composing a table cell by cell,
             //and using a xml table. Both txt and html output is checked.
             //So is this test passes, tables are not completely defunct!
@@ -20420,7 +20423,7 @@ print(df2)
             I("table xx.currow.settext(2,'you');");
             Globals.unitTestScreenOutput.Clear();
             I("table xx.print('txt');");
-            string s = Globals.unitTestScreenOutput.ToString();            
+            string s = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(s.Contains("|       2000        2001        2002        2003"));
             Assert.IsTrue(s.Contains("|      0.100       0.100       0.100       0.100"));
             Assert.IsTrue(s.Contains("|            ------------------------"));
@@ -20428,7 +20431,7 @@ print(df2)
             Assert.IsTrue(s.Contains("  hello       you"));
 
             // ---
-            
+
             I("RESET; time 2011 2021;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
@@ -20440,7 +20443,7 @@ print(df2)
             Assert.IsTrue(s.Contains(">1.60</td>"));  //just simple test that some html was produced
 
             // ---
-            
+
             I("OPTION table type = txt;");
             Globals.unitTestScreenOutput.Clear();
             I("TABLE <2010 2014> tablesmall;");
@@ -20454,7 +20457,7 @@ print(df2)
             Assert.IsTrue(s.Contains("| Import                |         M          M       1.83       1.61       1.60 |"));
             Assert.IsTrue(s.Contains("------------------------+--------------------------------------------------------"));
             Assert.IsTrue(s.Contains("| *) Lagerinvesteringer i procent af bruttonationalprodukt                      |"));
-            
+
 
         }
 
@@ -21556,7 +21559,7 @@ print(df2)
             I("option interface mute = no;");
             I("tell 'a3';");
             I("pipe<stop>;");
-            I("%s = readfile('deleteme.txt');");            
+            I("%s = readfile('deleteme.txt');");
             ScalarString ss = Program.databanks.GetDatabank("Work").GetIVariable("%s") as ScalarString;
             Assert.IsFalse(ss.string2.Contains("a2"));
 
@@ -21571,7 +21574,7 @@ print(df2)
             I("function val f(val %z); return 2 * %z; end;");
             I("%a = f(%x);");
             _AssertScalarVal(First(), "%a", 6d, sharedDelta);
-                       
+
 
             // ===========================================================
             // ================= test get/set of local and global databank
@@ -21704,7 +21707,7 @@ print(df2)
             _AssertScalarString(First(), "%s1", "first");
             _AssertScalarString(First(), "%s2", "global");
             _AssertScalarString(First(), "%s3", "first");
-            
+
             I("RESET;");
             I("LOCAL<all>;");
             I("%s1 = 'local';");
@@ -21727,7 +21730,7 @@ print(df2)
             I("%s1 = 'local';");
             I("%s2 = %s1;");
             FAIL("%s3 = %s0;");
-            I("%s3 = all:%s0;");  
+            I("%s3 = all:%s0;");
             Assert.AreEqual(Local().storage.Count, 3);
             _AssertScalarString(Local(), "%s1", "local");
             _AssertScalarString(Local(), "%s2", "local");
@@ -22172,7 +22175,7 @@ print(df2)
                 _AssertSeries(First(), "x1!m", EFreq.M, 2002, 0 + i, 10d / 3d, sharedDelta);
             }
             _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
-            
+
             // ================================
             //        Q to W
             // ================================
@@ -22265,7 +22268,7 @@ print(df2)
                     if (i == 0) _AssertSeries(First(), "x!w", EFreq.W, 2005, 5, double.NaN, sharedDelta);
                     else _AssertSeries(First(), "x!w", EFreq.W, 2005, 5, 1d / 7d * 4d, sharedDelta);
                     _AssertSeries(First(), "x!w", EFreq.W, 2005, 6, double.NaN, sharedDelta);
-                    if(i==0) _AssertScalarVal(First(), "%sum", 28.2857142857143, sharedDelta);  //probably ok as number            
+                    if (i == 0) _AssertScalarVal(First(), "%sum", 28.2857142857143, sharedDelta);  //probably ok as number            
                     else _AssertScalarVal(First(), "%sum", 3d * 31d / 7d + 4d * 31d / 7d, sharedDelta);  //both the months we are splitting out have 31 days.
 
                     I("INTERPOLATE x!w = x!m prorate;");
@@ -22357,7 +22360,7 @@ print(df2)
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 17, 1d, sharedDelta);
                     //
                     if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 18, double.NaN, sharedDelta);
-                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 18, 6d/7d, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 18, 6d / 7d, sharedDelta);
                     if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 18, double.NaN, sharedDelta);
                     else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 18, 1d / 7d, sharedDelta);
                     //
@@ -22487,11 +22490,11 @@ print(df2)
                 }
             }
 
-            
+
 
             //M to W with alternating data and holes -------------------
 
-            
+
 
             // ================================
             //        M to D (just a limited test here)
@@ -22654,7 +22657,7 @@ print(df2)
             //from DateTime to GekkoTime D
             gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, dt);
             Assert.AreEqual(gt.super, dt.Year, gt.super); Assert.AreEqual(gt.sub, dt.Month); Assert.AreEqual(gt.subsub, dt.Day);
-                                          
+
         }
 
 
@@ -23697,7 +23700,7 @@ print(df2)
                     }
                 }
             }
-        } 
+        }
 
 
         [TestMethod]
@@ -23798,7 +23801,7 @@ print(df2)
             // series
             // series
             // --------------------------------------------
-            
+
 
             //type1 -------------------
 
@@ -23809,12 +23812,12 @@ print(df2)
             _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
             if (true)
             {
-                
+
                 I("if_old (x1 == x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
                 I("if_old (x1 <> x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
-                
+
             }
             I("if (x1 < x2); %x = 1; else; %x = -1; end;");
             _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
@@ -23837,12 +23840,12 @@ print(df2)
 
             if (true)
             {
-                
+
                 I("if_old (x1 == x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
                 I("if_old (x1 <> x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
-                
+
             }
 
             I("if (x1 < x2); %x = 1; else; %x = -1; end;");
@@ -23864,12 +23867,12 @@ print(df2)
 
             if (true)
             {
-             
+
                 I("if_old (x1 == x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
                 I("if_old (x1 <> x2); %x = 1; else; %x = -1; end;");
                 _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
-                
+
             }
 
             I("if (x1 < x2); %x = 1; else; %x = -1; end;");
@@ -23883,7 +23886,7 @@ print(df2)
 
         }
 
-        
+
 
         [TestMethod]
         public void _Test_If_Series()
@@ -23992,161 +23995,161 @@ print(df2)
 
             //basic
             I("IF(%s1 == 'abc') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
-            _AssertScalarVal(First(), "%xx", 1d);            
+            _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%s1 == 'abc ') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc ') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc0') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc0') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
             //parentheses + not
-            I("IF((%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF((%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(not %s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(not %s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(not(%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(not(%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
             //or table
-            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
             //and table
-            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence and over or
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence not
-            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             //expressions
-            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
             //decorated with a lot of parentheses
-            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             // == and <> operators
-            I("IF(%s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 <> 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 <> 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 == 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 <> 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%s1 <> 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v3 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v3 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v3 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v3 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             //values, relations
 
-            I("IF(%v0+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v0+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v0+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v0+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v1+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v1+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v1+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v1+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%v2+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v2+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v2+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%v2+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             //dates, relations
 
-            I("IF(%d0-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d0-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
             I("IF(%d0-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d0-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d0-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d0-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d0-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d0-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%d1-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d1-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d1-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d1-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%d2-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d2-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d2-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(%d2-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             // FIXME FIXME FIXME
@@ -24163,9 +24166,9 @@ print(df2)
             I("VAL %v = 2000;");  //must be integer, else fail
             I("TIME 2000 2001;");
             I("SERIES y = 123;");
-            I("IF(y[%d+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(y[%d+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(y[%v+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
+            I("IF(y[%v+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
             _AssertScalarVal(First(), "%xx", 1d);
 
             //casting
@@ -24196,7 +24199,7 @@ print(df2)
                 */
             }
 
-            
+
 
 
         }
@@ -24889,8 +24892,8 @@ print(df2)
             }
             c5 = 0;
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-            {                
-                c5++;                
+            {
+                c5++;
                 Assert.AreEqual(tsD1.GetDataSimple(t), (double)c5);  //we are not reading from a bank, keep it fast!               
             }
 
@@ -25079,7 +25082,7 @@ print(df2)
 
         [TestMethod]
         public void _Test_Rebase()
-        {            
+        {
             I("RESET;");
             I("TIME 2010 2012;");
             I("MODE data;");
@@ -25238,7 +25241,7 @@ print(df2)
             I("temp2:y1 = rebase(work:y1, 2010q2, 7);");
             I("temp2:y2 = rebase(temp:y2, 2010q2, 7);");
             //"REBASE <tobank=temp2 index = 100> work:y1, temp:y2 2011;");
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 1,  -7d / 3d *7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 1, -7d / 3d * 7d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 2, 3d / 3d * 7d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 3, 4d / 3d * 7d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", EFreq.Q, 2010, 1, 7d / (-3d) * 7d, sharedDelta);
@@ -25441,7 +25444,7 @@ print(df2)
                         {
                             //e1 is a normal C# Exception
                             //if it was a C# parsing error, this error could be added to the string below (using e1.Message)
-                            new Error("This is error 1", e1); 
+                            new Error("This is error 1", e1);
                         }
                     }
                     catch (Exception e2)
@@ -25934,17 +25937,17 @@ print(df2)
             I("reset;");
             I("%s = 'a, b,c,,d, , e';");
             I("#m = %s.split(',');");  //yes, yes
-            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));            
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));
             I("#m = %s.split(',', 1, 1);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));
             I("#m = %s.split(',', 0, 1);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "", "d", "", "e" }));
             I("#m = %s.split(',', 1, 0);");
-            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c",  "d", " ", " e" }));
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c", "d", " ", " e" }));
             I("#m = %s.split(',', 0, 0);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c", "", "d", " ", " e" }));
         }
-        
+
         [TestMethod]
         public void _Test_Databanks()
         {
@@ -26008,7 +26011,7 @@ print(df2)
             ------------------------------------------------
 
              */
-                   
+
 
             for (int i = 0; i < 2; i++)
             {
@@ -26322,7 +26325,7 @@ print(df2)
                     G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
                     Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                     I("RESET;");
-                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");                    
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                     I("OPTION freq a;");
                     I("SER <2010 2013> xx1 = 1;");
                     I("OPTION freq q;");
@@ -26625,7 +26628,7 @@ print(df2)
             //_AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             //_AssertSeries(First(), "xx", 2003, 3d, sharedDelta);
             //_AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
-            
+
             // -----------
 
             I("RESET; TIME 2001 2005;");
@@ -26689,7 +26692,7 @@ print(df2)
             I("#onebyone[1, 1] = 2;");
 
             // ----------- multiply and divide
-            I("#c = #a * #b;");            
+            I("#c = #a * #b;");
             _AssertMatrix(First(), "#c", 1, 1, 74, sharedDelta);
             _AssertMatrix(First(), "#c", 1, 2, 80, sharedDelta);
             _AssertMatrix(First(), "#c", 1, 3, 86, sharedDelta);
@@ -26821,7 +26824,7 @@ print(df2)
             I("%v12 = #a[1,2];");
             I("%v21 = #a[2,1];");
             I("%v22 = #a[2,2];");
-            
+
             _AssertScalarVal(First(), "%v11", 1d);
             _AssertScalarVal(First(), "%v12", 2d);
             _AssertScalarVal(First(), "%v21", 3d);
@@ -26841,7 +26844,7 @@ print(df2)
             _AssertMatrix(First(), "#x", 2, 3, 8d, sharedDelta);
             _AssertMatrix(First(), "#x", 2, 4, 9d, sharedDelta);
             _AssertMatrix(First(), "#x", 2, 5, 10d, sharedDelta);
-                        
+
             _AssertMatrix(First(), "#x", 3, 1, 11d, sharedDelta);
             _AssertMatrix(First(), "#x", 3, 2, 12d, sharedDelta);
             _AssertMatrix(First(), "#x", 3, 3, 17d, sharedDelta);
@@ -26940,7 +26943,7 @@ print(df2)
             _AssertMatrix(First(), "#b", "cols", 1);
             _AssertMatrix(First(), "#b", 1, 1, 3d, sharedDelta);
             _AssertMatrix(First(), "#b", 2, 1, 7d, sharedDelta);
-            
+
             // -------- pack and unpack ---------
 
             I("RESET;");
@@ -26969,7 +26972,7 @@ print(df2)
             _AssertMatrix(First(), "#c", 1, 2, 15d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
             _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
-                        
+
             I("yy1 = unpack(#b[.., 1]);");
             _AssertSeries(First(), "yy1", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy1", 2000, 5d, sharedDelta);
@@ -26985,7 +26988,7 @@ print(df2)
             _AssertSeries(First(), "yy2", 2001, 16d, sharedDelta);
             _AssertSeries(First(), "yy2", 2002, 17d, sharedDelta);
             _AssertSeries(First(), "yy2", 2003, double.NaN, sharedDelta);
-                        
+
             I("RESET;");
             I("OPTION freq m;;");
             I("TIME 2010 2020;");
@@ -27011,7 +27014,7 @@ print(df2)
             _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
             _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
             I("yy1 = unpack(#b[.., 1]);");
-                        
+
             _AssertSeries(First(), "yy1", EFreq.M, 1999, 12, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 1, 5d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
@@ -27023,7 +27026,7 @@ print(df2)
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 3, 17d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 4, double.NaN, sharedDelta);
-            
+
             // -------------- divide(), multiply()
             I("RESET;");
             I("#a = [1, 2, 3 ; 4, 5, 6];");
@@ -27053,8 +27056,8 @@ print(df2)
             //Special 1
             I("RESET;");
             I("#a = [1, 2, 3 ; 4, 5, 6];");
-            I("#b = [2, 3, 4];");            
-            I("#c = multiply(#a, #b);"); 
+            I("#b = [2, 3, 4];");
+            I("#c = multiply(#a, #b);");
             _AssertMatrix(First(), "#c", "rows", 2);
             _AssertMatrix(First(), "#c", "cols", 3);
             _AssertMatrix(First(), "#c", 1, 1, 1d * 2d, sharedDelta);
@@ -27063,7 +27066,7 @@ print(df2)
             _AssertMatrix(First(), "#c", 2, 1, 4d * 2d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 2, 5d * 3d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 3, 6d * 4d, sharedDelta);
-            
+
             FAIL("#c = multiply(#b, #a);");  //not the other way around
             I("#c = divide(#a, #b);");
             _AssertMatrix(First(), "#c", "rows", 2);
@@ -27278,7 +27281,7 @@ print(df2)
             // ---------------------------------------------
             // --------- left-side indexer -----------------
             // ---------------------------------------------
-                        
+
             I("RESET;");
             I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
             I("#a[1..2, 1..2] = [10, 20 ; 30, 40];");
@@ -27522,8 +27525,8 @@ print(df2)
             I("%v = toExcelDate(2019m11d12);");
             I("%d = fromExcelDate(%v);");
             _AssertScalarVal(First(), "%v", 43781d, sharedDelta);
-            _AssertScalarDate(First(), "%d",EFreq.D, 2019, 11, 12);
-            
+            _AssertScalarDate(First(), "%d", EFreq.D, 2019, 11, 12);
+
         }
 
         [TestMethod]
@@ -27562,7 +27565,7 @@ print(df2)
 
         }
 
-        
+
 
         [TestMethod]
         public void _Test_Scalars()
@@ -27718,13 +27721,13 @@ print(df2)
             I("string %b = 'c';");
             I("string %d = %{%a};                                        //recursive: %(%a) -> %('b') -> %b -> 'c', so %d = 'c'.");
             _AssertScalarString(First(), "%d", "c");
-            
+
             I("string %n = 'a';");                                         //testing recursive on left-side
             I("val %v{%n} = 7;");
             I("val %(vv%n) = 77;");
             I("string %s = 'b';");
             I("val %vvv{%s} = 777;");
-            I("val %(vvvv%s) = 7777;"); 
+            I("val %(vvvv%s) = 7777;");
             _AssertScalarVal(First(), "%va", 7);
             _AssertScalarVal(First(), "%vva", 77);
             _AssertScalarVal(First(), "%vvvb", 777);
@@ -27732,7 +27735,7 @@ print(df2)
 
             I("string %n = 'a';");
             I("CREATE {%n};");  //This should be possible, had a bug previously, so we test it here
-            
+
             I("string %s1 = 'aa bb cc';");
             I("string %s2 = 'bb';");
             I("string %s3 = 'Ab';");
@@ -27818,21 +27821,21 @@ print(df2)
             _AssertSeries(First(), "xb", 2001, 11d, sharedDelta);
             _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
             _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
-                        
+
             I("SERIES<2000 2002> xB = @xA[-1];");
             _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xb", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xb", 2001, 10d, sharedDelta);
             _AssertSeries(First(), "xb", 2002, 11d, sharedDelta);
             _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
-            
+
             I("SERIES<2000 2002> xB = xA[-1];");
             _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xb", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xb", 2001, 10d, sharedDelta);
             _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
             _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
-            
+
             I("SERIES<2000 2002> xB = @xA[+1];");
             _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xb", 2000, 11d, sharedDelta);
@@ -27868,7 +27871,7 @@ print(df2)
             _AssertSeries(First(), "xb", 2001, 12d, sharedDelta);
             _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
             _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
-        }       
+        }
 
         [TestMethod]
         public void _Test_DataFormatsInOut()
@@ -27896,7 +27899,7 @@ print(df2)
             // testing on annual
 
             List<string> other = new List<string>();
-            other.Add(null);            
+            other.Add(null);
             other.Add("other:");
 
             foreach (string bank in other)
@@ -28271,7 +28274,7 @@ print(df2)
                     I("WRITE<2001q1 2001q2 flat>temp;");
                     I("RESET; OPTION freq q;");  //must tell Gekko what freq
                     I("READ<flat>temp;");
-                    ReadFormatsHelper("q", bank);                    
+                    ReadFormatsHelper("q", bank);
                 }
 
                 // ---------- Testing on daily
@@ -28760,7 +28763,7 @@ print(df2)
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[by1]");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[by2]");
             Assert.AreEqual(table.Get(1, 6), null);
-                        
+
             I("prt <n> {'x[b?]'};");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[bx]");
@@ -29085,11 +29088,11 @@ print(df2)
             Globals.unitTestScreenOutput.Clear();
             I("index {'x1[**]'};");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x1[ax], x1[ay], x1[bx], x1[by], x1[by1], x1[by2]\r\n"));
-            
+
             Globals.unitTestScreenOutput.Clear();
             I("index x1[**];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x1[ax], x1[ay], x1[bx], x1[by], x1[by1], x1[by2]\r\n"));
-                        
+
             Globals.unitTestScreenOutput.Clear();
             I("index x1['**'];");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("x1[ax], x1[ay], x1[bx], x1[by], x1[by1], x1[by2]\r\n"));
@@ -29183,8 +29186,8 @@ print(df2)
             _AssertSeries(First(), "pris6_enhed_100_VAREGRuppe_011200!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_enhed_100_VAREGRuppe_011100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
             _AssertSeries(First(), "pris6_enhed_100_VAREGRuppe_011200!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-            _AssertSeries(First(), "pris6_enhed_100_VAREGRuppe_011100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);            
-            
+            _AssertSeries(First(), "pris6_enhed_100_VAREGRuppe_011100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("IMPORT <px all> data;");
@@ -29282,7 +29285,7 @@ print(df2)
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("MATRIX #m1 = [1, 2 ; 3, 4];");
-            I("MATRIX #m2 = [11, 12 ; 13, 14];");            
+            I("MATRIX #m2 = [11, 12 ; 13, 14];");
             I("EXPORT<r> #m1, #m2 file=matrix.r;");
         }
 
@@ -29368,7 +29371,7 @@ print(df2)
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 101d, 0d);
             _AssertSeries(First(), "y", 2002, 102d, 0d);
@@ -29388,7 +29391,7 @@ print(df2)
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 101d, 0d);
             _AssertSeries(First(), "y", 2002, 102d, 0d);
@@ -29408,7 +29411,7 @@ print(df2)
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 101d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 1.02 * 101d, 0.000001d);
@@ -29428,7 +29431,7 @@ print(df2)
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 101d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 1.02 * 101d, 0.000001d);
@@ -29449,7 +29452,7 @@ print(df2)
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = (101, 102, 104);");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 102d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 104d, 0.000001d);
@@ -29470,7 +29473,7 @@ print(df2)
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = (101, 102, 104);");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 102d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 104d, 0.000001d);
@@ -29491,7 +29494,7 @@ print(df2)
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = (101, 102, 104);");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 1.01d * 101d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 1.02d * 102d, 0.000001d);
@@ -29512,7 +29515,7 @@ print(df2)
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = (101, 102, 104);");
-            I("RUN deleteme." + Globals.extensionCommand + ";");            
+            I("RUN deleteme." + Globals.extensionCommand + ";");
             _AssertSeries(First(), "y", 2000, double.NaN, 0d);
             _AssertSeries(First(), "y", 2001, 1.01d * 101d, 0.000001d);
             _AssertSeries(First(), "y", 2002, 1.02d * 102d, 0.000001d);
@@ -29541,7 +29544,7 @@ print(df2)
 
 
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\plotcombo\';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\plotcombo\';");
             I("RUN combo;");
 
             //Do this manually with:
@@ -29576,7 +29579,7 @@ print(df2)
             I("x <2001 2004 dyn> = x[-1] + 1;");
             I("y <2001 2004 dyn> = y[-1] + 1;");
             I("z <2001 2004 dyn> = z[-1] + 1;");
-            I("model lead1;");            
+            I("model lead1;");
             I("sim<res>;");
             _AssertSeries(First(), "y!a", 2001, 33d, sharedDelta);  //10 + 11 + 12
             _AssertSeries(First(), "y!a", 2002, 36d, sharedDelta);  //11 + 12 + 13
@@ -29709,7 +29712,7 @@ print(df2)
             //-----------------------------------------------------------
             I("RESET;");
             I("OPTION freq q;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("model lilleq;");
             I("read lilleq;");
             I("time 2000q1 2001q1;");
@@ -29849,7 +29852,7 @@ print(df2)
             //basic alias
             I("reset;");
             I("option interface alias = yes;");
-            I("#(listfile m) = (('fy', 'c[a]'), ('fe', 'c[b]'));");            
+            I("#(listfile m) = (('fy', 'c[a]'), ('fe', 'c[b]'));");
             I("global:#alias = #(listfile m);");
             I("c = series(1); c[a] = 100; c[b] = 200;");
             I("prt fy, fe;");
@@ -29859,7 +29862,7 @@ print(df2)
             I("reset; OPTION interface alias = yes;");
             I("x = series(1); x[a] = 1;");
             I("global:#alias = (('x', 'x[a]'),);");  // a --> b            
-            I("PRT x;");            
+            I("PRT x;");
         }
 
         [TestMethod]
@@ -30055,14 +30058,14 @@ print(df2)
         //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
         //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
         //    _AssertScalarVal(First(), "%v4", 1.2345 * 6d);
-            
+
         //}
 
         [TestMethod]
         public void _Test_ReplaceTimeseries()
-        {            
+        {
             I("RESET;");
-            I("TIME 2001 2003;");            
+            I("TIME 2001 2003;");
             I("SERIES x = (1, m(), 3);");
             I("SERIES y1 = replace(x, m(), 100);");
             _AssertSeries(First(), "y1", 2000, double.NaN, sharedDelta);
@@ -30156,7 +30159,7 @@ print(df2)
         {
             I("RESET; MODE data;");
 
-            I("#m1 = a, b;");  
+            I("#m1 = a, b;");
             I("#m2 = x, y;");
             I("#m = q{#m1}w{#m2}, b;");
             _AssertListString(First(), "#m", new StringOrList("qawx", "qawy", "qbwx", "qbwy", "b"));
@@ -30181,7 +30184,7 @@ print(df2)
             I("#m = (1.0, m(), 3 rep 2, 3.0e6);");
             _AssertListVal(First(), "#m", new List<double> { 1d, double.NaN, 3d, 3d, 3e6d });
 
-            FAIL("#m = 1.0, m(), 3 rep 2, 3e6;");            
+            FAIL("#m = 1.0, m(), 3 rep 2, 3e6;");
             I("#m = (1.0, m(), 3 rep 2, 3e6);");
             _AssertListVal(First(), "#m", new List<double> { 1d, double.NaN, 3d, 3d, 3e6d });
 
@@ -30204,7 +30207,7 @@ print(df2)
             _AssertListVal(First(), "#m", new List<double> { 12d, 100000d });
             I("#m = (12, 1.0e5);");
             _AssertListVal(First(), "#m", new List<double> { 12d, 100000d });
-            
+
             I("#m = ab7, 7dy, 638, 02e, 058, 1e5;");
             _AssertListString(First(), "#m", new StringOrList("ab7", "7dy", "638", "02e", "058", "1e5"));
 
@@ -30215,24 +30218,24 @@ print(df2)
 
             I("#m = -a, -b, c, -b:a rep 1+1, -b:a[x, y], -0a, -01, -10;");  //note: blank not removed in ...[x, y]
             _AssertListString(First(), "#m", new StringOrList("-a", "-b", "c", "-b:a", "-b:a", "-b:a[x, y]", "-0a", "-01", "-10"));
-            
+
             I("#m = -1.0, m(), -3 rep 2, -3.0e6;");
             _AssertListVal(First(), "#m", new List<double> { -1d, double.NaN, -3d, -3d, -3e6d });
-            
+
             FAIL("#m = -1.0, m(), -3 rep 2, -3e6;");
-            
+
             I("#m = -1, -2;");
             _AssertListVal(First(), "#m", new List<double> { -1d, -2d });
-            
+
             I("#m = -12, -02;");
             _AssertListString(First(), "#m", new StringOrList("-12", "-02"));
-            
+
             I("#m = -12, -1e5;");
             _AssertListString(First(), "#m", new StringOrList("-12", "-1e5"));
-            
+
             I("#m = -12, -1.0e5;");
             _AssertListVal(First(), "#m", new List<double> { -12d, -100000d });
-            
+
             I("#m = -ab7, -7dy, -638, -02e, -058, -1e5;");
             _AssertListString(First(), "#m", new StringOrList("-ab7", "-7dy", "-638", "-02e", "-058", "-1e5"));
 
@@ -30251,14 +30254,103 @@ print(df2)
             // Quarterly
             // Quarterly
 
-            // This is from the laspchanq.cmd function (Morten Werner):
+            // This is from the laspchanq.cmd function (Morten Werner):            
+            //
+            //The LASPCHAINQ function is here:
+            //
+            // // Danner Kædet Laspeyres mængdeindeks og paascheprisindeks for kvartalsserier.
+            // // Aggregatet dannes for den længst mulige periode. Periode og frekvens sættes afslutnngsvis som før kald af funktionen
+            // // INPUT    : Liste over prisserier, liste over mængdeserier (foranstillet "'-" indebærer at serien trækkes ud af indeks), referenceår: (pris = 1)
+            // // OUTPUT   : MAP der indeholder følgende (series value, series quantity, series price, series price_lag).
+            // FUNCTION MAP  LASPCHAINQ(list #p, list #q, date %refaar);
+            // date   %current_start = currentPerStart() ;
+            // date   %current_end   = currentPerEnd()   ;
+            // string %current_freq  = currentFreq()     ;
+            // OPTION freq q;
+            // date %st = {#p[1]}.fromseries('DataStart');
+            // date %sl = {#p[1]}.fromseries('DataEnd');
+            // for string %i = #p + #q;
+            // %ss = %i.startswith( '-' );
+            // if ( %ss == 1 );
+            // %ii = %i.substring(2,%i.length()-1) ;
+            // else;
+            // string %ii = %i;
+            // end;
+            // date %st_temp = %ii.fromSeries( 'DataStart' );
+            // if ( %st_temp > %st );
+            // date %st = %st_temp;
+            // end;
+            // date %sl_temp = %ii.fromSeries( 'DataEnd' );
+            // if ( %sl_temp < %sl );
+            // date %sl = %sl_temp;
+            // end;
+            // end;
+            // time %st %sl;
+            // option freq a;
+            // for string %p = #p string %q = #q;
+            // %ss = %q.startswith( '-' );
+            // if ( %ss == 1 );
+            // %qq = %q.substring(2,%q.length()-1) ;
+            // else;
+            // string %qq = %q;
+            // end;
+            // collapse {%qq}!a = {%qq}!q avg;
+            // option freq q;
+            // series v_{%p} = {%p} * {%qq};
+            // option freq a;
+            // collapse v_{%p}!a = v_{%p}!q avg;	  
+            // series  {%p}    = v_{%p} / {%qq} ; FINDMISSINGDATA <replace = 0> {%p};  //Missing data opstår her når mængden bliver nul - prisen sættes derefter ligeledes til nul taget fra monagenr!
+            // series  {%p}_la = {%p}[-1]; 
+            // end;
+            // #LPAGG = laspchain(#p, #q, %refaar);
+            // p_la  = #LPAGG.p[-1];
+            // option freq q;
+            // INTERPOLATE p_la!q = p_la!a repeat;
+            // series value    = 0 ;
+            // series quantity = 0 ;
+            // for string %p = #p string %q = #q;
+            // interpolate {%p}_la!q = {%p}_la!a repeat;
+            // %ss = %q.startswith( '-' );
+            // if ( %ss == 1 );
+            // %qq = %q.substring(2,%q.length()-1);
+            // VAL %fortegn = -1;
+            // else;
+            // string %qq = %q;
+            // VAL %fortegn =  1;
+            // end;
+            // series value 		= value    + {%p}    * %fortegn * {%qq};
+            // series quantity	= quantity + {%p}_la * %fortegn * {%qq}/p_la;  
+            // end;
+            // MAP #out_map = ( series value = value , series quantity = quantity , series price = value/quantity , series price_lag = p_la );
+            // time %current_start %current_end;
+            // option freq {%current_freq};
+            // RETURN  #out_map;
+            // END;
+            //
+            // --> and code to test it is here (same example as in unit tests):
+            //  
+            //reset;
+            //run laspchainq;
+            //option freq q;
+            //time 2020 2022;
+            //p1 = 1.50, 1.48, 1.44, 1.53,      1.45, 1.56, 1.45, 1.52,      1.57, 1.56, 1.47, 1.56;
+            //p2 = 1.47, 1.53, 1.53, 1.57,      1.61, 1.64, 1.66, 1.59,      1.61, 1.56, 1.53, 1.52;
+            //q1 = 10, 11, 12, 10,              13, 11, 14, 13,              12, 11, 14, 12;
+            //q2 = 27, 25, 27, 24,              23, 25, 27, 24,              22, 22, 25, 23;
+            //#p = p1, p2;
+            //#q = q1, q2;
+            //#m = laspchainq(#p, #q, 2020);
+            //print<n> #m.price, #m.quantity, #m.price_lag;
+            //
+            // // --> results:
+            //
             //            #m.price    #m.quantity   #m.price_lag 
             //2020
-            //q1          M              M M
-            //q2          M              M M
-            //q3          M              M M
-            //q4          M              M M
-            //
+            //q1          M              M          M
+            //q2          M              M          M
+            //q3          M              M          M
+            //q4          M              M          M
+            //            
             //
             //2021
             //q1           1.0282        54.3491         1.0000
@@ -30272,10 +30364,30 @@ print(df2)
             //q2           1.0322        49.8752         1.0464
             //q3           1.0003        58.8146         1.0464
             //q4           1.0156        52.8550         1.0464
+            //
+            //
+            //
+            // If we change #q = q1, q2; into --> //#q = -q1, q2;, we get these results:
 
+            //                         #m.price    #m.quantity   #m.price_lag 
+            //2020
+            //q1 M              M              M 
+            //q2 M              M              M 
+            //q3 M              M              M 
+            //q4 M              M              M 
             //
+            //2021
+            //q1           1.1553        15.7361         1.0000 
+            //q2           1.0959        21.7535         1.0000 
+            //q3           1.2052        20.3454         1.0000 
+            //q4           1.0661        17.2597         1.0000 
             //
-            //
+            //2022
+            //q1           1.0488        15.8086         1.1311 
+            //q2           1.0019        17.1273         1.1311 
+            //q3           1.0106        17.4848         1.1311 
+            //q4           0.9416        17.2464         1.1311 
+
 
             I("reset;");
             I("option freq q;");
@@ -30285,7 +30397,7 @@ print(df2)
             I("q1 = 10, 11, 12, 10,              13, 11, 14, 13,              12, 11, 14, 12;");
             I("q2 = 27, 25, 27, 24,              23, 25, 27, 24,              22, 22, 25, 23;");
             I("#p = p1, p2;");
-            I("#q = q1, q2;");            
+            I("#q = q1, q2;");
             I("#m = laspchainq(#p, #q, 2020, 'dst');");
             I("p = #m.p; q = #m.q;");
 
@@ -30306,6 +30418,30 @@ print(df2)
             _AssertSeries(First(), "q!q", EFreq.Q, 2022, 2, 49.8752d, sharedTableDelta);
             _AssertSeries(First(), "q!q", EFreq.Q, 2022, 3, 58.8146d, sharedTableDelta);
             _AssertSeries(First(), "q!q", EFreq.Q, 2022, 4, 52.8550d, sharedTableDelta);
+
+            I("#p_ = p1, p2;");
+            I("#q_ = -q1, q2;");
+            I("#m_ = laspchainq(#p_, #q_, 2020, 'dst');");
+            I("p_ = #m_.p; q_ = #m_.q;");
+
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2021, 1, 1.1553d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2021, 2, 1.0959d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2021, 3, 1.2052d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2021, 4, 1.0661d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2022, 1, 1.0488d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2022, 2, 1.0019d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2022, 3, 1.0106d, sharedTableDelta);
+            _AssertSeries(First(), "p_!q", EFreq.Q, 2022, 4, 0.9416d, sharedTableDelta);
+
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2021, 1, 15.7361d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2021, 2, 21.7535d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2021, 3, 20.3454d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2021, 4, 17.2597d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 1, 15.8086d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 2, 17.1273d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 3, 17.4848d, sharedTableDelta);
+            _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 4, 17.2464d, sharedTableDelta);
+
 
             UData u = null;
 
@@ -30460,7 +30596,7 @@ print(df2)
                 u = Data("dif_ww", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
             }
 
-            
+
         }
 
         [TestMethod]
@@ -30508,7 +30644,7 @@ print(df2)
             u = Data("y", 2004, "a"); _AssertHelperTwoDoubles(u.w, 9.2235d, epsilon);
             u = Data("y", 2005, "a"); _AssertHelperTwoDoubles(u.w, 5d, epsilon);
 
-        }        
+        }
 
         [TestMethod]
         public void _Test_ForwardLookingExhaustive()
@@ -30612,7 +30748,7 @@ print(df2)
                 }
             }
 
-            
+
         }
 
         [TestMethod]
@@ -30622,7 +30758,7 @@ print(df2)
             double e = 0.01d;
 
             List<double> dd = new List<double>() { 1.0d, 0.5d };  //other damping awaits conv.crits etc. (0.7 yields slightly different results)
-            foreach(double d in dd)
+            foreach (double d in dd)
             {
                 //-----------------------------
                 ForwardLookingHelper();  //sets up model and data from 1999-2030, sim period is 2000-2030
@@ -30679,7 +30815,7 @@ print(df2)
             }
             //Should give same result as "terminal exo" with repeated sims
             ForwardLookingHelperAssertExo(u, e);  //asserts
-            //-----------------------------
+                                                  //-----------------------------
             ForwardLookingHelper();  //sets up model and data from 1999-2030, sim period is 2000-2030
             I("OPTION solve forward method = none;");
             FAIL("SIM<2000 2030>;");
@@ -30886,7 +31022,7 @@ print(df2)
             //-----------------------------------------------------------
             //----- test STOP -----
             I("RESET;");
-            FAIL("RUN return1b;");            
+            FAIL("RUN return1b;");
             _AssertScalarString(First(), "%x", "abcd");
             //Assert.AreEqual(Assigns.GetAssign("x").string2, "abcd");
         }
@@ -30957,7 +31093,7 @@ print(df2)
                 u = Data("wn_h", 2010, "a"); Assert.AreEqual(u.q, 20.69d, 0.01d); //% PCIM says 20.59%
                 u = Data("wn_cf", 2010, "a"); Assert.AreEqual(u.q, -28.42d, 0.01d); //% PCIM says -28.43%
                 u = Data("wn_cr", 2010, "a"); Assert.AreEqual(u.q, 6.58d, 0.01d); //%
-                // ----- Problematic tests end ----------------------------------------------------------------
+                                                                                  // ----- Problematic tests end ----------------------------------------------------------------
 
                 //--- b3 ----
                 I("READ<tsd>lang10; ");
@@ -31050,7 +31186,7 @@ print(df2)
                 u = Data("lna", 2011, "a"); Assert.AreEqual(u.q, -0.38, 0.01);  //%
 
                 // e1
-                I("READ<tsd>lang10;" );
+                I("READ<tsd>lang10;");
                 I("RUN e1.cmd;");
                 I("TIME 2010 2010;");
                 I("PRT -200/fCe*1000;");
@@ -31537,7 +31673,7 @@ print(df2)
 "YSXtyc",
 "YSXpua",
 "YSXpub"
-            };
+};
             CheckFullDatabank(3d, double.NaN, 2010, 2020, ignore); //only checks absolute, must be < 3 absolute. Omits some Z-variables.
 
         }
@@ -31753,7 +31889,7 @@ print(df2)
                         }
                     }
                 }
-            Flag: ;
+            Flag:;
             }
         }
 

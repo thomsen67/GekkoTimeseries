@@ -20244,163 +20244,6 @@ namespace Gekko
         /// <returns></returns>
         public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
-            EFreq freq = EFreq.Q;
-
-            GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
-            GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
-
-            //if (!(Program.options.freq == EFreq.A))
-            //{
-            //    //G.Writeln();
-            //    new Error("Index functions only work for annual frequency at the moment");
-            //}
-
-            //if (indexYear.freq != EFreq.Q) new Error("The index period is of " + indexYear.freq.Pretty().ToLower() + " frequency, expected quarterly.");
-
-            //int indexYearI = -12345;
-            //int counter = -1;
-            //bool found = false;
-            //foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            //{
-            //    counter++;
-            //    if (t.EqualsGekkoTime(indexYear))
-            //    {
-            //        found = true;
-            //        indexYearI = counter;
-            //        break;
-            //    }
-            //}
-
-            //if (!found)
-            //{
-            //    new Error("with index period in Laspeyres function: seems outside time period");
-            //}
-
-            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
-            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
-
-            if (varsP.Count == 0 || varsX.Count == 0)
-            {
-                new Error("List with 0 elements not permitted");
-            }
-
-            if (varsP.Count != varsX.Count)
-            {
-                new Error("The lists should have same number of elements");
-            }
-
-            foreach (string s in varsP)
-            {
-                if (s.StartsWith("-"))
-                {
-                    new Error("'" + s + "': Please use subtraction in quantity list only");
-                }
-            }
-
-            //double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, freq);
-            //double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, freq);
-            
-            int obs = GekkoTime.Observations(tStart, tEnd);
-            //int obs2 = GekkoTime.Observations(tStart, indexYear);
-
-            //double[,] xx = new double[5, obs];
-
-            List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
-            List<SeriesAndBool> quarterlyQ = new List<SeriesAndBool>();
-            List<SeriesAndBool> quarterlyV = new List<SeriesAndBool>();
-            List<SeriesAndBool> quarterlyP_better_lag = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualP = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualQ = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualV = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualP_better = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualP_better_lag = new List<SeriesAndBool>();
-
-            for (int i = 0; i < varsP.Count; i++)
-            {
-                LaspeyresQCollapseHelper(freq, annualP, quarterlyP, varsP[i], null);
-                LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, varsX[i]);
-                LaspeyresQCollapseHelper(freq, annualV, quarterlyV, varsP[i], varsX[i]);
-                if (true)
-                {
-                    Series temp = new Series(EFreq.A, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
-                    {
-                        temp.SetData(t, annualV[i].ts.GetDataSimple(t) / annualQ[i].ts.GetDataSimple(t));
-                    }
-                    SeriesAndBool sab = new SeriesAndBool();
-                    sab.ts = temp;
-                    sab.b = false; //not used
-                    annualP_better.Add(sab);
-                }
-                if (true)
-                {
-                    Series temp = new Series(EFreq.A, null);
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
-                    {
-                        temp.SetData(t, annualP_better[i].ts.GetDataSimple(t.Add(-1)));
-                    }
-                    SeriesAndBool sab = new SeriesAndBool();
-                    sab.ts = temp;
-                    sab.b = false; //not used
-                    annualP_better_lag.Add(sab);
-                }
-                if (true)
-                {
-                    Series temp = new Series(EFreq.Q, null);
-                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, "repeat");
-                    SeriesAndBool sab = new SeriesAndBool();
-                    sab.ts = temp;
-                    sab.b = false; //not used
-                    quarterlyP_better_lag.Add(sab);
-                }
-            }            
-            
-            //using annualP_better instead of annualP, does it make sure the values sum up?
-            Map map = Laspeyres(function, null, null, annualP_better, annualQ, indexYear, tStart_annual, tEnd_annual) as Map;
-
-            //2021: plag should be 1
-            //2022: plag should be 1.0245  
-
-            Series p_annual = map.GetIVariable("p!a") as Series;
-            Series pLag_annual = new Series(EFreq.A, null);
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
-            {
-                pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
-            }
-            Series pLag = new Series(EFreq.Q, null);
-            Program.InterpolateHelper(pLag, pLag_annual, "repeat");            
-
-            Series p = new Series(freq, null);
-            Series q = new Series(freq, null);
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
-            {
-                //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q               
-                double y = 0d;
-                double v = 0d;
-                for (int i = 0; i < quarterlyP.Count; i++)
-                {
-                    double xx1 = quarterlyP[i].ts.GetDataSimple(t.Add(-1));
-                    double xx2 = quarterlyQ[i].ts.GetDataSimple(t);
-                    double xx3 = quarterlyP[i].ts.GetDataSimple(t);
-                    double xx4 = quarterlyQ[i].ts.GetDataSimple(t);
-                    double xx5 = quarterlyP_better_lag[i].ts.GetDataSimple(t);
-                    double xx6 = pLag.GetDataSimple(t);
-
-                    //double temp1= quarterlyP[i].ts.GetDataSimple(t.Add(-1)) * quarterlyQ[i].ts.GetDataSimple(t);
-                    //double temp2= quarterlyP[i].ts.GetDataSimple(t) * quarterlyQ[i].ts.GetDataSimple(t);
-
-                    //Series pLagi = new Series(EFreq.Q, null);
-                    //Program.InterpolateHelper(pLagi, pLag_annual, "repeat");
-
-                    v += xx3 * xx2;
-                    y += xx5 * xx2 / xx6;
-
-                }
-                //y = y / pLag.GetDataSimple(t);
-                q.SetData(t, y);
-                p.SetData(t, v / y);
-            }
-
             // --------------------- info start ---------------------------------------------------------------
             //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
             //følgende(her for to varer, bemærk at!a betyder år og!q kvartaler):
@@ -20420,30 +20263,143 @@ namespace Gekko
 
             //Vi kan nu beregne den aggregerede kvartalsmængde q!q som:
 
-            //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q
+            //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q   ===> nej, ikke [-1], den bruger også interpolate dér!
 
             //Jeg skal ikke kloge mig på dette udtryk.Men hvis man ganger nævneren over, smager det da helt
             //klart af ”foregående års priser” gange med ”indeværende års mængder”.
             //(Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
             // --------------------- info end -----------------------------------------------------------------
 
+            EFreq freq = EFreq.Q;
+
+            GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
+            GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
+            
+            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
+            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
+
+            if (varsP.Count == 0 || varsX.Count == 0)
+            {
+                new Error("List with 0 elements not permitted");
+            }
+
+            if (varsP.Count != varsX.Count)
+            {
+                new Error("The lists should have same number of elements");
+            }
+
+            foreach (string s in varsP)
+            {
+                if (s.StartsWith("-"))
+                {
+                    new Error("'" + s + "': Please use subtraction in quantity list only");
+                }
+            }            
+
+            List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyQ = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyV = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyP_better_lag = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualP = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualQ = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualV = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualP_better = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualP_better_lag = new List<SeriesAndBool>();
+
+            for (int i = 0; i < varsP.Count; i++)
+            {
+                LaspeyresQCollapseHelper(freq, annualP, quarterlyP, varsP[i], null);
+                LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, varsX[i]);
+                LaspeyresQCollapseHelper(freq, annualV, quarterlyV, varsP[i], varsX[i]);
+                if (true)
+                {
+                    //Just calculates annualP = annualV/annualQ.
+                    Series temp = new Series(EFreq.A, null);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                    {
+                        temp.SetData(t, annualV[i].ts.GetDataSimple(t) / annualQ[i].ts.GetDataSimple(t));
+                    }
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    annualP_better.Add(sab);
+                }
+                if (true)
+                {
+                    //Just calculates annualP_better_lag as annualP_better[-1]
+                    Series temp = new Series(EFreq.A, null);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                    {
+                        temp.SetData(t, annualP_better[i].ts.GetDataSimple(t.Add(-1)));
+                    }
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    annualP_better_lag.Add(sab);
+                }
+                if (true)
+                {
+                    //Interpolates from !a to !q, annualP_better_lag --> quarterlyP_better_lag.
+                    Series temp = new Series(EFreq.Q, null);
+                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, "repeat");
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    quarterlyP_better_lag.Add(sab);
+                }
+            }            
+            
+            //using annualP_better instead of annualP, does it make sure the values sum up?
+            Map map = Laspeyres(function, null, null, annualP_better, annualQ, indexYear, tStart_annual, tEnd_annual) as Map;
+
+            //Lags and interpolates the calculated Laspeyres price index into --> pLag!q
+            Series p_annual = map.GetIVariable("p!a") as Series;
+            Series pLag_annual = new Series(EFreq.A, null);
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+            {
+                pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
+            }
+            Series pLag = new Series(EFreq.Q, null);
+            Program.InterpolateHelper(pLag, pLag_annual, "repeat");            
+
+            Series p = new Series(freq, null);
+            Series q = new Series(freq, null);
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
+            {
+                //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q       ---> NOO!!        
+                double quantities = 0d;
+                double values = 0d;
+                for (int i = 0; i < quarterlyP.Count; i++)
+                {
+                    double sign = 1d;
+                    if (quarterlyQ[i].b) sign = -1d;
+                    values += sign * quarterlyP[i].ts.GetDataSimple(t) * quarterlyQ[i].ts.GetDataSimple(t);
+                    quantities += sign * quarterlyP_better_lag[i].ts.GetDataSimple(t) * quarterlyQ[i].ts.GetDataSimple(t) / pLag.GetDataSimple(t);
+                }
+                q.SetData(t, quantities);
+                p.SetData(t, values / quantities);
+            }           
+
             Map m = new Map();
             m.AddIVariable("p!q", p);
             m.AddIVariable("q!q", q);
             return m;
 
-            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, string sP, string sQ)
+            //local method
+            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, string sP, string sQ2)
             {
                 bool negative = false;
-                string var2 = sQ;
+                string sQ = sQ2;
                 if (sQ != null && sQ.StartsWith("-"))
                 {
-                    var2 = var2.Substring(1);
+                    sQ = sQ.Substring(1);
                     negative = true;
                 }
 
                 if (sP != null && sQ != null)
                 {
+                    //doing the product p*q
+
                     Series ts_lhs = new Series(EFreq.A, null);
                     Series ts_rhs1 = O.GetIVariableFromString(G.Chop_AddFreq(sP, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
                     Series ts_rhs2 = O.GetIVariableFromString(G.Chop_AddFreq(sQ, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
