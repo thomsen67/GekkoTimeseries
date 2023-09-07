@@ -30287,19 +30287,25 @@ print(df2)
             I("#p = p1, p2;");
             I("#q = q1, q2;");            
             I("#m = laspchainq(#p, #q, 2020, 'dst');");
-            I("prt #m.p, #m.q;");
-            Assert.Inconclusive();
-            //I("print #m.price, #m.quantity, #m.price_lag;");
+            I("p = #m.p; q = #m.q;");
 
+            _AssertSeries(First(), "p!q", EFreq.Q, 2021, 1, 1.0282d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2021, 2, 1.0686d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2021, 3, 1.0515d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2021, 4, 1.0366d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2022, 1, 1.0577d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2022, 2, 1.0322d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2022, 3, 1.0003d, sharedTableDelta);
+            _AssertSeries(First(), "p!q", EFreq.Q, 2022, 4, 1.0156d, sharedTableDelta);
 
-
-
-
-
-
-
-
-
+            _AssertSeries(First(), "q!q", EFreq.Q, 2021, 1, 54.3491d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2021, 2, 54.4261d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2021, 3, 61.9286d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2021, 4, 55.8727d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2022, 1, 51.3007d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2022, 2, 49.8752d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2022, 3, 58.8146d, sharedTableDelta);
+            _AssertSeries(First(), "q!q", EFreq.Q, 2022, 4, 52.8550d, sharedTableDelta);
 
             UData u = null;
 
