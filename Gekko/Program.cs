@@ -20308,25 +20308,51 @@ namespace Gekko
             List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
             List<SeriesAndBool> quarterlyQ = new List<SeriesAndBool>();
             List<SeriesAndBool> quarterlyV = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyP_better_lag = new List<SeriesAndBool>();
             List<SeriesAndBool> annualP = new List<SeriesAndBool>();
             List<SeriesAndBool> annualQ = new List<SeriesAndBool>();
             List<SeriesAndBool> annualV = new List<SeriesAndBool>();
             List<SeriesAndBool> annualP_better = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualP_better_lag = new List<SeriesAndBool>();
 
             for (int i = 0; i < varsP.Count; i++)
             {
                 LaspeyresQCollapseHelper(freq, annualP, quarterlyP, varsP[i], null);
                 LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, varsX[i]);
                 LaspeyresQCollapseHelper(freq, annualV, quarterlyV, varsP[i], varsX[i]);
-                Series temp = new Series(EFreq.A, null);
-                foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                if (true)
                 {
-                    temp.SetData(t, annualV[i].ts.GetDataSimple(t)/ annualQ[i].ts.GetDataSimple(t));
+                    Series temp = new Series(EFreq.A, null);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                    {
+                        temp.SetData(t, annualV[i].ts.GetDataSimple(t) / annualQ[i].ts.GetDataSimple(t));
+                    }
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    annualP_better.Add(sab);
                 }
-                SeriesAndBool sab = new SeriesAndBool();
-                sab.ts = temp;
-                sab.b = false; //not used
-                annualP_better.Add(sab);
+                if (true)
+                {
+                    Series temp = new Series(EFreq.A, null);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                    {
+                        temp.SetData(t, annualP_better[i].ts.GetDataSimple(t.Add(-1)));
+                    }
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    annualP_better_lag.Add(sab);
+                }
+                if (true)
+                {
+                    Series temp = new Series(EFreq.Q, null);
+                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, "repeat");
+                    SeriesAndBool sab = new SeriesAndBool();
+                    sab.ts = temp;
+                    sab.b = false; //not used
+                    quarterlyP_better_lag.Add(sab);
+                }
             }            
             
             //using annualP_better instead of annualP, does it make sure the values sum up?
@@ -20341,9 +20367,8 @@ namespace Gekko
             {
                 pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
             }
-
             Series pLag = new Series(EFreq.Q, null);
-            Program.InterpolateHelper(pLag, pLag_annual, "repeat");
+            Program.InterpolateHelper(pLag, pLag_annual, "repeat");            
 
             Series p = new Series(freq, null);
             Series q = new Series(freq, null);
@@ -20354,18 +20379,24 @@ namespace Gekko
                 double v = 0d;
                 for (int i = 0; i < quarterlyP.Count; i++)
                 {
-                    //double xx1 = quarterlyP[i].ts.GetDataSimple(t.Add(-1));
-                    //double xx2 = quarterlyQ[i].ts.GetDataSimple(t);
-                    //double xx3 = quarterlyP[i].ts.GetDataSimple(t);
-                    //double xx4 = quarterlyQ[i].ts.GetDataSimple(t);                    
+                    double xx1 = quarterlyP[i].ts.GetDataSimple(t.Add(-1));
+                    double xx2 = quarterlyQ[i].ts.GetDataSimple(t);
+                    double xx3 = quarterlyP[i].ts.GetDataSimple(t);
+                    double xx4 = quarterlyQ[i].ts.GetDataSimple(t);
+                    double xx5 = quarterlyP_better_lag[i].ts.GetDataSimple(t);
+                    double xx6 = pLag.GetDataSimple(t);
+
                     //double temp1= quarterlyP[i].ts.GetDataSimple(t.Add(-1)) * quarterlyQ[i].ts.GetDataSimple(t);
                     //double temp2= quarterlyP[i].ts.GetDataSimple(t) * quarterlyQ[i].ts.GetDataSimple(t);
 
-                    Series pLagi = new Series(EFreq.Q, null);
-                    Program.InterpolateHelper(pLagi, pLag_annual, "repeat");
+                    //Series pLagi = new Series(EFreq.Q, null);
+                    //Program.InterpolateHelper(pLagi, pLag_annual, "repeat");
+
+                    v += xx3 * xx2;
+                    y += xx5 * xx2 / xx6;
 
                 }
-                y = y / pLag.GetDataSimple(t);
+                //y = y / pLag.GetDataSimple(t);
                 q.SetData(t, y);
                 p.SetData(t, v / y);
             }
