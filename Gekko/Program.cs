@@ -20146,8 +20146,8 @@ namespace Gekko
             }
             else
             {
-                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list1_data, freq);
-                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list2_data, freq);
+                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list1_data, freq);
+                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list2_data, freq);                
             }
 
             int n = aX.GetLength(0);  //number of vars
@@ -20245,7 +20245,10 @@ namespace Gekko
         public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
             EFreq freq = EFreq.Q;
-            
+
+            GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
+            GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
+
             //if (!(Program.options.freq == EFreq.A))
             //{
             //    //G.Writeln();
@@ -20300,28 +20303,47 @@ namespace Gekko
             int obs = GekkoTime.Observations(tStart, tEnd);
             //int obs2 = GekkoTime.Observations(tStart, indexYear);
 
-            double[,] xx = new double[5, obs];
+            //double[,] xx = new double[5, obs];
 
             List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
-            List<SeriesAndBool> quarterlyX = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyQ = new List<SeriesAndBool>();
+            List<SeriesAndBool> quarterlyV = new List<SeriesAndBool>();
             List<SeriesAndBool> annualP = new List<SeriesAndBool>();
-            List<SeriesAndBool> annualX = new List<SeriesAndBool>();
-            foreach (string s in varsP)
-            {
-                Helper(freq, annualP, quarterlyP, s);
-            }
-            foreach (string s in varsX)
-            {
-                Helper(freq, annualX, quarterlyX, s);
-            }
+            List<SeriesAndBool> annualQ = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualV = new List<SeriesAndBool>();
+            List<SeriesAndBool> annualP_better = new List<SeriesAndBool>();
 
-            GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
-            GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
-            Map map = Laspeyres(function, null, null, annualP, annualX, indexYear, tStart_annual, tEnd_annual) as Map;
+            for (int i = 0; i < varsP.Count; i++)
+            {
+                LaspeyresQCollapseHelper(freq, annualP, quarterlyP, varsP[i], null);
+                LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, varsX[i]);
+                LaspeyresQCollapseHelper(freq, annualV, quarterlyV, varsP[i], varsX[i]);
+                Series temp = new Series(EFreq.A, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+                {
+                    temp.SetData(t, annualV[i].ts.GetDataSimple(t)/ annualQ[i].ts.GetDataSimple(t));
+                }
+                SeriesAndBool sab = new SeriesAndBool();
+                sab.ts = temp;
+                sab.b = false; //not used
+                annualP_better.Add(sab);
+            }            
+            
+            //using annualP_better instead of annualP, does it make sure the values sum up?
+            Map map = Laspeyres(function, null, null, annualP_better, annualQ, indexYear, tStart_annual, tEnd_annual) as Map;
+
+            //2021: plag should be 1
+            //2022: plag should be 1.0245  
+
+            Series p_annual = map.GetIVariable("p!a") as Series;
+            Series pLag_annual = new Series(EFreq.A, null);
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart_annual, tEnd_annual))
+            {
+                pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
+            }
 
             Series pLag = new Series(EFreq.Q, null);
-
-            Program.InterpolateHelper(pLag, map.GetIVariable("p!a") as Series, "repeat");
+            Program.InterpolateHelper(pLag, pLag_annual, "repeat");
 
             Series p = new Series(freq, null);
             Series q = new Series(freq, null);
@@ -20332,8 +20354,16 @@ namespace Gekko
                 double v = 0d;
                 for (int i = 0; i < quarterlyP.Count; i++)
                 {
-                    y += quarterlyP[i].ts.GetDataSimple(t.Add(-1)) * quarterlyX[i].ts.GetDataSimple(t);
-                    v += quarterlyP[i].ts.GetDataSimple(t) * quarterlyX[i].ts.GetDataSimple(t);
+                    //double xx1 = quarterlyP[i].ts.GetDataSimple(t.Add(-1));
+                    //double xx2 = quarterlyQ[i].ts.GetDataSimple(t);
+                    //double xx3 = quarterlyP[i].ts.GetDataSimple(t);
+                    //double xx4 = quarterlyQ[i].ts.GetDataSimple(t);                    
+                    //double temp1= quarterlyP[i].ts.GetDataSimple(t.Add(-1)) * quarterlyQ[i].ts.GetDataSimple(t);
+                    //double temp2= quarterlyP[i].ts.GetDataSimple(t) * quarterlyQ[i].ts.GetDataSimple(t);
+
+                    Series pLagi = new Series(EFreq.Q, null);
+                    Program.InterpolateHelper(pLagi, pLag_annual, "repeat");
+
                 }
                 y = y / pLag.GetDataSimple(t);
                 q.SetData(t, y);
@@ -20355,7 +20385,7 @@ namespace Gekko
             //Nu køres en almindelig Laspeyres-kæde(indbygget Gekko-funktion) på årsserierne p1!a, p2!a, q1!a
             //og q2!a.Dette giver aggregaterne p!a og q!a (der vil gælde, at p!a * q!a = p1!a * q1!a + p2!a*q2!a).
 
-            //Vi danner p_lag!a = p!a[-1]og interpolerer(repeat) p_lag!q ud fra p_lag!a.
+            //Vi danner p_lag!a = p!a[-1] og interpolerer(repeat) p_lag!q ud fra p_lag!a.
 
             //Vi kan nu beregne den aggregerede kvartalsmængde q!q som:
 
@@ -20371,30 +20401,65 @@ namespace Gekko
             m.AddIVariable("q!q", q);
             return m;
 
-            void Helper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, string s)
+            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, string sP, string sQ)
             {
                 bool negative = false;
-                string var2 = s;
-                if (s.StartsWith("-"))
+                string var2 = sQ;
+                if (sQ != null && sQ.StartsWith("-"))
                 {
                     var2 = var2.Substring(1);
                     negative = true;
                 }
-                Series ts_lhs = new Series(EFreq.A, null);
-                Series ts_rhs = O.GetIVariableFromString(G.Chop_AddFreq(s, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
-                CollapseHelper helper = new CollapseHelper();
-                helper.method = "avg";
-                CollapseHelper(ts_lhs, ts_rhs, helper);
 
-                SeriesAndBool sab1 = new SeriesAndBool();
-                sab1.ts = ts_rhs;
-                sab1.b = negative;
-                x.Add(sab1);
+                if (sP != null && sQ != null)
+                {
+                    Series ts_lhs = new Series(EFreq.A, null);
+                    Series ts_rhs1 = O.GetIVariableFromString(G.Chop_AddFreq(sP, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                    Series ts_rhs2 = O.GetIVariableFromString(G.Chop_AddFreq(sQ, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                    Series ts_rhs = new Series(EFreq.Q, null);
 
-                SeriesAndBool sab2 = new SeriesAndBool();
-                sab2.ts = ts_lhs;
-                sab2.b = negative;
-                x_annual.Add(sab2);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
+                    {
+                        ts_rhs.SetData(t, ts_rhs1.GetDataSimple(t) * ts_rhs2.GetDataSimple(t));
+                    }
+
+                    CollapseHelper helper = new CollapseHelper();
+                    helper.method = "avg";
+                    CollapseHelper(ts_lhs, ts_rhs, helper);
+                    // ---
+                    SeriesAndBool sab1 = new SeriesAndBool();
+                    sab1.ts = ts_rhs;
+                    sab1.b = negative;
+                    x.Add(sab1);
+                    // ---
+                    SeriesAndBool sab2 = new SeriesAndBool();
+                    sab2.ts = ts_lhs;
+                    sab2.b = negative;
+                    x_annual.Add(sab2);
+                }
+                else
+                {
+                    string s = null;
+                    if (sP != null) s = sP;
+                    else if (sQ != null) s = sQ;
+                    else throw new GekkoException();
+
+                    Series ts_lhs = new Series(EFreq.A, null);
+                    Series ts_rhs = O.GetIVariableFromString(G.Chop_AddFreq(s, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                    CollapseHelper helper = new CollapseHelper();
+                    helper.method = "avg";
+                    CollapseHelper(ts_lhs, ts_rhs, helper);
+                    // ---
+                    SeriesAndBool sab1 = new SeriesAndBool();
+                    sab1.ts = ts_rhs;
+                    sab1.b = negative;
+                    x.Add(sab1);
+                    // ---
+                    SeriesAndBool sab2 = new SeriesAndBool();
+                    sab2.ts = ts_lhs;
+                    sab2.b = negative;
+                    x_annual.Add(sab2);
+                }
             }
         }        
 
