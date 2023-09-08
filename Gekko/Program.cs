@@ -10887,17 +10887,17 @@ namespace Gekko
         /// <param name="tEnd"></param>
         /// <param name="vars_string"></param>
         /// <returns></returns>
-        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> vars_string, List<SeriesAndBool> vars_data, EFreq freq)
+        private static List<SeriesAndBool> PutTimeseriesIntoArrayPossiblyNegative1(GekkoTime tStart0, GekkoTime tEnd, List<string> vars_string, List<SeriesAndBool> vars_data, EFreq freq)
         {
             if (vars_string != null && vars_data != null) new Error("Series error");
-
-            List<SeriesAndBool> xvars = null;
+            
             if (vars_data != null)
             {
-                xvars = vars_data;
+                return vars_data;
             }
             else
             {
+                List<SeriesAndBool> xvars = null;
                 xvars = new List<SeriesAndBool>();
                 foreach (string var in vars_string)
                 {
@@ -10915,12 +10915,23 @@ namespace Gekko
                     x.b = negative;
                     xvars.Add(x);
                 }
+                return xvars;
             }
+        }
 
+        /// <summary>
+        /// Helper method for Laspeyres chain index method, cf. Laspeyres() method. Either called 
+        /// </summary>
+        /// <param name="tStart0"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="vars_string"></param>
+        /// <returns></returns>
+        private static double[,] PutTimeseriesIntoArrayPossiblyNegative2(GekkoTime tStart0, GekkoTime tEnd, List<SeriesAndBool> vars_data, EFreq freq)
+        {            
             int obs = GekkoTime.Observations(tStart0, tEnd);
-            double[,] aX = new double[xvars.Count, obs];
+            double[,] aX = new double[vars_data.Count, obs];
             int id = -1;
-            foreach(SeriesAndBool sab in xvars)
+            foreach (SeriesAndBool sab in vars_data)
             {
                 id++;
                 int length = -12345;
@@ -20113,7 +20124,7 @@ namespace Gekko
             if (!found)
             {
                 new Error("with index year in Laspeyres function: seems outside time period");
-            }
+            }            
 
             double[,] aX = null;
             double[,] aP = null;
@@ -20121,12 +20132,13 @@ namespace Gekko
             if (list1 != null)
             {
                 //Normal list with string names
-                //
-                List<string> varsP = null;
-                List<string> varsX = null;
-
-                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, freq);
-                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, freq);
+                //                
+                List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
+                List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
+                List<SeriesAndBool> tempP = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsP, null, freq);
+                List<SeriesAndBool> tempX = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsX, null, freq);
+                aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempP, freq);
+                aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempX, freq);                
 
                 if (varsP.Count == 0 || varsX.Count == 0)
                 {
@@ -20149,8 +20161,8 @@ namespace Gekko
             else
             {
                 //Lists with series objects, not string names
-                aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list1_data, freq);
-                aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list2_data, freq);                
+                aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list1_data, freq);
+                aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, list2_data, freq);                
             }
 
             int n = aX.GetLength(0);  //number of vars
