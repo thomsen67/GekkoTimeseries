@@ -20088,8 +20088,9 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
-        {
+        public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
+        {                  
+
             EFreq freq = EFreq.A;
 
             if (list1 != null && list1_data != null) new Error("Series error");
@@ -20119,10 +20120,11 @@ namespace Gekko
 
             if (list1 != null)
             {
+                //Normal list with string names
+                //
                 List<string> varsP = null;
                 List<string> varsX = null;
-                varsP = Stringlist.GetListOfStringsFromList((List)list1);
-                varsX = Stringlist.GetListOfStringsFromList((List)list2);
+
                 aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX, null, freq);
                 aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP, null, freq);
 
@@ -20146,6 +20148,7 @@ namespace Gekko
             }
             else
             {
+                //Lists with series objects, not string names
                 aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list1_data, freq);
                 aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, null, list2_data, freq);                
             }
@@ -20242,8 +20245,10 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
+        public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, List<SeriesAndBool> list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
+            //list1_data and list2_data are not used here
+            
             // --------------------- info start ---------------------------------------------------------------
             //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
             //følgende(her for to varer, bemærk at!a betyder år og!q kvartaler):
@@ -20350,7 +20355,7 @@ namespace Gekko
             }            
             
             //using annualP_better instead of annualP, does it make sure the values sum up?
-            Map map = Laspeyres(function, null, null, annualP_better, annualQ, indexYear, tStart_annual, tEnd_annual) as Map;
+            Map map = Laspeyres(function, null, null, annualP_better, annualQ, indexYear, options, tStart_annual, tEnd_annual) as Map;
 
             //Lags and interpolates the calculated Laspeyres price index into --> pLag!q
             Series p_annual = map.GetIVariable("p!a") as Series;

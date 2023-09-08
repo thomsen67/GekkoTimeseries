@@ -30398,7 +30398,7 @@ print(df2)
             I("q2 = 27, 25, 27, 24,              23, 25, 27, 24,              22, 22, 25, 23;");
             I("#p = p1, p2;");
             I("#q = q1, q2;");
-            I("#m = laspchainq(#p, #q, 2020, 'dst');");
+            I("#m = laspchain(#p, #q, 2020, 'dst');");
             I("p = #m.p; q = #m.q;");
 
             _AssertSeries(First(), "p!q", EFreq.Q, 2021, 1, 1.0282d, sharedTableDelta);
@@ -30421,7 +30421,7 @@ print(df2)
 
             I("#p_ = p1, p2;");
             I("#q_ = -q1, q2;");
-            I("#m_ = laspchainq(#p_, #q_, 2020, 'dst');");
+            I("#m_ = laspchain(#p_, #q_, 2020, 'dst');");
             I("p_ = #m_.p; q_ = #m_.q;");
 
             _AssertSeries(First(), "p_!q", EFreq.Q, 2021, 1, 1.1553d, sharedTableDelta);
