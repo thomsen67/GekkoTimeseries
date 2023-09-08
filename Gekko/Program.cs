@@ -20100,9 +20100,46 @@ namespace Gekko
         /// <param name="tEnd"></param>
         /// <returns></returns>
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, List<SeriesAndBool>list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
-        {                  
+        {
+            EFreq freq = EFreq.None;
 
-            EFreq freq = EFreq.A;
+            List<string> varsP = null;
+            List<string> varsX = null;
+            List<SeriesAndBool> tempP = null;
+            List<SeriesAndBool> tempX = null;
+
+            if (list1 != null)
+            {
+                //string list input
+                varsP = Stringlist.GetListOfStringsFromList((List)list1);
+                varsX = Stringlist.GetListOfStringsFromList((List)list2);
+                tempP = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsP, null, Program.options.freq);
+                tempX = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsX, null, Program.options.freq);
+                //EFreq freq2 = EFreq.None;
+                foreach (SeriesAndBool sab in tempP)
+                {
+                    if (freq == EFreq.None)
+                    {
+                        freq = sab.ts.freq;
+                    }
+                    else
+                    {
+                        if (freq != sab.ts.freq)
+                        {
+                            new Error("Frequency mismatch: " + freq.Pretty() + " vs. " + sab.ts.freq.Pretty());
+                        }
+                    }
+                }
+                if (freq == EFreq.A)
+                {
+                    //good, continue
+                }
+                else if (freq == EFreq.Q)
+                {
+                    return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
+                }
+                else new Error("Only A and Q freq supported.");
+            }
 
             if (list1 != null && list1_data != null) new Error("Series error");
             if (list2 != null && list2_data != null) new Error("Series error");
@@ -20132,11 +20169,7 @@ namespace Gekko
             if (list1 != null)
             {
                 //Normal list with string names
-                //                
-                List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
-                List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
-                List<SeriesAndBool> tempP = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsP, null, freq);
-                List<SeriesAndBool> tempX = PutTimeseriesIntoArrayPossiblyNegative1(tStart, tEnd, varsX, null, freq);
+                //                                
                 aP = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempP, freq);
                 aX = PutTimeseriesIntoArrayPossiblyNegative2(tStart, tEnd, tempX, freq);                
 
@@ -20257,7 +20290,7 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, List<SeriesAndBool> list1_data, List<SeriesAndBool> list2_data, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
+        public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, List<SeriesAndBool> varsP, List<SeriesAndBool> varsX, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
             //list1_data and list2_data are not used here
             
@@ -20292,26 +20325,26 @@ namespace Gekko
             GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
             GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
             
-            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
-            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
+            //List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
+            //List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
 
-            if (varsP.Count == 0 || varsX.Count == 0)
-            {
-                new Error("List with 0 elements not permitted");
-            }
+            //if (varsP.Count == 0 || varsX.Count == 0)
+            //{
+            //    new Error("List with 0 elements not permitted");
+            //}
 
-            if (varsP.Count != varsX.Count)
-            {
-                new Error("The lists should have same number of elements");
-            }
+            //if (varsP.Count != varsX.Count)
+            //{
+            //    new Error("The lists should have same number of elements");
+            //}
 
-            foreach (string s in varsP)
-            {
-                if (s.StartsWith("-"))
-                {
-                    new Error("'" + s + "': Please use subtraction in quantity list only");
-                }
-            }            
+            //foreach (string s in varsP)
+            //{
+            //    if (s.StartsWith("-"))
+            //    {
+            //        new Error("'" + s + "': Please use subtraction in quantity list only");
+            //    }
+            //}            
 
             List<SeriesAndBool> quarterlyP = new List<SeriesAndBool>();
             List<SeriesAndBool> quarterlyQ = new List<SeriesAndBool>();
