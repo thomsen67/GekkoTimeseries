@@ -30246,160 +30246,12 @@ print(df2)
 
         [TestMethod]
         public void _Test_PriceIndexFunctions()
-        {            
+        {
 
-            UData u = null;
 
-            //testing chain index
-            I("RESET; MODE data;");  //data mode, because we test searching in banks
-            I("TIME 90 2002;");
-            I("CREATE pibp, pibo, pibh, fibp, fibo, fibh, pib, fib;");
-            //from dec09 databank
-            I("SERIES <1998 2002> pibp = data(' 0.948133  0.971452  1.000000  1.041416  1.064057');");
-            I("SERIES <1998 2002> pibo = data(' 0.933059  0.969186  1.000000  1.040763  1.065663');");
-            I("SERIES <1998 2002> pibh = data(' 0.950284  0.988645  1.000000  1.041834  1.065160');");
-            I("SERIES <1998 2002> fIbp = data(' 57576.828125  52771.550781  54661.460938  55727.980469  51411.250000');");
-            I("SERIES <1998 2002> fIbo = data(' 11918.860352  11847.049805  12981.000000  14474.000000  13855.219727');");
-            I("SERIES <1998 2002> fIbh = data(' 53102.210938  55394.871094  61085.609375  55432.808594  55892.488281');");
-            I("SERIES <1998 2002> pib = data(' 0.947841  0.979390  1.000000  1.041533  1.064828');");
-            I("SERIES <1998 2002> fIb = data(' 122568.000000  119988.000000  128727.000000  125635.000000  121152.000000');");
-            I("list #p= pibp, pibo, pibh;");
-            I("list #x=fIbp, fIbo, work:fIbh;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#p, #x, 2000);");
-            //TODO TODO TODO
-            //TODO TODO TODO
-            //TODO TODO TODO  think about how to indicate time in tuples
-            //TODO TODO TODO
-            //TODO TODO TODO
-            I("OPEN<edit>temp;");
-            I("TIME 98 2002;");
-            //I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
-            I("MAP #m = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
-            I("xx_p = #m.p;");
-            I("xx_x = #m.q;");
-            I("COPY temp:xx_p TO work:xx_p;");
-            I("COPY temp:xx_x TO work:xx_x;");
-            I("CLOSE temp;");
-            I("CREATE dif_p, dif_x;");
-            I("SERIES dif_p = pib/xx_p;");
-            I("SERIES dif_x = fib/xx_x;");
-            for (int i = 1998; i <= 2002; i++)
-            {
-                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);
-            }
 
-            // ------------------------------------------------------
-            // ------------------------------------------------------
-            // ------------------------------------------------------
 
-            I("RESET;");
-            I("TIME 98 2002;");
-            I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
-            I("create fy, py;");
-            //from dec09 databank
-            I("SERIES <1998 2002> pcp = data(' 0.955412  0.973540  1.000000  1.023497  1.040734');");
-            I("SERIES <1998 2002> pco = data(' 0.960245  0.982991  1.000000  1.033200  1.062184')  ;");
-            I("SERIES <1998 2002> pim =  data('1.010228  0.999511  1.000000  1.009896  1.023762')  ;");
-            I("SERIES <1998 2002> pib =  data('0.947841  0.979390  1.000000  1.041533  1.064828')  ;");
-            I("SERIES <1998 2002> pit =  data('0.779661  0.690265  1.000000  1.166667  2.833333')  ;");
-            I("SERIES <1998 2002> pil =  data('0.486864  0.754511  1.000000  0.841816  0.802019')  ;");
-            I("SERIES <1998 2002> pm =  data('0.937313  0.932782  1.000000  1.015045  0.989444')  ;");
-            I("SERIES <1998 2002> pe =  data('0.928665  0.924367  1.000000  1.015529  1.002082')  ;");
-            I("SERIES <1998 2002> fCp =  data('617837.187500  615416.000000  616682.187500  617185.312500  626727.312500 ') ;");
-            I("SERIES <1998 2002> fCo =  data('310454.000000  317775.000000  325099.000000  332233.000000  339124.000000 ') ;");
-            I("SERIES <1998 2002> fIm =  data('122378.296875  124763.000000  134033.000000  133691.000000  138563.500000 ') ;");
-            I("SERIES <1998 2002> fIb =  data('122568.000000  119988.000000  128727.000000  125635.000000  121152.000000 ') ;");
-            I("SERIES <1998 2002> fIt =  data('118.000000  113.000000  120.000000  -18.000000  -6.000000 ') ;");
-            I("SERIES <1998 2002> fIl =  data('22000.000000  -2106.000000  11204.000000  7289.000000  11592.000000 ') ;");
-            I("SERIES <1998 2002> fM =  data('448199.312500  463879.406250  524253.187500  534168.875000  574250.625000 ') ;");
-            I("SERIES <1998 2002> fE =  data('478868.906250  534380.875000  602351.125000  621238.312500  646970.000000 ') ;");
-            I("SERIES <1998 2002> py =  data('0.954835  0.970887  1.000000  1.024961  1.048567 ') ;");
-            I("SERIES <1998 2002> fY =  data('1218658.000000  1249862.000000  1293965.000000  1303086.000000  1309156.000000 ') ;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#pris, #mgd, 2000);");
 
-            I("TIME 98 2002;");
-
-            I("MAP #m = laspchain(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
-            I("xx_p = #m.p;");
-            I("xx_x = #m.q;");
-
-            I("CREATE dif_p, dif_x;");
-            I("SERIES dif_p = py/xx_p;");
-            I("SERIES dif_x = fy/xx_x;");
-            for (int i = 1998; i <= 2002; i++)
-            {
-                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
-            }
-
-            // ------------------------------------------------------
-            // ------------------------------------------------------
-            // ------------------------------------------------------
-
-            //Testing fixed base index
-            I("RESET;");
-            I("TIME 98 2002;");
-            I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
-            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
-            I("create fy, py;");
-            //from jul05 databank
-            I("SERIES <1998 2002> pcp = data(' 0.950203  0.969992  1.000000  1.023500  1.040110 ') ;");
-            I("SERIES <1998 2002> pco = data(' 0.950436  0.975481  1.000000  1.033200  1.060210 ') ;");
-            I("SERIES <1998 2002> pim = data(' 1.001860  1.002600  1.000010  1.009900  1.022520 ') ;");
-            I("SERIES <1998 2002> pib = data(' 0.944726  0.980369  1.000010  1.041530  1.063590 ') ;");
-            I("SERIES <1998 2002> pit = data(' 0.828829  1.040000  1.000000  1.199870  1.795900 ') ;");
-            I("SERIES <1998 2002> pil = data(' 0.706035  -1.297190  1.000000  0.841789  0.849201 ') ;");
-            I("SERIES <1998 2002> pm = data(' 0.925393  0.929556  1.000000  1.015050  0.984646 ') ;");
-            I("SERIES <1998 2002> pe =  data('0.933015  0.923524  1.000000  1.015530  0.997510 ') ;");
-            I("SERIES <1998 2002> fCp = data(' 621224.000000  617668.000000  616682.000000  617185.000000  627102.000000 ') ;");
-            I("SERIES <1998 2002> fCo = data(' 313658.000000  320221.000000  325099.000000  332233.000000  339755.000000 ') ;");
-            I("SERIES <1998 2002> fIm = data(' 123407.000000  124370.000000  134033.000000  133691.000000  138730.000000 ') ;");
-            I("SERIES <1998 2002> fIb = data(' 122971.000000  119872.000000  128727.000000  125635.000000  121293.000000 ') ;");
-            I("SERIES <1998 2002> fIt = data(' 111.000000  75.000000  120.000000  -17.611000  -9.324000 ') ;");
-            I("SERIES <1998 2002> fIl = data(' 15171.300000  1224.990000  11204.500000  7288.880000  10947.500000 ') ;");
-            I("SERIES <1998 2002> fM = data(' 453972.000000  465489.000000  524253.000000  534168.000000  577049.000000 ') ;");
-            I("SERIES <1998 2002> fE = data(' 476637.000000  534869.000000  602351.000000  621238.000000  649935.000000 ') ;");
-            I("SERIES <1998 2002> fY = data(' 1219210.000000  1252810.000000  1293960.000000  1303080.000000  1310700.000000 ') ;");
-            I("SERIES <1998 2002> py = data(' 0.954403  0.968600  1.000000  1.024960  1.047330');");
-
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspfixed(#pris, #mgd, 2000);");
-
-            I("MAP #m = laspfixed(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
-            I("xx_p = #m.p;");
-            I("xx_x = #m.q;");
-
-            I("TIME 98 2002;");
-            //I("(series xx_p, series xx_x) = laspfixed(#pris, #mgd, 2000);");
-            I("CREATE dif_p, dif_x;");
-            I("SERIES dif_p = py/xx_p;");
-            I("SERIES dif_x = fy/xx_x;");
-            for (int i = 1998; i <= 2002; i++)
-            {
-                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
-            }
-
-            // ----------- not using explicit map
-
-            I("zz_x = laspfixed(#pris, #mgd, 2000).q;");  //direct pick out of .q field.
-            I("SERIES dif_zz = fy/zz_x;");
-            for (int i = 1998; i <= 2002; i++)
-            {
-                u = Data("dif_zz", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
-            }
-
-            // ----------- direct use of strings
-
-            I("ww_x = laspfixed(('pcp', 'pco', 'pim', 'pib', 'pit', 'pil', 'pm', 'pE'), ('fCp', 'fCo', 'fIm', 'fIb', 'fIt', 'fIl', '-fM', 'fE'), 2000).q;");  //direct pick out of .q field.
-            I("SERIES dif_ww = fy/ww_x;");
-            for (int i = 1998; i <= 2002; i++)
-            {
-                u = Data("dif_ww", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
-            }
 
 
             // Quarterly
@@ -30595,6 +30447,168 @@ print(df2)
             _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 2, 17.1273d, sharedTableDelta);
             _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 3, 17.4848d, sharedTableDelta);
             _AssertSeries(First(), "q_!q", EFreq.Q, 2022, 4, 17.2464d, sharedTableDelta);
+
+
+
+
+
+
+
+
+
+            UData u = null;
+
+            //testing chain index
+            I("RESET; MODE data;");  //data mode, because we test searching in banks
+            I("TIME 90 2002;");
+            I("CREATE pibp, pibo, pibh, fibp, fibo, fibh, pib, fib;");
+            //from dec09 databank
+            I("SERIES <1998 2002> pibp = data(' 0.948133  0.971452  1.000000  1.041416  1.064057');");
+            I("SERIES <1998 2002> pibo = data(' 0.933059  0.969186  1.000000  1.040763  1.065663');");
+            I("SERIES <1998 2002> pibh = data(' 0.950284  0.988645  1.000000  1.041834  1.065160');");
+            I("SERIES <1998 2002> fIbp = data(' 57576.828125  52771.550781  54661.460938  55727.980469  51411.250000');");
+            I("SERIES <1998 2002> fIbo = data(' 11918.860352  11847.049805  12981.000000  14474.000000  13855.219727');");
+            I("SERIES <1998 2002> fIbh = data(' 53102.210938  55394.871094  61085.609375  55432.808594  55892.488281');");
+            I("SERIES <1998 2002> pib = data(' 0.947841  0.979390  1.000000  1.041533  1.064828');");
+            I("SERIES <1998 2002> fIb = data(' 122568.000000  119988.000000  128727.000000  125635.000000  121152.000000');");
+            I("list #p= pibp, pibo, pibh;");
+            I("list #x=fIbp, fIbo, work:fIbh;");
+            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#p, #x, 2000);");
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO  think about how to indicate time in tuples
+            //TODO TODO TODO
+            //TODO TODO TODO
+            I("OPEN<edit>temp;");
+            I("TIME 98 2002;");
+            //I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("MAP #m = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("xx_p = #m.p;");
+            I("xx_x = #m.q;");
+            I("COPY temp:xx_p TO work:xx_p;");
+            I("COPY temp:xx_x TO work:xx_x;");
+            I("CLOSE temp;");
+            I("CREATE dif_p, dif_x;");
+            I("SERIES dif_p = pib/xx_p;");
+            I("SERIES dif_x = fib/xx_x;");
+            for (int i = 1998; i <= 2002; i++)
+            {
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);
+            }
+
+            // ------------------------------------------------------
+            // ------------------------------------------------------
+            // ------------------------------------------------------
+
+            I("RESET;");
+            I("TIME 98 2002;");
+            I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
+            I("create fy, py;");
+            //from dec09 databank
+            I("SERIES <1998 2002> pcp = data(' 0.955412  0.973540  1.000000  1.023497  1.040734');");
+            I("SERIES <1998 2002> pco = data(' 0.960245  0.982991  1.000000  1.033200  1.062184')  ;");
+            I("SERIES <1998 2002> pim =  data('1.010228  0.999511  1.000000  1.009896  1.023762')  ;");
+            I("SERIES <1998 2002> pib =  data('0.947841  0.979390  1.000000  1.041533  1.064828')  ;");
+            I("SERIES <1998 2002> pit =  data('0.779661  0.690265  1.000000  1.166667  2.833333')  ;");
+            I("SERIES <1998 2002> pil =  data('0.486864  0.754511  1.000000  0.841816  0.802019')  ;");
+            I("SERIES <1998 2002> pm =  data('0.937313  0.932782  1.000000  1.015045  0.989444')  ;");
+            I("SERIES <1998 2002> pe =  data('0.928665  0.924367  1.000000  1.015529  1.002082')  ;");
+            I("SERIES <1998 2002> fCp =  data('617837.187500  615416.000000  616682.187500  617185.312500  626727.312500 ') ;");
+            I("SERIES <1998 2002> fCo =  data('310454.000000  317775.000000  325099.000000  332233.000000  339124.000000 ') ;");
+            I("SERIES <1998 2002> fIm =  data('122378.296875  124763.000000  134033.000000  133691.000000  138563.500000 ') ;");
+            I("SERIES <1998 2002> fIb =  data('122568.000000  119988.000000  128727.000000  125635.000000  121152.000000 ') ;");
+            I("SERIES <1998 2002> fIt =  data('118.000000  113.000000  120.000000  -18.000000  -6.000000 ') ;");
+            I("SERIES <1998 2002> fIl =  data('22000.000000  -2106.000000  11204.000000  7289.000000  11592.000000 ') ;");
+            I("SERIES <1998 2002> fM =  data('448199.312500  463879.406250  524253.187500  534168.875000  574250.625000 ') ;");
+            I("SERIES <1998 2002> fE =  data('478868.906250  534380.875000  602351.125000  621238.312500  646970.000000 ') ;");
+            I("SERIES <1998 2002> py =  data('0.954835  0.970887  1.000000  1.024961  1.048567 ') ;");
+            I("SERIES <1998 2002> fY =  data('1218658.000000  1249862.000000  1293965.000000  1303086.000000  1309156.000000 ') ;");
+            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#pris, #mgd, 2000);");
+
+            I("TIME 98 2002;");
+
+            I("MAP #m = laspchain(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("xx_p = #m.p;");
+            I("xx_x = #m.q;");
+
+            I("CREATE dif_p, dif_x;");
+            I("SERIES dif_p = py/xx_p;");
+            I("SERIES dif_x = fy/xx_x;");
+            for (int i = 1998; i <= 2002; i++)
+            {
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+            }
+
+            // ------------------------------------------------------
+            // ------------------------------------------------------
+            // ------------------------------------------------------
+
+            //Testing fixed base index
+            I("RESET;");
+            I("TIME 98 2002;");
+            I("list #pris = pcp, pco, pim, pib, pit, pil, pm, pE ;");
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, fM, fE ;");
+            I("list #mgd = fCp, fCo, fIm, fIb, fIt, fIl, -fM, fE ;");  //fM is subtracted in fY definition
+            I("create fy, py;");
+            //from jul05 databank
+            I("SERIES <1998 2002> pcp = data(' 0.950203  0.969992  1.000000  1.023500  1.040110 ') ;");
+            I("SERIES <1998 2002> pco = data(' 0.950436  0.975481  1.000000  1.033200  1.060210 ') ;");
+            I("SERIES <1998 2002> pim = data(' 1.001860  1.002600  1.000010  1.009900  1.022520 ') ;");
+            I("SERIES <1998 2002> pib = data(' 0.944726  0.980369  1.000010  1.041530  1.063590 ') ;");
+            I("SERIES <1998 2002> pit = data(' 0.828829  1.040000  1.000000  1.199870  1.795900 ') ;");
+            I("SERIES <1998 2002> pil = data(' 0.706035  -1.297190  1.000000  0.841789  0.849201 ') ;");
+            I("SERIES <1998 2002> pm = data(' 0.925393  0.929556  1.000000  1.015050  0.984646 ') ;");
+            I("SERIES <1998 2002> pe =  data('0.933015  0.923524  1.000000  1.015530  0.997510 ') ;");
+            I("SERIES <1998 2002> fCp = data(' 621224.000000  617668.000000  616682.000000  617185.000000  627102.000000 ') ;");
+            I("SERIES <1998 2002> fCo = data(' 313658.000000  320221.000000  325099.000000  332233.000000  339755.000000 ') ;");
+            I("SERIES <1998 2002> fIm = data(' 123407.000000  124370.000000  134033.000000  133691.000000  138730.000000 ') ;");
+            I("SERIES <1998 2002> fIb = data(' 122971.000000  119872.000000  128727.000000  125635.000000  121293.000000 ') ;");
+            I("SERIES <1998 2002> fIt = data(' 111.000000  75.000000  120.000000  -17.611000  -9.324000 ') ;");
+            I("SERIES <1998 2002> fIl = data(' 15171.300000  1224.990000  11204.500000  7288.880000  10947.500000 ') ;");
+            I("SERIES <1998 2002> fM = data(' 453972.000000  465489.000000  524253.000000  534168.000000  577049.000000 ') ;");
+            I("SERIES <1998 2002> fE = data(' 476637.000000  534869.000000  602351.000000  621238.000000  649935.000000 ') ;");
+            I("SERIES <1998 2002> fY = data(' 1219210.000000  1252810.000000  1293960.000000  1303080.000000  1310700.000000 ') ;");
+            I("SERIES <1998 2002> py = data(' 0.954403  0.968600  1.000000  1.024960  1.047330');");
+
+            //I("SERIES <98 2002> (xx_p, xx_x) = laspfixed(#pris, #mgd, 2000);");
+
+            I("MAP #m = laspfixed(#pris, #mgd, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("xx_p = #m.p;");
+            I("xx_x = #m.q;");
+
+            I("TIME 98 2002;");
+            //I("(series xx_p, series xx_x) = laspfixed(#pris, #mgd, 2000);");
+            I("CREATE dif_p, dif_x;");
+            I("SERIES dif_p = py/xx_p;");
+            I("SERIES dif_x = fy/xx_x;");
+            for (int i = 1998; i <= 2002; i++)
+            {
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+            }
+
+            // ----------- not using explicit map
+
+            I("zz_x = laspfixed(#pris, #mgd, 2000).q;");  //direct pick out of .q field.
+            I("SERIES dif_zz = fy/zz_x;");
+            for (int i = 1998; i <= 2002; i++)
+            {
+                u = Data("dif_zz", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+            }
+
+            // ----------- direct use of strings
+
+            I("ww_x = laspfixed(('pcp', 'pco', 'pim', 'pib', 'pit', 'pil', 'pm', 'pE'), ('fCp', 'fCo', 'fIm', 'fIb', 'fIt', 'fIl', '-fM', 'fE'), 2000).q;");  //direct pick out of .q field.
+            I("SERIES dif_ww = fy/ww_x;");
+            for (int i = 1998; i <= 2002; i++)
+            {
+                u = Data("dif_ww", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+            }
+
 
 
         }
