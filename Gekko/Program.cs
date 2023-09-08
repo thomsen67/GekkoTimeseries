@@ -20294,31 +20294,29 @@ namespace Gekko
         public static IVariable LaspeyresQ(string function, IVariable list1, IVariable list2, List<SeriesAndBool> varsP, List<SeriesAndBool> varsQ, GekkoTime indexYear, IVariable options, GekkoTime tStart, GekkoTime tEnd)
         {
             //list1_data and list2_data are not used here
-            
+
             // --------------------- info start ---------------------------------------------------------------
-            //Jeg har prøvet at læse Nationalbankens kvartals - kædeindeks - program.Så vidt jeg kan se, gør det
-            //følgende(her for to varer, bemærk at!a betyder år og!q kvartaler):
+            // Taken from Central Bank Gekko function (Morten Werner):
 
-            //Lad p1!q og p2!q være to serier med kvartalspriser.
-            //Lad q1!q og q2!q være to serier med kvartalsmængder.
+            //p1!q and p2!q are two !q prices
+            //q1!q and q2!q are two !q quantities
 
-            //Alle collapses(gennemsnit), så vi får:
+            //All are collapsed with avg:
 
-            //p1!a og p2!a er serier med årspriser.
-            //q1!a og q2!a er serier med årsmængder.
+            //p1!a and p2!a are two !a prices
+            //q1!a and q2!a are two !a quantities
 
-            //Nu køres en almindelig Laspeyres-kæde(indbygget Gekko-funktion) på årsserierne p1!a, p2!a, q1!a
-            //og q2!a.Dette giver aggregaterne p!a og q!a (der vil gælde, at p!a * q!a = p1!a * q1!a + p2!a*q2!a).
+            //Do p1_lag!a = p1!a[-1], and interpolate with repeat p1_lag!q from p1_lag!a.
+            //Do p2_lag!a = p2!a[-1], and interpolate with repeat p2_lag!q from p2_lag!a.
 
-            //Vi danner p_lag!a = p!a[-1] og interpolerer(repeat) p_lag!q ud fra p_lag!a.
+            //We run a normal laspchain() on these annual data
+            //Do p_lag!a = p!a[-1], and interpolate with repeat p_lag!q from p_lag!a.
 
-            //Vi kan nu beregne den aggregerede kvartalsmængde q!q som:
+            //Now calc q!q:
 
-            //q!q = (p1!q[-1] * q1!q + p2!q[-1] * q2!q) / p_lag!q   ===> nej, ikke [-1], den bruger også interpolate dér!
+            //q!q = (p1_lag!q * q1!q + p2_lag!q * q2!q) / p_lag!q
+            //p!q is given from p!q*q!q = p1!q*q1!q + p2!q*q2!q
 
-            //Jeg skal ikke kloge mig på dette udtryk.Men hvis man ganger nævneren over, smager det da helt
-            //klart af ”foregående års priser” gange med ”indeværende års mængder”.
-            //(Ud fra q!q kan p!q nemt beregnes ud fra p!q* q!q = p1!q* q1!q + p2!q* q2!q).
             // --------------------- info end -----------------------------------------------------------------
 
             EFreq freq = EFreq.Q;
@@ -20340,7 +20338,7 @@ namespace Gekko
                 LaspeyresQCollapseHelper(freq, annualP, quarterlyP, null, i);
                 LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, i);
                 LaspeyresQCollapseHelper(freq, annualV, quarterlyP, quarterlyQ, i);
-                if (true)
+                
                 {
                     //Just calculates annualP = annualV/annualQ.
                     Series temp = new Series(EFreq.A, null);
@@ -20353,7 +20351,7 @@ namespace Gekko
                     sab.b = false; //not used
                     annualP_better.Add(sab);
                 }
-                if (true)
+                
                 {
                     //Just calculates annualP_better_lag as annualP_better[-1]
                     Series temp = new Series(EFreq.A, null);
@@ -20366,7 +20364,7 @@ namespace Gekko
                     sab.b = false; //not used
                     annualP_better_lag.Add(sab);
                 }
-                if (true)
+                
                 {
                     //Interpolates from !a to !q, annualP_better_lag --> quarterlyP_better_lag.
                     Series temp = new Series(EFreq.Q, null);
