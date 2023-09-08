@@ -20326,10 +20326,8 @@ namespace Gekko
             GekkoTime tStart_annual = GekkoTime.ConvertFreqsFirst(EFreq.A, tStart, null);
             GekkoTime tEnd_annual = GekkoTime.ConvertFreqsLast(EFreq.A, tEnd);
 
-
             List<SeriesAndBool> quarterlyP = varsP;
             List<SeriesAndBool> quarterlyQ = varsQ;
-            List<SeriesAndBool> quarterlyV = new List<SeriesAndBool>();
             List<SeriesAndBool> quarterlyP_better_lag = new List<SeriesAndBool>();
             List<SeriesAndBool> annualP = new List<SeriesAndBool>();
             List<SeriesAndBool> annualQ = new List<SeriesAndBool>();
@@ -20417,53 +20415,34 @@ namespace Gekko
             return m;
 
             //local method
-            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x, List<SeriesAndBool> y, int i)
+            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x1, List<SeriesAndBool> x2, int i)
             {
-                if (y != null)
+                if (x2 != null)
                 {
                     //doing the product p*q
-
-                    Series ts_lhs = new Series(EFreq.A, null);
-                    Series ts_rhs1 = x[i].ts; // O.GetIVariableFromString(G.Chop_AddFreq(sP, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
-                    Series ts_rhs2 = y[i].ts; // O.GetIVariableFromString(G.Chop_AddFreq(sQ, freq), O.ECreatePossibilities.NoneReportError, true) as Series;
+                    Series ts_lhs = new Series(EFreq.A, null);                    
                     Series ts_rhs = new Series(EFreq.Q, null);
-
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
                     {
-                        ts_rhs.SetData(t, ts_rhs1.GetDataSimple(t) * ts_rhs2.GetDataSimple(t));
+                        ts_rhs.SetData(t, x1[i].ts.GetDataSimple(t) * x2[i].ts.GetDataSimple(t));
                     }
-
                     CollapseHelper helper = new CollapseHelper();
                     helper.method = "avg";
-                    CollapseHelper(ts_lhs, ts_rhs, helper);
-                    // ---
-                    //SeriesAndBool sab1 = new SeriesAndBool();
-                    //sab1.ts = ts_rhs;
-                    //sab1.b = y[i].b;
-                    //x.Add(sab1);
-                    // ---
+                    CollapseHelper(ts_lhs, ts_rhs, helper);                    
                     SeriesAndBool sab2 = new SeriesAndBool();
                     sab2.ts = ts_lhs;
-                    sab2.b = y[i].b;
+                    sab2.b = x2[i].b;
                     x_annual.Add(sab2);
                 }
                 else
                 {
-                    Series ts_lhs = new Series(EFreq.A, null);
-                    //Series ts_rhs = O.GetIVariableFromString(G.Chop_AddFreq(s, freq), O.ECreatePossibilities.NoneReportError, true) as Series;                    
-                    //Series ts_rhs = x.ts;
+                    Series ts_lhs = new Series(EFreq.A, null);                    
                     CollapseHelper helper = new CollapseHelper();
                     helper.method = "avg";
-                    CollapseHelper(ts_lhs, x[i].ts, helper);
-                    // ---
-                    //SeriesAndBool sab1 = new SeriesAndBool();
-                    //sab1.ts = x[i].ts;
-                    //sab1.b = x[i].b;
-                    //x.Add(sab1);
-                    // ---
+                    CollapseHelper(ts_lhs, x1[i].ts, helper);
                     SeriesAndBool sab2 = new SeriesAndBool();
                     sab2.ts = ts_lhs;
-                    sab2.b = x[i].b;
+                    sab2.b = x1[i].b;
                     x_annual.Add(sab2);
                 }
             }
