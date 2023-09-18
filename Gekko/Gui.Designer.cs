@@ -227,7 +227,7 @@ namespace Gekko
             // textBox2
             // 
             this.textBoxMainTabLower.AcceptsTab = true;
-            this.textBoxMainTabLower.AllowDrop = true;
+            //this.textBoxMainTabLower.AllowDrop = true;
             this.textBoxMainTabLower.AutoWordSelection = true;
             this.textBoxMainTabLower.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxMainTabLower.ContextMenuStrip = this.contextMenuStrip1;

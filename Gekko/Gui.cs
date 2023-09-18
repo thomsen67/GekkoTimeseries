@@ -113,6 +113,12 @@ namespace Gekko
             this.splitContainerMainTab = new SplitContainerFix();
 
             InitializeComponent();
+            this.AllowDrop = true;
+            this.DragEnter += new DragEventHandler(Form1_DragEnter);
+            this.DragDrop += new DragEventHandler(Form1_DragDrop);
+            this.textBoxMainTabLower.AllowDrop = true;
+            this.textBoxMainTabLower.DragEnter += new DragEventHandler(Form1_DragEnter);
+            this.textBoxMainTabLower.DragDrop += new DragEventHandler(Form1_DragDrop);
 
             this.textBoxMainTabLower.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
@@ -199,6 +205,27 @@ namespace Gekko
             this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxMainTabUpper_LinkClicked);
             this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxOutputTab_LinkClicked);
 
+        }
+
+        void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            //We drop the [+] symbol and prefer the "move" symbol for this.
+            e.Effect = DragDropEffects.Move;
+        }
+
+        void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (string file in files)
+            {
+
+                G.Writeln(file);
+
+
+                Gui.gui.textBoxMainTabLower.Select(Gui.gui.textBoxMainTabLower.SelectionStart, 0);
+                Gui.gui.textBoxMainTabLower.SelectedText = file;
+
+            }
         }
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)

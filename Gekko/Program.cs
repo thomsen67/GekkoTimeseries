@@ -20336,9 +20336,9 @@ namespace Gekko
 
             for (int i = 0; i < varsP.Count; i++)
             {
-                LaspeyresQCollapseHelper(freq, annualP, quarterlyP, null, i);
-                LaspeyresQCollapseHelper(freq, annualQ, quarterlyQ, null, i);
-                LaspeyresQCollapseHelper(freq, annualV, quarterlyP, quarterlyQ, i);
+                LaspeyresQCollapseHelper(annualP, quarterlyP, null, i);
+                LaspeyresQCollapseHelper(annualQ, quarterlyQ, null, i);
+                LaspeyresQCollapseHelper(annualV, quarterlyP, quarterlyQ, i);
                 
                 {
                     //Just calculates annualP = annualV/annualQ.
@@ -20414,7 +20414,7 @@ namespace Gekko
             return m;
 
             //local method
-            void LaspeyresQCollapseHelper(EFreq freq, List<SeriesAndBool> x_annual, List<SeriesAndBool> x1, List<SeriesAndBool> x2, int i)
+            void LaspeyresQCollapseHelper(List<SeriesAndBool> x_annual, List<SeriesAndBool> x1, List<SeriesAndBool> x2, int i)
             {
                 if (x2 != null)
                 {
