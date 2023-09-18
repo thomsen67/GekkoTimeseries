@@ -20136,6 +20136,7 @@ namespace Gekko
                 }
                 else if (freq == EFreq.Q)
                 {
+                    if (options != null && !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error("For quarterly data, you must use option 'annualoverlap'");
                     return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
                 }
                 else new Error("Only A and Q freq supported.");
