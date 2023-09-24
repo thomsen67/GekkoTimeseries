@@ -216,15 +216,11 @@ namespace Gekko
         void Form1_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            //TODO: handle what should happen...
             foreach (string file in files)
             {
-
-                G.Writeln(file);
-
-
                 Gui.gui.textBoxMainTabLower.Select(Gui.gui.textBoxMainTabLower.SelectionStart, 0);
                 Gui.gui.textBoxMainTabLower.SelectedText = file;
-
             }
         }
 

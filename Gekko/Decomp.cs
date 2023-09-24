@@ -4842,25 +4842,15 @@ namespace Gekko
                 o.tSelected = o.decompFind.decompOptions2.t1;  //selected time
                 List<string> vars = O.Restrict(o.iv, false, false, false, true);
 
+                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
+
                 if (o.iv2 != null)
                 {
                     List<string> vars2 = O.Restrict(o.iv2, false, false, false, true);
-                    FindConnection(vars[0], vars2[0], modelGamsScalar);
+                    FindConnection(o.tSelected, vars[0], vars2[0], modelGamsScalar);
                     return;
-                }
-
-                //int timeIndex = 0;  //for 
-                //if (modelGamsScalar.is2000Model)
-                //{
-                //    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, Globals.decomp2000, 1));
-                //}
-                //else
-                //{
-                //    timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(o.tSelected);
-                //}
-
-                int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(o.tSelected));
-
+                }                
+                
                 string variableName = vars[0]; //.Replace(" ", "");  //no blanks
                 int aNumber = modelGamsScalar.dict_FromVarNameToANumber.GetInt(variableName);
                 if (aNumber == -12345)
@@ -5135,16 +5125,11 @@ namespace Gekko
         /// </summary>
         /// <param name="x1"></param>
         /// <param name="x2"></param>
-        private static void FindConnection(string x1, string x2, ModelGamsScalar modelGamsScalar)
+        private static void FindConnection(GekkoTime t0, string x1, string x2, ModelGamsScalar modelGamsScalar)
         {
-            //Speed-up: doing flood-fill from the endpoint and make them meet?
+            //Speed-up: doing flood-fill from the endpoint and make them meet?         
 
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK see also hack below
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-            int t2027 = modelGamsScalar.FromGekkoTimeToTimeInteger(new GekkoTime(EFreq.A, 2027, 1));
+            int timeIndex = modelGamsScalar.FromGekkoTimeToTimeInteger(modelGamsScalar.Maybe2000GekkoTime(t0));
 
             Dictionary<PeriodAndVariable, Flood> colors = new Dictionary<PeriodAndVariable, Flood>();
 
@@ -5154,8 +5139,8 @@ namespace Gekko
             int a2 = modelGamsScalar.dict_FromVarNameToANumber.GetInt(x2);
             if (a2 == -12345) new Error(NonFoundInModelError(x2, modelGamsScalar));
 
-            PeriodAndVariable pv1 = new PeriodAndVariable(t2027, a1);
-            PeriodAndVariable pv2 = new PeriodAndVariable(t2027, a2);
+            PeriodAndVariable pv1 = new PeriodAndVariable(timeIndex, a1);
+            PeriodAndVariable pv2 = new PeriodAndVariable(timeIndex, a2);            
 
             Flood start = new Flood();
             start.color = 0;
@@ -5192,12 +5177,18 @@ namespace Gekko
                 string label = null;
                 try
                 {
-                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1), EFreq.A);
+                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1), modelGamsScalar.parent.modelCommon.freq);
                     Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
                     label = ts.meta.label;
                 }
                 catch { };
-                temp.Add(f.pv.ToStringPretty(modelGamsScalar) + " (" + label + ")");
+
+                //#6irhwakery7
+                string name2 = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, false);
+
+                string lbl = null;
+                if (!G.NullOrEmpty(lbl)) lbl = "(" + label + ")";
+                temp.Add(name2 + lbl);
                 if (f.eq != -12345)
                 {
                     temp.Add("--> " + modelGamsScalar.dict_FromEqNumberToEqName[f.eq] + " --> ");
