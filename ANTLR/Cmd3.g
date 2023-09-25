@@ -1040,6 +1040,7 @@ Y2                    = 'Y2'                       ;
     AS               = 'AS';
     AUTO = 'AUTO';
     AVG          = 'AVG';
+    INDICATOR          = 'INDICATOR';
     BACKTRACK        = 'BACKTRACK'       ;
     BANK             = 'BANK'            ;
     BANK1            = 'BANK1'           ;
@@ -1689,6 +1690,7 @@ d.Add("Y" ,Y);
                                         d.Add("as"  , AS    );
                                         d.Add("AUTO", AUTO);
                                         d.Add("avg"  , AVG    );
+                                        d.Add("indicator"               , INDICATOR );
                                         d.Add("backtrack"               , BACKTRACK );
                                         d.Add("bank"    , BANK );
                                         d.Add("bank1"    , BANK1 );
@@ -3206,7 +3208,7 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 interpolate:                interpolate2 -> ^({token("ASTINTERPOLATE¤"+($interpolate2.text), ASTINTERPOLATE, input.LT(1).Line)} interpolate2);
-interpolate2:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 interpolateMethod? -> seqOfBankvarnames seqOfBankvarnames2 interpolateMethod?;
+interpolate2:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 (INDICATOR '=' seqOfBankvarnames3)? interpolateMethod? -> seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER seqOfBankvarnames3?) ^(ASTPLACEHOLDER interpolateMethod?);
 interpolateMethod:			name;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4369,6 +4371,7 @@ ident2: 					Ident |
   AVG|
   A|
   BACKTRACK|
+  INDICATOR|
   BANK1|
   BANK2|
   BANK|
@@ -4840,6 +4843,7 @@ ident3: 					Ident |
   AVG|
   A|
   BACKTRACK|
+  INDICATOR|
   BANK1|
   BANK2|
   BANK|

@@ -3843,7 +3843,7 @@ namespace Gekko
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
             if (method == null) method = "repeat";  //never happens...?
-            Program.InterpolateHelper(tsNew, ts, method);
+            Program.InterpolateHelper(tsNew, ts, null, method);
 
             return tsNew;
         }

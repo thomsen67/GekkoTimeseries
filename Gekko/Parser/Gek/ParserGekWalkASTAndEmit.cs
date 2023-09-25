@@ -1188,9 +1188,8 @@ namespace Gekko.Parser.Gek
                         node.Code.A("O.Interpolate o" + Num(node) + " = new O.Interpolate();" + G.NL);
                         node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
-                        string type = "null";
-                        if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
-                        node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                        if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".rhsIndicator = " + node[2][0].Code + ";" + G.NL);
+                        if (node[3].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".type = " + "O.ConvertToString(" + node[3][0][0].Code.ToString() + ")" + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".gekkocode = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);

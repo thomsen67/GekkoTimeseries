@@ -20369,7 +20369,7 @@ namespace Gekko
                 {
                     //Interpolates from !a to !q, annualP_better_lag --> quarterlyP_better_lag.
                     Series temp = new Series(EFreq.Q, null);
-                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, "repeat");
+                    Program.InterpolateHelper(temp, annualP_better_lag[i].ts, null, "repeat");
                     SeriesAndBool sab = new SeriesAndBool();
                     sab.ts = temp;
                     sab.b = false; //not used
@@ -20388,7 +20388,7 @@ namespace Gekko
                 pLag_annual.SetData(t, p_annual.GetDataSimple(t.Add(-1)));
             }
             Series pLag = new Series(EFreq.Q, null);
-            Program.InterpolateHelper(pLag, pLag_annual, "repeat");            
+            Program.InterpolateHelper(pLag, pLag_annual, null, "repeat");            
 
             Series p = new Series(freq, null);
             Series q = new Series(freq, null);
@@ -23808,7 +23808,7 @@ namespace Gekko
                 }
 
                 Series ts_daily = new Series(EFreq.D, null);
-                InterpolateHelper(ts_daily, ts_rhs, "prorate");
+                InterpolateHelper(ts_daily, ts_rhs, null, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
                 helper2.method = helper.method;
                 //if (missingLower != null) helper2.collapse_missing_d = missingLower;
@@ -23936,7 +23936,7 @@ namespace Gekko
                 }
 
                 if (method == null) method = Program.options.interpolate_method; // default is "repeat"
-                InterpolateHelper(ts_lhs, ts_rhs, method);
+                InterpolateHelper(ts_lhs, ts_rhs, null, method);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -23957,7 +23957,7 @@ namespace Gekko
             return;
         }
 
-        public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, string method)
+        public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, Series ts_rhsIndicator, string method)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -23966,13 +23966,13 @@ namespace Gekko
             //In principle, the generic methodology used for D freq destination could be used for all freqs here.
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
 
-            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate"))
+            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate") || G.Equal(method, "dentona1"))
             {
                 //good
             }
             else
             {
-                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'repeat' or 'prorate'.");
+                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'repeat', 'prorate' or 'dentona1'.");
             }
 
             EFreq freq_rhs = ts_rhs.freq;
@@ -23987,7 +23987,7 @@ namespace Gekko
                 //We cannot just run over the RHS time period, because the freqs do not fit neatly and we first convert to D freq.
                 //First we interpolate the RHS into D freq, which makes it easier.
                 Series ts_daily = new Series(EFreq.D, null);
-                InterpolateHelper(ts_daily, ts_rhs, "repeat");
+                InterpolateHelper(ts_daily, ts_rhs, null, "repeat");
                 GekkoTime t1_daily = ts_daily.GetRealDataPeriodFirst();
                 if (t1_daily.IsNull()) new Error("The input series has no data.");
                 GekkoTime t2_daily = ts_daily.GetRealDataPeriodLast();

@@ -10211,6 +10211,7 @@ namespace Gekko
         {
             public List lhs = null;
             public List rhs = null;
+            public List rhsIndicator = null;
             public string type = null;
             public string gekkocode = null;
             public P p = null;

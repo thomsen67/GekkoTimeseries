@@ -22017,6 +22017,131 @@ print(df2)
         public void _Test_Interpolate()
         {
             // ================================
+            //        Denton
+            // ================================
+
+
+
+            //I("reset;");
+            //I("%t1 = 2001a;");
+            //I("%t2 = 2005a;");
+            //I("%t1_highfreq = 2001q1;");
+            //I("%t2_highfreq = 2005q4;");                        
+
+            ////Data: Denton's example:
+            //I("y!a  <%t1 %t2>                   = 500,                  400,                  300,                  400,                  500;");
+            //I("z!q  <%t1_highfreq %t2_highfreq> = 50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;");
+
+            //I("interpolate z2!q = y!a z!q dentona1;");            
+
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2001, 1, 66.9868d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2001, 2, 126.9868d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2001, 3, 180.0000d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2001, 4, 126.0263d, sharedDelta);
+
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2002, 1, 65.0658d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2002, 2, 104.6553d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2002, 3, 144.7947d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2002, 4, 85.4842d, sharedDelta);
+
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2003, 1, 26.7237d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2003, 2, 72.5300d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2003, 3, 122.9032d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2003, 4, 77.8432d, sharedDelta);
+
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2004, 1, 37.3501d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2004, 2, 96.2128d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2004, 3, 154.4314d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2004, 4, 112.0058d, sharedDelta);
+
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2005, 1, 68.9360d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2005, 2, 124.1337d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2005, 3, 177.5988d, sharedDelta);
+            //_AssertSeries(First(), "z2!q", EFreq.Q, 2005, 4, 129.3314d, sharedDelta);
+
+            //// Cf. Denton: Adjustment of Monthly or Quarterly Series to Annual Totals: An Approach Based on Quadratic Minimization
+            //// https://www.oecd.org/sdd/21779760.pdf page 101, column delta(x-z).
+            //// The figures here are taken from the Gekko gcm program seen below.
+            ////
+
+            ///*                           
+            // reset;
+             
+            // %t1 = 2001a; //with 'a': becomes date, not value
+            // %t2 = 2005a; //with 'a': becomes date, not value
+            // %low = 'y!a';
+            // %high = 'z!q';
+            // %output = 'z2!q';
+            // %lowfreq = %low.getfreq();
+            // %highfreq = %high.getfreq();
+            // %t1_highfreq = %t1.date(%highfreq, 'start');
+            // %t2_highfreq = %t2.date(%highfreq, 'end');
+
+            // //Data: Denton's example:
+            // {%low}  <%t1 %t2>                    = 500,                  400,                  300,                  400,                  500;
+            // {%high} <%t1_highfreq  %t2_highfreq> =  50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100,    50, 100, 150, 100;
+
+            // %m = %t2 - %t1 + 1;  //low freq periods
+
+            // if(%lowfreq == 'a' and %highfreq == 'q');
+            //   %k = 4;
+            // elseif(%lowfreq == 'a' and %highfreq == 'm');
+            //   %k = 12;
+            // elseif(%lowfreq == 'q' and %highfreq == 'm');
+            //   %k = 3;
+            // else;
+            //   tell; tell'*** ERROR: Unexpected frequencies: interpolate {%lowfreq} to {%highfreq}'; stop;
+            // end;
+
+            // %n = %m * %k;  //high freq periods
+
+            // #y = pack(<%t1 %t2>, {%low});
+            // #z = pack(<%t1_highfreq %t2_highfreq>, {%high});
+
+            // #b = zeroes(%n, %m); //B
+            // for val %i = 1 to %m;
+            //   for val %j = 1 to %k;
+            //     #b[(%i - 1) * %k + %j, %i] = 1;
+            //   end;
+            // end;
+
+            // #ai = zeroes(%n, %n);  //inverted A
+            // for val %i = 1 to %n;
+            //   for val %j = 1 to %n;
+            //     #ai[%i, %j] = min(%i, %j);
+            //   end;
+            // end;
+
+            // #c = #ai *#b * inv(t(#b) * #ai * #b);
+            // #r = #y - t(#b) * #z;
+            // #x = #z + #c * #r;  //Seems to reproduce the Denton table page 101, the column with delta(x-z)
+
+            // {%output} <%t1_highfreq %t2_highfreq> = #x;  //unpack().
+
+            // prt  <%t1_highfreq %t2_highfreq> {%low}, {%high}, {%output};
+            // plot <%t1_highfreq %t2_highfreq> {%low}, {%high}, {%output};
+
+            // */
+
+            //// The same data (besides rounding) can be generated by the R tempdisagg package, as follows:
+            ////
+            ////  library(tempdisagg)
+            ////  d.q <- ts(rep(c(50, 100, 150, 100), 5), frequency = 4)
+            ////  d.a <- ts(c(500, 400, 300, 400, 500))
+            ////  a2 <- predict(td(d.a ~0 + d.q, method = "denton", criterion = "additive", h = 1))
+            ////  print(a2)
+            ////
+            ////  --> result:
+            ////
+            ////        Qtr1       Qtr2       Qtr3       Qtr4
+            //// 1  66.98684  126.98684  180.00000  126.02632
+            //// 2  65.06579  104.65527  144.79474   85.48420
+            //// 3  26.72367   72.52999  122.90316   77.84319
+            //// 4  37.35007   96.21279  154.43136  112.00577
+            //// 5  68.93603  124.13372  177.59885  129.33141
+
+
+            // ================================
             //        A to Q
             // ================================
 
