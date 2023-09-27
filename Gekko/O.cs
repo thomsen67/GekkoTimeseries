@@ -10211,13 +10211,13 @@ namespace Gekko
         {
             public List lhs = null;
             public List rhs = null;
-            public List rhsIndicator = null;
+            public List indicator = null;
             public string type = null;
             public string gekkocode = null;
             public P p = null;
             public void Exe()
             {
-                Program.Interpolate(this.lhs, this.rhs, this.type, this.gekkocode, this.p);
+                Program.Interpolate(this.lhs, this.rhs, this.indicator, this.type, this.gekkocode, this.p);
             }
         }
         

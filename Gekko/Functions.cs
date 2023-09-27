@@ -1273,11 +1273,11 @@ namespace Gekko
             if (n < 1)
             {
                 new Error("Number of items is " + n);
-                //throw new GekkoException();
             }
 
             Matrix m = new Matrix(obs, n);
 
+            //SLACK: could use array-copy...?
             int varcount = -1;
             foreach (Series ts in tss)
             {
