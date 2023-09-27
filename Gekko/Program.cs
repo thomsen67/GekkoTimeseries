@@ -24022,104 +24022,35 @@ namespace Gekko
                 // Loop through low-freq from left, convert to high-freq (with 'start' option) and see if this is <= datastart for high-freq
                 // if so, we found the start. Similar for the end, just looped the other way.
 
-                GekkoTime xt1 = GekkoTime.tNull; //highfreq
-                GekkoTime xt2 = GekkoTime.tNull; //highfreq
-                GekkoTime yt1 = GekkoTime.tNull; //lowfreq
-                GekkoTime yt2 = GekkoTime.tNull; //lowfreq
+                GekkoTime t1_high = GekkoTime.tNull; //highfreq
+                GekkoTime t2_high = GekkoTime.tNull; //highfreq
+                GekkoTime t1_low = GekkoTime.tNull; //lowfreq
+                GekkoTime t2_low = GekkoTime.tNull; //lowfreq
 
                 foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
                 {
                     GekkoTime tt = GekkoTime.ConvertFreqsFirst(t1_indicator.freq, t, null);
-                    if (tt.SmallerThanOrEqual(t1_indicator))
-                    {                        
-                        xt1 = tt; yt1 = t;
+                    if (tt.LargerThanOrEqual(t1_indicator))
+                    {
+                        t1_high = tt; t1_low = t;
                         break;
                     }
                 }
                 foreach (GekkoTime t in new GekkoTimeIteratorBackwards(t2_rhs, t1_rhs))
                 {
-                    GekkoTime tt = GekkoTime.ConvertFreqsLast(t1_indicator.freq, t);
-                    if (tt.LargerThanOrEqual(t2_indicator))
-                    {                        
-                        xt2 = tt; yt2 = t;
+                    GekkoTime tt = GekkoTime.ConvertFreqsLast(t2_indicator.freq, t);
+                    if (tt.SmallerThanOrEqual(t2_indicator))
+                    {
+                        t2_high = tt; t2_low = t;
                         break;
                     }
                 }
-                if (xt1.IsNull() || xt2.IsNull())
+                if (t1_high.IsNull() || t2_high.IsNull())
                 {
                     new Error("Incompatible: low-freq series over " + t1_rhs.ToString() + "-" + t2_rhs.ToString() + ", with high-freq indicator over " + t1_indicator.ToString() + "-" + t2_indicator.ToString());
                 }
 
-                int m = GekkoTime.Observations(yt1, yt2);  //low freq periods
-                int n = GekkoTime.Observations(xt1, xt2); //high freq periods
-
-                int k = -12345;
-                if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
-                {
-                    k = Globals.freqQSubperiods; //4
-                }
-                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
-                {
-                    k = Globals.freqMSubperiods; //12
-                }
-                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
-                {
-                    k = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
-                }
-                else
-                {
-                    new Error("Method 'dentona1' only supports a --> q, a --> m or q --> m");
-                }
-
-                if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
-
-                //TODO: what if periods do not fit together?
-                //SLACK: could use array-copy...?
-
-                double[,] y = new double[m, 1];
-                int counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(yt1, yt2))
-                {
-                    counter++;
-                    y[counter, 0] = ts_rhs.GetDataSimple(t);
-                }
-
-                double[,] z = new double[n, 1];
-                counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(xt1, xt2))
-                {
-                    counter++;
-                    z[counter, 0] = ts_indicator.GetDataSimple(t);
-                }
-
-                double[,] b = new double[n, m];
-                for (int i = 0; i < m; i++)
-                {
-                    for (int j = 0; j < k; j++)
-                    {
-                        b[i * k + j, i] = 1;
-                    }
-                }
-
-                double[,] ai = new double[n, n];
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        ai[i, j] = Math.Min(i + 1, j + 1);
-                    }
-                }
-
-                double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
-                double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
-                double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
-
-                counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(xt1, xt2))
-                {
-                    counter++;
-                    ts_lhs.SetData(t, x[counter, 0]);
-                }
+                Denton(ts_lhs, ts_rhs, ts_indicator, freq_lhs, freq_rhs, t1_high, t2_high, t1_low, t2_low);
             }
             else
             {
@@ -24254,6 +24185,92 @@ namespace Gekko
                         else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Denton method. Beware that if the indicator is very off (not summing reasonably to low-freq series), the result is bad.
+        /// </summary>
+        /// <param name="ts_lhs"></param>
+        /// <param name="ts_rhs"></param>
+        /// <param name="ts_indicator"></param>
+        /// <param name="freq_lhs"></param>
+        /// <param name="freq_rhs"></param>
+        /// <param name="t1_high"></param>
+        /// <param name="t2_high"></param>
+        /// <param name="t1_low"></param>
+        /// <param name="t2_low"></param>
+        private static void Denton(Series ts_lhs, Series ts_rhs, Series ts_indicator, EFreq freq_lhs, EFreq freq_rhs, GekkoTime t1_high, GekkoTime t2_high, GekkoTime t1_low, GekkoTime t2_low)
+        {
+            int m = GekkoTime.Observations(t1_low, t2_low); //low freq periods
+            int n = GekkoTime.Observations(t1_high, t2_high); //high freq periods
+
+            int k = -12345;
+            if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
+            {
+                k = Globals.freqQSubperiods; //4
+            }
+            else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
+            {
+                k = Globals.freqMSubperiods; //12
+            }
+            else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
+            {
+                k = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+            }
+            else
+            {
+                new Error("Method 'dentona1' only supports a --> q, a --> m or q --> m");
+            }
+
+            if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
+
+            //TODO: what if periods do not fit together?
+            //SLACK: could use array-copy...?
+
+            double[,] y = new double[m, 1];
+            int counter = -1;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_low, t2_low))
+            {
+                counter++;
+                y[counter, 0] = ts_rhs.GetDataSimple(t);
+            }
+
+            double[,] z = new double[n, 1];
+            counter = -1;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+            {
+                counter++;
+                z[counter, 0] = ts_indicator.GetDataSimple(t);
+            }
+
+            double[,] b = new double[n, m];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < k; j++)
+                {
+                    b[i * k + j, i] = 1;
+                }
+            }
+
+            double[,] ai = new double[n, n];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    ai[i, j] = Math.Min(i + 1, j + 1);
+                }
+            }
+
+            double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
+            double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
+            double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
+
+            counter = -1;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_high, t2_high))
+            {
+                counter++;
+                ts_lhs.SetData(t, x[counter, 0]);
             }
         }
 
