@@ -24005,8 +24005,53 @@ namespace Gekko
                 if (t1_indicator.IsNull()) new Error("The indicator series has no data.");
                 GekkoTime t2_indicator = ts_indicator.GetRealDataPeriodLast();
 
-                int m = GekkoTime.Observations(t1_rhs, t2_rhs);  //low freq periods
-                int n = GekkoTime.Observations(t1_indicator, t2_indicator); //high freq periods
+                //Here we find largest overlap of low- and high-freq series.
+
+                //For instance if we have this:
+
+                //     2001              2002           2003                2004
+                //      x                 x               x                  x
+                //      q3 q4       q1 q2 q3 q4      q1 q2 q3 q4           q1 q2
+                //
+                //Or this:
+                //
+                //          2001             2002            2003             2004
+                //                            x               x                    
+                //     q1 q2 q3 q4       q1 q2 q3 q4      q1 q2 q3 q4      q1 q2 q3 q4
+                //
+                // Loop through low-freq from left, convert to high-freq (with 'start' option) and see if this is <= datastart for high-freq
+                // if so, we found the start. Similar for the end, just looped the other way.
+
+                GekkoTime xt1 = GekkoTime.tNull; //highfreq
+                GekkoTime xt2 = GekkoTime.tNull; //highfreq
+                GekkoTime yt1 = GekkoTime.tNull; //lowfreq
+                GekkoTime yt2 = GekkoTime.tNull; //lowfreq
+
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
+                {
+                    GekkoTime tt = GekkoTime.ConvertFreqsFirst(t1_indicator.freq, t, null);
+                    if (tt.SmallerThanOrEqual(t1_indicator))
+                    {                        
+                        xt1 = tt; yt1 = t;
+                        break;
+                    }
+                }
+                foreach (GekkoTime t in new GekkoTimeIteratorBackwards(t2_rhs, t1_rhs))
+                {
+                    GekkoTime tt = GekkoTime.ConvertFreqsLast(t1_indicator.freq, t);
+                    if (tt.LargerThanOrEqual(t2_indicator))
+                    {                        
+                        xt2 = tt; yt2 = t;
+                        break;
+                    }
+                }
+                if (xt1.IsNull() || xt2.IsNull())
+                {
+                    new Error("Incompatible: low-freq series over " + t1_rhs.ToString() + "-" + t2_rhs.ToString() + ", with high-freq indicator over " + t1_indicator.ToString() + "-" + t2_indicator.ToString());
+                }
+
+                int m = GekkoTime.Observations(yt1, yt2);  //low freq periods
+                int n = GekkoTime.Observations(xt1, xt2); //high freq periods
 
                 int k = -12345;
                 if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
@@ -24029,12 +24074,11 @@ namespace Gekko
                 if (n != m * k) new Error("Expected indicator to have " + (m * k) + " periods, got " + n);
 
                 //TODO: what if periods do not fit together?
-
                 //SLACK: could use array-copy...?
 
                 double[,] y = new double[m, 1];
                 int counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
+                foreach (GekkoTime t in new GekkoTimeIterator(yt1, yt2))
                 {
                     counter++;
                     y[counter, 0] = ts_rhs.GetDataSimple(t);
@@ -24042,7 +24086,7 @@ namespace Gekko
 
                 double[,] z = new double[n, 1];
                 counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_indicator, t2_indicator))
+                foreach (GekkoTime t in new GekkoTimeIterator(xt1, xt2))
                 {
                     counter++;
                     z[counter, 0] = ts_indicator.GetDataSimple(t);
@@ -24067,12 +24111,11 @@ namespace Gekko
                 }
 
                 double[,] c = Program.MultiplyMatrices(Program.MultiplyMatrices(ai, b), Program.InvertMatrix(Program.MultiplyMatrices(Program.Transpose(b), Program.MultiplyMatrices(ai, b))));
-
                 double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
                 double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
 
                 counter = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_indicator, t2_indicator))
+                foreach (GekkoTime t in new GekkoTimeIterator(xt1, xt2))
                 {
                     counter++;
                     ts_lhs.SetData(t, x[counter, 0]);
@@ -24080,7 +24123,6 @@ namespace Gekko
             }
             else
             {
-
                 if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
                 {
                     //Splitting out W into A, Q or M is done in a special way.
