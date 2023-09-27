@@ -3796,16 +3796,24 @@ namespace Gekko
             //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
             //on the full sample. Therefore, _t1 and _t2 are ignored.
 
+            // 'm' is destination frequency, y is indicator for 'dentona1'
+            // --------------------------------------------------------------
             // interpolate(x)
             // interpolate(x, 'repeat')
             // interpolate(x, 'm')
             // interpolate(x, 'm', 'repeat')
+            // -  -  -  -  -  -  -  -  -  -  -  -
+            // interpolate(x, y)
+            // interpolate(x, y, 'repeat')
+            // interpolate(x, y, 'm')
+            // interpolate(x, y, 'm', 'repeat')
+            // --------------------------------------------------------------
 
             //either a --> q, a --> m, or q --> m.
             //if freq not stated: a --> q, q --> m. Else fail.                        
 
             if (x.Length < 1) new Error("Expected interpolate() with >= 1 arguments.");
-            if (x.Length > 3) new Error("Expected interpolate() with <= 3 arguments.");
+            if (x.Length > 4) new Error("Expected interpolate() with <= 4 arguments.");
 
             IVariable iv = x[0];
             if (G.IsGekkoNull(iv)) return iv;
@@ -3815,18 +3823,36 @@ namespace Gekko
             string freq_destination = null;
             string method = Program.options.interpolate_method;  // "repeat" is default
 
-            if (x.Length > 1)
+            Series tsIndicator = null;
+            int offset = 0;  //0 or 1, 1 if we use indicator series   
+            if (x.Length > 1 && x[1].Type() == EVariableType.Series)
+            {                
+                tsIndicator = x[1] as Series;
+                offset = 1;
+            }
+            else if (x.Length > 1 && x[1].Type() == EVariableType.Val)
             {
-                string s = O.ConvertToString(x[1]);
-                if (G.Equal(s, "repeat") || G.Equal(s, "prorate"))
+                //TODO: allow it to be a constant (value)?
+                //TODO: allow it to be a constant (value)?
+                //TODO: allow it to be a constant (value)?
+                //TODO: allow it to be a constant (value)?
+                //TODO: allow it to be a constant (value)?
+                tsIndicator = x[1] as Series;
+                offset = 1;
+            }            
+
+            if (x.Length > 1 + offset)
+            {
+                string s = O.ConvertToString(x[1 + offset]);
+                if (G.Equal(s, "repeat") || G.Equal(s, "prorate") || G.Equal(s, "dentona1"))
                 {
                     method = s;
-                    if (x.Length == 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
+                    if (x.Length == 3 + offset) new Error("If you state a method as argument #(" + (3 + offset - 1) + "), you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
                 }
                 else
                 {
                     freq_destination = s;
-                    if (x.Length == 3) method = O.ConvertToString(x[2]);
+                    if (x.Length == 3 + offset) method = O.ConvertToString(x[2 + offset]);
                 }
             }
 
@@ -3843,7 +3869,7 @@ namespace Gekko
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
             if (method == null) method = "repeat";  //never happens...?
-            Program.InterpolateHelper(tsNew, ts, null, method);
+            Program.InterpolateHelper(tsNew, ts, tsIndicator, method);
 
             return tsNew;
         }
