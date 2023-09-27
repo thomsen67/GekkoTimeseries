@@ -22032,30 +22032,31 @@ print(df2)
 
             I("interpolate z2!q = y!a indicator=z!q dentona1;");
 
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 1, 66.9868d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 2, 126.9868d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 3, 180.0000d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 4, 126.0263d, sharedDelta);
 
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 1, 65.0658d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 2, 104.6553d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 3, 144.7947d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 4, 85.4842d, sharedDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 1, 66.9868d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 2, 126.9868d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 3, 180.0000d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2001, 4, 126.0263d, sharedTableDelta);
 
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 1, 26.7237d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 2, 72.5300d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 3, 122.9032d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 4, 77.8432d, sharedDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 1, 65.0658d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 2, 104.6553d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 3, 144.7947d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2002, 4, 85.4842d, sharedTableDelta);
 
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 1, 37.3501d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 2, 96.2128d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 3, 154.4314d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 4, 112.0058d, sharedDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 1, 26.7237d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 2, 72.5300d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 3, 122.9032d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2003, 4, 77.8432d, sharedTableDelta);
 
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 1, 68.9360d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 2, 124.1337d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 3, 177.5988d, sharedDelta);
-            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 4, 129.3314d, sharedDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 1, 37.3501d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 2, 96.2128d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 3, 154.4314d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2004, 4, 112.0058d, sharedTableDelta);
+
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 1, 68.9360d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 2, 124.1337d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 3, 177.5988d, sharedTableDelta);
+            _AssertSeries(First(), "z2!q", EFreq.Q, 2005, 4, 129.3314d, sharedTableDelta);
 
             // Cf. Denton: Adjustment of Monthly or Quarterly Series to Annual Totals: An Approach Based on Quadratic Minimization
             // https://www.oecd.org/sdd/21779760.pdf page 101, column delta(x-z).

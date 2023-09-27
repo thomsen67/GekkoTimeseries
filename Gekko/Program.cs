@@ -24071,13 +24071,12 @@ namespace Gekko
                 double[,] r = Program.SubtractMatrixMatrix(y, Program.MultiplyMatrices(Program.Transpose(b), z), y.GetLength(0), y.GetLength(1));
                 double[,] x = Program.AddMatrixMatrix(z, Program.MultiplyMatrices(c, r), z.GetLength(0), z.GetLength(1));
 
-                //Matrix m = O.ConvertToMatrix(x);
-                //int n = CheckSquare(m);
-                //Matrix clone = m.Clone();
-                //clone.data = Program.InvertMatrix(clone.data);
-
-                //c = Program.MultiplyMatrices(a, b);
-
+                counter = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_indicator, t2_indicator))
+                {
+                    counter++;
+                    ts_lhs.SetData(t, x[counter, 0]);
+                }
             }
             else
             {
