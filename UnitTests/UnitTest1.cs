@@ -13745,22 +13745,35 @@ namespace UnitTests
                             Helper_CheckTrace("x!a[a]", x2);
                             Helper_CheckTrace("x!a[b]", x3);
                         }
-                        if (i == 1) Assert.Fail();
+
                         // ---------------------------------
                         // ---------------------------------
-                        string c4 = "c = a + b;";
+                        string c4 = null;
+                        if (i == 0) c4 = "c = a + b;";
+                        else c4 = "x[c] = x[a] + x[b];";
                         I(c4);
                         String2 x4 = new String2(null);
                         x4.m.Add(new String2(c4));
                         x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
                         x4.m[0].m.Add(null);
                         x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                        Helper_CheckTrace("a!a", x2);
-                        Helper_CheckTrace("b!a", x3);
-                        Helper_CheckTrace("c!a", x4);
+                        if (i == 0)
+                        {
+                            Helper_CheckTrace("a!a", x2);
+                            Helper_CheckTrace("b!a", x3);
+                            Helper_CheckTrace("c!a", x4);
+                        }
+                        else
+                        {
+                            Helper_CheckTrace("x!a[a]", x2);
+                            Helper_CheckTrace("x!a[b]", x3);
+                            Helper_CheckTrace("x!a[c]", x4);
+                        }
                         // ---------------------------------
                         // ---------------------------------
-                        string c5 = "d = a + b + c;";
+                        string c5 = null;
+                        if (i == 0) c5 = "d = a + b + c;";
+                        else c5 = "x[d] = x[a] + x[b] + x[c];";
                         I(c5);
                         String2 x5 = new String2(null);
                         x5.m.Add(new String2(c5));
@@ -13769,17 +13782,29 @@ namespace UnitTests
                         x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
                         x5.m[0].m.Add(null);
                         x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
-                        Helper_CheckTrace("a!a", x2);
-                        Helper_CheckTrace("b!a", x3);
-                        Helper_CheckTrace("c!a", x4);
-                        Helper_CheckTrace("d!a", x5);
+                        if (i == 0)
+                        {
+                            Helper_CheckTrace("a!a", x2);
+                            Helper_CheckTrace("b!a", x3);
+                            Helper_CheckTrace("c!a", x4);
+                            Helper_CheckTrace("d!a", x5);
+                        }
+                        else
+                        {
+                            Helper_CheckTrace("x!a[a]", x2);
+                            Helper_CheckTrace("x!a[b]", x3);
+                            Helper_CheckTrace("x!a[c]", x4);
+                            Helper_CheckTrace("x!a[d]", x5);
+                        }
 
                         TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                         Assert.AreEqual(4, th1.varCount);
                         Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
                         Assert.AreEqual(19, th1.traceCountIncludeInvisible);
 
-                        Trace2 trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+                        Trace2 trace1 = null;
+                        if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
+                        else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2; trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
 
                         // ---------------------------------
                         // ---------------------------------                    
@@ -13791,14 +13816,18 @@ namespace UnitTests
                         //I("c.traceprint();");
                         //I("a.traceprint();");
 
-                        Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2.precedents[0];
-                        Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
+                        Trace2 trace2 = null;
+                        if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0];
+                        else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0];
+                        if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
+                        else Assert.AreEqual("Work:x!a[d]", trace2.contents.bankAndVarnameWithFreq);
                         Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
                         Assert.AreEqual(2021, trace2.contents.GetT1().super);
                         Assert.AreEqual(2023, trace2.contents.GetT2().super);
                         Assert.AreEqual(2021, trace2.contents.periods[0].t1.super);
                         Assert.AreEqual(2023, trace2.contents.periods[0].t2.super);
-                        Assert.AreEqual("d = a + b + c;", trace2.contents.text);
+                        if (i == 0) Assert.AreEqual("d = a + b + c;", trace2.contents.text);
+                        else Assert.AreEqual("x[d] = x[a] + x[b] + x[c];", trace2.contents.text);
                         //.dataFile is not tested, since it is null here anyway
 
                         Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
@@ -13818,13 +13847,23 @@ namespace UnitTests
                         Assert.AreEqual(4, th2.varCount);     //4  4
                         Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
                         Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
-
-                        Helper_CheckTrace("a!a", x2);
-                        Helper_CheckTrace("b!a", x3);
-                        Helper_CheckTrace("c!a", x4);
-                        Helper_CheckTrace("d!a", x5);
+                        if (i == 0)
+                        {
+                            Helper_CheckTrace("a!a", x2);
+                            Helper_CheckTrace("b!a", x3);
+                            Helper_CheckTrace("c!a", x4);
+                            Helper_CheckTrace("d!a", x5);
+                        }
+                        else
+                        {
+                            Helper_CheckTrace("x!a[a]", x2);
+                            Helper_CheckTrace("x!a[b]", x3);
+                            Helper_CheckTrace("x!a[c]", x4);
+                            Helper_CheckTrace("x!a[d]", x5);
+                        }
                         // ---------------------------------
                         // ---------------------------------
+                        if (i == 1) Assert.Fail();
                         I("delete a, b, c;");
                         Helper_CheckTrace("d!a", x5);
                         // ---------------------------------
@@ -13918,8 +13957,7 @@ namespace UnitTests
         }
 
         private static void Helper_CheckTrace(string name, String2 c1)
-        {
-            Series tmp = O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError) as Series;
+        {            
             Trace2 trace2 = (O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError) as Series).meta.trace2;
             Helper_WalkTrace(trace2, c1, 0);
         }
