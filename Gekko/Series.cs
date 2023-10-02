@@ -194,6 +194,7 @@ namespace Gekko
 
         /// <summary>
         /// Gets databank that the series, subseries or array-series resides in.
+        /// Will return null if the series resides inside a map.
         /// 
         /// </summary>
         /// <returns></returns>
@@ -2306,7 +2307,6 @@ namespace Gekko
             if (indexes.Length == 0)
             {
                 new Error("Indexer has 0 length");
-                //throw new GekkoException();
             }
             IVariable rv = null;
 
@@ -2719,7 +2719,7 @@ namespace Gekko
                         double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                         GekkoTime t = new GekkoTime(this.freq, i, 1);
                         this.SetData(t, d);
-                        O.LookupHandleTrace(t, t, this, this.GetParentDatabank(), this.GetName(), false, options, smpl.p);
+                        O.LookupHandleTrace(t, t, this, false, options, smpl.p);
                         if (Program.options.series_failsafe)
                         {
                             //only for debugging                        
@@ -2736,7 +2736,7 @@ namespace Gekko
                     double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
                     GekkoTime t = ((ScalarDate)(indexes[0])).date;
                     this.SetData(t, d);  //will fail with an error if freqs do not match
-                    O.LookupHandleTrace(t, t, this, this.GetParentDatabank(), this.GetName(), false, options, smpl.p);
+                    O.LookupHandleTrace(t, t, this, false, options, smpl.p);
                     if (Program.options.series_failsafe)
                     {
                         //only for debugging                        

@@ -1272,7 +1272,7 @@ namespace Gekko
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                     LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
-                    LookupHandleTrace(smpl.t1, smpl.t2, lhs_series, ib, varnameWithFreq, isArraySubSeries, o, smpl.p);
+                    LookupHandleTrace(smpl.t1, smpl.t2, lhs_series, isArraySubSeries, o, smpl.p);
 
                     switch (rhs.Type())
                     {
@@ -1677,11 +1677,12 @@ namespace Gekko
 
         }
 
-        public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, Series lhs_series, IBank ib, string varnameWithFreq, bool isArraySubSeries, Assignment o, P p)
+        public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, Series lhs_series, bool isArraySubSeries, Assignment o, P p)
         {
+            Databank databank = lhs_series.GetParentDatabank();  //null if series is inside a map            
             if (Program.options.databank_trace)
             {
-                if (!isArraySubSeries)
+                if (true)
                 {
                     string traceString = null;
                     if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
@@ -1692,8 +1693,9 @@ namespace Gekko
                         // ---------
                         Trace2 trace = new Trace2(t1, t2);
 
-                        if (ib != null) trace.contents.bankAndVarnameWithFreq = ib.GetName() + ":" + varnameWithFreq;  //what if ib is MAP???
-                        else trace.contents.bankAndVarnameWithFreq = varnameWithFreq;  //what if ib is MAP???
+                        string b = null;
+                        if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
+                        trace.contents.bankAndVarnameWithFreq = b + lhs_series.GetName();                        
                         trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                         trace.contents.text = traceString + ";";
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")

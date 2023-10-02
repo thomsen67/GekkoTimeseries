@@ -13683,182 +13683,207 @@ namespace UnitTests
                     // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
                     //
 
-                    Program.Flush();
-                    Globals.cacheSize2 = 1;  //set it to minimum, so that cache if produced when reading for i==0, and cache can be used in i==1
+                    for (int i = 1; i >= 0; i--)  //0:normal series // 1:array-series. --> can be returned to normal loop
+                    {
 
-                    I("reset;");
-                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                    I("OPTION databank trace = yes;");
-                    //Globals.traceContainer = new List<IVariable>();
-                    //TODO: maps, <dyn>
-                    string c = "time 2021 2023;";
-                    I(c);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c1 = "a = 2, 3, 4;";
-                    I(c1);
-                    String2 x1 = new String2(null);
-                    x1.m.Add(new String2(c1));
-                    Helper_CheckTrace("a!a", x1);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c2_ = "a <2022 2022> = 123;";
-                    I(c2_);
-                    String2 x2_ = G.DeepCloneSlow<String2>(x1);
-                    x2_.m.Add(new String2(c2_));
-                    Helper_CheckTrace("a!a", x2_);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c2 = "a <2022 2022> = 100;";  //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
-                    I(c2);
-                    String2 x2 = G.DeepCloneSlow<String2>(x1);
-                    x2.m.Add(new String2(c2));
-                    Helper_CheckTrace("a!a", x2);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c3 = "b = 12, 13, 14;";
-                    I(c3);
-                    String2 x3 = new String2(null);
-                    x3.m.Add(new String2(c3));
-                    Helper_CheckTrace("a!a", x2);
-                    Helper_CheckTrace("b!a", x3);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c4 = "c = a + b;";
-                    I(c4);
-                    String2 x4 = new String2(null);
-                    x4.m.Add(new String2(c4));
-                    x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
-                    x4.m[0].m.Add(null);
-                    x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                    Helper_CheckTrace("a!a", x2);
-                    Helper_CheckTrace("b!a", x3);
-                    Helper_CheckTrace("c!a", x4);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c5 = "d = a + b + c;";
-                    I(c5);
-                    String2 x5 = new String2(null);
-                    x5.m.Add(new String2(c5));
-                    x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
-                    x5.m[0].m.Add(null);
-                    x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                    x5.m[0].m.Add(null);
-                    x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
-                    Helper_CheckTrace("a!a", x2);
-                    Helper_CheckTrace("b!a", x3);
-                    Helper_CheckTrace("c!a", x4);
-                    Helper_CheckTrace("d!a", x5);
+                        Program.Flush();
+                        Globals.cacheSize2 = 1;  //set it to minimum, so that cache is produced when reading
 
-                    TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                    Assert.AreEqual(4, th1.varCount);
-                    Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
-                    Assert.AreEqual(19, th1.traceCountIncludeInvisible);
+                        I("reset;");
+                        I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                        I("OPTION databank trace = yes;");
+                        if (i == 1) I("x = series(1);");
+                        //Globals.traceContainer = new List<IVariable>();
+                        //TODO: maps, <dyn>
+                        string c = "time 2021 2023;";
+                        I(c);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c1 = null;
+                        if (i == 0) c1 = "a = 2, 3, 4;";
+                        else c1 = "x[a] = 2, 3, 4;";
+                        I(c1);
+                        String2 x1 = new String2(null);
+                        x1.m.Add(new String2(c1));
+                        if (i == 0) Helper_CheckTrace("a!a", x1);
+                        else Helper_CheckTrace("x!a[a]", x1);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c2_ = null;
+                        if (i == 0) c2_ = "a <2022 2022> = 123;";
+                        else c2_ = "x[a] <2022 2022> = 123;";
+                        I(c2_);
+                        String2 x2_ = G.DeepCloneSlow<String2>(x1);
+                        x2_.m.Add(new String2(c2_));
+                        if (i == 0) Helper_CheckTrace("a!a", x2_);
+                        else Helper_CheckTrace("x!a[a]", x2_);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c2 = null;
+                        if (i == 0) c2 = "a <2022 2022> = 100;"; //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
+                        else c2 = "x[a] <2022 2022> = 100;";
+                        I(c2);
+                        String2 x2 = G.DeepCloneSlow<String2>(x1);
+                        x2.m.Add(new String2(c2));
+                        if (i == 0) Helper_CheckTrace("a!a", x2);
+                        else Helper_CheckTrace("x!a[a]", x2);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c3 = null;
+                        if (i == 0) c3 = "b = 12, 13, 14;";
+                        else c3 = "x[b] = 12, 13, 14;";
+                        I(c3);
+                        String2 x3 = new String2(null);
+                        x3.m.Add(new String2(c3));
+                        if (i == 0)
+                        {
+                            Helper_CheckTrace("a!a", x2);
+                            Helper_CheckTrace("b!a", x3);
+                        }
+                        else
+                        {
+                            Helper_CheckTrace("x!a[a]", x2);
+                            Helper_CheckTrace("x!a[b]", x3);
+                        }
+                        if (i == 1) Assert.Fail();
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c4 = "c = a + b;";
+                        I(c4);
+                        String2 x4 = new String2(null);
+                        x4.m.Add(new String2(c4));
+                        x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                        x4.m[0].m.Add(null);
+                        x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                        Helper_CheckTrace("a!a", x2);
+                        Helper_CheckTrace("b!a", x3);
+                        Helper_CheckTrace("c!a", x4);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c5 = "d = a + b + c;";
+                        I(c5);
+                        String2 x5 = new String2(null);
+                        x5.m.Add(new String2(c5));
+                        x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                        x5.m[0].m.Add(null);
+                        x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                        x5.m[0].m.Add(null);
+                        x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
+                        Helper_CheckTrace("a!a", x2);
+                        Helper_CheckTrace("b!a", x3);
+                        Helper_CheckTrace("c!a", x4);
+                        Helper_CheckTrace("d!a", x5);
 
-                    Trace2 trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+                        TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                        Assert.AreEqual(4, th1.varCount);
+                        Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
+                        Assert.AreEqual(19, th1.traceCountIncludeInvisible);
 
-                    // ---------------------------------
-                    // ---------------------------------                    
-                    I("write sletmig1;"); //a, b, c, d  ... 2021-23
-                    Globals.unitTestScreenOutput.Clear();
-                    I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
+                        Trace2 trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
 
-                    //I("d.traceprint();");
-                    //I("c.traceprint();");
-                    //I("a.traceprint();");
+                        // ---------------------------------
+                        // ---------------------------------                    
+                        I("write sletmig1;"); //a, b, c, d  ... 2021-23
+                        Globals.unitTestScreenOutput.Clear();
+                        I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
 
-                    Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2.precedents[0];
-                    Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
-                    Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
-                    Assert.AreEqual(2021, trace2.contents.GetT1().super);
-                    Assert.AreEqual(2023, trace2.contents.GetT2().super);
-                    Assert.AreEqual(2021, trace2.contents.periods[0].t1.super);
-                    Assert.AreEqual(2023, trace2.contents.periods[0].t2.super);
-                    Assert.AreEqual("d = a + b + c;", trace2.contents.text);
-                    //.dataFile is not tested, since it is null here anyway
+                        //I("d.traceprint();");
+                        //I("c.traceprint();");
+                        //I("a.traceprint();");
 
-                    Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
-                    Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
-                    Globals.unitTestScreenOutput.Clear();
-                    I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
-                    Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
-                    Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
+                        Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2.precedents[0];
+                        Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
+                        Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
+                        Assert.AreEqual(2021, trace2.contents.GetT1().super);
+                        Assert.AreEqual(2023, trace2.contents.GetT2().super);
+                        Assert.AreEqual(2021, trace2.contents.periods[0].t1.super);
+                        Assert.AreEqual(2023, trace2.contents.periods[0].t2.super);
+                        Assert.AreEqual("d = a + b + c;", trace2.contents.text);
+                        //.dataFile is not tested, since it is null here anyway
 
-                    //Test that the graph is really a DAG                        
-                    Helper_TestDAG(Program.databanks.GetFirst()); //will have been around protobuf
-                    Helper_TestDAG(Program.databanks.GetRef());  //will have been cloned
+                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                        Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
+                        Globals.unitTestScreenOutput.Clear();
+                        I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
+                        Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                        Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
 
-                    //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
+                        //Test that the graph is really a DAG                        
+                        Helper_TestDAG(Program.databanks.GetFirst()); //will have been around protobuf
+                        Helper_TestDAG(Program.databanks.GetRef());  //will have been cloned
 
-                    TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                    Assert.AreEqual(4, th2.varCount);     //4  4
-                    Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
-                    Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
+                        //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
 
-                    Helper_CheckTrace("a!a", x2);
-                    Helper_CheckTrace("b!a", x3);
-                    Helper_CheckTrace("c!a", x4);
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    I("delete a, b, c;");
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    I("write sletmig2;"); //d  ... 2021-23
-                    string c5b = "read sletmig2;";
-                    I(c5b); //d  ... 2021-23
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c6 = "copy d to e;";
-                    I(c6);
-                    String2 x6 = Helper_Push(x5, c6);
-                    Helper_CheckTrace("e!a", x6);
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c7 = "f = 1000;";
-                    I(c7);
-                    String2 x7 = new String2(null);
-                    x7.m.Add(new String2(c7));
-                    Helper_CheckTrace("f!a", x7);
-                    Helper_CheckTrace("e!a", x6);
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c8 = "copy <2021 2021> f to e;";  //only partial copy                    
-                    I(c8);
-                    String2 x8 = G.DeepCloneSlow<String2>(x6);
-                    x8.m.Add(new String2(c8));
-                    x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
-                    Helper_CheckTrace("f!a", x7);
-                    Helper_CheckTrace("e!a", x8);
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    string c9 = "rename e as g;";
-                    I(c9);
-                    String2 x9 = Helper_Push(x8, c9);
-                    Helper_CheckTrace("g!a", x9);
-                    Helper_CheckTrace("f!a", x7);
-                    Helper_CheckTrace("d!a", x5);
-                    // ---------------------------------
-                    // ---------------------------------
-                    I("delete d;");
-                    string c10 = "d = 5, 6, 7;";
-                    I(c10);
-                    string c10a = "import <2022 2022> sletmig2;";
-                    I(c10a);
-                    String2 x10a = new String2(c10a);
-                    x10a.m.AddRange(G.DeepCloneSlow<String2>(x5).m);
-                    String2 x10 = new String2(null);
-                    x10.m.Add(new String2(c10));
-                    x10.m.Add(x10a);
-                    Helper_CheckTrace("d!a", x10);
-                    // ---------------------------------
-                    // // ---------------------------------
-                    I("disp d;");
-                    //I("d.traceprint();");
+                        TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                        Assert.AreEqual(4, th2.varCount);     //4  4
+                        Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
+                        Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
+
+                        Helper_CheckTrace("a!a", x2);
+                        Helper_CheckTrace("b!a", x3);
+                        Helper_CheckTrace("c!a", x4);
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        I("delete a, b, c;");
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        I("write sletmig2;"); //d  ... 2021-23
+                        string c5b = "read sletmig2;";
+                        I(c5b); //d  ... 2021-23
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c6 = "copy d to e;";
+                        I(c6);
+                        String2 x6 = Helper_Push(x5, c6);
+                        Helper_CheckTrace("e!a", x6);
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c7 = "f = 1000;";
+                        I(c7);
+                        String2 x7 = new String2(null);
+                        x7.m.Add(new String2(c7));
+                        Helper_CheckTrace("f!a", x7);
+                        Helper_CheckTrace("e!a", x6);
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c8 = "copy <2021 2021> f to e;";  //only partial copy                    
+                        I(c8);
+                        String2 x8 = G.DeepCloneSlow<String2>(x6);
+                        x8.m.Add(new String2(c8));
+                        x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
+                        Helper_CheckTrace("f!a", x7);
+                        Helper_CheckTrace("e!a", x8);
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        string c9 = "rename e as g;";
+                        I(c9);
+                        String2 x9 = Helper_Push(x8, c9);
+                        Helper_CheckTrace("g!a", x9);
+                        Helper_CheckTrace("f!a", x7);
+                        Helper_CheckTrace("d!a", x5);
+                        // ---------------------------------
+                        // ---------------------------------
+                        I("delete d;");
+                        string c10 = "d = 5, 6, 7;";
+                        I(c10);
+                        string c10a = "import <2022 2022> sletmig2;";
+                        I(c10a);
+                        String2 x10a = new String2(c10a);
+                        x10a.m.AddRange(G.DeepCloneSlow<String2>(x5).m);
+                        String2 x10 = new String2(null);
+                        x10.m.Add(new String2(c10));
+                        x10.m.Add(x10a);
+                        Helper_CheckTrace("d!a", x10);
+                        // ---------------------------------
+                        // // ---------------------------------
+                        I("disp d;");
+                        //I("d.traceprint();");
+                    }
                 }
                 finally
                 {
@@ -13894,7 +13919,8 @@ namespace UnitTests
 
         private static void Helper_CheckTrace(string name, String2 c1)
         {
-            Trace2 trace2 = (Program.databanks.GetFirst().GetIVariable(name) as Series).meta.trace2;
+            Series tmp = O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError) as Series;
+            Trace2 trace2 = (O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError) as Series).meta.trace2;
             Helper_WalkTrace(trace2, c1, 0);
         }
 

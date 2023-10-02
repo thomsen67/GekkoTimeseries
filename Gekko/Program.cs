@@ -8820,17 +8820,7 @@ namespace Gekko
                 if (isLhs) x_lhs = "LHS";
                 string x_objectName = null;
                 if (rv_series != null) x_objectName = rv_series.GetName();
-                string x_bankOrMap = null;
-
-                if (ib.BankType() == EBankType.Map)
-                {
-                    x_bankOrMap = "map";
-                }
-                else
-                {
-                    x_bankOrMap = ib.GetFileNameWithPath() + " " + ib.GetStamp();
-                }
-
+                
                 if (!onlyTraceSeries || rv_series != null)
                 {   
                     //looks up in list, but the list should be rather short, and equality is by reference/pointer.
