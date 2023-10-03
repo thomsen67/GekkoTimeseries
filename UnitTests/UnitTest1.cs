@@ -13135,23 +13135,37 @@ namespace UnitTests
                     Assert.AreEqual(1, trace2.contents.periods.Count());
                     Assert.AreEqual(2006, trace2.contents.periods[0].t1.super);
                     Assert.AreEqual(2010, trace2.contents.periods[0].t2.super);
-                }
-
-                Assert.Fail("Mangler smooth, truncate og spice for array-series");
+                }                
 
                 //====================================================
                 // SMOOTH
                 //====================================================
                 I("reset; option freq q; time 2001q1 2002q4;");
                 I("option databank trace = yes;");
-                I("x1 = 2;");
-                I("smooth y = x1;");
-                y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                
+
+                if (i == 0)
+                {
+                    I("x1 = 2;");
+                    I("smooth y = x1;");
+                }
+                else
+                {
+                    I("x1 = series(1);");
+                    I("y = series(1);");
+                    I("x1[a] = 2;");
+                    I("smooth y[a] = x1[a];");
+                }
+
+                if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.precedents[0].contents;
-                Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual(null, tracec.dataFile);
-                Assert.AreEqual("smooth y = x1;", tracec.text);
+                if (i == 0) Assert.AreEqual("smooth y = x1;", tracec.text);
+                else Assert.AreEqual("smooth y[a] = x1[a];", tracec.text);
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
                 //We skip testing of periods here
@@ -13161,14 +13175,29 @@ namespace UnitTests
                 //====================================================
                 I("reset; option freq q; time 2001q1 2002q4;");
                 I("option databank trace = yes;");
-                I("y = 2;");
-                I("truncate <2001q2 2002q3> y;");
-                y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                
+
+                if (i == 0)
+                {
+                    I("y = 2;");
+                    I("truncate <2001q2 2002q3> y;");
+                }
+                else
+                {
+                    I("y = series(1);");
+                    I("y[a] = 2;");
+                    I("truncate <2001q2 2002q3> y[a];");
+                }
+
+                if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.precedents[0].contents;
-                Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual(null, tracec.dataFile);
-                Assert.AreEqual("truncate <2001q2 2002q3> y;", tracec.text);
+                if (i == 0) Assert.AreEqual("truncate <2001q2 2002q3> y;", tracec.text);
+                else Assert.AreEqual("truncate <2001q2 2002q3> y[a];", tracec.text);
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.GetT1());
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.GetT2());
                 //We skip testing of periods here
@@ -13178,19 +13207,33 @@ namespace UnitTests
                 //====================================================
                 I("reset; option freq q; time 2001q1 2002q4;");
                 I("option databank trace = yes;");
-                I("x1 = 2;");
-                I("x2 <2002q2 2003q4> = 3;");
-                I("splice y = x1 x2;");
-                y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                if (i == 0)
+                {
+                    I("x1 = 2;");
+                    I("x2 <2002q2 2003q4> = 3;");
+                    I("splice y = x1 x2;");
+                }
+                else
+                {
+                    I("x1 = series(1);");
+                    I("x2 = series(1);");
+                    I("y = series(1);");
+                    I("x1[a] = 2;");
+                    I("x2[a] <2002q2 2003q4> = 3;");
+                    I("splice y[a] = x1[a] x2[a];");
+                }
+                if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
+                else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.precedents[0].contents;
-                Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual(null, tracec.dataFile);
-                Assert.AreEqual("splice y = x1 x2;", tracec.text);
+                if (i == 0) Assert.AreEqual("splice y = x1 x2;", tracec.text);
+                else Assert.AreEqual("splice y[a] = x1[a] x2[a];", tracec.text);
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2003, 4), tracec.GetT2());
                 //We skip testing of periods here
-
             }
         }
 
