@@ -12962,12 +12962,11 @@ namespace UnitTests
                 string a = null; if (i == 1) a = "<array> ";
                 I("download " + a + "'https://api.statbank.dk/v1/data' statbank0.json;");
                 if (i == 0) _AssertSeries(First(), "pris6_varegr_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
-                else 
-                    _AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 1, 149.9000d, sharedDelta);
+                else _AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 1, 149.9000d, sharedDelta);
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("pris6_varegr_011100_enhed_100!m") as Series;
                 else y = O.GetIVariableFromString("pris6!m[011100, 100]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.precedents[0].contents;
-                if (i == 0) Assert.AreEqual("pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
+                if (i == 0) Assert.AreEqual("Work:pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:pris6!m[011100, 100]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual("statbank0.json", tracec.dataFile);

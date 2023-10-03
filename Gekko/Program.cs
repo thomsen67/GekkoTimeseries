@@ -7871,7 +7871,7 @@ namespace Gekko
                             Trace2 newTrace = new Trace2(gt_start, gt_end);
                             newTrace.contents.text = downloadHelper.gekkoCode + ";";
                             newTrace.contents.dataFile = downloadHelper.dataFile;
-                            newTrace.contents.bankAndVarnameWithFreq = name3;
+                            newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                             newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                             Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                         }
