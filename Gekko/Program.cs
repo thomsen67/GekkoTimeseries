@@ -7807,9 +7807,23 @@ namespace Gekko
                     for (int i = 0; i < split2.Length; i++)
                     {
                         split2[i] = split[2 * i + 2];
-                    }
+                    }                    
 
                     tsArray.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsArray), ts);
+                    tsArray.SetDirty(true);
+
+                    if (Program.options.databank_trace)
+                    {
+                        if (downloadHelper != null)
+                        {
+                            Trace2 newTrace = new Trace2(gt_start, gt_end);
+                            newTrace.contents.text = downloadHelper.gekkoCode + ";";
+                            newTrace.contents.dataFile = downloadHelper.dataFile;
+                            newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
+                            newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                        }
+                    }
                 }
             }
 
@@ -7844,12 +7858,16 @@ namespace Gekko
                         if (gt1.IsNull()) gt1 = gt_end;
                         if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                         if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
-                    }
+                    }                    
+
+                    //put in the timeseries                    
+                    databank.AddIVariableWithOverwrite(ts.name, ts);
+                    ts.SetDirty(true);
 
                     if (Program.options.databank_trace)
                     {
                         if (downloadHelper != null)
-                        {                                                         
+                        {
                             Trace2 newTrace = new Trace2(gt_start, gt_end);
                             newTrace.contents.text = downloadHelper.gekkoCode + ";";
                             newTrace.contents.dataFile = downloadHelper.dataFile;
@@ -7858,11 +7876,6 @@ namespace Gekko
                             Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                         }
                     }
-
-                    //put in the timeseries
-                    string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
-                    databank.AddIVariableWithOverwrite(ts.name, ts);
-                    ts.SetDirty(true);
                 }
             }
 

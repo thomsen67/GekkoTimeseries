@@ -12959,25 +12959,19 @@ namespace UnitTests
                 I("reset;");
                 I("option databank trace = yes;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-
-
-                //I("RESET;");
-                //I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-                //I("DOWNLOAD <array> 'https://api.statbank.dk/v1/data' statbank0.json;");
-                //_AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 4, 150.4000d, sharedDelta);
-
-
                 string a = null; if (i == 1) a = "<array> ";
                 I("download " + a + "'https://api.statbank.dk/v1/data' statbank0.json;");
                 if (i == 0) _AssertSeries(First(), "pris6_varegr_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
-                else _AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 1, 149.9000d, sharedDelta);
+                else 
+                    _AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 1, 149.9000d, sharedDelta);
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("pris6_varegr_011100_enhed_100!m") as Series;
                 else y = O.GetIVariableFromString("pris6!m[011100, 100]", ECreatePossibilities.NoneReportError) as Series;
                 tracec = y.meta.trace2.precedents[0].contents;
-                Assert.AreEqual("pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
+                if (i == 0) Assert.AreEqual("pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
+                else Assert.AreEqual("Work:pris6!m[011100, 100]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual("statbank0.json", tracec.dataFile);
-                Assert.AreEqual("download 'https://api.statbank.dk/v1/data' statbank0.json;", tracec.text);
+                Assert.AreEqual("download " + a + "'https://api.statbank.dk/v1/data' statbank0.json;", tracec.text);
                 Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 1), tracec.GetT1());
                 Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 4), tracec.GetT2());
                 //We skip testing of periods here
