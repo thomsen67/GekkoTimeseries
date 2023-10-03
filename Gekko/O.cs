@@ -9218,7 +9218,7 @@ namespace Gekko
                     {
                         //Necessary, otherwise it only fails when trying to write the databank to file (better to catch the problem here)
                         tsNew = ts;
-                        if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");
+                        if (!tsNew.GetParentDatabank().editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");
                     }
 
                     tsNew.Stamp();
