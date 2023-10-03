@@ -13683,7 +13683,7 @@ namespace UnitTests
                     // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
                     //
 
-                    for (int i = 1; i >= 0; i--)  //0:normal series // 1:array-series. --> can be returned to normal loop
+                    for (int i = 0; i< 2; i++)  //0:normal series // 1:array-series. 
                     {
 
                         Program.Flush();
@@ -13863,14 +13863,25 @@ namespace UnitTests
                         }
                         // ---------------------------------
                         // ---------------------------------
+
+                        if (i == 0)
+                        {
+                            I("delete a, b, c;");
+                            Helper_CheckTrace("d!a", x5);
+                        }
+                        else
+                        {
+                            Assert.Inconclusive();  //We need to implement delete, copy, rename, etc. for array-series!!
+                            I("delete x[a], x[b], x[c];");
+                            Helper_CheckTrace("x!a[d]", x5);
+                        }
                         
-                        I("delete a, b, c;");
-                        Helper_CheckTrace("d!a", x5);
                         // ---------------------------------
                         I("write sletmig2;"); //d  ... 2021-23
                         string c5b = "read sletmig2;";
                         I(c5b); //d  ... 2021-23
-                        Helper_CheckTrace("d!a", x5);
+                        if (i == 0) Helper_CheckTrace("d!a", x5);
+                        else Helper_CheckTrace("x!a[d]", x5);
                         // ---------------------------------
                         // ---------------------------------
                         string c6 = "copy d to e;";

@@ -2719,7 +2719,7 @@ namespace Gekko
                         double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                         GekkoTime t = new GekkoTime(this.freq, i, 1);
                         this.SetData(t, d);
-                        O.LookupHandleTrace(t, t, this, false, options, smpl.p);
+                        O.LookupHandleTrace(t, t, this.GetParentDatabank(), this, false, options, smpl.p);
                         if (Program.options.series_failsafe)
                         {
                             //only for debugging                        
@@ -2736,7 +2736,7 @@ namespace Gekko
                     double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
                     GekkoTime t = ((ScalarDate)(indexes[0])).date;
                     this.SetData(t, d);  //will fail with an error if freqs do not match
-                    O.LookupHandleTrace(t, t, this, false, options, smpl.p);
+                    O.LookupHandleTrace(t, t, this.GetParentDatabank(), this, false, options, smpl.p);
                     if (Program.options.series_failsafe)
                     {
                         //only for debugging                        
