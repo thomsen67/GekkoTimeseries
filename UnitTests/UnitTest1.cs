@@ -13804,7 +13804,7 @@ namespace UnitTests
 
                         Trace2 trace1 = null;
                         if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
-                        else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2; trace1 = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.trace2;
+                        else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2;                         
 
                         // ---------------------------------
                         // ---------------------------------                    
@@ -13838,8 +13838,8 @@ namespace UnitTests
                         Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
 
                         //Test that the graph is really a DAG                        
-                        Helper_TestDAG(Program.databanks.GetFirst()); //will have been around protobuf
-                        Helper_TestDAG(Program.databanks.GetRef());  //will have been cloned
+                        Helper_TestDAG(Program.databanks.GetFirst(), i); //will have been around protobuf
+                        Helper_TestDAG(Program.databanks.GetRef(), i);  //will have been cloned
 
                         //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
 
@@ -13863,7 +13863,7 @@ namespace UnitTests
                         }
                         // ---------------------------------
                         // ---------------------------------
-                        if (i == 1) Assert.Fail();
+                        
                         I("delete a, b, c;");
                         Helper_CheckTrace("d!a", x5);
                         // ---------------------------------
@@ -13934,18 +13934,28 @@ namespace UnitTests
             }
         }
 
-        private static void Helper_TestDAG(Databank db)
+        private static void Helper_TestDAG(Databank db, int i)
         {
+            string b = db.GetName() + Globals.symbolBankColon;
+            string a = "a!a";
+            string d = "d!a";
             string txt = "a = 2, 3, 4;";
-            string temp = (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text;
-            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace2.precedents[0].precedents[0].contents.text);
-            (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text = "Testing-123";
-            Assert.AreEqual("Testing-123", (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual("Testing-123", (db.GetIVariable("d!a") as Series).meta.trace2.precedents[0].precedents[0].contents.text);
-            (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text = temp;
-            Assert.AreEqual(txt, (db.GetIVariable("a!a") as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual(txt, (db.GetIVariable("d!a") as Series).meta.trace2.precedents[0].precedents[0].contents.text);
+            if (i == 1)
+            {
+                a = "x!a[a]";
+                d = "x!a[d]";
+                txt = "x[a] = 2, 3, 4;";
+            }            
+
+            string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text = "Testing-123";
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text = temp;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
         }
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
