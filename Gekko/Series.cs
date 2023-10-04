@@ -2883,7 +2883,7 @@ namespace Gekko
                 if (this.meta != null)
                 {
                     th.metas.Add(this.meta);
-                    if (this.meta.trace2 != null && (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths))
+                    if (this.meta.trace2 != null && (th.type == ETraceHelper.GetAllMetasAndTraces))
                     {
                         this.meta.trace2.DeepTrace(th, null, 0);
                     }

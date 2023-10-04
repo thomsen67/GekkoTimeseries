@@ -26,8 +26,7 @@ namespace Gekko
     }
 
     public enum ETraceHelper
-    {
-        GetAllMetasAndTracesAndDepths,
+    {        
         GetAllMetasAndTraces,
         OnlyGetMetas
     }
@@ -214,34 +213,26 @@ namespace Gekko
         }        
 
         public void DeepTrace(TraceHelper th, Trace2 parent, int depth)
-        {            
-            
-            PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
-            if (temp == null)
-            {
-                th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
-            }
-            else
+        {
+            if (th.type == ETraceHelper.GetAllMetasAndTraces)
             {                
-                //has been seen before
-                temp.depth = Math.Min(temp.depth, depth);                
-                if (!Globals.traceWalkAllCombinations) return;
-            }                        
+                th.unittestTraceCountIncludeInvisible++; //only for testing
 
-            if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
-            {
-                string s = depth + " " + this?.contents?.text;
-                th.traceCountIncludeInvisible++; //only for testing
-                                
-                if (!Trace2.IsInvisibleTrace(this))
+                PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
+                if (temp == null)
                 {
-                    th.traceCount++;
-                    if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);
-                    if (th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
-                    {
-                        if (!th.tracesDepth.ContainsKey(this)) th.tracesDepth.Add(this, depth);
-                        else if (depth < th.tracesDepth[this]) th.tracesDepth[this] = depth;
-                    }
+                    th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
+                }
+                else
+                {
+                    //has been seen before
+                    temp.depth = Math.Min(temp.depth, depth);
+                    if (!Globals.traceWalkAllCombinations) return;
+                }
+
+                if (!Trace2.IsInvisibleTrace(this))
+                {                    
+                    if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);                    
                 }
 
                 if (this.precedents.Count() > 0)
@@ -588,7 +579,7 @@ namespace Gekko
                     //txt.lineWidth = int.MaxValue;
                     TraceHelper th = new TraceHelper();
                     trace.DeepTrace(th, null, 0);
-                    int count = th.traceCount;  //we do not count the entry with .assign == null.
+                    int count = th.traces.Count;  //we do not count the entry with .assign == null.
                     //if (!all) txt.MainOmitVeryFirstNewLine();
                     string s = "Traces";
                     if (all) s = count + " " + "traces (click [] to see more info)";
@@ -718,14 +709,12 @@ namespace Gekko
         public int seriesObjectCount = 0; //number of series found (probably often equatl to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         // ----------
-        // --- the following is for stats etc. ("real" traces)
-        public int traceCount = 0; //will include combinations, traces will not
+        // --- the following is for stats etc. ("real" traces)        
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
-        public Dictionary<Trace2, int> tracesDepth = new Dictionary<Trace2, int>(); //value is depth
         
         // ----------
         // --- these are needed for gbk write/read, and for testing
-        public int traceCountIncludeInvisible = 0; //will include combinations, traces will not
+        public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not
         public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
     }
 

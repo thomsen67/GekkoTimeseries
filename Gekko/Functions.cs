@@ -5127,7 +5127,7 @@ namespace Gekko
             DateTime dt = GekkoTime.DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
-        }
+        }        
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
@@ -5136,46 +5136,9 @@ namespace Gekko
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            Databank db = Program.databanks.GetDatabank(x.ConvertToString());
-            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
-            int max = 10000;
-            int[] depths = new int[max];
-            foreach (KeyValuePair<Trace2, int> kvp in th.tracesDepth)
-            {
-                depths[Math.Min(kvp.Value, max - 1)]++;
-            }
-            
-            using (Writeln txt = new Writeln())
-            {
-                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
-            }
-            using (Writeln txt = new Writeln())
-            {
-                txt.MainOmitVeryFirstNewLine();
-                for (int i = 1; i < max; i++)
-                {
-                    string extra = null;
-                    if (depths[i] == 0) break;
-                    if (i == 0 && !Globals.runningOnTTComputer) continue;
-                    if (i == 0 && Globals.runningOnTTComputer) extra = "    <--- only TTH";
-                    txt.MainAdd("Dept: " + (i - 1) + ", traces: " + depths[i] + extra);
-                    txt.MainNewLineTight();                    
-                }
-                txt.MainAdd("");
-            }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
-        }
-
-        public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {
-            tracestats3(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
-        }
-
-        public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {
             //NOTE: Does not include the invisible traces assigned to each series object
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
-            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
             int max = 10000;
             int[] depths = new int[max];
             foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
@@ -5208,26 +5171,8 @@ namespace Gekko
                 }
                 txt.MainAdd("");
             }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
         }
-
-        //public static void traceprint(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        //{
-        //    Series x_series = x as Series;
-        //    if (x_series == null) new Error("Variable is not series type and hence has no trace.");
-        //    if (x_series.meta == null) new Error("Series has no meta information.");
-        //    if (x_series.meta.trace2 == null) new Error("Series has no trace information.");
-        //    List<string> ss = new List<string>();
-        //    x_series.meta.trace2.PrintRecursive(0, ss);
-        //    using (Writeln txt = new Writeln())
-        //    {
-        //        foreach (string s in ss)
-        //        {
-        //            txt.MainAdd(s);
-        //            txt.MainNewLineTight();
-        //        }
-        //    }
-        //}
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {

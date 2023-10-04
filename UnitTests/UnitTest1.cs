@@ -13950,7 +13950,7 @@ namespace UnitTests
                             //invisible = 4 (series objects), real traces = 5, total = 9.
                             Assert.AreEqual(9, th1.tracesDepth2.Count);
                             //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
-                            Assert.AreEqual(19, th1.traceCountIncludeInvisible);
+                            Assert.AreEqual(19, th1.unittestTraceCountIncludeInvisible);
                         }
                         finally
                         {
@@ -14004,7 +14004,7 @@ namespace UnitTests
                             TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                             Assert.AreEqual(4, th2.seriesObjectCount);
                             Assert.AreEqual(9, th2.tracesDepth2.Count);
-                            Assert.AreEqual(19, th2.traceCountIncludeInvisible);
+                            Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
                         }
                         finally
                         {                            
@@ -14098,7 +14098,7 @@ namespace UnitTests
                         I("disp d;");
 
                         Globals.unitTestScreenOutput.Clear();
-                        I("tracestats3();");
+                        I("tracestats2();");
                         string s = Globals.unitTestScreenOutput.ToString();
                         Assert.IsTrue(s.Contains("Databank Work: 3 series with 19 traces in total."));
                         Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
