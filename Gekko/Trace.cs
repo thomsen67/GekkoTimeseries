@@ -216,17 +216,15 @@ namespace Gekko
         public void DeepTrace(TraceHelper th, Trace2 parent, int depth)
         {            
             
-                PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
+            PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
             if (temp == null)
             {
                 th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
             }
             else
-            {
-                if (depth < temp.depth)
-                {
-                    temp.depth = depth;
-                }
+            {                
+                //has been seen before
+                temp.depth = Math.Min(temp.depth, depth);                
                 if (!Globals.traceWalkAllCombinations) return;
             }                        
 
@@ -724,11 +722,11 @@ namespace Gekko
         public int traceCount = 0; //will include combinations, traces will not
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
         public Dictionary<Trace2, int> tracesDepth = new Dictionary<Trace2, int>(); //value is depth
-        public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
+        
         // ----------
         // --- these are needed for gbk write/read, and for testing
         public int traceCountIncludeInvisible = 0; //will include combinations, traces will not
-        //public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)                
+        public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
     }
 
     public class PrecedentsAndDepth

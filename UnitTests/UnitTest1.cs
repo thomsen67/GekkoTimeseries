@@ -14007,10 +14007,10 @@ namespace UnitTests
                             Assert.AreEqual(19, th2.traceCountIncludeInvisible);
                         }
                         finally
-                        {
+                        {                            
                             Globals.traceWalkAllCombinations = false;
-                        }
-                        
+                        }                        
+
                         if (i == 0)
                         {
                             Helper_CheckTrace("a!a", x2);
@@ -14096,9 +14096,16 @@ namespace UnitTests
                         // ---------------------------------
                         // // ---------------------------------
                         I("disp d;");
-                        I("tracestats2();");
+
+                        Globals.unitTestScreenOutput.Clear();
                         I("tracestats3();");
-                        //I("d.traceprint();");
+                        string s = Globals.unitTestScreenOutput.ToString();
+                        Assert.IsTrue(s.Contains("Databank Work: 3 series with 19 traces in total."));
+                        Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                        Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                        Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
+                        Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
+                        Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
                     }
                 }
                 finally

@@ -5173,12 +5173,13 @@ namespace Gekko
 
         public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
+            //NOTE: Does not include the invisible traces assigned to each series object
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTracesAndDepths);
             int max = 10000;
             int[] depths = new int[max];
             foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
-            {
+            {                
                 depths[Math.Min(kvp.Value.depth, max - 1)]++;
             }
 
@@ -5193,9 +5194,16 @@ namespace Gekko
                 {
                     string extra = null;
                     if (depths[i] == 0) break;
-                    if (i == 0 && !Globals.runningOnTTComputer) continue;
-                    if (i == 0 && Globals.runningOnTTComputer) extra = "    <--- only TTH";
-                    txt.MainAdd("Dept: " + (i - 1) + ", traces: " + depths[i] + extra);
+                    if (Globals.runningOnTTComputer || G.IsUnitTesting())
+                    {
+                        if (i == 0) extra = "    <--- only TTH";
+                    }
+                    else
+                    {
+                        if (i == 0) continue;  //do not print that
+                    }                    
+                    
+                    txt.MainAdd("depth: " + (i - 1) + ", traces: " + depths[i] + extra);
                     txt.MainNewLineTight();
                 }
                 txt.MainAdd("");
