@@ -13941,10 +13941,18 @@ namespace UnitTests
                             Helper_CheckTrace("x!a[d]", x5);
                         }
 
-                        TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                        Assert.AreEqual(4, th1.varCount);
-                        Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
-                        Assert.AreEqual(19, th1.traceCountIncludeInvisible);
+                        try
+                        {
+                            Globals.traceWalkAllCombinations = true;
+                            TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                            Assert.AreEqual(4, th1.varCount);
+                            Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
+                            Assert.AreEqual(19, th1.traceCountIncludeInvisible);
+                        }
+                        finally
+                        {
+                            Globals.traceWalkAllCombinations = false;
+                        }
 
                         Trace2 trace1 = null;
                         if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
@@ -13987,10 +13995,19 @@ namespace UnitTests
 
                         //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
 
-                        TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                        Assert.AreEqual(4, th2.varCount);     //4  4
-                        Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
-                        Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
+                        try
+                        {
+                            Globals.traceWalkAllCombinations = true;
+                            TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                            Assert.AreEqual(4, th2.varCount);     //4  4
+                            Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
+                            Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
+                        }
+                        finally
+                        {
+                            Globals.traceWalkAllCombinations = false;
+                        }
+                        
                         if (i == 0)
                         {
                             Helper_CheckTrace("a!a", x2);
@@ -14076,6 +14093,8 @@ namespace UnitTests
                         // ---------------------------------
                         // // ---------------------------------
                         I("disp d;");
+                        I("tracestats2();");
+                        I("tracestats3();");
                         //I("d.traceprint();");
                     }
                 }

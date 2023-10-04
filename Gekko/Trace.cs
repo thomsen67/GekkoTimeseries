@@ -214,7 +214,24 @@ namespace Gekko
         }        
 
         public void DeepTrace(TraceHelper th, Trace2 parent, int depth)
-        {
+        {            
+            if (!Globals.traceWalkAllCombinations)
+            {
+                PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
+                if (temp == null)
+                {
+                    th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
+                }
+                else
+                {
+                    if (depth < temp.depth)
+                    {
+                        temp.depth = depth;
+                    }
+                    return;
+                }
+            }            
+
             if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
                 th.traceCountIncludeInvisible++; //only for testing               
@@ -235,7 +252,7 @@ namespace Gekko
                 {
                     foreach (Trace2 trace in this.precedents.GetStorage())
                     {
-                        if (trace == null) continue;
+                        if (trace == null) continue;                        
                         trace.DeepTrace(th, this, depth + 1);
                     }
                 }
@@ -709,10 +726,17 @@ namespace Gekko
         public int traceCount = 0; //will include combinations, traces will not
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
         public Dictionary<Trace2, int> tracesDepth = new Dictionary<Trace2, int>(); //value is depth
+        public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
         // ----------
         // --- these are needed for gbk write/read, and for testing
         public int traceCountIncludeInvisible = 0; //will include combinations, traces will not
-        public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)        
+        public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)                
+    }
+
+    public class PrecedentsAndDepth
+    {
+        public Precedents precedents = null;
+        public int depth = 0;
     }
 
     /// <summary>
@@ -729,7 +753,7 @@ namespace Gekko
         /// </summary>
         [ProtoMember(2)]
         public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
-
+        
         public void AddRange(Precedents precedents)
         {            
             if (precedents.storage != null)

@@ -12919,7 +12919,21 @@ namespace Gekko
                     {
                         Program.TestRam(false);
                     }
-                    break;
+                    break; 
+                case "--tracewalk":
+                    {
+                        if (Globals.traceWalkAllCombinations)
+                        {
+                            Globals.traceWalkAllCombinations = false;
+                            new Writeln("Does not walk all traces");
+                        }
+                        else
+                        {
+                            Globals.traceWalkAllCombinations = true;
+                            new Writeln("Walks all traces");
+                        }
+                    }
+                    break; 
                 case "--antlr":
                     {
                         //
