@@ -13284,7 +13284,7 @@ namespace UnitTests
             meta1.trace2.DeepTrace(th, null, 0);
             //Dictionary<Trace, byte> dict1 = th.dict2;
             Dictionary<TraceID2, Trace2> dict1Inverted = new Dictionary<TraceID2, Trace2>();
-            foreach (Trace2 trace in th.tracesIncludeInvisible.Keys)
+            foreach (Trace2 trace in th.tracesDepth2.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -13293,7 +13293,7 @@ namespace UnitTests
 
             //write bank
             Program.ProtobufWrite(meta1, path + @"\meta.data");
-            Program.ProtobufWrite(th.tracesIncludeInvisible.Keys.ToList(), path + @"\dict.data");
+            Program.ProtobufWrite(th.tracesDepth2.Keys.ToList(), path + @"\dict.data");
 
             //restore links
             if (true)
@@ -13948,7 +13948,7 @@ namespace UnitTests
                             //invisible, that is series objects = 4.
                             Assert.AreEqual(4, th1.seriesObjectCount);
                             //invisible = 4 (series objects), real traces = 5, total = 9.
-                            Assert.AreEqual(9, th1.tracesIncludeInvisible.Count);
+                            Assert.AreEqual(9, th1.tracesDepth2.Count);
                             //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
                             Assert.AreEqual(19, th1.traceCountIncludeInvisible);
                         }
@@ -14002,10 +14002,9 @@ namespace UnitTests
                         {
                             Globals.traceWalkAllCombinations = true;
                             TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                            Assert.AreEqual(4, th2.seriesObjectCount);     //4  4
-                            int n = th2.tracesDepth2.Count;
-                            Assert.AreEqual(9, th2.tracesIncludeInvisible.Count);  //23 8
-                            Assert.AreEqual(19, th2.traceCountIncludeInvisible);  //23 8
+                            Assert.AreEqual(4, th2.seriesObjectCount);
+                            Assert.AreEqual(9, th2.tracesDepth2.Count);
+                            Assert.AreEqual(19, th2.traceCountIncludeInvisible);
                         }
                         finally
                         {

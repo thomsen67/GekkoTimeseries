@@ -233,8 +233,7 @@ namespace Gekko
             if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
                 string s = depth + " " + this?.contents?.text;
-                th.traceCountIncludeInvisible++; //only for testing               
-                if (!th.tracesIncludeInvisible.ContainsKey(this)) th.tracesIncludeInvisible.Add(this, this.precedents);
+                th.traceCountIncludeInvisible++; //only for testing
                                 
                 if (!Trace2.IsInvisibleTrace(this))
                 {
@@ -567,7 +566,7 @@ namespace Gekko
             //gather lists
             th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);
             dict1Inverted = new Dictionary<TraceID2, Trace2>();
-            foreach (Trace2 trace in th.tracesIncludeInvisible.Keys)
+            foreach (Trace2 trace in th.tracesDepth2.Keys)
             {
                 dict1Inverted[trace.id] = trace;
                 trace.precedents.ToID();  //remove links
@@ -576,7 +575,7 @@ namespace Gekko
             {
                 meta.ToID();
             }
-            databank.traces = th.tracesIncludeInvisible.Keys.ToList();
+            databank.traces = th.tracesDepth2.Keys.ToList();
             if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
         }
 
@@ -729,7 +728,7 @@ namespace Gekko
         // ----------
         // --- these are needed for gbk write/read, and for testing
         public int traceCountIncludeInvisible = 0; //will include combinations, traces will not
-        public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)                
+        //public Dictionary<Trace2, Precedents> tracesIncludeInvisible = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)                
     }
 
     public class PrecedentsAndDepth
