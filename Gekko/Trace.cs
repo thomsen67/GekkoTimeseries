@@ -578,11 +578,10 @@ namespace Gekko
                 {
                     //txt.lineWidth = int.MaxValue;
                     TraceHelper th = new TraceHelper();
-                    trace.DeepTrace(th, null, 0);
-                    int count = th.traces.Count;  //we do not count the entry with .assign == null.
-                    //if (!all) txt.MainOmitVeryFirstNewLine();
+                    trace.DeepTrace(th, null, 0);                    
+                    int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
                     string s = "Traces";
-                    if (all) s = count + " " + "traces (click [] to see more info)";
+                    if (all) s = count2 + " " + "traces (click [] to see more info)";
                     if (!all)
                     {
                         if (trace.precedents[0].precedents.Count() > 0)
@@ -591,7 +590,7 @@ namespace Gekko
                             {
                                 PrintTraceHelper(trace, true);
                             };
-                            s += " (" + G.GetLinkAction("show " + count, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                            s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
                     }
                     s += ":";
@@ -607,6 +606,22 @@ namespace Gekko
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
             }
+        }
+
+        /// <summary>
+        /// Omit traces that are null (dividers) or traces with .content == null (glued to series objects)
+        /// </summary>
+        /// <param name="dict"></param>
+        /// <returns></returns>
+        public static int CountWithoutInvisible(Dictionary<Trace2, PrecedentsAndDepth> dict)
+        {
+            int n = 0;
+            foreach (Trace2 trace2 in dict.Keys)
+            {
+                if (Trace2.IsInvisibleTrace(trace2)) continue;
+                n++;
+            }
+            return n;
         }
 
         private static void PrintTraceHelper(Trace2 trace, int d, bool all)
@@ -710,11 +725,11 @@ namespace Gekko
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         // ----------
         // --- the following is for stats etc. ("real" traces)        
-        public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
-        
-        // ----------
-        // --- these are needed for gbk write/read, and for testing
         public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not
+        public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
+                
+        // --- gbk write/read and other stuff
+        //Hmm, isn't Precedents already a part of the key? Anyway, the depth needs to be inside an object anyway to be altered.
         public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
     }
 
