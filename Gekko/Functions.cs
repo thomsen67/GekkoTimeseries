@@ -5147,7 +5147,7 @@ namespace Gekko
             
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.varCount + " series with " + (th.traces.Count) + " traces in total.");
+                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
             }
             using (Writeln txt = new Writeln())
             {
@@ -5163,7 +5163,7 @@ namespace Gekko
                 }
                 txt.MainAdd("");
             }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.varCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
         }
 
         public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -5184,7 +5184,7 @@ namespace Gekko
 
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.varCount + " series with " + (th.traces.Count) + " traces in total.");
+                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
             }
             using (Writeln txt = new Writeln())
             {
@@ -5200,7 +5200,7 @@ namespace Gekko
                 }
                 txt.MainAdd("");
             }
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.varCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traceCount + " trace combinations.");
         }
 
         //public static void traceprint(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

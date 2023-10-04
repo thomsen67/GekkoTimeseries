@@ -2879,7 +2879,7 @@ namespace Gekko
             }
             else
             {
-                th.varCount++;
+                th.seriesObjectCount++;
                 if (this.meta != null)
                 {
                     th.metas.Add(this.meta);

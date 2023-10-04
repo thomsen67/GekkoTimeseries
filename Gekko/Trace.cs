@@ -215,25 +215,24 @@ namespace Gekko
 
         public void DeepTrace(TraceHelper th, Trace2 parent, int depth)
         {            
-            if (!Globals.traceWalkAllCombinations)
-            {
+            
                 PrecedentsAndDepth temp = null; th.tracesDepth2.TryGetValue(this, out temp);
-                if (temp == null)
+            if (temp == null)
+            {
+                th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
+            }
+            else
+            {
+                if (depth < temp.depth)
                 {
-                    th.tracesDepth2.Add(this, new PrecedentsAndDepth() { precedents = this.precedents, depth = depth });
+                    temp.depth = depth;
                 }
-                else
-                {
-                    if (depth < temp.depth)
-                    {
-                        temp.depth = depth;
-                    }
-                    return;
-                }
-            }            
+                if (!Globals.traceWalkAllCombinations) return;
+            }                        
 
             if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.GetAllMetasAndTracesAndDepths)
             {
+                string s = depth + " " + this?.contents?.text;
                 th.traceCountIncludeInvisible++; //only for testing               
                 if (!th.tracesIncludeInvisible.ContainsKey(this)) th.tracesIncludeInvisible.Add(this, this.precedents);
                                 
@@ -719,7 +718,7 @@ namespace Gekko
     public class TraceHelper
     {
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
-        public int varCount = 0; //number of series found (probably often equatl to meta count)
+        public int seriesObjectCount = 0; //number of series found (probably often equatl to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         // ----------
         // --- the following is for stats etc. ("real" traces)
