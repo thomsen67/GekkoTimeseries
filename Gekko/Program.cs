@@ -3206,7 +3206,7 @@ namespace Gekko
             //read cache parameters
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
+            // ------> if databank.traces is big, it should be written in parallel together with the others! See also #kgs6dskdfs
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             ProtobufWrite(databank.cacheParameters, files[k + extra - 2]);
