@@ -3826,7 +3826,7 @@ stop:					    STOP -> ^({token("ASTSTOP", ASTSTOP, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 sys:						SYS -> ^({token("ASTSYS", ASTSYS, input.LT(1).Line)})
-						  | SYS sysOpt1? expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression sysOpt1?)
+						  | SYS sysOpt1? expression (WORKING '=' fileName)? -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression ^(ASTPLACEHOLDER sysOpt1?) ^(ASTHANDLEFILENAME fileName?))
 						    ;
 sysOpt1:			        ISNOTQUAL | leftAngle sysOpt1h* RIGHTANGLE -> sysOpt1h*;
 sysOpt1h:                   MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);

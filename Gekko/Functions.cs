@@ -2708,7 +2708,6 @@ namespace Gekko
                 if (t1.StrictlyLargerThan(t2))
                 {
                     new Error("Local time period <...> must be increasing");
-                    //throw new GekkoException();
                 }
             }
         }
@@ -2857,9 +2856,9 @@ namespace Gekko
 
         public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            Series x = new Series(ESeriesType.Light, smpl.t0.freq, null);
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            if (_t1 != null || _t2 != null) new Error("time() function does not accept local time period");
+            Series x = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
                 x.SetData(t, helper_time(t).ConvertToVal());
             }
@@ -2868,36 +2867,32 @@ namespace Gekko
 
         public static IVariable iif(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {
-
-            Series result = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+            if (_t1 != null || _t2 != null) new Error("iif() function does not accept local time period");            
+            Series result = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
 
             if (!IsValOrTimeseries(i1))
             {
                 new Error("iif(): arg 1, type " + i1.Type().ToString() + " not supported");
-                //throw new GekkoException();
             }
             if (!IsValOrTimeseries(i2))
             {
                 new Error("iif(): arg 3, type " + i2.Type().ToString() + " not supported");
-                //throw new GekkoException();
             }
             if (!IsValOrTimeseries(o1))
             {
                 new Error("iif(): arg 4, type " + o1.Type().ToString() + " not supported");
-                //throw new GekkoException();
             }
             if (!IsValOrTimeseries(o2))
             {
                 new Error("iif(): arg 5, type " + o2.Type().ToString() + " not supported");
-                //throw new GekkoException();
             }
 
-            Series di1 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
-            Series di2 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
-            Series do1 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
-            Series do2 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+            Series di1 = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
+            Series di2 = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
+            Series do1 = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
+            Series do2 = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
 
-            foreach (GekkoTime gt in smpl.Iterate12())
+            foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
                 if (i1.Type() == EVariableType.Series) di1.SetData(gt, ((Series)i1).GetData(smpl, gt));
                 else di1.SetData(gt, ((ScalarVal)i1).val);
@@ -2910,14 +2905,12 @@ namespace Gekko
 
                 if (o2.Type() == EVariableType.Series) do2.SetData(gt, ((Series)o2).GetData(smpl, gt));
                 else do2.SetData(gt, ((ScalarVal)o2).val);
-
             }
 
             string x = O.ConvertToString(op).Trim();
 
-            foreach (GekkoTime gt in smpl.Iterate12())
+            foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
-
                 if (x == "==")
                 {
                     if (G.Equals(di1.GetData(smpl, gt), di2.GetData(smpl, gt)))
@@ -2987,7 +2980,6 @@ namespace Gekko
                 else
                 {
                     new Error("iif(): Expected operator '==', '<>', '<', '<=', '>' or '>='");
-                    //throw new GekkoException();
                 }
             }
             return result;
@@ -5385,7 +5377,7 @@ namespace Gekko
             DateTime t0 = DateTime.Now;
 
             string s1 = CrossThreadStuff.GetOutputWindowText();
-            Program.ExecuteShellCommand("gamsconvert" + depth + ".cmd", false);
+            Program.ExecuteShellCommand("gamsconvert" + depth + ".cmd", false, null);
             string s2 = CrossThreadStuff.GetOutputWindowText();
             string s = s2.Substring(s1.Length);
 

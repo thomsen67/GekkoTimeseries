@@ -25,6 +25,7 @@ using ProtoBuf;
 using System.Drawing;
 using System.Linq;
 using System.Globalization;
+using System.Windows;
 
 namespace Gekko
 {
@@ -2018,7 +2019,9 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("TT NOTE: Window test, #08753205743", false);
+                        //MessageBox.Show("#08753205743");
+                        //new Error("TT NOTE: Window test, #08753205743", false);
+                        Globals.numberOfTimeWindowErrors++;
                     }
                 }
 

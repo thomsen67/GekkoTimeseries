@@ -1683,79 +1683,9 @@ namespace Gekko
 
             model = ReadGAMSScalarModel2(o, folders, model, input);
 
-            //string modelHash = Program.GetMD5Hash(null, input.zipFilePathAndName);            
-
-            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + Globals.cacheExtensionModel;
-
-            //if (Program.options.model_cache == true)
-            //{
-            //    try
-            //    {
-            //        //TODO 
-            //        //TODO 
-            //        //TODO do something about ms here
-            //        //TODO 
-            //        //TODO 
-            //        double hashMs = 0d;
-            //        DateTime t0 = DateTime.Now;
-            //        Model modelTemp = Program.ReadParallelModel(input.zipFilePathAndName, modelHash);
-            //        timeLoadCache = "cache: " + G.Seconds(t0);
-                    
-            //        if (modelTemp == null)
-            //        {
-            //            model.modelGamsScalar = new ModelGamsScalar(model);
-            //            model.loadedFromCacheFile = false;
-            //        }
-            //        else
-            //        {
-            //            model = modelTemp;
-            //            if (Globals.runningOnTTComputer) new Writeln("TTH: Parallel protobuf read: " + G.Seconds(t0));
-            //            DateTime t1 = DateTime.Now;
-            //            if (model.type == EModelType.GAMSScalar) GAMSScalarModelHelper(true, model.modelGamsScalar);
-            //            model.loadedFromCacheFile = true;
-            //            timeCompile = "compile: " + G.Seconds(t1);
-            //        }
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        if (G.IsUnitTesting())
-            //        {
-            //            throw;
-            //        }
-            //        else
-            //        {
-            //            //do nothing, we then have to parse the file
-            //            model.loadedFromCacheFile = false;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    model.loadedFromCacheFile = false;
-            //}
-
-            //if (model.loadedFromCacheFile)
-            //{
-            //    //no writing of .mdl file of course                
-            //}
-            //else
-            //{
-            //    model = ReadGAMSScalarModel2(o, folders, model, input);
-
-            //    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-            //    {
-            //        DateTime dt1 = DateTime.Now;
-            //        if (model.type == EModelType.GAMSScalar) GAMSScalarModelHelper(false, model.modelGamsScalar);
-            //        //TODO
-            //        //TODO what about last argument ms?
-            //        //TODO
-            //        Program.WriteParallelModel(Program.options.system_threads, input.zipFilePathAndName, modelHash, 0, model);
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        //do nothing, not the end of the world if it fails
-            //    }
-            //}
+            //TODO TODO TODO
+            //TODO TODO TODO Store the table in the cache
+            //TODO TODO TODO
 
             Table tab = new Table();
 

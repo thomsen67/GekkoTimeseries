@@ -1668,6 +1668,7 @@ namespace Gekko
             Globals.numberOfWarnings = 0;
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
+            Globals.numberOfTimeWindowErrors = 0;
 
             Program.AbortingReset();
 
@@ -2191,7 +2192,7 @@ namespace Gekko
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the command");
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the command");
                 }
-            }
+            }            
 
             if (Globals.bugfixMissing1.Count > 0)
             {
@@ -2252,6 +2253,11 @@ namespace Gekko
                     }                
                 };
                 new Warning("In Gekko >= 3.1.16, using $ on the left-hand side has changed behavior if the condition contains timeseries. In the job just run, this affects " + Globals.bugfixLhsDollar + " values/observations (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ").");
+            }
+
+            if (Globals.runningOnTTComputer && Globals.numberOfTimeWindowErrors > 0)
+            {
+                new Error("TTH: There were " + Globals.numberOfTimeWindowErrors + " time window errors.", false);
             }
 
             if (p.hasBeenCmdFile)

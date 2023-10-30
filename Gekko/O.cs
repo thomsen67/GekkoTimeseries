@@ -10395,6 +10395,7 @@ namespace Gekko
         {
             public string opt_mute = null;
             public IVariable s = null;
+            public string fileName = null;
             public void Exe()
             {            
                 if (s == null)
@@ -10404,7 +10405,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.ConvertToString(s);
-                    Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"));
+                    Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);
 
                     if (Program.options.global_pink && Globals.pink3)
                     {

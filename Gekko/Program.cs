@@ -3209,9 +3209,13 @@ namespace Gekko
             // ------> if databank.traces is big, it should be written in parallel together with the others! See also #kgs6dskdfs
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            DateTime dt0 = DateTime.Now;
             ProtobufWrite(databank.cacheParameters, files[k + extra - 2]);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Write time cache params: " + G.Seconds(dt0));
+            dt0 = DateTime.Now;
             ProtobufWrite(databank.traces, files[k + extra - 1]);
-                        
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Write time traces: " + G.Seconds(dt0));
+
             Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
             databank.traces = null;  //important!
 
@@ -3356,9 +3360,15 @@ namespace Gekko
             // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            DateTime dt0 = DateTime.Now;
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));
+            dt0 = DateTime.Now;
             databank.traces = ProtobufRead<List<Trace2>>(files[k - extra + 1]);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time traces: " + G.Seconds(dt0));
+            dt0 = DateTime.Now;
             Gekko.Trace2.HandleTraceRead1(databank);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Handle time traces: " + G.Seconds(dt0));
             databank.traces = null;  //important!
 
             //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
@@ -9568,7 +9578,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void RunR(Gekko.O.R_run o)
         {
-
+            string working = null;
             string RFileName = Globals.localTempFilesLocation + "\\tempRFile.r";
             string RExportFileName = Globals.localTempFilesLocation + "\\tempR2Gekko.txt";
             List<string> lines2 = new List<string>();
@@ -9681,7 +9691,7 @@ namespace Gekko
 
             G.Writeln2("----- R start -----");
             string ss7 = "\"\"" + RPathUsedHere + "\" --no-save \"" + RFileName + "\"\"";
-            Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
+            Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"), working);
             G.Writeln("------ R end ------");
 
             //Old way --> r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
@@ -9764,6 +9774,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void RunPython(Gekko.O.Python_run o)
         {
+            string working = null;
             string pythonFileName = Globals.localTempFilesLocation + "\\tempPyFile.py";
             string pythonExportFileName = Globals.localTempFilesLocation + "\\tempPy2Gekko.txt";
             List<string> lines2 = new List<string>();
@@ -9903,14 +9914,12 @@ namespace Gekko
             if (pythonPathUsedHere == "[[PythonDetectFailed]]")
             {
                 new Error("python.exe path could not be auto-detected. Please state the python.exe path manually with OPTION python exe folder = ...");
-
-                //throw new GekkoException();
             }
 
             G.Writeln2("----- Python start -----");
             //Python needs -u argument to show long-running processes output line by line
             string ss7 = "\"\"" + pythonPathUsedHere + "\" -u \"" + pythonFileName + "\"\"";
-            Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
+            Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"), working);
             G.Writeln("------ Python end ------");
 
             string s = Program.GetTextFromFileWithWait(pythonExportFileName);
@@ -12945,7 +12954,7 @@ namespace Gekko
                         string classPath = "c:\\Thomas\\Software\\ANTLR\\antlr-3.1.3.jar";
                         string s = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 300000 -traceParser " + antlrFile;
                         new Writeln("Start Cmd3.g");
-                        Program.ExecuteShellCommand(s, false);
+                        Program.ExecuteShellCommand(s, false, null);
                         new Writeln("End Cmd3.g");
                         string txt2 = GetTextFromFileWithWait(antlrFile, false);  //keep ansi
                         List<string> txt3 = Stringlist.ExtractLinesFromText(txt2);
@@ -12975,7 +12984,7 @@ namespace Gekko
                         }
                         string s4 = "\"" + javaPath + "\" -classpath " + classPath + " -Xmx500m org.antlr.Tool -Xconversiontimeout 120000 -traceParser " + antlrFile4;
                         new Writeln("Start Cmd4.g");
-                        Program.ExecuteShellCommand(s4, false);
+                        Program.ExecuteShellCommand(s4, false, null);
                         new Writeln("End Cmd4.g");
                         new Writeln("--------------------------------------------------------------");
                         new Writeln("Parsing finished - remember to close and reopen Gekko!");
@@ -17815,8 +17824,6 @@ namespace Gekko
             //salted with subpers, so will end with "1" for annual, "4" for quarterly.
             string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, O.CurrentSubperiods().ToString());
 
-            //string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "model" + "_" + modelHash + Globals.cacheExtension;
-
             ModelCacheParams cacheParameters = null; //See also for databanks #i9hkjhesf34rf
 
             if (Program.options.model_cache == true)
@@ -19030,7 +19037,7 @@ namespace Gekko
                         return null;
                     }
                 }
-                string tempFileNameWithPath = WaitForExtractZipFileEntryToTempFile(entry, zipFileWithPath);
+                string tempFileNameWithPath = WaitForZipExtractFileEntryToTempFile(entry, zipFileWithPath);
                 //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
                 rv_fileName = tempFileNameWithPath;
             }
@@ -19044,8 +19051,9 @@ namespace Gekko
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        public static string WaitForExtractZipFileEntryToTempFile(ZipArchiveEntry entry, string zipFileWithPath)
+        public static string WaitForZipExtractFileEntryToTempFile(ZipArchiveEntry entry, string zipFileWithPath)
         {
+            DateTime dt0 = DateTime.Now;
             string tempFileName = null;
 
             int gap = Globals.waitFileGap;  //2 seconds
@@ -19110,6 +19118,8 @@ namespace Gekko
                     error.MoreAdd(message + " " + innerException);
                 }
             }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Unzipped file in " + G.Seconds(dt0));
 
             return tempFileName;
         }        
@@ -19788,10 +19798,10 @@ namespace Gekko
         }
 
         /// <summary>
-        /// SYS command: execute from Windows shell
+        /// SYS command: execute from Windows shell. Can choose to mute, and can choose working folder for the shell (.WorkingDirectory).
         /// </summary>
         /// <param name="commandLine">Command line parameters to pass</param>        
-        public static void ExecuteShellCommand(string commandLine, bool mute)
+        public static void ExecuteShellCommand(string commandLine, bool mute, string working)
         {
             //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
 
@@ -19825,7 +19835,9 @@ namespace Gekko
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardInput = false;
                 process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.WorkingDirectory = Program.options.folder_working;
+                string wd = Program.options.folder_working;
+                if (!G.NullOrBlanks(working)) wd = working;
+                process.StartInfo.WorkingDirectory = wd;
                 process.StartInfo.Arguments = _Arguments;
                 process.StartInfo.FileName = _CMDProcess;
                 //process.StartInfo = p;
@@ -21540,6 +21552,7 @@ namespace Gekko
         //This is a general method for zipping the contents of a folder
         public static void WaitForZipWrite(string folder, string zipFileName)
         {
+            DateTime dt0 = DateTime.Now;
             string path_zipFileName = Path.GetDirectoryName(zipFileName);
             if (!Directory.Exists(path_zipFileName))
             {
@@ -21594,6 +21607,7 @@ namespace Gekko
             {
                 //do nothing
             }
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Zip write took: " + G.Seconds(dt0));
         }
 
         //
@@ -21610,6 +21624,7 @@ namespace Gekko
         public static string WaitForZipReadGbk(string folder, string zipFileName, string inside, string originalFileName)
         {
             //is not actually waiting...
+            DateTime dt0 = DateTime.Now;
             int gap = Globals.waitFileGap;  //2 seconds
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
@@ -21688,15 +21703,15 @@ namespace Gekko
                 if (tsdfilecounter > 1)
                 {
                     new Error("Found several tsd-files inside zip-file. Cannot decide which one to use");
-                    //throw new GekkoException();
                 }
 
                 if (tsdFile == "")
                 {
                     new Error("Cannot find tsd-file inside zip-file. Expected to find '" + inside + "' inside '" + originalFileName + "'");
-                    //throw new GekkoException();
                 }
             }
+
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Unzipping (gbk) took: " + G.Seconds(dt0));
 
             return tsdFile;
         }
@@ -24219,6 +24234,51 @@ namespace Gekko
         /// <param name="t2_low"></param>
         private static void Denton(Series ts_lhs, Series ts_rhs, Series ts_indicator, EFreq freq_lhs, EFreq freq_rhs, GekkoTime t1_high, GekkoTime t2_high, GekkoTime t1_low, GekkoTime t2_low)
         {
+            //Denton tries to match the differences in the produced series y (high-freq) to the differences in
+            //the indicator series x as closely as possible, while making sure that the produces series
+            //collapses into the low-freq series z.
+            //This looks like R[t] = y[t]-y[t-1] - (x[t]-x[t-1]), but at the very start we do not know y[t-1] and x[t-1] and we
+            //assume that they are equal: R[1] = y[1] - x[1]. But imagine t being quarterly and y[t] = x[t] = 1, and annual z = 4.
+            //This could be a perfect match. But now imagine that z = 8, with the same indicator x series.
+            //Now, we cannot set y[t] = constant 2, because of the first observation that would be R = 2-1 = 1. Therefore, 
+            //the algorithm would set the first y < 2, and y[t] would oscillate towards 2.
+            //To avoid this behavior, we could scale the indicator so that it (collapsed) matches the low-freq series.
+            //
+            //reset;
+            //option freq q;
+            //y = 1;
+            //option freq a;
+            //x = 8;
+            //option freq q;
+            //z = interpolate(x!a, y!q, 'dentona1');
+            //p<n> z!q, y!q;
+            //
+            //
+            //                z!q            y!q 
+            //2013
+            //q1           1.5798         1.0000
+            //q2           1.9798         1.0000
+            //q3           2.2000         1.0000
+            //q4           2.2404         1.0000            
+            //
+            //2014
+            //q1           2.1010         1.0000
+            //q2           2.0049         1.0000
+            //q3           1.9519         1.0000
+            //q4           1.9422         1.0000
+            //
+            //2015
+            //q1           1.9757         1.0000
+            //q2           1.9988         1.0000
+            //q3           2.0116         1.0000
+            //q4           2.0139         1.0000
+            //
+            //2016
+            //q1           2.0058         1.0000
+            //q2           2.0003         1.0000
+            //q3           1.9972         1.0000
+            //q4           1.9967         1.0000
+
             int m = GekkoTime.Observations(t1_low, t2_low); //low freq periods
             int n = GekkoTime.Observations(t1_high, t2_high); //high freq periods
 

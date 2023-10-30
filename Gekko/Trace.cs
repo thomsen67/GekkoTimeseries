@@ -519,7 +519,7 @@ namespace Gekko
         /// <param name="databank"></param>
         public static void HandleTraceRead1(Databank databank)
         {
-            if (databank.traces != null)
+            if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
             {
                 TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
                 Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
