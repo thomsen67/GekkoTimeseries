@@ -726,6 +726,20 @@ namespace Gekko
             }
         }
 
+        delegate string GetTextBoxMainTabUpperCallback();
+        public static string GetTextBoxMainTabUpper()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.                
+                return Gui.gui.Invoke(new GetTextBoxMainTabUpperCallback(GetTextBoxMainTabUpper), new object[] { }) as string;
+            }
+            else
+            {
+                return Gui.gui.textBoxMainTabUpper.Text;
+            }
+        }        
+
 
         // ======================================
         //            WinForms end

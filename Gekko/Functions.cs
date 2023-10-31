@@ -4208,6 +4208,12 @@ namespace Gekko
             return new ScalarString(txt);
         }
 
+        public static IVariable readscreen(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            string txt = CrossThreadStuff.GetTextBoxMainTabUpper();
+            return new ScalarString(txt);
+        }
+
         public static IVariable isutf8file(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
@@ -4231,11 +4237,10 @@ namespace Gekko
             Program.WriteFile(file1, O.ReplaceSlash(x1));
         }
 
-        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        public static IVariable nl(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            return split(smpl, _t1, _t2, x1, x2, new ScalarVal(1), new ScalarVal(1));  //removeempty = yes, stripblanks = yes
+            return new ScalarString(G.NL2.ToString());
         }
-
 
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable removeEmpty, IVariable strip)
         {
@@ -4255,7 +4260,6 @@ namespace Gekko
             else
             {
                 new Error("removeempty must be yes or no");
-                //throw new GekkoException();
             }
 
             if (strip_int == 1)
@@ -4292,6 +4296,16 @@ namespace Gekko
             }
 
             return m;
+        }
+
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            return split(smpl, _t1, _t2, x1, x2, x3, new ScalarVal(1));  //stripblanks = yes
+        }
+
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            return split(smpl, _t1, _t2, x1, x2, new ScalarVal(1), new ScalarVal(1));  //removeempty = yes, stripblanks = yes
         }
 
         public static IVariable type(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

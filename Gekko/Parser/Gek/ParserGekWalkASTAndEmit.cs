@@ -1452,8 +1452,8 @@ namespace Gekko.Parser.Gek
                     {
                         node.Code.A("O.Sys o" + Num(node) + " = new O.Sys();" + G.NL);
                         if (node[0] != null) node.Code.A("o" + Num(node) + ".s = " + node[0].Code + ";" + G.NL);
-                        if (node[1][0] != null) node.Code.A(node[1][0].Code);
-                        node.Code.A(node[2].Code);
+                        if (node[1]?[0] != null) node.Code.A(node[1][0].Code);
+                        if (node[2]?.Code != null) node.Code.A(node[2].Code);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
