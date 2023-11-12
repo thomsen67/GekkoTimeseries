@@ -812,7 +812,7 @@ namespace Gekko
                             EFreq freq = modelGamsScalar.parent.modelCommon.freq;
                             if (freq == EFreq.None) freq = EFreq.A;
                             //do O.ECreatePossibilities.CanIncludingParentSeries
-                            Series ts = O.GetIVariableFromString((G.Chop_AddFreq(name, G.ConvertFreq(freq)), O.ECreatePossibilities.Can) as Series;
+                            Series ts = O.GetIVariableFromString(G.Chop_AddFreq(name, G.ConvertFreq(freq)), O.ECreatePossibilities.Can) as Series;
                             ts.SetData(t, r[i]);
                         }
                     }

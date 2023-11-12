@@ -1193,9 +1193,10 @@ namespace Gekko
         {
             NoneReturnNullButErrorForParentArraySeries,
             NoneReportError,
-            Can,
+            Can, //for "x[i, j]", will NOT create a new parent series
             Must,
-            NoneReturnNullAlways
+            NoneReturnNullAlways,
+            CanIncludingParentArraySeries  //if "x[i, j]", and x is not already existing, x will also be created.
         }
 
 

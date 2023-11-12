@@ -157,8 +157,11 @@ namespace Gekko
                     settingsTemp = new LookupSettings(); //normal abort if array-super-series is not found, cannot just be created                    
                     settingsTemp.depth = settings.depth;  //no recursion for #alias
                     //the if below was changed 5/12 2022, so that for ECreatePossibilities.NoneReturnNullAlways we can return a null for x[a], both if x does not exist, and if [a] does not exist. The stuff with settingsTemp probably has to do with auto-creation, not whether it return null or throws error.
+
+                    //PROBABLY A BUG!
+
                     if (settings.create == ECreatePossibilities.NoneReturnNullAlways) settingsTemp.create = settings.create = ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries; //if it is set to return null, this should be allowed also for an array series parent series that is missing
-                }
+                                    }
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, settingsTemp, type, errorIfNotFound, options);
                 
                 if (iv != null && indexes != null)
