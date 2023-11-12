@@ -16542,7 +16542,7 @@ namespace UnitTests
         {
             //NOTE: Fails sometimes with a null pointer exception while doing the MODEL<gams>. This
             //      is probably due to protobuf and too little ram or something similar. Annoying 
-            //      that it does not report ram issue instead. Try to run several times.
+            //      that it does not report ram issue instead. Try to run several times. 
 
             for (int i = 0; i < 2; i++)
             {
