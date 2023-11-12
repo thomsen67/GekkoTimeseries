@@ -160,7 +160,7 @@ namespace Gekko
 
                     //PROBABLY A BUG!
 
-                    if (settings.create == ECreatePossibilities.NoneReturnNullAlways) settingsTemp.create = settings.create = ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries; //if it is set to return null, this should be allowed also for an array series parent series that is missing
+                    if (settings.create == ECreatePossibilities.NoneReturnNullAlways) settingsTemp.create = ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries; //if it is set to return null, this should be allowed also for an array series parent series that is missing
                                     }
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, settingsTemp, type, errorIfNotFound, options);
                 
