@@ -18073,7 +18073,7 @@ namespace Gekko
 
             Model modelTemp = GamsModel.ReadGamsScalarModelEquations(settings, model);
             model.modelGamsScalar = modelTemp.modelGamsScalar;
-            model.modelGamsScalar.isStaticModel = true;
+            model.modelGamsScalar.isPerpetualModel = true;
 
             new Writeln("Linking to DECOMP module (" + G.Seconds(dt0) + ")");
         }

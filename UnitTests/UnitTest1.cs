@@ -16560,18 +16560,30 @@ namespace UnitTests
                 Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
                 Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
-                I("SIM;");
+                I("SIM <res>;");  //produce residuals
+                //Test some of them...
+
+                try
+                {
+                    Globals.modelStaticUnitTest = true;
+                    I("SIM;");
+                }
+                finally
+                {
+                    Globals.modelStaticUnitTest = false;
+                }
+                
                 string s = Globals.unitTestScreenOutput.ToString();
-                Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));
-                //Assert.IsTrue(s.Contains("RSS = 1.92045218981909E-10")); --> this is corresponding to the data contained in the GAMS scalar model output
-                //Assert.IsTrue(s.Contains("RSS = 1.92045031439235E-10")); //this must be ok
+                Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));                
                 Assert.IsTrue(s.Contains("1.92045120177723E-10")); //this must be ok
 
                 //TODO
                 //TODO
                 //TODO Do a better test of the resulting model object
+                //TODO Also test timing (speed)
                 //TODO
-                //TODO
+                //TODO          
+
             }
 
         }

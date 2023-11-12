@@ -725,7 +725,7 @@ namespace Gekko
         }
 
         public static void Sim(O.Sim o)
-        {            
+        {
             if (G.GetModelSourceType() == EModelType.GAMSScalar)
             {
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
@@ -734,47 +734,90 @@ namespace Gekko
                 // test the scalar model
                 // test the scalar model
 
-                bool testForZeroResiduals = false;
-                int rep1 = 5;
-                int rep2 = 100;
-                double rss = double.NaN;
-                for (int j1 = 0; j1 < rep1; j1++)
+                if (Globals.modelStaticUnitTest)
                 {
-                    DateTime dt0 = DateTime.Now;
-                    for (int j2 = 0; j2 < rep2; j2++)
+                    bool testForZeroResiduals = false;
+                    int rep1 = 5;
+                    int rep2 = 100;
+                    double rss = double.NaN;
+                    for (int j1 = 0; j1 < rep1; j1++)
                     {
-                        //This must run fast, else see PredictScalarModel()
-                        Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
-                        double[][] a = modelGamsScalar.a;
-                        double[] r = modelGamsScalar.r;
-                        int[][] bb = modelGamsScalar.bb;
-                        double[] cc = modelGamsScalar.cc;
-                        int[][] dd = modelGamsScalar.dd;
-                        int[] ee = modelGamsScalar.ee;
+                        DateTime dt0 = DateTime.Now;
+                        for (int j2 = 0; j2 < rep2; j2++)
+                        {
+                            //This must run fast, else see PredictScalarModel()
+                            Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
+                            double[][] a = modelGamsScalar.a;
+                            double[] r = modelGamsScalar.r;
+                            int[][] bb = modelGamsScalar.bb;
+                            double[] cc = modelGamsScalar.cc;
+                            int[][] dd = modelGamsScalar.dd;
+                            int[] ee = modelGamsScalar.ee;
+
+                            for (int i = 0; i < modelGamsScalar.eqCounts; i++)
+                            {
+                                functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
+                                                                           //double x = r[i];                              
+                            }
+                        }
+                        new Writeln(modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
+
+                        if (j1 == 0)
+                        {
+                            rss = 0d;
+                            foreach (double d in modelGamsScalar.r)
+                            {
+                                rss += d * d;
+                            }
+                            rss = Math.Sqrt(rss);
+                            if (testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+                            rss = rss;
+                        }
+                    }
+                    new Writeln("RSS = " + rss);
+                }
+                else
+                {
+                    if (!G.Equal(o.opt_res, "yes")) new Error("A GAMS scalar model only supports SIM<res>.");
+                    double rss = double.NaN;
+
+
+
+                    //This must run fast, else see PredictScalarModel()
+                    Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
+                    double[][] a = modelGamsScalar.a;
+                    double[] r = modelGamsScalar.r;
+                    int[][] bb = modelGamsScalar.bb;
+                    double[] cc = modelGamsScalar.cc;
+                    int[][] dd = modelGamsScalar.dd;
+                    int[] ee = modelGamsScalar.ee;
+
+                    string residualPrefix = "res";
+                    //do a "res_grandtotal".
+
+                    if (modelGamsScalar.isPerpetualModel)
+                    {
+
+                    }
+                    else
+                    {
 
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
-                                                                    //double x = r[i];                              
+                                                                       //double x = r[i];                              
 
+                            GekkoTime t = G.Chop_DimensionGetPeriod(modelGamsScalar.GetEqName(i));
+                            string name = G.Chop_DimensionRemoveLast(modelGamsScalar.GetEqName(i));
+                            EFreq freq = modelGamsScalar.parent.modelCommon.freq;
+                            if (freq == EFreq.None) freq = EFreq.A;
+                            //do O.ECreatePossibilities.CanIncludingParentSeries
+                            Series ts = O.GetIVariableFromString((G.Chop_AddFreq(name, G.ConvertFreq(freq)), O.ECreatePossibilities.Can) as Series;
+                            ts.SetData(t, r[i]);
                         }
                     }
-                    new Writeln(modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
-
-                    if (j1 == 0)
-                    {
-                        rss = 0d;
-                        foreach (double d in modelGamsScalar.r)
-                        {
-                            rss += d * d;
-                        }
-                        rss = Math.Sqrt(rss);
-                        if (testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
-                        rss = rss;
-                    }
+                    new Writeln("RSS = " + rss);
                 }
-
-                new Writeln("RSS = " + rss);
                 return;
             }
 

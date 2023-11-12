@@ -960,7 +960,7 @@ namespace Gekko
                     string s7 = varName + "[" + t.ToString() + "] = ";
                     foreach (int i in kvp.Value)
                     {
-                        string eqName = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                        string eqName = modelGamsScalar.GetEqName(i);
                         s7 += eqName + ", ";
                     }
                     new Writeln(s7);

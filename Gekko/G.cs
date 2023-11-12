@@ -1256,7 +1256,6 @@ namespace Gekko
             return name2;
         }
 
-
         /// <summary>
         /// Sets lag when there is an existing time, like "x[a, 2002]", which for t0=2001 would be
         /// changed into "x[a][+1]" if merge=false (which is normal), or else "x[a, +1]".
@@ -1266,16 +1265,23 @@ namespace Gekko
         /// <param name="t"></param>
         /// <param name="merge"></param>
         /// <returns></returns>
-        public static string Chop_DimensionSetLag(string name, GekkoTime t0, bool merge)
+        public static string Chop_DimensionConvertToLag(string name, GekkoTime t0, bool merge)
+        {            
+            return Chop_DimensionAddLag(Chop_DimensionRemoveLast(name), t0, Chop_DimensionGetPeriod(name), merge);
+        }
+
+        /// <summary>
+        /// In a name like "x[a, 2002]" or "x[a,2002]" the method returns the GekkoTime 2002.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static GekkoTime Chop_DimensionGetPeriod(string name)
         {
             List<string> ss = Chop_GetIndex(name);
             if (ss == null) new Error("No index found");
             string time = ss[ss.Count - 1];
             GekkoTime t = GekkoTime.FromStringToGekkoTime(time);
-            //string slag = GekkoTime.GetLagString(t0, t);
-            string name7 = Chop_DimensionRemoveLast(name);
-            string name8 = Chop_DimensionAddLag(name7, t0, t, merge);
-            return name8;
+            return t;
         }
 
         // ===========================================================================================================================

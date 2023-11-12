@@ -674,7 +674,7 @@ namespace Gekko
     public class ModelGamsScalar
     {
         [ProtoMember(1)]
-        public bool isStaticModel = false;  //only defined for 2000, other periods use offsets
+        public bool isPerpetualModel = false;  //only defined for phoney period 2000, other periods use offsets
 
         //not protobuffed
         public Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = null;
@@ -810,14 +810,14 @@ namespace Gekko
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
         /// <summary>
-        /// Start of data for static scalar model, not protobuffed.
+        /// Start of data for static perpetual model, not protobuffed.
         /// </summary>
-        public GekkoTime staticT1 = GekkoTime.tNull;
+        public GekkoTime perpetualT1 = GekkoTime.tNull;
 
         /// <summary>
-        /// End of data for static scalar model, not protobuffed.
+        /// End of data for static perpetual model, not protobuffed.
         /// </summary>
-        public GekkoTime staticT2 = GekkoTime.tNull;
+        public GekkoTime perpetualT2 = GekkoTime.tNull;
         
         // =============================================
         // =============================================
@@ -844,6 +844,12 @@ namespace Gekko
             return this.dict_FromEqNameToEqNumber.GetInt(eqName);
         }
 
+        /// <summary>
+        /// Input an eq number and get an equation name (string) returned, for instance "E_tIOy[tje,tje,2027]", where
+        /// the last part is the year.        /// 
+        /// </summary>
+        /// <param name="eqNumber"></param>
+        /// <returns></returns>
         public string GetEqName(int eqNumber)
         {
             //TODO: handle errors
@@ -898,7 +904,7 @@ namespace Gekko
         public GekkoTime Maybe2000GekkoTime(GekkoTime t0)
         {
             GekkoTime tTemp = t0;
-            if (this.isStaticModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
+            if (this.isPerpetualModel) tTemp = new GekkoTime(this.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
             return tTemp;
         }
 
@@ -1005,14 +1011,14 @@ namespace Gekko
         /// </summary>
         public void FlushAAndRArrays()
         {
-            if (this.isStaticModel)
+            if (this.isPerpetualModel)
             {
-                //static model, fill data in according to time period
-                //non-static model, fill all data in
+                //perpetual model, fill data in according to time period
+                //non-perpetual model, fill all data in
                 //NOTE: when widening with new periods, it would be possible to reuse existing period,
                 //      but probably does not matter regarding performance.                
 
-                int n = GekkoTime.Observations(this.staticT1, this.staticT2);
+                int n = GekkoTime.Observations(this.perpetualT1, this.perpetualT2);
                 this.a = new double[n][];
                 this.a_ref = new double[n][];
                 for (int j = 0; j < n; j++) this.a[j] = new double[this.dict_FromANumberToVarName.Length];
@@ -1020,7 +1026,7 @@ namespace Gekko
             }
             else
             {
-                //non-static model, fill all data in                               
+                //non-perpetual model, fill all data in                               
             }
 
             if (this.a != null)
@@ -1054,26 +1060,26 @@ namespace Gekko
             bool hasPeriodChanged = false;
             bool hasDatabankChanged = true;  //in the longer run, keep track of that
 
-            if (this.isStaticModel)
+            if (this.isPerpetualModel)
             {
                 int largestLag = this.Maybe2000GekkoTime(GekkoTime.tNull).Subtract(this.absoluteT1);
                 int largestLead = this.absoluteT2.Subtract(this.Maybe2000GekkoTime(GekkoTime.tNull));
                 GekkoTime staticT1Probe = gt1.Add(-largestLag - Globals.decompLagAddition);
                 GekkoTime staticT2Probe = gt2.Add(largestLead);
 
-                if (this.staticT1.IsNull() || this.staticT2.IsNull())
+                if (this.perpetualT1.IsNull() || this.perpetualT2.IsNull())
                 {                    
                     hasPeriodChanged = true;
-                    this.staticT1 = staticT1Probe;
-                    this.staticT2 = staticT2Probe;
+                    this.perpetualT1 = staticT1Probe;
+                    this.perpetualT2 = staticT2Probe;
                 }
                 else
                 {
-                    if (staticT1Probe.StrictlySmallerThan(this.staticT1) || staticT2Probe.StrictlyLargerThan(this.staticT2))
+                    if (staticT1Probe.StrictlySmallerThan(this.perpetualT1) || staticT2Probe.StrictlyLargerThan(this.perpetualT2))
                     {
                         hasPeriodChanged = true;
-                        this.staticT1 = staticT1Probe;
-                        this.staticT2 = staticT2Probe;
+                        this.perpetualT1 = staticT1Probe;
+                        this.perpetualT2 = staticT2Probe;
                     }
                     else
                     {                    
@@ -1151,10 +1157,10 @@ namespace Gekko
 
             GekkoTime tStart = this.absoluteT1;
             GekkoTime tEnd = this.absoluteT2;
-            if (this.isStaticModel)
+            if (this.isPerpetualModel)
             {
-                tStart = this.staticT1;
-                tEnd = this.staticT2;
+                tStart = this.perpetualT1;
+                tEnd = this.perpetualT2;
                 if (isRef) this.a_ref = null;
                 else this.a = null;
             }
@@ -1308,10 +1314,10 @@ namespace Gekko
         {
             GekkoTime tStart = this.absoluteT1;
             GekkoTime tEnd = this.absoluteT2;
-            if (this.isStaticModel)
+            if (this.isPerpetualModel)
             {
-                tStart = this.staticT1;
-                tEnd = this.staticT2;
+                tStart = this.perpetualT1;
+                tEnd = this.perpetualT2;
             }
 
             //Beware of OPTION series data missing, if it is set.
@@ -1347,12 +1353,7 @@ namespace Gekko
         /// <param name="fromDatabankToA"></param>
         /// <returns></returns>
         private Series DatabankAHelperScalarModel(Databank db, int aNumber, string name, bool fromDatabankToA, bool isRef)
-        {
-            if (name.ToLower().Contains("qxskala"))
-            {
-
-            }
-
+        {            
             Series ts = null;
 
             string firstRef = "first-position";
@@ -1527,7 +1528,7 @@ namespace Gekko
             int more = 20;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(ss, more);
 
-            if (this.isStaticModel)
+            if (this.isPerpetualModel)
             {
                 //handle translation of "x1-(x2-2);" into "x1=x2-2" , where () represents RHS
 

@@ -540,7 +540,7 @@ namespace Gekko
 
             GekkoTime gt1 = t1.Add(deduct);
             GekkoTime gt2 = t2;
-            if (modelGamsScalar.isStaticModel)
+            if (modelGamsScalar.isPerpetualModel)
             {                
                 gt1 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
                 gt2 = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
@@ -550,7 +550,7 @@ namespace Gekko
             {                
                 int i = time.Subtract(modelGamsScalar.tBasis);
 
-                if (modelGamsScalar.isStaticModel) i = 0;
+                if (modelGamsScalar.isPerpetualModel) i = 0;
                 if (i < 0 || i > element.periods.Length - 1)
                 {
                     if (showErrors) new Error("Period " + time.ToString() + " outside GAMS scalar model period. " + modelGamsScalar.GamsModelDefinedString() + ".");
@@ -928,7 +928,7 @@ namespace Gekko
                     element.indexes = mmi;
                     element.fullName = element.name + element.indexes.GetName();
                     int periods = GekkoTime.Observations(modelGamsScalar.absoluteT1, modelGamsScalar.absoluteT2);
-                    if (modelGamsScalar.isStaticModel) periods = 1;
+                    if (modelGamsScalar.isPerpetualModel) periods = 1;
                     element.periods = new DecompStartHelperPeriod[periods];
                     elements.Add(mmi, element);
                 }
@@ -2521,12 +2521,12 @@ namespace Gekko
                 int timeIndex1 = modelGamsScalar.FromGekkoTimeToTimeInteger(t);
                 int timeIndex2 = -timeIndex1;
                                 
-                if (modelGamsScalar.isStaticModel)
+                if (modelGamsScalar.isPerpetualModel)
                 {
                     ONE = 1;
                     timeIndex1 = 0;                    
                     timeIndex2 = modelGamsScalar.tBasis.Subtract(new GekkoTime(model.modelCommon.GetFreq(), Globals.decomp2000, 1));
-                    tZero = t.Subtract(modelGamsScalar.staticT1) + timeIndex2;
+                    tZero = t.Subtract(modelGamsScalar.perpetualT1) + timeIndex2;
                 }
                 string s = AddTimeToIndexes(eqPeriods.name, new List<string>(eqPeriods.indexes.storage), modelGamsScalar.Maybe2000GekkoTime(t));
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s);
@@ -4878,7 +4878,7 @@ namespace Gekko
                 {
                     string eqName = modelGamsScalar.GetEqName(eqNumber);
                     string eqNameWithLag = null;                    
-                    eqNameWithLag = G.Chop_DimensionSetLag(eqName, modelGamsScalar.Maybe2000GekkoTime(o.tSelected), false);                    
+                    eqNameWithLag = G.Chop_DimensionConvertToLag(eqName, modelGamsScalar.Maybe2000GekkoTime(o.tSelected), false);                    
                     EqHelper e = new EqHelper();
                     e.eqName = eqName;
                     e.eqNameWithLag = eqNameWithLag;
@@ -5191,7 +5191,7 @@ namespace Gekko
                 temp.Add(name2 + lbl);
                 if (f.eq != -12345)
                 {
-                    temp.Add("--> " + modelGamsScalar.dict_FromEqNumberToEqName[f.eq] + " --> ");
+                    temp.Add("--> " + modelGamsScalar.GetEqName(f.eq) + " --> ");
                 }
                 if (f.parent == null) break;
                 f = f.parent;
