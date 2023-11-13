@@ -455,6 +455,8 @@ namespace Gekko
 
         /// <summary>
         /// Set a timeseries as an array-timeseries. Note that the dimension includes time dimension (if present).
+        /// Note that setting (3, true) and (2, false) really results in the same object... because the parent
+        /// object does not know what is put inside.
         /// </summary>
         /// <param name="dimensionsIncludingTimeDimension"></param>
         /// <param name="hasTimeDimension"></param>
@@ -2297,7 +2299,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Find sub-series inside array super-series
+        /// Find sub-series inside array super-series (using IVariable keys)
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="indexes"></param>
@@ -2307,11 +2309,10 @@ namespace Gekko
         /// <returns></returns>
         public IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless, LookupSettings settings)
         {
-            if (indexes.Length == 0)
-            {
-                new Error("Indexer has 0 length");
-            }
             IVariable rv = null;
+
+            if (indexes == null) new Error("Indexer has null value");
+            if (indexes.Length == 0) new Error("Indexer has 0 length");            
 
             string[] keys = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
 
@@ -2324,11 +2325,24 @@ namespace Gekko
                     s += iv.Type().ToString() + ", ";
                 }
                 new Error("Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
-                //throw new GekkoException();
             }
+            return FindArraySeries(smpl, keys, isLhs, rhsIsTimeless, settings);
+        }
 
-            rv = FindArraySeriesHelper(smpl, isLhs, keys, rhsIsTimeless, settings);
-
+        /// <summary>
+        /// Find sub-series inside array super-series (using string keys)
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="indexes"></param>
+        /// <param name="isLhs"></param>
+        /// <param name="rhsIsTimeless"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public IVariable FindArraySeries(GekkoSmpl smpl, string[] keys, bool isLhs, bool rhsIsTimeless, LookupSettings settings)
+        {            
+            if (keys == null) new Error("Indexer has null value");
+            if (keys.Length == 0) new Error("Indexer has 0 length");            
+            IVariable rv = FindArraySeriesHelper(smpl, isLhs, keys, rhsIsTimeless, settings);
             return rv;
         }
 

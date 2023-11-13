@@ -3777,6 +3777,7 @@ simOpt1h:                   FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
 						  | STATIC (EQUAL yesNo)? -> ^(ASTOPT_STRING_STATIC yesNo?)
 						  | AFTER (EQUAL yesNo)? -> ^(ASTOPT_STRING_AFTER yesNo?)
 						  | RES (EQUAL yesNo)? -> ^(ASTOPT_STRING_RES yesNo?)
+                          | PREFIX EQUAL expression -> ^(ASTOPT_STRING_PREFIX expression)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

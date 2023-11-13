@@ -1195,8 +1195,7 @@ namespace Gekko
             NoneReportError,
             Can, //for "x[i, j]", will NOT create a new parent series
             Must,
-            NoneReturnNullAlways,
-            CanIncludingParentArraySeries  //if "x[i, j]", and x is not already existing, x will also be created.
+            NoneReturnNullAlways
         }
 
 
@@ -10090,6 +10089,7 @@ namespace Gekko
             public string opt_static = null;
             public string opt_after = null;
             public string opt_res = null;
+            public string opt_prefix = null;
             public P p = null;
 
             public void Exe()

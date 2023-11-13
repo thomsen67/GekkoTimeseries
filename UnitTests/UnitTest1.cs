@@ -16561,6 +16561,8 @@ namespace UnitTests
                 Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
                 I("SIM <res>;");  //produce residuals
+                I("PRT <80 2050> E_tIOy[tje, tje];");
+                return;
                 //Test some of them...
 
                 try

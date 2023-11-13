@@ -790,10 +790,7 @@ namespace Gekko
                     int[][] bb = modelGamsScalar.bb;
                     double[] cc = modelGamsScalar.cc;
                     int[][] dd = modelGamsScalar.dd;
-                    int[] ee = modelGamsScalar.ee;
-
-                    string residualPrefix = "res";
-                    //do a "res_grandtotal".
+                    int[] ee = modelGamsScalar.ee;                    
 
                     if (modelGamsScalar.isPerpetualModel)
                     {
@@ -801,19 +798,78 @@ namespace Gekko
                     }
                     else
                     {
-
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
-                                                                       //double x = r[i];                              
+                                                                       //double x = r[i];                            
+                        }
+                        //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.                            
+                        const bool useSpeedup = true;  //has been tested to work ok
+                        string previousName = ""; string[] previousIndexes = null; Series previousSeries = null;
+                        for (int i = 0; i < modelGamsScalar.eqCounts; i++)
+                        {
+                            string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
+                            G.Chop_Chop(modelGamsScalar.GetEqName(i), out bank, out name2, out freq2, out indexes); //freq2 will be == null
+                            string name = o.opt_prefix + name2;
+                            GekkoTime t = GekkoTime.FromStringToGekkoTime(indexes[indexes.Length - 1]);
 
-                            GekkoTime t = G.Chop_DimensionGetPeriod(modelGamsScalar.GetEqName(i));
-                            string name = G.Chop_DimensionRemoveLast(modelGamsScalar.GetEqName(i));
-                            EFreq freq = modelGamsScalar.parent.modelCommon.freq;
-                            if (freq == EFreq.None) freq = EFreq.A;
-                            //do O.ECreatePossibilities.CanIncludingParentSeries
-                            Series ts = O.GetIVariableFromString(G.Chop_AddFreq(name, G.ConvertFreq(freq)), O.ECreatePossibilities.Can) as Series;
-                            ts.SetData(t, r[i]);
+                            bool good = true;
+                            if (name != previousName)  //no need to check case-insensitive
+                            {
+                                good = false;
+                            }
+                            else
+                            {
+                                for (int ii = 0; ii < indexes.Length - 1; ii++)
+                                {
+                                    if (indexes[ii] != previousIndexes[ii]) { good = false; break; }  //no need to check case-insensitive
+                                }
+                            }
+
+                            if (good)
+                            {
+                                previousSeries.SetData(t, r[i]);
+                            }
+                            else
+                            {
+                                EFreq freq = modelGamsScalar.parent.modelCommon.freq; if (freq == EFreq.None) freq = EFreq.A;
+                                string nameWithFreq = G.Chop_AddFreq(name, G.ConvertFreq(freq));
+                                Series ts = null;
+                                string[] indexesWithoutT = new string[indexes.Length - 1];
+                                for (int ii = 0; ii < indexesWithoutT.Length; ii++) indexesWithoutT[ii] = indexes[ii];
+                                if (indexesWithoutT.Length > 0)
+                                {
+                                    //array-series
+                                    ts = O.GetIVariableFromString(nameWithFreq, O.ECreatePossibilities.Can) as Series;
+                                    if (ts.dimensions == indexesWithoutT.Length)
+                                    {
+                                        //the parent series already exists, and with the right # dimensions
+                                    }
+                                    else
+                                    {
+                                        //the parent series is not compatible: make it so!
+                                        ts.SetArrayTimeseries(indexesWithoutT.Length + 1, true);
+                                        ts.data = null;  //safety, if the parent series was a normal series
+                                    }
+                                    LookupSettings settings = new LookupSettings();
+                                    settings.create = O.ECreatePossibilities.Can;
+                                    Series sub = ts.FindArraySeries(null, indexesWithoutT, false, false, settings) as Series;
+                                    sub.SetData(t, r[i]);
+                                    if (useSpeedup) previousSeries = sub;
+                                }
+                                else
+                                {
+                                    //normal series
+                                    ts = O.GetIVariableFromString(nameWithFreq, O.ECreatePossibilities.Can) as Series;
+                                    ts.SetData(t, r[i]);
+                                    if (useSpeedup) previousSeries = ts;
+                                }
+                                if (useSpeedup)
+                                {
+                                    previousName = name;
+                                    previousIndexes = indexesWithoutT;
+                                }
+                            }
                         }
                     }
                     new Writeln("RSS = " + rss);
