@@ -5182,6 +5182,7 @@ namespace Gekko
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {
+            //To test: start up here: c:\Thomas\Gekko\regres\MAKRO\test3_BACKUP2\klon\Model
             if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
             string input1 = O.ConvertToString(input[0]);
             if (G.Equal(input1, "pack"))
@@ -5363,19 +5364,36 @@ namespace Gekko
                     {
                         string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString());
                         if (dif0 > 0 && s6.Trim().ToLower().StartsWith("solve "))
-                        {                            
+                        {
                             int counter = 0;
-                            for (int? t = settings.t1; t <= settings.t2; t++)
-                            {
-                                for (int? a = settings.a1; a <= settings.a2; a++)
+                            if (false)
+                            {                                
+                                for (int? t = settings.t1; t <= settings.t2; t++)
                                 {
-                                    sw.WriteLine(settings.fix_variable + ".fx['" + a + "', '" + t + "'] = 0;");
-                                    counter++;
-                                    if (counter == dif0 + dif)
+                                    for (int? a = settings.a1; a <= settings.a2; a++)
                                     {
-                                        goto Lbl;
-                                    }                                    
+                                        sw.WriteLine(settings.fix_variable + ".fx['" + a + "', '" + t + "'] = 0;");
+                                        counter++;
+                                        if (counter == dif0 + dif)
+                                        {
+                                            goto Lbl;
+                                        }
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                string s7 = null;
+                                for (int i = 0; i < dif0 + dif; i++)
+                                {
+                                    string s8 = "extra" + i;
+                                    s7 += " , " + s8;
+                                    sw.WriteLine("equation " + s8 + "[t];");
+                                    sw.WriteLine(s8 + "['2030'] .. qBNP['2030'] - 1.00000000001*qBNP['2030'] =E= 0;");
+
+                                }
+                                sw.WriteLine("model m_base2 / m_base" + s7 + " /;");
+                                sw.WriteLine("model m_base / m_base2 /;");
                             }
                         Lbl:;
                             if (counter != dif0 + dif)

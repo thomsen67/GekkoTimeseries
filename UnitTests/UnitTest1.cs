@@ -16521,9 +16521,17 @@ namespace UnitTests
             Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
             Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
-            I("SIM;");
+            try
+            {
+                Globals.modelResUnitTest = true;
+                I("SIM;");
+            }
+            finally
+            {
+                Globals.modelResUnitTest = false;
+            }
+            
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
-            //Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.10011561985681E-15"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 9.94176668132747E-16"));
             //TODO
             //TODO
@@ -16560,34 +16568,42 @@ namespace UnitTests
                 Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
                 Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
-                I("SIM <res>;");  //produce residuals
-                I("PRT <80 2050> E_tIOy[tje, tje];");
-                return;
-                //Test some of them...
-
-                try
+                if (true)
                 {
-                    Globals.modelStaticUnitTest = true;
-                    I("SIM;");
+                    //Testing out residual production
+                    I("SIM <res prefix = 'res_'>;");  //produce residuals
+                    _AssertSeries(First(), "res_E_tIOy", new string[] { "tje", "tje" }, 2027, 0d, sharedDelta);
                 }
-                finally
+
+                if (true)
                 {
-                    Globals.modelStaticUnitTest = false;
+
+                    //Test some of them...
+
+                    Globals.unitTestScreenOutput.Clear();
+
+                    try
+                    {
+                        Globals.modelResUnitTest = true;
+                        I("SIM;");
+                    }
+                    finally
+                    {
+                        Globals.modelResUnitTest = false;
+                    }
+                    
+                    string s = Globals.unitTestScreenOutput.ToString();
+                    Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));
+                    Assert.IsTrue(s.Contains("1.92045120177723E-10")); //this must be ok
+
+                    //TODO
+                    //TODO
+                    //TODO Do a better test of the resulting model object
+                    //TODO Also test timing (speed)
+                    //TODO
+                    //TODO          
                 }
-                
-                string s = Globals.unitTestScreenOutput.ToString();
-                Assert.IsTrue(s.Contains("1063359 evaluations x 100 took"));                
-                Assert.IsTrue(s.Contains("1.92045120177723E-10")); //this must be ok
-
-                //TODO
-                //TODO
-                //TODO Do a better test of the resulting model object
-                //TODO Also test timing (speed)
-                //TODO
-                //TODO          
-
             }
-
         }
 
         [TestMethod]

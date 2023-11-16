@@ -734,7 +734,7 @@ namespace Gekko
                 // test the scalar model
                 // test the scalar model
 
-                if (Globals.modelStaticUnitTest)
+                if (Globals.modelResUnitTest)
                 {
                     bool testForZeroResiduals = false;
                     int rep1 = 5;
@@ -745,7 +745,7 @@ namespace Gekko
                         DateTime dt0 = DateTime.Now;
                         for (int j2 = 0; j2 < rep2; j2++)
                         {
-                            //This must run fast, else see PredictScalarModel()
+                            //See also #7jm32rd8dsf
                             Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
                             double[][] a = modelGamsScalar.a;
                             double[] r = modelGamsScalar.r;
@@ -779,11 +779,8 @@ namespace Gekko
                 else
                 {
                     if (!G.Equal(o.opt_res, "yes")) new Error("A GAMS scalar model only supports SIM<res>.");
-                    double rss = double.NaN;
 
-
-
-                    //This must run fast, else see PredictScalarModel()
+                    //See also #7jm32rd8dsf
                     Func<int, double[], double[][], double[], int[][], int[][], int, double>[] functions = modelGamsScalar.functions;
                     double[][] a = modelGamsScalar.a;
                     double[] r = modelGamsScalar.r;
@@ -794,17 +791,21 @@ namespace Gekko
 
                     if (modelGamsScalar.isPerpetualModel)
                     {
-
+                        new Writeln("SIM<res> is not yet implemented for perpetual type model.");
                     }
                     else
                     {
+                        GekkoTime t1 = GekkoTime.tNull;
+                        GekkoTime t2 = GekkoTime.tNull;
+                        int counterMissings = 0;
+                        int counterSeries = 0;
+
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
                                                                        //double x = r[i];                            
                         }
-                        //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.                            
-                        const bool useSpeedup = true;  //has been tested to work ok
+                        //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.                                                    
                         string previousName = ""; string[] previousIndexes = null; Series previousSeries = null;
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
                         {
@@ -826,12 +827,27 @@ namespace Gekko
                                 }
                             }
 
-                            if (good)
+                            if (i == 0)
                             {
-                                previousSeries.SetData(t, r[i]);
+                                t1 = t;
+                                t2 = t;
                             }
                             else
                             {
+                                if (t.StrictlySmallerThan(t1)) t1 = t;
+                                if (t.StrictlyLargerThan(t2)) t2 = t;
+                            }
+                            double v = r[i];
+                            if (G.isNumericalError(v)) counterMissings++;
+
+                            if (good)
+                            {
+                                //reuse!
+                                previousSeries.SetData(t, v);
+                            }
+                            else
+                            {
+                                //we have to find a new series
                                 EFreq freq = modelGamsScalar.parent.modelCommon.freq; if (freq == EFreq.None) freq = EFreq.A;
                                 string nameWithFreq = G.Chop_AddFreq(name, G.ConvertFreq(freq));
                                 Series ts = null;
@@ -854,25 +870,23 @@ namespace Gekko
                                     LookupSettings settings = new LookupSettings();
                                     settings.create = O.ECreatePossibilities.Can;
                                     Series sub = ts.FindArraySeries(null, indexesWithoutT, false, false, settings) as Series;
-                                    sub.SetData(t, r[i]);
-                                    if (useSpeedup) previousSeries = sub;
+                                    sub.SetData(t, v);
+                                    previousSeries = sub;
                                 }
                                 else
                                 {
                                     //normal series
                                     ts = O.GetIVariableFromString(nameWithFreq, O.ECreatePossibilities.Can) as Series;
-                                    ts.SetData(t, r[i]);
-                                    if (useSpeedup) previousSeries = ts;
-                                }
-                                if (useSpeedup)
-                                {
-                                    previousName = name;
-                                    previousIndexes = indexesWithoutT;
-                                }
+                                    ts.SetData(t, v);
+                                    previousSeries = ts;                                    
+                                }                                
+                                previousName = name;
+                                previousIndexes = indexesWithoutT;                                
+                                counterSeries++;
                             }
                         }
-                    }
-                    new Writeln("RSS = " + rss);
+                        new Writeln("Residuals calculated for " + t1.ToString() + "-" + t2.ToString() + ", resulting in " + counterSeries + " (array-)series with a total of " + modelGamsScalar.eqCounts + " residual values (of which " + counterMissings + " were missings)");
+                    }                    
                 }
                 return;
             }

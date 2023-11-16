@@ -892,7 +892,7 @@ namespace Gekko
         public static double gamsNA = 2e300d;
         public static double gamsUndf = 1e300d; //probably has this value in gdx, see https://github.com/NREL/gdx-pandas/blob/master/gdxpds/gdx.py
 
-        public static bool modelStaticUnitTest = false;
+        public static bool modelResUnitTest = false;
 
         public static int convertTableCounter = 0;
         public static int convertTableErrorCounter = 0;
