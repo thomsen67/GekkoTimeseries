@@ -17,14 +17,13 @@ namespace Gekko
         public string zip_name = null;
         public string raw_path = null;
         public object[] raw_ignore = null;
-        public string fix_variable = null;
+        public string variable = null;
+        public string model = null;
         public string counts1 = "**** counts do not match";
         public string counts2 = "**** unmatched free variables";
         public string counts3 = "**** number of unmatched =e= rows";
         public int? t1 = null;
         public int? t2 = null;
-        public int? a1 = 18;
-        public int? a2 = 100;
         public object[] cmd_lines = null;
         public object[] gms_lines = null;
     }
@@ -5226,11 +5225,11 @@ namespace Gekko
 
         private static void helper_GamsScalar(int depth, int dif0, GamsScalarHelper settings)
         {
+            if (depth > 1) new Error("GAMS solver called > 2 times in gamsscalar() function. This should not be necessary: report this to the Gekko editor.");
             int dif = 0;
             string path = Program.options.folder_working;
             if (depth == 0)
-            {
-                O.Cls("main");
+            {                
                 string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(path + "\\" + "gamsconvert.json"));
                 System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
                 Dictionary<string, object> jsonTree = null;
@@ -5249,14 +5248,13 @@ namespace Gekko
                 try { settings.zip_name = (string)jsonTree["zip_name"]; } catch { }
                 try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
                 try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
-                try { settings.fix_variable = (string)jsonTree["fix_variable"]; } catch { }
+                try { settings.variable = (string)jsonTree["variable"]; } catch { }
+                try { settings.model = (string)jsonTree["model"]; } catch { }
                 try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
                 try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
                 try { settings.counts3 = (string)jsonTree["counts3"]; } catch { }
                 try { settings.t1 = (int)jsonTree["t1"]; } catch { }
                 try { settings.t2 = (int)jsonTree["t2"]; } catch { }
-                try { settings.a1 = (int)jsonTree["a1"]; } catch { }
-                try { settings.a2 = (int)jsonTree["a2"]; } catch { }
                 try { settings.cmd_lines = (object[])jsonTree["cmd_lines"]; } catch { }
                 try { settings.gms_lines = (object[])jsonTree["gms_lines"]; } catch { }
 
@@ -5265,7 +5263,8 @@ namespace Gekko
                 if (settings.zip_name == null) new Error("You must indicate zip_name in gamsconvert.json");
                 if (settings.raw_path == null) new Error("You must indicate raw_path in gamsconvert.json");
                 if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
-                if (settings.fix_variable == null) new Error("You must indicate fix_variable in gamsconvert.json");
+                if (settings.variable == null) new Error("You must indicate variable in gamsconvert.json");
+                if (settings.model == null) new Error("You must indicate model in gamsconvert.json");
                 //if (settings.counts1 == null) new Error("");
                 //if (settings.counts2 == null) new Error("");
                 //if (settings.counts3 == null) new Error("");
@@ -5301,14 +5300,13 @@ namespace Gekko
                         if (x == null) new Error("Expected raw_ignore elements to be all strings");
                         txt.MainAdd("- " + x); txt.MainNewLineTight();
                     }
-                    txt.MainAdd("fix_variable = " + settings.fix_variable); txt.MainNewLineTight();
+                    txt.MainAdd("variable = " + settings.variable); txt.MainNewLineTight();
+                    txt.MainAdd("model = " + settings.variable); txt.MainNewLineTight();
                     txt.MainAdd("counts1 = " + settings.counts1); txt.MainNewLineTight();
                     txt.MainAdd("counts2 = " + settings.counts2); txt.MainNewLineTight();
                     txt.MainAdd("counts3 = " + settings.counts3); txt.MainNewLineTight();
                     txt.MainAdd("t1 = " + settings.t1); txt.MainNewLineTight();
                     txt.MainAdd("t2 = " + settings.t2); txt.MainNewLineTight();
-                    txt.MainAdd("a1 = " + settings.a1); txt.MainNewLineTight();
-                    txt.MainAdd("a2 = " + settings.a2); txt.MainNewLineTight();
                     txt.MainAdd("cmd_lines = "); txt.MainNewLineTight();
                     foreach (string ox in settings.cmd_lines)
                     {
@@ -5324,24 +5322,20 @@ namespace Gekko
                         txt.MainAdd("- " + x); txt.MainNewLineTight();
                     }
                 }
-
                 Helper_GamsConvert2(path);
-
             }
 
             using (Writeln txt = new Writeln())
             {
                 txt.MainAdd(""); txt.MainNewLineTight();
-                txt.MainAdd(""); txt.MainNewLineTight();
-                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd(""); txt.MainNewLineTight();                ;
                 txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
                 txt.MainAdd("DIFF = " + (dif0 + dif) + ", depth = " + depth); txt.MainNewLineTight();
-                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
-                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                txt.MainAdd("=========================================================================="); txt.MainNewLineTight();                
                 txt.MainAdd(""); txt.MainNewLineTight();
             }            
 
-            Pause(); new Writeln("-------------------- calling GAMS start ---------------------------------------");
+            new Writeln("-------------------- calling GAMS start ---------------------------------------");
 
             using (Writeln txt = new Writeln())
             {
@@ -5362,44 +5356,19 @@ namespace Gekko
                 {
                     foreach (string s5 in settings.gms_lines)
                     {
-                        string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString());
+                        string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString()).Replace("{model}", settings.model);
                         if (dif0 > 0 && s6.Trim().ToLower().StartsWith("solve "))
-                        {
-                            int counter = 0;
-                            if (false)
-                            {                                
-                                for (int? t = settings.t1; t <= settings.t2; t++)
-                                {
-                                    for (int? a = settings.a1; a <= settings.a2; a++)
-                                    {
-                                        sw.WriteLine(settings.fix_variable + ".fx['" + a + "', '" + t + "'] = 0;");
-                                        counter++;
-                                        if (counter == dif0 + dif)
-                                        {
-                                            goto Lbl;
-                                        }
-                                    }
-                                }
-                            }
-                            else
+                        {                            
+                            string s7 = null;
+                            for (int i = 0; i < dif0 + dif; i++)
                             {
-                                string s7 = null;
-                                for (int i = 0; i < dif0 + dif; i++)
-                                {
-                                    string s8 = "extra" + i;
-                                    s7 += " , " + s8;
-                                    sw.WriteLine("equation " + s8 + "[t];");
-                                    sw.WriteLine(s8 + "['2030'] .. qBNP['2030'] - 1.00000000001*qBNP['2030'] =E= 0;");
-
-                                }
-                                sw.WriteLine("model m_base2 / m_base" + s7 + " /;");
-                                sw.WriteLine("model m_base / m_base2 /;");
+                                string s8 = "extra" + i;
+                                s7 += " , " + s8;
+                                sw.WriteLine("equation " + s8 + "[t];");
+                                sw.WriteLine(s8 + "['" + settings.t1.ToString() + "'] .. " + settings.variable + "['" + settings.t1.ToString() + "'] =E= 0;");
                             }
-                        Lbl:;
-                            if (counter != dif0 + dif)
-                            {
-                                fail = "Needed to fix " + (dif0 + dif) + " variables, but could only fix " + counter;
-                            }
+                            sw.WriteLine("model " + settings.model + "_temp / " + settings.model + s7 + " /;");
+                            sw.WriteLine("model " + settings.model + " / " + settings.model + "_temp /;");                        
                         }
                         sw.WriteLine(s6);
                     }
@@ -5413,7 +5382,7 @@ namespace Gekko
             string s2 = CrossThreadStuff.GetOutputWindowText();
             string s = s2.Substring(s1.Length);
 
-            Pause(); new Writeln("-------------------- calling GAMS end ---------------------------------------");
+            new Writeln("-------------------- calling GAMS end ---------------------------------------");
 
             List<string> ss = Stringlist.ExtractLinesFromText(s);
             try
@@ -5521,7 +5490,7 @@ namespace Gekko
                 }
                 new Writeln("Cleanup: deleting gams.gms and dict.txt.");
                 Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
-                Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
+                Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));                
             }
             else
             {
@@ -5547,10 +5516,7 @@ namespace Gekko
 
             Helper_GamsConvert2(path);
 
-            void Pause()
-            {
-                //System.Windows.Forms.MessageBox.Show("Press [Enter] to continue");
-            }
+            if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.zip_name + ".");
         }
 
         private static void Helper_GamsConvert2(string path)
