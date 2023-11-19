@@ -16607,6 +16607,53 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_GAMSScalar()
+        {
+            Globals.unitTestScreenOutput.Clear();
+            //string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model";
+            string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3_BACKUP2\klon\Model\";        
+            I("RESET;");
+            I("OPTION folder working = '" + path5 + "';");
+            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
+            using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.WriteLine(@"{");
+                sw.WriteLine(@" ""zip_name"" : ""makro2gekko.zip"",");
+                sw.WriteLine(@" ""raw_path"" : ""*.gms"",");
+                sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],");
+                sw.WriteLine(@" ""variable"" : ""qBNP"",");
+                sw.WriteLine(@" ""counts1"" : ""****counts do not match"",");
+                sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",");
+                sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",");
+                sw.WriteLine(@" ""t1"" : 2026,");
+                sw.WriteLine(@" ""t2"" : 2099,");
+                sw.WriteLine(@" ""model"": ""m_base"",");
+                sw.WriteLine(@" ""is_manual"": false,");
+                sw.WriteLine(@" ""cmd_lines"":");
+                sw.WriteLine(@" [");
+                sw.WriteLine(@" ""call ..\\paths.cmd"",");
+                sw.WriteLine(@" ""set gamY=call %python% ..\\gamY\\gamY.py"",");
+                sw.WriteLine(@" ""%gamY% gamsscalar.gms r=..\\Model\\Savepoints\\model""");
+                sw.WriteLine(@" ],");
+                sw.WriteLine(@" ""gms_lines"":");
+                sw.WriteLine(@" [");
+                sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",");
+                sw.WriteLine(@" ""$fix all; $unfix g_endo;"",");
+                sw.WriteLine(@" ""{model}.holdFixed = 0;"",");
+                sw.WriteLine(@" ""option mcp = convert;"",");
+                sw.WriteLine(@" ""solve {model} using mcp;""");
+                sw.WriteLine(@" ]");
+                sw.WriteLine(@" } ");
+            }
+            File.Delete(path5 + "\\makro2gekko.zip");
+            I("gamsscalar('pack');");
+            long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
+            Assert.AreEqual(size, 61012491L);
+        }
+
+        [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()
         {
             double Function(double[] x_function, CGSolverInput input_function)

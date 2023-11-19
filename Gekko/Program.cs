@@ -68,6 +68,7 @@ using System.Threading.Tasks;
 using static Gekko.Program;
 using System.Windows.Markup.Localizer;
 using static alglib;
+using System.Windows.Interop;
 //using Microsoft.Office.Interop.Excel;
 
 namespace Gekko
@@ -9417,6 +9418,377 @@ namespace Gekko
             }
             //doFoundWinRegKey(rCore, logger);
             return r;
+        }
+
+        /// <summary>
+        /// Packs a zip file containing raw and scalar gams equations. Uses gamsconvert.json to control which files are used.
+        /// </summary>
+        /// <param name="depth"></param>
+        /// <param name="dif0"></param>
+        /// <param name="settings"></param>
+        public static void GamsScalar(int depth, int dif0, GamsScalarHelper settings)
+        {
+            DateTime t00 = DateTime.Now;
+            string path = Program.options.folder_working;
+            bool optionsFileExists = false;
+            try
+            {
+                if (depth > 1) new Error("GAMS solver called > 2 times in gamsscalar() function. This should not be necessary: report this to the Gekko editor.");
+                int dif = 0;
+                if (depth == 0 || G.IsUnitTesting())
+                {
+                    if (File.Exists(Path.Combine(path, "convert.opt"))) optionsFileExists = true;
+                    if (!optionsFileExists)
+                    {
+                        File.WriteAllText(Path.Combine(path, "convert.opt"), " "); //create a convert.opt file to avoid GAMS error message (will be deleted again at the end). To avoid a warning, " " is used.
+                    }
+                    string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(path + "\\" + "gamsscalar.json"));
+                    System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    Dictionary<string, object> jsonTree = null;
+                    try
+                    {
+                        jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("The .json file does not seem correctly formatted. " + e.Message);
+                    }
+
+                    // -------------------------------------------------------------
+
+                    settings = new GamsScalarHelper();
+                    try { settings.zip_name = (string)jsonTree["zip_name"]; } catch { }
+                    try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
+                    try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
+                    try { settings.variable = (string)jsonTree["variable"]; } catch { }
+                    try { settings.model = (string)jsonTree["model"]; } catch { }
+                    try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
+                    try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
+                    try { settings.counts3 = (string)jsonTree["counts3"]; } catch { }
+                    try { settings.t1 = (int)jsonTree["t1"]; } catch { }
+                    try { settings.t2 = (int)jsonTree["t2"]; } catch { }
+                    try { settings.cmd_lines = (object[])jsonTree["cmd_lines"]; } catch { }
+                    try { settings.gms_lines = (object[])jsonTree["gms_lines"]; } catch { }
+                    try { settings.isManual = (bool)jsonTree["is_manual"]; } catch { }
+
+                    // ============================================
+
+                    if (settings.zip_name == null) new Error("You must indicate zip_name in gamsscalar.json");
+                    if (settings.raw_path == null) new Error("You must indicate raw_path in gamsscalar.json");
+                    if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
+                    if (settings.variable == null) new Error("You must indicate variable in gamsscalar.json");
+                    if (settings.model == null) new Error("You must indicate model in gamsscalar.json");
+                    //if (settings.counts1 == null) new Error("");
+                    //if (settings.counts2 == null) new Error("");
+                    //if (settings.counts3 == null) new Error("");
+                    if (settings.t1 == null) new Error("You must indicate t1 in gamsscalar.json");
+                    if (settings.t2 == null) new Error("You must indicate t2 in gamsscalar.json");
+                    //if (settings.a1 == null) Error("");
+                    //if (settings.a2 == null) Error("");
+                    if (settings.cmd_lines == null) new Error("You must indicate cmd_lines in gamsscalar.json");
+                    if (settings.gms_lines == null) new Error("You must indicate gms_lines in gamsscalar.json");
+
+                    // -------------------------------------------------------------
+
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The gamsscalar() function is a helper function for GAMS to produce a ");
+                        txt.MainAdd("scalar model for use in the Gekko DECOMP command.");
+                        txt.MainAdd("A GAMS scalar model is produced by the GAMS CONVERT command.");
+                    }
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("Settings:");
+                    }
+                    using (Writeln txt = new Writeln("- ", int.MaxValue, System.Drawing.Color.Empty, false, ETabs.Main))
+                    {
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd("working folder (model folder) = " + Program.options.folder_working); txt.MainNewLineTight();
+                        txt.MainAdd("zip_name = " + settings.zip_name); txt.MainNewLineTight();
+                        txt.MainAdd("raw_path = " + settings.raw_path); txt.MainNewLineTight();
+                        txt.MainAdd("raw_ignore = "); txt.MainNewLineTight();
+                        foreach (string ox in settings.raw_ignore)
+                        {
+                            string x = ox as string;
+                            if (x == null) new Error("Expected raw_ignore elements to be all strings");
+                            txt.MainAdd("- " + x); txt.MainNewLineTight();
+                        }
+                        txt.MainAdd("variable = " + settings.variable); txt.MainNewLineTight();
+                        txt.MainAdd("model = " + settings.variable); txt.MainNewLineTight();
+                        txt.MainAdd("counts1 = " + settings.counts1); txt.MainNewLineTight();
+                        txt.MainAdd("counts2 = " + settings.counts2); txt.MainNewLineTight();
+                        txt.MainAdd("counts3 = " + settings.counts3); txt.MainNewLineTight();
+                        txt.MainAdd("t1 = " + settings.t1); txt.MainNewLineTight();
+                        txt.MainAdd("t2 = " + settings.t2); txt.MainNewLineTight();
+                        txt.MainAdd("cmd_lines = "); txt.MainNewLineTight();
+                        foreach (string ox in settings.cmd_lines)
+                        {
+                            string x = ox as string;
+                            if (x == null) new Error("Expected cmd_lines elements to be all strings");
+                            txt.MainAdd("- " + x); txt.MainNewLineTight();
+                        }
+                        txt.MainAdd("gms_lines = "); txt.MainNewLineTight();
+                        foreach (string ox in settings.gms_lines)
+                        {
+                            string x = ox as string;
+                            if (x == null) new Error("Expected gms_lines elements to be all strings");
+                            txt.MainAdd("- " + x); txt.MainNewLineTight();
+                        }
+                    }
+                    DeleteFiles(path);
+                }
+
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd(""); txt.MainNewLineTight();
+                    txt.MainAdd(""); txt.MainNewLineTight(); ;
+                    txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                    txt.MainAdd("DIFF = " + (dif0 + dif) + ", depth = " + depth); txt.MainNewLineTight();
+                    txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                    txt.MainAdd(""); txt.MainNewLineTight();
+                }
+
+                new Writeln("-------------------- calling GAMS start ---------------------------------------");
+
+                using (Writeln txt = new Writeln())
+                {
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsscalar" + depth + ".cmd"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string s5 in settings.cmd_lines)
+                        {
+                            string s6 = (s5 as string).Replace("gamsscalar.gms", "gamsscalar" + depth + ".gms");
+                            sw.WriteLine(s6);
+                        }
+                    }
+
+                    string fail = null;
+
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsscalar" + depth + ".gms"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string s5 in settings.gms_lines)
+                        {
+                            string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString()).Replace("{model}", settings.model);
+                            if (dif0 > 0 && s6.Trim().ToLower().StartsWith("solve "))
+                            {
+                                string s7 = null;
+                                for (int i = 0; i < dif0 + dif; i++)
+                                {
+                                    string s8 = "extra" + i;
+                                    s7 += " , " + s8;
+                                    sw.WriteLine("equation " + s8 + "[t];");
+                                    sw.WriteLine(s8 + "['" + settings.t1.ToString() + "'] .. " + settings.variable + "['" + settings.t1.ToString() + "'] =E= 0;");
+                                }
+                                sw.WriteLine("model " + settings.model + "_temp / " + settings.model + s7 + " /;");
+                                sw.WriteLine("model " + settings.model + " / " + settings.model + "_temp /;");
+                            }
+                            sw.WriteLine(s6);
+                        }
+                    }
+                }
+
+                DateTime t0 = DateTime.Now;
+
+                string s1 = null;
+                if (G.IsUnitTesting())
+                {
+                    s1 = Globals.unitTestScreenOutput.ToString();
+                }
+                else
+                {
+                    s1 = CrossThreadStuff.GetOutputWindowText();
+                }               
+                
+                
+                if (settings.isManual)
+                {
+                    using (var txt = new Writeln())
+                    {
+                        txt.MainAdd("cd " + path);
+                        txt.MainNewLineTight();
+                        txt.MainAdd("gamsscalar" + depth + ".cmd");
+                        txt.color = Color.Blue;
+                    }
+
+                    string inputValue = null;
+                    //if (Program.InputBox("Note", "Execute the shown command lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the command has finished." + G.NL + "Return the difference.", ref inputValue) == DialogResult.OK)
+                    bool b = Program.InputBox("Input", "Difference", ref inputValue) == DialogResult.OK;
+                    if (b)
+                    {
+                        //O.Pause("Execute the shown command lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the command has finished.");
+                        dif = int.Parse(inputValue);
+                    }
+                }
+                else
+                {
+                    string folder = Program.options.folder_working;
+                    Program.ExecuteShellCommand("gamsscalar" + depth + ".cmd", false, folder);
+
+                    string s2 = null;
+                    if (G.IsUnitTesting())
+                    {
+                        s2 = Globals.unitTestScreenOutput.ToString();
+                    }
+                    else
+                    {
+                        s2 = CrossThreadStuff.GetOutputWindowText();
+                    }                   
+                    
+                    string s = s2.Substring(s1.Length);
+
+                    new Writeln("-------------------- calling GAMS end ---------------------------------------");
+
+                    List<string> ss = Stringlist.ExtractLinesFromText(s);
+                    try
+                    {
+                        for (int i = 0; i < ss.Count; i++)
+                        {
+                            if (G.Contains(ss[i], settings.counts1))
+                            {
+                                if (G.Contains(ss[i + 1], settings.counts2) && G.Contains(ss[i + 2], settings.counts3))
+                                {
+                                    string[] ss1 = ss[i + 1].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                    string[] ss2 = ss[i + 2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                    string x1 = ss1[ss1.Length - 1];
+                                    string x2 = ss2[ss2.Length - 1];
+                                    int i1 = int.Parse(x1);
+                                    int i2 = int.Parse(x2);
+                                    dif = i1 - i2;
+                                }
+                                else
+                                {
+                                    new Error("It seems the GAMS rows/cols do not match, but Gekko cannot extract the difference from the GAMS output, from the two lines following the line containing '" + settings.counts1 + "'.");
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }                
+
+                //Test date/time of gams.gms and dict.txt --> must be after start of ...
+
+                if (dif == 0)
+                {
+                    new Writeln("Created scalar model. Now packing: " + settings.zip_name + "...");
+                    if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder.");
+                    if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created.");
+                    try
+                    {
+                        Zipper zipper = new Zipper(settings.zip_name);
+                        Program.WaitForFileCopy(Path.Combine(path, "gams.gms"), Path.Combine(zipper.tempFolder, "gams.gms"));
+                        Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
+
+                        bool isFolder = false;
+                        string rawpath = Program.CreateFullPathAndFileName(settings.raw_path);
+                        string temp = Path.GetFileName(rawpath);
+                        if (G.Equal(temp, "*.gms")) isFolder = true;
+                        if (temp.Contains("*") && !isFolder) new Error("Expected raw_path to use '*.gms' not '" + temp + "'");
+
+                        if (isFolder)
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            string[] files = Directory.GetFiles(Path.GetDirectoryName(rawpath), temp, SearchOption.AllDirectories);
+                            if (files.Length == 0)
+                            {
+                                new Warning("Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
+                            }
+                            else
+                            {
+                                foreach (string file in files)
+                                {
+                                    if (Path.GetFileNameWithoutExtension(file).StartsWith("gams", StringComparison.OrdinalIgnoreCase)) continue; //drop gams*.gms
+                                    if (!G.Equal(Path.GetExtension(temp), Path.GetExtension(file))) continue;  //must be same extension
+                                    bool ignore = false;
+                                    foreach (object osi in settings.raw_ignore)
+                                    {
+                                        string si = osi as string;
+                                        if (G.Equal(Path.GetFileName(file), si))
+                                        {
+                                            ignore = true;
+                                            break;
+                                        }
+                                    }
+                                    if (ignore) continue;
+                                    string fileTxt = Program.GetTextFromFileWithWait(file);
+                                    if (!fileTxt.Contains("..")) continue;
+                                    sb.Append(fileTxt);
+                                    sb.AppendLine();
+                                }
+                                using (FileStream fs = WaitForFileStream(Path.Combine(zipper.tempFolder, "raw.gms"), null, GekkoFileReadOrWrite.Write))
+                                using (StreamWriter res = G.GekkoStreamWriter(fs))
+                                {
+                                    res.Write(sb);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(rawpath))
+                            {
+                                Program.WaitForFileCopy(rawpath, Path.Combine(zipper.tempFolder, "raw.gms"));
+                            }
+                            else
+                            {
+                                new Warning("Did not find raw.gms as this file path: " + rawpath);
+                            }
+                        }
+                        zipper.ZipAndCleanup();
+                        new Writeln("Zipping of " + settings.zip_name + " finished");
+                    }
+                    catch
+                    {
+                        new Error("Something went wrong when zipping " + settings.zip_name);
+                    }
+                    Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
+                    Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
+                }
+                else
+                {
+
+                    if (dif0 + dif >= 0)
+                    {
+                        new Writeln("");
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainAdd("The model row/columns differ with " + dif + " --> Gekko will try to remedy this.");
+                            txt.MainAdd("");
+                        }
+                        new Writeln("");
+                        Program.GamsScalar(depth + 1, dif0 + dif, settings);
+                    }
+                    else
+                    {
+                        new Error("It seems there are " + dif + " more equations than variables, so some variables need to be unfixed. Gekko does not support that scenario (yet).");
+                    }
+                }
+                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.zip_name + " (" + G.Seconds(t00) + ").");
+            }
+            finally
+            {
+                if (depth == 0)
+                {
+                    try { DeleteFiles(path); } catch { };
+                    try { if (!optionsFileExists) File.Delete(Path.Combine(path, "convert.opt")); } catch { };
+                }
+            }
+
+            //Internal method
+            void DeleteFiles(string path)
+            {
+                int counter = 0;
+                foreach (string f in Directory.EnumerateFiles(path, "gamsscalar*.cmd"))
+                {
+                    File.Delete(f);
+                }
+
+                foreach (string f in Directory.EnumerateFiles(path, "gamsscalar*.gms"))
+                {
+                    File.Delete(f);
+                }
+            }
         }
 
         /// <summary>
@@ -19803,172 +20175,257 @@ namespace Gekko
         /// <param name="commandLine">Command line parameters to pass</param>        
         public static void ExecuteShellCommand(string commandLine, bool mute, string working)
         {
-            //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
-
             bool fail = false;
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
             System.Diagnostics.Process process = null;
 
-            int widthRemember = Program.options.print_width;
-            Program.options.print_width = int.MaxValue;
-
-            try
+            if (G.IsUnitTesting())
             {
-                process = new System.Diagnostics.Process();
-                // invokes the cmd process specifying the command to be executed.
-                string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
-                // pass executing file to cmd (Windows command interpreter) as a arguments
-                // /C tells cmd that we want it to execute the command that follows, and then exit.
-                //string _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _FileToExecute });
-                string _Arguments = "";
-                // pass any command line parameters for execution
-                if (commandLine != null && commandLine.Length > 0)
+                //process = new System.Diagnostics.Process();
+                //string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
+                //string _Arguments = "";
+                //// pass any command line parameters for execution
+                //if (commandLine != null && commandLine.Length > 0)
+                //{
+                //    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
+                //}
+                //process.StartInfo.CreateNoWindow = true;
+                //process.StartInfo.UseShellExecute = false;
+                //// sets a value that indicates the output/input/error of an application is written to the Process.
+                ////process.StartInfo.RedirectStandardOutput = true;
+                ////process.StartInfo.RedirectStandardInput = false;
+                ////process.StartInfo.RedirectStandardError = true;
+                //string wd = Program.options.folder_working;
+                //if (!G.NullOrBlanks(working)) wd = working;
+                //process.StartInfo.WorkingDirectory = wd;
+                //process.StartInfo.Arguments = _Arguments;
+                //process.StartInfo.FileName = _CMDProcess;
+                //int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
+                //StringBuilder error = new StringBuilder();
+                //process.Start();
+
+                //Process.Start(@"c:\Thomas\Gekko\regres\MAKRO\test3_BACKUP2\klon\Model\gamsscalar0.cmd");
+                //Process.Start(Path.Combine(working, commandLine));
+
+                process = new Process();
+                process.StartInfo.FileName = Path.Combine(working, commandLine);
+                process.StartInfo.WorkingDirectory = working;
+                process.Start();
+                process.WaitForExit();
+
+                //process = new Process();
+                //process.StartInfo.FileName = "@c:\\Thomas\\Gekko\\regres\\MAKRO\\test3_BACKUP2\\klon\\Model\\gamsscalar0.cmd";
+                ////process.StartInfo.Arguments = "/c DIR"; // Note the /c command (*)
+                //process.StartInfo.UseShellExecute = false;
+                //process.StartInfo.RedirectStandardOutput = true;
+                //process.StartInfo.RedirectStandardError = true;
+                //process.Start();
+                ////* Read the output (or the error)
+                //string output = process.StandardOutput.ReadToEnd();
+                //string err = process.StandardError.ReadToEnd();
+                //process.WaitForExit();
+                //string ss = output + err;
+
+                //string command = "@c:\\Thomas\\Gekko\\regres\\MAKRO\\test3_BACKUP2\\klon\\Model\\gamsscalar0.cmd";
+                //var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
+                //processInfo.CreateNoWindow = true;
+                //processInfo.UseShellExecute = false;
+                //processInfo.RedirectStandardError = true;
+                //processInfo.RedirectStandardOutput = true;
+
+                //process = Process.Start(processInfo);
+
+                //process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                //    Console.WriteLine("output>>" + e.Data);
+                //process.BeginOutputReadLine();
+
+                //process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                //    Console.WriteLine("error>>" + e.Data);
+                //process.BeginErrorReadLine();
+
+                //process.WaitForExit();
+
+                //Console.WriteLine("ExitCode: {0}", process.ExitCode);
+                //process.Close();
+
+
+
+            }
+            else
+            {
+
+                //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
+
+                int widthRemember = Program.options.print_width;
+                Program.options.print_width = int.MaxValue;
+
+                try
                 {
-                    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
-                }
-                // sets a value indicating not to start the process in a new window.
-                process.StartInfo.CreateNoWindow = true;
-                // sets a value indicating not to use the operating system shell to start the process.
-                process.StartInfo.UseShellExecute = false;
-                // sets a value that indicates the output/input/error of an application is written to the Process.
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardInput = false;
-                process.StartInfo.RedirectStandardError = true;
-                string wd = Program.options.folder_working;
-                if (!G.NullOrBlanks(working)) wd = working;
-                process.StartInfo.WorkingDirectory = wd;
-                process.StartInfo.Arguments = _Arguments;
-                process.StartInfo.FileName = _CMDProcess;
-                //process.StartInfo = p;
-                // Starts a process resource and associates it with a Process component.
-
-                int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
-
-                //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
-
-                //StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
-                using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
-                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
-                {
-                    process.OutputDataReceived += (sender, e) =>
+                    process = new System.Diagnostics.Process();
+                    // invokes the cmd process specifying the command to be executed.
+                    string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
+                    // pass executing file to cmd (Windows command interpreter) as a arguments
+                    // /C tells cmd that we want it to execute the command that follows, and then exit.
+                    //string _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _FileToExecute });
+                    string _Arguments = "";
+                    // pass any command line parameters for execution
+                    if (commandLine != null && commandLine.Length > 0)
                     {
+                        _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
+                    }
+                    // sets a value indicating not to start the process in a new window.
+                    process.StartInfo.CreateNoWindow = true;
+                    // sets a value indicating not to use the operating system shell to start the process.
+                    process.StartInfo.UseShellExecute = false;
+                    // sets a value that indicates the output/input/error of an application is written to the Process.
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardInput = false;
+                    process.StartInfo.RedirectStandardError = true;
+                    string wd = Program.options.folder_working;
+                    if (!G.NullOrBlanks(working)) wd = working;
+                    process.StartInfo.WorkingDirectory = wd;
+                    process.StartInfo.Arguments = _Arguments;
+                    process.StartInfo.FileName = _CMDProcess;
+                    //process.StartInfo = p;
+                    // Starts a process resource and associates it with a Process component.
+
+                    int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
+
+                    //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
+
+                    //StringBuilder output = new StringBuilder();
+                    StringBuilder error = new StringBuilder();
+                    using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                    using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                    {
+                        process.OutputDataReceived += (sender, e) =>
+                        {
+                            if (!Globals.threadIsInProcessOfAborting)
+                            {
+                                if (e.Data == null)
+                                {
+                                    outputWaitHandle.Set();
+                                }
+                                else
+                                {
+                                    if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
+                                }
+                            }
+                        };
+                        process.ErrorDataReceived += (sender, e) =>
+                        {
+                            if (!Globals.threadIsInProcessOfAborting)
+                            {
+                                if (e.Data == null)
+                                {
+                                    errorWaitHandle.Set();
+                                }
+                                else
+                                {
+                                    error.AppendLine(e.Data);
+                                }
+                            }
+                        };
+
+                        process.Start();
+                        //string output = process.StandardOutput.ReadToEnd();
+
                         if (!Globals.threadIsInProcessOfAborting)
                         {
-                            if (e.Data == null)
-                            {
-                                outputWaitHandle.Set();
-                            }
-                            else
-                            {
-                                if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
-                            }
+                            process.BeginOutputReadLine();
+                            process.BeginErrorReadLine();
                         }
-                    };
-                    process.ErrorDataReceived += (sender, e) =>
-                    {
-                        if (!Globals.threadIsInProcessOfAborting)
-                        {
-                            if (e.Data == null)
-                            {
-                                errorWaitHandle.Set();
-                            }
-                            else
-                            {
-                                error.AppendLine(e.Data);
-                            }
-                        }
-                    };
 
-                    process.Start();
-                    //string output = process.StandardOutput.ReadToEnd();
+                        if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
+                        {
+                            // Process completed. Check process.ExitCode here.
+                        }
+                        else
+                        {
+                            // Timed out.
+                        }
+                    }
 
                     if (!Globals.threadIsInProcessOfAborting)
                     {
-                        process.BeginOutputReadLine();
-                        process.BeginErrorReadLine();
-                    }
-
-                    if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
-                    {
-                        // Process completed. Check process.ExitCode here.
-                    }
-                    else
-                    {
-                        // Timed out.
-                    }
-                }
-
-                if (!Globals.threadIsInProcessOfAborting)
-                {
-                    int exitCode = process.ExitCode;
-                    if (exitCode != 0)
-                    {
-                        new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
-                        //fail = true;
-                    }
-                }
-
-                if (!mute || Globals.threadIsInProcessOfAborting)
-                {
-                    try
-                    {
-                        //G.Writeln2(output.ToString());
-                        if (error.Length > 0)
+                        int exitCode = process.ExitCode;
+                        if (exitCode != 0)
                         {
-                            G.Writeln2("=================== System error message ===================", Globals.warningColor);
-                            G.Writeln2(error.ToString(), Globals.warningColor);
+                            new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
                             //fail = true;
                         }
                     }
-                    catch (Exception e)
+
+                    if (!mute || Globals.threadIsInProcessOfAborting)
                     {
-                        new Warning("Could not write output from system command");
-                        //fail = true;
+                        try
+                        {
+                            //G.Writeln2(output.ToString());
+                            if (error.Length > 0)
+                            {
+                                G.Writeln2("=================== System error message ===================", Globals.warningColor);
+                                G.Writeln2(error.ToString(), Globals.warningColor);
+                                //fail = true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            new Warning("Could not write output from system command");
+                            //fail = true;
+                        }
                     }
                 }
-            }
-            catch (Win32Exception _Win32Exception)
-            {
-                if (!Globals.threadIsInProcessOfAborting)
+                catch (Win32Exception _Win32Exception)
                 {
-                    // Error
-                    new Error("SYS Win32 exception: " + _Win32Exception.ToString(), false);
-                    fail = true;
-                }
-            }
-            catch (Exception _Exception)
-            {
-                if (!Globals.threadIsInProcessOfAborting)
-                {
-                    // Error
-                    new Error("SYS exception: " + _Exception.ToString(), false);
-                    fail = true;
-                }
-            }
-            finally
-            {
-                if (Globals.threadIsInProcessOfAborting)
-                {
-                }
-                else
-                {
-                    //resetting, also if there is an error
-                    Program.options.print_width = widthRemember;
-                    // close process and do cleanup
-                    if (true)
+                    if (!Globals.threadIsInProcessOfAborting)
                     {
-                        //like killing it in the task manager, no questions asked
-                        if (!process.HasExited)
+                        // Error
+                        new Error("SYS Win32 exception: " + _Win32Exception.ToString(), false);
+                        fail = true;
+                    }
+                }
+                catch (Exception _Exception)
+                {
+                    if (!Globals.threadIsInProcessOfAborting)
+                    {
+                        // Error
+                        new Error("SYS exception: " + _Exception.ToString(), false);
+                        fail = true;
+                    }
+                }
+                finally
+                {
+                    if (Globals.threadIsInProcessOfAborting)
+                    {
+                    }
+                    else
+                    {
+                        //resetting, also if there is an error
+                        Program.options.print_width = widthRemember;
+                        // close process and do cleanup
+                        if (true)
                         {
-                            try
+                            //like killing it in the task manager, no questions asked
+                            if (!process.HasExited)
                             {
-                                process.Kill();
+                                try
+                                {
+                                    process.Kill();
+                                }
+                                catch
+                                {
+                                    //in principle, the process could exit just after .HasExited is asked, there the try here
+                                }
                             }
-                            catch
+                            else
                             {
-                                //in principle, the process could exit just after .HasExited is asked, there the try here
+                                try
+                                {
+                                    process.Close();
+                                    process.Dispose();
+                                }
+                                catch { }
                             }
                         }
                         else
@@ -19980,20 +20437,11 @@ namespace Gekko
                             }
                             catch { }
                         }
+                        //process = null;
                     }
-                    else
-                    {
-                        try
-                        {
-                            process.Close();
-                            process.Dispose();
-                        }
-                        catch { }
-                    }
-                    //process = null;
                 }
+                if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
             }
-            if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
         }
 
         /// <summary>
