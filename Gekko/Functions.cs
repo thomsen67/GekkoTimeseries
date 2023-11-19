@@ -5190,7 +5190,7 @@ namespace Gekko
                 bool isManual = G.Equal(input1, "packmanual");
                 if (G.IsUnitTesting())
                 {
-                    Program.GamsScalar(1, 1241, null);
+                    Program.GamsScalar(1, Globals.unittest_gamsscalar_cheat, null);
                 }
                 else
                 {

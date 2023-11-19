@@ -20181,76 +20181,16 @@ namespace Gekko
             System.Diagnostics.Process process = null;
 
             if (G.IsUnitTesting())
-            {
-                //process = new System.Diagnostics.Process();
-                //string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
-                //string _Arguments = "";
-                //// pass any command line parameters for execution
-                //if (commandLine != null && commandLine.Length > 0)
-                //{
-                //    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
-                //}
-                //process.StartInfo.CreateNoWindow = true;
-                //process.StartInfo.UseShellExecute = false;
-                //// sets a value that indicates the output/input/error of an application is written to the Process.
-                ////process.StartInfo.RedirectStandardOutput = true;
-                ////process.StartInfo.RedirectStandardInput = false;
-                ////process.StartInfo.RedirectStandardError = true;
-                //string wd = Program.options.folder_working;
-                //if (!G.NullOrBlanks(working)) wd = working;
-                //process.StartInfo.WorkingDirectory = wd;
-                //process.StartInfo.Arguments = _Arguments;
-                //process.StartInfo.FileName = _CMDProcess;
-                //int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
-                //StringBuilder error = new StringBuilder();
-                //process.Start();
-
-                //Process.Start(@"c:\Thomas\Gekko\regres\MAKRO\test3_BACKUP2\klon\Model\gamsscalar0.cmd");
-                //Process.Start(Path.Combine(working, commandLine));
-
+            {                
+                //Cannot figure out how to get the output of the process as a string...
                 process = new Process();
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = false;
+                process.StartInfo.UseShellExecute = false;
                 process.StartInfo.FileName = Path.Combine(working, commandLine);
-                process.StartInfo.WorkingDirectory = working;
+                process.StartInfo.WorkingDirectory = working;                
                 process.Start();
-                process.WaitForExit();
-
-                //process = new Process();
-                //process.StartInfo.FileName = "@c:\\Thomas\\Gekko\\regres\\MAKRO\\test3_BACKUP2\\klon\\Model\\gamsscalar0.cmd";
-                ////process.StartInfo.Arguments = "/c DIR"; // Note the /c command (*)
-                //process.StartInfo.UseShellExecute = false;
-                //process.StartInfo.RedirectStandardOutput = true;
-                //process.StartInfo.RedirectStandardError = true;
-                //process.Start();
-                ////* Read the output (or the error)
-                //string output = process.StandardOutput.ReadToEnd();
-                //string err = process.StandardError.ReadToEnd();
-                //process.WaitForExit();
-                //string ss = output + err;
-
-                //string command = "@c:\\Thomas\\Gekko\\regres\\MAKRO\\test3_BACKUP2\\klon\\Model\\gamsscalar0.cmd";
-                //var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
-                //processInfo.CreateNoWindow = true;
-                //processInfo.UseShellExecute = false;
-                //processInfo.RedirectStandardError = true;
-                //processInfo.RedirectStandardOutput = true;
-
-                //process = Process.Start(processInfo);
-
-                //process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-                //    Console.WriteLine("output>>" + e.Data);
-                //process.BeginOutputReadLine();
-
-                //process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
-                //    Console.WriteLine("error>>" + e.Data);
-                //process.BeginErrorReadLine();
-
-                //process.WaitForExit();
-
-                //Console.WriteLine("ExitCode: {0}", process.ExitCode);
-                //process.Close();
-
-
-
+                process.WaitForExit();                
             }
             else
             {

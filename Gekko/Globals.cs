@@ -884,6 +884,8 @@ namespace Gekko
 
         public static bool noini = false;
 
+        public static int unittest_gamsscalar_cheat = 0;
+
         public static GAMS.GAMSWorkspace gamsWorkspace = null;
         public static string gamsWorkspaceHelper = null;
         public static double gamsEps = 5e300d;
