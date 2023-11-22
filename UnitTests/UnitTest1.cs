@@ -16635,7 +16635,7 @@ namespace UnitTests
                 sw.WriteLine(@" [");
                 sw.WriteLine(@" ""call ..\\paths.cmd"",");
                 sw.WriteLine(@" ""set gamY=call %python% ..\\gamY\\gamY.py"",");
-                sw.WriteLine(@" ""%gamY% gamsscalar.gms r=..\\Model\\Savepoints\\model""");
+                sw.WriteLine(@" ""%gamY% {gms_lines} r=..\\Model\\Savepoints\\model""");
                 sw.WriteLine(@" ],");
                 sw.WriteLine(@" ""gms_lines"":");
                 sw.WriteLine(@" [");
@@ -16648,7 +16648,7 @@ namespace UnitTests
                 sw.WriteLine(@" } ");
             }
             File.Delete(path5 + "\\makro2gekko.zip");
-            Globals.unittest_gamsscalar_cheat = 1241;  //we skip stage 0.
+            Globals.unittest_gamsscalar_cheat = 1241;  //we skip directly to stage 1, with DIF = 1241. Cannot make reading GAMS output work under unit testing, therefore this cheating.
             I("gamsscalar('pack');");
             long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
             Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.

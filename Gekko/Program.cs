@@ -9483,8 +9483,6 @@ namespace Gekko
                     //if (settings.counts3 == null) new Error("");
                     if (settings.t1 == null) new Error("You must indicate t1 in gamsscalar.json");
                     if (settings.t2 == null) new Error("You must indicate t2 in gamsscalar.json");
-                    //if (settings.a1 == null) Error("");
-                    //if (settings.a2 == null) Error("");
                     if (settings.cmd_lines == null) new Error("You must indicate cmd_lines in gamsscalar.json");
                     if (settings.gms_lines == null) new Error("You must indicate gms_lines in gamsscalar.json");
 
@@ -9557,7 +9555,7 @@ namespace Gekko
                     {
                         foreach (string s5 in settings.cmd_lines)
                         {
-                            string s6 = (s5 as string).Replace("gamsscalar.gms", "gamsscalar" + depth + ".gms");
+                            string s6 = (s5 as string).Replace("{gms_lines}", "gamsscalar" + depth + ".gms");
                             sw.WriteLine(s6);
                         }
                     }
@@ -9776,15 +9774,15 @@ namespace Gekko
             }
 
             //Internal method
-            void DeleteFiles(string path)
+            void DeleteFiles(string pathname)
             {
                 int counter = 0;
-                foreach (string f in Directory.EnumerateFiles(path, "gamsscalar*.cmd"))
+                foreach (string f in Directory.EnumerateFiles(pathname, "gamsscalar*.cmd"))
                 {
                     File.Delete(f);
                 }
 
-                foreach (string f in Directory.EnumerateFiles(path, "gamsscalar*.gms"))
+                foreach (string f in Directory.EnumerateFiles(pathname, "gamsscalar*.gms"))
                 {
                     File.Delete(f);
                 }
