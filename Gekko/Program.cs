@@ -27,49 +27,28 @@ using System.Text;
 using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
-using System.Windows.Forms;
 using System.Threading;
 using MathNet.Numerics.LinearAlgebra.Sparse.Linear;
 using MathNet.Numerics.LinearAlgebra.Sparse;
-using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
-using Microsoft.CSharp;
-using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Runtime.Serialization;
 using System.Reflection;
 using System.Xml;
-using System.Xml.Serialization;
-using Office = Microsoft.Office.Core;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Security.Cryptography;
-using System.Reflection.Emit;
-using System.Runtime.Serialization.Formatters.Binary;
 using ProtoBuf;
 using ProtoBuf.Meta;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Linq;
 using OfficeOpenXml;
-using System.Data;
 using System.IO.Compression;
-//for Parallel.ForEach(...)
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
-using static Gekko.Program;
-using System.Windows.Markup.Localizer;
-using static alglib;
-using System.Windows.Interop;
-//using Microsoft.Office.Interop.Excel;
 
 namespace Gekko
 {
@@ -20176,23 +20155,25 @@ namespace Gekko
             bool fail = false;
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
-            System.Diagnostics.Process process = null;
-
+            
             if (G.IsUnitTesting())
-            {                
-                //Cannot figure out how to get the output of the process as a string...
-                process = new Process();
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.FileName = Path.Combine(working, commandLine);
-                process.StartInfo.WorkingDirectory = working;                
-                process.Start();
-                process.WaitForExit();                
+            {
+                //Direct system output to Globals.unitTestScreenOutput
+                ProcessStartInfo info = new ProcessStartInfo();
+                info.CreateNoWindow = true;
+                info.RedirectStandardOutput = true;
+                info.UseShellExecute = false;
+                info.FileName = Path.Combine(working, commandLine);
+                info.WorkingDirectory = working;
+                using (Process process = Process.Start(info))
+                {
+                    string results = process.StandardOutput.ReadToEndAsync().Result;
+                    Globals.unitTestScreenOutput.Append(results);
+                }
             }
             else
             {
-
+                System.Diagnostics.Process process = null;
                 //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
 
                 int widthRemember = Program.options.print_width;

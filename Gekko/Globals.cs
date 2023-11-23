@@ -882,9 +882,7 @@ namespace Gekko
 
         public static bool printGrayLinesForDebugging = false;
 
-        public static bool noini = false;
-
-        public static int unittest_gamsscalar_cheat = 0;
+        public static bool noini = false;        
 
         public static GAMS.GAMSWorkspace gamsWorkspace = null;
         public static string gamsWorkspaceHelper = null;

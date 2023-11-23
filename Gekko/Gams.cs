@@ -1293,7 +1293,7 @@ namespace Gekko
             string gams = null;
             if (1 == 1)
             {
-                gams = @"c:\Program Files\GAMS\38\";
+                gams = @"c:\GAMS\38\";
             }
             else if (1 == 0)
             {

@@ -1365,7 +1365,7 @@ namespace UnitTests
             //tests timeless toghether with gdx
 
             I("RESET; TIME 2001 2003;");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("x1 = timeless(100);");
             I("x2 = 200;");
             I("x3 = series(1);");
@@ -1379,7 +1379,7 @@ namespace UnitTests
 
             I("WRITE <gdx> temp;");
             I("RESET;");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> temp;");
 
             HelperTimeless();  //asserts
@@ -1439,11 +1439,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 4); DatabanksTestHelper5(); DatabanksTestHelper6(); DatabanksTestHelper7();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             DatabanksTestHelper8();
             I("WRITE <gdx> sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
@@ -1457,11 +1457,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             DatabanksTestHelper8();
             I("WRITE <gdx> xx1 file=sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
 
@@ -1475,11 +1475,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             DatabanksTestHelper8();
             I("WRITE <gdx> xx1, xx2 file=sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
@@ -1532,10 +1532,10 @@ namespace UnitTests
         public void _Test_GdxWithoutTimeDetectAuto()
         {
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");
+            I("option gams exe folder = 'c:\\GAMS\\38';");
             I("read <gdx> adambk_domains.gdx;");
 
-            //read <gdx option|gams|exe|folder = 'c:\\Program Files\\GAMS\\38'> adambk_domains.gdx;
+            //read <gdx option|gams|exe|folder = 'c:\\GAMS\\38'> adambk_domains.gdx;
 
             _AssertSeries(First(), "adam", new string[] { "bfinvmqfe", "1973" }, 2030, 0.153725d, sharedTableDelta); //BAD! This is actually bad, fundamentally mis-read as timeless series.
             I("option gams time detect auto = yes;");
@@ -1548,7 +1548,7 @@ namespace UnitTests
         {
             Globals.unitTestScreenOutput.Clear();
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");
+            I("option gams exe folder = 'c:\\GAMS\\38';");
             I("read jul05;");
             I("arraypack('ADAM', '#adamvars');"); //last arg can be '*'
             I("write <gdx> gdxtest1;");
@@ -1559,7 +1559,7 @@ namespace UnitTests
             I("compare;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Databank compare on 8359 common series, 0 differences shown"));
 
-            //I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");
+            //I("option gams exe folder = 'c:\\GAMS\\38';");
             //I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             //I("read <gdx> adambk_domains.gdx;");            
             //_AssertSeries(First(), "adam", new string[] { "bfinvmqfe", "1973" }, 2030, 0.153725d, sharedTableDelta); //BAD! This is actually bad, fundamentally mis-read as timeless series.
@@ -12758,7 +12758,7 @@ namespace UnitTests
                 Globals.unitTestScreenOutput.Clear();
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
-                I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+                I("option gams exe folder = 'c:\\GAMS\\38';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx first> makro.zip\\makro1.gdx;");
                 I("READ <gdx ref> makro.zip\\makro0.gdx;");
@@ -16558,7 +16558,7 @@ namespace UnitTests
                 if (i == 0) I("flush();");  //test without or with cache
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
-                I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+                I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx> makro.zip\\makro0.gdx;");
 
@@ -16614,7 +16614,7 @@ namespace UnitTests
             string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3_BACKUP2\klon\Model\";        
             I("RESET;");
             I("OPTION folder working = '" + path5 + "';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
             using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -16624,7 +16624,7 @@ namespace UnitTests
                 sw.WriteLine(@" ""raw_path"" : ""*.gms"",");
                 sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],");
                 sw.WriteLine(@" ""variable"" : ""qBNP"",");
-                sw.WriteLine(@" ""counts1"" : ""****counts do not match"",");
+                sw.WriteLine(@" ""counts1"" : ""**** counts do not match"",");
                 sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",");
                 sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",");
                 sw.WriteLine(@" ""t1"" : 2026,");
@@ -16647,8 +16647,7 @@ namespace UnitTests
                 sw.WriteLine(@" ]");
                 sw.WriteLine(@" } ");
             }
-            File.Delete(path5 + "\\makro2gekko.zip");
-            Globals.unittest_gamsscalar_cheat = 1241;  //we skip directly to stage 1, with DIF = 1241. Cannot make reading GAMS output work under unit testing, therefore this cheating.
+            File.Delete(path5 + "\\makro2gekko.zip");            
             I("gamsscalar('pack');");
             long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
             Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.
@@ -16699,11 +16698,10 @@ namespace UnitTests
                 sw.WriteLine(@" ]");
                 sw.WriteLine(@" } ");
             }
-            File.Delete(path5 + "\\makro2gekko.zip");
-            Globals.unittest_gamsscalar_cheat = 1241;  //we skip directly to stage 1, with DIF = 1241. Cannot make reading GAMS output work under unit testing, therefore this cheating.
+            File.Delete(path5 + "\\makro2gekko.zip");            
             I("gamsscalar('pack');");
             long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
-            Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.
+            Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.9 MB
         }
 
 
@@ -16877,7 +16875,7 @@ namespace UnitTests
         public void _Test_GAMSVariableParameterType()
         {
             I("reset;");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("v = series(1);");
             I("v.setFixType('variable');");
@@ -16887,7 +16885,7 @@ namespace UnitTests
             I("p[a] = 3;");
             I("write <gdx> temp;");
             I("reset;");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("read <gdx> temp;");
             I("%v = v.getFixType();");
             I("%p = p.getFixType();");
@@ -19424,7 +19422,7 @@ namespace UnitTests
                 I("RESET;");
                 I("OPTION folder working " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2;");
                 I("option model type = gams;");
-                I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+                I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("read <first> d3a;");
                 I("read <gdx first merge> Sets\\sets;");
                 I("work:%tBase = work:#tBase[1].val();");  //else it becomes a string which is bad
@@ -26284,7 +26282,7 @@ print(df2)
             I("reset;");
             I("option model type = gams;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("option gams exe folder = 'c:\\Program Files\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("read <gdx> testfix;"); //See c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\testfix.gms
             I("time 2001 2003;");
             I("disp d4;");

@@ -5188,14 +5188,7 @@ namespace Gekko
             if (G.Equal(input1, "pack") || G.Equal(input1, "packmanual"))
             {
                 bool isManual = G.Equal(input1, "packmanual");
-                if (G.IsUnitTesting())
-                {
-                    Program.GamsScalar(1, Globals.unittest_gamsscalar_cheat, null);
-                }
-                else
-                {
-                    Program.GamsScalar(0, 0, null);
-                }
+                Program.GamsScalar(0, 0, null);
             }
             else if (G.Equal(input1, "info"))
             {
