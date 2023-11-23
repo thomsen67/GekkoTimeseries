@@ -9669,10 +9669,10 @@ namespace Gekko
                 if (dif == 0)
                 {
                     new Writeln("Created scalar model. Now packing: " + settings.zip_name + "...");
-                    if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder.");
-                    if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder.");
-                    if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created.");
-                    if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created.");
+                    if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
+                    if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
                     try
                     {
                         Zipper zipper = new Zipper(settings.zip_name);

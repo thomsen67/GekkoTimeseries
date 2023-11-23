@@ -16607,7 +16607,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_GAMSScalar()
+        public void _Test_GAMSScalar1()
         {
             Globals.unitTestScreenOutput.Clear();
             //string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model";
@@ -16653,6 +16653,59 @@ namespace UnitTests
             long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
             Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.
         }
+
+        [TestMethod]
+        public void _Test_GAMSScalar2()
+        {
+            MessageBox.Show("We need to stuff \\Savepoints\\smoothed_parameters_calibration.g00+pkl \nA path.cmd --> 45");
+            Globals.unitTestScreenOutput.Clear();
+            //string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model";
+            string path5 = Globals.ttPath2 + @"\regres\MAKRO\2023-11-01-790eb70\Model";
+            I("RESET;");
+            I("OPTION folder working = '" + path5 + "';");
+            I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+            if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
+            using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.WriteLine(@"// Gekko settings for GAMS CONVERT (produces scalar model for Gekko DECOMP).");
+                sw.WriteLine(@"// Comments '//' can be used: not legal in .json, but Gekko removes them before reading the file.");
+                sw.WriteLine(@"// Beware that you must use double backslash for paths.");
+                sw.WriteLine(@"{");
+                sw.WriteLine(@" ""zip_name"" : ""makro2gekko.zip"",                     //Resulting zip name.");
+                sw.WriteLine(@" ""raw_path"" : ""*.gms"",                               //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
+                sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations (raw.gms). Can be omitted.");
+                sw.WriteLine(@" ""variable"" : ""qBNP"",                                //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
+                sw.WriteLine(@" ""counts1"" : ""**** counts do not match"",             //Can be omitted, default = ""**** counts do not match""");
+                sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",        //Can be omitted, default = ""**** unmatched free variables""");
+                sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",    //Can be omitted, default = ""**** number of unmatched =e= rows""");
+                sw.WriteLine(@" ""t1"" : 2029,                                        //First year in scalar model");
+                sw.WriteLine(@" ""t2"" : 2099,                                        //Last year in scalar model");
+                sw.WriteLine(@" ""model"": ""m_base"",                                  //Model name, default = ""m_base""");                               
+                sw.WriteLine(@" ""is_manual"": false,                                 //Call GAMS manually, default = false           ");
+                sw.WriteLine(@" ""cmd_lines"":                                        //lines in the file gamsscalar{i}.cmd (that Gekko calls). Beware: use double backslash for paths.");
+                sw.WriteLine(@" [");
+                sw.WriteLine(@" ""call ..\\paths.cmd"",");
+                sw.WriteLine(@" ""set gamY=call %python% ..\\gamY\\gamY.py"",");
+                sw.WriteLine(@" ""%gamY% {gms_lines} r=..\\Model\\Savepoints\\smoothed_parameters_calibration""");
+                sw.WriteLine(@" ],");
+                sw.WriteLine(@" ""gms_lines"":                                           //lines in the file gamsscalar{i}.gms, called from gamsscalar{i}.cmd. Beware: use double backslash for paths.");
+                sw.WriteLine(@" [");
+                sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",                       //{t1} and {t2} are taken from settings");
+                sw.WriteLine(@" ""$fix all; $unfix g_endo; $unfix g_post;"",");
+                sw.WriteLine(@" ""{model}.holdFixed = 0;"",                              //0 enables exogenous (fixed) variables to be shown. Note: {model} is taken from settings");
+                sw.WriteLine(@" ""option mcp = convert;"",");
+                sw.WriteLine(@" ""solve {model} using mcp;""                             //{model} is taken from settings");
+                sw.WriteLine(@" ]");
+                sw.WriteLine(@" } ");
+            }
+            File.Delete(path5 + "\\makro2gekko.zip");
+            Globals.unittest_gamsscalar_cheat = 1241;  //we skip directly to stage 1, with DIF = 1241. Cannot make reading GAMS output work under unit testing, therefore this cheating.
+            I("gamsscalar('pack');");
+            long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
+            Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.
+        }
+
 
         [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()

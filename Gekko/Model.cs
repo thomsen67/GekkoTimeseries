@@ -1694,14 +1694,6 @@ namespace Gekko
         [ProtoMember(10)]
         public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
         
-        // Gekko variant 2 (C# syntax) ----------------------------------
-
-        [ProtoMember(11)]
-        public string conditionalsCs = null;
-
-        [ProtoMember(12)]
-        public string allCs = null;       
-        
         // ===========================================
         // ===========================================
         // ===========================================
