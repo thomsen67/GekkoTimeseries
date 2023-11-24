@@ -16609,9 +16609,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_GAMSScalar1()
         {
+            //Older model and older GAMS, cf. _Test_GAMSScalar1()
             Globals.unitTestScreenOutput.Clear();
-            //string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model";
-            string path5 = Globals.ttPath2 + @"\regres\MAKRO\test3_BACKUP2\klon\Model\";        
+            string path5 = Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-xxxxxxx\klon\Model";        
             I("RESET;");
             I("OPTION folder working = '" + path5 + "';");
             I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
@@ -16628,8 +16628,8 @@ namespace UnitTests
                 sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",");
                 sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",");
                 sw.WriteLine(@" ""t1"" : 2026,");
-                sw.WriteLine(@" ""t2"" : 2099,");
-                sw.WriteLine(@" ""model"": ""m_base"",");
+                sw.WriteLine(@" ""t2"" : 2099,");                
+                sw.WriteLine(@" ""model"": [""m_base""],");
                 sw.WriteLine(@" ""is_manual"": false,");
                 sw.WriteLine(@" ""cmd_lines"":");
                 sw.WriteLine(@" [");
@@ -16641,9 +16641,17 @@ namespace UnitTests
                 sw.WriteLine(@" [");
                 sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",");
                 sw.WriteLine(@" ""$fix all; $unfix g_endo;"",");
-                sw.WriteLine(@" ""{model}.holdFixed = 0;"",");
-                sw.WriteLine(@" ""option mcp = convert;"",");
-                sw.WriteLine(@" ""solve {model} using mcp;""");
+                
+                //sw.WriteLine(@" ""{model}.holdFixed = 0;"",");
+                //sw.WriteLine(@" ""option mcp = convert;"",");
+                //sw.WriteLine(@" ""solve {model} using mcp;""");
+
+                sw.WriteLine(@" ""model m_gekko / {model} /;"",");
+                sw.WriteLine(@" ""m_gekko.holdFixed = 0;"",");
+                sw.WriteLine(@" ""option mcp = convert; "",");
+                sw.WriteLine(@" ""solve m_gekko using mcp;""");
+
+
                 sw.WriteLine(@" ]");
                 sw.WriteLine(@" } ");
             }
@@ -16663,6 +16671,7 @@ namespace UnitTests
             // !
             // !
             // !
+            //Newer model and newer GAMS, cf. _Test_GAMSScalar2()
             new Writeln("We need to have \\Savepoints\\smoothed_parameters_calibration.g00+pkl -- And path.cmd --> 45");
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\MAKRO\2023-11-01-790eb70\Model";
@@ -16726,14 +16735,7 @@ namespace UnitTests
                     }
                     File.Delete(path5 + "\\makro2gekko.zip");
                     I("gamsscalar('pack');");
-                    long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
-                    // ?
-                    // ?
-                    // ?                    
-                    // ? Why are the result the same for h==0 and h==1, and for h==0 it has to iterate!                    
-                    // ?
-                    // ?
-                    // ?
+                    long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;                    
                     if (h == 1 && p == 0) Assert.IsTrue(size > 51000000 && size < 52000000);       //size should be around 51.819.217 bytes
                     else if (h == 1 && p == 1) Assert.IsTrue(size > 59000000 && size < 60000000);  //size should be around 59.109.882 bytes
                     else if (h == 0 && p == 0) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes

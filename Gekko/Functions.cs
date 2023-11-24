@@ -5182,7 +5182,7 @@ namespace Gekko
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {
-            //To test: start up here: c:\Thomas\Gekko\regres\MAKRO\test3_BACKUP2\klon\Model
+            //See _Test_GAMSScalar1()+2() unit tests
             if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
             string input1 = O.ConvertToString(input[0]);
             if (G.Equal(input1, "pack") || G.Equal(input1, "packmanual"))
