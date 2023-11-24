@@ -9412,6 +9412,7 @@ namespace Gekko
             bool optionsFileExists = false;
             try
             {
+                string lmodel = null;
                 if (depth > 1) new Error("GAMS solver called > 2 times in gamsscalar() function. This should not be necessary: report this to the Gekko editor.");
                 int dif = 0;
                 if (depth == 0 || G.IsUnitTesting())
@@ -9440,7 +9441,7 @@ namespace Gekko
                     try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
                     try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
                     try { settings.variable = (string)jsonTree["variable"]; } catch { }
-                    try { settings.model = (string)jsonTree["model"]; } catch { }
+                    try { settings.model = (object[])jsonTree["model"]; } catch { }
                     try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
                     try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
                     try { settings.counts3 = (string)jsonTree["counts3"]; } catch { }
@@ -9448,7 +9449,14 @@ namespace Gekko
                     try { settings.t2 = (int)jsonTree["t2"]; } catch { }
                     try { settings.cmd_lines = (object[])jsonTree["cmd_lines"]; } catch { }
                     try { settings.gms_lines = (object[])jsonTree["gms_lines"]; } catch { }
-                    try { settings.isManual = (bool)jsonTree["is_manual"]; } catch { }
+                    try { settings.isManual = (bool)jsonTree["is_manual"]; } catch { }                    
+                    foreach (object o in settings.model)
+                    {
+                        if (o.GetType() != typeof(string)) new Error("Json file error: expected all model elements to be strings");
+                        lmodel += o as string;
+                        lmodel += ", ";
+                    }
+                    lmodel = lmodel.Substring(0, lmodel.Length - ", ".Length);
 
                     // ============================================
 
@@ -9457,9 +9465,6 @@ namespace Gekko
                     if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
                     if (settings.variable == null) new Error("You must indicate variable in gamsscalar.json");
                     if (settings.model == null) new Error("You must indicate model in gamsscalar.json");
-                    //if (settings.counts1 == null) new Error("");
-                    //if (settings.counts2 == null) new Error("");
-                    //if (settings.counts3 == null) new Error("");
                     if (settings.t1 == null) new Error("You must indicate t1 in gamsscalar.json");
                     if (settings.t2 == null) new Error("You must indicate t2 in gamsscalar.json");
                     if (settings.cmd_lines == null) new Error("You must indicate cmd_lines in gamsscalar.json");
@@ -9539,27 +9544,25 @@ namespace Gekko
                         }
                     }
 
-                    string fail = null;
+                    string fail = null;                   
 
                     using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsscalar" + depth + ".gms"), null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
+                        string eqList = null;
+                        if (dif0 > 0)
+                        {                            
+                            for (int i = 0; i < dif0 + dif; i++)
+                            {
+                                string s8 = "extra" + i;
+                                eqList += ", " + s8;
+                                sw.WriteLine("equation " + s8 + "[t]; " + s8 + "['" + settings.t1.ToString() + "'] .. " + settings.variable + "['" + settings.t1.ToString() + "'] =E= 0;");
+                            }
+                        }
                         foreach (string s5 in settings.gms_lines)
                         {
-                            string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString()).Replace("{model}", settings.model);
-                            if (dif0 > 0 && s6.Trim().ToLower().StartsWith("solve "))
-                            {
-                                string s7 = null;
-                                for (int i = 0; i < dif0 + dif; i++)
-                                {
-                                    string s8 = "extra" + i;
-                                    s7 += " , " + s8;
-                                    sw.WriteLine("equation " + s8 + "[t];");
-                                    sw.WriteLine(s8 + "['" + settings.t1.ToString() + "'] .. " + settings.variable + "['" + settings.t1.ToString() + "'] =E= 0;");
-                                }
-                                sw.WriteLine("model " + settings.model + "_temp / " + settings.model + s7 + " /;");
-                                sw.WriteLine("model " + settings.model + " / " + settings.model + "_temp /;");
-                            }
+                            string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString());
+                            s6 = s6.Replace("{model}", lmodel + eqList);
                             sw.WriteLine(s6);
                         }
                     }
@@ -9567,7 +9570,7 @@ namespace Gekko
 
                 DateTime t0 = DateTime.Now;
 
-                string s1 = null;
+                string s1 = null;  //just to deduct it later on
                 if (G.IsUnitTesting())
                 {
                     s1 = Globals.unitTestScreenOutput.ToString();

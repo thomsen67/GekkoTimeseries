@@ -18,7 +18,7 @@ namespace Gekko
         public string raw_path = null;
         public object[] raw_ignore = null;
         public string variable = null;
-        public string model = null;
+        public object[] model = null;
         public string counts1 = "**** counts do not match";
         public string counts2 = "**** unmatched free variables";
         public string counts3 = "**** number of unmatched =e= rows";
