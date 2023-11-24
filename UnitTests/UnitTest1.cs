@@ -16666,67 +16666,80 @@ namespace UnitTests
             new Writeln("We need to have \\Savepoints\\smoothed_parameters_calibration.g00+pkl -- And path.cmd --> 45");
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\MAKRO\2023-11-01-790eb70\Model";
-            for (int i = 1; i < 2; i++)
+            for (int h = 1; h >= 0; h--)  //holdfixed
             {
-                I("RESET;");
-                I("OPTION folder working = '" + path5 + "';");
-                I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
-                if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
-                using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                for (int p = 0; p < 2; p++)  //post model
                 {
-                    sw.WriteLine(@"// Gekko settings for GAMS CONVERT (produces scalar model for Gekko DECOMP).");
-                    sw.WriteLine(@"// Comments '//' can be used: not legal in .json, but Gekko removes them before reading the file.");
-                    sw.WriteLine(@"// Beware that you must use double backslash for paths.");
-                    sw.WriteLine(@"{");
-                    sw.WriteLine(@" ""zip_name"" : ""makro2gekko.zip"",                     //Resulting zip name.");
-                    sw.WriteLine(@" ""raw_path"" : ""*.gms"",                               //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
-                    sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations (raw.gms). Can be omitted.");
-                    sw.WriteLine(@" ""variable"" : ""qBNP"",                                //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
-                    sw.WriteLine(@" ""counts1"" : ""**** counts do not match"",             //Can be omitted, default = ""**** counts do not match""");
-                    sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",        //Can be omitted, default = ""**** unmatched free variables""");
-                    sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",    //Can be omitted, default = ""**** number of unmatched =e= rows""");
-                    sw.WriteLine(@" ""t1"" : 2029,                                        //First year in scalar model");
-                    sw.WriteLine(@" ""t2"" : 2099,                                        //Last year in scalar model");
-                    if (i == 1)
+                    I("RESET;");
+                    I("OPTION folder working = '" + path5 + "';");
+                    I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+                    if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
+                    using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
-                        sw.WriteLine(@" ""model"": [""m_base""],                                   //Model name(s)");
+                        sw.WriteLine(@"// Gekko settings for GAMS CONVERT (produces scalar model for Gekko DECOMP).");
+                        sw.WriteLine(@"// Comments '//' can be used: not legal in .json, but Gekko removes them before reading the file.");
+                        sw.WriteLine(@"// Beware that you must use double backslash for paths.");
+                        sw.WriteLine(@"{");
+                        sw.WriteLine(@" ""zip_name"" : ""makro2gekko.zip"",                     //Resulting zip name.");
+                        sw.WriteLine(@" ""raw_path"" : ""*.gms"",                               //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
+                        sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations (raw.gms). Can be omitted.");
+                        sw.WriteLine(@" ""variable"" : ""qBNP"",                                //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
+                        sw.WriteLine(@" ""counts1"" : ""**** counts do not match"",             //Can be omitted, default = ""**** counts do not match""");
+                        sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",        //Can be omitted, default = ""**** unmatched free variables""");
+                        sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",    //Can be omitted, default = ""**** number of unmatched =e= rows""");
+                        sw.WriteLine(@" ""t1"" : 2029,                                        //First year in scalar model");
+                        sw.WriteLine(@" ""t2"" : 2099,                                        //Last year in scalar model");
+                        if (p == 0)
+                        {
+                            sw.WriteLine(@" ""model"": [""m_base""],                                   //Model name(s)");
+                        }
+                        else
+                        {
+                            sw.WriteLine(@" ""model"": [""m_base"", ""m_post""],                       //Model name(s)");
+                        }
+                        sw.WriteLine(@" ""is_manual"": false,                                 //Call GAMS manually, default = false           ");
+                        sw.WriteLine(@" ""cmd_lines"":                                        //lines in the file gamsscalar{i}.cmd (that Gekko calls). Beware: use double backslash for paths.");
+                        sw.WriteLine(@" [");
+                        sw.WriteLine(@" ""call ..\\paths.cmd"",");
+                        sw.WriteLine(@" ""set gamY=call %python% ..\\gamY\\gamY.py"",");
+                        sw.WriteLine(@" ""%gamY% {gms_lines} r=..\\Model\\Savepoints\\smoothed_parameters_calibration""");
+                        sw.WriteLine(@" ],");
+                        sw.WriteLine(@" ""gms_lines"":                                           //lines in the file gamsscalar{i}.gms, called from gamsscalar{i}.cmd. Beware: use double backslash for paths.");
+                        sw.WriteLine(@" [");
+                        sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",                       //{t1} and {t2} are taken from settings");
+                        if (p == 0)
+                        {
+                            sw.WriteLine(@" ""$fix all; $unfix g_endo;"",");
+                        }
+                        else
+                        {
+                            sw.WriteLine(@" ""$fix all; $unfix g_endo; $unfix g_post;"",");
+                        }
+                        sw.WriteLine(@" ""model m_gekko / {model} /;"",");
+                        if (h == 0) sw.WriteLine(@" ""m_gekko.holdFixed = 0;"",");                              //GAMS default, fixed variables turn up in scalar model
+                        else sw.WriteLine(@" ""m_gekko.holdFixed = 1;"",");                                     //MAKRO har this set: fixed variables become fixed numerical values in scalar model
+                        sw.WriteLine(@" ""option mcp = convert; "",");
+                        sw.WriteLine(@" ""solve m_gekko using mcp;""");
+                        sw.WriteLine(@" ]");
+                        sw.WriteLine(@" } ");
                     }
-                    else if (i == 2)                     
-                    {
-                        sw.WriteLine(@" ""model"": [""m_base"", ""m_post""],                       //Model name(s)");
-                    }                    
-                    sw.WriteLine(@" ""is_manual"": false,                                 //Call GAMS manually, default = false           ");
-                    sw.WriteLine(@" ""cmd_lines"":                                        //lines in the file gamsscalar{i}.cmd (that Gekko calls). Beware: use double backslash for paths.");
-                    sw.WriteLine(@" [");
-                    sw.WriteLine(@" ""call ..\\paths.cmd"",");
-                    sw.WriteLine(@" ""set gamY=call %python% ..\\gamY\\gamY.py"",");
-                    sw.WriteLine(@" ""%gamY% {gms_lines} r=..\\Model\\Savepoints\\smoothed_parameters_calibration""");
-                    sw.WriteLine(@" ],");
-                    sw.WriteLine(@" ""gms_lines"":                                           //lines in the file gamsscalar{i}.gms, called from gamsscalar{i}.cmd. Beware: use double backslash for paths.");
-                    sw.WriteLine(@" [");
-                    sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",                       //{t1} and {t2} are taken from settings");
-                    if (i == 1)
-                    {
-                        sw.WriteLine(@" ""$fix all; $unfix g_endo;"",");
-                    }
-                    else if (i == 2)
-                    {
-                        sw.WriteLine(@" ""$fix all; $unfix g_endo; $unfix g_post;"",");                        
-                    }
-                    sw.WriteLine(@" ""model m_gekko / {model} /;"",");
-                    sw.WriteLine(@" ""m_gekko.holdFixed = 0;"",                              //setting = 0 enables fixed exogenous variables to be shown.");
-                    sw.WriteLine(@" ""option mcp = convert;"",");
-                    sw.WriteLine(@" ""solve m_gekko using mcp;""");
-                    sw.WriteLine(@" ]");
-                    sw.WriteLine(@" } ");
+                    File.Delete(path5 + "\\makro2gekko.zip");
+                    I("gamsscalar('pack');");
+                    long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
+                    // ?
+                    // ?
+                    // ?                    
+                    // ? Why are the result the same for h==0 and h==1, and for h==0 it has to iterate!                    
+                    // ?
+                    // ?
+                    // ?
+                    if (h == 1 && p == 0) Assert.IsTrue(size > 51000000 && size < 52000000);       //size should be around 51.819.217 bytes
+                    else if (h == 1 && p == 1) Assert.IsTrue(size > 59000000 && size < 60000000);  //size should be around 59.109.882 bytes
+                    else if (h == 0 && p == 0) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes
+                    else if (h == 0 && p == 1) Assert.IsTrue(size > 70000000 && size < 71000000);  //size should be around 70.650.027 bytes (both fixed vars and post-model)                    
+                    else new Error("Wrong!");
                 }
-                File.Delete(path5 + "\\makro2gekko.zip");
-                I("gamsscalar('pack');");
-                long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
-                if (i == 1) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes
-                else if (i == 2) Assert.IsTrue(size > 70000000 && size < 71000000);  //size should be around 70.650.027 bytes
-                else new Error("Wrong!");
             }
         }
 
