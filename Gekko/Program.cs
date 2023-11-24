@@ -9644,11 +9644,15 @@ namespace Gekko
                         }
                     }
                     catch { }
-                }                
+                }
 
                 //Test date/time of gams.gms and dict.txt --> must be after start of ...
 
-                if (dif == 0)
+                if (dif < 0)
+                {
+                    new Error("In the gamsscalar() funtion, GAMS reports that there are more equations than variables. If you need to be able to handle this, please contact the Gekko editor (Gekko only handles more variables than equations.");
+                }
+                else if (dif == 0)
                 {
                     new Writeln("Created scalar model. Now packing: " + settings.zip_name + "...");
                     if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");

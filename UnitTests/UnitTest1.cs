@@ -16666,7 +16666,7 @@ namespace UnitTests
             new Writeln("We need to have \\Savepoints\\smoothed_parameters_calibration.g00+pkl -- And path.cmd --> 45");
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\MAKRO\2023-11-01-790eb70\Model";
-            for (int post = 0; post < 1; post++)
+            for (int i = 1; i < 2; i++)
             {
                 I("RESET;");
                 I("OPTION folder working = '" + path5 + "';");
@@ -16688,11 +16688,11 @@ namespace UnitTests
                     sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",    //Can be omitted, default = ""**** number of unmatched =e= rows""");
                     sw.WriteLine(@" ""t1"" : 2029,                                        //First year in scalar model");
                     sw.WriteLine(@" ""t2"" : 2099,                                        //Last year in scalar model");
-                    if (post == 0)
+                    if (i == 1)
                     {
                         sw.WriteLine(@" ""model"": [""m_base""],                                   //Model name(s)");
                     }
-                    else
+                    else if (i == 2)                     
                     {
                         sw.WriteLine(@" ""model"": [""m_base"", ""m_post""],                       //Model name(s)");
                     }                    
@@ -16706,11 +16706,11 @@ namespace UnitTests
                     sw.WriteLine(@" ""gms_lines"":                                           //lines in the file gamsscalar{i}.gms, called from gamsscalar{i}.cmd. Beware: use double backslash for paths.");
                     sw.WriteLine(@" [");
                     sw.WriteLine(@" ""set_time_periods({t1}, {t2});"",                       //{t1} and {t2} are taken from settings");
-                    if (post == 0)
+                    if (i == 1)
                     {
                         sw.WriteLine(@" ""$fix all; $unfix g_endo;"",");
                     }
-                    else
+                    else if (i == 2)
                     {
                         sw.WriteLine(@" ""$fix all; $unfix g_endo; $unfix g_post;"",");                        
                     }
@@ -16724,7 +16724,9 @@ namespace UnitTests
                 File.Delete(path5 + "\\makro2gekko.zip");
                 I("gamsscalar('pack');");
                 long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
-                Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.9 MB
+                if (i == 1) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes
+                else if (i == 2) Assert.IsTrue(size > 70000000 && size < 71000000);  //size should be around 70.650.027 bytes
+                else new Error("Wrong!");
             }
         }
 
