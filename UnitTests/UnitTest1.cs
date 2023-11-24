@@ -12757,7 +12757,7 @@ namespace UnitTests
                 //
                 Globals.unitTestScreenOutput.Clear();
                 I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
                 I("option gams exe folder = 'c:\\GAMS\\38';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx first> makro.zip\\makro1.gdx;");
@@ -16514,7 +16514,7 @@ namespace UnitTests
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
             I("MODEL <gms> small.zip;");
 
             //A good test of reading and writing from GAMS scalar model a array.
@@ -16557,7 +16557,7 @@ namespace UnitTests
                 Globals.unitTestScreenOutput.Clear();
                 if (i == 0) I("flush();");  //test without or with cache
                 I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
                 I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx> makro.zip\\makro0.gdx;");
