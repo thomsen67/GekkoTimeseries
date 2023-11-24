@@ -16691,13 +16691,14 @@ namespace UnitTests
                         sw.WriteLine(@"// Beware that you must use double backslash for paths.");
                         sw.WriteLine(@"{");
                         sw.WriteLine(@" ""zip_name"" : ""makro2gekko.zip"",                     //Resulting zip name.");
-                        sw.WriteLine(@" ""raw_path"" : ""*.gms"",                               //Files containing raw GAMS equations (Gekko will look in sub-folders, too.");
+                        sw.WriteLine(@" ""raw_path"" : ""*.gms"",                               //Path to file(s) containing raw GAMS equations (may include *.gms)");
                         sw.WriteLine(@" ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations. Can be omitted.");
                         sw.WriteLine(@" ""variable"" : ""qBNP"",                                //Name of variable used for phoney equations (must have time dimension, default = ""qBNP"").");
                         sw.WriteLine(@" ""counts1"" : ""**** counts do not match"",             //Can be omitted, default = ""**** counts do not match""");
                         sw.WriteLine(@" ""counts2"" : ""**** unmatched free variables"",        //Can be omitted, default = ""**** unmatched free variables""");
                         sw.WriteLine(@" ""counts3"" : ""**** number of unmatched =e= rows"",    //Can be omitted, default = ""**** number of unmatched =e= rows""");
-                        //You can actually write 2019 here, but 2018 crashes with numerical errors
+                        //You can actually write t1:2018 here, which has errors but seems to produce a zip.
+                        //Using t1:2019 seems to run more smooth. Using t1:2029 is default.
                         sw.WriteLine(@" ""t1"" : 2029,                                        //First year in scalar model");                        
                         sw.WriteLine(@" ""t2"" : 2099,                                        //Last year in scalar model");
                         if (p == 0)

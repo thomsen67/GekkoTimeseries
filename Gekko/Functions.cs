@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.IO;
-using System.Windows.Controls.Primitives;
-using static GAMS.GAMSOptions;
-using static Gekko.O;
-using System.Management;
-using static Gekko.Program;
 
 namespace Gekko
 {
@@ -19,6 +12,7 @@ namespace Gekko
         public object[] raw_ignore = null;
         public string variable = null;
         public object[] model = null;
+        public string lmodel = null;  //.model unfolded
         public string counts1 = "**** counts do not match";
         public string counts2 = "**** unmatched free variables";
         public string counts3 = "**** number of unmatched =e= rows";
@@ -5188,7 +5182,8 @@ namespace Gekko
             if (G.Equal(input1, "pack") || G.Equal(input1, "packmanual"))
             {
                 bool isManual = G.Equal(input1, "packmanual");
-                Program.GamsScalar(0, 0, null);
+                GamsScalarHelper settings = new GamsScalarHelper();
+                Program.GamsScalar(0, 0, settings);
             }
             else if (G.Equal(input1, "info"))
             {
