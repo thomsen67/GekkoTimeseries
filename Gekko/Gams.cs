@@ -669,8 +669,8 @@ namespace Gekko
         /// <returns></returns>
         public static Model ReadGamsScalarModelEquations(GAMSScalarModelSettings settings, Model model)
         {
-            //for c:\Thomas\Gekko\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model\gams.gms and
-            //    c:\Thomas\Gekko\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model\dict.txt
+            //for c:\Thomas\Gekko\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model\gams.gms and
+            //    c:\Thomas\Gekko\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model\dict.txt
             //Import dictionary: 8.53 sec
             //GAMS equations read: 48.44 sec-- > count 1063359 unique 12750    //// best: 40 (best release: 19)
             //Starting values read: 3.64 sec
@@ -789,11 +789,6 @@ namespace Gekko
             //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
             if (helper.count != semis) new Error("Not summing up");
-
-            if (false)
-            {
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(csCodeLines).ToString(), G.GetEncoding());
-            }
 
             foreach (string line in values)
             {
@@ -1245,7 +1240,7 @@ namespace Gekko
         {
             DateTime dt0 = DateTime.Now;
 
-            ANTLRStringStream input = new ANTLRStringStream(Program.GetTextFromFileWithWait(@"c:\Thomas\Gekko\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model\cut.gms"));  //a newline for ease of use of ANTLR
+            ANTLRStringStream input = new ANTLRStringStream(Program.GetTextFromFileWithWait(@"c:\Thomas\Gekko\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model\cut.gms"));  //a newline for ease of use of ANTLR
 
             List<string> errors = null;
             CommonTree t = null;

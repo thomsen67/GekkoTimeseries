@@ -12757,7 +12757,7 @@ namespace UnitTests
                 //
                 Globals.unitTestScreenOutput.Clear();
                 I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
                 I("option gams exe folder = 'c:\\GAMS\\38';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx first> makro.zip\\makro1.gdx;");
@@ -16514,7 +16514,7 @@ namespace UnitTests
             Program.Flush(); //wipes out existing cached models
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
             I("MODEL <gms> small.zip;");
 
             //A good test of reading and writing from GAMS scalar model a array.
@@ -16557,7 +16557,7 @@ namespace UnitTests
                 Globals.unitTestScreenOutput.Clear();
                 if (i == 0) I("flush();");  //test without or with cache
                 I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-yyyyyyy\klon\Model';");
                 I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx> makro.zip\\makro0.gdx;");
@@ -16571,8 +16571,8 @@ namespace UnitTests
                 if (true)
                 {
                     //Testing out residual production
-                    I("SIM <res prefix = 'res_'>;");  //produce residuals
-                    _AssertSeries(First(), "res_E_tIOy", new string[] { "tje", "tje" }, 2027, 0d, sharedDelta);
+                    I("SIM<res>;");  //produce residuals, can use <prefix = 'res_'>
+                    _AssertSeries(First(), "E_tIOy", new string[] { "tje", "tje" }, 2027, 0d, sharedDelta);
                 }
 
                 if (true)
@@ -16611,7 +16611,7 @@ namespace UnitTests
         {
             //Older model and older GAMS, cf. _Test_GAMSScalar1()
             Globals.unitTestScreenOutput.Clear();
-            string path5 = Globals.ttPath2 + @"\regres\MAKRO\2022-01-26-xxxxxxx\klon\Model";        
+            string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-xxxxxxx\klon\Model";        
             I("RESET;");
             I("OPTION folder working = '" + path5 + "';");
             I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
@@ -16674,7 +16674,7 @@ namespace UnitTests
             //Newer model and newer GAMS, cf. _Test_GAMSScalar2()
             new Writeln("We need to have \\Savepoints\\smoothed_parameters_calibration.g00+pkl -- And path.cmd --> 45");
             Globals.unitTestScreenOutput.Clear();
-            string path5 = Globals.ttPath2 + @"\regres\MAKRO\2023-11-01-790eb70\Model";
+            string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2023-11-01-790eb70\Model";
             for (int h = 1; h >= 0; h--)  //holdfixed
             {
                 for (int p = 0; p < 2; p++)  //post model
@@ -31605,10 +31605,37 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_MAKRO_test1()
+        public void _Test_Systems_MAKROBK()
+        {
+            //Tests MAKROBK update
+            //Changes compared to downloaded version:
+            //1. Remember to copy the existing (downloaded) makrobk.gdx as previous_makrobk.gdx.
+            //2. 
+            string folder = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2023-11-01-790eb70\Data\Makrobk";
+            I("RESET;");
+            I("OPTION folder working = '" + folder + "';");
+            I("RUN makrobk;");
+            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1968_1993.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
+            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1994_2022.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));            
+        }
+
+        [TestMethod]
+        public void _Test_Systems_MONABK()
+        {            
+            string folder = Globals.ttPath2 + @"\regres\Nationalbanken";
+            I("RESET;");
+            I("OPTION folder working = '" + folder + "';");
+            I("RUN start;");
+            //Something goes wrong here with the sys'copy...'
+            Assert.IsTrue(File.ReadAllText(folder + @"\originaler\compare_konjuk.txt").Contains("Out of the 2632 common series, there are differences regarding 0 of them"));
+            Assert.IsTrue(File.ReadAllText(folder + @"\originaler\compare_priser.txt").Contains("Out of the 1099 common series, there are differences regarding 5 of them"));
+        }
+
+        [TestMethod]
+        public void _Test_Systems_MAKRO_procedures()
         {
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test1\';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\DREAM\MAKRO\test1\';");
             I("RUN makro;");
         }
 

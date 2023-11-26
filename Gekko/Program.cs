@@ -20171,7 +20171,7 @@ namespace Gekko
                 info.CreateNoWindow = true;
                 info.RedirectStandardOutput = true;
                 info.UseShellExecute = false;
-                info.FileName = Path.Combine(working, commandLine);
+                info.FileName = Path.Combine("" + working, commandLine);  //does not allow null as first arg.
                 info.WorkingDirectory = working;
                 using (Process process = Process.Start(info))
                 {
