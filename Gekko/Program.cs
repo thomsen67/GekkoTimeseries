@@ -20164,7 +20164,7 @@ namespace Gekko
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
 
-            if (G.IsUnitTesting())
+            if (false)
             {
                 //Direct system output to Globals.unitTestScreenOutput
                 ProcessStartInfo info = new ProcessStartInfo();
@@ -20187,156 +20187,184 @@ namespace Gekko
                 int widthRemember = Program.options.print_width;
                 Program.options.print_width = int.MaxValue;
 
-                try
+                process = new System.Diagnostics.Process();
+                // invokes the cmd process specifying the command to be executed.
+                string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
+                // pass executing file to cmd (Windows command interpreter) as a arguments
+                // /C tells cmd that we want it to execute the command that follows, and then exit.                    
+                string _Arguments = "";
+                // pass any command line parameters for execution
+                if (commandLine != null && commandLine.Length > 0)
                 {
-                    process = new System.Diagnostics.Process();
-                    // invokes the cmd process specifying the command to be executed.
-                    string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
-                    // pass executing file to cmd (Windows command interpreter) as a arguments
-                    // /C tells cmd that we want it to execute the command that follows, and then exit.                    
-                    string _Arguments = "";
-                    // pass any command line parameters for execution
-                    if (commandLine != null && commandLine.Length > 0)
-                    {
-                        _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
-                    }
-                    // sets a value indicating not to start the process in a new window.
-                    process.StartInfo.CreateNoWindow = true;
-                    // sets a value indicating not to use the operating system shell to start the process.
-                    process.StartInfo.UseShellExecute = false;
-                    // sets a value that indicates the output/input/error of an application is written to the Process.
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.RedirectStandardInput = false;
-                    process.StartInfo.RedirectStandardError = true;
-                    string wd = Program.options.folder_working;
-                    if (!G.NullOrBlanks(working)) wd = working;
-                    process.StartInfo.WorkingDirectory = wd;
-                    process.StartInfo.Arguments = _Arguments;
-                    process.StartInfo.FileName = _CMDProcess;
-                    int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
-                    //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
-                    //StringBuilder output = new StringBuilder();
-                    StringBuilder error = new StringBuilder();
-                    using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
-                    using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
-                    {
-                        process.OutputDataReceived += (sender, e) =>
-                        {
-                            if (!Globals.threadIsInProcessOfAborting)
-                            {
-                                if (e.Data == null)
-                                {
-                                    outputWaitHandle.Set();
-                                }
-                                else
-                                {
-                                    if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
-                                }
-                            }
-                        };
-                        process.ErrorDataReceived += (sender, e) =>
-                        {
-                            if (!Globals.threadIsInProcessOfAborting)
-                            {
-                                if (e.Data == null)
-                                {
-                                    errorWaitHandle.Set();
-                                }
-                                else
-                                {
-                                    error.AppendLine(e.Data);
-                                }
-                            }
-                        };
+                    _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
+                }
+                // sets a value indicating not to start the process in a new window.
+                process.StartInfo.CreateNoWindow = true;
+                // sets a value indicating not to use the operating system shell to start the process.
+                process.StartInfo.UseShellExecute = false;
+                // sets a value that indicates the output/input/error of an application is written to the Process.
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardInput = false;
+                process.StartInfo.RedirectStandardError = true;
+                string wd = Program.options.folder_working;
+                if (!G.NullOrBlanks(working)) wd = working;
+                process.StartInfo.WorkingDirectory = wd;
+                process.StartInfo.Arguments = _Arguments;
+                process.StartInfo.FileName = _CMDProcess;
+                int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
+                                                       //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1                    
+                StringBuilder error = new StringBuilder();
 
+
+
+                if (G.IsUnitTesting())
+                {
+                    //We do it pretty simple when unit testing.
+                    using (process)
+                    {
                         process.Start();
-                        //string output = process.StandardOutput.ReadToEnd();
-
-                        if (!Globals.threadIsInProcessOfAborting)
-                        {
-                            process.BeginOutputReadLine();
-                            process.BeginErrorReadLine();
-                        }
-
-                        if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
-                        {
-                            // Process completed. Check process.ExitCode here.
-                        }
-                        else
-                        {
-                            // Timed out.
-                        }
+                        string results = process.StandardOutput.ReadToEndAsync().Result;
+                        Globals.unitTestScreenOutput.Append(results);
                     }
-
-                    if (!Globals.threadIsInProcessOfAborting)
+                }
+                else
+                {
+                    try
                     {
-                        int exitCode = process.ExitCode;
-                        if (exitCode != 0)
-                        {
-                            new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
-                            //fail = true;
-                        }
-                    }
 
-                    if (!mute || Globals.threadIsInProcessOfAborting)
-                    {
-                        try
+                        using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                        using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
                         {
-                            //G.Writeln2(output.ToString());
-                            if (error.Length > 0)
+                            process.OutputDataReceived += (sender, e) =>
                             {
-                                G.Writeln2("=================== System error message ===================", Globals.warningColor);
-                                G.Writeln2(error.ToString(), Globals.warningColor);
-                                //fail = true;
+                                if (!Globals.threadIsInProcessOfAborting)
+                                {
+                                    if (e.Data == null)
+                                    {
+                                        outputWaitHandle.Set();
+                                    }
+                                    else
+                                    {
+                                        if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
+                                    }
+                                }
+                            };
+                            process.ErrorDataReceived += (sender, e) =>
+                            {
+                                if (!Globals.threadIsInProcessOfAborting)
+                                {
+                                    if (e.Data == null)
+                                    {
+                                        errorWaitHandle.Set();
+                                    }
+                                    else
+                                    {
+                                        error.AppendLine(e.Data);
+                                    }
+                                }
+                            };
+
+                            process.Start();
+                            //string output = process.StandardOutput.ReadToEnd();
+
+                            if (!Globals.threadIsInProcessOfAborting)
+                            {
+                                process.BeginOutputReadLine();
+                                process.BeginErrorReadLine();
+                            }
+
+                            if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
+                            {
+                                // Process completed. Check process.ExitCode here.
+                            }
+                            else
+                            {
+                                // Timed out.
                             }
                         }
-                        catch (Exception e)
+
+                        if (!G.IsUnitTesting())
                         {
-                            new Warning("Could not write output from system command");
-                            //fail = true;
-                        }
-                    }
-                }
-                catch (Win32Exception _Win32Exception)
-                {
-                    if (!Globals.threadIsInProcessOfAborting)
-                    {
-                        // Error
-                        new Error("SYS Win32 exception: " + _Win32Exception.ToString(), false);
-                        fail = true;
-                    }
-                }
-                catch (Exception _Exception)
-                {
-                    if (!Globals.threadIsInProcessOfAborting)
-                    {
-                        // Error
-                        new Error("SYS exception: " + _Exception.ToString(), false);
-                        fail = true;
-                    }
-                }
-                finally
-                {
-                    if (Globals.threadIsInProcessOfAborting)
-                    {
-                    }
-                    else
-                    {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        // close process and do cleanup
-                        if (true)
-                        {
-                            //like killing it in the task manager, no questions asked
-                            if (!process.HasExited)
+                            if (!Globals.threadIsInProcessOfAborting)
+                            {
+                                int exitCode = process.ExitCode;
+                                if (exitCode != 0)
+                                {
+                                    new Warning("System call exited with code: " + exitCode + ". System command: " + commandLine);
+                                    //fail = true;
+                                }
+                            }
+
+                            if (!mute || Globals.threadIsInProcessOfAborting)
                             {
                                 try
                                 {
-                                    process.Kill();
+                                    //G.Writeln2(output.ToString());
+                                    if (error.Length > 0)
+                                    {
+                                        G.Writeln2("=================== System error message ===================", Globals.warningColor);
+                                        G.Writeln2(error.ToString(), Globals.warningColor);
+                                        //fail = true;
+                                    }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
-                                    //in principle, the process could exit just after .HasExited is asked, there the try here
+                                    new Warning("Could not write output from system command");
+                                    //fail = true;
+                                }
+                            }
+                        }
+                    }
+                    catch (Win32Exception _Win32Exception)
+                    {
+                        if (!Globals.threadIsInProcessOfAborting)
+                        {
+                            // Error
+                            new Error("SYS Win32 exception: " + _Win32Exception.ToString(), false);
+                            fail = true;
+                        }
+                    }
+                    catch (Exception _Exception)
+                    {
+                        if (!Globals.threadIsInProcessOfAborting)
+                        {
+                            // Error
+                            new Error("SYS exception: " + _Exception.ToString(), false);
+                            fail = true;
+                        }
+                    }
+                    finally
+                    {
+                        if (Globals.threadIsInProcessOfAborting)
+                        {
+                        }
+                        else
+                        {
+                            //resetting, also if there is an error
+                            Program.options.print_width = widthRemember;
+                            // close process and do cleanup
+                            if (true)
+                            {
+                                //like killing it in the task manager, no questions asked
+                                if (!process.HasExited)
+                                {
+                                    try
+                                    {
+                                        process.Kill();
+                                    }
+                                    catch
+                                    {
+                                        //in principle, the process could exit just after .HasExited is asked, there the try here
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        process.Close();
+                                        process.Dispose();
+                                    }
+                                    catch { }
                                 }
                             }
                             else
@@ -20348,20 +20376,11 @@ namespace Gekko
                                 }
                                 catch { }
                             }
+                            //process = null;
                         }
-                        else
-                        {
-                            try
-                            {
-                                process.Close();
-                                process.Dispose();
-                            }
-                            catch { }
-                        }
-                        //process = null;
                     }
+                    if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
                 }
-                if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
             }
         }
 
