@@ -175,7 +175,7 @@ namespace UnitTests
             }
             //We set a default regarding this folder -- not good if the string is empty
             //and we try to write a file etc.
-            Program.options.folder_working = Globals.ttPath2 + @"\regres\working";
+            Program.options.folder_working = Globals.ttPath2 + @"\regres\Root\working";
             Globals.globalPeriodStart = new GekkoTime(EFreq.A, 2000, 1);
             Globals.globalPeriodEnd = new GekkoTime(EFreq.A, 2010, 1);
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
@@ -8810,25 +8810,25 @@ namespace UnitTests
         public void _Test_Root()
         {
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Root\Working';");
             I("%s = readfile('{root()}/Working/root.txt');");
             _AssertScalarString(First(), "%s", "Root test ok (1)" + G.NL);
 
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Root\Working';");
             I("run root.gcm;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Root test ok (1)"));
 
             Globals.unitTestScreenOutput.Clear();
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Working';");
-            FAIL("run \\..\\..\\regres2\\Working\\root.gcm;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Root\Working';");
+            FAIL("run \\..\\..\\..\\regres2\\Working\\root.gcm;");
 
             //will return "Root test ok (1)" !
             //Problem is that the found ini path (c:\Thomas\Gekko\regres2) is not subset (part) of the 
-            //gcm file path (c:\Thomas\Gekko\regres\Working). And hence we do not know whether a root()
-            //from working folder = c:\Thomas\Gekko\regres\Working would return the same root.ini (it
+            //gcm file path (c:\Thomas\Gekko\regres\Root\Working). And hence we do not know whether a root()
+            //from working folder = c:\Thomas\Gekko\regres\Root\Working would return the same root.ini (it
             //would not here). So the Gekko working folder and the running gcm file path must point to
             //the same root.ini.
             //NOTE NOTE: root() from functions/procedures/libraries should be ok (hm what about a gcm
