@@ -20163,14 +20163,14 @@ namespace Gekko
             bool fail = false;
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
-            
+
             if (G.IsUnitTesting())
             {
                 //Direct system output to Globals.unitTestScreenOutput
                 ProcessStartInfo info = new ProcessStartInfo();
                 info.CreateNoWindow = true;
-                info.RedirectStandardOutput = true;
                 info.UseShellExecute = false;
+                info.RedirectStandardOutput = true;
                 info.FileName = Path.Combine("" + working, commandLine);  //does not allow null as first arg.
                 info.WorkingDirectory = working;
                 using (Process process = Process.Start(info))
@@ -20193,8 +20193,7 @@ namespace Gekko
                     // invokes the cmd process specifying the command to be executed.
                     string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
                     // pass executing file to cmd (Windows command interpreter) as a arguments
-                    // /C tells cmd that we want it to execute the command that follows, and then exit.
-                    //string _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _FileToExecute });
+                    // /C tells cmd that we want it to execute the command that follows, and then exit.                    
                     string _Arguments = "";
                     // pass any command line parameters for execution
                     if (commandLine != null && commandLine.Length > 0)
@@ -20214,13 +20213,8 @@ namespace Gekko
                     process.StartInfo.WorkingDirectory = wd;
                     process.StartInfo.Arguments = _Arguments;
                     process.StartInfo.FileName = _CMDProcess;
-                    //process.StartInfo = p;
-                    // Starts a process resource and associates it with a Process component.
-
                     int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
-
                     //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
-
                     //StringBuilder output = new StringBuilder();
                     StringBuilder error = new StringBuilder();
                     using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
