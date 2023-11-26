@@ -5925,7 +5925,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Copy1()
-        {
+        {            
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually copied
 
