@@ -59,12 +59,7 @@ namespace Gekko
         public string dataFile = null;
 
         /// <summary>
-        /// The "active" left-hand side periods for the current trace (that is, what the trace determines). 
-        /// At some point, the periods inside should be compacted. For instance a list of GekkoTimes 1966-2022 is a
-        /// waste of space. Some kind of interval logic could be implemented. For instance, updating 2000-2010 over the 
-        /// 1966-2022 interval would break 1966-2022 into --> 1966-1999 and 2011-2022. Would save a lot of space.
-        /// See maybe https://github.com/mbuchetics/RangeTree for ideas. But this tree is only for searching though.
-        /// Perhaps allow combo of intervals (for > 3 dates) and single dates.
+        /// The "active" left-hand side periods for the current trace (that is, what the trace determines).
         /// </summary>
         [ProtoMember(7)]
         public Periods periods = new Periods();
@@ -310,7 +305,7 @@ namespace Gekko
                 //s += "";
                 foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.t1 + "-" + gtss.t2 + ", ";
             }
-            if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
+            if (s != null && s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
             return s;
         }
 
