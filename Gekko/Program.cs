@@ -1994,6 +1994,10 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {            
+            if(true)
+            {
+                TestProgram.Main2(null);
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
