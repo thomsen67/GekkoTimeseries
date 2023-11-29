@@ -705,8 +705,28 @@ namespace Gekko
         //  d=2, c=0, DIVIDER      --> x3=x1+x2
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
+        public Trace2 Copy()
+        {
+            Trace2 newNode = new Trace2();
+            newNode.contents = this.contents;
+            if (this.precedents.GetStorage() != null)
+            {
+                foreach (Trace2 child in this.precedents.GetStorage())
+                {
+                    Trace2 newChild = null;
+                    if (child != null) newChild = child.Copy();
+                    newNode.precedents.Add(newChild);
+                }
+            }
+            return newNode;
+        }
+
+
         public static void ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
         {
+            Trace2 copy = trace.Copy();
+            
+            
             if (!all && d > 1) return;
             string s = null;
 
@@ -755,6 +775,8 @@ namespace Gekko
                         TwoStrings s2 = trace.Text(false, d);
                         txt = s + s2.s1;
                     }
+                    
+                    
                     child = new Item(txt, 12321, false);
                     //Item child1 = new Item(s + s2.s1, 12321, false);
                     //Item child2 = new Item(s + s2.s1, 12321, false);
