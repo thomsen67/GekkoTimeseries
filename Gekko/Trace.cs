@@ -591,7 +591,7 @@ namespace Gekko
                             {
                                 //PrintTraceHelper(trace, true);
                                 TreeGridModel model = new TreeGridModel();
-                                PrintTraceHelper(trace, 0, true, model);
+                                ViewerTraceHelper(trace, 0, true, model);
 
                                 // Create the app
                                 Application app = new Application();
@@ -697,7 +697,7 @@ namespace Gekko
             }
         }
 
-        public static void PrintTraceHelper(Trace2 trace, int d, bool all, TreeGridModel model)
+        public static void ViewerTraceHelper(Trace2 trace, int d, bool all, TreeGridModel model)
         {
             if (!all && d > 1) return;
             string s = null;
@@ -738,26 +738,18 @@ namespace Gekko
                 if (!Trace2.IsInvisibleTrace(trace))
                 {
                     TwoStrings s2 = trace.Text(false, d);
-                    //G.Write(s + s2.s1);
-                    //G.Writeln(s2.s2, Globals.MiddleGray);
-
                     Item root = new Item(s + s2.s1, 12321, true);
                     Item child1 = new Item(s + s2.s1, 12321, false);
                     Item child2 = new Item(s + s2.s1, 12321, false);
                     root.Children.Add(child1);
                     root.Children.Add(child2);
-
-                    //    // Add children to the root
-                    //    AddChildren(root);
-
-                    //    // Add the root to the model
                     model.Add(root);
                 }
                 if (trace.precedents.Count() > 0)
                 {
                     foreach (Trace2 child in trace.precedents.GetStorage())
                     {
-                        PrintTraceHelper(child, d + 1, all, model);
+                        ViewerTraceHelper(child, d + 1, all, model);
                     }
                 }
             }
