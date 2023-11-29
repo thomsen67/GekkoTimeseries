@@ -656,9 +656,8 @@ namespace Gekko
         private const int Levels = 3;
         private const int Roots = 100;
         private const int ItemsPerLevel = 5;
-
         private int value;
-        private TreeGridModel model;
+        public TreeGridModel model;
 
         public WindowTreeViewWithTable()
         {
@@ -674,21 +673,24 @@ namespace Gekko
 
         private void InitModel()
         {
-            // Create the model
-            model = new TreeGridModel();
+            //TreeGridModel model = new TreeGridModel();
+            //Trace2.PrintTraceHelper(this.startTrace, 0, true, model);
 
-            // Add a bunch of items at the root
-            for (int count = 0; count < Roots; count++)
-            {
-                // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), value++, true);
+            //// Create the model
+            //model = new TreeGridModel();
 
-                // Add children to the root
-                AddChildren(root);
+            //// Add a bunch of items at the root
+            //for (int count = 0; count < Roots; count++)
+            //{
+            //    // Create the root item
+            //    Item root = new Item(String.Format("Root {0}", count), value++, true);
 
-                // Add the root to the model
-                model.Add(root);
-            }
+            //    // Add children to the root
+            //    AddChildren(root);
+
+            //    // Add the root to the model
+            //    model.Add(root);
+            //}
         }
 
         private int c(Item i)

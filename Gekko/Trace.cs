@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 //using System.Windows.Forms;
 //using System.Windows.Forms;
 //using static alglib;
@@ -588,7 +589,25 @@ namespace Gekko
                         {
                             Action<GAO> a = (gao) =>
                             {
-                                PrintTraceHelper(trace, true);
+                                //PrintTraceHelper(trace, true);
+                                TreeGridModel model = new TreeGridModel();
+                                PrintTraceHelper(trace, 0, true, model);
+
+                                // Create the app
+                                Application app = new Application();
+
+                                // Create the main window
+
+                                WindowTreeViewWithTable w = new WindowTreeViewWithTable();
+                                w.model = model;
+                                app.MainWindow = w;
+
+                                // Show the main window
+                                app.MainWindow.Show();
+
+                                // Run the app
+                                app.Run();
+
                             };
                             s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
@@ -676,7 +695,61 @@ namespace Gekko
                     }
                 }
             }
-        }        
+        }
+
+        public static void PrintTraceHelper(Trace2 trace, int d, bool all, TreeGridModel model)
+        {
+            if (!all && d > 1) return;
+            string s = null;
+
+            if (all)
+            {
+                if (!Trace2.IsInvisibleTrace(trace))
+                {
+                    Action<GAO> a = (gao) =>
+                    {
+                        G.Writeln();
+                        G.Writeln("Trace:     " + trace.contents.text);
+                        G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
+                        G.Writeln("Active:    " + trace.PrintPeriods());
+                        if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
+                        if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
+                        if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
+                        G.Writeln("Stamp:     " + trace.id.stamp.ToString("dd-MM-yyyy HH:mm:ss"));
+                        G.Writeln("ID:        " + trace.id.counter);
+                    };
+                    string more = G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
+                    G.Write(more);
+                }
+                s = G.Blanks(d * 2 - 2);
+            }
+            else
+            {
+                s = "| ";
+            }
+
+            if (trace == null)
+            {
+                G.Write(s);
+                G.Writeln("---", Globals.MiddleGray);
+            }
+            else
+            {
+                if (!Trace2.IsInvisibleTrace(trace))
+                {
+                    TwoStrings s2 = trace.Text(false, d);
+                    G.Write(s + s2.s1);
+                    G.Writeln(s2.s2, Globals.MiddleGray);
+                }
+                if (trace.precedents.Count() > 0)
+                {
+                    foreach (Trace2 child in trace.precedents.GetStorage())
+                    {
+                        PrintTraceHelper(child, d + 1, all);
+                    }
+                }
+            }
+        }
     }
 
     [ProtoContract]
