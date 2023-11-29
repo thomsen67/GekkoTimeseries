@@ -40,7 +40,7 @@
     </Window.Resources>
 
     <DockPanel>
-        <TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="10, 10 10 10"></TextBox>
+        <TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="4, 4, 4, 4"></TextBox>
         <DataGrid AutoGenerateColumns="False" Name="grid" CanUserAddRows="False" IsReadOnly="True" VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
 				  AlternationCount="2" AlternatingRowBackground="WhiteSmoke" SelectionChanged="SelectionChanged" SelectedCellsChanged="SelectedCellsChanged">
             <DataGrid.Resources>
@@ -62,13 +62,13 @@
                                 </Grid.ColumnDefinitions>
 
                                 <CheckBox Style="{StaticResource myCheckboxStyle}"
-									Grid.Column="1" Height="12" Width="12"
+									Grid.Column="1" Height="10" Width="10"
 									IsChecked="{Binding IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 									Visibility="{Binding HasChildren, Converter={StaticResource TreeToggleConverter}}"/>
 
                                 <TextBlock
 									Grid.Column="2"
-									Text="{Binding Name}" Padding="10,10,10,10"/>
+									Text="{Binding Name}" Padding="6,0,6,1"/>
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -77,7 +77,7 @@
                 <DataGridTemplateColumn Header="Value">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Value}" Padding="10,10,10,10"/>
+                            <TextBlock Text="{Binding Value}" Padding="6,0,6,1"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
