@@ -598,8 +598,8 @@ namespace Gekko
 
                                 // Create the main window
 
-                                WindowTreeViewWithTable w = new WindowTreeViewWithTable();
-                                w.model = model;
+                                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                //w.model = model;
                                 app.MainWindow = w;
 
                                 // Show the main window
@@ -738,14 +738,26 @@ namespace Gekko
                 if (!Trace2.IsInvisibleTrace(trace))
                 {
                     TwoStrings s2 = trace.Text(false, d);
-                    G.Write(s + s2.s1);
-                    G.Writeln(s2.s2, Globals.MiddleGray);
+                    //G.Write(s + s2.s1);
+                    //G.Writeln(s2.s2, Globals.MiddleGray);
+
+                    Item root = new Item(s + s2.s1, 12321, true);
+                    Item child1 = new Item(s + s2.s1, 12321, false);
+                    Item child2 = new Item(s + s2.s1, 12321, false);
+                    root.Children.Add(child1);
+                    root.Children.Add(child2);
+
+                    //    // Add children to the root
+                    //    AddChildren(root);
+
+                    //    // Add the root to the model
+                    model.Add(root);
                 }
                 if (trace.precedents.Count() > 0)
                 {
                     foreach (Trace2 child in trace.precedents.GetStorage())
                     {
-                        PrintTraceHelper(child, d + 1, all);
+                        PrintTraceHelper(child, d + 1, all, model);
                     }
                 }
             }

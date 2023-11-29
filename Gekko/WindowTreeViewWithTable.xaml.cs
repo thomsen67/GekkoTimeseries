@@ -588,24 +588,24 @@ namespace Gekko
         }
     }
 
-    public class TestProgram
-    {
-        [STAThread]
-        public static void Main2(string[] args)
-        {
-            // Create the app
-            Application app = new Application();
+    //public class TestProgram
+    //{
+    //    [STAThread]
+    //    public static void Main2(string[] args)
+    //    {
+    //        // Create the app
+    //        Application app = new Application();
 
-            // Create the main window
-            app.MainWindow = new WindowTreeViewWithTable();
+    //        // Create the main window
+    //        app.MainWindow = new WindowTreeViewWithTable();
 
-            // Show the main window
-            app.MainWindow.Show();
+    //        // Show the main window
+    //        app.MainWindow.Show();
 
-            // Run the app
-            app.Run();
-        }
-    }
+    //        // Run the app
+    //        app.Run();
+    //    }
+    //}
 
     public class VisibilityConverter : IValueConverter
     {
@@ -657,18 +657,18 @@ namespace Gekko
         private const int Roots = 100;
         private const int ItemsPerLevel = 5;
         private int value;
-        public TreeGridModel model;
+        //public TreeGridModel model;
 
-        public WindowTreeViewWithTable()
+        public WindowTreeViewWithTable(TreeGridModel model)
         {
             // Initialize the component
             InitializeComponent();
 
             // Initialize the model
-            InitModel();
+            //InitModel();
 
             // Set the model for the grid
-            grid.ItemsSource = model.FlatModel;            
+            grid.ItemsSource = model.FlatModel;
         }
 
         private void InitModel()
