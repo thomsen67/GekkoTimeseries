@@ -591,7 +591,9 @@ namespace Gekko
                             {
                                 //PrintTraceHelper(trace, true);
                                 TreeGridModel model = new TreeGridModel();
-                                ViewerTraceHelper(trace, 0, true, model);
+                                Item root = new Item("--ROOT---", 10, true);
+                                ViewerTraceHelper(trace, 0, true, root);
+                                model.Add(root);
 
                                 // Create the app
                                 Application app = new Application();
@@ -697,7 +699,13 @@ namespace Gekko
             }
         }
 
-        public static void ViewerTraceHelper(Trace2 trace, int d, bool all, TreeGridModel model)
+        //  d=0, c=1, null         -->  aa
+        //  d=1, c=3, x3=x1+x2     -->  ---
+        //  d=2, c=0, x1=...       --> x3=x1+x2
+        //  d=2, c=0, DIVIDER      --> x3=x1+x2
+        //  d=2, c=0, x2=...       --> x3=x1+x2
+
+        public static void ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
         {
             if (!all && d > 1) return;
             string s = null;
@@ -735,21 +743,30 @@ namespace Gekko
             }
             else
             {
-                if (!Trace2.IsInvisibleTrace(trace))
+                bool hasChildren = trace.precedents.Count() > 0;
+                Item child = null;
+
+                if (true || !Trace2.IsInvisibleTrace(trace))
                 {
-                    TwoStrings s2 = trace.Text(false, d);
-                    Item root = new Item(s + s2.s1, 12321, true);
-                    Item child1 = new Item(s + s2.s1, 12321, false);
-                    Item child2 = new Item(s + s2.s1, 12321, false);
-                    root.Children.Add(child1);
-                    root.Children.Add(child2);
-                    model.Add(root);
+                    parent.HasChildren = hasChildren;
+                    string txt = "---";
+                    if (!Trace2.IsInvisibleTrace(trace))
+                    {
+                        TwoStrings s2 = trace.Text(false, d);
+                        txt = s + s2.s1;
+                    }
+                    child = new Item(txt, 12321, false);
+                    //Item child1 = new Item(s + s2.s1, 12321, false);
+                    //Item child2 = new Item(s + s2.s1, 12321, false);
+                    //root.Children.Add(child1);
+                    //root.Children.Add(child2);
+                    parent.Children.Add(child);
                 }
                 if (trace.precedents.Count() > 0)
                 {
-                    foreach (Trace2 child in trace.precedents.GetStorage())
+                    foreach (Trace2 tchild in trace.precedents.GetStorage())
                     {
-                        ViewerTraceHelper(child, d + 1, all, model);
+                        ViewerTraceHelper(tchild, d + 1, all, child);
                     }
                 }
             }
