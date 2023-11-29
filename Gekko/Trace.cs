@@ -3,9 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 //using System.Windows.Forms;
 //using static alglib;
+//using System.Windows;
+//using System.Windows.Data;
+//using System.Globalization;
+//using System.Windows.Controls;
+//using System.Windows.Input;
 
 namespace Gekko
 {
@@ -926,4 +931,6 @@ namespace Gekko
             return this.storage.Count;
         }
     }
+    
+
 }

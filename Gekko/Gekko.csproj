@@ -434,6 +434,9 @@
     <Compile Include="WindowTableViewer.xaml.cs">
       <DependentUpon>WindowTableViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowTreeViewWithTable.xaml.cs">
+      <DependentUpon>WindowTreeViewWithTable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Wrap.cs" />
     <EmbeddedResource Include="GuiDialogMakeBatfile.resx">
       <SubType>Designer</SubType>
@@ -660,6 +663,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WindowTreeViewWithCheckBoxes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowTreeViewWithTable.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
