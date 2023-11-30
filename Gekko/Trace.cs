@@ -569,21 +569,21 @@ namespace Gekko
             if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
         }
 
-        public static void SLET()
-        {
-            //Series ts = O.GetIVariableFromString("work:qbnp!a", O.ECreatePossibilities.NoneReportError) as Series;
-            //Trace2 trace = ts.meta.trace2;
-            //TreeGridModel model = new TreeGridModel();
-            //Item root = new Item("--ROOT---", 10, true);
-            //Item xxx = ViewerTraceHelper(trace, 0, true, root);
-            ////model.Add(root);
-            //model.Add(xxx);
+        //public static void SLET()
+        //{
+        //    //Series ts = O.GetIVariableFromString("work:qbnp!a", O.ECreatePossibilities.NoneReportError) as Series;
+        //    //Trace2 trace = ts.meta.trace2;
+        //    //TreeGridModel model = new TreeGridModel();
+        //    //Item root = new Item("--ROOT---", 10, true);
+        //    //Item xxx = ViewerTraceHelper(trace, 0, true, root);
+        //    ////model.Add(root);
+        //    //model.Add(xxx);
 
-            TreeGridModel model = null;
-            WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-            w.Title = "Gekko traces";
-            w.ShowDialog();
-        }
+        //    TreeGridModel model = null;
+        //    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+        //    w.Title = "Gekko traces";
+        //    w.ShowDialog();
+        //}
 
         public static void PrintTraceHelper(Trace2 trace, bool all)
         {
@@ -604,30 +604,14 @@ namespace Gekko
                         if (trace.precedents[0].precedents.Count() > 0)
                         {
                             Action<GAO> a = (gao) =>
-                            {
-                                //PrintTraceHelper(trace, true);
+                            {                                
                                 TreeGridModel model = new TreeGridModel();
                                 Item root = new Item("--ROOT---", 10, true);
-                                Item xxx = ViewerTraceHelper(trace, 0, true, root);
-                                //model.Add(root);
-                                model.Add(xxx);
-
-
-
+                                Item items = ViewerTraceHelper(trace, 0, true, root);
+                                model.Add(items.Children[0]);
                                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                                 w.Title = "Gekko traces";
-                                w.Show();
-
-                                //// Create the app
-                                //Application app = new Application();
-                                //// Create the main window
-                                //WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                                ////w.model = model;
-                                //app.MainWindow = w;
-                                //// Show the main window
-                                //app.MainWindow.Show();
-                                //// Run the app
-                                //app.Run();
+                                w.ShowDialog();  //maybe run in own thread?? Also do this for PRT<view>. Close with Esc.
 
                             };
                             s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";

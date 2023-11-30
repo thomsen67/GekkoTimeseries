@@ -1995,10 +1995,10 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
 
-            if (true)
-            {
-                Trace2.SLET();
-            }                    
+            //if (true)
+            //{
+            //    Trace2.SLET();
+            //}                    
 
             if (false && Globals.runningOnTTComputer)
             {
