@@ -605,28 +605,13 @@ namespace Gekko
                         {
                             Action<GAO> a = (gao) =>
                             {
-                                if (false)
-                                {
-                                    TreeGridModel model = new TreeGridModel();
-                                    Item root = new Item("--ROOT---", "---", true);
-                                    Item items = ViewerTraceHelper(trace, 0, true, root);
-                                    model.Add(items.Children[0]);
-                                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                                    w.Title = "Gekko traces";
-                                    w.ShowDialog();  //maybe run in own thread?? Also do this for PRT<view>. Close with Esc.
-                                }
-                                else
-                                {
-
-                                    TreeGridModel model = new TreeGridModel();
-                                    model.Add(trace.CopyToItems().Children[0]);
-                                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                                    string v = null;
-                                    if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
-                                    w.Title = v + "Gekko trace";
-                                    w.ShowDialog();
-                                }
-
+                                TreeGridModel model = new TreeGridModel();
+                                model.Add(trace.CopyToItems().Children[0]);
+                                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                string v = null;
+                                if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
+                                w.Title = v + "Gekko trace";
+                                w.ShowDialog();
                             };
                             s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
@@ -728,12 +713,25 @@ namespace Gekko
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
             string code = "null";
+            string period = null;
+            string file = null;
+            string stamp = null;
             if (this.contents != null)
             {
                 text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);
+                //if (G.Equal(text, "vio[cbol, tot]"))
+                //{
+                //}
                 code = this.contents.text;
+                int count = this.contents.periods.Count();
+                if (count == 0) period = "";
+                else period = this.contents.periods[0].t1.ToString() + "-" + this.contents.periods[0].t2.ToString();
+                if (count > 1) period += " (" + this.contents.periods.Count() + " more)";
+                if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
+                if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
+                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             }
-            Item newNode = new Item(text, code, hasChildren);
+            Item newNode = new Item(text, code, period, stamp, file, hasChildren);
             if (this.precedents.GetStorage() != null)
             {
                 foreach (Trace2 child in this.precedents.GetStorage())

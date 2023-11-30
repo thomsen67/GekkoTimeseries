@@ -40,7 +40,8 @@
     </Window.Resources>
 
     <DockPanel>
-        <TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="4, 4, 4, 4"></TextBox>
+        <!--<TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="4, 4, 4, 4"></TextBox>-->
+        <RichTextBox DockPanel.Dock="Bottom" Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="text"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10"></RichTextBox>
         <DataGrid AutoGenerateColumns="False" Name="grid" CanUserAddRows="False" IsReadOnly="True" VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
 				  AlternationCount="2" AlternatingRowBackground="WhiteSmoke" SelectionChanged="SelectionChanged" SelectedCellsChanged="SelectedCellsChanged">
             <DataGrid.Resources>
@@ -78,6 +79,30 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Code}" Padding="6,0,6,1"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Period">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Period}" Padding="6,0,6,1"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Stamp">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Stamp}" Padding="6,0,6,1"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="File">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding File}" Padding="6,0,6,1"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

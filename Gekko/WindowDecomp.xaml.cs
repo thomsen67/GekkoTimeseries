@@ -2683,8 +2683,7 @@ namespace Gekko
             //TODO When doing GUI, look 1 col to the right and see if vars_hack contains somehing from varsNew.
             //TODO if so, mark the cell name green.
             //TODO Ungreen when [OK] is clicked. Any window that is merged TO must first be ungreened.
-
-
+                        
             windowParentDecomp.decompDatas = new DecompDatas();  //clearing it, otherwise we get problems
 
             dfParentDecomp.decompOptions2.code = dfParentDecomp.decompOptions2.ToCode();
