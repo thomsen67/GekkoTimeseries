@@ -604,14 +604,28 @@ namespace Gekko
                         if (trace.precedents[0].precedents.Count() > 0)
                         {
                             Action<GAO> a = (gao) =>
-                            {                                
-                                TreeGridModel model = new TreeGridModel();
-                                Item root = new Item("--ROOT---", 10, true);
-                                Item items = ViewerTraceHelper(trace, 0, true, root);
-                                model.Add(items.Children[0]);
-                                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                                w.Title = "Gekko traces";
-                                w.ShowDialog();  //maybe run in own thread?? Also do this for PRT<view>. Close with Esc.
+                            {
+                                if (false)
+                                {
+                                    TreeGridModel model = new TreeGridModel();
+                                    Item root = new Item("--ROOT---", 10, true);
+                                    Item items = ViewerTraceHelper(trace, 0, true, root);
+                                    model.Add(items.Children[0]);
+                                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                    w.Title = "Gekko traces";
+                                    w.ShowDialog();  //maybe run in own thread?? Also do this for PRT<view>. Close with Esc.
+                                }
+                                else
+                                {
+
+                                    TreeGridModel model = new TreeGridModel();
+                                    model.Add(trace.CopyToItems().Children[0]);
+                                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                    string v = null;
+                                    if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
+                                    w.Title = v + "Gekko trace";
+                                    w.ShowDialog();
+                                }
 
                             };
                             s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
@@ -737,71 +751,77 @@ namespace Gekko
 
         public static Item ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
         {
+            
+            
             Item copy = trace.CopyToItems();
             return copy;
             
-            //if (!all && d > 1) return;
-            //string s = null;
-
-            //if (all)
+            
             //{
-            //    if (!Trace2.IsInvisibleTrace(trace))
+
+            //    if (!all && d > 1) return;
+            //    string s = null;
+
+            //    if (all)
             //    {
-            //        Action<GAO> a = (gao) =>
-            //        {
-            //            G.Writeln();
-            //            G.Writeln("Trace:     " + trace.contents.text);
-            //            G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
-            //            G.Writeln("Active:    " + trace.PrintPeriods());
-            //            if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
-            //            if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
-            //            if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
-            //            G.Writeln("Stamp:     " + trace.id.stamp.ToString("dd-MM-yyyy HH:mm:ss"));
-            //            G.Writeln("ID:        " + trace.id.counter);
-            //        };
-            //        string more = G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
-            //        G.Write(more);
-            //    }
-            //    s = G.Blanks(d * 2 - 2);
-            //}
-            //else
-            //{
-            //    s = "| ";
-            //}
-
-            //if (trace == null)
-            //{
-            //    G.Write(s);
-            //    G.Writeln("---", Globals.MiddleGray);
-            //}
-            //else
-            //{
-            //    bool hasChildren = trace.precedents.Count() > 0;
-            //    Item child = null;
-
-            //    if (true || !Trace2.IsInvisibleTrace(trace))
-            //    {
-            //        parent.HasChildren = hasChildren;
-            //        string txt = "---";
             //        if (!Trace2.IsInvisibleTrace(trace))
             //        {
-            //            TwoStrings s2 = trace.Text(false, d);
-            //            txt = s + s2.s1;
+            //            Action<GAO> a = (gao) =>
+            //            {
+            //                G.Writeln();
+            //                G.Writeln("Trace:     " + trace.contents.text);
+            //                G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
+            //                G.Writeln("Active:    " + trace.PrintPeriods());
+            //                if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
+            //                if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
+            //                if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
+            //                G.Writeln("Stamp:     " + trace.id.stamp.ToString("dd-MM-yyyy HH:mm:ss"));
+            //                G.Writeln("ID:        " + trace.id.counter);
+            //            };
+            //            string more = G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
+            //            G.Write(more);
             //        }
-                    
-                    
-            //        child = new Item(txt, 12321, false);
-            //        //Item child1 = new Item(s + s2.s1, 12321, false);
-            //        //Item child2 = new Item(s + s2.s1, 12321, false);
-            //        //root.Children.Add(child1);
-            //        //root.Children.Add(child2);
-            //        parent.Children.Add(child);
+            //        s = G.Blanks(d * 2 - 2);
             //    }
-            //    if (trace.precedents.Count() > 0)
+            //    else
             //    {
-            //        foreach (Trace2 tchild in trace.precedents.GetStorage())
+            //        s = "| ";
+            //    }
+
+            //    if (trace == null)
+            //    {
+            //        G.Write(s);
+            //        G.Writeln("---", Globals.MiddleGray);
+            //    }
+            //    else
+            //    {
+            //        bool hasChildren = trace.precedents.Count() > 0;
+            //        Item child = null;
+
+            //        if (true || !Trace2.IsInvisibleTrace(trace))
             //        {
-            //            ViewerTraceHelper(tchild, d + 1, all, child);
+            //            parent.HasChildren = hasChildren;
+            //            string txt = "---";
+            //            if (!Trace2.IsInvisibleTrace(trace))
+            //            {
+            //                TwoStrings s2 = trace.Text(false, d);
+            //                txt = s + s2.s1;
+            //            }
+
+
+            //            child = new Item(txt, 12321, false);
+            //            //Item child1 = new Item(s + s2.s1, 12321, false);
+            //            //Item child2 = new Item(s + s2.s1, 12321, false);
+            //            //root.Children.Add(child1);
+            //            //root.Children.Add(child2);
+            //            parent.Children.Add(child);
+            //        }
+            //        if (trace.precedents.Count() > 0)
+            //        {
+            //            foreach (Trace2 tchild in trace.precedents.GetStorage())
+            //            {
+            //                ViewerTraceHelper(tchild, d + 1, all, child);
+            //            }
             //        }
             //    }
             //}

@@ -661,14 +661,24 @@ namespace Gekko
 
         public WindowTreeViewWithTable(TreeGridModel model)
         {
-            // Initialize the component
-            InitializeComponent();
+            bool demo = true;
 
-            // Initialize the model
-            InitModel();
-
-            // Set the model for the grid
-            grid.ItemsSource = this.model.FlatModel;
+            if (demo)
+            {
+                // Initialize the component
+                InitializeComponent();
+                // Initialize the model
+                InitModel();
+                // Set the model for the grid
+                grid.ItemsSource = this.model.FlatModel;
+            }
+            else
+            {
+                // Initialize the component
+                InitializeComponent();                
+                // Set the model for the grid
+                grid.ItemsSource = model.FlatModel;
+            }
         }
 
         private void InitModel()
