@@ -638,15 +638,15 @@ namespace Gekko
     }
 
     public class Item : TreeGridElement
-    {
-        public int Value { get; private set; }
+    {        
         public string Name { get; private set; }
+        public string Code { get; private set; }
 
-        public Item(string name, int value, bool hasChildren)
+        public Item(string name, string code, bool hasChildren)
         {
             // Initialize the item
             Name = name;
-            Value = value;
+            Code = code;
             HasChildren = hasChildren;
         }
     }
@@ -661,7 +661,7 @@ namespace Gekko
 
         public WindowTreeViewWithTable(TreeGridModel model)
         {
-            bool demo = true;
+            bool demo = false;
 
             if (demo)
             {
@@ -690,7 +690,7 @@ namespace Gekko
             for (int count = 0; count < Roots; count++)
             {
                 // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), value++, true);
+                Item root = new Item(String.Format("Root {0}", count), "" + value++, true);
 
                 // Add children to the root
                 AddChildren(root);
@@ -721,7 +721,7 @@ namespace Gekko
             for (int count = 0; count < ItemsPerLevel; count++)
             {
                 // Create the child
-                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), value++, hasChildren);
+                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, hasChildren);
 
                 // Does the child have children?
                 if (hasChildren)

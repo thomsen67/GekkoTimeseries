@@ -74,10 +74,10 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Value">
+                <DataGridTemplateColumn Header="Code">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Value}" Padding="6,0,6,1"/>
+                            <TextBlock Text="{Binding Code}" Padding="6,0,6,1"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

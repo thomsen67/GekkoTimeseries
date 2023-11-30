@@ -608,7 +608,7 @@ namespace Gekko
                                 if (false)
                                 {
                                     TreeGridModel model = new TreeGridModel();
-                                    Item root = new Item("--ROOT---", 10, true);
+                                    Item root = new Item("--ROOT---", "---", true);
                                     Item items = ViewerTraceHelper(trace, 0, true, root);
                                     model.Add(items.Children[0]);
                                     WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
@@ -727,8 +727,13 @@ namespace Gekko
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
-            if (this.contents != null) text = this.contents.text;
-            Item newNode = new Item(text, 12321, hasChildren);
+            string code = "null";
+            if (this.contents != null)
+            {
+                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);
+                code = this.contents.text;
+            }
+            Item newNode = new Item(text, code, hasChildren);
             if (this.precedents.GetStorage() != null)
             {
                 foreach (Trace2 child in this.precedents.GetStorage())
@@ -737,12 +742,12 @@ namespace Gekko
                     if (child != null)
                     {
                         newChild = child.CopyToItems();
+                        newNode.Children.Add(newChild);
                     }
                     else
                     {
-                        newChild = new Item("----------", 12321, false);
-                    }
-                    newNode.Children.Add(newChild);
+                        //newChild = new Item("----------", "---", false);
+                    }                    
                 }
             }
             return newNode;
