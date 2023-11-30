@@ -596,20 +596,22 @@ namespace Gekko
                                 //model.Add(root);
                                 model.Add(xxx);
 
-                                // Create the app
-                                Application app = new Application();
 
-                                // Create the main window
 
                                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                                //w.model = model;
-                                app.MainWindow = w;
+                                w.Title = "Gekko traces";
+                                w.Show();
 
-                                // Show the main window
-                                app.MainWindow.Show();
-
-                                // Run the app
-                                app.Run();
+                                //// Create the app
+                                //Application app = new Application();
+                                //// Create the main window
+                                //WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                ////w.model = model;
+                                //app.MainWindow = w;
+                                //// Show the main window
+                                //app.MainWindow.Show();
+                                //// Run the app
+                                //app.Run();
 
                             };
                             s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
