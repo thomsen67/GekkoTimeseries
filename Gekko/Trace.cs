@@ -571,13 +571,15 @@ namespace Gekko
 
         public static void SLET()
         {
-            Series ts = O.GetIVariableFromString("work:qbnp!a", O.ECreatePossibilities.NoneReportError) as Series;
-            Trace2 trace = ts.meta.trace2;
-            TreeGridModel model = new TreeGridModel();
-            Item root = new Item("--ROOT---", 10, true);
-            Item xxx = ViewerTraceHelper(trace, 0, true, root);
-            //model.Add(root);
-            model.Add(xxx);
+            //Series ts = O.GetIVariableFromString("work:qbnp!a", O.ECreatePossibilities.NoneReportError) as Series;
+            //Trace2 trace = ts.meta.trace2;
+            //TreeGridModel model = new TreeGridModel();
+            //Item root = new Item("--ROOT---", 10, true);
+            //Item xxx = ViewerTraceHelper(trace, 0, true, root);
+            ////model.Add(root);
+            //model.Add(xxx);
+
+            TreeGridModel model = null;
             WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
             w.Title = "Gekko traces";
             w.ShowDialog();
