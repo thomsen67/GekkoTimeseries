@@ -957,7 +957,8 @@ namespace Gekko
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showCurrentOptionsToolStripMenuItem,
-            this.restoreUserSettingsToolStripMenuItem});
+            this.restoreUserSettingsToolStripMenuItem, 
+            this.traceToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -976,9 +977,16 @@ namespace Gekko
             this.restoreUserSettingsToolStripMenuItem.Text = "Restore user settings...";
             this.restoreUserSettingsToolStripMenuItem.Click += new System.EventHandler(this.restoreUserSettingsToolStripMenuItem_Click);
             // 
+            // tracing
+            // 
+            this.traceToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.traceToolStripMenuItem.Text = "Program dependency tracking";
+            this.traceToolStripMenuItem.ToolTipText = "When active, external files being read or written are tracked while a Gekko session is running (the 'traffic light' is yellow \nat the right-side of the GUI bottom bar), and when the session ends, a report of such dependencies is shown.";
+            this.traceToolStripMenuItem.Click += new System.EventHandler(this.traceToolStripMenuItem_Click);
+            // 
             // dataToolStripMenuItem
             // 
-            this.dataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { this.viewDatabanksToolStripMenuItem, this.traceToolStripMenuItem });
+            this.dataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { this.viewDatabanksToolStripMenuItem });
             this.dataToolStripMenuItem.Name = "dataToolStripMenuItem";
             this.dataToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.dataToolStripMenuItem.Text = "Data";
@@ -989,14 +997,7 @@ namespace Gekko
             this.viewDatabanksToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.viewDatabanksToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.viewDatabanksToolStripMenuItem.Text = "View databanks...";
-            this.viewDatabanksToolStripMenuItem.Click += new System.EventHandler(this.viewDatabanksToolStripMenuItem_Click);
-            // 
-            // tracing
-            // 
-            this.traceToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.traceToolStripMenuItem.Text = "Program tracing";
-            this.traceToolStripMenuItem.ToolTipText = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow \nat the right-side of the GUI bottom bar), and when the session ends, a report ('trace') is shown.";
-            this.traceToolStripMenuItem.Click += new System.EventHandler(this.traceToolStripMenuItem_Click);            
+            this.viewDatabanksToolStripMenuItem.Click += new System.EventHandler(this.viewDatabanksToolStripMenuItem_Click);            
             // 
             // windowToolStripMenuItem
             // 

@@ -95,7 +95,7 @@ namespace Gekko
         // ---
         // --- the following can only be called from gekko.ini next to gekko.exe
         // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
-        public string global_datatrace = "none";  // none | simple
+        public string global_dependency_tracking = "none";  // none | simple
         public bool global_pink = false;
         // ---
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
@@ -367,7 +367,7 @@ namespace Gekko
             //Options here can only be in gekko.ini next to gekko.exe
             //These options must start with 'global'
             // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
-            Add("GLOBAL DATATRACE", Globals.xnameOrString, "none", "simple");
+            Add("GLOBAL DEPENDENCY TRACKING", Globals.xnameOrString, "none", "simple");
             Add("GLOBAL PINK", Globals.xbool);
 
             //========================================================================================================

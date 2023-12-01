@@ -164,6 +164,10 @@ namespace Gekko
             return ss;
         }
 
+        /// <summary>
+        /// Returns for instance "x!a" or "x!a[i, j]"
+        /// </summary>
+        /// <returns></returns>
         public string GetName()
         {            
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))

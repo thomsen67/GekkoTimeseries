@@ -1674,7 +1674,7 @@ namespace Gekko
 
             Globals.errorMemory = null;  //so that it is not recording all the time.   
 
-            if (Program.IsDataTrace())
+            if (Program.IsDependencyTracking())
             {
                 Globals.dataTraceContainer = new TraceSimple();
             }
@@ -2128,14 +2128,14 @@ namespace Gekko
                 }
 
                 List<string> traceList = null;
-                if (Program.IsDataTrace() && Globals.dataTraceContainer != null)  //last condition should not be necessary
+                if (Program.IsDependencyTracking() && Globals.dataTraceContainer != null)  //last condition should not be necessary
                 {
                     traceList = Globals.dataTraceContainer.Get();
                     if (traceList.Count > 0)
                     {
                         Table tab = new Table();
                         tab.CurRow.SetTopBorder(1, 3);
-                        tab.CurRow.SetText(1, "PROGRAM TRACE");
+                        tab.CurRow.SetText(1, "DEPENDENCY TRACK:");
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.Next();
                         int count = -1;
@@ -2152,7 +2152,7 @@ namespace Gekko
                         tab.CurRow.SetLeftBorder(1);
                         tab.CurRow.SetRightBorder(3);
                         tab.CurRow.Next();
-                        tab.CurRow.SetText(1, "Cf. menu 'Data' --> 'Program tracing'");
+                        tab.CurRow.SetText(1, "Cf. menu 'Options' --> 'Program dependency tracking'");
                         tab.CurRow.MergeCols(1, 3);
 
                         int widthRemember = Program.options.print_width;
@@ -2269,7 +2269,7 @@ namespace Gekko
                     {
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         string s = null;
-                        if (G.Equal(Program.options.global_datatrace, "none")) s = ". (To activate tracing, see menu 'Data' --> 'Trace data').";
+                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s = ". (To activate program tracking, see menu 'Options' --> 'Program dependency tracking').";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s);
                         G.Writeln();
@@ -3112,22 +3112,22 @@ namespace Gekko
         private void traceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.traceToolStripMenuItem.Checked = !this.traceToolStripMenuItem.Checked;
-            string s = "When active, files being read or written are 'recorded' while a Gekko session is running (the 'traffic light' is yellow at the right-side of the GUI bottom bar), and when the session ends, a report('trace') is shown.";
+            string s = "When active, external files being read or written are tracked while a Gekko session is running (the 'traffic light' is yellow at the right-side of the GUI bottom bar), and when the session ends, a report of such dependencies is shown.";
             if (this.traceToolStripMenuItem.Checked)
             {
-                Program.options.global_datatrace = "simple";          
+                Program.options.global_dependency_tracking = "simple";          
                 using (Writeln txt = new Writeln())
                 {
-                    txt.MainAdd("Program tracing is activated.");
+                    txt.MainAdd("Program dependency tracking is activated.");
                     txt.MoreAdd(s);
                 }                
             }
             else
             {
-                Program.options.global_datatrace = "none";
+                Program.options.global_dependency_tracking = "none";
                 using (Writeln txt = new Writeln())
                 {
-                    txt.MainAdd("Program tracing is deactivated.");
+                    txt.MainAdd("Program dependency tracking is deactivated.");
                     txt.MoreAdd(s);
                 }
             }

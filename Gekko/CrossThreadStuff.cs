@@ -692,7 +692,7 @@ namespace Gekko
                 {
                     Gui.gui.textBoxMainTabLower.BackColor = Color.MistyRose;
                     Gui.gui.textBoxMainTabLower.Parent.BackColor = Color.MistyRose;
-                    Program.options.global_datatrace = "simple";
+                    Program.options.global_dependency_tracking = "simple";
                     SetDatatrace();
                     new Writeln("Activated special DST databank version (pink version). This version is intended for work in the g:\\datopgek3\\ folder and will -- among other things -- make sure that files on g:\\datopgek\\ are not tampered with.");                    
                 }
@@ -715,11 +715,11 @@ namespace Gekko
             }
             else
             {
-                if (Program.options.global_datatrace == "none")
+                if (Program.options.global_dependency_tracking == "none")
                 {
                     Gui.gui.traceToolStripMenuItem.Checked = false;
                 }
-                else if (Program.options.global_datatrace == "simple")
+                else if (Program.options.global_dependency_tracking == "simple")
                 {
                     Gui.gui.traceToolStripMenuItem.Checked = true;
                 }

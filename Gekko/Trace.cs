@@ -373,6 +373,13 @@ namespace Gekko
         /// <param name="ts"></param>
         public static void PushIntoSeries(Series ts, Trace2 trace, ETracePushType type)
         {
+
+            if (ts.GetName().ToLower().Contains("vio!a[cbol, tot]"))
+            {
+
+            }            
+
+
             if (trace.contents.text == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
@@ -601,19 +608,19 @@ namespace Gekko
                     if (all) s = count2 + " " + "traces (click [] to see more info)";
                     if (!all)
                     {
-                        if (trace.precedents[0].precedents.Count() > 0)
+                        if (trace.precedents.Count() > 0)
                         {
                             Action<GAO> a = (gao) =>
                             {
                                 TreeGridModel model = new TreeGridModel();
-                                model.Add(trace.CopyToItems().Children[0]);
+                                model.Add(trace.CopyToItems(0, 0).Children[0]);
                                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                                 string v = null;
                                 if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
                                 w.Title = v + "Gekko trace";
                                 w.ShowDialog();
                             };
-                            s += " (" + G.GetLinkAction("show " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                            s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
                     }
                     s += ":";
@@ -707,8 +714,8 @@ namespace Gekko
         //  d=2, c=0, DIVIDER      --> x3=x1+x2
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
-        public Item CopyToItems()
-        {
+        public Item CopyToItems(int depth, int cnt)
+        {            
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
@@ -725,21 +732,38 @@ namespace Gekko
                 code = this.contents.text;
                 int count = this.contents.periods.Count();
                 if (count == 0) period = "";
-                else period = this.contents.periods[0].t1.ToString() + "-" + this.contents.periods[0].t2.ToString();
-                if (count > 1) period += " (" + this.contents.periods.Count() + " more)";
+
+                GekkoTime t1 = this.contents.GetT1();
+                GekkoTime t2 = this.contents.GetT2();
+                if (t1.IsNull() && t2.IsNull()) period = "<>";
+                else period = "<" + t1.ToString() + " " + t2.ToString() + ">";
+                int counter = 0;
+                if (this.contents.periods.Count() > 0)
+                {
+                    foreach (GekkoTimeSpanSimple span in this.contents.periods.GetStorage())
+                    {
+                        counter++;
+                        if (counter == 1) period += " --> ";
+                        if (counter > 1) period += ", ";
+                        period += span.t1.ToString() + " " + span.t2.ToString();
+                    }
+                }
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + " (#" + this.id.counter + ")";
             }
             Item newNode = new Item(text, code, period, stamp, file, hasChildren);
             if (this.precedents.GetStorage() != null)
             {
+                int n = -1;
                 foreach (Trace2 child in this.precedents.GetStorage())
                 {
+                    n++;
                     Item newChild = null;
-                    if (child != null)
+                    if (child != null && depth < 6)
                     {
-                        newChild = child.CopyToItems();
+                        //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
+                        newChild = child.CopyToItems(depth + 1, cnt + 1);
                         newNode.Children.Add(newChild);
                     }
                     else
@@ -756,7 +780,7 @@ namespace Gekko
         {
             
             
-            Item copy = trace.CopyToItems();
+            Item copy = trace.CopyToItems(0, 0);
             return copy;
             
             

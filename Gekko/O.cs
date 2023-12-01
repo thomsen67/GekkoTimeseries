@@ -897,11 +897,11 @@ namespace Gekko
             }
             else if (G.Equal(s2, "global_pink"))
             {
-                CrossThreadStuff.SetPink();
+                CrossThreadStuff.SetPink(); //er89ljkhaf87
             }
-            else if (G.Equal(s2, "global_datatrace"))
+            else if (G.Equal(s2, "global_dependency_tracking"))
             {
-                CrossThreadStuff.SetDatatrace();
+                CrossThreadStuff.SetDatatrace(); //er89ljkhaf87
             }
             else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
             {
@@ -2618,7 +2618,7 @@ namespace Gekko
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
             List ml = GetRawListElements(ffh.realPathAndFileName);
-            if (Program.IsDataTrace()) Globals.dataTraceContainer.Add(1, "Read list", ffh.prettyPathAndFileName);
+            if (Program.IsDependencyTracking()) Globals.dataTraceContainer.Add(1, "Read list", ffh.prettyPathAndFileName);
             return ml;
         }
 
@@ -3580,7 +3580,7 @@ namespace Gekko
                 res.Flush();
                 res.Close();
 
-                if (Program.IsDataTrace()) Globals.dataTraceContainer.Add(2, "Write list", pathAndFilename);
+                if (Program.IsDependencyTracking()) Globals.dataTraceContainer.Add(2, "Write list", pathAndFilename);
             }
 
             string listfileName = G.TransformListfileName(varnameWithFreq);
