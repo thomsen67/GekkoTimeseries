@@ -13359,6 +13359,12 @@ namespace Gekko
                         G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
                     }
                     break;
+                case "--traceseed":
+                    {
+                        Globals.traceCounter= 0;
+                        G.Writeln("Trace counter set = 0");
+                    }
+                    break;
                 case "--prune":
                     {
                         string[] ss2 = sub.Split(' ');

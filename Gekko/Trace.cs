@@ -300,10 +300,10 @@ namespace Gekko
         //}
 
         /// <summary>
-        /// Pretty print periods and stamp.
+        /// Pretty print periods
         /// </summary>
         /// <returns></returns>
-        public string PrintPeriods()
+        public string PeriodsToStringPretty()
         {
             string s = null;
             if (this.contents.periods.Count() > 0)
@@ -344,7 +344,7 @@ namespace Gekko
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
                 s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;
-                string active = this.PrintPeriods();
+                string active = this.PeriodsToStringPretty();
                 if (!G.Equal(period, active))
                 {
                     s2 += " (active:" + active + ")";
@@ -357,7 +357,7 @@ namespace Gekko
                 s2 += " --> ";
                 s1 += this.contents.text;
                 s2 += "          ";
-                s2 += " || " + this.PrintPeriods();
+                s2 += " || " + this.PeriodsToStringPretty();
                 if (this.contents.bankAndVarnameWithFreq != null) s2 += " || lhs=" + this.contents.bankAndVarnameWithFreq;
                 if (this.contents.dataFile != null) s2 += " || data=" + this.contents.dataFile;
                 if (this.contents.commandFileAndLine != null) s2 += " || gcm=" + this.contents.commandFileAndLine;
@@ -373,14 +373,13 @@ namespace Gekko
         /// <param name="ts"></param>
         public static void PushIntoSeries(Series ts, Trace2 trace, ETracePushType type)
         {
+            //
+            // !!!
+            // !!! In the longer run, these IF's can be removed
+            // !!!            
+            if (trace.contents.text == null) new Error("Trace problem");
+            if (trace.PeriodsToStringPretty() == null) new Error("Trace problem");
 
-            if (ts.GetName().ToLower().Contains("vio!a[cbol, tot]"))
-            {
-
-            }            
-
-
-            if (trace.contents.text == null) new Error("PushIntoSeries problem");
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
             {                   
@@ -403,6 +402,18 @@ namespace Gekko
 
                         foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
                         {
+                            //
+                            // Beware that such a sibling may be used (pointed to) from other traces.
+                            // Therefore when period shadowing, be careful about changing the sibling
+                            // active periods.
+                            //
+                            // reset; option databank trace = yes;
+                            // x1 <2001 2003> = 1;
+                            // x2 <2001 2003> = x1 + 2;
+                            // x1 <2002 2002> = 3;
+                            // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
+                            //
+
                             //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
                             //So the siblings all belong to the same timeseries, and therefore it is ok
                             //to remove periods.
@@ -467,7 +478,7 @@ namespace Gekko
                         {
                             List<Trace2> tempTrace = new List<Trace2>();
                             foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-                            {
+                            {                                
                                 if (sibling == null)
                                 {
                                     if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
@@ -488,7 +499,8 @@ namespace Gekko
                                 }
                             }
                             if (tempTrace.Count == 0) tempTrace = null;
-                            ts.meta.trace2.precedents.SetStorage(tempTrace);
+
+                            ts.meta.trace2.precedents.SetStorage(tempTrace);                            
                         }
                     }
                 }
@@ -613,7 +625,7 @@ namespace Gekko
                             Action<GAO> a = (gao) =>
                             {
                                 TreeGridModel model = new TreeGridModel();
-                                model.Add(trace.CopyToItems(0, 0).Children[0]);
+                                model.Add(trace.CopyToItems(0, 0));
                                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                                 string v = null;
                                 if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
@@ -668,7 +680,7 @@ namespace Gekko
                         G.Writeln();
                         G.Writeln("Trace:     " + trace.contents.text);
                         G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
-                        G.Writeln("Active:    " + trace.PrintPeriods());
+                        G.Writeln("Active:    " + trace.PeriodsToStringPretty());
                         if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
                         if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
                         if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
@@ -732,26 +744,28 @@ namespace Gekko
                 code = this.contents.text;
                 int count = this.contents.periods.Count();
                 if (count == 0) period = "";
-
                 GekkoTime t1 = this.contents.GetT1();
                 GekkoTime t2 = this.contents.GetT2();
                 if (t1.IsNull() && t2.IsNull()) period = "<>";
                 else period = "<" + t1.ToString() + " " + t2.ToString() + ">";
                 int counter = 0;
-                if (this.contents.periods.Count() > 0)
+                string p = this.PeriodsToStringPretty();
+                if (p != null) period += " --> " + p;   
+                else
                 {
-                    foreach (GekkoTimeSpanSimple span in this.contents.periods.GetStorage())
-                    {
-                        counter++;
-                        if (counter == 1) period += " --> ";
-                        if (counter > 1) period += ", ";
-                        period += span.t1.ToString() + " " + span.t2.ToString();
-                    }
+                    //
+                    //
+                    //
+                    //new Error("Trace null period");
+                    //
+                    //
+                    //
                 }
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
                 stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + " (#" + this.id.counter + ")";
             }
+            
             Item newNode = new Item(text, code, period, stamp, file, hasChildren);
             if (this.precedents.GetStorage() != null)
             {
@@ -760,7 +774,7 @@ namespace Gekko
                 {
                     n++;
                     Item newChild = null;
-                    if (child != null && depth < 6)
+                    if (child != null)
                     {
                         //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
                         newChild = child.CopyToItems(depth + 1, cnt + 1);

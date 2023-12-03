@@ -13342,10 +13342,37 @@ namespace UnitTests
         public void _Test_TracePeriodsShadowing()
         {
             Trace2 trace1, trace11, trace2, trace21, trace3;
+
+
+            // ========== Combination
+
+            I("reset; time 2001 2003;");
+            I("option databank trace = yes;");
+            I("x1 <2001 2003> = 1;");
+            I("x2 <2001 2003> = x1 + 2;");
+            I("x1 <2002 2002> = 3;");
+            Series x1 = Program.databanks.GetFirst().GetIVariable("x1!a") as Series;
+            
+            Assert.AreEqual(2, x1.meta.trace2.precedents.Count());
+            trace11 = x1.meta.trace2.precedents[0];
+            Assert.AreEqual(2, trace11.contents.periods.Count()); //chopped up
+            Trace2 trace12 = x1.meta.trace2.precedents[1];
+            Assert.AreEqual(1, trace12.contents.periods.Count()); //not chopped up
+
+            Series x2 = Program.databanks.GetFirst().GetIVariable("x2!a") as Series;
+            Assert.AreEqual(1, x2.meta.trace2.precedents.Count());
+            trace21 = x2.meta.trace2.precedents[0];
+            Assert.AreEqual(1, trace21.contents.periods.Count());
+            Assert.AreEqual(2001, trace21.contents.periods[0].t1.super);
+            Assert.AreEqual(2003, trace21.contents.periods[0].t2.super);
+            Trace2 trace211 = x2.meta.trace2.precedents[0].precedents[0];
+            Assert.AreEqual(1, trace211.contents.periods.Count());  //must b 1, not chopped up
+            Assert.AreEqual(2001, trace211.contents.periods[0].t1.super);
+            Assert.AreEqual(2003, trace211.contents.periods[0].t2.super);
+
+            // ========== Different variations START            
+
             Series y;
-
-            // ========== Different variations START
-
             I("reset; time 2000 2010;");
             I("option databank trace = yes;");
             I("x <2004 2006> = 1;");
@@ -13360,6 +13387,7 @@ namespace UnitTests
             Assert.AreEqual(1, trace2.contents.periods.Count());
             Assert.AreEqual(2003, trace2.contents.periods[0].t1.super);
             Assert.AreEqual(2003, trace2.contents.periods[0].t2.super);
+
 
             I("reset; time 2000 2010;");
             I("option databank trace = yes;");
