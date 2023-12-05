@@ -22587,9 +22587,9 @@ namespace Gekko
                         double data = ts.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
                         if (G.isNumericalError(data))
                         {
-
                             if (!Program.options.bugfix_csv_missing && (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd)))
                             {
+                                //this logic is swithed off per default now
                                 if (fileType == EdataFormat.Csv)
                                 {
                                     //write nothing, indicates out-of-sample
@@ -22900,13 +22900,27 @@ namespace Gekko
             {
                 if (Program.options.bugfix_csv_missing)
                 {
-                    if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#I/T";  //missing value indicator (M) -- SHEET uses na()
-                    else s = "#N/A";  //missing value indicator (M) -- SHEET uses na()
+                    if (Program.options.interface_csv_ignoremissing)
+                    {
+                        s = "";
+                    }
+                    else
+                    {
+                        if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#I/T";  //missing value indicator (M) -- SHEET uses na()
+                        else s = "#N/A";  //missing value indicator (M) -- SHEET uses na()
+                    }
                 }
                 else
                 {
-                    if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#NAVN?";  //missing value indicator (M) -- SHEET uses na()
-                    else s = "#NAME?";  //missing value indicator (M) -- SHEET uses na()
+                    if (Program.options.interface_csv_ignoremissing)
+                    {
+                        s = "";
+                    }
+                    else
+                    {
+                        if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#NAVN?";  //missing value indicator (M) -- SHEET uses na()
+                        else s = "#NAME?";  //missing value indicator (M) -- SHEET uses na()
+                    }
                 }
             }
             else
@@ -29978,7 +29992,15 @@ namespace Gekko
                         {
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
                             {
-                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;
+                                if (Program.options.interface_excel_ignoremissing)
+                                {
+                                    ws.Cells[d1 + i, d2 + j].Formula = null;
+                                    ws.Cells[d1 + i, d2 + j].Value = null;
+                                }
+                                else
+                                {
+                                    ws.Cells[d1 + i, d2 + j].Formula = "=" + na;
+                                }
                             }
                         }
                     }
