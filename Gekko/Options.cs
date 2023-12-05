@@ -104,7 +104,8 @@ namespace Gekko
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
         public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
-        public int interface_csv_ndec = 100;        
+        public int interface_csv_ndec = 100;
+        public bool interface_csv_ignoremissing = false; //with true, all missings are shown as blanks, even when it is inside a block of real data.
         public string interface_debug = "dialog";  //or "none"  
         public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
         public string interface_errors = "normal";  // old | normal
@@ -389,6 +390,7 @@ namespace Gekko
             Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");    //#kljsdfasfdlkj
             Add("INTERFACE CSV DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj
             Add("INTERFACE CSV DELIMITER", Globals.xnameOrString, "semicolon", "comma", "tab");
+            Add("INTERFACE CSV IGNOREMISSING", Globals.xbool);
             Add("INTERFACE CSV NDEC", Globals.xint);
             Add("INTERFACE DEBUG", Globals.xnameOrString, "none", "dialog");
             Add("INTERFACE EDIT STYLE", Globals.xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");

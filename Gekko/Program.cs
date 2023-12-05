@@ -22568,16 +22568,8 @@ namespace Gekko
 
                     GekkoTime tsStart = GekkoTime.tNull;
                     GekkoTime tsEnd = GekkoTime.tNull;
-                    if (Program.options.bugfix_csv_missing)
-                    {
-                        tsStart = ts.GetRealDataPeriodFirst();
-                        tsEnd = ts.GetRealDataPeriodLast();
-                    }
-                    else
-                    {
-                        tsStart = ts.GetPeriodFirst();
-                        tsEnd = ts.GetPeriodLast();
-                    }
+                    tsStart = ts.GetPeriodFirst();
+                    tsEnd = ts.GetPeriodLast();                    
 
                     counter++;
                     if (fileType == EdataFormat.Csv)
@@ -22595,7 +22587,8 @@ namespace Gekko
                         double data = ts.GetDataSimple(t);  //no lag or anything here, smpl can be null...?
                         if (G.isNumericalError(data))
                         {
-                            if (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd))
+
+                            if (!Program.options.bugfix_csv_missing && (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd)))
                             {
                                 if (fileType == EdataFormat.Csv)
                                 {
