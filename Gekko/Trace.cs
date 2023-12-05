@@ -388,125 +388,148 @@ namespace Gekko
                 ts.meta.trace2.precedents.Add(trace);
             }            
             else if (type == ETracePushType.Sibling)
-            {
-                if (ts.meta.trace2.precedents.Count() > 0)
-                {
-                    if (ts.meta.trace2.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
-
-                    if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
-                    GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
-
-                    if (!thsSpan.IsNull()) //if null --> cannot shadow anything
-                    {
-                        List<Trace2> siblingsToRemove = new List<Trace2>();
-
-                        foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-                        {
-                            //
-                            // Beware that such a sibling may be used (pointed to) from other traces.
-                            // Therefore when period shadowing, be careful about changing the sibling
-                            // active periods.
-                            //
-                            // reset; option databank trace = yes;
-                            // x1 <2001 2003> = 1;
-                            // x2 <2001 2003> = x1 + 2;
-                            // x1 <2002 2002> = 3;
-                            // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
-                            //
-
-                            //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
-                            //So the siblings all belong to the same timeseries, and therefore it is ok
-                            //to remove periods.
-                            //trace is the new trace that is going to be added    
-
-                            if (sibling.contents.periods.Count() > 0)
-                            {
-                                List<GekkoTimeSpanSimple> spansTemp = new List<GekkoTimeSpanSimple>();
-                                foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
-                                {
-                                    // Four possibilities
-                                    //
-                                    //             =============                  === is siblingSpan (existing), --- is thsSpan (new one)
-                                    //  -----                         -----       A. Outside (left or right)
-                                    //          -----        -----                B. Cut from left or right                                
-                                    //                 ----                       C. Separate in two
-                                    //          -------------------               D. Shadow and remove
-                                    //
-                                    // The code below removes the --- from the ===, so removes periods from siblingSpan
-                                    //
-
-                                    if (siblingSpan.IsNull())
-                                    {
-                                        //will not be touched
-                                        spansTemp.Add(siblingSpan);
-                                    }
-                                    else if (thsSpan.t2.StrictlySmallerThan(siblingSpan.t1) || thsSpan.t1.StrictlyLargerThan(siblingSpan.t2))
-                                    {
-                                        //A, nothing happens
-                                        spansTemp.Add(siblingSpan);
-                                    }
-                                    else if (thsSpan.t1.SmallerThanOrEqual(siblingSpan.t1) && thsSpan.t2.LargerThanOrEqual(siblingSpan.t2))
-                                    {
-                                        //D, remove --> nothing added
-                                    }
-                                    else if (thsSpan.t1.SmallerThanOrEqual(siblingSpan.t1) && thsSpan.t2.StrictlySmallerThan(siblingSpan.t2))
-                                    {
-                                        //B left
-                                        spansTemp.Add(new GekkoTimeSpanSimple(thsSpan.t2.Add(1), siblingSpan.t2));
-                                    }
-                                    else if (thsSpan.t1.StrictlyLargerThan(siblingSpan.t1) && thsSpan.t2.LargerThanOrEqual(siblingSpan.t2))
-                                    {
-                                        //B right
-                                        spansTemp.Add(new GekkoTimeSpanSimple(siblingSpan.t1, thsSpan.t1.Add(-1)));
-                                    }
-                                    else if (thsSpan.t1.StrictlyLargerThan(siblingSpan.t1) && thsSpan.t2.StrictlySmallerThan(siblingSpan.t2))
-                                    {
-                                        //C cut in two
-                                        spansTemp.Add(new GekkoTimeSpanSimple(siblingSpan.t1, thsSpan.t1.Add(-1)));
-                                        spansTemp.Add(new GekkoTimeSpanSimple(thsSpan.t2.Add(1), siblingSpan.t2));
-                                    }
-                                    else new Error("Wrong logic regarding time spans");
-                                }
-                                if (spansTemp.Count() == 0)
-                                {
-                                    siblingsToRemove.Add(sibling);
-                                }
-                                sibling.contents.periods.SetStorage(spansTemp);
-                            }
-                        }
-                        if (siblingsToRemove.Count > 0)
-                        {
-                            List<Trace2> tempTrace = new List<Trace2>();
-                            foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-                            {                                
-                                if (sibling == null)
-                                {
-                                    if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
-                                    {
-                                        //do nothing, we do not want two nulls 
-                                    }
-                                    else
-                                    {
-                                        tempTrace.Add(null);
-                                    }                                    
-                                }
-                                else
-                                {
-                                    if (!siblingsToRemove.Contains(sibling))
-                                    {
-                                        tempTrace.Add(sibling);
-                                    }
-                                }
-                            }
-                            if (tempTrace.Count == 0) tempTrace = null;
-
-                            ts.meta.trace2.precedents.SetStorage(tempTrace);                            
-                        }
-                    }
-                }
+            {                
                 ts.meta.trace2.precedents.Add(trace);
             }
             else new Error("Trace");
+        }
+
+        private static void PeriodShadowing(Series ts, Trace2 trace)
+        {
+
+        }
+
+        private static void TraceShadowing(Series ts, Trace2 trace)
+        {
+            if (false && ts.meta.trace2.precedents.Count() > 0)
+            {
+                if (ts.meta.trace2.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
+
+                if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
+                GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
+
+                if (!thsSpan.IsNull()) //if null --> cannot shadow anything
+                {
+                    List<Trace2> siblingsToRemove = new List<Trace2>();
+
+                    foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
+                    {
+                        //
+                        // Beware that such a sibling may be used (pointed to) from other traces.
+                        // Therefore when period shadowing, be careful about changing the sibling
+                        // active periods.
+                        //
+                        // reset; option databank trace = yes;
+                        // x1 <2001 2003> = 1;
+                        // x2 <2001 2003> = x1 + 2;
+                        // x1 <2002 2002> = 3;
+                        // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
+                        //
+
+                        //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
+                        //So the siblings all belong to the same timeseries, and therefore it is ok
+                        //to remove periods.
+                        //trace is the new trace that is going to be added    
+
+                        if (sibling.contents.periods.Count() > 0)
+                        {
+                            List<GekkoTimeSpanSimple> newPeriods = new List<GekkoTimeSpanSimple>();
+                            foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
+                            {
+                                TimeShadow(thsSpan, siblingSpan, newPeriods);
+                            }
+                            if (newPeriods.Count() == 0)
+                            {
+                                siblingsToRemove.Add(sibling);
+                            }
+                            sibling.contents.periods.SetStorage(newPeriods);
+                        }
+                    }
+                    if (siblingsToRemove.Count > 0)
+                    {
+                        List<Trace2> tempTrace = new List<Trace2>();
+                        foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
+                        {
+                            if (sibling == null)
+                            {
+                                if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
+                                {
+                                    //do nothing, we do not want two nulls 
+                                }
+                                else
+                                {
+                                    tempTrace.Add(null);
+                                }
+                            }
+                            else
+                            {
+                                if (!siblingsToRemove.Contains(sibling))
+                                {
+                                    tempTrace.Add(sibling);
+                                }
+                            }
+                        }
+                        if (tempTrace.Count == 0) tempTrace = null;
+
+                        ts.meta.trace2.precedents.SetStorage(tempTrace);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// For a newSpan (timespan), it sees how much is an oldSpan. If the old is completely shadowed
+        /// the method returns true, else false.
+        /// </summary>
+        /// <param name="newSpan"></param>
+        /// <param name="oldSpan"></param>
+        /// <param name="periodsContainer"></param>
+        private static bool TimeShadow(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan, List<GekkoTimeSpanSimple> periodsContainer)
+        {
+            // Four possibilities
+            //
+            //             =============                  --- is newSpan, === is oldSpan
+            //  -----                         -----       A. Outside (left or right)
+            //          -----        -----                B. Cut from left or right                                
+            //                 ----                       C. Separate in two
+            //          -------------------               D. Shadow and remove
+            //
+            // The code below removes the --- from the ===, so removes periods from siblingSpan
+            //
+            bool rv = false;
+            if (oldSpan.IsNull())
+            {
+                //will not be touched
+                periodsContainer.Add(oldSpan);
+            }
+            else if (newSpan.t2.StrictlySmallerThan(oldSpan.t1) || newSpan.t1.StrictlyLargerThan(oldSpan.t2))
+            {
+                //A, nothing happens
+                periodsContainer.Add(oldSpan);
+            }            
+            else if (newSpan.t1.SmallerThanOrEqual(oldSpan.t1) && newSpan.t2.StrictlySmallerThan(oldSpan.t2))
+            {
+                //B left
+                periodsContainer.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
+            }
+            else if (newSpan.t1.StrictlyLargerThan(oldSpan.t1) && newSpan.t2.LargerThanOrEqual(oldSpan.t2))
+            {
+                //B right
+                periodsContainer.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
+            }
+            else if (newSpan.t1.StrictlyLargerThan(oldSpan.t1) && newSpan.t2.StrictlySmallerThan(oldSpan.t2))
+            {
+                //C cut in two
+                periodsContainer.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
+                periodsContainer.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
+            }
+            else if (newSpan.t1.SmallerThanOrEqual(oldSpan.t1) && newSpan.t2.LargerThanOrEqual(oldSpan.t2))
+            {
+                //D, remove --> nothing added
+                rv = true;
+            }
+            else new Error("Wrong logic regarding time spans");
+            return rv;
         }
 
         ///// <summary>
@@ -1121,6 +1144,4 @@ namespace Gekko
             return this.storage.Count;
         }
     }
-    
-
 }

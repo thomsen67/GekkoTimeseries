@@ -1669,6 +1669,7 @@ namespace Gekko
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
             Globals.numberOfTimeWindowErrors = 0;
+            Globals.traceTime = 0d;
 
             Program.AbortingReset();
 
@@ -2268,10 +2269,15 @@ namespace Gekko
                     if (ms > 1000 && !Globals.threadIsInProcessOfAborting)
                     {
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
-                        string s = null;
-                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s = ". (To activate program tracking, see menu 'Options' --> 'Program dependency tracking').";
+                        string s1 = null;
+                        string s2 = null;                                                
+                        if (Globals.traceTime != 0d)
+                        {
+                            s1 = " (of which data tracing used " + G.SecondsFormat(Globals.traceTime) + ")";
+                        }
+                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track dependencies (files etc.), see menu 'Options' --> 'Program dependency tracking'.";
                         G.Writeln();
-                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s);
+                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);
                         G.Writeln();
                     }
                 }
