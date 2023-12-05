@@ -42,6 +42,7 @@ namespace Gekko
         public bool bugfix_sas = false;            //not mentioned in help (used by KNR). For prn writes vars and name/date with CAPS and inside "", q and m are written as for instance 202003 instead of 2020q3. For csv, numbers are F15.6 with 4 digits for exponent (normal is F15.8 with 2 digits for exponent). 
         public bool bugfix_lhs_dollar = true;      //not mentioned in help, if lhs condition is a series, just skips the 0 (false) values instead of setting them to 0. On the rhs, they are always set to 0. Does not affect non-series conditions like set membership.
         public bool bugfix_lhs_dollar_warning = true;  //see above...
+        public bool bugfix_csv_missing = true;     ////not mentioned in help, uses #N/A or #I/T, and determines start/end dates better (also works for prn)
         // ---
         //method options could look like the 2 following:
         public string collapse_method = "total";  //total|avg|first|last
@@ -330,6 +331,7 @@ namespace Gekko
             Add("BUGFIX SAS", Globals.xbool);
             Add("BUGFIX LHS DOLLAR", Globals.xbool);
             Add("BUGFIX LHS DOLLAR WARNING", Globals.xbool);
+            Add("BUGFIX CSV MISSING", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");

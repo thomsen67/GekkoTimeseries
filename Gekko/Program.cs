@@ -22566,8 +22566,18 @@ namespace Gekko
                     IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
 
-                    GekkoTime tsStart = ts.GetPeriodFirst();
-                    GekkoTime tsEnd = ts.GetPeriodLast();
+                    GekkoTime tsStart = GekkoTime.tNull;
+                    GekkoTime tsEnd = GekkoTime.tNull;
+                    if (Program.options.bugfix_csv_missing)
+                    {
+                        tsStart = ts.GetRealDataPeriodFirst();
+                        tsEnd = ts.GetRealDataPeriodLast();
+                    }
+                    else
+                    {
+                        tsStart = ts.GetPeriodFirst();
+                        tsEnd = ts.GetPeriodLast();
+                    }
 
                     counter++;
                     if (fileType == EdataFormat.Csv)
@@ -22895,13 +22905,15 @@ namespace Gekko
             string s = "";
             if (isCsv)
             {
-                if (G.Equal(Program.options.interface_excel_language, "danish"))
+                if (Program.options.bugfix_csv_missing)
                 {
-                    s = "#NAVN?";  //missing value indicator (M) -- SHEET uses na()
+                    if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#I/T";  //missing value indicator (M) -- SHEET uses na()
+                    else s = "#N/A";  //missing value indicator (M) -- SHEET uses na()
                 }
                 else
                 {
-                    s = "#NAME?";  //missing value indicator (M) -- SHEET uses na()
+                    if (G.Equal(Program.options.interface_excel_language, "danish")) s = "#NAVN?";  //missing value indicator (M) -- SHEET uses na()
+                    else s = "#NAME?";  //missing value indicator (M) -- SHEET uses na()
                 }
             }
             else
