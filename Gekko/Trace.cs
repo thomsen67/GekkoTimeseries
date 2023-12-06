@@ -193,15 +193,39 @@ namespace Gekko
         }
 
         public List<TraceAndPeriods> GetRealPrecedents()
-        {            
+        {
+            int THREE = 3;
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
+            List<TraceAndPeriods> deleted = new List<TraceAndPeriods>();  //use these to mark objects for deletion
             int varCounter = 0;  //0-based
-            for (int i = this.precedents.Count() - 1; i > 0; i++)
+            List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first
+            int counter = -1;
+            for (int i = this.precedents.Count() - 1 - THREE; i >= 0; i--)
             {
+                counter++;
+                bool isFirstI = false;                 
+                if (i == this.precedents.Count() - 1 - THREE) isFirstI = true;
                 Trace2 traceNew = this.precedents[i];
-                if (traceNew == null) new Error("Unexpected!");
-                for (int j = i - 1; j >= 0; j++)
+                if (i == 0 || traceNew == null)
                 {
+                    //also go here if i == 1
+                    //pack it up
+                    continue;
+                }
+                if (isFirstI)
+                {
+                    //To get the first one going. Actually not important, but oh well.
+                    List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
+                    tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                    spansList.Add(tmp);
+                }                
+                
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    //int ii = i - j + 1;  //starts as 2
+                    //int ii = this.precedents.Count() - i;  //starts as 2
+                    int ii = counter + 1 - (j - (i - 1));
+
                     Trace2 traceOld = this.precedents[j];
                     if (traceOld == null)
                     {
@@ -209,14 +233,28 @@ namespace Gekko
                         break;
                     }
 
-                    Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
+                    if (isFirstI)
+                    {
+                        List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
+                        spansList.Add(spans);
+                    }
+                    else
+                    {
+                        List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
+                        foreach (GekkoTimeSpanSimple spanTemp in spansList[ii])
+                        {
+                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), spanTemp);
+                            newList.AddRange(spans);
+                        }
+                        spansList[ii] = newList;
+                    }
 
-                    TraceAndPeriods tap = new TraceAndPeriods();
-                    tap.trace = traceNew;
-                    //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
-                    tap.periods = new Periods();
-                    tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
-                    rv.Add(tap);
+                    //TraceAndPeriods tap = new TraceAndPeriods();
+                    //tap.trace = traceNew;
+                    ////The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
+                    //tap.periods = new Periods();
+                    //tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                    //rv.Add(tap);
                 }                
             }
             return rv;
