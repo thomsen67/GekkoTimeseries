@@ -13352,7 +13352,14 @@ namespace UnitTests
             I("x2 <2001 2003> = x1 + 2;");
             I("x1 <2002 2002> = 3;");
             Series x1 = Program.databanks.GetFirst().GetIVariable("x1!a") as Series;
-            
+
+            if (true)
+            {
+                Assert.AreEqual(2, x1.meta.trace2.GetRealPrecedents().Count());
+                Assert.AreEqual(2, x1.meta.trace2.GetRealPrecedents()[0].periods.Count()); //chopped up
+                Assert.AreEqual(1, x1.meta.trace2.GetRealPrecedents()[1].periods.Count()); //not chopped up                
+            }
+
             Assert.AreEqual(2, x1.meta.trace2.precedents.Count());
             trace11 = x1.meta.trace2.precedents[0];
             Assert.AreEqual(2, trace11.contents.periods.Count()); //chopped up

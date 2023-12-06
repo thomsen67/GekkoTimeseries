@@ -192,6 +192,21 @@ namespace Gekko
             else new Error("Trace period problem");
         }
 
+        public List<TraceAndPeriods> GetRealPrecedents()
+        {
+            List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
+            foreach (Trace2 trace in this.precedents.GetStorage())
+            {
+                TraceAndPeriods tap = new TraceAndPeriods();
+                tap.trace = trace;
+                //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
+                tap.periods = new Periods();
+                tap.periods.Add(new GekkoTimeSpanSimple(trace.contents.GetT1(), trace.contents.GetT2()));
+                rv.Add(tap);
+            }
+            return rv;
+        }
+
         /// <summary>
         /// Test if a trace is "real" (false) or "invisible" (true). Invisible traces are directly linked to timeseries
         /// and have no contents. They are just an entry into the real traces.
@@ -394,11 +409,6 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        private static void PeriodShadowing(Series ts, Trace2 trace)
-        {
-
-        }
-
         private static void TraceShadowing(Series ts, Trace2 trace)
         {
             if (false && ts.meta.trace2.precedents.Count() > 0)
@@ -436,7 +446,7 @@ namespace Gekko
                             List<GekkoTimeSpanSimple> newPeriods = new List<GekkoTimeSpanSimple>();
                             foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
                             {
-                                TimeShadow(thsSpan, siblingSpan, newPeriods);
+                                //TimeShadow(thsSpan, siblingSpan, newPeriods);
                             }
                             if (newPeriods.Count() == 0)
                             {
@@ -478,55 +488,48 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For a newSpan (timespan), it sees how much is an oldSpan. If the old is completely shadowed
-        /// the method returns true, else false.
+        /// For the newSpan, it removes these periods from the oldSpan. Returns a list of GekkoTimeSpanSimple with 0, 1 or 2 elements.
         /// </summary>
         /// <param name="newSpan"></param>
         /// <param name="oldSpan"></param>
         /// <param name="periodsContainer"></param>
-        private static bool TimeShadow(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan, List<GekkoTimeSpanSimple> periodsContainer)
+        public static List<GekkoTimeSpanSimple> TimeShadow(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan)
         {
+            // The code below removes the --- from the ===, so newSpan removes periods from oldSpan
             // Four possibilities
             //
-            //             =============                  --- is newSpan, === is oldSpan
+            //             =============                  === is oldSpan, --- is newSpan
             //  -----                         -----       A. Outside (left or right)
             //          -----        -----                B. Cut from left or right                                
             //                 ----                       C. Separate in two
             //          -------------------               D. Shadow and remove
+            //            
             //
-            // The code below removes the --- from the ===, so removes periods from siblingSpan
-            //
-            bool rv = false;
-            if (oldSpan.IsNull())
-            {
-                //will not be touched
-                periodsContainer.Add(oldSpan);
-            }
-            else if (newSpan.t2.StrictlySmallerThan(oldSpan.t1) || newSpan.t1.StrictlyLargerThan(oldSpan.t2))
+            List<GekkoTimeSpanSimple> rv = new List<GekkoTimeSpanSimple>();  //this construction is pretty fast
+            if (newSpan.t2.StrictlySmallerThan(oldSpan.t1) || newSpan.t1.StrictlyLargerThan(oldSpan.t2))
             {
                 //A, nothing happens
-                periodsContainer.Add(oldSpan);
+                rv.Add(oldSpan);
             }            
             else if (newSpan.t1.SmallerThanOrEqual(oldSpan.t1) && newSpan.t2.StrictlySmallerThan(oldSpan.t2))
             {
                 //B left
-                periodsContainer.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
+                rv.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
             }
             else if (newSpan.t1.StrictlyLargerThan(oldSpan.t1) && newSpan.t2.LargerThanOrEqual(oldSpan.t2))
             {
                 //B right
-                periodsContainer.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
+                rv.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
             }
             else if (newSpan.t1.StrictlyLargerThan(oldSpan.t1) && newSpan.t2.StrictlySmallerThan(oldSpan.t2))
             {
                 //C cut in two
-                periodsContainer.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
-                periodsContainer.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
+                rv.Add(new GekkoTimeSpanSimple(oldSpan.t1, newSpan.t1.Add(-1)));
+                rv.Add(new GekkoTimeSpanSimple(newSpan.t2.Add(1), oldSpan.t2));
             }
             else if (newSpan.t1.SmallerThanOrEqual(oldSpan.t1) && newSpan.t2.LargerThanOrEqual(oldSpan.t2))
             {
                 //D, remove --> nothing added
-                rv = true;
             }
             else new Error("Wrong logic regarding time spans");
             return rv;
@@ -1143,5 +1146,14 @@ namespace Gekko
             if (this.storage == null) return 0;
             return this.storage.Count;
         }
+    }
+
+    /// <summary>
+    /// Only used for reporting, to know how periods shadow each other. Never stored in databanks etc.
+    /// </summary>
+    public class TraceAndPeriods
+    {
+        public Trace2 trace = null;
+        public Periods periods = null;  //is basically a List<GekkoTimeSpanSimple>
     }
 }

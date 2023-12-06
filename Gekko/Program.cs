@@ -1995,10 +1995,17 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
 
-            //if (true)
-            //{
-            //    Trace2.SLET();
-            //}                    
+            if (true && Globals.runningOnTTComputer)
+            {
+                GekkoTimeSpanSimple span1 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2002, 1), new GekkoTime(EFreq.A, 2008, 1));
+                GekkoTimeSpanSimple span2 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2005, 1), new GekkoTime(EFreq.A, 2005, 1));
+                GekkoTimeSpanSimple span3 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2003, 1));
+                GekkoTimeSpanSimple span4 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2007, 1), new GekkoTime(EFreq.A, 2009, 1));
+                GekkoTimeSpanSimple span5 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2004, 1));
+
+                List<GekkoTimeSpanSimple> span = Trace2.TimeShadow(span2, span1);
+
+            }                    
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -29993,8 +30000,7 @@ namespace Gekko
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
                             {
                                 if (Program.options.interface_excel_ignoremissing)
-                                {
-                                    ws.Cells[d1 + i, d2 + j].Formula = null;
+                                {                                
                                     ws.Cells[d1 + i, d2 + j].Value = null;
                                 }
                                 else
