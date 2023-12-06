@@ -19793,7 +19793,7 @@ print(df2)
         [TestMethod]
         public void _Test_FunctionsInBuilt()
         {
-
+            //Program.Flush();
             Databank work = First();
             //simplest possible
             I("RESET;");
@@ -26542,6 +26542,8 @@ print(df2)
         [TestMethod]
         public void _Test_Databanks()
         {
+            //Program.Flush();
+            
             // ----------------------------------------------------------
             //          - tsd and tsdx (latter with .tsd or .bin inside)
             //          - testing READ and WRITE of these files,
@@ -27116,10 +27118,10 @@ print(df2)
             u = Data("one", 2000, "a"); Assert.AreEqual(u.w, 2.22d);
             u = Data("one", 2001, "a"); Assert.AreEqual(u.w, 3.33d);
             Series ts = First().GetIVariable("one!a") as Series;
-            GekkoTime gt = ts.GetPeriodFirst();
+            GekkoTime gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 1);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 2001);
             Assert.AreEqual(gt.sub, 1);
 
@@ -27127,10 +27129,10 @@ print(df2)
             u = Data("nine", 2000, "a"); Assert.AreEqual(u.w, 9.999d);
             u = Data("nine", 2001, "a"); Assert.AreEqual(u.w, 9.9999d);
             ts = First().GetIVariable("nine!a") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 1);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 2001);
             Assert.AreEqual(gt.sub, 1);
 
@@ -27138,10 +27140,10 @@ print(df2)
             u = Data("qq", 1999, 2, "q"); Assert.AreEqual(u.w, 4.44444444d);
             u = Data("qq", 1999, 3, "q"); Assert.AreEqual(u.w, 5.55555555d);
             ts = First().GetIVariable("qq!q") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 1);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 3);
 
@@ -27149,10 +27151,10 @@ print(df2)
             u = Data("mm", 1999, 2, "m"); Assert.AreEqual(u.w, 7.77777777d);
             u = Data("mm", 1999, 3, "m"); Assert.AreEqual(u.w, 8.88888888d);
             ts = First().GetIVariable("mm!m") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 1);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 3);
 
@@ -27166,11 +27168,11 @@ print(df2)
             u = Data("fy1", 2004, "a"); Assert.AreEqual(u.w, double.NaN);
             u = Data("fy1", 2005, "a"); Assert.AreEqual(u.w, double.NaN);
             ts = First().GetIVariable("fy1!a") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1998);
             Assert.AreEqual(gt.sub, 1);
-            gt = ts.GetPeriodLast();
-            Assert.AreEqual(gt.super, 2004);
+            gt = ts.GetRealDataPeriodLast();
+            Assert.AreEqual(gt.super, 2003);
             Assert.AreEqual(gt.sub, 1);
 
             u = Data("fy1", 1999, 3, "q"); Assert.AreEqual(u.w, double.NaN);
@@ -27183,12 +27185,12 @@ print(df2)
             u = Data("fy1", 2001, 2, "q"); Assert.AreEqual(u.w, double.NaN);
             u = Data("fy1", 2001, 3, "q"); Assert.AreEqual(u.w, double.NaN);
             ts = First().GetIVariable("fy1!q") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 4);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 2001);
-            Assert.AreEqual(gt.sub, 2);
+            Assert.AreEqual(gt.sub, 1);
 
             u = Data("fy1", 1999, 11, "m"); Assert.AreEqual(u.w, double.NaN);
             u = Data("fy1", 1999, 12, "m"); Assert.AreEqual(u.w, 6.54320000E+00d);
@@ -27200,12 +27202,12 @@ print(df2)
             u = Data("fy1", 2000, 6, "m"); Assert.AreEqual(u.w, double.NaN);
             u = Data("fy1", 2000, 7, "m"); Assert.AreEqual(u.w, double.NaN);
             ts = First().GetIVariable("fy1!m") as Series;
-            gt = ts.GetPeriodFirst();
+            gt = ts.GetRealDataPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 12);
-            gt = ts.GetPeriodLast();
+            gt = ts.GetRealDataPeriodLast();
             Assert.AreEqual(gt.super, 2000);
-            Assert.AreEqual(gt.sub, 6);
+            Assert.AreEqual(gt.sub, 5);
             return;
         }
 

@@ -193,16 +193,31 @@ namespace Gekko
         }
 
         public List<TraceAndPeriods> GetRealPrecedents()
-        {
+        {            
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
-            foreach (Trace2 trace in this.precedents.GetStorage())
+            int varCounter = 0;  //0-based
+            for (int i = this.precedents.Count() - 1; i > 0; i++)
             {
-                TraceAndPeriods tap = new TraceAndPeriods();
-                tap.trace = trace;
-                //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
-                tap.periods = new Periods();
-                tap.periods.Add(new GekkoTimeSpanSimple(trace.contents.GetT1(), trace.contents.GetT2()));
-                rv.Add(tap);
+                Trace2 traceNew = this.precedents[i];
+                if (traceNew == null) new Error("Unexpected!");
+                for (int j = i - 1; j >= 0; j++)
+                {
+                    Trace2 traceOld = this.precedents[j];
+                    if (traceOld == null)
+                    {
+                        varCounter++;
+                        break;
+                    }
+
+                    Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
+
+                    TraceAndPeriods tap = new TraceAndPeriods();
+                    tap.trace = traceNew;
+                    //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
+                    tap.periods = new Periods();
+                    tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                    rv.Add(tap);
+                }                
             }
             return rv;
         }
