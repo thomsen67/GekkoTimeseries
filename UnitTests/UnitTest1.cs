@@ -14239,12 +14239,25 @@ namespace UnitTests
                         Globals.unitTestScreenOutput.Clear();
                         I("tracestats2();");
                         string s = Globals.unitTestScreenOutput.ToString();
-                        Assert.IsTrue(s.Contains("Databank Work: 3 series with 19 traces in total."));
-                        Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
-                        Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
-                        Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
-                        Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
-                        Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
+                        if (true)
+                        {
+                            Assert.IsTrue(s.Contains("Databank Work: 3 series with 22 traces in total."));
+                            Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                            Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                            Assert.IsTrue(s.Contains("depth: 2, traces: 6"));
+                            Assert.IsTrue(s.Contains("depth: 3, traces: 5"));
+                            Assert.IsTrue(s.Contains("depth: 4, traces: 4"));
+                        }
+                        else
+                        {
+                            //If traces were compacted first, we would get this. See also above.
+                            Assert.IsTrue(s.Contains("Databank Work: 3 series with 19 traces in total."));
+                            Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                            Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                            Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
+                            Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
+                            Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
+                        }
                     }
                 }
                 finally

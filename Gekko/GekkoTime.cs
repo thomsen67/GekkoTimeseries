@@ -2127,7 +2127,7 @@ namespace Gekko
 
         public GekkoTimeSpanSimple(GekkoTime t1, GekkoTime t2)
         {
-            if (t1.IsNull() && IsNull())
+            if (t1.IsNull() && t2.IsNull())
             {
                 //ok, signifies no period(s)
             }

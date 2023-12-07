@@ -535,14 +535,15 @@ namespace Gekko
             //          -------------------               D. Shadow and remove
             //            
             //
-            
-            if(newSpan.IsNull() || oldSpan.IsNull())
-            {
-
-            }
-            
+                        
             List<GekkoTimeSpanSimple> rv = new List<GekkoTimeSpanSimple>();  //this construction is pretty fast
-            if (newSpan.t2.StrictlySmallerThan(oldSpan.t1) || newSpan.t1.StrictlyLargerThan(oldSpan.t2))
+
+            if (newSpan.IsNull() || oldSpan.IsNull())
+            {
+                //One of the spans is null, no shadowing then...
+                rv.Add(oldSpan);
+            }
+            else if (newSpan.t2.StrictlySmallerThan(oldSpan.t1) || newSpan.t1.StrictlyLargerThan(oldSpan.t2))
             {
                 //A, nothing happens
                 rv.Add(oldSpan);
