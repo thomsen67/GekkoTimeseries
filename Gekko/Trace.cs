@@ -194,86 +194,61 @@ namespace Gekko
 
         public List<TraceAndPeriods> GetRealPrecedents()
         {
-            int THREE = 0;
+            //Remove the if below at some point, just for sanity now
+            if (this.precedents[0] == null || this.precedents[this.precedents.Count() - 1] == null) new Error("Unexpected");
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
-            List<TraceAndPeriods> deleted = new List<TraceAndPeriods>();  //use these to mark objects for deletion
-            int varCounter = 0;  //0-based
-            List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first
-            int counter = -1;
-            int counter2 = -1;
-            for (int i = this.precedents.Count() - 1 - THREE; i >= 0; i--)
-            {
-                counter++; counter2++;                
+            List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first            
+            int counterI = -1;
+            for (int i = this.precedents.Count() - 1; i >= 0; i--)
+            {                
+                counterI++;                
                 Trace2 traceNew = this.precedents[i];
                 if (i == 0 || traceNew == null)
                 {
                     for (int k = 0; k < spansList.Count; k++)
-                    {
-                        //int k2 = counter - k + i;
-                        int k2 = this.precedents.Count() - rv.Count - 1;
+                    {                        
                         TraceAndPeriods tap = new TraceAndPeriods();
-                        tap.trace = this.precedents[k2];
+                        tap.trace = this.precedents[this.precedents.Count() - rv.Count - 1];
                         //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
                         tap.periods = spansList[k];
                         rv.Add(tap);
                     }
                     if (i > 0) rv.Add(null); //divider
-                    counter2 = -1;
+                    counterI = -1;
                     spansList.Clear();
-
-                    //TraceAndPeriods tap = new TraceAndPeriods();
-                    //tap.trace = traceNew;
-                    ////The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
-                    //tap.periods = new Periods();
-                    //tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
-                    //rv.Add(tap);
                     continue;
                 }
-                if (counter2 == 0)
+                if (counterI == 0)
                 {
-                    //To get the first one going. Actually not important, but oh well.
+                    //To get the first one going.
                     List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
                     tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
                     spansList.Add(tmp);
                 }
 
-                int counter3 = -1;
+                int counterJ = -1;
                 for (int j = i - 1; j >= 0; j--)
                 {
-                    counter3++;
-                    int ii = i - j + 1 + counter2 - 1;  //starts as 2
-                    //int ii = this.precedents.Count() - i;  //starts as 2
-                    //int ii = counter + 1 - (j - (i - 1));
-
+                    counterJ++;
                     Trace2 traceOld = this.precedents[j];
-                    if (traceOld == null)
-                    {
-                        varCounter++;
-                        break;
-                    }
+                    if (traceOld == null) break;
 
-                    if (counter2 == 0)
+                    if (counterI == 0)
                     {
                         List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
                         spansList.Add(spans);
                     }
                     else
                     {
-                        List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
-                        foreach (GekkoTimeSpanSimple spanTemp in spansList[ii])
+                        int k2 = counterI + counterJ + 1;
+                        List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();                        
+                        foreach (GekkoTimeSpanSimple spanTemp in spansList[k2])
                         {
                             List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), spanTemp);
                             newList.AddRange(spans);
                         }
-                        spansList[ii] = newList;
+                        spansList[k2] = newList;
                     }
-
-                    //TraceAndPeriods tap = new TraceAndPeriods();
-                    //tap.trace = traceNew;
-                    ////The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
-                    //tap.periods = new Periods();
-                    //tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
-                    //rv.Add(tap);
                 }                
             }
             rv.Reverse();

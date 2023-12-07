@@ -13341,24 +13341,44 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePeriodsShadowing2()
         {
+            //Pretty good test of shadowing.
+            //Shadowing code must run fast and is therefore a bit complicated: therefore a good test is a must!
+            //This is how shadowing of x2 looks like:
+            //2001    2002    2003    2004    2005    2006    2007    2008    2009             spancount
+            //           1       1       1       1       1       1       1                         1
+            //                                   2                                                 1
+            //   3       3       3                                                                 1
+            //                                           4       4       4        4                1
+            //   5       5       5       5                                                         1
+            //                   6                                                                 1
+            //It ends up like this:
+            //2001    2002    2003    2004    2005    2006    2007    2008    2009             spancount
+            //           .       .       .       .       .       .       .                         0
+            //                                   2                                                 1
+            //   .       .       .                                                                 0
+            //                                           4       4       4        4                1
+            //   5       5       .       5                                                         2
+            //                   6                                                                 1
+            //So with shadowing, only the numbers nearest the bottom survive.
+
             I("reset;");
             I("option databank trace = yes; time 2001 2005;");
             I("x1 <2001 2005> = 1;");
             I("x1 <2002 2004> = 100;");
-            
+            // --------------
             I("x2 <2002 2008> = 1;");
             I("x2 <2005 2005> = 2;");
             I("x2 <2001 2003> = 3;");
             I("x2 <2006 2009> = 4;");
             I("x2 <2001 2004> = 5;");
             I("x2 <2003 2003> = 6;");
-
+            // --------------
             I("x3 <2021 2025> = 3;");
             I("x3 <2022 2024> = 300;");
             I("x = x1 + x2 + x3;");
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             List<TraceAndPeriods> m = x.meta.trace2.precedents[0].GetRealPrecedents();
-
+            //
             Assert.AreEqual(12, m.Count);
             int i = 0;
             Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
@@ -13373,7 +13393,7 @@ namespace UnitTests
             Assert.AreEqual(2002, m[i].periods[0].t1.super);
             Assert.AreEqual(2004, m[i].periods[0].t2.super);
             i++;
-            Assert.IsNull(m[i]);
+            Assert.IsNull(m[i]); //---------------------------------------------
             i++;
             Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
             Assert.AreEqual(0, m[i].periods.Count);
@@ -13384,7 +13404,7 @@ namespace UnitTests
             Assert.AreEqual(2005, m[i].periods[0].t2.super);
             i++;
             Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
-            Assert.AreEqual(0, m[i].periods.Count);            
+            Assert.AreEqual(0, m[i].periods.Count);
             i++;
             Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
             Assert.AreEqual(1, m[i].periods.Count);
@@ -13403,7 +13423,7 @@ namespace UnitTests
             Assert.AreEqual(2003, m[i].periods[0].t1.super);
             Assert.AreEqual(2003, m[i].periods[0].t2.super);
             i++;
-            Assert.IsNull(m[i]);
+            Assert.IsNull(m[i]); //---------------------------------------------
             i++;
             Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
             Assert.AreEqual(2, m[i].periods.Count);
