@@ -128,7 +128,7 @@ namespace Gekko
         public TraceContents contents = null;
 
         [ProtoMember(3)]
-        public Precedents precedents = new Precedents();
+        private Precedents precedents = new Precedents();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()        
 
         private Trace2()
         {
@@ -163,6 +163,24 @@ namespace Gekko
                 this.contents = new TraceContents(isNullTime);
             }
             else new Error("Trace period problem");
+        }
+
+        /// <summary>
+        /// Only for internal use.
+        /// </summary>
+        /// <returns></returns>
+        public Precedents GetPrecedents_BewareOnlyInternalUse()
+        {
+            return this.precedents;
+        }
+
+        /// <summary>
+        /// Only for internal use.
+        /// </summary>
+        /// <param name="x"></param>
+        public void SetPrecedents_BewareOnlyInternalUse(Precedents x)
+        {
+            this.precedents = x;
         }
 
         public List<TraceAndPeriods> GetPrecedentsAndShadowedPeriods()

@@ -12866,7 +12866,7 @@ namespace UnitTests
                 }
                 if (i == 0) y = O.GetIVariableFromString("Work:" + "y!q", ECreatePossibilities.NoneReportError) as Series;
                 else y = O.GetIVariableFromString("Work:" + "y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -12901,7 +12901,7 @@ namespace UnitTests
                 else I("collapse y!a[a] = x1[a];");                
                 if (i == 0) y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
                 else y = O.GetIVariableFromString("Work:" + "y!a[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!a", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!a[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -12923,7 +12923,7 @@ namespace UnitTests
                     I("y = 2;");
                     I("copy <2001q2 2002q3> x1 to y;");
                     y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
-                    tracec = y.meta.trace2.precedents[1].contents; // <---------------------- note the 1 here!
+                    tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].trace.contents; // <---------------------- note the 1 here!
                     Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
@@ -12943,7 +12943,7 @@ namespace UnitTests
                     I("x1 = 2;");
                     I("copy x1 to y;");
                     y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
-                    tracec = y.meta.trace2.precedents[0].contents;
+                    tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                     Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
@@ -12965,7 +12965,7 @@ namespace UnitTests
                 else _AssertSeries(First(), "pris6!m", new string[] { "011100", "100" }, EFreq.M, 2012, 1, 149.9000d, sharedDelta);
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("pris6_varegr_011100_enhed_100!m") as Series;
                 else y = O.GetIVariableFromString("pris6!m[011100, 100]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:pris6_VAREGR_011100_enhed_100!m", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:pris6!m[011100, 100]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -12997,7 +12997,7 @@ namespace UnitTests
 
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!m") as Series;
                 else y = O.GetIVariableFromString("Work:y!m[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!m", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!m[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13029,7 +13029,7 @@ namespace UnitTests
                 I("read sletmig;");
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
                 else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13064,7 +13064,7 @@ namespace UnitTests
 
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
                 else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13085,7 +13085,7 @@ namespace UnitTests
                     I("x1 = 2;");
                     I("rename x1 as y;");
                     y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
-                    tracec = y.meta.trace2.precedents[0].contents;
+                    tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                     Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
@@ -13110,9 +13110,9 @@ namespace UnitTests
                     I("enl <80 2020> = 12345;");  //just to get an existing trace that the sim trace modifices
                     I("sim;");
                     y = Program.databanks.GetFirst().GetIVariable("enl!a") as Series;
-                    Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-                    Trace2 trace1 = y.meta.trace2.precedents[0];
-                    Trace2 trace2 = y.meta.trace2.precedents[1];
+                    Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
+                    Trace2 trace1 = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace;
+                    Trace2 trace2 = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].trace;
                     // ---
                     Assert.AreEqual("Work:ENL!a", trace2.contents.bankAndVarnameWithFreq);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", trace1.contents.commandFileAndLine);
@@ -13161,7 +13161,7 @@ namespace UnitTests
 
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
                 else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13193,7 +13193,7 @@ namespace UnitTests
 
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
                 else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13226,7 +13226,7 @@ namespace UnitTests
                 }
                 if (i == 0) y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
                 else y = O.GetIVariableFromString("Work:y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                tracec = y.meta.trace2.precedents[0].contents;
+                tracec = y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
                 else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -13267,19 +13267,19 @@ namespace UnitTests
             SeriesMetaInformation meta1 = new SeriesMetaInformation();
             meta1.trace2 = new Trace2(true);
             //dict1.Add(meta1.trace, dict1.Count);
-            meta1.trace2.precedents = new Precedents();
+            meta1.trace2.SetPrecedents_BewareOnlyInternalUse(new Precedents());
             Trace2 xx1 = new Trace2(true);
             xx1.contents.text = "xx1";
-            meta1.trace2.precedents.Add(xx1);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
             Trace2 xx2 = new Trace2(true);
             xx2.contents.text = "xx2";
-            meta1.trace2.precedents.Add(xx2);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
             Trace2 xx3 = new Trace2(true);
             xx3.contents.text = "xx3";
-            meta1.trace2.precedents.Add(xx3);
-            xx3.precedents = new Precedents();
-            xx3.precedents.Add(xx1);
-            xx3.precedents.Add(xx2);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx3);
+            xx3.SetPrecedents_BewareOnlyInternalUse(new Precedents());
+            xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
+            xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
 
             //gather lists
             TraceHelper th = new TraceHelper();
@@ -13289,7 +13289,7 @@ namespace UnitTests
             foreach (Trace2 trace in th.tracesDepth2.Keys)
             {
                 dict1Inverted[trace.id] = trace;
-                trace.precedents.ToID();  //remove links
+                trace.GetPrecedents_BewareOnlyInternalUse().ToID();  //remove links
             }
             meta1.ToID(); //remove link from meta
 
@@ -13301,7 +13301,7 @@ namespace UnitTests
             if (true)
             {
                 meta1.FromID(dict1Inverted);
-                foreach (Trace2 trace in dict1Inverted.Values) trace.precedents.FromID(dict1Inverted);
+                foreach (Trace2 trace in dict1Inverted.Values) trace.GetPrecedents_BewareOnlyInternalUse().FromID(dict1Inverted);
                 meta1.traceID2 = null;
             }
 
@@ -13314,7 +13314,7 @@ namespace UnitTests
             if (true)
             {
                 meta2.FromID(dict2Inverted);
-                foreach (Trace2 trace in dict2Inverted.Values) trace.precedents.FromID(dict2Inverted);
+                foreach (Trace2 trace in dict2Inverted.Values) trace.GetPrecedents_BewareOnlyInternalUse().FromID(dict2Inverted);
                 meta2.traceID2 = null;
             }
 
@@ -13322,21 +13322,21 @@ namespace UnitTests
             dict2 = null;
             dict2Inverted = null;
 
-            string z1 = meta1.trace2.precedents[0].contents.text;  //xx1
+            string z1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;  //xx1
             Assert.AreEqual("xx1", z1);
-            meta1.trace2.precedents[0].contents.text = "yy1";
-            string s1 = meta1.trace2.precedents[2].precedents[0].contents.text; //yy1
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "yy1";
+            string s1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yy1
             Assert.AreEqual("yy1", s1);
 
-            string z2 = meta2.trace2.precedents[0].contents.text;  //xx1
+            string z2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;  //xx1
             Assert.AreEqual("xx1", z2);
-            meta2.trace2.precedents[0].contents.text = "yyy1";
-            string s2 = meta2.trace2.precedents[2].precedents[0].contents.text; //yyy1
+            meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "yyy1";
+            string s2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yyy1
             Assert.AreEqual("yyy1", s2);
 
-            string ss1 = meta1.trace2.precedents[2].precedents[0].contents.text; //yy1
+            string ss1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yy1
             Assert.AreEqual("yy1", ss1);
-            string ss2 = meta2.trace2.precedents[2].precedents[0].contents.text; //yyy1
+            string ss2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yyy1
             Assert.AreEqual("yyy1", ss2);
         }
 
@@ -13379,7 +13379,7 @@ namespace UnitTests
             I("x3 <2022 2024> = 300;");
             I("x = x1 + x2 + x3;");
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            List<TraceAndPeriods> m = x.meta.trace2.precedents[0].GetPrecedentsAndShadowedPeriods();
+            List<TraceAndPeriods> m = x.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.GetPrecedentsAndShadowedPeriods();
             //
             Assert.AreEqual(12, m.Count);
             int i = 0;
@@ -13482,7 +13482,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2003 2003> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13497,7 +13497,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2003 2004> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2005, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13512,8 +13512,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t2.super);
@@ -13529,7 +13528,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2006 2007> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13544,7 +13543,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2007 2007> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13563,7 +13562,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x <2004 2006> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(1, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13577,7 +13576,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("rename x as y;"); //series x!a will not exist after this           
             y = Program.databanks.GetFirst().GetIVariable("y!a") as Series;
-            Assert.AreEqual(1, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(-12345, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13588,7 +13587,7 @@ namespace UnitTests
             
             // -----
             I("x <2005 2005> = 2;");  //should have no effect on y, even though x gets a new trace                                    
-            Assert.AreEqual(1, y.meta.trace2.precedents.Count());            
+            Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(-12345, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13601,7 +13600,7 @@ namespace UnitTests
             
             // -----
             I("y <2005 2005> = 3;");
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
             
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(-12345, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13620,7 +13619,7 @@ namespace UnitTests
             I("x <2004 2006> = 1;");
             I("x[2005] = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13645,7 +13644,7 @@ namespace UnitTests
             I("close *;");
             I("open <first> trace1;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13686,7 +13685,7 @@ namespace UnitTests
             I("read trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
             Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13710,7 +13709,7 @@ namespace UnitTests
             I("read <2005 2006> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
             Assert.AreEqual("read <2005 2006> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2006, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13744,7 +13743,7 @@ namespace UnitTests
             I("read <merge> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(3, y.meta.trace2.precedents.Count());            
+            Assert.AreEqual(3, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13780,7 +13779,7 @@ namespace UnitTests
             I("read <2005 2006 merge> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(3, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(3, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13830,7 +13829,7 @@ namespace UnitTests
             I("read <tsd> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());            
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("read <tsd> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13853,7 +13852,7 @@ namespace UnitTests
             I("read <2005 2006 tsd> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("read <2005 2006 tsd> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13880,7 +13879,7 @@ namespace UnitTests
             I("read <merge tsd> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(3, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(3, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13916,7 +13915,7 @@ namespace UnitTests
             I("read <2005 2006 merge tsd> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(3, y.meta.trace2.precedents.Count());
+            Assert.AreEqual(3, y.meta.trace2.GetPrecedentsAndShadowedPeriods().Count);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -14095,8 +14094,8 @@ namespace UnitTests
                         //I("a.traceprint();");
 
                         Trace2 trace2 = null;
-                        if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0];
-                        else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0];
+                        if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0];
+                        else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0];
                         if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
                         else Assert.AreEqual("Work:x!a[d]", trace2.contents.bankAndVarnameWithFreq);
                         Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
@@ -14252,15 +14251,15 @@ namespace UnitTests
                 txt = "x[a] = 2, 3, 4;";
             }            
 
-            string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text;
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
-            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text = "Testing-123";
-            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
-            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text = temp;
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].contents.text);
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.precedents[0].precedents[0].contents.text);
+            string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "Testing-123";
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = temp;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
         }
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
@@ -14287,10 +14286,10 @@ namespace UnitTests
             {
                 if (m.s == null) Assert.IsTrue(trace.contents == null);
                 else Assert.AreEqual(trace.contents.text, m.s);
-                Assert.AreEqual(trace.precedents.Count(), m.m.Count);
-                for (int i = 0; i < trace.precedents.Count(); i++)
+                Assert.AreEqual(trace.GetPrecedents_BewareOnlyInternalUse().Count(), m.m.Count);
+                for (int i = 0; i < trace.GetPrecedents_BewareOnlyInternalUse().Count(); i++)
                 {
-                    Helper_WalkTrace(trace.precedents[i], m.m[i], depth + 1);
+                    Helper_WalkTrace(trace.GetPrecedents_BewareOnlyInternalUse()[i], m.m[i], depth + 1);
                 }
             }
         }

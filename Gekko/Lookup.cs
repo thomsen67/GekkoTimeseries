@@ -1721,10 +1721,10 @@ namespace Gekko
                                 {
                                     continue;  //do not point to your own trace!
                                 }
-                                if (iv_ts.meta.trace2.precedents.Count() > 0)
+                                if (iv_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
                                 {
                                     int counter2 = -1;
-                                    foreach (Trace2 kvp in iv_ts.meta.trace2.precedents.GetStorage())
+                                    foreach (Trace2 kvp in iv_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                                     {
                                         Trace2 childTrace2 = kvp;
                                         bool known = false;
@@ -1749,7 +1749,7 @@ namespace Gekko
                             }
                             if (temp.Count > 0)
                             {
-                                trace.precedents.SetStorage(temp);  //keep it null if no children                            
+                                trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(temp);  //keep it null if no children                            
                             }
                         }
                         Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);

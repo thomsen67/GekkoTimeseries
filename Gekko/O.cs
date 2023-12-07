@@ -7335,7 +7335,7 @@ namespace Gekko
                         newTrace.contents.text = this.gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
-                        newTrace.precedents.AddRange(rhs.meta.trace2.precedents);
+                        newTrace.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
                         Gekko.Trace2.PushIntoSeries(lhs, newTrace, ETracePushType.NewParent);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
@@ -7399,7 +7399,7 @@ namespace Gekko
                             Series ts_rhs = iv as Series;
                             if (ts_rhs != null)
                             {
-                                newTrace.precedents.AddRange(ts_rhs.meta.trace2.precedents);
+                                newTrace.GetPrecedents_BewareOnlyInternalUse().AddRange(ts_rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
                                 counter++;
                             }
                         }
