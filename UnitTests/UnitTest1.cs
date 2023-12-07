@@ -13377,7 +13377,7 @@ namespace UnitTests
             I("x3 <2022 2024> = 300;");
             I("x = x1 + x2 + x3;");
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            List<TraceAndPeriods> m = x.meta.trace2.precedents[0].GetRealPrecedents();
+            List<TraceAndPeriods> m = x.meta.trace2.precedents[0].GetPrecedentsAndShadowedPeriods();
             //
             Assert.AreEqual(12, m.Count);
             int i = 0;
@@ -13454,9 +13454,9 @@ namespace UnitTests
 
             if (false)
             {
-                Assert.AreEqual(2, x1.meta.trace2.GetRealPrecedents().Count());
-                Assert.AreEqual(2, x1.meta.trace2.GetRealPrecedents()[0].periods.Count()); //chopped up
-                Assert.AreEqual(1, x1.meta.trace2.GetRealPrecedents()[1].periods.Count()); //not chopped up                
+                Assert.AreEqual(2, x1.meta.trace2.GetPrecedentsAndShadowedPeriods().Count());
+                Assert.AreEqual(2, x1.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count()); //chopped up
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].periods.Count()); //not chopped up                
             }
 
             Assert.AreEqual(2, x1.meta.trace2.precedents.Count());

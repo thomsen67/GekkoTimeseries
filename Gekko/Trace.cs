@@ -192,7 +192,7 @@ namespace Gekko
             else new Error("Trace period problem");
         }
 
-        public List<TraceAndPeriods> GetRealPrecedents()
+        public List<TraceAndPeriods> GetPrecedentsAndShadowedPeriods()
         {
             //Remove the if below at some point, just for sanity now
             if (this.precedents[0] == null || this.precedents[this.precedents.Count() - 1] == null) new Error("Unexpected");

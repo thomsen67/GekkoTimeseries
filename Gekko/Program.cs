@@ -16272,11 +16272,10 @@ namespace Gekko
             for (int i = 0; i < ts.dimensions; i++)
             {
                 string domain = null;
-                try
+                if (ts?.meta?.domains != null)
                 {
-                    domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
+                    if (i >= 0 && i < domains.Count) domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
                 }
-                catch { };
                 if (domain == "*") domain = null;
                 if (domain != null) domain = domain + ", ";
                 temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
