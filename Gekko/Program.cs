@@ -1994,7 +1994,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 GekkoTimeSpanSimple span1 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2002, 1), new GekkoTime(EFreq.A, 2008, 1));
                 GekkoTimeSpanSimple span2 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2005, 1), new GekkoTime(EFreq.A, 2005, 1));

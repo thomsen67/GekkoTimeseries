@@ -2111,14 +2111,14 @@ namespace Gekko
 
     [ProtoContract]
     /// <summary>
-    /// For use with Trace
+    /// For use with Trace. Like GekkoTime it is immutable.
     /// </summary>
     public class GekkoTimeSpanSimple
     {
         [ProtoMember(1)]
-        public GekkoTime t1;
+        public readonly GekkoTime t1;
         [ProtoMember(2)]
-        public GekkoTime t2;
+        public readonly GekkoTime t2;
 
         public GekkoTimeSpanSimple()
         {
