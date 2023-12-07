@@ -13946,7 +13946,7 @@ namespace UnitTests
                 try
                 {
                     //
-                    // TODO: do an equivalent array-series version. Consider to unfold sum(#i, ...) or at least report #i values.
+                    // TODO: Consider to unfold sum(#i, ...) or at least report #i values.
                     //
 
                     for (int i = 0; i< 2; i++)  //0:normal series // 1:array-series. 
@@ -14070,9 +14070,19 @@ namespace UnitTests
                             //invisible, that is series objects = 4.
                             Assert.AreEqual(4, th1.seriesObjectCount);
                             //invisible = 4 (series objects), real traces = 5, total = 9.
-                            Assert.AreEqual(9, th1.tracesDepth2.Count);
-                            //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
-                            Assert.AreEqual(19, th1.unittestTraceCountIncludeInvisible);
+                            if (true)
+                            {
+                                Assert.AreEqual(10, th1.tracesDepth2.Count); //We get 10 not 9 because traces are not compacted first.
+                                //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits. We get 23 not 19 because traces are not compacted first.
+                                Assert.AreEqual(23, th1.unittestTraceCountIncludeInvisible);
+                            }
+                            else
+                            {
+                                //If traces were compacted first, we would get this;
+                                Assert.AreEqual(9, th1.tracesDepth2.Count);
+                                //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
+                                Assert.AreEqual(19, th1.unittestTraceCountIncludeInvisible);
+                            }
                         }
                         finally
                         {
@@ -14123,8 +14133,17 @@ namespace UnitTests
                             Globals.traceWalkAllCombinations = true;
                             TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                             Assert.AreEqual(4, th2.seriesObjectCount);
-                            Assert.AreEqual(9, th2.tracesDepth2.Count);
-                            Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
+                            if (true)
+                            {
+                                Assert.AreEqual(10, th2.tracesDepth2.Count);
+                                Assert.AreEqual(23, th2.unittestTraceCountIncludeInvisible);
+                            }
+                            else
+                            {
+                                //If traces were compacted first, we would get this. See also above.
+                                Assert.AreEqual(9, th2.tracesDepth2.Count);
+                                Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
+                            }
                         }
                         finally
                         {                            
@@ -14286,10 +14305,31 @@ namespace UnitTests
             {
                 if (m.s == null) Assert.IsTrue(trace.contents == null);
                 else Assert.AreEqual(trace.contents.text, m.s);
+                List<TraceAndPeriods> temp = trace.GetPrecedentsAndShadowedPeriods();
+                Assert.AreEqual(temp.Count, m.m.Count);                
+                for (int i = 0; i < temp.Count; i++)
+                {
+                    Trace2 traceTemp = null;
+                    if (temp[i] != null) traceTemp = temp[i].trace;
+                    Helper_WalkTrace(traceTemp, m.m[i], depth + 1);
+                }
+            }
+        }
+
+        public static void Helper_WalkTraceNoShadow(Trace2 trace, String2 m, int depth)
+        {
+            if (trace == null)
+            {
+                Assert.IsNull(m);
+            }
+            else
+            {
+                if (m.s == null) Assert.IsTrue(trace.contents == null);
+                else Assert.AreEqual(trace.contents.text, m.s);
                 Assert.AreEqual(trace.GetPrecedents_BewareOnlyInternalUse().Count(), m.m.Count);
                 for (int i = 0; i < trace.GetPrecedents_BewareOnlyInternalUse().Count(); i++)
                 {
-                    Helper_WalkTrace(trace.GetPrecedents_BewareOnlyInternalUse()[i], m.m[i], depth + 1);
+                    Helper_WalkTraceNoShadow(trace.GetPrecedents_BewareOnlyInternalUse()[i], m.m[i], depth + 1);
                 }
             }
         }

@@ -2127,20 +2127,17 @@ namespace Gekko
 
         public GekkoTimeSpanSimple(GekkoTime t1, GekkoTime t2)
         {
-            if (t1.StrictlyLargerThan(t2)) new Error("Time span problem");
-            if (t1.IsNull() || t2.IsNull()) new Error("Time span problem");  //use the other constructor
+            if (t1.IsNull() && IsNull())
+            {
+                //ok, signifies no period(s)
+            }
+            else
+            {
+                if (t1.StrictlyLargerThan(t2)) new Error("Time span problem");
+                if (t1.IsNull() || t2.IsNull()) new Error("Time span problem");
+            }
             this.t1 = t1;
             this.t2 = t2;
-        }
-
-        public GekkoTimeSpanSimple(bool isNullTime)
-        {
-            if (isNullTime)
-            {
-                this.t1 = GekkoTime.tNull;
-                this.t2 = GekkoTime.tNull;
-            }
-            else new Error("GekkoTimeSpanSimple problem");
         }
 
         public bool IsNull()
