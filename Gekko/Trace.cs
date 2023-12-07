@@ -194,37 +194,55 @@ namespace Gekko
 
         public List<TraceAndPeriods> GetRealPrecedents()
         {
-            int THREE = 3;
+            int THREE = 0;
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
             List<TraceAndPeriods> deleted = new List<TraceAndPeriods>();  //use these to mark objects for deletion
             int varCounter = 0;  //0-based
             List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first
             int counter = -1;
+            int counter2 = -1;
             for (int i = this.precedents.Count() - 1 - THREE; i >= 0; i--)
             {
-                counter++;
-                bool isFirstI = false;                 
-                if (i == this.precedents.Count() - 1 - THREE) isFirstI = true;
+                counter++; counter2++;                
                 Trace2 traceNew = this.precedents[i];
                 if (i == 0 || traceNew == null)
                 {
-                    //also go here if i == 1
-                    //pack it up
+                    for (int k = 0; k < spansList.Count; k++)
+                    {
+                        int k2 = counter - k + i;
+                        TraceAndPeriods tap = new TraceAndPeriods();
+                        tap.trace = this.precedents[k2];
+                        //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
+                        tap.periods = spansList[k];
+                        rv.Add(tap);
+                    }
+                    if (i > 0) rv.Add(null); //divider
+                    counter2 = -1;
+                    spansList.Clear();
+
+                    //TraceAndPeriods tap = new TraceAndPeriods();
+                    //tap.trace = traceNew;
+                    ////The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
+                    //tap.periods = new Periods();
+                    //tap.periods.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                    //rv.Add(tap);
                     continue;
                 }
-                if (isFirstI)
+                if (counter2 == 0)
                 {
                     //To get the first one going. Actually not important, but oh well.
                     List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
                     tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
                     spansList.Add(tmp);
-                }                
-                
+                }
+
+                int counter3 = -1;
                 for (int j = i - 1; j >= 0; j--)
                 {
-                    //int ii = i - j + 1;  //starts as 2
+                    counter3++;
+                    int ii = i - j + 1 + counter2 - 1;  //starts as 2
                     //int ii = this.precedents.Count() - i;  //starts as 2
-                    int ii = counter + 1 - (j - (i - 1));
+                    //int ii = counter + 1 - (j - (i - 1));
 
                     Trace2 traceOld = this.precedents[j];
                     if (traceOld == null)
@@ -233,7 +251,7 @@ namespace Gekko
                         break;
                     }
 
-                    if (isFirstI)
+                    if (counter2 == 0)
                     {
                         List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
                         spansList.Add(spans);
@@ -257,6 +275,7 @@ namespace Gekko
                     //rv.Add(tap);
                 }                
             }
+            rv.Reverse();
             return rv;
         }
 
@@ -1207,6 +1226,6 @@ namespace Gekko
     public class TraceAndPeriods
     {
         public Trace2 trace = null;
-        public Periods periods = null;  //is basically a List<GekkoTimeSpanSimple>
+        public List<GekkoTimeSpanSimple> periods = null;
     }
 }
