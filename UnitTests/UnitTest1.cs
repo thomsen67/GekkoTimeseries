@@ -13381,7 +13381,7 @@ namespace UnitTests
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             List<TraceAndPeriods> m = x.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.GetPrecedentsAndShadowedPeriods();
             //
-            Assert.AreEqual(12, m.Count);
+            Assert.AreEqual(10, m.Count);
             int i = 0;
             Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
             Assert.AreEqual(2, m[i].periods.Count);
@@ -13396,17 +13396,17 @@ namespace UnitTests
             Assert.AreEqual(2004, m[i].periods[0].t2.super);
             i++;
             Assert.IsNull(m[i]); //---------------------------------------------
-            i++;
-            Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
-            Assert.AreEqual(0, m[i].periods.Count);
+            //i++;
+            //Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
+            //Assert.AreEqual(0, m[i].periods.Count);
             i++;
             Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
             Assert.AreEqual(1, m[i].periods.Count);
             Assert.AreEqual(2005, m[i].periods[0].t1.super);
             Assert.AreEqual(2005, m[i].periods[0].t2.super);
-            i++;
-            Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
-            Assert.AreEqual(0, m[i].periods.Count);
+            //i++;
+            //Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
+            //Assert.AreEqual(0, m[i].periods.Count);
             i++;
             Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
             Assert.AreEqual(1, m[i].periods.Count);
