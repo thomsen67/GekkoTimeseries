@@ -13443,8 +13443,6 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePeriodsShadowing()
         {
-            Trace2 trace1, trace11, trace2, trace21, trace3;
-
             // ========== Combination
 
             I("reset; time 2001 2003;");
@@ -13485,7 +13483,6 @@ namespace UnitTests
             I("x <2003 2003> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = y.meta.trace2.precedents[0];
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13501,7 +13498,6 @@ namespace UnitTests
             I("x <2003 2004> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = y.meta.trace2.precedents[0];
 
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2005, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13517,7 +13513,6 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = y.meta.trace2.precedents[0];
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13626,7 +13621,6 @@ namespace UnitTests
             I("x[2005] = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = y.meta.trace2.precedents[0];
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13693,10 +13687,7 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            Assert.AreEqual("x <2004 2006> = 1;", trace1.contents.text);
+            Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
 
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2004, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13720,12 +13711,7 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace11 = y.meta.trace2.precedents[0].precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            Assert.AreEqual("read <2005 2006> trace2;", trace1.contents.text);
-
+            Assert.AreEqual("read <2005 2006> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
             Assert.AreEqual(2006, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t2.super);
@@ -13758,11 +13744,7 @@ namespace UnitTests
             I("read <merge> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(3, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            trace3 = y.meta.trace2.precedents[2];
+            Assert.AreEqual(3, y.meta.trace2.precedents.Count());            
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13799,11 +13781,6 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(3, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            trace21 = y.meta.trace2.precedents[1].precedents[0];
-            trace3 = y.meta.trace2.precedents[2];
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13853,10 +13830,7 @@ namespace UnitTests
             I("read <tsd> trace2;");
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-            Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
+            Assert.AreEqual(2, y.meta.trace2.precedents.Count());            
 
             Assert.AreEqual("read <tsd> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13880,9 +13854,6 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
 
             Assert.AreEqual("read <2005 2006 tsd> trace2;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13910,10 +13881,6 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(3, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            trace3 = y.meta.trace2.precedents[2];
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
@@ -13950,10 +13917,6 @@ namespace UnitTests
             I("x <2005 2005> = 2;");
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(3, y.meta.trace2.precedents.Count());
-            trace1 = null; trace11 = null; trace2 = null; trace21 = null; trace3 = null;
-            trace1 = y.meta.trace2.precedents[0];
-            trace2 = y.meta.trace2.precedents[1];
-            trace3 = y.meta.trace2.precedents[2];
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].trace.contents.text);
             Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
