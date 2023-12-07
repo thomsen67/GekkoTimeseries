@@ -64,12 +64,6 @@ namespace Gekko
         [ProtoMember(6)]
         public string dataFile = null;
 
-        /// <summary>
-        /// The "active" left-hand side periods for the current trace (that is, what the trace determines).
-        /// </summary>
-        [ProtoMember(7)]
-        public Periods periods = new Periods();
-
         public GekkoTime GetT1()
         {
             return this.t1;
@@ -89,20 +83,6 @@ namespace Gekko
             trace2.commandFileAndLine = this.commandFileAndLine;
             trace2.text = this.text;
             trace2.dataFile = this.dataFile;
-            trace2.periods = new Periods();
-
-            if (this.periods.Count() > 0)
-            {
-                trace2.periods.Initialize();
-                foreach (GekkoTimeSpanSimple gtss in this.periods.GetStorage())
-                {
-                    GekkoTimeSpanSimple temp = new GekkoTimeSpanSimple(); //We use this constructor because .t1 and .t2 may or may not be null.
-                    temp.t1 = gtss.t1;
-                    temp.t2 = gtss.t2;
-                    trace2.periods.Add(temp);
-                }
-            }
-
             return trace2;
         }
 
@@ -115,11 +95,6 @@ namespace Gekko
         {
             this.t1 = t1;
             this.t2 = t2;
-            if (!this.t1.IsNull() && !this.t2.IsNull())
-            {
-                this.periods = new Periods();
-                this.periods.Add(new GekkoTimeSpanSimple(this.t1, this.t2));
-            }
         }
 
         public TraceContents(bool isNullTime)
@@ -128,8 +103,6 @@ namespace Gekko
             {
                 this.t1 = GekkoTime.tNull;
                 this.t2 = GekkoTime.tNull;
-                this.periods = new Periods();
-                this.periods.Add(new GekkoTimeSpanSimple(isNullTime));
             }
             else new Error("TraceContents time error");
         }
@@ -360,23 +333,7 @@ namespace Gekko
         //        }
         //    }            
         //    if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
-        //}
-
-        /// <summary>
-        /// Pretty print periods
-        /// </summary>
-        /// <returns></returns>
-        public string PeriodsToStringPretty()
-        {
-            string s = null;
-            if (this.contents.periods.Count() > 0)
-            {
-                //s += "";
-                foreach (GekkoTimeSpanSimple gtss in this.contents.periods.GetStorage()) s += gtss.t1 + "-" + gtss.t2 + ", ";
-            }
-            if (s != null && s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
-            return s;
-        }
+        //}        
 
         public string PrintStamp()
         {
@@ -406,12 +363,7 @@ namespace Gekko
                 string period = this.contents.GetT1() + "-" + this.contents.GetT2();
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
-                s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;
-                string active = this.PeriodsToStringPretty();
-                if (!G.Equal(period, active))
-                {
-                    s2 += " (active:" + active + ")";
-                }
+                s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;                
                 s2 += ", " + this.id.stamp.ToString("dd-MM-yyyy HH:mm:ss");
             }
             else
@@ -419,8 +371,7 @@ namespace Gekko
                 s2 += "" + this.contents.GetT1() + "-" + this.contents.GetT2() + "";
                 s2 += " --> ";
                 s1 += this.contents.text;
-                s2 += "          ";
-                s2 += " || " + this.PeriodsToStringPretty();
+                s2 += "          ";                
                 if (this.contents.bankAndVarnameWithFreq != null) s2 += " || lhs=" + this.contents.bankAndVarnameWithFreq;
                 if (this.contents.dataFile != null) s2 += " || data=" + this.contents.dataFile;
                 if (this.contents.commandFileAndLine != null) s2 += " || gcm=" + this.contents.commandFileAndLine;
@@ -441,7 +392,6 @@ namespace Gekko
             // !!! In the longer run, these IF's can be removed
             // !!!            
             if (trace.contents.text == null) new Error("Trace problem");
-            if (trace.PeriodsToStringPretty() == null) new Error("Trace problem");
 
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);
             if (type == ETracePushType.NewParent)
@@ -457,83 +407,83 @@ namespace Gekko
             else new Error("Trace");
         }
 
-        private static void TraceShadowing(Series ts, Trace2 trace)
-        {
-            if (false && ts.meta.trace2.precedents.Count() > 0)
-            {
-                if (ts.meta.trace2.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
+        //private static void TraceShadowing(Series ts, Trace2 trace)
+        //{
+        //    if (false && ts.meta.trace2.precedents.Count() > 0)
+        //    {
+        //        if (ts.meta.trace2.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
 
-                if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
-                GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
+        //        if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
+        //        GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
 
-                if (!thsSpan.IsNull()) //if null --> cannot shadow anything
-                {
-                    List<Trace2> siblingsToRemove = new List<Trace2>();
+        //        if (!thsSpan.IsNull()) //if null --> cannot shadow anything
+        //        {
+        //            List<Trace2> siblingsToRemove = new List<Trace2>();
 
-                    foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-                    {
-                        //
-                        // Beware that such a sibling may be used (pointed to) from other traces.
-                        // Therefore when period shadowing, be careful about changing the sibling
-                        // active periods.
-                        //
-                        // reset; option databank trace = yes;
-                        // x1 <2001 2003> = 1;
-                        // x2 <2001 2003> = x1 + 2;
-                        // x1 <2002 2002> = 3;
-                        // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
-                        //
+        //            foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
+        //            {
+        //                //
+        //                // Beware that such a sibling may be used (pointed to) from other traces.
+        //                // Therefore when period shadowing, be careful about changing the sibling
+        //                // active periods.
+        //                //
+        //                // reset; option databank trace = yes;
+        //                // x1 <2001 2003> = 1;
+        //                // x2 <2001 2003> = x1 + 2;
+        //                // x1 <2002 2002> = 3;
+        //                // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
+        //                //
 
-                        //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
-                        //So the siblings all belong to the same timeseries, and therefore it is ok
-                        //to remove periods.
-                        //trace is the new trace that is going to be added    
+        //                //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
+        //                //So the siblings all belong to the same timeseries, and therefore it is ok
+        //                //to remove periods.
+        //                //trace is the new trace that is going to be added    
 
-                        if (sibling.contents.periods.Count() > 0)
-                        {
-                            List<GekkoTimeSpanSimple> newPeriods = new List<GekkoTimeSpanSimple>();
-                            foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
-                            {
-                                //TimeShadow(thsSpan, siblingSpan, newPeriods);
-                            }
-                            if (newPeriods.Count() == 0)
-                            {
-                                siblingsToRemove.Add(sibling);
-                            }
-                            sibling.contents.periods.SetStorage(newPeriods);
-                        }
-                    }
-                    if (siblingsToRemove.Count > 0)
-                    {
-                        List<Trace2> tempTrace = new List<Trace2>();
-                        foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-                        {
-                            if (sibling == null)
-                            {
-                                if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
-                                {
-                                    //do nothing, we do not want two nulls 
-                                }
-                                else
-                                {
-                                    tempTrace.Add(null);
-                                }
-                            }
-                            else
-                            {
-                                if (!siblingsToRemove.Contains(sibling))
-                                {
-                                    tempTrace.Add(sibling);
-                                }
-                            }
-                        }
-                        if (tempTrace.Count == 0) tempTrace = null;
+        //                if (sibling.contents.periods.Count() > 0)
+        //                {
+        //                    List<GekkoTimeSpanSimple> newPeriods = new List<GekkoTimeSpanSimple>();
+        //                    foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
+        //                    {
+        //                        //TimeShadow(thsSpan, siblingSpan, newPeriods);
+        //                    }
+        //                    if (newPeriods.Count() == 0)
+        //                    {
+        //                        siblingsToRemove.Add(sibling);
+        //                    }
+        //                    sibling.contents.periods.SetStorage(newPeriods);
+        //                }
+        //            }
+        //            if (siblingsToRemove.Count > 0)
+        //            {
+        //                List<Trace2> tempTrace = new List<Trace2>();
+        //                foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
+        //                {
+        //                    if (sibling == null)
+        //                    {
+        //                        if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
+        //                        {
+        //                            //do nothing, we do not want two nulls 
+        //                        }
+        //                        else
+        //                        {
+        //                            tempTrace.Add(null);
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        if (!siblingsToRemove.Contains(sibling))
+        //                        {
+        //                            tempTrace.Add(sibling);
+        //                        }
+        //                    }
+        //                }
+        //                if (tempTrace.Count == 0) tempTrace = null;
 
-                        ts.meta.trace2.precedents.SetStorage(tempTrace);
-                    }
-                }
-            }
-        }
+        //                ts.meta.trace2.precedents.SetStorage(tempTrace);
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// For the newSpan, it removes these periods from the oldSpan. Returns a list of GekkoTimeSpanSimple with 0, 1 or 2 elements.
@@ -754,7 +704,6 @@ namespace Gekko
                         G.Writeln();
                         G.Writeln("Trace:     " + trace.contents.text);
                         G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
-                        G.Writeln("Active:    " + trace.PeriodsToStringPretty());
                         if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
                         if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
                         if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
@@ -816,25 +765,11 @@ namespace Gekko
                 //{
                 //}
                 code = this.contents.text;
-                int count = this.contents.periods.Count();
-                if (count == 0) period = "";
                 GekkoTime t1 = this.contents.GetT1();
                 GekkoTime t2 = this.contents.GetT2();
                 if (t1.IsNull() && t2.IsNull()) period = "<>";
                 else period = "<" + t1.ToString() + " " + t2.ToString() + ">";
-                int counter = 0;
-                string p = this.PeriodsToStringPretty();
-                if (p != null) period += " --> " + p;   
-                else
-                {
-                    //
-                    //
-                    //
-                    //new Error("Trace null period");
-                    //
-                    //
-                    //
-                }
+                int counter = 0;                                
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
                 stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + " (#" + this.id.counter + ")";

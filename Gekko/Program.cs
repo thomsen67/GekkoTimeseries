@@ -1985,7 +1985,7 @@ namespace Gekko
                     + "  (IL offset: 0x" + frame.GetILOffset().ToString("x") + ")\n" + stackTrace;
             }
             return stackTrace;
-        }
+        }        
 
         /// <summary>
         /// TELL command.
@@ -1994,7 +1994,6 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-
             if (true && Globals.runningOnTTComputer)
             {
                 GekkoTimeSpanSimple span1 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2002, 1), new GekkoTime(EFreq.A, 2008, 1));
