@@ -194,6 +194,15 @@ namespace Gekko
             {                
                 counterI++;                
                 Trace2 traceNew = this.precedents[i];
+
+                if (counterI == 0)
+                {
+                    //To get the first one going.
+                    List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
+                    tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                    spansList.Add(tmp);
+                }
+
                 if (i == 0 || traceNew == null)
                 {
                     for (int k = 0; k < spansList.Count; k++)
@@ -208,14 +217,7 @@ namespace Gekko
                     counterI = -1;
                     spansList.Clear();
                     continue;
-                }
-                if (counterI == 0)
-                {
-                    //To get the first one going.
-                    List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
-                    tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
-                    spansList.Add(tmp);
-                }
+                }               
 
                 int counterJ = -1;
                 for (int j = i - 1; j >= 0; j--)
