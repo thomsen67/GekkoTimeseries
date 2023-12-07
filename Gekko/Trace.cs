@@ -209,7 +209,8 @@ namespace Gekko
                 {
                     for (int k = 0; k < spansList.Count; k++)
                     {
-                        int k2 = counter - k + i;
+                        //int k2 = counter - k + i;
+                        int k2 = this.precedents.Count() - rv.Count - 1;
                         TraceAndPeriods tap = new TraceAndPeriods();
                         tap.trace = this.precedents[k2];
                         //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.

@@ -13343,7 +13343,7 @@ namespace UnitTests
         {
             I("reset;");
             I("option databank trace = yes; time 2001 2005;");
-            I("x1 = 1;");
+            I("x1 <2001 2005> = 1;");
             I("x1 <2002 2004> = 100;");
             
             I("x2 <2002 2008> = 1;");
@@ -13353,8 +13353,8 @@ namespace UnitTests
             I("x2 <2001 2004> = 5;");
             I("x2 <2003 2003> = 6;");
 
-            I("x3 = 3;");
-            I("x3 <2002 2004> = 300;");
+            I("x3 <2021 2025> = 3;");
+            I("x3 <2022 2024> = 300;");
             I("x = x1 + x2 + x3;");
             Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             List<TraceAndPeriods> m = x.meta.trace2.precedents[0].GetRealPrecedents();
