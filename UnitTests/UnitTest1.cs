@@ -13976,7 +13976,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceBasics()
+        public void _Test_TraceBasics() 
         {
             double csize = Globals.cacheSize2;
             if (true)
