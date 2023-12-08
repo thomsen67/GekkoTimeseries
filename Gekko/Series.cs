@@ -3050,8 +3050,8 @@ namespace Gekko
         [ProtoMember(12)]
         public TraceID2 traceID2 = null; //traceID2 because it is experimental
 
-        //[ProtoMember(13)] reserved for .trace
-        //[ProtoMember(14)] reserved for .traceId
+        //[ProtoMember(13)] reserved for .trace when it arrives!!!
+        //[ProtoMember(14)] reserved for .traceId when it arrives!!!
 
         [ProtoMember(7)]
         public string[] domains = null;

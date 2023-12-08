@@ -40,45 +40,31 @@ namespace Gekko
     [ProtoContract]
     public class TraceContents
     {
+        /// <summary>
+        /// An extra char in this .text will take up 2 bytes or 16 bits.
+        /// </summary>
         [ProtoMember(1)]
-        private GekkoTime t1 = GekkoTime.tNull;
+        public string text = null;
 
         [ProtoMember(2)]
-        private GekkoTime t2 = GekkoTime.tNull;
+        public GekkoTimeSpanSimple span = null;
 
         [ProtoMember(3)]
         public string bankAndVarnameWithFreq = null;
 
         [ProtoMember(4)]
         public string commandFileAndLine = null;
-
-        /// <summary>
-        /// An extra char in this .text will take up 2 bytes or 16 bits.
-        /// </summary>
-        [ProtoMember(5)]
-        public string text = null;
-
+                
         /// <summary>
         /// For instance the file from where data was imported. Will often be null.
         /// </summary>
-        [ProtoMember(6)]
+        [ProtoMember(5)]
         public string dataFile = null;
-
-        public GekkoTime GetT1()
-        {
-            return this.t1;
-        }
-
-        public GekkoTime GetT2()
-        {
-            return this.t2;
-        }
 
         public TraceContents DeepClone()
         {
             TraceContents trace2 = new TraceContents();
-            trace2.t1 = this.t1;
-            trace2.t2 = this.t2;
+            trace2.span = this.span;  //it is immutable
             trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
             trace2.commandFileAndLine = this.commandFileAndLine;
             trace2.text = this.text;
@@ -93,16 +79,14 @@ namespace Gekko
 
         public TraceContents(GekkoTime t1, GekkoTime t2)
         {
-            this.t1 = t1;
-            this.t2 = t2;
+            this.span = new GekkoTimeSpanSimple(t1, t2);
         }
 
         public TraceContents(bool isNullTime)
         {
             if (isNullTime)
             {
-                this.t1 = GekkoTime.tNull;
-                this.t2 = GekkoTime.tNull;
+                this.span = new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull);
             }
             else new Error("TraceContents time error");
         }
@@ -151,8 +135,7 @@ namespace Gekko
         /// <param name="t2"></param>
         public Trace2(GekkoTime t1, GekkoTime t2)
         {
-            if (t1.IsNull() || t2.IsNull()) 
-                new Error("Trace time error");
+            if (t1.IsNull() || t2.IsNull()) new Error("Trace time error");
             this.contents = new TraceContents(t1, t2);            
         }
 
@@ -203,7 +186,7 @@ namespace Gekko
                     {
                         //To get the first one going.
                         List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
-                        tmp.Add(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()));
+                        tmp.Add(traceNew.contents.span);
                         spansList.Add(tmp);
                     }
 
@@ -239,7 +222,7 @@ namespace Gekko
 
                         if (counterI == 0)
                         {
-                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), new GekkoTimeSpanSimple(traceOld.contents.GetT1(), traceOld.contents.GetT2()));
+                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(traceNew.contents.span, traceOld.contents.span);
                             spansList.Add(spans);
                         }
                         else
@@ -248,7 +231,7 @@ namespace Gekko
                             List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
                             foreach (GekkoTimeSpanSimple spanTemp in spansList[k2])
                             {
-                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(new GekkoTimeSpanSimple(traceNew.contents.GetT1(), traceNew.contents.GetT2()), spanTemp);
+                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(traceNew.contents.span, spanTemp);
                                 newList.AddRange(spans);
                             }
                             spansList[k2] = newList;
@@ -277,7 +260,7 @@ namespace Gekko
         {
             string s = null;
             if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
-            else s = this.contents.GetT1() + "-" + this.contents.GetT2() + ": " + this.contents.text;
+            else s = this.contents.span.t1 + "-" + this.contents.span.t2 + ": " + this.contents.text;
             return s;
         }        
 
@@ -392,7 +375,7 @@ namespace Gekko
             if (!unfold)
             {
                 s1 = this.contents.text;
-                string period = this.contents.GetT1() + "-" + this.contents.GetT2();
+                string period = this.contents.span.t1 + "-" + this.contents.span.t2;
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
                 s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;                
@@ -400,7 +383,7 @@ namespace Gekko
             }
             else
             {
-                s2 += "" + this.contents.GetT1() + "-" + this.contents.GetT2() + "";
+                s2 += "" + this.contents.span.t1 + "-" + this.contents.span.t2 + "";
                 s2 += " --> ";
                 s1 += this.contents.text;
                 s2 += "          ";                
@@ -742,7 +725,7 @@ namespace Gekko
                     {
                         G.Writeln();
                         G.Writeln("Trace:     " + trace.contents.text);
-                        G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
+                        G.Writeln("Period:    " + trace.contents.span.t1 + "-" + trace.contents.span.t2 + "");
                         if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
                         if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
                         if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
@@ -804,8 +787,8 @@ namespace Gekko
                 //{
                 //}
                 code = this.contents.text;
-                GekkoTime t1 = this.contents.GetT1();
-                GekkoTime t2 = this.contents.GetT2();
+                GekkoTime t1 = this.contents.span.t1;
+                GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "<>";
                 else period = "<" + t1.ToString() + " " + t2.ToString() + ">";
                 int counter = 0;                                
@@ -859,7 +842,7 @@ namespace Gekko
             //            {
             //                G.Writeln();
             //                G.Writeln("Trace:     " + trace.contents.text);
-            //                G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.GetT2() + "");
+            //                G.Writeln("Period:    " + trace.contents.GetT1() + "-" + trace.contents.span.t2 + "");
             //                G.Writeln("Active:    " + trace.PrintPeriods());
             //                if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
             //                if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);

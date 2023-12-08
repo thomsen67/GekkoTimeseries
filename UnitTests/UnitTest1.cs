@@ -12873,8 +12873,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("y = 2;", tracec.text);
                 else Assert.AreEqual("y[a] = 2;", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -12908,8 +12908,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("collapse y!a = x1;", tracec.text);
                 else Assert.AreEqual("collapse y!a[a] = x1[a];", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.A, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.A, 2002, 1), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.A, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.A, 2002, 1), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -12928,8 +12928,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
                     Assert.AreEqual("copy <2001q2 2002q3> x1 to y;", tracec.text);
-                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.GetT1());
-                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.GetT2());
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.span.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.span.t2);
                     //We skip testing of periods here
                 }
 
@@ -12948,8 +12948,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
                     Assert.AreEqual("copy x1 to y;", tracec.text);
-                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                     //We skip testing of periods here
                 }
                 //====================================================
@@ -12971,8 +12971,8 @@ namespace UnitTests
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                 Assert.AreEqual("statbank0.json", tracec.dataFile);
                 Assert.AreEqual("download " + a + "'https://api.statbank.dk/v1/data' statbank0.json;", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.M, 2012, 4), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13004,8 +13004,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("interpolate y!m = x1;", tracec.text);
                 else Assert.AreEqual("interpolate y!m[a] = x1!q[a];", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.M, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.M, 2002, 12), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.M, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.M, 2002, 12), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13040,8 +13040,8 @@ namespace UnitTests
                 }
                 if (i == 0) Assert.AreEqual("y = 2;", tracec.text);
                 else Assert.AreEqual("y[a] = 2;", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13071,8 +13071,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("rebase y 2001q4;", tracec.text);
                 else Assert.AreEqual("rebase y[a] 2001q4;", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13090,8 +13090,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
                     Assert.AreEqual("rename x1 as y;", tracec.text);
-                    Assert.AreEqual(GekkoTime.tNull, tracec.GetT1());
-                    Assert.AreEqual(GekkoTime.tNull, tracec.GetT2());
+                    Assert.AreEqual(GekkoTime.tNull, tracec.span.t1);
+                    Assert.AreEqual(GekkoTime.tNull, tracec.span.t2);
                     //We skip testing of periods here
                 }
 
@@ -13118,8 +13118,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", trace1.contents.commandFileAndLine);
                     Assert.AreEqual(null, trace1.contents.dataFile);
                     Assert.AreEqual("enl <80 2020> = 12345;", trace1.contents.text);
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 1980, 1, 1), trace1.contents.GetT1());
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2020, 1, 1), trace1.contents.GetT2());
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 1980, 1, 1), trace1.contents.span.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2020, 1, 1), trace1.contents.span.t2);
 
                     Assert.AreEqual(2, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods.Count);
                     Assert.AreEqual(1980, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[0].periods[0].t1.super);
@@ -13132,8 +13132,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", trace2.contents.commandFileAndLine);
                     Assert.AreEqual(null, trace2.contents.dataFile);
                     Assert.AreEqual("Solve (sim) jul05.frm, hash = rtamRJATOLALMm8du5T6Ug", trace2.contents.text);
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace2.contents.GetT1());
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace2.contents.GetT2());                    
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace2.contents.span.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace2.contents.span.t2);                    
                     Assert.AreEqual(1, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].periods.Count);
                     Assert.AreEqual(2006, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].periods[0].t1.super);
                     Assert.AreEqual(2010, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[1].periods[0].t2.super);
@@ -13168,8 +13168,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("smooth y = x1;", tracec.text);
                 else Assert.AreEqual("smooth y[a] = x1[a];", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13200,8 +13200,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("truncate <2001q2 2002q3> y;", tracec.text);
                 else Assert.AreEqual("truncate <2001q2 2002q3> y[a];", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 3), tracec.span.t2);
                 //We skip testing of periods here
 
                 //====================================================
@@ -13233,8 +13233,8 @@ namespace UnitTests
                 Assert.AreEqual(null, tracec.dataFile);
                 if (i == 0) Assert.AreEqual("splice y = x1 x2;", tracec.text);
                 else Assert.AreEqual("splice y[a] = x1[a] x2[a];", tracec.text);
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.GetT1());
-                Assert.AreEqual(new GekkoTime(EFreq.Q, 2003, 4), tracec.GetT2());
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2003, 4), tracec.span.t2);
                 //We skip testing of periods here
             }
         }
@@ -13444,7 +13444,6 @@ namespace UnitTests
         public void _Test_TracePeriodsShadowing()
         {
             // ========== Combination
-
             I("reset; time 2001 2003;");
             I("option databank trace = yes;");
             I("x1 <2001 2003> = 1;");
@@ -14109,8 +14108,8 @@ namespace UnitTests
                         if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.bankAndVarnameWithFreq);
                         else Assert.AreEqual("Work:x!a[d]", trace2.contents.bankAndVarnameWithFreq);
                         Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
-                        Assert.AreEqual(2021, trace2.contents.GetT1().super);
-                        Assert.AreEqual(2023, trace2.contents.GetT2().super);
+                        Assert.AreEqual(2021, trace2.contents.span.t1.super);
+                        Assert.AreEqual(2023, trace2.contents.span.t2.super);
                         if (i == 0) Assert.AreEqual("d = a + b + c;", trace2.contents.text);
                         else Assert.AreEqual("x[d] = x[a] + x[b] + x[c];", trace2.contents.text);
                         //.dataFile is not tested, since it is null here anyway
