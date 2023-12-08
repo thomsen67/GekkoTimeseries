@@ -540,7 +540,7 @@ namespace Gekko
                             //databank name not given, for instance "PRT x", or it is given as "PRT all:x"
                             //Searching only if:
                             //  (1) OPTION databank search = yes
-                            //  (2) settings.canSearch = true (deactivated for commands like DOC, TRUNCATE and others)
+                            //  (2) settings.canSearch = true (deactivated for statements like DOC, TRUNCATE and others)
                             //  (3) the name is not found in Local or Global databanks
                             //  (4) it is on the right-hand side (which is the case here)
                             //  With Program.options.databank_search == false, it will skip banks opened with OPEN (but search local/global)
@@ -869,7 +869,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    //DATE and VAL commands will fail
+                                    //DATE and VAL statements will fail
                                     ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
 
@@ -889,7 +889,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    //STRING and VAL commands will fail
+                                    //STRING and VAL statements will fail
                                     ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
 

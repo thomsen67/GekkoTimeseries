@@ -619,7 +619,7 @@ namespace Gekko.Parser.Gek
             //       ASTOPT_DATE_END
             //       ASTOPT_DATE_START
             //   
-            //The code below is to avoid a lot of repetitive coding regarding options to commands
+            //The code below is to avoid a lot of repetitive coding regarding options to statements
             //
             // !!! probably not much used anymore, after option code has been changed (also in ANTLR)
             //

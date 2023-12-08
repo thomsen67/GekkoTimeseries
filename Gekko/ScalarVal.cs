@@ -132,7 +132,7 @@ namespace Gekko
             using (Error txt = new Error())
             {
                 txt.MainAdd("You are trying to convert/use the value " + this.val + " as a string item in a list.");
-                txt.MainAdd("In list commands, you must for example use '5' instead of 5, and '01' instead of 01.");                
+                txt.MainAdd("In list statements, you must for example use '5' instead of 5, and '01' instead of 01.");                
                 txt.MainAdd("If you are using a value scalar %v, you may try to use string(%v) instead.");
             }
             return null;

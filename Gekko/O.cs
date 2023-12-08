@@ -9521,7 +9521,7 @@ namespace Gekko
                 //series or vals can be printed in one table. This includes array-series without indexers (these are unfolded).
                 //if all (including contents in lists) are series or vals (at least one series),
                 //print normally in columns
-                //else print them one by one separately like separate print commands.
+                //else print them one by one separately like separate print statements.
 
                 //We may have this: PRT {('a', 'b')} where a and b are array-series
                 //.labels2 will contain list('a', 'b'). The print could be:
@@ -10638,7 +10638,7 @@ namespace Gekko
                             w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
                             w.MoreAdd("Therefore, 'global:' is added to all such statements, so that these variables are ");
                             w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
-                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
+                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar statements.");
                             w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
                         }
                     }
@@ -10689,24 +10689,24 @@ namespace Gekko
                         if (Translator_AREMOS_Gekko30.globalBankCounter > 0)
                         {
                             w.MainNewLineTight();
-                            w.MainAdd("Note: The translator added " + Translator_AREMOS_Gekko30.globalBankCounter + " 'global:' bank indicators on the left-hand side of ASSIGN commands (cf. explanation).");
+                            w.MainAdd("Note: The translator added " + Translator_AREMOS_Gekko30.globalBankCounter + " 'global:' bank indicators on the left-hand side of ASSIGN statements (cf. explanation).");
 
                             w.MoreAdd("In Gekko 3.0 and above, vals, dates and strings all live in databanks.");
                             w.MoreAdd("Therefore, 'global:' is added to assign variables, so that these variables are ");
                             w.MoreAdd("put into the Global databank (for instance, 'assign x value 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
-                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
+                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar statements.");
                             w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
                         }
 
                         if (Translator_AREMOS_Gekko30.globalOpenCounter > 0)
                         {
                             w.MainNewLineTight();
-                            w.MainAdd("Note: There are OPEN commands in the translated file: consider OPEN <pos=2>, cf. explanation.");
+                            w.MainAdd("Note: There are OPEN statements in the translated file: consider OPEN <pos=2>, cf. explanation.");
 
                             w.MoreNewLine();
                             w.MoreAdd("Firstly, note that OPEN <prim> translates fine as OPEN <edit>. But normal OPEN in AREMOS opens the databank in position #2, whereas it is opened in last position in Gekko. ");
                             w.MoreAdd("Often, this is irrelevant, but in some cases the databank order may be important. ");
-                            w.MoreAdd("If in doubt, replace all normal OPEN commands with OPEN <pos=2>, but the translator prefers not ");
+                            w.MoreAdd("If in doubt, replace all normal OPEN statements with OPEN <pos=2>, but the translator prefers not ");
                             w.MoreAdd("to do this automatically, because it is seldom relevant.");
                         }
                     }

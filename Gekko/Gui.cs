@@ -1957,7 +1957,7 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.color = Color.Blue;
-                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
+                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension .gbk_gek2.");
                         txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
@@ -1999,7 +1999,7 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.color = Color.Blue;
-                        txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
+                        txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension ...._gek2.");
                         txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
@@ -2295,7 +2295,7 @@ namespace Gekko
                 //isAutoExec will only be true when both 1, 2 and 3 are finished. But worst case, the historyGekkoInputWindow
                 //links will just show up too soon in the output window. So worst case is not catastrophical.
 
-                //G.Writeln2("Restore commands from last session?  Raw   History   More    (23-02-2021 11:55)");
+                //G.Writeln2("Restore statements from last session?  Raw   History   More    (23-02-2021 11:55)");
 
                 string fileSnapshot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoSnapshot.gcm";
                 string fileHistory = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoHistory.gcm";

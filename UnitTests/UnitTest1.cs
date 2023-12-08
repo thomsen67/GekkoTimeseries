@@ -5714,7 +5714,7 @@ namespace UnitTests
             FAIL("PROCEDURE time; tell 'hello'; END;");
             FAIL("PROCEDURE time date %d1, date %d2; tell 'hello'; END;");
 
-            //But other name bits (tokens) that are used in commands are ok.
+            //But other name bits (tokens) that are used in statements are ok.
             I("RESET;");
             I("PROCEDURE gdx; tell 'hello'; END;");
             I("PROCEDURE gdx date %d1, date %d2; tell 'hello'; END;");
@@ -13659,7 +13659,7 @@ namespace UnitTests
 
             // -----------------------------------------------------------
             // -----------------------------------------------------------
-            // -- The following tests combinations of SERIES commands
+            // -- The following tests combinations of SERIES statements
             // -- and READ from gbk banks.
             // -----------------------------------------------------------
             // -----------------------------------------------------------            
@@ -13933,7 +13933,7 @@ namespace UnitTests
             Assert.AreEqual(2005, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[2].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.GetPrecedentsAndShadowedPeriods()[2].periods[0].t2.super);
 
-            Assert.Inconclusive("The trace2 databank should have 2 traces, and the commands around read should have 2 traces too...");
+            Assert.Inconclusive("The trace2 databank should have 2 traces, and the statements around read should have 2 traces too...");
         }
 
         [TestMethod]
@@ -21102,7 +21102,7 @@ print(df2)
         [TestMethod]
         public void _Test_Hdg()
         {
-            //Does not test the result of a simulation, only the commands
+            //Does not test the result of a simulation, only the statements
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
@@ -21183,7 +21183,7 @@ print(df2)
         public void _Test_EndoExo2()
         {
             //Checks ENDO, EXO and UNFIX
-            //Does not test the result of a simulation, only the commands
+            //Does not test the result of a simulation, only the statements
             I("RESET; MODE sim;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
             I("MODEL jul05;");  //otherwise ENDO/EXO will refuse to work
@@ -22244,7 +22244,7 @@ print(df2)
             I("CLEAR global;");
             FAIL("ref:%s = %s;");
 
-            // ----------- test of LOCAL/GLOBAL commands -------------
+            // ----------- test of LOCAL/GLOBAL statements -------------
 
             I("RESET;");
             I("LOCAL x;");

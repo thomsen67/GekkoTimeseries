@@ -88,9 +88,9 @@ namespace Gekko.Parser.Gek
                 bool hasSigil = m[0].s == Globals.symbolScalar.ToString() || m[0].s == Globals.symbolCollection.ToString();
                 if (!hasSigil)
                 {
-                    //We are trying to find commands here, to distinguish them from assignments.
+                    //We are trying to find statements here, to distinguish them from assignments.
                     //function and procedure calls like f(...), p ..., m.f(...), m.p ... are 
-                    //dealt with already, so below we try to identify normal commands like "prt ...", "read ..." etc.
+                    //dealt with already, so below we try to identify normal statements like "prt ...", "read ..." etc.
                     //because else they become assignments.
                     //
                     //Default is assignment, because it is most difficult to determine.

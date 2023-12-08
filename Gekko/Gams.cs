@@ -2578,7 +2578,7 @@ namespace Gekko
         {
             GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             //hashHelper: will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
-            //the dependents list does not change the model per se, but it changes how DISP and other commands
+            //the dependents list does not change the model per se, but it changes how DISP and other statements
             //like DECOMP show stuff.
             StringBuilder hashHelper = new StringBuilder();
             hashHelper.AppendLine();

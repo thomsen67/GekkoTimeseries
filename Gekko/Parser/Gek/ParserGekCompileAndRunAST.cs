@@ -19,7 +19,7 @@ namespace Gekko.Parser.Gek
     public class ParserGekCompileAndRunAST
     {
         /// <summary>
-        /// Run the compiled C# code from .gcm commands.
+        /// Run the compiled C# code from .gcm statements.
         /// </summary>
         /// <param name="ch"></param>
         /// <param name="p"></param>

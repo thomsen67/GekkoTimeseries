@@ -23,7 +23,7 @@ namespace Gekko.Parser.Gek
     }
     
     /// <summary>
-    /// This class is used to parse commands and create an ASTtree, and walk it.There is a similar class for model files.
+    /// This class is used to parse statements and create an ASTtree, and walk it.There is a similar class for model files.
     /// </summary>
     public class ParserGekCreateAST
     {
@@ -1189,7 +1189,7 @@ namespace Gekko.Parser.Gek
             //        ......
             //    [[commandEnd]]118, where 118 is a number
             //Between Start and End there can be no lines starting with "[[command"            
-            //This may go on, until the above rule breaks, or for instance 126, that is, 10 commands. Then there is a FLUSH
+            //This may go on, until the above rule breaks, or for instance 126, that is, 10 statements. Then there is a FLUSH
             //
 
             int ciCounter = 0;
@@ -1233,7 +1233,7 @@ namespace Gekko.Parser.Gek
                             else break;
                         }
 
-                        //now j is pointing to the end of a valid block of max commands, without control variables
+                        //now j is pointing to the end of a valid block of max statements, without control variables
                         if (true)
                         {
                             string s1 = null;
@@ -1612,7 +1612,7 @@ namespace Gekko.Parser.Gek
                 txt.MoreAdd("stem from 'funny' characters/symbols, like '€' or '½' etc.");
                 txt.MoreAdd("The hardest cases are characters that show up as blanks, but are in reality some other code. This mostly happens while copy-pasting code.");
                 txt.MoreNewLine();
-                txt.MoreAdd("The best thing to do is to start checking if quotes ' and \" match up. If so, you can perhaps run the commands line by line to find the offending character/symbol.");
+                txt.MoreAdd("The best thing to do is to start checking if quotes ' and \" match up. If so, you can perhaps run the statements line by line to find the offending character/symbol.");
             }
         }
 

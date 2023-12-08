@@ -1969,7 +1969,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper regarding stack trace, to see how commands/functions/procedures call each other
+        /// Helper regarding stack trace, to see how statements/functions/procedures call each other
         /// </summary>
         /// <param name="e2"></param>
         /// <returns></returns>
@@ -4188,7 +4188,7 @@ namespace Gekko
 
         /// <summary>
         /// This is the main entry method for both READ/IMPORT and OPEN. A lot of the internals of READ versus OPEN is the same. Note that the READ and
-        /// IMPORT commands are really 99% identical, it is mostly a name difference. The method will transfer data from an external file into a 
+        /// IMPORT statements are really 99% identical, it is mostly a name difference. The method will transfer data from an external file into a 
         /// Gekko databank. To do this, all data is first read into the databankTemp, and subsequently it may be merged in differnt ways, if it is 
         /// a READ/IMPORT statement.
         /// </summary>
@@ -8619,8 +8619,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This is the main entry into running Gekko commands, called for instance from the Gekko GUI window.
-        /// These commands are parsed, compiled and executed. BEWARE: Do not change name or signature without changing in 
+        /// This is the main entry into running Gekko statements, called for instance from the Gekko GUI window.
+        /// These statements are parsed, compiled and executed. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
         /// <param name="text">Set this "" not null if missing</param>
@@ -13168,7 +13168,7 @@ namespace Gekko
 
 
         /// <summary>
-        /// These are internal developer "commands" that can be issued from the Gekko statement window (GUI). But only on the developer
+        /// These are internal developer "statements" that can be issued from the Gekko statement window (GUI). But only on the developer
         /// computer. Stuff like rungenr1, rungenr2, etc. Some of it is obsolete. On a non-developer pc, this method does exactly
         /// nothing. All this is to avoid using ANTLR, which would be tedious.
         /// </summary>
@@ -16646,7 +16646,7 @@ namespace Gekko
             if (var == null) return type;
             if (G.GetModelSourceType() == EModelType.Gekko)
             {
-                //checks if left-hand var in model. So this ignores exo/endo commands.
+                //checks if left-hand var in model. So this ignores exo/endo statements.
                 //so the E and X only describes the model equations as they are
                 if (Program.model.modelGekko?.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(var))
                 {
@@ -17024,7 +17024,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This is the central hub regarding wildcards in commands like INDEX, DISP, COPY, RENAME, DELETE, WRITE/EXPORT, READ/IMPORT, 
+        /// This is the central hub regarding wildcards in statements like INDEX, DISP, COPY, RENAME, DELETE, WRITE/EXPORT, READ/IMPORT, 
         /// and having a central hub assures the the wildcard logic is consistent. 
         /// It deals with the logic of for instance INDEX x*; or COPY x*b TO y*; etc. Also deals with {'...'} wildcards, and handles
         /// the logic if banknames are given, too. This is a quite complicated method.
@@ -23157,7 +23157,7 @@ namespace Gekko
                 //not the end of the world if it fails
             }
 
-            Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace                                                         
+            Globals.commandMemory = new CommandMemory();  //these statements are only remembered up to last clearing of workspace                                                         
 
             try
             {
@@ -26522,7 +26522,7 @@ namespace Gekko
                         using (Error e = new Error()) {
                             e.MainAdd("You cannot mix display codes of short and long type, for example");
                             e.MainAdd("PRT <p abs> or PRT<d pch=no> etc. Please consult the help file regarding");
-                            e.MainAdd("the PRT and MULPRT commands. Short types are n, d, p, m, q, mp and");
+                            e.MainAdd("the PRT and MULPRT statements. Short types are n, d, p, m, q, mp and");
                             e.MainAdd("similar, whereas long types are lev, abs, dif, pch, gdif.");
                         }
                     }
@@ -32719,7 +32719,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used for CLONE and READ commands. Makes ref databank an excact copy of first-pos dabank.
+        /// Used for CLONE and READ statements. Makes ref databank an excact copy of first-pos dabank.
         /// </summary>
         public static void MulbkClone()
         {

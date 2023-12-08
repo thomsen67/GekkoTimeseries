@@ -51,7 +51,7 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            new Error("You are trying to convert/use the date " + this.date + " as a string item in a list. In LIST commands, you must for example use '2015q3' instead of 2015q3. If you are using a date scalar %d, you may try to use string(%d) instead."); return null;
+            new Error("You are trying to convert/use the date " + this.date + " as a string item in a list. In LIST statements, you must for example use '2015q3' instead of 2015q3. If you are using a date scalar %d, you may try to use string(%d) instead."); return null;
 
 
             //throw new GekkoException();

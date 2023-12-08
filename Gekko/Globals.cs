@@ -61,7 +61,7 @@ namespace Gekko
         // -------------------------------------------------        
         //public static bool pink = false; //overall pink or not: pink2 and pink3 controls details.
         public static bool pink2 = true;  //also keeps track of .lst and .tsd, .prn, .csv files
-        public static bool pink3 = true;  //also tracks SYS commands
+        public static bool pink3 = true;  //also tracks SYS statements
         public static bool pinkStrict = true;  //cannot access anything on g:\datopgek\...
         public static List<string> datopgek_errors = null;
         public static List<string> datopgek_banks = null;
@@ -705,7 +705,7 @@ namespace Gekko
             "diff"
         };
 
-        public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko commands" in the help files
+        public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko statements" in the help files
             //done January 2021, see also Globals.extraNames and Globals.commandNames
             "ACCEPT",
             "ANALYZE",
