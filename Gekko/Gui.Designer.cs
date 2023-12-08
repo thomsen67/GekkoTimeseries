@@ -832,14 +832,14 @@ namespace Gekko
             // 
             this.clearCommandHistoryToolStripMenuItem.Name = "clearCommandHistoryToolStripMenuItem";
             this.clearCommandHistoryToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-            this.clearCommandHistoryToolStripMenuItem.Text = "Clear command history";
+            this.clearCommandHistoryToolStripMenuItem.Text = "Clear statement history";
             this.clearCommandHistoryToolStripMenuItem.Click += new System.EventHandler(this.clearCommandHistoryToolStripMenuItem_Click);
             // 
             // commandHistoryToolStripMenuItem
             // 
             this.commandHistoryToolStripMenuItem.Name = "commandHistoryToolStripMenuItem";
             this.commandHistoryToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-            this.commandHistoryToolStripMenuItem.Text = "Command history...";
+            this.commandHistoryToolStripMenuItem.Text = "Statement history...";
             this.commandHistoryToolStripMenuItem.Click += new System.EventHandler(this.commandHistoryToolStripMenuItem_Click);
             // 
             // utilitiesToolStripMenuItem
@@ -1242,7 +1242,7 @@ namespace Gekko
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             
-            if (e.CloseReason == CloseReason.UserClosing || (e.CloseReason == CloseReason.ApplicationExitCall && !Globals.applicationIsInProcessOfAborting))  //Globals.applicationIsInProcessOfAborting is issued with an EXIT command
+            if (e.CloseReason == CloseReason.UserClosing || (e.CloseReason == CloseReason.ApplicationExitCall && !Globals.applicationIsInProcessOfAborting))  //Globals.applicationIsInProcessOfAborting is issued with an EXIT statement
             {
                 
                 //Hitting X on the window, or closing via file menu including Alt-F4.
@@ -1253,7 +1253,7 @@ namespace Gekko
             }
             else
             {
-                //could be EXIT command, or a Windows reboot
+                //could be EXIT statement, or a Windows reboot
             }
         }
 
@@ -1309,11 +1309,11 @@ namespace Gekko
             {
                 if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z) || (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
                 {
-                    //like this, the letter will be transferred for instance if it is a new command.
+                    //like this, the letter will be transferred for instance if it is a new statement.
                     //other keys like +, -, etc. will not be transferred but are lost. Seems to work
-                    //sort of okay. Typically, the user ends a command with enter, and then clicks on the
+                    //sort of okay. Typically, the user ends a statement with enter, and then clicks on the
                     //top window. The logic here avoids the next sequence of chars getting lost, since the first
-                    //char is typically a letter (first letter of a command). So for most purposes it works ok.
+                    //char is typically a letter (first letter of a statement). So for most purposes it works ok.
                     //Ctrl+C etc. in the upper window work ok.
                     string s = ("" + (char)e.KeyValue).ToLower();
                     this.textBoxMainTabLower.SelectedText = s;
@@ -1660,7 +1660,7 @@ namespace Gekko
             }
             else
             {
-                //Just silently ignore this empty command
+                //Just silently ignore this empty statement
             }
         }
 

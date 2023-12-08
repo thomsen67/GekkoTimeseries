@@ -397,7 +397,7 @@ namespace Gekko
             if (Globals.noini == false) RunGekkoIniFile();
             if (Globals.gekkoExeParameters != null)
             {
-                //works as if it was an inputted command line from the GUI  
+                //works as if it was an inputted statement line from the GUI  
                 //must be after run of possible ini files (bug fixed 14.6 2019)
                 this.StartThread(Globals.gekkoExeParameters, true);
             }
@@ -411,7 +411,7 @@ namespace Gekko
 
         private void RunGekkoIniFile()
         {
-            this.StartThread(Globals.iniFileSecretName, true); //This "command" gets handled in handleObeyFiles. Better 'run' than 'add', since RUN looks in cmd/cmd1/cmd2 folders also. Run2 ignores if the file is not found
+            this.StartThread(Globals.iniFileSecretName, true); //This "statement" gets handled in handleObeyFiles. Better 'run' than 'add', since RUN looks in cmd/cmd1/cmd2 folders also. Run2 ignores if the file is not found
         }
 
         private static void GuiStuff(string folder, bool noini, bool hideGui, bool nolog)
@@ -1099,12 +1099,12 @@ namespace Gekko
 
         private static void ChangeWorkingFolderNoteMessage()
         {
-            new Note("You may consider a RESTART (or RESET) command now. A RESTART command will clear the workspace and run any INI file '" + Globals.autoExecCmdFileName + "' in the newly chosen working folder.");
+            new Note("You may consider a RESTART (or RESET) statement now. A RESTART statement will clear the workspace and run any INI file '" + Globals.autoExecCmdFileName + "' in the newly chosen working folder.");
         }
 
         private void textBox2_VisibleChanged(object sender, EventArgs e)
         {
-            //In order to move the focus to the command input textbox
+            //In order to move the focus to the statement input textbox
             //Otherwise the focus is set on the results text box (above)
             gui.textBoxMainTabLower.Focus();
             gui.textBoxMainTabLower.Select();
@@ -1651,7 +1651,7 @@ namespace Gekko
             Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Globals.bugfixLhsDollar = 0;
 
-            //Blinking icon when running a command
+            //Blinking icon when running a statement
             //Not active/blinking when Gekko is idle
             Globals.guiTimerCounter = 0;
             if (Globals.guiTimer == null)
@@ -1870,7 +1870,7 @@ namespace Gekko
             //Console.WriteLine("tråd stop: " + gui.m_WorkerThread.GetHashCode());
             if (Globals.tasks.Count > 0)
             {
-                string s = Globals.tasks.Peek();  //this must be the buffer regarding command line input
+                string s = Globals.tasks.Peek();  //this must be the buffer regarding statement line input
                 StartThread(s, false);
             }
             else
@@ -2093,9 +2093,9 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.color = Color.Blue;
-                        txt.MainAdd("The session used the Gekko SYS command to call the Windows system. You may for instance want to check files copied 'manually' with the SYS command.");
+                        txt.MainAdd("The session used the Gekko SYS statement to call the Windows system. You may for instance want to check files copied 'manually' with the SYS statement.");
                         txt.MainNewLineTight();
-                        txt.MainAdd(" ----- SYS command contents: -----");
+                        txt.MainAdd(" ----- SYS statement contents: -----");
                         txt.MainNewLineTight();
                         foreach (string s in Globals.datopgek_sysCalls)
                         {
@@ -2180,18 +2180,18 @@ namespace Gekko
                 G.Writeln();
                 if (Globals.numberOfErrors > 0)
                 {
-                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the command");
-                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the command");
+                    if (Globals.numberOfErrors == 1) G.Writeln("There was " + Globals.numberOfErrors + " ERROR message while running the statement");
+                    else G.Writeln("There were " + Globals.numberOfErrors + " ERROR messages while running the statement");
                 }
                 if (Globals.numberOfWarnings > 0)
                 {
-                    if (Globals.numberOfWarnings == 1) G.Writeln("There was " + Globals.numberOfWarnings + " WARNING message while running the command");
-                    else G.Writeln("There were " + Globals.numberOfWarnings + " WARNING messages while running the command");
+                    if (Globals.numberOfWarnings == 1) G.Writeln("There was " + Globals.numberOfWarnings + " WARNING message while running the statement");
+                    else G.Writeln("There were " + Globals.numberOfWarnings + " WARNING messages while running the statement");
                 }
                 if (Globals.numberOfSkippedLines > 0)
                 {
-                    if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the command");
-                    else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the command");
+                    if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the statement");
+                    else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the statement");
                 }
             }            
 
@@ -2273,9 +2273,9 @@ namespace Gekko
                         string s2 = null;                                                
                         if (Globals.traceTime != 0d)
                         {
-                            s1 = " (of which data tracing used " + G.SecondsFormat(Globals.traceTime) + ")";
+                            s1 = ", of which data tracing used " + G.SecondsFormat(Globals.traceTime) + "";
                         }
-                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track dependencies (files etc.), see menu 'Options' --> 'Program dependency tracking'.";
+                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);
                         G.Writeln();
@@ -2363,7 +2363,7 @@ namespace Gekko
 
             if (type == ETabs.Main)
             {
-                if (var != null)  //a DISP, either via a command or link clicked
+                if (var != null)  //a DISP, either via a statement or link clicked
                 {
                     if (Program.guiBrowseNumber > Program.guiBrowseHistory.Count - 1)
                     {
@@ -2379,7 +2379,7 @@ namespace Gekko
                     {
                         if (link && G.Equal(var, Program.guiBrowseHistory[Program.guiBrowseNumber]))
                         {
-                            //retracing old history, but only if link (otherwise it will be treated as a DISP command, starting from scratch)
+                            //retracing old history, but only if link (otherwise it will be treated as a DISP statement, starting from scratch)
                         }
                         else
                         {
@@ -3055,13 +3055,13 @@ namespace Gekko
             }
             else if (c == null && (e.Url.AbsoluteUri.ToLower().EndsWith("." + Globals.extensionCommand)))
             {
-                //Command file (gcm)
+                //Program file (gcm)
                 //cancel Navigation
                 string file = e.Url.AbsoluteUri;
                 if (file.ToLower().StartsWith("http://") || file.ToLower().StartsWith("https://"))
                 {
                     //This is an external link
-                    MessageBox.Show("*** ERROR: Expected command file to be on local file system");
+                    MessageBox.Show("*** ERROR: Expected program file to be on local file system");
                     e.Cancel = true;
                 }
                 else
@@ -3249,7 +3249,7 @@ namespace Gekko
             WindowMessageBox w = new WindowMessageBox();
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
-            w.Title = "Command history since last clearing of workspace";
+            w.Title = "Statement history since last clearing of workspace";
             w.textBox1.Text = Stringlist.ExtractTextFromLines(ss2).ToString();
             w.ShowDialog();
         }
@@ -3290,7 +3290,7 @@ namespace Gekko
         private void clearCommandHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Globals.commandMemory = new CommandMemory();
-            G.Writeln2("Command memory cleared. (Note: this is done automatically");
+            G.Writeln2("Statement memory cleared. (Note: this is done automatically");
             G.Writeln("when the workspace is cleared (RESET/RESTART)).");
         }
 

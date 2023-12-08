@@ -1695,12 +1695,12 @@ namespace Gekko
         //public static List<Item> unfoldedVariableList = null;  //the unfolded variable list
 
         /// <summary>
-        /// Helper for the GUI browser (DISP command)
+        /// Helper for the GUI browser (DISP statement)
         /// </summary>
         public static int guiBrowseNumber = 0;
 
         /// <summary>
-        /// Helper for the GUI browser (DISP command)
+        /// Helper for the GUI browser (DISP statement)
         /// </summary>
         public static List<string> guiBrowseHistory = new List<string>();
 
@@ -1838,11 +1838,11 @@ namespace Gekko
 
                 if (FindException(e2, "GekkoException"))
                 {
-                    G.Write("*** ERROR: The command failed");
+                    G.Write("*** ERROR: The statement failed");
                 }
                 else
                 {
-                    G.Write("*** ERROR: The command failed due to internal Gekko error");
+                    G.Write("*** ERROR: The statement failed due to internal Gekko error");
                 }
                 string s = "";
 
@@ -1924,7 +1924,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for the PIPE command
+        /// Helper for the PIPE statement
         /// </summary>
         /// <param name="i"></param>
         public static void StopPipeAndMute(int i)
@@ -1988,7 +1988,7 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// TELL command.
+        /// TELL statement.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="nocr"></param>
@@ -4190,7 +4190,7 @@ namespace Gekko
         /// This is the main entry method for both READ/IMPORT and OPEN. A lot of the internals of READ versus OPEN is the same. Note that the READ and
         /// IMPORT commands are really 99% identical, it is mostly a name difference. The method will transfer data from an external file into a 
         /// Gekko databank. To do this, all data is first read into the databankTemp, and subsequently it may be merged in differnt ways, if it is 
-        /// a READ/IMPORT command.
+        /// a READ/IMPORT statement.
         /// </summary>
         /// <param name="offset"></param>
         /// <param name="wipeDatabankBeforeInsertingData"></param>
@@ -4200,7 +4200,7 @@ namespace Gekko
         /// <param name="create"></param>
         public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, P p)
         {
-            //open = true if called with OPEN command              
+            //open = true if called with OPEN statement              
 
             int n = 1;
             List<int> list = new List<int>();
@@ -5120,7 +5120,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for OPEN command
+        /// Helper for OPEN statement
         /// </summary>
         /// <param name="oRead"></param>
         private static void CheckOpenSyntax(ReadOpenMulbkHelper oRead)
@@ -5957,7 +5957,7 @@ namespace Gekko
         /// <summary>
         /// When reading a timeseries from a databank, this timeseries has a date "window" (observations over which it is defined). In addition,
         /// if the timeseries already exists in the memory databank, the existing timeseries also has a window. To make matters even worse, there
-        /// may be a time indication in the command, for instance IMPORT&lt;2000 2020&gt;. This method handles the logic of these three 
+        /// may be a time indication in the statement, for instance IMPORT&lt;2000 2020&gt;. This method handles the logic of these three 
         /// overlapping date "windows".
         /// </summary>
         /// <param name="dates"></param>
@@ -7935,7 +7935,7 @@ namespace Gekko
                     txt.MoreAdd("The time dimension is not defined last in the .px file, since either CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
                     txt.MoreAdd("When the time dimension is not defined last, an experimental Gekko module for px file reading is used (written in November 2021).");
                     txt.MoreAdd("In contrast to the original px file module, which has been running for a number of years, the new experimental module has not been tested a lot yet. So please check the results carefully!");
-                    txt.MoreAdd("If you are uncertain about using the above-mentioned experimental px file module, and if the px file originates from a {a{DOWNLOAD¤download.htm}a} command, you may reorder the .json file:");
+                    txt.MoreAdd("If you are uncertain about using the above-mentioned experimental px file module, and if the px file originates from a {a{DOWNLOAD¤download.htm}a} statement, you may reorder the .json file:");
                     txt.MoreAdd("In your .json file, move the \"code\": \"tid\" or \"code\": \"time\" element last in the file. After this, the warning should go away.");
                     txt.MoreNewLine();
                     txt.MoreAdd("Note: If the new experimental px file module really turns out to contain bugs, these will probably be immediately visible,");
@@ -8631,7 +8631,7 @@ namespace Gekko
         public static void RunGekkoCommands(string text, string fileName, int skip, P p)
         {
             //#98073245298345
-            //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
+            //Here, we are translating (1) a gui oneliner, (2) a gui statement block, or a gcm file (that might be .ini or called with LIBRARY).
 
             Globals.suggestions.Clear();  //to not fill out ram too much
 
@@ -8793,8 +8793,8 @@ namespace Gekko
 
         private static void RecordRestorInfo()
         {
-            //after the command is done -- even if an error occurs
-            //by recording these files after the command, * in "read *" or "model *" will have been
+            //after the statement is done -- even if an error occurs
+            //by recording these files after the statement, * in "read *" or "model *" will have been
             //replaced with real filenames.
 
 
@@ -9055,7 +9055,7 @@ namespace Gekko
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
-            G.Writeln(text, Color.Red, true);  //will also be red for a STOP command, but without counting as an error
+            G.Writeln(text, Color.Red, true);  //will also be red for a STOP statement, but without counting as an error
             G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueSymbols(problemLine), Color.Blue, true);
         }
 
@@ -9522,7 +9522,7 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The gamsscalar() function is a helper function for GAMS to produce a ");
-                        txt.MainAdd("scalar model for use in the Gekko DECOMP command.");
+                        txt.MainAdd("scalar model for use in the Gekko DECOMP statement.");
                         txt.MainAdd("A GAMS scalar model is produced by the GAMS CONVERT command.");
                     }
                     using (Writeln txt = new Writeln())
@@ -9639,11 +9639,11 @@ namespace Gekko
                     }
 
                     string inputValue = null;
-                    //if (Program.InputBox("Note", "Execute the shown command lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the command has finished." + G.NL + "Return the difference.", ref inputValue) == DialogResult.OK)
+                    //if (Program.InputBox("Note", "Execute the shown statement lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the statement has finished." + G.NL + "Return the difference.", ref inputValue) == DialogResult.OK)
                     bool b = Program.InputBox("Input", "Difference", ref inputValue) == DialogResult.OK;
                     if (b)
                     {
-                        //O.Pause("Execute the shown command lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the command has finished.");
+                        //O.Pause("Execute the shown statement lines (blue) in a system shell window. " + G.NL + "Click 'OK' when the statement has finished.");
                         dif = int.Parse(inputValue);
                     }
                 }
@@ -9976,7 +9976,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Handling R_RUN command.
+        /// Handling R_RUN statement.
         /// </summary>
         /// <param name="o"></param>
         public static void RunR(Gekko.O.R_run o)
@@ -10372,7 +10372,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Method for the X12A command, seasonal correction. An external .exe file is called.
+        /// Method for the X12A statement, seasonal correction. An external .exe file is called.
         /// </summary>
         /// <param name="o"></param>
         public static void X12a(Gekko.O.X12a o)
@@ -10611,7 +10611,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for X12A command, see X12a() method.
+        /// Helper for X12A statement, see X12a() method.
         /// </summary>
         /// <param name="freq"></param>
         /// <returns></returns>
@@ -10644,7 +10644,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Print a Gekko matrix. Used in PRT command.
+        /// Print a Gekko matrix. Used in PRT statement.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="label"></param>
@@ -11425,7 +11425,7 @@ namespace Gekko
                         e.MainAdd("Trying to invert a singular matrix. This is because the equations are");
                         e.MainAdd("somehow undetermined, for instance because of an equation 'X = X', ");
                         e.MainAdd("or an equation 'Y = Z', where Z is exogenous, and the variable");
-                        e.MainAdd("Y has been exogenized (by means of the EXO command).");
+                        e.MainAdd("Y has been exogenized (by means of the EXO statement).");
                         e.MainAdd("The problem arises in the following equation: ");
                         e.MainNewLineTight();
                         e.MainAdd("  " + eh.equationText);
@@ -11831,7 +11831,7 @@ namespace Gekko
                 {
                     if (Program.model.modelGams == null)
                     {
-                        new Error("DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
+                        new Error("DECOMP: A GAMS model is not loaded, cf. the MODEL statement.");
                         //throw new GekkoException();
                     }
                     if (Program.model.modelGams.equationsByVarname != null)
@@ -11846,7 +11846,7 @@ namespace Gekko
 
                     if (G.GetModelSourceType() != EModelType.Gekko)
                     {
-                        new Error("DECOMP: A Gekko model is not loaded, cf. the MODEL command.");
+                        new Error("DECOMP: A Gekko model is not loaded, cf. the MODEL statement.");
                         //throw new GekkoException();
                     }
 
@@ -12724,7 +12724,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for the PREDICT command, compiling some dynamic C# code.
+        /// Helper for the PREDICT statement, compiling some dynamic C# code.
         /// </summary>
         /// <param name="code"></param>
         public static void CreatePredictActions(string code)
@@ -12764,7 +12764,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for internal test of SIM command.
+        /// Helper for internal test of SIM statement.
         /// </summary>
         /// <param name="cr"></param>
         /// <param name="list"></param>
@@ -12848,7 +12848,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for "old" DECOMP command. Will be obsolete.
+        /// Helper for "old" DECOMP statement. Will be obsolete.
         /// </summary>
         /// <param name="cr"></param>
         /// <param name="t"></param>
@@ -12947,8 +12947,8 @@ namespace Gekko
 
         /// <summary>
         /// Get info fields from a model, and compute "true" hash of the model equations. This hash is both for signing of the model (cf. 
-        /// the SIGN command), and for internal use when storing dynamic C# code corresponding to a model in a local cache (so that it
-        /// can avoid parsing next time it is read with MODEL command).
+        /// the SIGN statement), and for internal use when storing dynamic C# code corresponding to a model in a local cache (so that it
+        /// can avoid parsing next time it is read with MODEL statement).
         /// </summary>
         /// <param name="linesNew"></param>
         /// <param name="modelCommentsHelper"></param>
@@ -13168,7 +13168,7 @@ namespace Gekko
 
 
         /// <summary>
-        /// These are internal developer "commands" that can be issued from the Gekko command window (GUI). But only on the developer
+        /// These are internal developer "commands" that can be issued from the Gekko statement window (GUI). But only on the developer
         /// computer. Stuff like rungenr1, rungenr2, etc. Some of it is obsolete. On a non-developer pc, this method does exactly
         /// nothing. All this is to avoid using ANTLR, which would be tedious.
         /// </summary>
@@ -15121,7 +15121,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// RUN command.
+        /// RUN statement.
         /// </summary>
         /// <param name="o"></param>
         public static void Run(O.Run o)
@@ -15136,7 +15136,7 @@ namespace Gekko
 
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
-                Globals.datopgek_errors.Add("Running this command file: " + fileName);
+                Globals.datopgek_errors.Add("Running this program file: " + fileName);
                 DatopgekError();
             }            
 
@@ -15431,7 +15431,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The DISP command.
+        /// The DISP statement.
         /// </summary>
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
@@ -15552,7 +15552,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The DISP command. Wildcards can be used, like DISP x*; Wildcards use Program.Search().
+        /// The DISP statement. Wildcards can be used, like DISP x*; Wildcards use Program.Search().
         /// </summary>
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
@@ -15577,7 +15577,7 @@ namespace Gekko
             List<IVariable> m = new List<IVariable>();
             if (list != null)
             {
-                //seems list is always null when called from command
+                //seems list is always null when called from statement
                 foreach (string listItem in list)
                 {
                     IVariable x = O.GetIVariableFromString(listItem, O.ECreatePossibilities.NoneReportError, true);
@@ -16661,7 +16661,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// RENAME command.
+        /// RENAME statement.
         /// </summary>
         /// <param name="o"></param>
         public static void Rename(O.Rename o)
@@ -16725,7 +16725,7 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// COPY command. Uses Program.SearchFromTo() internally.
+        /// COPY statement. Uses Program.SearchFromTo() internally.
         /// </summary>
         /// <param name="o"></param>
         public static void Copy(O.Copy o)
@@ -17258,7 +17258,7 @@ namespace Gekko
                 if (!lhsHasStarOrQuestion && type == EWildcardSearchType.Search)
                 {
                     //a hack to make DISP x[a] work                    
-                    //OR: it is an INDEX command without stars, here we must find out if the single non-wildcard item exists
+                    //OR: it is an INDEX statement without stars, here we must find out if the single non-wildcard item exists
                     //OR: it is an index wildcard like x[*] or x[?] that returns a List (of Series).
                     IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                     if (iv != null)
@@ -17881,7 +17881,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// CHECKOFF command.
+        /// CHECKOFF statement.
         /// </summary>
         /// <param name="vars2"></param>
         /// <param name="type"></param>
@@ -17934,7 +17934,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// ENDO command.
+        /// ENDO statement.
         /// </summary>
         /// <param name="vars2"></param>
         public static void Endo(List<string> vars2)
@@ -18004,7 +18004,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// EXO command.
+        /// EXO statement.
         /// </summary>
         /// <param name="vars2"></param>
         public static void Exo(List<string> vars2)
@@ -18050,7 +18050,7 @@ namespace Gekko
         {
             if (G.GetModelSourceType() != EModelType.Gekko)
             {
-                new Error("DIP<info> command requires a Gekko model -- seems no model is defined");
+                new Error("DIP<info> statement requires a Gekko model -- seems no model is defined");
                 //throw new GekkoException();
             }
 
@@ -18203,7 +18203,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// MODEL command, loads Gekko or GAMS models (the latter requires MODEL&lt;gms&gt;)
+        /// MODEL statement, loads Gekko or GAMS models (the latter requires MODEL&lt;gms&gt;)
         /// </summary>
         /// <param name="o"></param>
         public static void Model(O.Model o)
@@ -18391,7 +18391,7 @@ namespace Gekko
             Program.model = model;
 
             model.modelCommon.SetModelSourceType(EModelType.Gekko);
-            //TODO: keep the old version, so model command can be undone (like undo sim)
+            //TODO: keep the old version, so model statement can be undone (like undo sim)
             ModelGekko modelGekko = new ModelGekko(model);
             modelGekko.modelInfo = new ModelInfo();
             modelGekko.modelInfo.fileName = fileNamePretty;
@@ -18828,7 +18828,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// PIPE command.
+        /// PIPE statement.
         /// </summary>
         /// <param name="o"></param>
         public static void Pipe(O.Pipe o)
@@ -18845,7 +18845,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// PIPE command.
+        /// PIPE statement.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="args"></param>
@@ -18855,7 +18855,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// PIPE command.
+        /// PIPE statement.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="args"></param>
@@ -18973,7 +18973,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// PIPE command. Also handles html piping.
+        /// PIPE statement. Also handles html piping.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="append"></param>
@@ -19656,7 +19656,7 @@ namespace Gekko
         {
             if (G.GetModelSourceType() != EModelType.Gekko)
             {
-                new Error("No Gekko model is defined for trimming, cf. MODEL command.");
+                new Error("No Gekko model is defined for trimming, cf. MODEL statement.");
                 //throw new GekkoException();
             }
 
@@ -19692,7 +19692,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// FINDMISSINGDATA command.
+        /// FINDMISSINGDATA statement.
         /// </summary>
         /// <param name="o"></param>
         public static void FindMissingData(O.Findmissingdata o)
@@ -19960,7 +19960,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// ITERSHOW command.
+        /// ITERSHOW statement.
         /// </summary>
         /// <param name="vars"></param>
         /// <param name="t1"></param>
@@ -19969,7 +19969,7 @@ namespace Gekko
         {
             if (G.GetModelSourceType() != EModelType.Gekko)
             {
-                new Error("No Gekko model seems to be defined, see MODEL command.");
+                new Error("No Gekko model seems to be defined, see MODEL statement.");
                 //throw new GekkoException();
             }
 
@@ -20092,7 +20092,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// TIME command.
+        /// TIME statement.
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -20112,7 +20112,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// TIMEFILTER command.
+        /// TIMEFILTER statement.
         /// </summary>
         /// <param name="o"></param>
         public static void TimeFilter(O.TimeFilter o)
@@ -20158,7 +20158,7 @@ namespace Gekko
                     if (!gt.StrictlyLargerThan(gtLag))
                     {
                         //G.Writeln();
-                        new Error("TIMEFILTER sequence problem: '" + G.FromDateToString(gtLag) + "' should be larger than '" + G.FromDateToString(gt) + "'. Please check your TIMEFILTER command");
+                        new Error("TIMEFILTER sequence problem: '" + G.FromDateToString(gtLag) + "' should be larger than '" + G.FromDateToString(gt) + "'. Please check your TIMEFILTER statement");
                     }
                     else
                     {
@@ -20232,7 +20232,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// SYS command: execute from Windows shell. Can choose to mute, and can choose working folder for the shell (.WorkingDirectory).
+        /// SYS statement: execute from Windows shell. Can choose to mute, and can choose working folder for the shell (.WorkingDirectory).
         /// </summary>
         /// <param name="commandLine">Command line parameters to pass</param>        
         public static void ExecuteShellCommand(string commandLine, bool mute, string working)
@@ -20265,12 +20265,12 @@ namespace Gekko
                 Program.options.print_width = int.MaxValue;
 
                 process = new System.Diagnostics.Process();
-                // invokes the cmd process specifying the command to be executed.
+                // invokes the cmd process specifying the statement to be executed.
                 string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
-                // pass executing file to cmd (Windows command interpreter) as a arguments
-                // /C tells cmd that we want it to execute the command that follows, and then exit.                    
+                // pass executing file to cmd (Windows statement interpreter) as a arguments
+                // /C tells cmd that we want it to execute the statement that follows, and then exit.                    
                 string _Arguments = "";
-                // pass any command line parameters for execution
+                // pass any statement line parameters for execution
                 if (commandLine != null && commandLine.Length > 0)
                 {
                     _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { commandLine, System.Globalization.CultureInfo.InvariantCulture });
@@ -20488,7 +20488,7 @@ namespace Gekko
 
             if (File.Exists(pathAndFilename))
             {
-                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.");
+                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " program file.");
             }
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -20942,7 +20942,7 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// WRITE/EXPORT command.
+        /// WRITE/EXPORT statement.
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
@@ -21871,7 +21871,7 @@ namespace Gekko
 
             if (G.GetModelSourceType() == EModelType.Gekko && !isCloseCommand)
             {
-                //We do not want to put model info into XML if it is a CLOSE command triggering the bank write, for
+                //We do not want to put model info into XML if it is a CLOSE statement triggering the bank write, for
                 //instance after a OPEN<edit>, etc. This is mode=data and something else.
                 //(Would probably happen very rarely anyhow, since model endogenous and databank variables must match)
                 bool ok = true;
@@ -23418,7 +23418,7 @@ namespace Gekko
                 {
                     using (Error e = new Error())
                     {
-                        e.MainAdd("The databank '" + removed.name + "' was opened with the OPEN command.");
+                        e.MainAdd("The databank '" + removed.name + "' was opened with the OPEN statement.");
                         e.MainAdd("It has been altered, but the changes cannot be written back to the");
                         e.MainAdd("underlying databank file, since this file is not a " + Globals.extensionDatabank + " file.");
                         e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
@@ -23461,7 +23461,7 @@ namespace Gekko
         {
             if (Globals.threadIsInProcessOfAborting)
             {
-                p.hasShownErrorHandling = EHasShownErrorHandling.True;  //to make the command files 'Fail' in status window.
+                p.hasShownErrorHandling = EHasShownErrorHandling.True;  //to make the statement files 'Fail' in status window.
                 return "stop";
             }
             if (G.IsUnitTesting()) return "stop";
@@ -23514,7 +23514,7 @@ namespace Gekko
                     w.textBox1.Text = "*** ERROR: Run-time error.";
                     w.textBox1.Text += "\n";
                     w.textBox1.Text += "\n";
-                    w.textBox1.Text += "Gekko encountered a run-time error while trying to execute a command line (cf. the Gekko output window). You may stop the program execution ('Stop'), ";
+                    w.textBox1.Text += "Gekko encountered a run-time error while trying to execute a statement line (cf. the Gekko output window). You may stop the program execution ('Stop'), ";
                     w.textBox1.Text += "or try to skip the problematic line ('Skip line')." + "\n" + "\n" + "Skipping a line is usually ok if the line is non-vital for the rest of the program (for instance a print statement), ";
                     w.textBox1.Text += "else you should rerun your program files ('Stop' and run again).";
                     w.textBox1.Text += "\n";
@@ -23530,8 +23530,8 @@ namespace Gekko
                     w.textBox1.Text = "*** ERROR: Syntax error.";
                     w.textBox1.Text += "\n";
                     w.textBox1.Text += "\n";
-                    w.textBox1.Text += "Gekko encountered a syntax error (cf. the Gekko output window). The problematic command file has not been run (since it could not be parsed), so you may try to fix the error and try again. ";
-                    w.textBox1.Text += "\n" + "\n" + "If you fix the syntax error now and click 'Retry file', Gekko will continue executing the system of command files as if no error had happened. (If errors persist, the error dialog will show up again).";
+                    w.textBox1.Text += "Gekko encountered a syntax error (cf. the Gekko output window). The problematic program file has not been run (since it could not be parsed), so you may try to fix the error and try again. ";
+                    w.textBox1.Text += "\n" + "\n" + "If you fix the syntax error now and click 'Retry file', Gekko will continue executing the system of program files as if no error had happened. (If errors persist, the error dialog will show up again).";
                     w.button3.IsEnabled = false;  //skip
 
                     WriteCallStack(true, p);
@@ -23596,7 +23596,7 @@ namespace Gekko
                         if (commandLines2.Count == 1)
                         {
                             StackHelper sh = new StackHelper();
-                            sh.line = "    " + "Call stack: Command line calling -->";
+                            sh.line = "    " + "Call stack: Statement line calling -->";
                             sh.file = "";
                             sh.line2 = lineNumber2;
                             stackLines.Add(sh);
@@ -23604,7 +23604,7 @@ namespace Gekko
                         else
                         {
                             StackHelper sh = new StackHelper();
-                            sh.line = "    " + "Call stack: Command block line " + lineNumber3 + " calling -->";
+                            sh.line = "    " + "Call stack: Statement block line " + lineNumber3 + " calling -->";
                             sh.file = "";
                             sh.line2 = lineNumber2;
                             stackLines.Add(sh);
@@ -23695,9 +23695,9 @@ namespace Gekko
 
         public static void GetErrorLineAndText(P p, int i, out int lineNumber2, out string lineText, out List<string> commandLines)
         {
-            //if it is a procedure, command will be something like: "procedure 'test', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
-            //if it is a procedure, command will be something like: "function 'test()', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
-            //if it is a gcm, command will be something like: "C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤12"
+            //if it is a procedure, statement will be something like: "procedure 'test', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
+            //if it is a procedure, statement will be something like: "function 'test()', C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤10"
+            //if it is a gcm, statement will be something like: "C:\Thomas\Desktop\gekko\testing\Datopgek3\MAKRO\bug.gcm¤12"
             //
             //The start 'procedure ' and 'function' is stable, not likely to be changed. So we can use it to determine if we are inside a procedure/function call
 
@@ -23732,8 +23732,8 @@ namespace Gekko
             //{
             //    if (p.hasSeenStopCommand == 1)
             //    {
-            //        lineNumber2++;  //else it reports the line before the STOP command                
-            //        p.hasSeenStopCommand = 2;  //no adjustments for callee command files (this is a bit of a hack)
+            //        lineNumber2++;  //else it reports the line before the STOP statement                
+            //        p.hasSeenStopCommand = 2;  //no adjustments for callee statement files (this is a bit of a hack)
             //    }
             //}
         }
@@ -25423,7 +25423,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Plotting in Gekko (PLOT command). Can plot mixed frequencies.
+        /// Plotting in Gekko (PLOT statement). Can plot mixed frequencies.
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
         {
@@ -27078,7 +27078,7 @@ namespace Gekko
 
         private static void IssueCreateWarning(string variable)
         {
-            new Error("You are trying to put data into a variable or list ('" + variable + "') that does not exist. Please create the variable or list first (CREATE or LIST command), or use a name that starts with the characters 'xx'.", false);
+            new Error("You are trying to put data into a variable or list ('" + variable + "') that does not exist. Please create the variable or list first (CREATE or LIST statement), or use a name that starts with the characters 'xx'.", false);
         }
 
         public static EMissingType CheckVariableExistence(List<string> variablesLabelsForPrtCommand, List<Dictionary<string, string>> precedents, bool isMultiplier, bool isCalledFromGenr, bool isBaseline, bool isCalledFromTable)
@@ -32678,15 +32678,15 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used for TABLE command 
+        /// Used for TABLE statement 
         /// </summary>
         /// <param name="inputFileName"></param>
         /// <param name="menuTable"></param>
         /// <returns></returns>
         public static string TableHelper(string inputFileName, bool menuTable, P p)
         {
-            //This is called from "TABLE filename.tab" command, including calls from menus which
-            //will issue such a command in a thread (is so, menuTable is true).
+            //This is called from "TABLE filename.tab" statement, including calls from menus which
+            //will issue such a statement in a thread (is so, menuTable is true).
 
             //inputFileName = Program.SubstituteAssignVarsInExpression(inputFileName);
             inputFileName = G.AddExtension(inputFileName, "." + Globals.extensionTable);

@@ -942,7 +942,7 @@ namespace Gekko
     public class TraceHelper
     {
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
-        public int seriesObjectCount = 0; //number of series found (probably often equatl to meta count)
+        public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         // ----------
         // --- the following is for stats etc. ("real" traces)        

@@ -78,7 +78,7 @@ namespace Gekko
         delegate void SetTextInputCallback(string text, string type2);
         /// <summary>
         /// Replaces for instance "READ * [Enter]" with the found file so it becomes "READ jul05".
-        /// Also does regarding command history. Also add some partially missing paths.
+        /// Also does regarding statement history. Also add some partially missing paths.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="type2"></param>

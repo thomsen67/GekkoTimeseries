@@ -473,7 +473,7 @@ namespace Gekko
 
         public static bool useMAsDefaultOperatorInFindWindow = true;  //use <m> as default      
 
-        public static bool fastGauss = true;  //Beware: RES command should switch the option off
+        public static bool fastGauss = true;  //Beware: RES statement should switch the option off
 
         public static double[] scaleNewtonValues = new double[0];
 
@@ -503,7 +503,7 @@ namespace Gekko
         public const string reportLabel2 = ")";
 
         public static int guiTimerCounter = 0;
-        public static System.Timers.Timer guiTimer = null;  //only runs when executing a command
+        public static System.Timers.Timer guiTimer = null;  //only runs when executing a statement
 
         public static int guiTimerCounter2 = 0;
         public static System.Timers.Timer guiTimer2 = null;  //runs the entire time (listens for remote.gcm)
@@ -854,13 +854,13 @@ namespace Gekko
         public static int numberOfTimeWindowErrors = 0;
 
         public static bool threadIsInProcessOfAborting = false;  //click on stop button
-        public static bool applicationIsInProcessOfAborting = false;  //exit command issued
-        public static bool applicationIsInProcessOfDying = false;  //exit command issued
+        public static bool applicationIsInProcessOfAborting = false;  //exit statement issued
+        public static bool applicationIsInProcessOfDying = false;  //exit statement issued
         public static string lastDynamicCsCode = null;  //if it does not compile (internal error)
 
         public static int lockedCounter = 0;
 
-        public static bool printAST = false;  //for debugging, gets true when "ast" is typed at command prompt        
+        public static bool printAST = false;  //for debugging, gets true when "ast" is typed at statement prompt        
 
         public static Excel.Application objApp = null;  //used for the Excel PIA interface (not used much anymore, after EPPlus).
         public static int excelLastThreadID = int.MinValue;

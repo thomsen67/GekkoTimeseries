@@ -3551,7 +3551,7 @@ namespace Gekko
 
             // x, i         --> rebase(x, 2020)
             // x, i, v      --> rebase(x, 2020, 1)
-            // Does not support rebasing over a window of periods --> use REBASE command            
+            // Does not support rebasing over a window of periods --> use REBASE statement            
 
             //hmmm, what if we are doing a PLOT <2010 2030> pch(rebase(x, 2020)) --> we will get a missing in 2010...?
 

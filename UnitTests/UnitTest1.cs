@@ -5709,7 +5709,7 @@ namespace UnitTests
             _AssertScalarVal(First(), "%x", 7d);
             FAIL("f;");
 
-            //It is not allowed to use a command name for a procedure name
+            //It is not allowed to use a statement name for a procedure name
             I("RESET;");
             FAIL("PROCEDURE time; tell 'hello'; END;");
             FAIL("PROCEDURE time date %d1, date %d2; tell 'hello'; END;");
@@ -5795,7 +5795,7 @@ namespace UnitTests
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually renamed
 
-            //NOTE: rename between banks works kind of like a MOVE-command.
+            //NOTE: rename between banks works kind of like a MOVE-statement.
 
             //  Work     Ref      b1       b10
             //-------------------------------------
@@ -8123,7 +8123,7 @@ namespace UnitTests
               @"tell 'a %x%y';");
 
 
-            //SERIES command:
+            //SERIES statement:
             //In 2.4, for string/name %x. On lhs, 2.4 can use either %x or {%x} no matter if 
             //%x is string, name or nameloop. In 3.0, it must be {%x} on lhs. On rhs, 2.4
             //can use {%x} always, but may use %x if name or nameloop. This must always be
@@ -8910,23 +8910,23 @@ namespace UnitTests
             //
             Globals.unitTestScreenOutput.Clear(); FAIL("global('a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("lib:global('a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
-            //Globals.unitTestScreenOutput.Clear(); FAIL("global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
-            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
 
             Globals.unitTestScreenOutput.Clear(); FAIL("global(x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
-            //Globals.unitTestScreenOutput.Clear(); FAIL("global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
-            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
 
             Globals.unitTestScreenOutput.Clear(); FAIL("global(%x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(%x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
-            //Globals.unitTestScreenOutput.Clear(); FAIL("global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
-            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
 
             Globals.unitTestScreenOutput.Clear(); FAIL("global(<2001 2002>, %x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
             Globals.unitTestScreenOutput.Clear(); FAIL("lib:global(<2001 2002>, %x, 'a');" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global"));
-            //Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
-            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a command name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
+            //Globals.unitTestScreenOutput.Clear(); FAIL("lib:global <2001 2002> %x 'a';" + G.NL + "prt 1/;"); Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("global")); --> nor allowed as procedure because it is a statement name
         }
 
         [TestMethod]
@@ -10719,7 +10719,7 @@ namespace UnitTests
             _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
             _AssertSeries(First(), "b2", 2012, 888d, sharedDelta);
 
-            //=====with respect and TIME command
+            //=====with respect and TIME statement
 
             //-----does not exist beforehand
 
@@ -18623,7 +18623,7 @@ namespace UnitTests
                 I("f1;");
                 _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
                 I("f2;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //command file has no 
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //program file has no 
                 I("f3;");
                 _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
 
@@ -18680,7 +18680,7 @@ namespace UnitTests
             c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm line 12 pos 8"));
             Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm, line 102"));
-            Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
+            Assert.IsTrue(c1.Contains(@"Call stack: Statement line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm (run-time error in line 102)"));
 
@@ -18693,7 +18693,7 @@ namespace UnitTests
             c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm line 12 pos 8"));
             Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm, line 72"));
-            Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
+            Assert.IsTrue(c1.Contains(@"Call stack: Statement line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib4.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm (run-time error in line 72)"));
 
@@ -18717,7 +18717,7 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
 
             // ------------------
-            // Command files
+            // Program files
             // ------------------
 
             Globals.unitTestScreenOutput = new StringBuilder();
@@ -18735,7 +18735,7 @@ namespace UnitTests
     [   1]:   run cc1;";
 
             string cc1a =
-@"    Call stack: Command line calling -->
+@"    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";
 
             Assert.IsTrue(c1.Contains(cc1));
@@ -18750,7 +18750,7 @@ namespace UnitTests
 
             string cc2 =
 @"
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c2.gcm (run-time error in line 1)";
 
             Assert.IsTrue(c2.Contains(cc2));
@@ -18765,7 +18765,7 @@ namespace UnitTests
 *** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\cc3.gcm, line 5
     [   5]:   y = notexisting();
 
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c3.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\cc3.gcm (run-time error in line 5)";
 
@@ -18781,7 +18781,7 @@ namespace UnitTests
 *** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\cc4.gcm, line 5
     [   5]:   y = %x;  //will fail with a run-error
 
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c4.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\cc4.gcm (run-time error in line 5)";
 
@@ -18797,7 +18797,7 @@ namespace UnitTests
 *** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\c5.gcm, line 1
     [   1]:   run cc5;
 
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c5.gcm (run-time error in line 1)";
 
             Assert.IsTrue(c5.Contains(cc5));
@@ -18818,7 +18818,7 @@ namespace UnitTests
 *** ERROR: Problem parsing/lexing file c:\Thomas\Gekko\regres\StackTrace\mm1.gcm, line 5
     [   5]:   model m1;
 
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\m1.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\mm1.gcm (run-time error in line 5)";
 
@@ -18838,7 +18838,7 @@ namespace UnitTests
 *** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\mm2.gcm, line 5
     [   5]:   model m2;
 
-    Call stack: Command line calling -->
+    Call stack: Statement line calling -->
     c:\Thomas\Gekko\regres\StackTrace\m2.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\mm2.gcm (run-time error in line 5)";
 
@@ -18895,7 +18895,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 10" + G.NL
               + @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 10)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -18912,7 +18912,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 20" + G.NL
               + @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 20)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -18929,7 +18929,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 28" + G.NL
               + @"    [  28]:   %v = HELPER_error('1c'); //line 30" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 28)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -18946,7 +18946,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 40" + G.NL
               + @"    [  40]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 11 calling -->" + G.NL
               + @"    procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 40)" + G.NL + G.NL;
@@ -18964,7 +18964,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 50" + G.NL
               + @"    [  50]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 11 calling -->" + G.NL
               + @"    procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 50)" + G.NL + G.NL;
@@ -18982,7 +18982,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 60" + G.NL
               + @"    [  60]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 11 calling -->" + G.NL
               + @"    procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 60)" + G.NL + G.NL;
@@ -19000,7 +19000,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x3', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 70" + G.NL
               + @"    [  70]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 11 calling -->" + G.NL
               + @"    procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 41 calling -->" + G.NL
@@ -19019,7 +19019,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x4', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 80" + G.NL
               + @"    [  80]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 11 calling -->" + G.NL
               + @"    procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 51 calling -->" + G.NL
@@ -19038,7 +19038,7 @@ namespace UnitTests
               + @"*** ERROR: Running file procedure 'x5', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 90" + G.NL
               + @"    [  90]:   " + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 21 calling -->" + G.NL
               + @"    procedure 'x5', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 90)" + G.NL + G.NL;
@@ -19046,7 +19046,7 @@ namespace UnitTests
 
 
             // -----------------------------------------------------
-            // ----- COMMAND FILES (gcm)
+            // ----- statement FILES (gcm)
             // -----------------------------------------------------
 
             Globals.errorHelper = null;
@@ -19064,7 +19064,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p1.gcm, line 10" + G.NL
               + @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 10)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
 
@@ -19080,7 +19080,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p1.gcm, line 20" + G.NL
               + @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 20)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
 
@@ -19096,7 +19096,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p1.gcm, line 30" + G.NL
               + @"    [  30]:   %v = HELPER_error('1c'); //line 30" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 30)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
 
@@ -19112,7 +19112,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p2.gcm, line 40" + G.NL
               + @"    [  40]:   %v = HELPER_error('2a'); //line 40" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm (run-time error in line 40)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -19129,7 +19129,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p2.gcm, line 50" + G.NL
               + @"    [  50]:   %v = HELPER_error('2b'); //line 50" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm (run-time error in line 50)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -19146,7 +19146,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p2.gcm, line 60" + G.NL
               + @"    [  60]:   %v = HELPER_error('2c'); //line 60" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm (run-time error in line 60)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -19163,7 +19163,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p3.gcm, line 70" + G.NL
               + @"    [  70]:   %v = HELPER_error('3'); //line 70" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm line 41 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p3.gcm (run-time error in line 70)" + G.NL + G.NL;
@@ -19181,7 +19181,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p4.gcm, line 80" + G.NL
               + @"    [  80]:   %v = HELPER_error('4'); //line 80" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm line 51 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p4.gcm (run-time error in line 80)" + G.NL + G.NL;
@@ -19199,7 +19199,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\p5.gcm, line 90" + G.NL
               + @"    [  90]:   %v = HELPER_error('5'); //line 90" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 21 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p5.gcm (run-time error in line 90)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -19221,7 +19221,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\extra2.gcm, line 11" + G.NL
               + @"    [  11]:   for(val %i = 1 to HELPER_error('extra2'));" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\extra2.gcm (run-time error in line 11)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
 
@@ -19236,7 +19236,7 @@ namespace UnitTests
               + @"*** ERROR: Running file c:\Thomas\Gekko\regres\StackTrace\extra1.gcm, line 11" + G.NL
               + @"    [  11]:   if(HELPER_error('extra1') == 2);" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\extra1.gcm (run-time error in line 11)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
         }
@@ -28497,7 +28497,7 @@ print(df2)
             I("val %v = endswith('abcde', 'cdf');");
             _AssertScalarVal(First(), "%v", 0d);
 
-            I("string %s = currentDateTime();                            //corresponds to STAMP command");
+            I("string %s = currentDateTime();                            //corresponds to STAMP statement");
             I("string %s = currentFreq();                                //for instance 'a' or 'q' etc.");
             _AssertScalarString(First(), "%s", "a");
             I("date %d = currentPerStart();                              //for instance 2001q1");
@@ -30345,7 +30345,7 @@ print(df2)
             //The test is a bit artificial, just doing an EFTER on a model and databank. But the result is
             //taken from Gekko 1.4 which we consider the 'truth' regarding EFTER :-).
             //Get a real check from TMK at some point.
-            //The EFTER command here produces 149 differences, and there are both real vars and add-factors among these.
+            //The EFTER statement here produces 149 differences, and there are both real vars and add-factors among these.
             CheckFullDatabank(0.0001, 0.0001, 2004, 2007);  //must be < 0.0001% or < 0.0001 absolute. Quite strict.
         }
 
