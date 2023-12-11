@@ -13439,9 +13439,6 @@ namespace UnitTests
             Assert.AreEqual(2022, m[i].periods[0].t1.super);
             Assert.AreEqual(2024, m[i].periods[0].t2.super);
 
-            Globals.unitTestScreenOutput.Clear();
-            I("tracestats3();");
-            string s = Globals.unitTestScreenOutput.ToString();
 
             // Trace objects created:
             //
@@ -13462,26 +13459,63 @@ namespace UnitTests
             // x=x1+x3+x3
             //
             // The <parent> nodes stick out from series objects (x1, x2, x3 and x).
-            // x has 8 precedents, of which 2 are null-dividers (<div>).
+            // x has 2+1+4+1+2 = 10 precedents, of which 2 are null-dividers
             //
-            // x1 -- <parent> -- x1=1
-            //                -- x1=100
-            //
-            // x2 -- <parent> -- x2=1 
-            //                -- x2=2
-            //                -- x2=3
-            //                -- x2=4            ... <---+
-            //                -- x2=5                    |
-            //                -- x2=6                    |
-            //                                     points back to 2+6+2=10 traces
-            // x1 -- <parent> -- x3=3              and adds 2 null-dividers for a total of 12 children
-            //                -- x3=300                  |
+            // x1 -- <parent> -- x1=1          ]
+            //                -- x1=100        ]
+            //                                 ]
+            // x2 -- <parent> -- x2=1 *dead*   ]
+            //                -- x2=2          ]
+            //                -- x2=3 *dead*   ]
+            //                -- x2=4          ] ... <---+
+            //                -- x2=5          ]         |
+            //                -- x2=6          ]         |
+            //                                 ]   points back to 2+1+4+1+2=10 traces from x1, x2 and x3,
+            // x1 -- <parent> -- x3=3          ]   including 2 null-dividers for a total of 10 children (8 real)
+            //                -- x3=300        ]         |
             //                                           |
             // x  -- <parent> -- x=x1+x2+x3 -------------+
             //
             // 
 
-            Assert.IsTrue(s.Contains("Removed 4 traces, 19 remaining "));
+            Globals.unitTestScreenOutput.Clear();
+            I("tracestats2();");
+            string s1 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s1.Contains(" 4 series with 11 traces "));
+            Assert.IsTrue(s1.Contains("--> depth: 0, traces: 11" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("tracestats3();");
+            string s2 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s2.Contains("Removed 4 trace references "));  //2 shadowed traces have references cut. They are referenced from both x1 and x (therefore 4 deleted references in all).
+
+            Globals.unitTestScreenOutput.Clear();
+            I("tracestats2();");
+            string s3 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s3.Contains(" 4 series with 9 traces "));
+            Assert.IsTrue(s3.Contains("--> depth: 0, traces: 9" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x1; tracestats2();");
+            string s4 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s4.Contains(" 3 series with 9 traces "));
+            Assert.IsTrue(s4.Contains("--> depth: 0, traces: 7" + G.NL));
+            Assert.IsTrue(s4.Contains("--> depth: 1, traces: 2" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x2; tracestats2();");
+            string s5 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s5.Contains(" 2 series with 9 traces "));
+            Assert.IsTrue(s5.Contains("--> depth: 0, traces: 3" + G.NL));
+            Assert.IsTrue(s5.Contains("--> depth: 1, traces: 6" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x3; tracestats2();");
+            string s6 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s6.Contains(" 1 series with 9 traces "));
+            Assert.IsTrue(s6.Contains("--> depth: 0, traces: 1" + G.NL));
+            Assert.IsTrue(s6.Contains("--> depth: 1, traces: 8" + G.NL));
+
         }
 
         [TestMethod]

@@ -5135,7 +5135,7 @@ namespace Gekko
             {
                 DateTime t0 = DateTime.Now;
                 TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetTimeShadowInfo);
-                new Writeln("Removed " + (th.input - th.output) + " traces, " + th.output + " remaining (" + G.Seconds(t0) + ")");
+                new Writeln("Removed " + (th.input - th.output) + " trace references (" + G.Seconds(t0) + ")");
             }
         }
 
