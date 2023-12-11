@@ -1996,18 +1996,6 @@ namespace Gekko
         {
             if (false && Globals.runningOnTTComputer)
             {
-                GekkoTimeSpanSimple span1 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2002, 1), new GekkoTime(EFreq.A, 2008, 1));
-                GekkoTimeSpanSimple span2 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2005, 1), new GekkoTime(EFreq.A, 2005, 1));
-                GekkoTimeSpanSimple span3 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2003, 1));
-                GekkoTimeSpanSimple span4 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2007, 1), new GekkoTime(EFreq.A, 2009, 1));
-                GekkoTimeSpanSimple span5 = new GekkoTimeSpanSimple(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2004, 1));
-
-                List<GekkoTimeSpanSimple> span = Trace2.TimeShadow(span2, span1);
-
-            }                    
-
-            if (false && Globals.runningOnTTComputer)
-            {
                 new Writeln(Environment.UserName + " --- " + System.Security.Principal.WindowsIdentity.GetCurrent().Name);
             }
             //if (false && Globals.runningOnTTComputer)

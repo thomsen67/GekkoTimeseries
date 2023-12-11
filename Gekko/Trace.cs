@@ -34,7 +34,8 @@ namespace Gekko
     public enum ETraceHelper
     {        
         GetAllMetasAndTraces,
-        OnlyGetMetas
+        OnlyGetMetas,
+        GetTimeShadowInfo
     }
 
     [ProtoContract]
@@ -166,9 +167,16 @@ namespace Gekko
             this.precedents = x;
         }
 
-        public List<TraceAndPeriods> GetPrecedentsAndShadowedPeriods()
-        {
-            bool FIX_shadowedTracesAreCompletelyRemoved = true;
+        /// <summary>
+        /// For the list of precedents in this.precedents, the method checks which traces are shadowed by later traces.
+        /// With shadowedTracesAreRemoved == false, the count of the list returned will be the same as the count of the
+        /// count of this.precedents (so we also get null-dividers). The included list includes period information, and
+        /// if shadowedTracesAreRemoved == false, the period info may be empty.
+        /// </summary>
+        /// <param name="shadowedTracesAreRemoved"></param>
+        /// <returns></returns>
+        public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved)
+        {            
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
             if (this.precedents.Count() > 0)
             {
@@ -197,7 +205,7 @@ namespace Gekko
                         {
                             count++;
                             List<GekkoTimeSpanSimple> m = spansList[k];
-                            if (!FIX_shadowedTracesAreCompletelyRemoved || m.Count > 0)
+                            if (!shadowedTracesAreRemoved || m.Count > 0)
                             {
                                 TraceAndPeriods tap = new TraceAndPeriods();
                                 tap.trace = this.precedents[lastNull - count - 1];
@@ -222,7 +230,7 @@ namespace Gekko
 
                         if (counterI == 0)
                         {
-                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(traceNew.contents.span, traceOld.contents.span);
+                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.span, traceOld.contents.span);
                             spansList.Add(spans);
                         }
                         else
@@ -231,7 +239,7 @@ namespace Gekko
                             List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
                             foreach (GekkoTimeSpanSimple spanTemp in spansList[k2])
                             {
-                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow(traceNew.contents.span, spanTemp);
+                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.span, spanTemp);
                                 newList.AddRange(spans);
                             }
                             spansList[k2] = newList;
@@ -243,11 +251,16 @@ namespace Gekko
             return rv;
         }
 
+        public List<TraceAndPeriods> TimeShadow2()
+        {
+            return this.TimeShadow2(true);
+        }
+
         /// <summary>
         /// Test if a trace is "real" (false) or "invisible" (true). Invisible traces are directly linked to timeseries
         /// and have no contents. They are just an entry into the real traces.
         /// These should not count in statistics etc.
-        /// Remember that a divider trace can be == null!
+        /// Remember that a divider trace can have .contents == null! (this will also return true and should also not be counted)
         /// </summary>
         /// <returns></returns>
         public static bool IsInvisibleTrace(Trace2 trace)
@@ -264,7 +277,7 @@ namespace Gekko
             return s;
         }        
 
-        public void DeepTrace(TraceHelper th, Trace2 parent, int depth)
+        public void DeepTrace(TraceHelper th, int depth)
         {
             if (th.type == ETraceHelper.GetAllMetasAndTraces)
             {                
@@ -292,10 +305,57 @@ namespace Gekko
                     foreach (Trace2 trace in this.precedents.GetStorage())
                     {
                         if (trace == null) continue;                        
-                        trace.DeepTrace(th, this, depth + 1);
+                        trace.DeepTrace(th, depth + 1);
                     }
                 }
             }            
+            else if (th.type == ETraceHelper.GetTimeShadowInfo)
+            {
+                if (true || !Trace2.IsInvisibleTrace(this))  //traces next to timeseries + dividers
+                {
+
+                    ScalarVal temp = null; th.timeShadowing.TryGetValue(this, out temp);
+                    if (temp == null)
+                    {
+                        th.timeShadowing.Add(this, Globals.scalarVal1);
+                        if (this.precedents.Count() > 0)
+                        {
+                            th.input += this.precedents.Count();
+                            List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+                            th.output += shadow.Count;
+                            if (shadow.Count > precedents.Count())
+                            {
+                                new Error("Hov!");
+                            }
+                            else if (shadow.Count != precedents.Count())
+                            {
+                                this.precedents = new Precedents();
+                                foreach (TraceAndPeriods temp2 in shadow)
+                                {
+                                    if (temp2 == null) this.precedents.Add(null);
+                                    else this.precedents.Add(temp2.trace);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //has been seen before
+                        //temp.lighted++;
+                        //temp.shadowed++;
+                        return;
+                    }
+                }
+                
+                if (this.precedents.Count() > 0)
+                {
+                    foreach (Trace2 trace in this.precedents.GetStorage())
+                    {
+                        if (trace == null) continue;
+                        trace.DeepTrace(th, depth + 1);
+                    }
+                }
+            }
         }        
 
         public Trace2 DeepClone(CloneHelper cloneHelper)
@@ -502,11 +562,12 @@ namespace Gekko
 
         /// <summary>
         /// For the newSpan, it removes these periods from the oldSpan. Returns a list of GekkoTimeSpanSimple with 0, 1 or 2 elements.
+        /// Used in TimeShadow2().
         /// </summary>
         /// <param name="newSpan"></param>
         /// <param name="oldSpan"></param>
         /// <param name="periodsContainer"></param>
-        public static List<GekkoTimeSpanSimple> TimeShadow(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan)
+        public static List<GekkoTimeSpanSimple> TimeShadow1(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan)
         {
             // The code below removes the --- from the ===, so newSpan removes periods from oldSpan
             // Four possibilities
@@ -660,7 +721,7 @@ namespace Gekko
                 {
                     //txt.lineWidth = int.MaxValue;
                     TraceHelper th = new TraceHelper();
-                    trace.DeepTrace(th, null, 0);                    
+                    trace.DeepTrace(th, 0);                    
                     int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
                     string s = "Traces";
                     if (all) s = count2 + " " + "traces (click [] to see more info)";
@@ -944,7 +1005,7 @@ namespace Gekko
         public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
         public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
-        // ----------
+        
         // --- the following is for stats etc. ("real" traces)        
         public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not
         public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
@@ -952,6 +1013,12 @@ namespace Gekko
         // --- gbk write/read and other stuff
         //Hmm, isn't Precedents already a part of the key? Anyway, the depth needs to be inside an object anyway to be altered.
         public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
+        //
+        // --- this is for time-shadowing
+        public int input = 0;
+        public int output = 0;
+        public Dictionary<Trace2, ScalarVal> timeShadowing = new Dictionary<Trace2, ScalarVal>();
+
     }
 
     public class PrecedentsAndDepth
@@ -1161,4 +1228,10 @@ namespace Gekko
         public Trace2 trace = null;
         public List<GekkoTimeSpanSimple> periods = null;
     }
+
+    //public class TraceShadowingHelper
+    //{
+    //    public int lighted = 0; //was retained in a TimeShadow sweep
+    //    public int shadowed = 0; //was removed in a TimeShadow sweep
+    //}
 }

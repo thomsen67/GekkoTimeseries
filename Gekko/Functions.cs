@@ -5127,7 +5127,17 @@ namespace Gekko
             DateTime dt = GekkoTime.DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
-        }        
+        }
+
+        public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            if (true)
+            {
+                DateTime t0 = DateTime.Now;
+                TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetTimeShadowInfo);
+                new Writeln("Removed " + (th.input - th.output) + " traces, " + th.output + " remaining (" + G.Seconds(t0) + ")");
+            }
+        }
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
@@ -5165,11 +5175,12 @@ namespace Gekko
                     {
                         if (i == 0) continue;  //do not print that
                     }                    
-                    
-                    txt.MainAdd("depth: " + (i - 1) + ", traces: " + depths[i] + extra);
+                    txt.MainAdd("--> depth: " + (i - 1) + ", traces: " + depths[i] + extra);
                     txt.MainNewLineTight();
                 }
                 txt.MainAdd("");
+                txt.MainNewLineTight();
+                txt.MainAdd("Traces of depth 0 connect directly to a series/array-series in the databank. A trace of depth 1 connects to a trace of depth 0, and so on.");
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
         }
