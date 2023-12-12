@@ -733,7 +733,7 @@ namespace Gekko
                             {
                                 TreeGridModel model = new TreeGridModel();
                                 model.Add(trace.CopyToItems(0, 0));
-                                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model); 
                                 string v = null;
                                 if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
                                 w.Title = v + "Gekko trace";
