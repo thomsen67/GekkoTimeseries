@@ -16823,6 +16823,13 @@ namespace UnitTests
                     //Testing out residual production
                     I("SIM<res>;");  //produce residuals, can use <prefix = 'res_'>
                     _AssertSeries(First(), "E_tIOy", new string[] { "tje", "tje" }, 2027, 0d, sharedDelta);
+                    _AssertSeries(First(), "E_qBNP", 2027, 0d, sharedDelta);
+                    I("pG <2027 2040> *= 2;");
+                    //Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                    I("SIM<res>;");  //produce residuals, can use <prefix = 'res_'>
+                    _AssertSeries(First(), "E_qBNP", 2030, -496.9875, 0.001d);
+                    //I("pG <2027 2040> *= 0.5;");
+                    //Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                 }
 
                 if (true)
@@ -16835,6 +16842,8 @@ namespace UnitTests
                     try
                     {
                         Globals.modelResUnitTest = true;
+                        I("READ <gdx> makro.zip\\makro0.gdx;");
+                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
                         I("SIM;");
                     }
                     finally

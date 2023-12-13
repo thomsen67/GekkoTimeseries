@@ -1993,7 +1993,8 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
+        {                               
+
             if (false && Globals.runningOnTTComputer)
             {
                 new Writeln(Environment.UserName + " --- " + System.Security.Principal.WindowsIdentity.GetCurrent().Name);

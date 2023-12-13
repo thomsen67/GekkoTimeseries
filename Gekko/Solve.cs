@@ -730,6 +730,10 @@ namespace Gekko
             {
                 ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
 
+                //Get data into scalar model
+                //??? What about ref bank?
+                Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+
                 // test the scalar model
                 // test the scalar model
                 // test the scalar model
