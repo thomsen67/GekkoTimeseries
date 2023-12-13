@@ -1245,7 +1245,7 @@ namespace Gekko
         private static void LinkClicked(System.Windows.Forms.LinkClickedEventArgs e, ETabs tab)
         {
             try
-            {
+            {                                
                 //any abort from STOP or red atop button have probably finished when user
                 //clicks a link. If not reset, the link may throw an exception.
                 Program.AbortingReset();
@@ -1496,13 +1496,23 @@ namespace Gekko
                 else
                 {
                     new Error("Unexpected error rgd. links");
-                    //throw new GekkoException();
                 }
             }
             catch (Exception e2)
             {
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
                 new Error("Problem with link", false);
+                if (Globals.runningOnTTComputer)
+                {
+                    new Writeln(" --- TTH start ---"); 
+                    new Writeln(e2.Message);
+                    new Writeln(e2.ToString());
+                    new Writeln(e2.InnerException.Message);
+                    new Writeln(e2.InnerException.ToString());
+                    new Writeln(e2.StackTrace);
+                    new Writeln(" --- TTH end ---");
+                }
+                //Program.PrintExceptionAndFinishThread(e2, p);
                 //consume this error: otherwise the whole GUI will close (for instance if a DISP-variable does not exist)
             }
         }

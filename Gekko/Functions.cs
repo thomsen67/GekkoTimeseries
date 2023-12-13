@@ -3305,7 +3305,27 @@ namespace Gekko
             Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x1, ilags, true);
         }
-                
+
+        public static IVariable modelrawvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            GekkoDictionary<string, List<ModelGamsEquation>> vars = Program.model?.modelGams?.equationsByVarname;
+            if (vars == null) new Error("Could not find GAMS raw model. Did you forget a MODEL<gms> statement?");
+            List<string> m = vars.Keys.ToList();
+            //string s = Stringlist.GetListWithCommas(m);
+            List mm = new List(Stringlist.GetListOfIVariablesFromListOfStrings(m.ToArray()));
+            return mm;
+        }
+
+        public static IVariable modelraweqs(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            GekkoDictionary<string, List<ModelGamsEquation>> eqs = Program.model?.modelGams?.equationsByEqname;
+            if (eqs == null) new Error("Could not find GAMS raw model. Did you forget a MODEL<gms> statement?");
+            List<string> m = eqs.Keys.ToList();
+            //string s = Stringlist.GetListWithCommas(m);
+            List mm = new List(Stringlist.GetListOfIVariablesFromListOfStrings(m.ToArray()));
+            return mm;
+        }
+
         public static IVariable asbrename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable file, IVariable decorate)
         {
             string s = null;
