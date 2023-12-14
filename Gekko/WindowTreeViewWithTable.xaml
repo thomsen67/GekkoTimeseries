@@ -5,8 +5,8 @@
 	x:Class="Gekko.WindowTreeViewWithTable"
 	Width="800"
 	Height="600"
-	WindowStartupLocation="CenterScreen">
-
+	WindowStartupLocation="CenterScreen">    
+    
     <Window.Resources>
         <GridLength x:Key="TreeToggleWidth">20</GridLength>        
         <local:LevelConverter x:Key="LevelSpaceConverter" LevelWidth="{StaticResource TreeToggleWidth}"/>
@@ -17,26 +17,25 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <StackPanel Orientation="Horizontal">
-                            <Image x:Name="checkboxImage" Source="c:\tools\normal.png"/>
+                            <Image x:Name="checkboxImage" Source= "pack://siteoforigin:,,,/images/normal.png" />
                             <ContentPresenter/>
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="checkboxImage" Property="Source" Value="c:\tools\checked.png"/>
+                                <Setter TargetName="checkboxImage" Property="Source" Value="pack://siteoforigin:,,,/images/checked.png"/>
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsMouseOver" Value="True"/>
                                     <Condition Property="IsChecked" Value="False"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="checkboxImage" Property="Source" Value="c:\tools\hover.png"/>
+                                <Setter TargetName="checkboxImage" Property="Source" Value="pack://siteoforigin:,,,/images/hover.png"/>
                             </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
 
     <DockPanel>
