@@ -25509,7 +25509,7 @@ namespace Gekko
             }
         }
 
-        private static string PrintNonSeries(IVariable x, string labelGiven, int depth, NonSeriesHelper helper)
+        public static string PrintNonSeries(IVariable x, string labelGiven, int depth, NonSeriesHelper helper)
         {
             string s = "";
             string pling = "'";

@@ -1253,7 +1253,8 @@ namespace Gekko
 
         /// <summary>
         /// Equations. Type 1 = all (unrolled). Type 2 = omit time dimension. Type 3 = omit all dimensions.
-        /// Beware for type == 1 that it takes a tiny bit of time, do not use the function inside a long loop or as end in a long loop...
+        /// Beware for type != 1 that it takes a tiny bit of time, do not use the function inside a long loop or as end in a long loop...
+        /// See also GetEqs().
         /// </summary>
         /// <returns></returns>
         public int CountEqs(int type)
@@ -1277,7 +1278,40 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Equations. Type 1 = all (unrolled). Type 2 = omit time dimension. Type 3 = omit all dimensions.
+        /// Beware for type != 1 that it takes a tiny bit of time, do not use the function inside a long loop or as end in a long loop...
+        /// See also CountEqs().
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetEqs(int type)
+        {
+            List<string> rv = null;
+            if (type == 1)
+            {
+                rv = this.dict_FromEqNumberToEqName.ToList();                
+            }
+            GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s2 in this.dict_FromEqNumberToEqName)
+            {
+                ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                if (type == 2)
+                {
+                    if (!temp.ContainsKey(helper.resultingFullName)) temp.Add(helper.resultingFullName, 0);
+                }
+                else if (type == 3)
+                {
+                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                }
+                else new Error("Unexpected");
+            }
+            rv = temp.Keys.ToList();
+            rv.Sort();
+            return rv;
+        }
+
+        /// <summary>
         /// Variables. Type 1 = all. Type 2 = omit time dimension (corresponds to a-array variables). Type 3 = omit all dimensions.
+        /// See also GetVars().
         /// </summary>
         /// <returns></returns>
         public int CountVars(int type)
@@ -1305,8 +1339,39 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Variables. Type 1 = all. Type 2 = omit time dimension (corresponds to a-array variables). Type 3 = omit all dimensions.
+        /// See also CountVars().
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetVars(int type)
+        {
+            List<string> rv = null;
+            if (type == 1)
+            {
+                rv= this.dict_FromVarNumberToVarName.ToList();
+            }
+            else if (type == 2)
+            {
+                return this.dict_FromANumberToVarName.ToList();
+            }
+            else if (type == 3)
+            {
+                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s2 in this.dict_FromVarNumberToVarName)
+                {
+                    ExtractTimeDimensionHelper helper = GamsModel.ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, s2, false);
+                    if (!temp.ContainsKey(helper.name)) temp.Add(helper.name, 0);
+                }
+                rv = temp.Keys.ToList();
+            }
+            else new Error("Unexpected");
+            rv.Sort();
+            return rv;
+        }
+
+        /// <summary>
         /// Takes data from a Databank and puts it into an a[][] data array (this array is from model.a).
-        /// If model is a ModelGamsScalar.
+        /// If model is a ModelGamsScalar.        
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>

@@ -3326,6 +3326,59 @@ namespace Gekko
             return mm;
         }
 
+        public static IVariable modelscalarvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            int i = 3;
+            string s = null;
+            if (x != null)
+            {
+                s = x.ConvertToString();
+                if (G.Equal(s, "dims")) i = 2;
+            }
+            
+            if (Program.model.modelGamsScalar == null) new Error("Could not find GAMS scalar model. Did you forget a MODEL<gms> statement?");
+            List<string> vars = Program.model?.modelGamsScalar.GetVars(i);
+            List mm = new List(Stringlist.GetListOfIVariablesFromListOfStrings(vars.ToArray()));
+            return mm;
+        }
+
+        public static IVariable modelscalarvars(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return modelscalarvars(smpl, _t1, _t2, null);
+        }
+
+        public static IVariable modelscalareqs(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            int i = 3;
+            string s = null;
+            if (x != null)
+            {
+                s = x.ConvertToString();
+                if (G.Equal(s, "dims")) i = 2;
+            }
+            if (Program.model.modelGamsScalar == null) new Error("Could not find GAMS scalar model. Did you forget a MODEL<gms> statement?");
+            List<string> eqs = Program.model?.modelGamsScalar.GetEqs(i);            
+            List mm = new List(Stringlist.GetListOfIVariablesFromListOfStrings(eqs.ToArray()));
+            return mm;
+        }
+        public static IVariable modelscalareqs(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return modelscalareqs(smpl, _t1, _t2, null);
+        }
+
+        public static void venn(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            List v1 = Functions.intersect(smpl, _t1, _t2, x2, x1) as List;
+            List v2 = Functions.except(smpl, _t1, _t2, x1, x2) as List;
+            List v3 = Functions.except(smpl, _t1, _t2, x2, x1) as List;
+
+            if (v1 == null || v2 == null || v3 == null) new Error("Problem with lists in venn() function");
+
+            Program.PrintNonSeries(v1, "The following " + v1.Count() + " strings are in both lists:", 0, null);
+            Program.PrintNonSeries(v2, "The following " + v2.Count() + " strings are in list #1, but not in list #2:", 0, null);
+            Program.PrintNonSeries(v3, "The following " + v3.Count() + " strings are in list #2, but not in list #1:", 0, null);
+        }
+
         public static IVariable asbrename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable file, IVariable decorate)
         {
             string s = null;
@@ -5162,6 +5215,41 @@ namespace Gekko
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
+
+        public static void flatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable t3)
+        {
+            GekkoTime gt1 = t1.ConvertToDate(O.GetDateChoices.Strict);
+            GekkoTime gt2 = t2.ConvertToDate(O.GetDateChoices.Strict);
+            GekkoTime gt3 = t3.ConvertToDate(O.GetDateChoices.Strict);
+            Databank w = Program.databanks.GetFirst();
+            foreach (KeyValuePair<string, IVariable> kvp in w.storage)
+            {
+                Helper_Flatten(gt1, gt2, gt3, kvp.Value);
+            }
+            new Writeln("Over the period " + gt1.ToString() + "-" + gt3.ToString() + ", all series and array-series are set to their " + gt2.ToString() + " value");
+        }
+
+        private static void Helper_Flatten(GekkoTime gt1, GekkoTime gt2, GekkoTime gt3, IVariable iv)
+        {
+            Series ts = iv as Series;
+            if (ts != null)
+            {
+                if (ts.type == ESeriesType.Normal)
+                {
+                    foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt3))
+                    {
+                        ts.SetData(gt, ts.GetDataSimple(gt2));
+                    }
+                }
+                else if (ts.type == ESeriesType.ArraySuper)
+                {
+                    foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                    {
+                        Helper_Flatten(gt1, gt2, gt3, kvp2.Value);
+                    }
+                }
+            }
         }
 
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

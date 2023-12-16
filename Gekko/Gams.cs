@@ -1647,7 +1647,7 @@ namespace Gekko
             // Should #dependents list be reflected in hash ?????
             //
             model.modelGams = ReadGamsModelHelper(false, textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
-            //if (Globals.runningOnTTComputer) Sniff2(model);
+            if (Globals.runningOnTTComputer) Sniff3(model);
             DateTime t1 = DateTime.Now;
             return model;
         }
@@ -2445,114 +2445,166 @@ namespace Gekko
             return found;
         }
 
-        //private static void Sniff2(Model model)
-        //{
-        //    DateTime dt = DateTime.Now;
-        //    double ms1 = 0;
-        //    double ms2 = 0;
-        //    int n1 = 0;
-        //    int n2 = 0;
-        //    int n3 = 0;
+        private static void Sniff2(Model model)
+        {
+            DateTime dt = DateTime.Now;
+            double ms1 = 0;
+            double ms2 = 0;
+            int n1 = 0;
+            int n2 = 0;
+            int n3 = 0;
 
-        //    int counterA = 0;
-        //    int counterError1 = 0;
-        //    int counterError2 = 0;
+            int counterA = 0;
+            int counterError1 = 0;
+            int counterError2 = 0;
 
-        //    foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
-        //    {
-        //        //if (counterA > 6) break;
-        //        if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
+            {
+                //if (counterA > 6) break;
+                if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
-        //        counterA++;
-        //        ModelGamsEquation eq = kvp.Value[0];
+                counterA++;
+                ModelGamsEquation eq = kvp.Value[0];
 
-        //        eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
+                eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
 
-        //        string rhs = eq.rhs.Trim();
-        //        string lhs = eq.lhs.Trim();
-        //        string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
+                string rhs = eq.rhs.Trim();
+                string lhs = eq.lhs.Trim();
+                string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
 
-        //        if (eq.expressions == null || eq.expressions.Count == 0)
-        //        {
-        //            Globals.expressions = null;  //maybe not necessary
+                if (eq.expressions == null || eq.expressions.Count == 0)
+                {
+                    Globals.expressions = null;  //maybe not necessary
 
-        //            try
-        //            {
-        //                DateTime dt1 = DateTime.Now;
-        //                Program.CallEval(eq.conditionals, s1);
-        //                ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
-        //                n1++;
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                counterError1++;
-        //                if (e.Message.Contains("System.OutOfMemoryException"))
-        //                {
-        //                    G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
-        //                }
-        //                else
-        //                {
-        //                    G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
-        //                }
-        //                continue;
-        //            }
-        //            eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                    try
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        Program.CallEval(eq.conditionals, s1);
+                        ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
+                        n1++;
+                    }
+                    catch (Exception e)
+                    {
+                        counterError1++;
+                        if (e.Message.Contains("System.OutOfMemoryException"))
+                        {
+                            G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
+                        }
+                        else
+                        {
+                            G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
+                        }
+                        continue;
+                    }
+                    eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
 
-        //            DateTime dt2 = DateTime.Now;
-        //            foreach (Func<GekkoSmpl, IVariable> expression in eq.expressions)
-        //            {
+                    DateTime dt2 = DateTime.Now;
+                    foreach (Func<GekkoSmpl, IVariable> expression in eq.expressions)
+                    {
 
-        //                //Function call start --------------
-        //                //O.AdjustSmplForDecomp(smpl, 0);
-        //                //TODO: can be deleted, #p24234oi32
+                        //Function call start --------------
+                        //O.AdjustSmplForDecomp(smpl, 0);
+                        //TODO: can be deleted, #p24234oi32
 
-        //                try
-        //                {
-        //                    DecompOperator op = new DecompOperator("d");
-        //                    GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
-        //                    GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
-        //                    string residualName = "residual___";
-        //                    int funcCounter = 0;
-        //                    DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
+                        try
+                        {
+                            DecompOperator op = new DecompOperator("d");
+                            GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
+                            GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
+                            string residualName = "residual___";
+                            int funcCounter = 0;
+                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks_OLDREMOVESOON(op), residualName, ref funcCounter);
 
-        //                    List<string> m1 = new List<string>();
-        //                    List<string> m2 = new List<string>();
-        //                    foreach (string s in dd.cellsContribD.storage.Keys)
-        //                    {
-        //                        string ss5 = Program.DecompGetNameFromContrib(s);
-        //                        if (!m1.Contains(ss5, StringComparer.OrdinalIgnoreCase))
-        //                        {
-        //                            m1.Add(ss5);
-        //                        }
-        //                    }
-        //                    EquationVariablesGams temp = new EquationVariablesGams();
-        //                    temp.equationVariables = m1;
-        //                    eq.expressionVariablesWithSets.Add(temp);
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    counterError2++;
-        //                    eq.expressionVariablesWithSets.Add(null); //keep alignment
-        //                    if (e.Message.Contains("System.OutOfMemoryException"))
-        //                    {
-        //                        G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
-        //                    }
-        //                    else
-        //                    {
-        //                        G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
-        //                    }
-        //                    break;
-        //                }
-        //                n2++;
-        //            }
-        //            ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
-        //            n3++;
-        //            Globals.expressions = null;  //maybe not necessary
-        //        }
-        //    }
-        //    G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + (-ms1 / 1000d) + " " + (-ms2 / 1000d));
-        //    G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
-        //}
+                            List<string> m1 = new List<string>();
+                            List<string> m2 = new List<string>();
+                            foreach (string s in dd.cellsContribD.storage.Keys)
+                            {
+                                string ss5 = Program.DecompGetNameFromContrib(s);
+                                if (!m1.Contains(ss5, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    m1.Add(ss5);
+                                }
+                            }
+                            EquationVariablesGams temp = new EquationVariablesGams();
+                            temp.equationVariables = m1;
+                            eq.expressionVariablesWithSets.Add(temp);
+                        }
+                        catch (Exception e)
+                        {
+                            counterError2++;
+                            eq.expressionVariablesWithSets.Add(null); //keep alignment
+                            if (e.Message.Contains("System.OutOfMemoryException"))
+                            {
+                                G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
+                            }
+                            else
+                            {
+                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                            }
+                            break;
+                        }
+                        n2++;
+                    }
+                    ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
+                    n3++;
+                    Globals.expressions = null;  //maybe not necessary
+                }
+            }
+            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + (-ms1 / 1000d) + " " + (-ms2 / 1000d));
+            G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
+        }
+
+        private static void Sniff3(Model model)
+        {
+            DateTime dt = DateTime.Now;            
+
+            int counterA = 0;
+
+            string eqs = null;
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in model.modelGams.equationsByEqname)
+            {                
+                counterA++;
+                ModelGamsEquation eq = kvp.Value[0];
+                eqs += ", " + eq.nameGams;
+
+                eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
+
+                string rhs = eq.rhs.Trim();
+                string lhs = eq.lhs.Trim();
+                string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
+                string sets = null;
+                bool hasDim = false;
+                
+                foreach(string ss in eq.setsGamsList)
+                {                    
+                    if (!G.Equal(ss, "t"))
+                    {
+                        hasDim = true;
+                        sets += ", #" + ss;
+                    }
+                }
+                string c = null;
+                if (!G.NullOrBlanks(eq.conditionals))
+                {
+                    c = " $ (" + eq.conditionals + ")";
+                }
+                if (sets != null) sets = sets.Substring(2);
+                string x = null;
+                if (hasDim) x = "[" + sets + "]";
+                string s2 = kvp.Key + x + c + " = " + s1;
+                using (var txt = new Writeln())
+                {
+                    if (hasDim) txt.MainAdd(kvp.Key + " = series(" + (eq.setsGamsList.Count - 1) + ");");
+                    else txt.MainAdd("//");
+                    txt.MainNewLineTight();
+                    //txt.MainAdd("// " + eq.nameGams);
+                    //txt.MainNewLineTight();
+                    txt.MainAdd(s2);
+                }                
+            }
+            new Writeln("===> Eqs: " + counterA + ", " + G.Seconds(dt));
+            new Writeln("NAMES: " + eqs);
+        }
 
         private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable, Model model)
         {            

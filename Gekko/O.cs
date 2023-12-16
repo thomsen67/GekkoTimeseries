@@ -9710,8 +9710,7 @@ namespace Gekko
                                 new Warning("Skipped one variable for printing");
                             }
                             else if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
-                            {
-                                //G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
+                            {                                
                                 G.Writeln2("[empty list]");
                             }                            
                             else
