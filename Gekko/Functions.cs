@@ -4706,7 +4706,7 @@ namespace Gekko
             {
                 return x1;  //not touched
             }
-        }
+        }        
 
         public static IVariable unique(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
@@ -4956,6 +4956,44 @@ namespace Gekko
             return replace(smpl, _t1, _t2, ths, x2, x3, false, Globals.scalarVal0);
         }
 
+        public static void bankreplace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable xbank, IVariable x1, IVariable x2)
+        {
+            //replace values in series in databank
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);            
+            double d1 = O.ConvertToVal(x1);
+            double d2 = O.ConvertToVal(x2);
+            Databank db = Program.databanks.GetFirst();
+            if (xbank != null) db = Program.databanks.GetDatabank(O.ConvertToString(xbank), true);
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                Helper_BankReplace(t1, t2, kvp.Value, d1, d2);
+            }
+            new Writeln("Over the period " + t1.ToString() + "-" + t2.ToString() + ", all series and array-series have " + d1 + " replaced with " + d2);
+        }
+
+        public static void bankreplace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x2, IVariable x3)
+        {            
+            bankreplace(smpl, _t1, _t2, null, x2, x3);
+        }
+        
+        public static void bankflatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable xbank, IVariable xt)
+        {
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);            
+            GekkoTime t = O.ConvertToDate(xt);            
+            Databank db = Program.databanks.GetFirst();
+            if (xbank != null) db = Program.databanks.GetDatabank(O.ConvertToString(xbank), true);
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                Helper_BankFlatten(t1, t2, t, kvp.Value);
+            }
+            new Writeln("Over the period " + t1.ToString() + "-" + t2.ToString() + ", all series and array-series are set to their " + t.ToString() + " value");
+        }
+
+        public static void bankflatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable xt)
+        {
+            bankflatten(smpl, _t1, _t2, null, xt);
+        }
+
         public static IVariable replace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x2, IVariable x3, bool isInside, IVariable max)
         {
             int imax = O.ConvertToInt(max);
@@ -4965,7 +5003,6 @@ namespace Gekko
                 if (isInside)
                 {
                     new Error("replaceinside() is for list argument only");
-                    //throw new GekkoException();
                 }
                 string s1 = O.ConvertToString(ths);
                 string s2 = O.ConvertToString(x2);
@@ -5217,36 +5254,52 @@ namespace Gekko
             tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
-        public static void flatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable t3)
-        {
-            GekkoTime gt1 = t1.ConvertToDate(O.GetDateChoices.Strict);
-            GekkoTime gt2 = t2.ConvertToDate(O.GetDateChoices.Strict);
-            GekkoTime gt3 = t3.ConvertToDate(O.GetDateChoices.Strict);
-            Databank w = Program.databanks.GetFirst();
-            foreach (KeyValuePair<string, IVariable> kvp in w.storage)
-            {
-                Helper_Flatten(gt1, gt2, gt3, kvp.Value);
-            }
-            new Writeln("Over the period " + gt1.ToString() + "-" + gt3.ToString() + ", all series and array-series are set to their " + gt2.ToString() + " value");
-        }
-
-        private static void Helper_Flatten(GekkoTime gt1, GekkoTime gt2, GekkoTime gt3, IVariable iv)
+        private static void Helper_BankFlatten(GekkoTime t1, GekkoTime t2, GekkoTime t, IVariable iv)
         {
             Series ts = iv as Series;
             if (ts != null)
             {
                 if (ts.type == ESeriesType.Normal)
                 {
-                    foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt3))
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t1, t2))
                     {
-                        ts.SetData(gt, ts.GetDataSimple(gt2));
+                        ts.SetData(gt, ts.GetDataSimple(t));
                     }
                 }
                 else if (ts.type == ESeriesType.ArraySuper)
                 {
                     foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
                     {
-                        Helper_Flatten(gt1, gt2, gt3, kvp2.Value);
+                        Helper_BankFlatten(t1, t2, t, kvp2.Value);
+                    }
+                }
+            }
+        }
+
+        private static void Helper_BankReplace(GekkoTime t1, GekkoTime t2, IVariable iv, double d1, double d2)
+        {
+            Series ts = iv as Series;
+
+            if (ts != null)
+            {
+                if (ts.type == ESeriesType.Normal)
+                {
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t1, t2))
+                    {
+                        double existing = ts.GetDataSimple(gt);
+                        ts.SetData(gt, Helper_Replace(existing, d1, d2));
+                    }
+                }
+                else if (ts.type == ESeriesType.Timeless)
+                {
+                    double existing = ts.GetDataSimple(t1);
+                    ts.SetData(t1, Helper_Replace(existing, d1, d2));
+                }
+                else if (ts.type == ESeriesType.ArraySuper)
+                {
+                    foreach (KeyValuePair<MultidimItem, IVariable> kvp2 in ts.dimensionsStorage.storage)
+                    {
+                        Helper_BankReplace(t1, t2, kvp2.Value, d1, d2);
                     }
                 }
             }

@@ -20017,7 +20017,52 @@ print(df2)
         [TestMethod]
         public void _Test_FunctionsInBuilt()
         {
-            //Program.Flush();
+            I("reset; time 2001 2003;");
+            I("x1 = 1;");
+            I("x2 = timeless(1);");
+            I("x3 = series(1);");
+            I("x3[a] = 1;");
+            I("bankreplace(1, 100);");
+            _AssertSeries(First(), "x1!a", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 100d, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x1 = 1, 2, 3;");
+            I("x2 = timeless(1);");
+            I("x3 = series(1);");
+            I("x3[a] = 3;");
+            I("bankflatten(<1990 2010>, 2002);");
+            _AssertSeries(First(), "x1!a", 1990, 2d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 1990, 1d, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 1990, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2010, 2d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2010, 1d, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2010, 3d, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("@x1 = 1;");
+            I("@x2 = timeless(1);");
+            I("@x3 = series(1);");
+            I("@x3[a] = 1;");
+            I("bankreplace('ref', 1, 100);");
+            _AssertSeries(Ref(), "x1!a", 2002, 100d, sharedDelta);
+            _AssertSeries(Ref(), "x2!a", 2002, 100d, sharedDelta);
+            _AssertSeries(Ref(), "x3!a", new string[] { "a" }, 2002, 100d, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("@x1 = 1, 2, 3;");
+            I("@x2 = timeless(1);");
+            I("@x3 = series(1);");
+            I("@x3[a] = 3;");
+            I("bankflatten(<1990 2010>, 'ref', 2002);");
+            _AssertSeries(Ref(), "x1!a", 1990, 2d, sharedDelta);
+            _AssertSeries(Ref(), "x2!a", 1990, 1d, sharedDelta);
+            _AssertSeries(Ref(), "x3!a", new string[] { "a" }, 1990, 3d, sharedDelta);
+            _AssertSeries(Ref(), "x1!a", 2010, 2d, sharedDelta);
+            _AssertSeries(Ref(), "x2!a", 2010, 1d, sharedDelta);
+            _AssertSeries(Ref(), "x3!a", new string[] { "a" }, 2010, 3d, sharedDelta);
+
             Databank work = First();
             //simplest possible
             I("RESET;");
