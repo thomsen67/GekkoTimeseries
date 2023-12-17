@@ -56,6 +56,7 @@ using static Gekko.O;
 using System.Linq;
 using System.Drawing;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using System.IO.Compression;
 //using System.Windows.Documents;
 
 namespace UnitTests
@@ -17016,6 +17017,35 @@ namespace UnitTests
             I("reset; time 1983 1983;");
             I("option folder working = '" + path5 + "';");
             I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+
+            if (false)
+            {
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration2.gmy r = Savepoints\exogenous_values';");
+                string file0 = path5 + "\\" + "M_static_calibration2.zip";
+                string file1 = path5 + "\\" + "gams.gms";
+                string file2 = path5 + "\\" + "dict.txt";
+                using (FileStream fs = new FileStream(file0, FileMode.Create))
+                using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
+                {
+                    arch.CreateEntryFromFile(file1, "gams.gms");
+                    arch.CreateEntryFromFile(file2, "dict.txt");
+                }
+            }
+
+            if (false)
+            {
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration1.gmy r = Savepoints\exogenous_values';");
+                string file0 = path5 + "\\" + "M_static_calibration1.zip";
+                string file1 = path5 + "\\" + "gams.gms";
+                string file2 = path5 + "\\" + "dict.txt";
+                using (FileStream fs = new FileStream(file0, FileMode.Create))
+                using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
+                {
+                    arch.CreateEntryFromFile(file1, "gams.gms");
+                    arch.CreateEntryFromFile(file2, "dict.txt");
+                }
+            }
+
             I("read<gdx> gdx/static_calibration_presolve.gdx;");
             I("model<gms> M_static_calibration.zip;");
             I("bankreplace(<1960 2030>, m(), 0);");
