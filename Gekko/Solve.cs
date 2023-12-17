@@ -816,6 +816,8 @@ namespace Gekko
                             string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
                             G.Chop_Chop(modelGamsScalar.GetEqName(i), out bank, out name2, out freq2, out indexes); //freq2 will be == null
                             string name = o.opt_prefix + name2;
+                            if (name2.ToLower().StartsWith("e_extra")) continue;  //#987asfd9fda
+                            if (indexes == null) new Error("Equation " + name2 + " does not seem to have indexes -- this is unexpected.");
                             GekkoTime t = GekkoTime.FromStringToGekkoTime(indexes[indexes.Length - 1]);
 
                             bool good = true;

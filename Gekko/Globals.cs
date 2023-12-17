@@ -78,6 +78,13 @@ namespace Gekko
         // -------------------------------------------------     
         // -------------------------------------------------     
 
+        public const string eqs1 = "------------- scalar -------------";
+        public const string eqs2 = "<no raw eqs>";
+        public const string eqs3 = "-------------- GAMS --------------";
+        public const string eqs4 = "------------- detailed -------------";
+        public const string eqs5 = "<no scalar eqs>";
+        public const string eqs6 = "could not be found...";
+
         public static bool bugfixDollarOperator = true;
         
         public const string pivotHelper1 = "{extra}";

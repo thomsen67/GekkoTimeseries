@@ -203,7 +203,8 @@ namespace Gekko
         /// <param name="t0"></param>
         /// <returns></returns>
         public string GetEquationText(List<string> eqs, bool showTime, GekkoTime t0)
-        {            
+        {
+            bool hit = false;  //if anything is found
             List<string> eqs2 = new List<string>();
             foreach (string s in eqs)
             {
@@ -211,31 +212,41 @@ namespace Gekko
             }
             TwoStrings two = this.GetEquationTextFoldedScalar(eqs2);
 
+            if (!G.NullOrBlanks(two.s1) || !G.NullOrBlanks(two.s2)) hit = true;
+
             string sUnfolded = null;
             int i = -1;
             foreach (string s in eqs)
             {
                 i++;
                 if (i > 0) sUnfolded += G.NL;
-                sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;                
+                if (this.modelGamsScalar != null)
+                {
+                    sUnfolded += this.modelGamsScalar.GetEquationTextUnfolded(s, showTime, t0) + G.NL;
+                    if (!sUnfolded.Contains(Globals.eqs6)) hit = true;
+                }
+                else
+                {
+                    sUnfolded += Globals.eqs5 + G.NL;
+                }
             }
             string rv = null;            
             if (this.modelGekko != null)
             {
                 rv += two.s1;
-                rv += "------------- detailed -------------" + G.NL + G.NL + two.s2;
-                if (false && Globals.runningOnTTComputer) rv += "------------- TTH: detailed2 -------------" + G.NL + G.NL + sUnfolded + G.NL;
+                rv += Globals.eqs4 + G.NL + G.NL + two.s2;
             }
             else
             {
                 string s1 = two.s1;
                 string s2 = two.s2;
-                if (G.NullOrBlanks(s1)) s1 = "<no raw eqs>" + G.NL;
-                if (G.NullOrBlanks(s2)) s2 = "<no raw eqs>" + G.NL;
+                if (G.NullOrBlanks(s1)) s1 = Globals.eqs2 + G.NL;
+                if (G.NullOrBlanks(s2)) s2 = Globals.eqs2 + G.NL;
                 rv += s1 + G.NL;
-                rv += "------------- scalar -------------" + G.NL + G.NL + sUnfolded + G.NL;
-                rv += "-------------- GAMS --------------" + G.NL + G.NL + s2 + G.NL;
+                rv += Globals.eqs1 + G.NL + G.NL + sUnfolded + G.NL;
+                rv += Globals.eqs3 + G.NL + G.NL + s2 + G.NL;
             }
+            if (!hit) rv += ".";  //signals no hit (hacky, but oh well)
             return rv;
         }
 
@@ -1581,7 +1592,7 @@ namespace Gekko
             int eq = this.dict_FromEqNameToEqNumber.GetInt(name);
             if (eq == -12345)
             {
-                return "...equation '" + name + "' could not be found...";
+                return "...equation '" + name + "' " + Globals.eqs6;
             }
 
             //Beware of this: for a scalar-2000 model, time basis is always 2000.

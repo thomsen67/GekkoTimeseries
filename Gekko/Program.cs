@@ -15583,7 +15583,7 @@ namespace Gekko
                 }
             }
 
-            DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+            DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
 
             if (seriesCounter + nonSeries == 0)
             {
@@ -15603,7 +15603,7 @@ namespace Gekko
                             names.Add(ss);
                             m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
                         }
-                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                        DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + G.GetLinkAction(helper.allBanks.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
@@ -15619,7 +15619,7 @@ namespace Gekko
                             names.Add(ss);
                             m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
                         }
-                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                        DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
@@ -15635,7 +15635,7 @@ namespace Gekko
                             names.Add(ss);
                             m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
                         }
-                        DispHelper(tStart, tEnd, m, list, names, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+                        DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allBanksAndFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
@@ -15653,7 +15653,7 @@ namespace Gekko
             }
         }
 
-        private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
+        private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, List originalList, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
         {
             for (int i5 = 0; i5 < m.Count; i5++)
             {
@@ -15700,6 +15700,38 @@ namespace Gekko
                     else
                     {
                         DispNonGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, variableMaybeWithFreq, bank);
+                    }
+                }
+
+                
+
+            }
+
+            //Print any equations now
+            
+            foreach (IVariable iv in originalList.list)
+            {
+                if (iv.Type() == EVariableType.String)
+                {
+                    string s = O.ConvertToString(iv);
+                    GekkoTime tUsedHere = tStart;
+                    if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
+                    string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
+                    string eq = Program.model.GetEquationText(new List<string>() { s2 }, false, tUsedHere);
+                    if (!eq.EndsWith("."))
+                    {
+                        using (var txt = new Writeln())
+                        {
+                            txt.MainAdd("=========================================================================");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("Equation " + s + " (period " + tStart + ")");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("=========================================================================");
+                            txt.MainNewLine();
+                            txt.MainAdd(eq);
+                            txt.MainNewLine();
+                            txt.MainAdd("=========================================================================");
+                        }                                                
                     }
                 }
             }

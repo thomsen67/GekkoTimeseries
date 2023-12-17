@@ -17008,6 +17008,41 @@ namespace UnitTests
 
 
         [TestMethod]
+        public void _Test_GAMSScalar3()
+        {
+            //Preliminary test of stuff for DST data revision            
+            Globals.unitTestScreenOutput.Clear();
+            string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2023-11-01-790eb70\Model";
+            I("reset; time 1983 1983;");
+            I("option folder working = '" + path5 + "';");
+            I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+            I("read<gdx> gdx/static_calibration_presolve.gdx;");
+            I("model<gms> M_static_calibration.zip;");
+            I("bankreplace(<1960 2030>, m(), 0);");
+            I("sim<res>;");
+            I("disp E_qbnp;");
+            string s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("0.798180161484433 * qC[cTot]"));
+            _AssertSeries(First(), "e_qbnp", 2000, 0d, sharedDelta);
+
+            //Preliminary test of stuff for DST data revision            
+            Globals.unitTestScreenOutput.Clear();            
+            I("reset; time 2000 2000;");
+            I("option folder working = '" + path5 + "';");
+            I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+            I("read<gdx> gdx/static_calibration_presolve.gdx;");
+            I("model<gms> M_static_calibration2.zip;");  //med .holdfixed = 0
+            I("bankreplace(<1960 2030>, m(), 0);");
+            I("sim<res>;");
+            I("disp E_qbnp;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("pC[cTot][-1] * qC[cTot]"));
+            _AssertSeries(First(), "e_qbnp", 2000, 0d, sharedDelta);
+
+        }
+
+
+        [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()
         {
             double Function(double[] x_function, CGSolverInput input_function)
