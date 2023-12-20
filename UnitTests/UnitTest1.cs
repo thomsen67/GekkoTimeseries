@@ -17075,15 +17075,23 @@ namespace UnitTests
             I("read<gdx> gdx/static_calibration_presolve.gdx;");
             I("model<gms> M_static_calibration2.zip;");  //med .holdfixed = 0
             I("bankreplace(<1960 2030>, m(), 0);");
-            I("p <n> qBNP, pBNP, pC[cTot], qC[cTot], pG[gTot], qG[gTot], pI[iTot], qI[iTot], pX[xTot], qX[xTot], pM[tot], qM[tot];");
+            //I("p <n> qBNP, pBNP, pC[cTot], qC[cTot], pG[gTot], qG[gTot], pI[iTot], qI[iTot], pX[xTot], qX[xTot], pM[tot], qM[tot];");
             I("residual = 0.982511298879937 * qBNP * pBNP[-1] - 0.982511298879937 * pC[cTot][-1] * qC[cTot] - 0.982511298879937 * pG[gTot][-1] * qG[gTot] - 0.982511298879937 * pI[iTot][-1] * qI[iTot] - 0.982511298879937 * pX[xTot][-1] * qX[xTot] + 0.982511298879937 * pM[tot][-1] * qM[tot];");
             I("p residual;");
-            I("sim<res>;");
+            I("sim <res>;");
             I("disp E_qbnp;");
             s = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(s.Contains("pC[cTot][-1] * qC[cTot]"));
             _AssertSeries(First(), "e_qbnp", 2000, 0d, sharedDelta);
 
+            if (true)
+            {
+                I("time 83 2023;");
+                I("write e_* file=residuals;");
+                I("pipe residuals.lst;");
+                I("for string %s = modelscalareqs() - 'e_extra'; prt <n nomax> {%s}; end;");
+                I("pipe<stop>;");
+            }
         }
 
 

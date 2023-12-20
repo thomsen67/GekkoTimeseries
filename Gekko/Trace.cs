@@ -732,7 +732,13 @@ namespace Gekko
                             Action<GAO> a = (gao) =>
                             {
                                 TreeGridModel model = new TreeGridModel();
-                                model.Add(trace.CopyToItems(0, 0));
+
+                                Item temp = trace.CopyToItems(0, 0);
+                                foreach (Item item in temp.Children)
+                                {
+                                    model.Add(item);
+                                }
+
                                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model); 
                                 string v = null;
                                 if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
@@ -833,7 +839,8 @@ namespace Gekko
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
         public Item CopyToItems(int depth, int cnt)
-        {            
+        {
+            if (depth == 0) MessageBox.Show("Note: max 4 levels (will be fixed)");
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
@@ -843,39 +850,39 @@ namespace Gekko
             string stamp = null;
             if (this.contents != null)
             {
-                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);
-                //if (G.Equal(text, "vio[cbol, tot]"))
-                //{
-                //}
+                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);                
                 code = this.contents.text;
                 GekkoTime t1 = this.contents.span.t1;
                 GekkoTime t2 = this.contents.span.t2;
-                if (t1.IsNull() && t2.IsNull()) period = "<>";
-                else period = "<" + t1.ToString() + " " + t2.ToString() + ">";
+                if (t1.IsNull() && t2.IsNull()) period = "";
+                else period = "" + t1.ToString() + "-" + t2.ToString() + "";
                 int counter = 0;                                
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + " (#" + this.id.counter + ")";
+                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) /* + " (#" + this.id.counter + ")" */ ;
             }
             
             Item newNode = new Item(text, code, period, stamp, file, hasChildren);
-            if (this.precedents.GetStorage() != null)
+            if (depth < 4)
             {
-                int n = -1;
-                foreach (Trace2 child in this.precedents.GetStorage())
+                if (this.precedents.GetStorage() != null)
                 {
-                    n++;
-                    Item newChild = null;
-                    if (child != null)
+                    int n = -1;
+                    foreach (Trace2 child in this.precedents.GetStorage())
                     {
-                        //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
-                        newChild = child.CopyToItems(depth + 1, cnt + 1);
-                        newNode.Children.Add(newChild);
+                        n++;
+                        Item newChild = null;
+                        if (child != null)
+                        {
+                            //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
+                            newChild = child.CopyToItems(depth + 1, cnt + 1);
+                            newNode.Children.Add(newChild);
+                        }
+                        else
+                        {
+                            //newChild = new Item("----------", "---", false);
+                        }
                     }
-                    else
-                    {
-                        //newChild = new Item("----------", "---", false);
-                    }                    
                 }
             }
             return newNode;
