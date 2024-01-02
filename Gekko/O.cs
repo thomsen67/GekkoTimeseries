@@ -3301,6 +3301,11 @@ namespace Gekko
             }
         }
 
+        public static void DynamicTrace(GekkoSmpl smpl, IVariable iv)
+        {
+
+        }
+
         /// <summary>
         /// Helper method regarding &lt;dyn&gt; option for series
         /// </summary>
@@ -3377,11 +3382,22 @@ namespace Gekko
                 {
                     GekkoTime tt1_20 = smpl.t1;
                     GekkoTime tt2_20 = smpl.t2;
+                    int counter = -1;
                     foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
                     {
+                        counter++;
                         smpl.t1 = t_20;
                         smpl.t2 = t_20;
-                        assign_20();
+                        bool remember = Program.options.databank_trace;
+                        if (counter > 0) Program.options.databank_trace = false;
+                        try
+                        {
+                            assign_20();
+                        }
+                        finally
+                        {
+                            Program.options.databank_trace = remember;  //set back no matter what
+                        }
                     }
                     smpl.t1 = tt1_20;
                     smpl.t2 = tt2_20;

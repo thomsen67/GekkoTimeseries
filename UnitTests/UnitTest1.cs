@@ -12878,6 +12878,36 @@ namespace UnitTests
                 Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
                 //We skip testing of periods here
 
+                //------- Test that <dyn> only produces 1 trace -----------
+
+                I("reset; option freq q; time 2001q1 2002q4;");
+                I("option databank trace = yes;");
+                if (i == 0)
+                {
+                    I("y = 2;");
+                    I("y <2001q2 2002q4 dyn> = y[-1] + 2;");
+                }
+                else
+                {
+                    I("y = series(1);");
+                    I("y[a] = 2;");
+                    I("y[a] <2001q2 2002q4 dyn> = y[a][-1] + 2;");
+                }
+                if (i == 0) y = O.GetIVariableFromString("Work:" + "y!q", ECreatePossibilities.NoneReportError) as Series;
+                else y = O.GetIVariableFromString("Work:" + "y!q[a]", ECreatePossibilities.NoneReportError) as Series;
+                List<TraceAndPeriods> m = y.meta.trace2.TimeShadow2();
+                Assert.AreEqual(2, m.Count);
+                tracec = y.meta.trace2.TimeShadow2()[1].trace.contents;
+                if (i == 0) Assert.AreEqual("Work:y!q", tracec.bankAndVarnameWithFreq);
+                else Assert.AreEqual("Work:y!q[a]", tracec.bankAndVarnameWithFreq);
+                Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
+                Assert.AreEqual(null, tracec.dataFile);
+                if (i == 0) Assert.AreEqual("y <2001q2 2002q4 dyn> = y[-1] + 2;", tracec.text);
+                else Assert.AreEqual("y[a] <2001q2 2002q4 dyn> = y[a][-1] + 2;", tracec.text);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 2), tracec.span.t1);
+                Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.span.t2);
+                //We skip testing of periods here
+
                 //====================================================
                 // COLLAPSE
                 //====================================================
@@ -17022,17 +17052,20 @@ namespace UnitTests
             I("option folder working = '" + path5 + "';");
             I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
 
-            if (true)
+            if (false)
             {
-                I(@"sys 'kqr1.cmd';");
+                I(@"sys 'kqr1.cmd';");  //makes .gmy files, savepoints, etc.
             }
 
             if (false)
             {
-                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration2.gmy r = Savepoints\exogenous_values';");
-                string file0 = path5 + "\\" + "M_static_calibration2.zip";
+                //Indeholder eksogene -- .holdfixed = 0. Laver M_static_calibration_scalar.zip
+                string file0 = path5 + "\\" + "M_static_calibration_scalar.zip";
                 string file1 = path5 + "\\" + "gams.gms";
                 string file2 = path5 + "\\" + "dict.txt";
+                File.Delete(file1); File.Delete(file2);
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration_scalar1.gmy r = Savepoints\exogenous_values';");
+                if (!File.Exists(file1)) throw new Exception("No files");
                 using (FileStream fs = new FileStream(file0, FileMode.Create))
                 using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
                 {
@@ -17043,10 +17076,49 @@ namespace UnitTests
 
             if (false)
             {
-                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration1.gmy r = Savepoints\exogenous_values';");
+                //Indeholder eksogene -- .holdfixed = 0. Laver M_post_scalar.zip
+                string file0 = path5 + "\\" + "M_post_scalar.zip";
+                string file1 = path5 + "\\" + "gams.gms";
+                string file2 = path5 + "\\" + "dict.txt";
+                File.Delete(file1); File.Delete(file2);
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration_scalar2.gmy r = Savepoints\exogenous_values';");
+                if (!File.Exists(file1)) throw new Exception("No files");
+                using (FileStream fs = new FileStream(file0, FileMode.Create))
+                using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
+                {
+                    arch.CreateEntryFromFile(file1, "gams.gms");
+                    arch.CreateEntryFromFile(file2, "dict.txt");
+                }
+            }
+
+            if (true)
+            {
+                //Indeholder eksogene -- .holdfixed = 0. Laver M_static_scalar.zip
+                string file0 = path5 + "\\" + "M_static_scalar.zip";
+                string file1 = path5 + "\\" + "gams.gms";
+                string file2 = path5 + "\\" + "dict.txt";
+                File.Delete(file1); File.Delete(file2);
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration_scalar3.gmy r = Savepoints\exogenous_values';");
+                if (!File.Exists(file1)) throw new Exception("No files");
+                using (FileStream fs = new FileStream(file0, FileMode.Create))
+                using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
+                {
+                    arch.CreateEntryFromFile(file1, "gams.gms");
+                    arch.CreateEntryFromFile(file2, "dict.txt");
+                }
+            }
+
+            return;
+
+
+            if (false)
+            {
                 string file0 = path5 + "\\" + "M_static_calibration1.zip";
                 string file1 = path5 + "\\" + "gams.gms";
                 string file2 = path5 + "\\" + "dict.txt";
+                File.Delete(file1); File.Delete(file2);
+                I(@"sys 'C:\GAMS\45\gams.exe expanded\static_calibration1.gmy r = Savepoints\exogenous_values';");
+                if (!File.Exists(file1)) throw new Exception("No files");
                 using (FileStream fs = new FileStream(file0, FileMode.Create))
                 using (ZipArchive arch = new ZipArchive(fs, System.IO.Compression.ZipArchiveMode.Create))
                 {
@@ -17073,7 +17145,7 @@ namespace UnitTests
             I("option folder working = '" + path5 + "';");
             I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
             I("read<gdx> gdx/static_calibration_presolve.gdx;");
-            I("model<gms> M_static_calibration2.zip;");  //med .holdfixed = 0
+            I("model<gms> M_static_calibration_scalar.zip;");  //med .holdfixed = 0
             I("bankreplace(<1960 2030>, m(), 0);");
             //I("p <n> qBNP, pBNP, pC[cTot], qC[cTot], pG[gTot], qG[gTot], pI[iTot], qI[iTot], pX[xTot], qX[xTot], pM[tot], qM[tot];");
             I("residual = 0.982511298879937 * qBNP * pBNP[-1] - 0.982511298879937 * pC[cTot][-1] * qC[cTot] - 0.982511298879937 * pG[gTot][-1] * qG[gTot] - 0.982511298879937 * pI[iTot][-1] * qI[iTot] - 0.982511298879937 * pX[xTot][-1] * qX[xTot] + 0.982511298879937 * pM[tot][-1] * qM[tot];");

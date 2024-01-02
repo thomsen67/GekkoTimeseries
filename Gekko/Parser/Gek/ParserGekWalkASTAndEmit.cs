@@ -3446,7 +3446,6 @@ namespace Gekko.Parser.Gek
                             if (ivTempVar == null)
                             {
                                 new Error("Internal error #7698248427");
-                                //throw new GekkoException();
                             }
                             string convertTo = null;
 
@@ -3530,6 +3529,7 @@ namespace Gekko.Parser.Gek
 
                                 node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
                                 node.Code.A(sb1);
+                                node.Code.A("O.DynamicTrace(" + Globals.smpl + ", " + ivTempVar + ");");
                                 node.Code.A("};" + G.NL);  //end of action
 
                                 node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action

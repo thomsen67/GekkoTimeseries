@@ -266,7 +266,6 @@ namespace Gekko
                     //smec
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
                 }
-                Globals.browserLimit = false;  //for safety
             }
             else if (Globals.runningOnTTComputer)
             {
@@ -372,6 +371,27 @@ namespace Gekko
                 if (ts1 == null)
                 {
                     new Error("Could not find series " + varnameWithFreq + " in databank " + Program.databanks.GetFirst().name);
+                }
+
+                if (Globals.browserLimit)
+                {
+                    if (settings_index_filename.ToLower().Contains("mona"))
+                    {
+                    }
+                    else if (settings_index_filename.ToLower().Contains("adam"))
+                    {
+                    }
+                    else
+                    {
+                        //smec
+                        if (G.Equal(ts1.GetName(), "ktiorn!a"))
+                        {
+                            //Test that a null-label is ok (ktiorn is also removed from varlist.dat)
+                            ts1.meta.label = null;
+                            ts1.meta.source = null;
+                            ts1.meta.units = null;
+                        }
+                    }
                 }
 
                 Series ts2 = Program.databanks.GetRef().GetIVariable(varnameWithFreq) as Series;
