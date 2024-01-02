@@ -3526,9 +3526,8 @@ namespace Gekko.Parser.Gek
                                 sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
                                 sb2.A(node[0].Code).End();
                                 sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
-
-                                int c = ++Globals.counter;
-                                node.Code.A("Action<GekkoTime> assign" + number + " = (t" + c + ") => {" + G.NL);  //start of action
+                                                                
+                                node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
                                 node.Code.A(sb1);
                                 //node.Code.A("O.DynamicTrace(" + Globals.smpl + ", t" + c + ", " + ivTempVar + ");");
                                 node.Code.A("};" + G.NL);  //end of action

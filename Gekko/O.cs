@@ -3350,7 +3350,7 @@ namespace Gekko
         /// <param name="assign_20"></param>
         /// <param name="check_20"></param>
         /// <param name="o"></param>
-        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action<GekkoTime> assign_20, Func<bool> check_20, O.Assignment o, P p)
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o, P p)
         {            
             MissingMemory missing = null;
             if (o.opt_missing != null)
@@ -3395,10 +3395,8 @@ namespace Gekko
                         bool remember = Program.options.databank_trace;
                         if (counter > 0) Program.options.databank_trace = false;
                         try
-                        {
-                            GekkoTime t = GekkoTime.tNull;
-                            if (counter == 0) t = smpl.t2;
-                            assign_20(t);  //when != tNull, it will signal to do something in O.DynamicTrace().
+                        {                            
+                            assign_20();
                         }
                         finally
                         {
@@ -3410,7 +3408,7 @@ namespace Gekko
                 }
                 else
                 {
-                    assign_20(GekkoTime.tNull);
+                    assign_20();
                 }
             }
             finally
