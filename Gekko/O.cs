@@ -3301,10 +3301,14 @@ namespace Gekko
             }
         }
 
-        public static void DynamicTrace(GekkoSmpl smpl, IVariable iv)
-        {
-
-        }
+        //public static void DynamicTrace(GekkoSmpl smpl, GekkoTime end, IVariable iv)
+        //{
+        //    if (end.IsNull()) return;
+        //    Series ts = iv as Series;
+        //    if (ts == null) return;
+        //    Trace2 trace = ts?.meta?.trace2;
+        //    if (trace == null) return;
+        //}
 
         /// <summary>
         /// Helper method regarding &lt;dyn&gt; option for series
@@ -3346,7 +3350,7 @@ namespace Gekko
         /// <param name="assign_20"></param>
         /// <param name="check_20"></param>
         /// <param name="o"></param>
-        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o, P p)
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action<GekkoTime> assign_20, Func<bool> check_20, O.Assignment o, P p)
         {            
             MissingMemory missing = null;
             if (o.opt_missing != null)
@@ -3392,7 +3396,9 @@ namespace Gekko
                         if (counter > 0) Program.options.databank_trace = false;
                         try
                         {
-                            assign_20();
+                            GekkoTime t = GekkoTime.tNull;
+                            if (counter == 0) t = smpl.t2;
+                            assign_20(t);  //when != tNull, it will signal to do something in O.DynamicTrace().
                         }
                         finally
                         {
@@ -3404,7 +3410,7 @@ namespace Gekko
                 }
                 else
                 {
-                    assign_20();
+                    assign_20(GekkoTime.tNull);
                 }
             }
             finally

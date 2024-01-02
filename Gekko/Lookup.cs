@@ -1275,7 +1275,7 @@ namespace Gekko
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                     LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
-                    LookupHandleTrace(smpl.t1, smpl.t2, ib, lhs_series, isArraySubSeries, o, smpl.p);
+                    LookupHandleTrace(smpl.t1, smpl.t2, smpl.t3, ib, lhs_series, isArraySubSeries, o, smpl.p);
 
                     switch (rhs.Type())
                     {
@@ -1680,7 +1680,7 @@ namespace Gekko
 
         }
 
-        public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, IBank ib, Series lhs_series, bool isArraySubSeries, Assignment o, P p)
+        public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, GekkoTime t3, IBank ib, Series lhs_series, bool isArraySubSeries, Assignment o, P p)
         {
             Databank databank = null;
             Databank parentDatabank = lhs_series.GetParentDatabank();  //for subseries where ib will be = null
@@ -1700,8 +1700,9 @@ namespace Gekko
                     {
                         if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Parent);
                         // ---------
-                        Trace2 trace = new Trace2(t1, t2);
-
+                        GekkoTime tEnd = t2;
+                        if (G.Equal(o.opt_dyn, "yes")) tEnd = t3;
+                        Trace2 trace = new Trace2(t1, tEnd);  //if <dyn>, only the first of the iterations will have a trace, and this trace has to be modified regarding end period.
                         string b = null;
                         if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
                         trace.contents.bankAndVarnameWithFreq = b + lhs_series.GetName();

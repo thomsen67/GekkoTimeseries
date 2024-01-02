@@ -30,7 +30,7 @@ o0.opt_dyn = "yes";
 
 
 Globals.precedentsSeries = null;
-Action assign_9 = () => {
+Action<GekkoTime> assign_9 = (i777) => {
 O.AdjustT0(smpl, -2);
 IVariable ivTmpvar4 = O.Add(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.Dot,i5), smpl, O.EIndexerType.Dot, O.Lookup(smpl, null, null, "x", null, null, new  LookupSettings(), EVariableType.Var, null), i5), i6);
 O.AdjustT0(smpl, 2);
