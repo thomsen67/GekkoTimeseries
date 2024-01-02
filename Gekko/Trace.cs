@@ -428,30 +428,19 @@ namespace Gekko
             return x;
         }
 
-        public TwoStrings Text(bool unfold, int d)
+        public TwoStrings Text(int d)
         {            
             string s1 = null;
             string s2 = null;
-            if (!unfold)
+            if (true)
             {
                 s1 = this.contents.text;
                 string period = this.contents.span.t1 + "-" + this.contents.span.t2;
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
-                s2 += G.Blanks(50 - len - 2 * d) + " --> period:" + period;                
-                s2 += ", " + this.id.stamp.ToString("dd-MM-yyyy HH:mm:ss");
-            }
-            else
-            {
-                s2 += "" + this.contents.span.t1 + "-" + this.contents.span.t2 + "";
-                s2 += " --> ";
-                s1 += this.contents.text;
-                s2 += "          ";                
-                if (this.contents.bankAndVarnameWithFreq != null) s2 += " || lhs=" + this.contents.bankAndVarnameWithFreq;
-                if (this.contents.dataFile != null) s2 += " || data=" + this.contents.dataFile;
-                if (this.contents.commandFileAndLine != null) s2 += " || gcm=" + this.contents.commandFileAndLine;
-                s2 += " || " + this.PrintStamp();
-            }
+                s2 += G.Blanks(50 - len - 2 * d) + " --> period: " + period;
+                s2 += ", stamp: " + this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            }            
             return new TwoStrings(s1, s2);
         }
 
@@ -724,8 +713,8 @@ namespace Gekko
                     trace.DeepTrace(th, 0);                    
                     int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
                     string s = "Traces";
-                    if (all) s = count2 + " " + "traces (click [] to see more info)";
-                    if (!all)
+                    //if (all) s = count2 + " " + "traces (click [] to see more info)";
+                    if (true)
                     {
                         if (trace.precedents.Count() > 0)
                         {
@@ -749,12 +738,12 @@ namespace Gekko
                         }
                     }
                     s += ":";
-                    if (all) G.Writeln();
+                    //if (all) G.Writeln();
                     G.Writeln(s);
                     //txt.MainAdd(s);
                     //txt.MainNewLineTight();
                 }
-                PrintTraceHelper(trace, 0, all);
+                PrintTraceHelper(trace, 0);
             }
             finally
             {
@@ -779,35 +768,11 @@ namespace Gekko
             return n;
         }
 
-        private static void PrintTraceHelper(Trace2 trace, int d, bool all)
+        private static void PrintTraceHelper(Trace2 trace, int d)
         {
-            if (!all && d > 1) return;
-            string s = null;
-
-            if (all)
-            {
-                if (!Trace2.IsInvisibleTrace(trace))
-                {
-                    Action<GAO> a = (gao) =>
-                    {
-                        G.Writeln();
-                        G.Writeln("Trace:     " + trace.contents.text);
-                        G.Writeln("Period:    " + trace.contents.span.t1 + "-" + trace.contents.span.t2 + "");
-                        if (trace.contents.bankAndVarnameWithFreq != null) G.Writeln("LHS var:   " + trace.contents.bankAndVarnameWithFreq);
-                        if (trace.contents.dataFile != null) G.Writeln("Data file: " + trace.contents.dataFile);
-                        if (trace.contents.commandFileAndLine != null) G.Writeln("Gcm file:  " + trace.contents.commandFileAndLine.Replace("¤", " line ").Trim());
-                        G.Writeln("Stamp:     " + trace.id.stamp.ToString("dd-MM-yyyy HH:mm:ss"));
-                        G.Writeln("ID:        " + trace.id.counter);
-                    };
-                    string more = G.GetLinkAction("[]", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ";
-                    G.Write(more);
-                }
-                s = G.Blanks(d * 2 - 2);
-            }
-            else
-            {
-                s = "| ";
-            }
+            if (d > 1) return;
+            string s = null;            
+            s = "| ";            
             
             if (trace == null)
             {
@@ -818,17 +783,28 @@ namespace Gekko
             {
                 if (!Trace2.IsInvisibleTrace(trace))
                 {
-                    TwoStrings s2 = trace.Text(false, d);
+                    TwoStrings s2 = trace.Text(d);
                     G.Write(s + s2.s1);
                     G.Writeln(s2.s2, Globals.MiddleGray);
                 }
+
+                int max = 5;
+                int start = 0;
+                if (trace.precedents.Count() > max)
+                {
+                    start = trace.precedents.Count() - max;
+                    if (d < 1) G.Writeln("...omitted " + start + " older traces...", System.Drawing.Color.Gray);
+                }                
+                                
                 if (trace.precedents.Count() > 0)
                 {
+                    int counter = -1;
                     foreach (Trace2 child in trace.precedents.GetStorage())
                     {
-                        PrintTraceHelper(child, d + 1, all);
+                        counter++;
+                        if (counter >= start) PrintTraceHelper(child, d + 1);
                     }
-                }
+                }                
             }
         }
 
@@ -859,7 +835,7 @@ namespace Gekko
                 int counter = 0;                                
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) /* + " (#" + this.id.counter + ")" */ ;
+                stamp = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) /* + " (#" + this.id.counter + ")" */ ;
             }
             
             Item newNode = new Item(text, code, period, stamp, file, hasChildren);

@@ -2146,7 +2146,7 @@ namespace Gekko
                     {
                         Table tab = new Table();
                         tab.CurRow.SetTopBorder(1, 3);
-                        tab.CurRow.SetText(1, "DEPENDENCY TRACK:");
+                        tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.Next();
                         int count = -1;

@@ -748,7 +748,7 @@ namespace Gekko
             string text = null;
             text = "" + item.Name + G.NL;
             text += "" + item.Code + G.NL;
-            text += "Periods: " + item.Period + G.NL;
+            text += "Period: " + item.Period + G.NL;
             text += "Stamp: " + item.Stamp + G.NL;
             text += "File: " + item.File + G.NL;
             WindowDecomp.RichSetText(this.text, Decomp.GetColoredEquations(text));
