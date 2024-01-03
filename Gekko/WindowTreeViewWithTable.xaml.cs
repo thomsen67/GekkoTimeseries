@@ -644,16 +644,22 @@ namespace Gekko
         public string Period { get; private set; }
 
         public string Stamp { get; private set; }
+
+        public string StampDetailed { get; private set; }
         public string File { get; private set; }
 
-        public Item(string name, string code, string period, string stamp, string file, bool hasChildren)
+        public string FileDetailed { get; private set; }
+
+        public Item(string name, string code, string period, string stamp, string stampDetailed, string file, string fileDetailed, bool hasChildren)
         {
             // Initialize the item
             Name = name;
             Code = code;
             Period = period;
             Stamp = stamp;
+            StampDetailed = stampDetailed;
             File = file;
+            FileDetailed = fileDetailed;
             HasChildren = hasChildren;
         }
     }
@@ -682,7 +688,9 @@ namespace Gekko
             else
             {
                 // Initialize the component
-                InitializeComponent();                
+                InitializeComponent();           
+                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Note: the trace viewer shows max 4 levels deep for now (this will be fixed).")));
+
                 // Set the model for the grid
                 grid.ItemsSource = model.FlatModel;
             }
@@ -697,7 +705,7 @@ namespace Gekko
             for (int count = 0; count < Roots; count++)
             {
                 // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "today", "file", true);
+                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "2020", "today", "file", "file", true);
 
                 // Add children to the root
                 AddChildren(root);
@@ -705,6 +713,12 @@ namespace Gekko
                 // Add the root to the model
                 model.Add(root);
             }
+        }
+
+
+        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            this.Close();
         }
 
         private int c(Item i)
@@ -728,7 +742,7 @@ namespace Gekko
             for (int count = 0; count < ItemsPerLevel; count++)
             {
                 // Create the child
-                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "today", "file", hasChildren);
+                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "2020", "today", "file", "file", hasChildren);
 
                 // Does the child have children?
                 if (hasChildren)
@@ -746,11 +760,11 @@ namespace Gekko
         {            
             Item item = (sender as DataGrid).SelectedItem as Item;
             string text = null;
-            text = "" + item.Name + G.NL;
-            text += "" + item.Code + G.NL;
+            text = "Name: " + item.Name + G.NL;
+            text += "Code: " + item.Code + G.NL;
             text += "Period: " + item.Period + G.NL;
-            text += "Stamp: " + item.Stamp + G.NL;
-            text += "File: " + item.File + G.NL;
+            text += "Stamp: " + item.StampDetailed + G.NL;
+            text += "File: " + item.FileDetailed + G.NL;
             WindowDecomp.RichSetText(this.text, Decomp.GetColoredEquations(text));
         }
 

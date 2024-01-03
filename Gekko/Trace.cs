@@ -815,15 +815,16 @@ namespace Gekko
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
         public Item CopyToItems(int depth, int cnt)
-        {
-            if (depth == 0) MessageBox.Show("Note: max 4 levels (will be fixed)");
+        {            
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
             string code = "null";
             string period = null;
             string file = null;
+            string fileDetailed = null;
             string stamp = null;
+            string stampDetailed = null;
             if (this.contents != null)
             {
                 text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);                
@@ -832,13 +833,20 @@ namespace Gekko
                 GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
-                int counter = 0;                                
-                if (!G.NullOrBlanks(this.contents.commandFileAndLine)) file = this.contents.commandFileAndLine.Replace("¤", " line ");
-                if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) /* + " (#" + this.id.counter + ")" */ ;
+                int counter = 0;
+                if (!G.NullOrBlanks(this.contents.commandFileAndLine))
+                {
+                    string[] ss = this.contents.commandFileAndLine.Split('¤');
+                    file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
+                    fileDetailed = ss[0] + " line " + ss[1];
+                }
+                if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.contents.dataFile) + ")";
+                if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
+                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             }
             
-            Item newNode = new Item(text, code, period, stamp, file, hasChildren);
+            Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, hasChildren);
             if (depth < 4)
             {
                 if (this.precedents.GetStorage() != null)

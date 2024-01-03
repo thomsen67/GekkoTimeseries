@@ -6,7 +6,7 @@
 	Width="800"
 	Height="600"
 	WindowStartupLocation="CenterScreen">    
-    
+
     <Window.Resources>
         <GridLength x:Key="TreeToggleWidth">20</GridLength>        
         <local:LevelConverter x:Key="LevelSpaceConverter" LevelWidth="{StaticResource TreeToggleWidth}"/>
@@ -37,6 +37,14 @@
             </Setter>
         </Style>
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
+    </Window.CommandBindings>
 
     <DockPanel>
         <!--<TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="4, 4, 4, 4"></TextBox>-->
