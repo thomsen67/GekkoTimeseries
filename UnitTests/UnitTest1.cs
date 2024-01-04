@@ -32083,7 +32083,19 @@ print(df2)
             I("OPTION folder working = '" + folder + "';");
             I("RUN makrobk;");
             Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1968_1993.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
-            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1994_2022.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));            
+            Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1994_2022.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
+
+            //MAKE THIS WORK, ALSO FOR 3.1.1
+            //MAKE THIS WORK, ALSO FOR 3.1.1
+            //MAKE THIS WORK, ALSO FOR 3.1.1 make sure makrobk.gbk has traces.
+            //MAKE THIS WORK, ALSO FOR 3.1.1
+            //MAKE THIS WORK, ALSO FOR 3.1.1
+            Globals.unitTestScreenOutput.Clear();
+            I("SYS 'gekko.exe read '" + folder + "\\makrobk.gbk' working = 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit';");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Read 76543 variables... booh"));
+
+            Assert.Fail();  //Do a test where older databanks (tsdx, 1.0, 1.1, 1.2 etc are read, if this test is not done already...)
+            //just try to find some old banks 
         }
 
         [TestMethod]

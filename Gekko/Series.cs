@@ -492,9 +492,9 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET: does not use GekkoTime at all, so no problem. This is simple array trimming.
             // ----------------------------------------------------------------------------
-            
+
             //DimensionCheck();
-            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null) return;
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null) return;  //can be so if a normal or timeless series is just CREATEd and nothing else.
             if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
             if (!(this.meta.firstPeriodPositionInArray == 0 && this.meta.lastPeriodPositionInArray == this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1))  //already trimmed                
             {

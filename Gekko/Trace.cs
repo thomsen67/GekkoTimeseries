@@ -455,9 +455,10 @@ namespace Gekko
             // !!!
             // !!! In the longer run, these IF's can be removed
             // !!!            
-            if (trace.contents.text == null) new Error("Trace problem");
-
-            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);
+            if (trace.contents.text == null) new Error("Trace problem: trace.contents.text == null");
+            if (ts.meta == null) new Error("Trace problem: ts.meta == null");
+            
+            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);            
             if (type == ETracePushType.NewParent)
             {                   
                 trace.precedents.AddRange(ts.meta.trace2.precedents);

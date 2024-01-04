@@ -24182,7 +24182,6 @@ namespace Gekko
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
                         newTrace.contents.text = gekkocode + ";";
-                        //newTrace.contents.text = "Collapsed from " + ts_rhs.GetName();
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                         newTrace.GetPrecedents_BewareOnlyInternalUse().AddRange(ts_rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
@@ -33012,7 +33011,8 @@ namespace Gekko
                 string i1, i2; GetYearPeriod(this.startPerInFile, this.endPerInFile, out i1, out i2);
 
                 tab.CurRow.SetText(1, "Period   : The file contains data from " + i1 + "-" + i2);
-                tab.CurRow.Next();
+                tab.CurRow.Next();                
+
                 //#8572309572439
                 int total = Program.databanks.GetDatabank(this.dbName).storage.Count;
                 if (this.shouldMerge)
@@ -33035,6 +33035,18 @@ namespace Gekko
                     tab.CurRow.Next();
                     tab.CurRow.SetText(1, "           " + this.dbName + " databank now contains " + total + " variables (" + this.startPerResultingBank + "-" + this.endPerResultingBank + ")");
                 }
+
+                TraceHelper th = Trace2.CollectAllTraces(this.databank, ETraceHelper.GetAllMetasAndTraces);
+                if (th.traces.Count > 0)
+                {
+                    Action<GAO> a = (gao) =>
+                    {
+                        Functions.tracestats2(null, null, null, new ScalarString(this.databank.GetName()));
+                    };
+                    tab.CurRow.SetText(1, "Trace    : " + th.traces.Count + " data traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    tab.CurRow.Next();
+                }
+
                 tab.CurRow.SetText(1, "Note     : Press F2 for info on databanks. " + this.note);
                 if (this.gamsNote != null)
                 {
