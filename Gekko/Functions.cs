@@ -5330,7 +5330,7 @@ namespace Gekko
 
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank '" + x.ConvertToString() + "' has " + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
+                txt.MainAdd("Databank '" + x.ConvertToString() + "' has " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
             }
 
             bool hasDepth1 = false;
@@ -5366,6 +5366,20 @@ namespace Gekko
                 }
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
+        }
+
+        public static void tracetrim2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            tracetrim2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
+
+        public static void tracetrim2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //Removes shadowed references
+            DateTime t0 = DateTime.Now;
+            Databank db = Program.databanks.GetDatabank(x.ConvertToString());
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetTimeShadowInfo);
+            new Writeln("Removed " + (th.input - th.output) + " trace references (" + G.Seconds(t0) + ")");
         }
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)

@@ -13516,9 +13516,15 @@ namespace UnitTests
             Assert.IsTrue(s1.Contains("--> depth: 0, traces: 11" + G.NL));
 
             Globals.unitTestScreenOutput.Clear();
-            I("tracestats3();");
+            I("clone;");
+            I("tracedelete2('ref');");
             string s2 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(s2.Contains("Removed 4 trace references "));  //2 shadowed traces have references cut. They are referenced from both x1 and x (therefore 4 deleted references in all).
+            Assert.IsTrue(s2.Contains("Deleted 11 data traces from databank 'Ref'"));
+
+            Globals.unitTestScreenOutput.Clear();            
+            I("tracetrim2();");
+            string s2a = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s2a.Contains("Removed 4 trace references"));  //2 shadowed traces have references cut. They are referenced from both x1 and x (therefore 4 deleted references in all).
 
             Globals.unitTestScreenOutput.Clear();
             I("tracestats2();");
@@ -14349,7 +14355,7 @@ namespace UnitTests
                         string s = Globals.unitTestScreenOutput.ToString();
                         if (true)
                         {
-                            Assert.IsTrue(s.Contains("Databank Work: 3 series with 22 traces in total."));
+                            Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 traces in total."));
                             Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
                             Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
                             Assert.IsTrue(s.Contains("depth: 2, traces: 6"));

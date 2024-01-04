@@ -4,14 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-//using System.Windows.Forms;
-//using System.Windows.Forms;
-//using static alglib;
-//using System.Windows;
-//using System.Windows.Data;
-//using System.Globalization;
-//using System.Windows.Controls;
-//using System.Windows.Input;
 
 namespace Gekko
 {
@@ -455,13 +447,14 @@ namespace Gekko
             // !!!
             // !!! In the longer run, these IF's can be removed
             // !!!            
+            if (trace == null) new Error("Trace problem: trace == null");
             if (trace.contents.text == null) new Error("Trace problem: trace.contents.text == null");
             if (ts.meta == null) new Error("Trace problem: ts.meta == null");
             
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);            
             if (type == ETracePushType.NewParent)
             {                   
-                trace.precedents.AddRange(ts.meta.trace2.precedents);
+                trace.precedents.AddRangeFromSeries(ts);
                 ts.meta.trace2.precedents = new Precedents();
                 ts.meta.trace2.precedents.Add(trace);
             }            
@@ -470,85 +463,7 @@ namespace Gekko
                 ts.meta.trace2.precedents.Add(trace);
             }
             else new Error("Trace");
-        }
-
-        //private static void TraceShadowing(Series ts, Trace2 trace)
-        //{
-        //    if (false && ts.meta.trace2.precedents.Count() > 0)
-        //    {
-        //        if (ts.meta.trace2.GetTraceType() != ETraceType.Parent) new Error("Trace type error");  //should never be possible huh???
-
-        //        if (trace.contents.periods.Count() != 1) new Error("Problem with time spans");
-        //        GekkoTimeSpanSimple thsSpan = trace.contents.periods[0];
-
-        //        if (!thsSpan.IsNull()) //if null --> cannot shadow anything
-        //        {
-        //            List<Trace2> siblingsToRemove = new List<Trace2>();
-
-        //            foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-        //            {
-        //                //
-        //                // Beware that such a sibling may be used (pointed to) from other traces.
-        //                // Therefore when period shadowing, be careful about changing the sibling
-        //                // active periods.
-        //                //
-        //                // reset; option databank trace = yes;
-        //                // x1 <2001 2003> = 1;
-        //                // x2 <2001 2003> = x1 + 2;
-        //                // x1 <2002 2002> = 3;
-        //                // --> look at x2 trace: it depends upon x1, but x1 has a hole in 2002...
-        //                //
-
-        //                //We know that sibling's parent always has GetTraceType() == ETraceType.Parent
-        //                //So the siblings all belong to the same timeseries, and therefore it is ok
-        //                //to remove periods.
-        //                //trace is the new trace that is going to be added    
-
-        //                if (sibling.contents.periods.Count() > 0)
-        //                {
-        //                    List<GekkoTimeSpanSimple> newPeriods = new List<GekkoTimeSpanSimple>();
-        //                    foreach (GekkoTimeSpanSimple siblingSpan in sibling.contents.periods.GetStorage())
-        //                    {
-        //                        //TimeShadow(thsSpan, siblingSpan, newPeriods);
-        //                    }
-        //                    if (newPeriods.Count() == 0)
-        //                    {
-        //                        siblingsToRemove.Add(sibling);
-        //                    }
-        //                    sibling.contents.periods.SetStorage(newPeriods);
-        //                }
-        //            }
-        //            if (siblingsToRemove.Count > 0)
-        //            {
-        //                List<Trace2> tempTrace = new List<Trace2>();
-        //                foreach (Trace2 sibling in ts.meta.trace2.precedents.GetStorage())
-        //                {
-        //                    if (sibling == null)
-        //                    {
-        //                        if (tempTrace.Count > 0 && tempTrace[tempTrace.Count - 1] == null)
-        //                        {
-        //                            //do nothing, we do not want two nulls 
-        //                        }
-        //                        else
-        //                        {
-        //                            tempTrace.Add(null);
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-        //                        if (!siblingsToRemove.Contains(sibling))
-        //                        {
-        //                            tempTrace.Add(sibling);
-        //                        }
-        //                    }
-        //                }
-        //                if (tempTrace.Count == 0) tempTrace = null;
-
-        //                ts.meta.trace2.precedents.SetStorage(tempTrace);
-        //            }
-        //        }
-        //    }
-        //}
+        }        
 
         /// <summary>
         /// For the newSpan, it removes these periods from the oldSpan. Returns a list of GekkoTimeSpanSimple with 0, 1 or 2 elements.
@@ -683,23 +598,7 @@ namespace Gekko
             }
             databank.traces = th.tracesDepth2.Keys.ToList();
             if (Globals.runningOnTTComputer) new Writeln("TTH: " + databank.traces.Count + " traces written");
-        }
-
-        //public static void SLET()
-        //{
-        //    //Series ts = O.GetIVariableFromString("work:qbnp!a", O.ECreatePossibilities.NoneReportError) as Series;
-        //    //Trace2 trace = ts.meta.trace2;
-        //    //TreeGridModel model = new TreeGridModel();
-        //    //Item root = new Item("--ROOT---", 10, true);
-        //    //Item xxx = ViewerTraceHelper(trace, 0, true, root);
-        //    ////model.Add(root);
-        //    //model.Add(xxx);
-
-        //    TreeGridModel model = null;
-        //    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-        //    w.Title = "Gekko traces";
-        //    w.ShowDialog();
-        //}
+        }        
 
         public static void PrintTraceHelper(Trace2 trace, bool all)
         {
@@ -1033,14 +932,29 @@ namespace Gekko
         /// </summary>
         [ProtoMember(2)]
         public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
-        
-        public void AddRange(Precedents precedents)
+
+        /// <summary>
+        /// Add into precedents.storage. Be careful that something like trace.GetPrecedents_BewareOnlyInternalUse().AddRange(ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse()) may
+        /// fail if ts.meta.trace2 is == null. In cases like that, better to use trace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(ts).
+        /// </summary>
+        /// <param name="precedents"></param>
+        private void AddRange(Precedents precedents)
         {            
             if (precedents.storage != null)
             {
                 if (this.storage == null) this.storage = new List<Trace2>();
                 this.storage.AddRange(precedents.storage);
             }
+        }
+
+        /// <summary>
+        /// Get all traces from series ts. Safer to use than AddRange(). Method does nothing if ts == null, ts.meta == null or ts.meta.trace2 == null.
+        /// </summary>
+        /// <param name="ts"></param>
+        public void AddRangeFromSeries(Series ts)
+        {
+            if (ts?.meta?.trace2 == null) return; //may come from an old Gekko databank where .trace2 == null.
+            this.AddRange(ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
         }
 
         /// <summary>
