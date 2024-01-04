@@ -765,13 +765,13 @@ namespace Gekko
                         
             x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
-            string s1 = null;
-            string s2 = null;
+            string s1 = G.NL;
+            string s2 = G.NL;
             foreach (string s in vars2)
             {
                 string[] ss = s.Split('¤');
-                s1 += "`" + ss[0] + "`" + ", ";
-                s2 += "`" + ss[1] + "`" + ", ";
+                s1 += "`" + ss[0] + "`" + ", " + G.NL;
+                s2 += "`" + ss[1] + "`" + ", " + G.NL;
             }
 
             string write = null;
