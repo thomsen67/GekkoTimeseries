@@ -5237,23 +5237,29 @@ namespace Gekko
             DateTime dt = GekkoTime.DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
+        }                   
+
+        public static void tracedelete2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {            
+            tracedelete2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
         }
 
-        public static void tracestats3(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static void tracedelete2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            if (true)
+            Databank db = Program.databanks.GetDatabank(x.ConvertToString());
+            if (!db.editable) new Error("Databank " + db.GetName() + " is not editable");
+            TraceHelper th = null;
+            if (false) th = Trace2.CollectAllTraces(db, ETraceHelper.GetTimeShadowInfo);
+            else th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
+            foreach (SeriesMetaInformation meta in th.metas)
             {
-                DateTime t0 = DateTime.Now;
-                TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetTimeShadowInfo);
-                new Writeln("Removed " + (th.input - th.output) + " trace references (" + G.Seconds(t0) + ")");
+                if (meta == null) continue;  //is this even possible?
+                meta.trace2 = null;
             }
+            db.isDirty = true;
+            new Writeln("Deleted " + th.traces.Count + " data traces from databank '" + db.GetName() + "'");
         }
-
-        public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {
-            tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
-        }
-
+        
         private static void Helper_BankFlatten(GekkoTime t1, GekkoTime t2, GekkoTime t, IVariable iv)
         {
             Series ts = iv as Series;
@@ -5305,6 +5311,11 @@ namespace Gekko
             }
         }
 
+        public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            tracestats2(smpl, _t1, _t2, new ScalarString(Program.databanks.GetFirst().GetName()));
+        }
+
         public static void tracestats2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             //NOTE: Does not include the invisible traces assigned to each series object
@@ -5319,8 +5330,10 @@ namespace Gekko
 
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank " + x.ConvertToString() + ":" + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
+                txt.MainAdd("Databank '" + x.ConvertToString() + "' has " + " " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
             }
+
+            bool hasDepth1 = false;
             using (Writeln txt = new Writeln())
             {
                 txt.MainOmitVeryFirstNewLine();
@@ -5338,10 +5351,19 @@ namespace Gekko
                     }                    
                     txt.MainAdd("--> depth: " + (i - 1) + ", traces: " + depths[i] + extra);
                     txt.MainNewLineTight();
+                    if (i - 1 > 0) hasDepth1 = true;
                 }
                 txt.MainAdd("");
                 txt.MainNewLineTight();
-                txt.MainAdd("Traces of depth 0 connect directly to a series/array-series in the databank. A trace of depth 1 connects to a trace of depth 0, and so on.");
+                if (th.traces.Count > 0)
+                {
+                    txt.MainAdd("Traces of depth 0 connect directly to a series/array-series in the databank.");
+                    if (hasDepth1)
+                    {
+                        txt.MainNewLineTight();
+                        txt.MainAdd("A trace of depth 1 connects to a trace of depth 0, and so on.");
+                    }
+                }
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
         }

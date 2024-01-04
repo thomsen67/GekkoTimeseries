@@ -17,6 +17,12 @@ namespace Gekko
         public bool show_source = false;
     }
 
+    public class EquationBrowserHelper
+    {
+        public string s1;
+        public string s2;
+    }
+
     public static class EquationBrowser
     {
         public static void Browser()
@@ -314,7 +320,7 @@ namespace Gekko
                 doc[varname].Add(new Tuple<string, string>(path, descr));
             }
 
-            List<string> vars2 = new List<string>();
+            List<EquationBrowserHelper> vars2 = new List<EquationBrowserHelper>();                        
 
             //Fetches estimation output
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -434,8 +440,11 @@ namespace Gekko
                         if (varExpl2.Trim().StartsWith("Series: " + varnameWithoutFreq, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
                         explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";  //see also #324lkj2342
                     }
-                }                
-                vars2.Add(varnameWithoutFreq + "¤" + G.ReplaceWhitespaceWith1Blank(explanation));
+                }
+                EquationBrowserHelper ebh = new EquationBrowserHelper();
+                ebh.s1 = varnameWithoutFreq;
+                ebh.s2 = G.ReplaceWhitespaceWith1Blank(explanation);
+                vars2.Add(ebh);
 
                 // --------------------------------
                 // html print info on ENDO/EXO, freq, data period
@@ -754,7 +763,7 @@ namespace Gekko
             // ----------------- find -------------------------------------
             // ------------------------------------------------------------
 
-            vars2.Sort(StringComparer.OrdinalIgnoreCase);
+            var sorted = vars2.OrderBy(o => o.s1, StringComparer.OrdinalIgnoreCase);
 
             StringBuilder x3 = new StringBuilder();
             x3.AppendLine("<html>");
@@ -767,11 +776,10 @@ namespace Gekko
 
             string s1 = G.NL;
             string s2 = G.NL;
-            foreach (string s in vars2)
-            {
-                string[] ss = s.Split('¤');
-                s1 += "`" + ss[0] + "`" + ", " + G.NL;
-                s2 += "`" + ss[1] + "`" + ", " + G.NL;
+            foreach (EquationBrowserHelper s in sorted)
+            {                
+                s1 += "\"" + s.s1 + "\"" + ", " + G.NL;
+                s2 += "\"" + s.s2 + "\"" + ", " + G.NL;
             }
 
             string write = null;

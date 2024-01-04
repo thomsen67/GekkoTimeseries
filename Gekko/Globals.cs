@@ -49,7 +49,7 @@ namespace Gekko
 
         public static bool traceWalkAllCombinations = false;  //only activated for unit testing, counting all combinations.
         public static double traceTime = double.NaN;
-        public static string traceError = "Something went wrong regarding {a{data tracing¤appendix_trace.htm}a}. Data tracing is experimental, and to deactivate it, you may set 'option databank trace = no;' at the beginning of your Gekko program.";
+        public static string traceError = "Something went wrong regarding {a{data tracing¤appendix_trace.htm}a}. Data tracing is experimental from Gekko 3.1.16 and on, and to deactivate it, you may set 'option databank trace = no;' at the beginning of your Gekko program.";
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
