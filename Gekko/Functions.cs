@@ -5248,9 +5248,7 @@ namespace Gekko
         {
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             if (!db.editable) new Error("Databank " + db.GetName() + " is not editable");
-            TraceHelper th = null;
-            if (false) th = Trace2.CollectAllTraces(db, ETraceHelper.GetTimeShadowInfo);
-            else th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
+            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
             foreach (SeriesMetaInformation meta in th.metas)
             {
                 if (meta == null) continue;  //is this even possible?

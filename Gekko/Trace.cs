@@ -303,41 +303,37 @@ namespace Gekko
             }            
             else if (th.type == ETraceHelper.GetTimeShadowInfo)
             {
-                if (true || !Trace2.IsInvisibleTrace(this))  //traces next to timeseries + dividers
+                ScalarVal temp = null; th.timeShadowing.TryGetValue(this, out temp);
+                if (temp == null)
                 {
-
-                    ScalarVal temp = null; th.timeShadowing.TryGetValue(this, out temp);
-                    if (temp == null)
+                    th.timeShadowing.Add(this, Globals.scalarVal1);
+                    if (this.precedents.Count() > 0)
                     {
-                        th.timeShadowing.Add(this, Globals.scalarVal1);
-                        if (this.precedents.Count() > 0)
+                        th.input += this.precedents.Count();
+                        List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+                        th.output += shadow.Count;
+                        if (shadow.Count > precedents.Count())
                         {
-                            th.input += this.precedents.Count();
-                            List<TraceAndPeriods> shadow = this.TimeShadow2(true);
-                            th.output += shadow.Count;
-                            if (shadow.Count > precedents.Count())
+                            new Error("Hov!");
+                        }
+                        else if (shadow.Count != precedents.Count())
+                        {
+                            this.precedents = new Precedents();
+                            foreach (TraceAndPeriods temp2 in shadow)
                             {
-                                new Error("Hov!");
-                            }
-                            else if (shadow.Count != precedents.Count())
-                            {
-                                this.precedents = new Precedents();
-                                foreach (TraceAndPeriods temp2 in shadow)
-                                {
-                                    if (temp2 == null) this.precedents.Add(null);
-                                    else this.precedents.Add(temp2.trace);
-                                }
+                                if (temp2 == null) this.precedents.Add(null);
+                                else this.precedents.Add(temp2.trace);
                             }
                         }
                     }
-                    else
-                    {
-                        //has been seen before
-                        //temp.lighted++;
-                        //temp.shadowed++;
-                        return;
-                    }
                 }
+                else
+                {
+                    //has been seen before
+                    //temp.lighted++;
+                    //temp.shadowed++;
+                    return;
+                }                
                 
                 if (this.precedents.Count() > 0)
                 {

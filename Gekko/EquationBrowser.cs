@@ -442,8 +442,10 @@ namespace Gekko
                     }
                 }
                 EquationBrowserHelper ebh = new EquationBrowserHelper();
-                ebh.s1 = varnameWithoutFreq;
+                ebh.s1 = varnameWithoutFreq; 
+                if (ebh.s1 != null) ebh.s1 = ebh.s1.Replace("`", "'"); //We use ` to represent "
                 ebh.s2 = G.ReplaceWhitespaceWith1Blank(explanation);
+                if (ebh.s2 != null) ebh.s2 = ebh.s2.Replace("`", "'"); //We use ` to represent "
                 vars2.Add(ebh);
 
                 // --------------------------------
