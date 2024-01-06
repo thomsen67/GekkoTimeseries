@@ -182,18 +182,24 @@ namespace Gekko
             return list.Count;
         }
 
-        public int GetIntFromString(string s)
+        public int GetIntFromString(string s, bool addToList)
         {
             int i;
             bool b = this.dictionary.TryGetValue(s, out i);
             if (!b)
             {
-                i = this.list.Count;
+                i = this.dictionary.Count;
                 this.dictionary.Add(s, i); //starts with value = 0
-                this.list.Add(s);
+                if (addToList) this.list.Add(s);
             }
             return i;
         }
+
+        public int GetIntFromString(string s)        
+        {
+            return GetIntFromString(s, true);
+        }
+
         public string GetStringFromInt(int i)
         {
             if (i < 0 || i >= this.list.Count) new Error("String container overflow");
@@ -210,14 +216,13 @@ namespace Gekko
         public void Unpack()
         {
             //Unpack from protobuf
-            List<string> temp1 = this.list;
-            List<int> temp2 = new List<int>();
-            this.list.Clear();
+            //List<string> temp1 = this.list;
+            //List<int> temp2 = new List<int>();
+            //this.list.Clear();
             this.dictionary.Clear();
-            for (int i = 0; i < temp1.Count; i++)
+            for (int i = 0; i < this.list.Count; i++)
             {
-                int ii = this.GetIntFromString(temp1[i]);
-                temp2.Add(ii);
+                int ii = this.GetIntFromString(this.list[i], false);
             }
         }
     }
@@ -2057,14 +2062,17 @@ namespace Gekko
                 StringIntern si = new StringIntern();
 
                 InternTest it1 = new InternTest();
-                it1.i1 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
-                it1.i2 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
-                it1.i3 = si.GetIntFromString(@"c:\path1\path2\file2.gcm");
+                it1.i1 = si.GetIntFromString(@"1");
+                it1.i2 = si.GetIntFromString(@"1");
+                it1.i3 = si.GetIntFromString(@"2");
 
                 InternTest it2 = new InternTest();
-                it2.i1 = si.GetIntFromString(@"c:\path1\path2\file2.gcm");
-                it2.i2 = si.GetIntFromString(@"c:\path1\path2\file3.gcm");
-                it2.i3 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
+                it2.i1 = si.GetIntFromString(@"2");
+                it2.i2 = si.GetIntFromString(@"3");
+                it2.i3 = si.GetIntFromString(@"1");
+
+                si.Pack();
+                si.Unpack();
 
                 G.Writeln(si.GetStringFromInt(it1.i1) + ", " + si.GetStringFromInt(it1.i2) + ", "+ si.GetStringFromInt(it1.i3));
                 G.Writeln(si.GetStringFromInt(it2.i1) + ", " + si.GetStringFromInt(it2.i2) + ", " + si.GetStringFromInt(it2.i3));
