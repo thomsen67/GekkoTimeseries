@@ -167,8 +167,59 @@ namespace Gekko
 
     public class InternTest
     {
-        public int s1 = -12345;
-        public int s2 = -12345;
+        public int i1 = -12345;
+        public int i2 = -12345;
+        public int i3 = -12345;
+    }
+
+    public class StringIntern
+    {        
+        private GekkoDictionary<string, int> dictionary = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private List<string> list = new List<string>();
+
+        public int Count()
+        {
+            return list.Count;
+        }
+
+        public int GetIntFromString(string s)
+        {
+            int i;
+            bool b = this.dictionary.TryGetValue(s, out i);
+            if (!b)
+            {
+                i = this.list.Count;
+                this.dictionary.Add(s, i); //starts with value = 0
+                this.list.Add(s);
+            }
+            return i;
+        }
+        public string GetStringFromInt(int i)
+        {
+            if (i < 0 || i >= this.list.Count) new Error("String container overflow");
+            return this.list[i];
+        }
+
+        public void Pack()
+        {
+            //Pack for protubuf
+            //If anything is put in after this (which would be an error anyway), an existing string will not be found. So it is kind of foolproof.
+            this.dictionary.Clear();
+        }
+
+        public void Unpack()
+        {
+            //Unpack from protobuf
+            List<string> temp1 = this.list;
+            List<int> temp2 = new List<int>();
+            this.list.Clear();
+            this.dictionary.Clear();
+            for (int i = 0; i < temp1.Count; i++)
+            {
+                int ii = this.GetIntFromString(temp1[i]);
+                temp2.Add(ii);
+            }
+        }
     }
 
     public class DownloadHelper
@@ -2002,20 +2053,23 @@ namespace Gekko
         {                               
 
             if (true && Globals.runningOnTTComputer)
-            {
-                GekkoDictionary<string, int> intern = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                List<string> container = new List<string>();
+            {                
+                StringIntern si = new StringIntern();
 
-                InternTest it1 = new InternTest();                
-                it1.s1 = Intern(intern, container, @"c:\path1\path2\file1.gcm");
-                it1.s2 = Intern(intern, container, @"c:\path1\path2\file1.gcm");
+                InternTest it1 = new InternTest();
+                it1.i1 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
+                it1.i2 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
+                it1.i3 = si.GetIntFromString(@"c:\path1\path2\file2.gcm");
 
                 InternTest it2 = new InternTest();
-                it2.s1 = Intern(intern, container, @"c:\path1\path2\file2.gcm");
-                it2.s2 = Intern(intern, container, @"c:\path1\Path2\file1.gcm");
+                it2.i1 = si.GetIntFromString(@"c:\path1\path2\file2.gcm");
+                it2.i2 = si.GetIntFromString(@"c:\path1\path2\file3.gcm");
+                it2.i3 = si.GetIntFromString(@"c:\path1\path2\file1.gcm");
 
-                G.Writeln(Intern2(container, it1.s1) + ", " + Intern2(container, it1.s2));
-                G.Writeln(Intern2(container, it2.s1) + ", " + Intern2(container, it2.s2));
+                G.Writeln(si.GetStringFromInt(it1.i1) + ", " + si.GetStringFromInt(it1.i2) + ", "+ si.GetStringFromInt(it1.i3));
+                G.Writeln(si.GetStringFromInt(it2.i1) + ", " + si.GetStringFromInt(it2.i2) + ", " + si.GetStringFromInt(it2.i3));
+                G.Writeln("Count "+si.Count());
+
             }
 
             if (false && Globals.runningOnTTComputer)
@@ -2477,26 +2531,7 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }
-
-        private static int Intern(GekkoDictionary<string, int> intern, List<string> container, string s)
-        {
-            int i;
-            bool b = intern.TryGetValue(s, out i);
-            if (!b)
-            {
-                i = container.Count;
-                intern.Add(s, i); //starts with value = 0
-                container.Add(s);
-            }
-            return i;
-        }
-
-        private static string Intern2(List<string> container, int i)
-        {
-            if (i < 0 || i >= container.Count) new Error("String container overflow");
-            return container[i];
-        }
+        }        
 
         /// <summary>
         /// From the variable pv, flood the adjacent variables with color color.
