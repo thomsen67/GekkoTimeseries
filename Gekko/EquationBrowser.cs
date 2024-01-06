@@ -368,18 +368,34 @@ namespace Gekko
             string modelFrequencyString = GetModelFreq(vars);
             Program.options.freq = G.ConvertFreq(modelFrequencyString); //sets global freq
 
+            if (Globals.browserLimit)
+            {
+                if (settings_index_filename.ToLower().Contains("mona"))
+                {
+                }
+                else if (settings_index_filename.ToLower().Contains("adam"))
+                {
+                }
+                else
+                {
+                    //smec
+                    //Program.databanks.GetRef().RemoveIVariable("tfon!a");
+                    Program.databanks.GetFirst().RemoveIVariable("tfon!a");
+                }
+            }
+
+            int missingFirst = 0;
+            int missingRef = 0;
+
             foreach (string varnameWithoutFreq in vars)
             {
                 string varnameWithFreq = varnameWithoutFreq + "!" + modelFrequencyString;
                 StringBuilder sb = new StringBuilder();
+
                 Series ts1 = Program.databanks.GetFirst().GetIVariable(varnameWithFreq) as Series;
+                if (ts1 == null) missingFirst++;               
 
-                if (ts1 == null)
-                {
-                    new Error("Could not find series " + varnameWithFreq + " in databank " + Program.databanks.GetFirst().name);
-                }
-
-                if (Globals.browserLimit)
+                if (ts1 != null && Globals.browserLimit)
                 {
                     if (settings_index_filename.ToLower().Contains("mona"))
                     {
@@ -401,6 +417,8 @@ namespace Gekko
                 }
 
                 Series ts2 = Program.databanks.GetRef().GetIVariable(varnameWithFreq) as Series;
+                if (ts2 == null) missingRef++;
+
                 string jName = null;  //name of possible j-led
                 bool jNameAutoGen = false;
 
@@ -454,73 +472,81 @@ namespace Gekko
 
                 EEndoOrExo type1 = Program.VariableTypeEndoExo(varnameWithFreq);
                 string type = "";
-                if (type1 == EEndoOrExo.Exo) type = "Eksogen, ";
-                else if (type1 == EEndoOrExo.Endo) type = "Endogen, ";
+                if (type1 == EEndoOrExo.Exo) type = "Eksogen";
+                else if (type1 == EEndoOrExo.Endo) type = "Endogen";
 
                 //========================================================================================================
                 //                          FREQUENCY LOCATION, indicates where to implement more frequencies
                 //========================================================================================================
 
-                string freq = "[ukendt frekvens]";
-                if (ts1.freq == EFreq.A)
-                {
-                    freq = "Årlig";
-                }
-                else if (ts1.freq == EFreq.Q)
-                {
-                    freq = "Kvartalsvis";
-                }
-                else if (ts1.freq == EFreq.M)
-                {
-                    freq = "Månedlig";
-                }
-                else if (ts1.freq == EFreq.W)
-                {
-                    freq = "Ugentlig";
-                }
-                else if (ts1.freq == EFreq.D)
-                {
-                    freq = "Daglig";
-                }
-                else if (ts1.freq == EFreq.U)
-                {
-                    freq = "Udateret";
-                }
+                if (ts1 != null)                
+                { 
 
-                bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data
-
-                GekkoTime first = ts1.GetRealDataPeriodFirst();
-                GekkoTime last = ts1.GetRealDataPeriodLast();
-
-                StringBuilder sb4 = new StringBuilder();
-                sb4.Append(type);
-                string stamp = null;
-                if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (opdateret: " + ts1.meta.stamp + ")";
-                if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
-                {
-                    if (noData || first.super == -12345 || last.super == -12345)
+                    string freq = "[ukendt frekvens]";
+                    if (ts1.freq == EFreq.A)
                     {
-                        sb4.Append(freq + ", ingen dataperiode");
+                        freq = "Årlig";
+                    }
+                    else if (ts1.freq == EFreq.Q)
+                    {
+                        freq = "Kvartalsvis";
+                    }
+                    else if (ts1.freq == EFreq.M)
+                    {
+                        freq = "Månedlig";
+                    }
+                    else if (ts1.freq == EFreq.W)
+                    {
+                        freq = "Ugentlig";
+                    }
+                    else if (ts1.freq == EFreq.D)
+                    {
+                        freq = "Daglig";
+                    }
+                    else if (ts1.freq == EFreq.U)
+                    {
+                        freq = "Udateret";
+                    }
+
+                    bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data
+
+                    GekkoTime first = ts1.GetRealDataPeriodFirst();
+                    GekkoTime last = ts1.GetRealDataPeriodLast();
+
+                    StringBuilder sb4 = new StringBuilder();
+                    sb4.Append(type + ", ");
+                    string stamp = null;
+                    if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (opdateret: " + ts1.meta.stamp + ")";
+                    if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
+                    {
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            sb4.Append(freq + ", ingen dataperiode");
+                        }
+                        else
+                        {
+                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                            sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
+                        }
                     }
                     else
                     {
-                        //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                        sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            sb4.Append(freq + ", ingen dataperiode");
+                        }
+                        else
+                        {
+                            sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
+                        }
                     }
+                    WriteHtml(sb, sb4.ToString());  //for instance: Endogen: Årlige data fra 1966 til 2030 (opdateret: 23-09-2021)
                 }
                 else
                 {
-                    if (noData || first.super == -12345 || last.super == -12345)
-                    {
-                        sb4.Append(freq + ", ingen dataperiode");
-                    }
-                    else
-                    {
-                        sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
-                    }
+                    WriteHtml(sb, type);
                 }
-                WriteHtml(sb, sb4.ToString());  //for instance: Endogen: Årlige data fra 1966 til 2030 (opdateret: 23-09-2021)
-                
+
                 // --------------------------------
                 // print link(s) to possible external documentation files
                 // --------------------------------
@@ -529,7 +555,7 @@ namespace Gekko
                 if (tuples != null)
                 {
                     int counter = -1;
-                    sb.Append("<table style=`margin: 0px; padding: 0px; border: 0px; width = 800px;`>");
+                    sb.Append("<table style=`margin: 0px; padding: 0px; border: 0px; width: 800px;`>");
                     foreach (Tuple<string, string> tuple in tuples)
                     {
                         counter++;
@@ -583,7 +609,7 @@ namespace Gekko
                         s5 += s + G.NL;
                     }
                     WriteHtmlPreCode(sb, s5);
-                }
+                }                
 
                 bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
 
@@ -597,72 +623,80 @@ namespace Gekko
                 string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
                 string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
 
-                if (ts2 == null)
+                if (ts1 != null)
                 {
-                    //only plot the series from Work
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    if (ts2 == null)
+                    {
+                        //only plot the series from Work
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    }
+                    else
+                    {
+                        //plot both
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
+                        Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    }
+
+                    sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + ".svg" + "`>");
+
+                    sb.AppendLine("<p/>");
+
+                    FoldingButtonStart(sb, "Vækst %");
+                    sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
+                    FoldingButtonEnd(sb);
+
+                    if (jName != null)
+                    {
+                        FoldingButtonStart(sb, "J-led");
+                        sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
+                        FoldingButtonEnd(sb);
+                    }
+
+                    // --------------------------------
+                    // html print data values of series
+                    // --------------------------------
+
+                    StringBuilder sb3 = new StringBuilder();
+                    string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
+                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
+                    sb3.AppendLine();
+                    sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
+                    int counter6 = 0;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
+                    {
+                        counter6++;
+                        if (hasFilter)  //some periods are set via TIMEFILTER
+                        {
+                            if (Program.ShouldFilterPeriod(gt)) continue;
+                        }
+
+                        int counter2 = -1;
+                        foreach (Series ts in new List<Series> { ts1, ts2 })
+                        {
+                            counter2++;
+                            if (ts == null)
+                            {
+                                //ignore it
+                            }
+                            else
+                            {
+                                BrowserWritePrintLine(ts, sb3, gt);
+                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
+                            }
+                        }
+
+                        sb3.AppendLine();
+                        if (gt.freq == EFreq.Q && gt.sub == Globals.freqQSubperiods) sb3.AppendLine();  //prettier
+                        if (gt.freq == EFreq.M && gt.sub == Globals.freqMSubperiods) sb3.AppendLine();  //prettier
+                    }
+
+                    WriteHtmlPreCode(sb, sb3.ToString());
                 }
                 else
                 {
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    WriteHtmlPreCode(sb, "+++ Note: variablens data kunne ikke indlæses");
                 }
-
-                sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + ".svg" + "`>");
-
-                sb.AppendLine("<p/>");
-
-                FoldingButtonStart(sb, "Vækst %");
-                sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
-                FoldingButtonEnd(sb);
-
-                if (jName != null)
-                {
-                    FoldingButtonStart(sb, "J-led");
-                    sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
-                    FoldingButtonEnd(sb);
-                }
-
-                // --------------------------------
-                // html print data values of series
-                // --------------------------------
-
-                StringBuilder sb3 = new StringBuilder();
-                string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
-                sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
-                sb3.AppendLine();
-                sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
-                int counter6 = 0;
-                foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
-                {
-                    counter6++;
-                    if (hasFilter)  //some periods are set via TIMEFILTER
-                    {
-                        if (Program.ShouldFilterPeriod(gt)) continue;
-                    }
-
-                    int counter2 = -1;
-                    foreach (Series ts in new List<Series> { ts1, ts2 })
-                    {
-                        counter2++;
-                        if (ts == null)
-                        {
-                            //ignore it
-                        }
-                        else
-                        {
-                            BrowserWritePrintLine(ts, sb3, gt);
-                            if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
-                        }
-                    }
-
-                    sb3.AppendLine();
-                    if (gt.freq == EFreq.Q && gt.sub == Globals.freqQSubperiods) sb3.AppendLine();  //prettier
-                    if (gt.freq == EFreq.M && gt.sub == Globals.freqMSubperiods) sb3.AppendLine();  //prettier
-                }
-
-                WriteHtmlPreCode(sb, sb3.ToString());
 
                 StringBuilder x = new StringBuilder();
                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -932,7 +966,12 @@ namespace Gekko
                 sw.Write(x3.Replace('`', '\"'));
             }
 
-            G.Writeln2("End of html browser generation, " + G.Seconds(dt0));
+            if (missingFirst + missingRef > 0)
+            {
+                new Note("Regarding the model variables, there were " + missingFirst + " missing variable" + G.S(missingFirst) + " in the first-position databank and " + missingRef + " missing variable" + G.S(missingRef) + " in the refefence databank. Data, labels etc. for these are therefore not show.");
+            }
+
+            new Writeln("End of html browser generation, " + G.Seconds(dt0));
 
         }
 

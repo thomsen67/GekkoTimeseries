@@ -165,6 +165,12 @@ namespace Gekko
         public bool b = false;
     }
 
+    public class InternTest
+    {
+        public int s1 = -12345;
+        public int s2 = -12345;
+    }
+
     public class DownloadHelper
     {
         public string gekkoCode = null;
@@ -1995,59 +2001,22 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {                               
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
-                new Writeln(Environment.UserName + " --- " + System.Security.Principal.WindowsIdentity.GetCurrent().Name);
+                GekkoDictionary<string, int> intern = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                List<string> container = new List<string>();
+
+                InternTest it1 = new InternTest();                
+                it1.s1 = Intern(intern, container, @"c:\path1\path2\file1.gcm");
+                it1.s2 = Intern(intern, container, @"c:\path1\path2\file1.gcm");
+
+                InternTest it2 = new InternTest();
+                it2.s1 = Intern(intern, container, @"c:\path1\path2\file2.gcm");
+                it2.s2 = Intern(intern, container, @"c:\path1\Path2\file1.gcm");
+
+                G.Writeln(Intern2(container, it1.s1) + ", " + Intern2(container, it1.s2));
+                G.Writeln(Intern2(container, it2.s1) + ", " + Intern2(container, it2.s2));
             }
-            //if (false && Globals.runningOnTTComputer)
-            //{
-            //    if (Globals.modelFileName == null) new Error("No model defined");
-
-            //    byte[] data = null;
-
-            //    try
-            //    {
-            //        string filePath = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info.zip");
-            //        data = File.ReadAllBytes(filePath);
-            //    }
-            //    catch { };  //does not fail
-
-            //    try
-            //    {
-            //        string filePath2 = Path.Combine(Program.options.folder_working, Globals.modelFileName.Replace(".frm", "") + "__info2.zip");
-            //        if (File.Exists(filePath2)) WaitForFileDelete(filePath2);
-            //        using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(filePath2)))
-            //        {
-            //            writer.Write(data);
-            //        }
-            //    }
-            //    catch { };  //does not fail
-            //}
-
-            //if(true && Globals.runningOnTTComputer)
-            //{
-            //    GekkoTime gt = new GekkoTime(EFreq.Q, 2020, 3);
-            //    string dateFormat = "yyyy-mm-dd last";
-            //    if (false)
-            //    {
-            //        object o = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart).ToOADate();
-            //    }
-            //    else
-            //    {
-            //        bool isFirst = true;
-            //        string format = SplitDateFormatInTwo(dateFormat, ref isFirst);
-            //        if (IsGekkoDateFormat(format))
-            //        {
-                        
-            //        }
-            //        else
-            //        {
-            //            string dateString = null; DateTime dt; string f;
-            //            GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out dateString);
-            //            object o = dateString;
-            //        }
-            //    }
-            //}
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -2508,7 +2477,26 @@ namespace Gekko
             }
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }        
+        }
+
+        private static int Intern(GekkoDictionary<string, int> intern, List<string> container, string s)
+        {
+            int i;
+            bool b = intern.TryGetValue(s, out i);
+            if (!b)
+            {
+                i = container.Count;
+                intern.Add(s, i); //starts with value = 0
+                container.Add(s);
+            }
+            return i;
+        }
+
+        private static string Intern2(List<string> container, int i)
+        {
+            if (i < 0 || i >= container.Count) new Error("String container overflow");
+            return container[i];
+        }
 
         /// <summary>
         /// From the variable pv, flood the adjacent variables with color color.

@@ -1523,12 +1523,13 @@ namespace Gekko
             {
                 s = total.ToString("0.0000") + " sec";
             }
-            else if (total < 60d)
+            else
             {
                 s = total.ToString("0.00") + " sec";
             }
-            else
-            {
+            
+            if (total >= 60d)
+            {                
                 string min = "";
                 string sec = "";
                 int minutes = (int)total / 60;
