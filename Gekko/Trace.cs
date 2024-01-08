@@ -130,10 +130,14 @@ namespace Gekko
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
-        public Trace2(GekkoTime t1, GekkoTime t2)
+        public Trace2(GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
         {
-            if (t1.IsNull() || t2.IsNull()) new Error("Trace time error");
-            this.contents = new TraceContents(t1, t2);            
+            if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");
+            this.contents = new TraceContents(t1, t2);
+        }
+
+        public Trace2(GekkoTime t1, GekkoTime t2) : this(t1, t2, false)
+        {
         }
 
         public Trace2(bool isNullTime)

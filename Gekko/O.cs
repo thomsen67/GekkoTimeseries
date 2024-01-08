@@ -7351,7 +7351,7 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast());
+                        Trace2 newTrace = new Trace2(lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast(), true);
                         newTrace.contents.text = this.gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
@@ -7410,7 +7410,7 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast());
+                        Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = this.p?.GetExecutingGcmFile(true);
                         int counter = 0;
@@ -9293,7 +9293,7 @@ namespace Gekko
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                            Trace2 newTrace = new Trace2(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast());
+                            Trace2 newTrace = new Trace2(tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast(), true);
                             newTrace.contents.text = this.gekkocode + ";";
                             //newTrace.contents.text = "Rebased from " + (iv as Series).GetName();
                             newTrace.contents.bankAndVarnameWithFreq = tsNew.GetNameAndParentDatabank();
