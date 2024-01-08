@@ -2057,7 +2057,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {                               
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {                
                 StringIntern si = new StringIntern();
 

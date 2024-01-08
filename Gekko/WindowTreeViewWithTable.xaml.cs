@@ -650,7 +650,9 @@ namespace Gekko
 
         public string FileDetailed { get; private set; }
 
-        public Item(string name, string code, string period, string stamp, string stampDetailed, string file, string fileDetailed, bool hasChildren)
+        public List<string> PrecedentsNames { get; private set; }
+
+        public Item(string name, string code, string period, string stamp, string stampDetailed, string file, string fileDetailed, List<string>precedentsNames, bool hasChildren)
         {
             // Initialize the item
             Name = name;
@@ -661,6 +663,7 @@ namespace Gekko
             File = file;
             FileDetailed = fileDetailed;
             HasChildren = hasChildren;
+            PrecedentsNames = precedentsNames;
         }
     }
 
@@ -705,7 +708,7 @@ namespace Gekko
             for (int count = 0; count < Roots; count++)
             {
                 // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "2020", "today", "file", "file", true);
+                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "2020", "today", "file", "file", null, true);
 
                 // Add children to the root
                 AddChildren(root);
@@ -742,7 +745,7 @@ namespace Gekko
             for (int count = 0; count < ItemsPerLevel; count++)
             {
                 // Create the child
-                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "2020", "today", "file", "file", hasChildren);
+                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "2020", "today", "file", "file", null, hasChildren);
 
                 // Does the child have children?
                 if (hasChildren)
@@ -765,6 +768,7 @@ namespace Gekko
             text += "Period: " + item.Period + G.NL;
             text += "Stamp: " + item.StampDetailed + G.NL;
             text += "File: " + item.FileDetailed + G.NL;
+            if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);
             WindowDecomp.RichSetText(this.text, Decomp.GetColoredEquations(text));
         }
 

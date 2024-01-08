@@ -35,12 +35,13 @@ namespace Gekko
     {
         /// <summary>
         /// An extra char in this .text will take up 2 bytes or 16 bits.
-        /// </summary>
+        /// </summary>        
+
         [ProtoMember(1)]
-        public string text = null;
+        public GekkoTimeSpanSimple span = null;
 
         [ProtoMember(2)]
-        public GekkoTimeSpanSimple span = null;
+        public string text = null;
 
         [ProtoMember(3)]
         public string bankAndVarnameWithFreq = null;
@@ -52,10 +53,13 @@ namespace Gekko
         /// For instance the file from where data was imported. Will often be null.
         /// </summary>
         [ProtoMember(5)]
-        public string dataFile = null;
+        public string dataFile = null;               
+
+        [ProtoMember(6)]
+        public List<string> precedentsNames = null;
 
         public TraceContents DeepClone()
-        {
+        {            
             TraceContents trace2 = new TraceContents();
             trace2.span = this.span;  //it is immutable
             trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
@@ -721,6 +725,7 @@ namespace Gekko
             string fileDetailed = null;
             string stamp = null;
             string stampDetailed = null;
+            List<string> precedentsNames = null;
             if (this.contents != null)
             {
                 text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);                
@@ -740,9 +745,10 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
                 stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
                 stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                precedentsNames = this.contents.precedentsNames;
             }
             
-            Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, hasChildren);
+            Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             if (depth < 4)
             {
                 if (this.precedents.GetStorage() != null)
@@ -949,7 +955,9 @@ namespace Gekko
         /// <param name="ts"></param>
         public void AddRangeFromSeries(Series ts)
         {
-            if (ts?.meta?.trace2 == null) return; //may come from an old Gekko databank where .trace2 == null.
+            bool hasPrecedents = true;
+            if (ts?.meta?.trace2 == null) hasPrecedents = false;            
+            if (!hasPrecedents) return; //may come from an old Gekko databank where .trace2 == null.            
             this.AddRange(ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
         }
 
