@@ -451,6 +451,7 @@ namespace Gekko
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
 
         public const string symbolTurtle = "___";
+        public const string precedentHasTrace = "¤";  //used in tracing
 
         public const string symbolBankColon = ":";
         public const char symbolBankColon2 = ':';

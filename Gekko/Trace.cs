@@ -34,7 +34,7 @@ namespace Gekko
     public class TraceContents
     {
         /// <summary>
-        /// An extra char in this .text will take up 2 bytes or 16 bits.
+        /// An extra char in a text string here will take up 2 bytes or 16 bits.
         /// </summary>        
 
         [ProtoMember(1)]
@@ -161,9 +161,10 @@ namespace Gekko
         public void AddRangeFromSeries(Series lhs, Series rhs)
         {
             if (rhs == null || Object.ReferenceEquals(lhs, rhs)) return; //do not point to your own trace!
+            if (rhs.type == ESeriesType.ArraySuper) return; //do not do this for array-series parent
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
             if (this.contents.precedentsNames == null) this.contents.precedentsNames = new List<string>();
-            this.contents.precedentsNames.Add((hasTrace ? "+" : null) + rhs.GetNameAndParentDatabank());
+            this.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs.GetNameAndParentDatabank());
             if (hasTrace) this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
         }
 
@@ -741,7 +742,8 @@ namespace Gekko
             List<string> precedentsNames = null;
             if (this.contents != null)
             {
-                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name), Program.options.freq);                
+                //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
+                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq), Program.options.freq);           
                 code = this.contents.text;
                 GekkoTime t1 = this.contents.span.t1;
                 GekkoTime t2 = this.contents.span.t2;
@@ -758,11 +760,20 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
                 stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
                 stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-                precedentsNames = this.contents.precedentsNames;
+
+                if (this.contents.precedentsNames != null)
+                {
+                    List<string> list = new List<string>();
+                    foreach (string s in this.contents.precedentsNames)
+                    {
+                        list.Add(G.Chop_RemoveFreq(G.Chop_RemoveBank(s.Replace(Globals.precedentHasTrace, "")), Program.options.freq));
+                    }
+                    precedentsNames = list;
+                }
             }
             
             Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
-            if (depth < 4)
+            if (depth < 5)
             {
                 if (this.precedents.GetStorage() != null)
                 {
@@ -938,7 +949,7 @@ namespace Gekko
     /// </summary>
     [ProtoContract]
     public class Precedents
-    {
+    {        
         [ProtoMember(1)]
         private List<Trace2> storage = null;
 

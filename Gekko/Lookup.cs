@@ -1716,12 +1716,13 @@ namespace Gekko
                             foreach (IVariable iv in Globals.traceContainer)
                             {
                                 counter1++;
-                                Series iv_ts = iv as Series;
-                                if (iv_ts == null || Object.ReferenceEquals(iv_ts, lhs_series)) continue; //do not point to your own trace!
+                                Series iv_ts = iv as Series;                                
+                                if (iv_ts == null || Object.ReferenceEquals(iv_ts, lhs_series)) continue; //do not point to your own trace!                                
+                                if (iv_ts.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
                                 bool hasTrace = true; if (iv_ts?.meta?.trace2 == null) hasTrace = false;
 
                                 if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
-                                trace.contents.precedentsNames.Add((hasTrace ? "+" : null) + iv_ts.GetNameAndParentDatabank());
+                                trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + iv_ts.GetNameAndParentDatabank());
 
                                 if (hasTrace && iv_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
                                 {
