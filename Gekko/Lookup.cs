@@ -1711,20 +1711,17 @@ namespace Gekko
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                         if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                         {
-                            List<Trace2> newTraceList = new List<Trace2>();
+                            //trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(new List<Trace2>());  //may be set to null after this method has been looped
                             int counter1 = -1;
                             foreach (IVariable iv in Globals.traceContainer)
                             {
                                 counter1++;
-                                Series rhs_ts = iv as Series;
-                                if (rhs_ts == null || Object.ReferenceEquals(rhs_ts, lhs_series)) continue; //do not point to your own trace!                                
-                                if (rhs_ts.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
-                                Trace2.AddRangeFromSeries1(trace, rhs_ts, newTraceList);
+                                Series rhs = iv as Series;
+                                if (rhs == null || Object.ReferenceEquals(rhs, lhs_series)) continue; //do not point to your own trace!                                
+                                if (rhs.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
+                                Trace2.AddRangeFromSeries1(trace, rhs);
                             }
-                            if (newTraceList.Count > 0)
-                            {
-                                trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(newTraceList);  //keep it null if no children                            
-                            }
+                            //if (trace.GetPrecedents_BewareOnlyInternalUse().GetStorage().Count() == 0) trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(null); //keep it null if no children traces found                                                        
                         }
                         Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);
                     }

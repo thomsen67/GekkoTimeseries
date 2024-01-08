@@ -159,35 +159,51 @@ namespace Gekko
             return this.precedents;
         }
 
-        public static void AddRangeFromSeries1(Trace2 trace, Series rhs_ts, List<Trace2> traceList)
-        {
-            bool hasTrace = true; if (rhs_ts?.meta?.trace2 == null) hasTrace = false;
+        /// <summary>
+        /// Get all traces from series rhs into trace (later put inside lhs series).
+        /// The method is used for assignments, and assignments automatically identify all series "asked" on the rhs.
+        /// When altering something regarding traces, make sure precedentsNames is also altered!
+        /// See also AddRangeFromSeries2().
+        /// </summary>
+        /// <param name="trace"></param>
+        /// <param name="rhs"></param>
+        public static void AddRangeFromSeries1(Trace2 trace, Series rhs)
+        {            
+            bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
 
             if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
-            trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs_ts.GetNameAndParentDatabank());
+            trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs.GetNameAndParentDatabank());
 
-            if (hasTrace && rhs_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            if (hasTrace && rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
                 int counter2 = -1;
-                foreach (Trace2 kvp in rhs_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                foreach (Trace2 kvp in rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                 {
                     Trace2 childTrace2 = kvp;
                     bool known = false;
-                    foreach (Trace2 tempElement in traceList)
+                    if (trace.precedents.GetStorage() != null)
                     {
-                        if (Object.ReferenceEquals(childTrace2, tempElement))
+                        foreach (Trace2 tempElement in trace.precedents.GetStorage())
                         {
-                            known = true; break;
+                            if (Object.ReferenceEquals(childTrace2, tempElement))
+                            {
+                                known = true; break;
+                            }
                         }
                     }
+
                     if (!known)
                     {
                         counter2++;
-                        if (counter2 == 0 && traceList.Count > 0 && traceList[traceList.Count - 1] != null)
+                        if (trace.precedents.GetStorage() == null)
                         {
-                            traceList.Add(null);  //divider
+                            trace.precedents.InitWithEmptyList();
                         }
-                        traceList.Add(childTrace2);
+                        if (counter2 == 0 && trace.precedents.GetStorage().Count > 0 && trace.precedents.GetStorage()[trace.precedents.GetStorage().Count - 1] != null)
+                        {
+                            trace.precedents.GetStorage().Add(null);  //divider
+                        }
+                        trace.precedents.GetStorage().Add(childTrace2);
                     }
                 }
             }
@@ -195,7 +211,9 @@ namespace Gekko
 
 
         /// <summary>
-        /// Get all traces from series rhs. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
+        /// Get all traces from series rhs into lhs. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
+        /// When altering something regarding traces, make sure precedentsNames is also altered!
+        /// See also AddRangeFromSeries1().
         /// </summary>
         /// <param name="rhs"></param>
         public void AddRangeFromSeries2(Series lhs, Series rhs)
@@ -1042,6 +1060,11 @@ namespace Gekko
         {
             if (m != null && m.Count == 0) this.storage = null; //so it does not take up space
             else this.storage = m;
+        }
+
+        public void InitWithEmptyList()
+        {
+            this.storage = new List<Trace2>();
         }
 
         public  void ToID()
