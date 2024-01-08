@@ -1717,13 +1717,8 @@ namespace Gekko
                             {
                                 counter1++;
                                 Series iv_ts = iv as Series;
-                                if (Object.ReferenceEquals(iv_ts, lhs_series))
-                                {
-                                    continue;  //do not point to your own trace!
-                                }
-
-                                bool hasTrace = true;
-                                if (iv_ts?.meta?.trace2 == null) hasTrace = false;
+                                if (iv_ts == null || Object.ReferenceEquals(iv_ts, lhs_series)) continue; //do not point to your own trace!
+                                bool hasTrace = true; if (iv_ts?.meta?.trace2 == null) hasTrace = false;
 
                                 if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
                                 trace.contents.precedentsNames.Add((hasTrace ? "+" : null) + iv_ts.GetNameAndParentDatabank());

@@ -155,6 +155,19 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Get all traces from series ts. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
+        /// </summary>
+        /// <param name="rhs"></param>
+        public void AddRangeFromSeries(Series lhs, Series rhs)
+        {
+            if (rhs == null || Object.ReferenceEquals(lhs, rhs)) return; //do not point to your own trace!
+            bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
+            if (this.contents.precedentsNames == null) this.contents.precedentsNames = new List<string>();
+            this.contents.precedentsNames.Add((hasTrace ? "+" : null) + rhs.GetNameAndParentDatabank());
+            if (hasTrace) this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
+        }
+
+        /// <summary>
         /// Only for internal use.
         /// </summary>
         /// <param name="x"></param>
@@ -454,7 +467,7 @@ namespace Gekko
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);            
             if (type == ETracePushType.NewParent)
             {                   
-                trace.precedents.AddRangeFromSeries(ts);
+                trace.AddRangeFromSeries(null, ts);
                 ts.meta.trace2.precedents = new Precedents();
                 ts.meta.trace2.precedents.Add(trace);
             }            
@@ -940,26 +953,14 @@ namespace Gekko
         /// fail if ts.meta.trace2 is == null. In cases like that, better to use trace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(ts).
         /// </summary>
         /// <param name="precedents"></param>
-        private void AddRange(Precedents precedents)
+        public void AddRange(Precedents precedents)
         {            
             if (precedents.storage != null)
             {
                 if (this.storage == null) this.storage = new List<Trace2>();
                 this.storage.AddRange(precedents.storage);
             }
-        }
-
-        /// <summary>
-        /// Get all traces from series ts. Safer to use than AddRange(). Method does nothing if ts == null, ts.meta == null or ts.meta.trace2 == null.
-        /// </summary>
-        /// <param name="ts"></param>
-        public void AddRangeFromSeries(Series ts)
-        {
-            bool hasPrecedents = true;
-            if (ts?.meta?.trace2 == null) hasPrecedents = false;            
-            if (!hasPrecedents) return; //may come from an old Gekko databank where .trace2 == null.            
-            this.AddRange(ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse());
-        }
+        }        
 
         /// <summary>
         /// Add a Trace to precedents list. Cannot add a "meta entry" to a Trace. These can only be set for .trace in SeriesMetaInformation objects.

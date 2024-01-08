@@ -4763,7 +4763,7 @@ namespace Gekko
                                                         //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
                                                         if (tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse() != null)
                                                         {
-                                                            newTrace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(tsImported);
+                                                            newTrace.AddRangeFromSeries(tsExisting, tsImported);
                                                         }
                                                         Gekko.Trace2.PushIntoSeries(tsExisting, newTrace, ETracePushType.Sibling);
                                                     }
@@ -16894,7 +16894,7 @@ namespace Gekko
                                     //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                     newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
                                     newTrace.contents.commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                                    newTrace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(iv_series);
+                                    newTrace.AddRangeFromSeries(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                                     Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                 }
@@ -24219,7 +24219,7 @@ namespace Gekko
                         newTrace.contents.text = gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                        newTrace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(ts_rhs);
+                        newTrace.AddRangeFromSeries(ts_lhs, ts_rhs);
                         Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
@@ -24548,7 +24548,7 @@ namespace Gekko
                         //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                        newTrace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(ts_rhs);
+                        newTrace.AddRangeFromSeries(ts_lhs, ts_rhs);
                         Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
