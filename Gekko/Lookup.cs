@@ -1711,48 +1711,19 @@ namespace Gekko
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                         if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
                         {
-                            List<Trace2> temp = new List<Trace2>();
+                            List<Trace2> newTraceList = new List<Trace2>();
                             int counter1 = -1;
                             foreach (IVariable iv in Globals.traceContainer)
                             {
                                 counter1++;
-                                Series iv_ts = iv as Series;                                
-                                if (iv_ts == null || Object.ReferenceEquals(iv_ts, lhs_series)) continue; //do not point to your own trace!                                
-                                if (iv_ts.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
-                                bool hasTrace = true; if (iv_ts?.meta?.trace2 == null) hasTrace = false;
-
-                                if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
-                                trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + iv_ts.GetNameAndParentDatabank());
-
-                                if (hasTrace && iv_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
-                                {
-                                    int counter2 = -1;
-                                    foreach (Trace2 kvp in iv_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
-                                    {
-                                        Trace2 childTrace2 = kvp;
-                                        bool known = false;
-                                        foreach (Trace2 tempElement in temp)
-                                        {
-                                            if (Object.ReferenceEquals(childTrace2, tempElement))
-                                            {
-                                                known = true; break;
-                                            }
-                                        }
-                                        if (!known)
-                                        {
-                                            counter2++;
-                                            if (counter2 == 0 && temp.Count > 0 && temp[temp.Count - 1] != null)
-                                            {
-                                                temp.Add(null);  //divider
-                                            }
-                                            temp.Add(childTrace2);
-                                        }
-                                    }
-                                }
+                                Series rhs_ts = iv as Series;
+                                if (rhs_ts == null || Object.ReferenceEquals(rhs_ts, lhs_series)) continue; //do not point to your own trace!                                
+                                if (rhs_ts.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
+                                Trace2.AddRangeFromSeries1(trace, rhs_ts, newTraceList);
                             }
-                            if (temp.Count > 0)
+                            if (newTraceList.Count > 0)
                             {
-                                trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(temp);  //keep it null if no children                            
+                                trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(newTraceList);  //keep it null if no children                            
                             }
                         }
                         Trace2.PushIntoSeries(lhs_series, trace, ETracePushType.Sibling);
@@ -1765,7 +1736,7 @@ namespace Gekko
                 }                
             }            
         }
-
+        
         private static void LookupHandleMetaStuff(Series lhs_series, bool isArraySubSeries, Assignment o)
         {
             if (!isArraySubSeries)

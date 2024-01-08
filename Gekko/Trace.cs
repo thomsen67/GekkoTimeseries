@@ -66,6 +66,7 @@ namespace Gekko
             trace2.commandFileAndLine = this.commandFileAndLine;
             trace2.text = this.text;
             trace2.dataFile = this.dataFile;
+            if (this.precedentsNames != null) trace2.precedentsNames = this.precedentsNames.ToList();
             return trace2;
         }
 
@@ -158,11 +159,46 @@ namespace Gekko
             return this.precedents;
         }
 
+        public static void AddRangeFromSeries1(Trace2 trace, Series rhs_ts, List<Trace2> traceList)
+        {
+            bool hasTrace = true; if (rhs_ts?.meta?.trace2 == null) hasTrace = false;
+
+            if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
+            trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs_ts.GetNameAndParentDatabank());
+
+            if (hasTrace && rhs_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            {
+                int counter2 = -1;
+                foreach (Trace2 kvp in rhs_ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                {
+                    Trace2 childTrace2 = kvp;
+                    bool known = false;
+                    foreach (Trace2 tempElement in traceList)
+                    {
+                        if (Object.ReferenceEquals(childTrace2, tempElement))
+                        {
+                            known = true; break;
+                        }
+                    }
+                    if (!known)
+                    {
+                        counter2++;
+                        if (counter2 == 0 && traceList.Count > 0 && traceList[traceList.Count - 1] != null)
+                        {
+                            traceList.Add(null);  //divider
+                        }
+                        traceList.Add(childTrace2);
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
-        /// Get all traces from series ts. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
+        /// Get all traces from series rhs. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
         /// </summary>
         /// <param name="rhs"></param>
-        public void AddRangeFromSeries(Series lhs, Series rhs)
+        public void AddRangeFromSeries2(Series lhs, Series rhs)
         {
             if (rhs == null || Object.ReferenceEquals(lhs, rhs)) return; //do not point to your own trace!
             if (rhs.type == ESeriesType.ArraySuper) return; //do not do this for array-series parent
@@ -472,7 +508,7 @@ namespace Gekko
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);            
             if (type == ETracePushType.NewParent)
             {                   
-                trace.AddRangeFromSeries(null, ts);
+                trace.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents();
                 ts.meta.trace2.precedents.Add(trace);
             }            
