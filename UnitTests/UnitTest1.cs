@@ -13557,7 +13557,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_TracePeriodsShadowing()
-        {
+        {            
             // ========== Combination
             I("reset; time 2001 2003;");
             I("option databank trace = yes;");
@@ -13750,6 +13750,7 @@ namespace UnitTests
             I("reset; time 2000 2010;");
             I("option databank trace = yes;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("sys 'del trace1.gbk';");
             I("open <edit> trace1;");
             I("x <2004 2006> = 1;");
             I("close *;");
