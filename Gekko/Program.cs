@@ -2059,7 +2059,7 @@ namespace Gekko
 
             if (false && Globals.runningOnTTComputer)
             {                
-                StringIntern si = new StringIntern();
+                StringIntern si = new StringIntern(); 
 
                 InternTest it1 = new InternTest();
                 it1.i1 = si.GetIntFromString(@"1");
