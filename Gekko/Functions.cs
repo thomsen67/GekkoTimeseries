@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Text;
 
 namespace Gekko
 {
@@ -2057,6 +2058,217 @@ namespace Gekko
             {
                 FunctionError("length", x1);
                 return null;
+            }
+        }
+
+        public static void comparefolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            string f1 = O.ConvertToString(x1);  //new
+            string f2 = O.ConvertToString(x2);  //old
+            if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
+            if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
+            if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
+            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
+            var d1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var d2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var e12 = d1.Except(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+            var e21 = d2.Except(d1, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+            var intersect = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
+
+            List<string> differentBinary = new List<string>();
+            List<string> differentText = new List<string>();
+            List<string> differentAll = new List<string>();            
+
+            new Writeln("Comparing files...");
+            foreach (string s in intersect)
+            {
+                string p1 = f1 + "\\" + s;
+                string p2 = f2 + "\\" + s;
+                bool identical = false;
+
+                bool isText = !G.IsBinary(p1) && !G.IsBinary(p2);
+
+                if ((new FileInfo(p1)).Length == (new FileInfo(p2)).Length)
+                {
+                    identical = File.ReadAllBytes(p1).SequenceEqual(File.ReadAllBytes(p2));
+                }
+
+                if (!identical)
+                {
+                    if (isText)
+                    {
+                        //Two text files may have same contents when ignoring blanks etc.
+                        List<string> ss1 = Stringlist.ExtractLinesFromText(File.ReadAllText(p1));
+                        List<string> ss2 = Stringlist.ExtractLinesFromText(File.ReadAllText(p2));
+
+                        //TODO: Maybe allow blank lines to differ??
+                        if (ss1.Count == ss2.Count)
+                        {
+                            bool same = true;
+                            for (int i = 0; i < ss1.Count; i++)
+                            {
+                                if (ss1[i].Trim() != ss2[i].Trim())
+                                {
+                                    //Beware that this removes tabs in Python files (in practice hard to see that this should possibly be a problem regarding equality)
+                                    //On the positive side, it removes quite a lot of noise like file endings etc.
+                                    //Differing blank lines will render the files different
+                                    same = false;
+                                    break;
+                                }
+                            }
+                            if (same) identical = true;  //the two text files are the same line by line, if stuff like tabs + blanks (whitespace) are trimmed off at start/end of line
+                        }
+                    }
+                }
+
+                if (!identical)
+                {
+                    if (isText) differentText.Add(s);
+                    else differentBinary.Add(s);
+                    differentAll.Add(s);
+                }
+            }
+
+            //
+            // ------- comparefolders2.zip
+            //
+
+            Zipper zipper2 = new Zipper("comparefolders2.zip");
+            if (true)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("// ========== From folder2 to folder1: copy files that are missing in folder1 ==========");
+                foreach (string s in e21)
+                {
+                    sb.AppendLine("sys 'copy " + f2 + s + " " + f1 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (binary) ==========");
+                foreach (string s in differentBinary)
+                {
+                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder2 to folder1: overwrite common files that are different (text) ==========");
+                foreach (string s in differentText)
+                {
+                    sb.AppendLine("sys 'copy /y " + f2 + s + " " + f1 + s + "';");
+                }
+                File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder1.gcm", sb.ToString());
+            }
+            
+            if (true)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("// ========== From folder1 to folder2: copy files that are missing in folder2 ==========");
+                foreach (string s in e12)
+                {
+                    sb.AppendLine("sys 'copy " + f1 + s + " " + f2 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (binary) ==========");
+                foreach (string s in differentBinary)
+                {
+                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("// ========== From folder1 to folder2: overwrite common files that are different (text) ==========");
+                foreach (string s in differentText)
+                {
+                    sb.AppendLine("sys 'copy /y " + f1 + s + " " + f2 + s + "';");
+                }
+                File.WriteAllText(zipper2.tempFolder + "\\" + "updatefolder2.gcm", sb.ToString());
+            }
+            zipper2.ZipAndCleanup();
+
+            StringBuilder sb2 = new StringBuilder();
+
+            using (var txt = new Writeln())
+            {
+                txt.MainAdd("Folder1 = " + f1);
+                sb2.AppendLine("Folder1 = " + f1);
+                txt.MainNewLineTight();
+                txt.MainAdd("Folder2 = " + f2);
+                sb2.AppendLine("Folder2 = " + f2);
+                txt.MainNewLineTight();
+                txt.MainAdd(intersect.Count() + " common files, of which " + differentAll.Count + " are different");
+                sb2.AppendLine(intersect.Count() + " common files, of which " + differentAll.Count + " are different");
+                txt.MainNewLineTight();
+                txt.MainAdd(e12.Count() + " files from folder1 do not exist in folder2");
+                sb2.AppendLine(e12.Count() + " files from folder1 do not exist in folder2");
+                txt.MainNewLineTight();
+                txt.MainAdd(e21.Count() + " files from folder2 do not exist in folder1");
+                sb2.AppendLine(e21.Count() + " files from folder2 do not exist in folder1");
+                txt.MainNewLineTight();
+            }
+
+            //
+            // ------- comparefolders1.zip
+            //
+
+            if (true)
+            {
+                Zipper zipper1 = new Zipper("comparefolders1.zip");
+                foreach (string s in differentText)
+                {
+                    string a1 = f1 + s;
+                    string b1 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s) + "," + Path.GetExtension(s).Replace(".", "") + " (1)";
+                    File.Copy(a1, b1);
+                    string a2 = f2 + s;
+                    string b2 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s) + "," + Path.GetExtension(s).Replace(".", "") + " (2)";
+                    File.Copy(a2, b2);
+                }
+                zipper1.ZipAndCleanup();
+            }
+
+            //
+            // ------- comparefolders.txt
+            //
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + intersect.Count() + " common files" + " ==========");
+            foreach (string s in intersect)
+            {
+                sb2.AppendLine(s);
+            }            
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + e12.Count() + " files in folder1, but not in folder2:" + " ==========");
+            foreach (string s in e12)
+            {
+                sb2.AppendLine(s);
+            }            
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + e21.Count() + " files in folder2, but not in folder1:" + " ==========");
+            foreach (string s in e21)
+            {
+                sb2.AppendLine(s);
+            }            
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + differentBinary.Count + " different common files (binary):" + " ==========");
+            foreach (string s in differentBinary)
+            {
+                sb2.AppendLine(s);
+            }            
+
+            sb2.AppendLine();
+            sb2.AppendLine("========== " + differentText.Count + " different common files (text):" + " ==========");
+            foreach (string s in differentText)
+            {
+                sb2.AppendLine(s);
+            }
+
+            File.WriteAllText("comparefolders.txt", sb2.ToString());            
+
+            using (var txt = new Writeln())
+            {
+                txt.MainAdd("File comparefolders.txt contains lists of file differences");
+                txt.MainNewLineTight();
+                txt.MainAdd("File comparefolders1.zip contains differing text files for easy comparison");
+                txt.MainNewLineTight();
+                txt.MainAdd("File comparefolders2.zip contains Gekko code to update folder1 or folder2");
             }
         }
 

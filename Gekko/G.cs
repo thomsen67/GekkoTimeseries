@@ -3160,6 +3160,43 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Tastes a file to see if it is (likely) binary, cf. https://stackoverflow.com/questions/4744890/c-sharp-check-if-file-is-text-based
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="requiredConsecutiveNul"></param>
+        /// <returns></returns>
+        public static bool IsBinary(string filePath, int requiredConsecutiveNul = 1)
+        {
+            const int charsToCheck = 8000;
+            const char nulChar = '\0';
+
+            int nulCount = 0;
+
+            using (var streamReader = new StreamReader(filePath))
+            {
+                for (var i = 0; i < charsToCheck; i++)
+                {
+                    if (streamReader.EndOfStream)
+                        return false;
+
+                    if ((char)streamReader.Read() == nulChar)
+                    {
+                        nulCount++;
+
+                        if (nulCount >= requiredConsecutiveNul)
+                            return true;
+                    }
+                    else
+                    {
+                        nulCount = 0;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another 
         /// specified string according the type of search to use for the specified string.
         /// </summary>
