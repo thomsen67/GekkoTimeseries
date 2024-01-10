@@ -124,8 +124,8 @@ namespace Gekko
         // Protobuf tuning start
         // ------------------------------------------------------------        
         public static bool modelParallelProtobuf = true;
-        public static double cacheSize1 = 5e5;    //non-gbk --> only very tiny files < 500k are not put into cache (the cache is well-tested by now)
-        public static double cacheSize2 = 5e5;   //gbk      --> only very tiny files < 500k are not put into cache
+        public static double cacheSize1 = 500e3;    //non-gbk --> only very tiny files < 500k are not put into cache (the cache is well-tested by now)
+        public static double cacheSize2 = 500e3;   //gbk      --> only very tiny files < 500k are not put into cache
         public static double cacheFileMax = 50e9; //bytes, flush always if over (50 GB).
         //!!! --> See Program.options.system_threads = 5;
         public const int count1 = 32;  //dead weight of an object (guess, too low for series...)
@@ -178,9 +178,9 @@ namespace Gekko
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
 
-        public static string windowFindStatusBarText = "Double-click to decompose equation, single-click to select";
-        public static string windowDecompStatusBarText = "Double-click to find equation(s)";
-        public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel";
+        public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
+        public static string windowDecompStatusBarText = "Double-click to find equation(s).";
+        public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
 
         public const string col_variable = Globals.internalColumnIdentifyer + "vars";
         public const string col_lag = Globals.internalColumnIdentifyer + "lags";

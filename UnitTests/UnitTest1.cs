@@ -8798,6 +8798,48 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Cache_Matrix()
+        {
+            //When using cache, remember to use BeforeProtobufWrite() and AfterProtobufRead(),
+            //so that matrices do not just disappear. Old bug.
+            //May need to use [ProtoBeforeSerialization] and [ProtoAfterDeserialization], but not sure why. May therefore need to put lists into object...
+
+            double cacheSize2Remember = Globals.cacheSize2;
+
+            try
+            {
+                Globals.cacheSize2 = 1; //1 byte... --> will be reset
+
+                I("flush();");
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\databanks\temp';");
+                I("#m = [1, 2; 3, 4];");
+                I("write matrixbk;");
+
+                I("reset;");
+                I("read matrixbk;");
+                _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
+                _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+                _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
+                _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+
+
+                I("reset;");
+                I("read matrixbk;");  // --> currently failing!
+                _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
+                _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+                _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
+                _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+
+            }
+            finally
+            {
+                Globals.cacheSize2 = cacheSize2Remember;
+            }
+        }
+
+
+        [TestMethod]
         public void _Test_AREMOS_ras()
         {
             Databank work = First();

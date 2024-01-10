@@ -3352,7 +3352,7 @@ namespace Gekko
             foreach (List<KeyValuePair<string, IVariable>> list in lists)
             {
                 foreach (KeyValuePair<string, IVariable> kvp in list)
-                {
+                {                    
                     databank.storage.Add(kvp.Key, kvp.Value);
                 }
             }

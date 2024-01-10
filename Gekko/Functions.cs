@@ -2063,6 +2063,9 @@ namespace Gekko
 
         public static void comparefolders(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            //
+            // TODO: when doing text compare, allow differing number of blank lines. Will need line read syncing.
+            //
             string f1 = O.ConvertToString(x1);  //new
             string f2 = O.ConvertToString(x2);  //old
             if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);

@@ -2071,7 +2071,7 @@ namespace Gekko
             CloneHelper cloneHelper = new CloneHelper();
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
             foreach (KeyValuePair<string, IVariable> kvp in originalDatabank.storage)
-            {
+            {                
                 IVariable ivCopy = kvp.Value.DeepClone(null, cloneHelper);
                 newDatabank.AddIVariable(kvp.Key, ivCopy);
             }

@@ -130,15 +130,18 @@ namespace Gekko
 
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount != 2) return;
-            //if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) || Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
-            //{
-            //    //ignore if combined with ctrl or alt, only a clean left-clik is a link
-            //    return;
-            //}
-            FrameworkElement fe = e.OriginalSource as FrameworkElement;
-            EquationListItem item = fe.DataContext as EquationListItem;            
-            CallDecomp(item.fullName, decompFind.model);
+            //if (e.ClickCount != 2) return;
+            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+            if (isCtrl)
+            {
+
+            }
+            else
+            {
+                FrameworkElement fe = e.OriginalSource as FrameworkElement;
+                EquationListItem item = fe.DataContext as EquationListItem;
+                CallDecomp(item.fullName, decompFind.model);
+            }
         }
 
         private void CallDecomp(string fullName, Model model)
