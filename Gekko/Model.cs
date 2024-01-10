@@ -115,7 +115,7 @@ namespace Gekko
         public ModelGamsScalar modelGamsScalar = null;                
 
         /// <summary>
-        /// Type used for decomp. This is not always the same as ModelSourceType(), which is the "born" type.
+        /// Type used for decomp. This is not always the same as GetModelSourceType(), which is the "born" type.
         /// </summary>
         /// <returns></returns>
         public EModelType DecompType()

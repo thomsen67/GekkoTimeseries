@@ -179,7 +179,8 @@ namespace Gekko
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
 
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
-        public static string windowDecompStatusBarText = "Double-click to find equation(s).";
+        public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model
+        public static string windowDecompStatusBarText_gams = "Click to find equation(s)."; //Gams model
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
 
         public const string col_variable = Globals.internalColumnIdentifyer + "vars";

@@ -1541,6 +1541,8 @@ namespace Gekko
             //#98732498724    
             //if (e.ClickCount != 2) return;
 
+            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
             TextBlock tb = (TextBlock)sender;
             DockPanel dp = G.FindParent<DockPanel>(tb);
 
@@ -1562,8 +1564,9 @@ namespace Gekko
                     new Error(Decomp.Text1(1));
                 }
 
-                if (e.ClickCount == 1)
+                if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
+                    MessageBox.Show("Directly to DECOMP!");
                     _activeVariable = var;
                     return;
                 }
@@ -1734,7 +1737,8 @@ namespace Gekko
                             }
                             else
                             {
-                                this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText;
+                                if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko) this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gekko;
+                                else this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
                                 string var7 = HiddenVariableHelper(c2);
 
                                 int number = -12345;
