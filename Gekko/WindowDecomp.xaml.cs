@@ -1574,7 +1574,7 @@ namespace Gekko
                     //EquationListItem item = fe.DataContext as EquationListItem;
                     //CallDecomp(item.fullName, decompFind.model);
                     decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
-                    WindowFind.CallDecompHelper("e_" + var, decompFind, decompFind.model);
+                    WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
                     //CallDecomp(var, decompFind.model);
                     //_activeVariable = var;
                     return;

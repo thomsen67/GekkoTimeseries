@@ -478,7 +478,7 @@ namespace Gekko
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 if (isGekko)
                 {
-                    decompOptions2.new_from = new List<string>() { "e_" + decompOptions2.new_select[0] };
+                    decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
                     decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
                 }
                 else
@@ -4914,7 +4914,7 @@ namespace Gekko
                     //int eqNumber = model.modelGamsScalar.dict_FromEqNameToEqNumber.Get("e_fy[2000]");
                     //GekkoTime gt = new GekkoTime(modelGamsScalar.parent.modelCommon.GetFreq(), Globals.decomp2000, 1);
                     //eqNames.Add("e_" + s2 + "[" + gt.ToString() + "]");
-                    eqNames.Add("e_" + s2);
+                    eqNames.Add(Globals.decompGekkoEquationPrefix + s2);
                     // -------> do something so e_fy is first
                 }
                 else if (model.modelGams != null)
