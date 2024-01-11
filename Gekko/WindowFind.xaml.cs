@@ -25,6 +25,8 @@ namespace Gekko
     public partial class WindowFind
     {
 
+        DateTime lastClick = DateTime.Now;
+        
         public string _activeEquation = null; //this always has a non-null value
         public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
         //public GekkoTime _t1 = GekkoTime.tNull;
@@ -130,11 +132,21 @@ namespace Gekko
 
         private void OnEquationListLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //if (e.ClickCount != 2) return;
+
+            //Click in DECOMP: #8fdskfesdfw            
+
+            double ms = (DateTime.Now - lastClick).TotalMilliseconds;
+            lastClick = DateTime.Now;
+            if (ms < 500)  //Windows standard is 500. But this never seems to be activated...
+            {
+                MessageBox.Show(ms + " The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (selects/retains the equation).");
+                return;
+            }
+
             bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
             if (isCtrl)
             {
-
+                //do nothing here, will "select" the equation elsewhere.
             }
             else
             {

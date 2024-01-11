@@ -1837,7 +1837,7 @@ namespace Gekko
             else if (operatorOneOf3Types == EContribType.RD) return decompData.cellsContribDRef;
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
             else
-                new Error("Wrong type");
+                new Error("Wrong type. Note: for decomposition you need to use operator <d>, <p>, <dp>, <m>, <q> or <mp>, because decomposition cannot be done for other types. In the DECOMP window, use operators from the 'Decomp' columns, not the 'Raw' columns.");
             return null;
         }
 

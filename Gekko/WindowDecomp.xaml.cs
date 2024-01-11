@@ -47,6 +47,7 @@ namespace Gekko
     /// </summary>
     public partial class WindowDecomp : Window
     {
+        DateTime lastClick = DateTime.Now;
 
         public enum GekkoTableTypes
         {
@@ -771,7 +772,8 @@ namespace Gekko
 
             //this.buttonMerge.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(80, Globals.LightBlueWord.R, Globals.LightBlueWord.G, Globals.LightBlueWord.B));
             this.buttonMerge.Background = new SolidColorBrush(Globals.GekkoModeBlue);
-            if (this.decompFind.depth < 2) this.buttonMerge.Visibility = Visibility.Collapsed;
+                        
+            if (this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp) == null) this.buttonMerge.Visibility = Visibility.Collapsed;
 
             DataContext = new ViewModel();  //MVVM style
 
@@ -1538,8 +1540,16 @@ namespace Gekko
 
         private void Mouse_Down(object sender, MouseButtonEventArgs e) // MouseEventArgs e)
         {
-            //#98732498724    
-            //if (e.ClickCount != 2) return;
+            //#98732498724
+            //Click in FIND: #8fdskfesdfw
+
+            double ms = (DateTime.Now - lastClick).TotalMilliseconds;
+            lastClick= DateTime.Now;
+            if (ms < 500)  //Windows standard is 500
+            {
+                MessageBox.Show(ms + " The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (forces a FIND window).");
+                return;
+            }
 
             bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
@@ -1566,24 +1576,16 @@ namespace Gekko
 
                 if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
-                    //probably create an artificial find child...
-                    //MessageBox.Show("Directly to DECOMP!");
-                    //return;
-
-                    //FrameworkElement fe = e.OriginalSource as FrameworkElement;
-                    //EquationListItem item = fe.DataContext as EquationListItem;
-                    //CallDecomp(item.fullName, decompFind.model);
                     decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
                     WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
-                    //CallDecomp(var, decompFind.model);
-                    //_activeVariable = var;
-                    return;
                 }
-
-                O.Find o = new O.Find(this.decompFind);
-                List m = new List(new List<string>() { var });
-                o.iv = m;
-                o.Exe();
+                else
+                {
+                    O.Find o = new O.Find(this.decompFind);
+                    List m = new List(new List<string>() { var });
+                    o.iv = m;
+                    o.Exe();
+                }
             }
             else
             {
@@ -2591,21 +2593,15 @@ namespace Gekko
             //
             // Merge button
             //
-            DecompFind dfParentFind = this.decompFind.SearchUpwards(EDecompFindNavigation.Find);
-            DecompFind dfParentDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);            
-
-            if (dfParentFind == null || dfParentDecomp == null) return;
+            DecompFind dfParentDecomp = this.decompFind.SearchUpwards(EDecompFindNavigation.Decomp);                                    
             if (dfParentDecomp.closed)
             {
                 new Error("Merge not possible, because the preceding DECOMP window has been closed");
                 return;
-            }
-            WindowFind windowFindParent = dfParentFind.window as WindowFind;
+            }            
             WindowDecomp windowDecompParent = dfParentDecomp.window as WindowDecomp;           
-
             //Close the child decomp window (= present window)
             this.Close();
-
             //Merge the child window (= present window) into the parent window.
             //We have to use dispatcher on the parent decomp window, else it will complain that it is the wrong thread.            
             windowDecompParent.Dispatcher.Invoke(() => { Merge(dfParentDecomp); });
