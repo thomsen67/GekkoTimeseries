@@ -358,7 +358,10 @@ namespace Gekko
             Model model = Program.model;
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
-            if (o.from.Count == 0)
+            bool isGekko = false;
+            if (model.modelCommon.GetModelSourceType() == EModelType.Gekko) isGekko = true;
+
+            if (!isGekko && o.from.Count == 0)
             {
                 O.Find find = new O.Find();
                 find.t1 = o.t1;
@@ -473,8 +476,17 @@ namespace Gekko
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
-                decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
-                decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+                if (isGekko)
+                {
+                    decompOptions2.new_from = new List<string>() { "e_" + decompOptions2.new_select[0] };
+                    decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };
+                }
+                else
+                {
+                    decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.                
+                    decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+                }
+                
                 for (int i = 0; i < decompOptions2.new_select.Count; i++) decompOptions2.new_select[i] = G.HandleBlanksRemove(decompOptions2.new_select[i]);
                 for (int i = 0; i < decompOptions2.new_from.Count; i++) decompOptions2.new_from[i] = G.HandleBlanksRemove(decompOptions2.new_from[i]);
                 for (int i = 0; i < decompOptions2.new_endo.Count; i++) decompOptions2.new_endo[i] = G.HandleBlanksRemove(decompOptions2.new_endo[i]);

@@ -147,12 +147,17 @@ namespace Gekko
         private void CallDecomp(string fullName, Model model)
         {
             string eqName = G.Chop_DimensionRemoveLast(fullName);
+            DecompFind decompFind = this.decompFind;
+            CallDecompHelper(eqName, decompFind, model);
+        }
 
+        public static void CallDecompHelper(string eqName, DecompFind decompFind, Model model)
+        {
             O.Decomp2 decomp = new O.Decomp2();
-            decomp.opt_prtcode = this.decompFind.decompOptions2.decompOperator.OperatorLower();
-            decomp.t1 = this.decompFind.decompOptions2.t1;
-            decomp.t2 = this.decompFind.decompOptions2.t2;
-            string varName = this.decompFind.decompOptions2.iv.list[0].ConvertToString();
+            decomp.opt_prtcode = decompFind.decompOptions2.decompOperator.OperatorLower();
+            decomp.t1 = decompFind.decompOptions2.t1;
+            decomp.t2 = decompFind.decompOptions2.t2;
+            string varName = decompFind.decompOptions2.iv.list[0].ConvertToString();
 
             List select = new List(new List<string>() { varName });
             decomp.select = new List<IVariable>() { select };
@@ -160,11 +165,11 @@ namespace Gekko
             decomp.from = new List<IVariable>() { from };
             List endo = new List(new List<string>() { varName });
             decomp.endo = new List<IVariable>() { endo };
-            decomp.name = new ScalarString(eqName);            
-            decomp.decompFind = this.decompFind.CreateChild(this.decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, model);
+            decomp.name = new ScalarString(eqName);
+            decomp.decompFind = decompFind.CreateChild(decompFind.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, model);
 
             decomp.type = "ASTDECOMP3";  //else old style decomp is used...
-            
+
             decomp.Exe();
         }
 
