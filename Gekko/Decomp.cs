@@ -476,7 +476,9 @@ namespace Gekko
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
-                if (isGekko)
+
+                //bool isPreviousWindowAFindWindow = o.decompFind.parent != null && o.decompFind.parent.type == EDecompFindNavigation.Find;
+                if (isGekko && (o.decompFind.parent == null || o.decompFind.parent.type == EDecompFindNavigation.Decomp))
                 {
                     decompOptions2.new_from = new List<string>() { Globals.decompGekkoEquationPrefix + decompOptions2.new_select[0] };
                     decompOptions2.new_endo = new List<string>() { decompOptions2.new_select[0] };

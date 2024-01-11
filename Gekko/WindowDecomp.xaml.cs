@@ -1574,6 +1574,8 @@ namespace Gekko
                     new Error(Decomp.Text1(1));
                 }
 
+                _activeVariable = var;
+
                 if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                 {
                     decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
