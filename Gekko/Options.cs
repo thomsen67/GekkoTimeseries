@@ -54,7 +54,7 @@ namespace Gekko
         public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache databank files for faster (re)read.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;        
-        public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
+        public string databank_file_gbk_internal = "databank.data";
         public bool databank_search = true;
 
         public bool databank_trace = true;

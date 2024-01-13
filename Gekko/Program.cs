@@ -5749,10 +5749,9 @@ namespace Gekko
                 if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName)) fileName = tempTsdxPath + "\\" + Globals.protobufFileName;  //legacy
                 else if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName2)) fileName = tempTsdxPath + "\\" + Globals.protobufFileName2;  //usual name
                 else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) fileName = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
-                else
-                {
-                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
-                }
+                else new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);                
+
+                string fileName2 = tempTsdxPath + "\\" + Globals.protobufFileName3;
 
                 ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                 //RuntimeTypeModel serializer = TypeModel.Create();
@@ -5761,6 +5760,8 @@ namespace Gekko
                 {
                     DateTime dt3 = DateTime.Now;
                     deserializedDatabank = ProtobufRead<Databank>(fileName);
+                    List<Trace2> traces = ProtobufRead<List<Trace2>>(fileName2);
+                    deserializedDatabank.traces = traces;
                     TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
                     foreach (IVariable iv in deserializedDatabank.storage.Values)
                     {
@@ -21625,6 +21626,7 @@ namespace Gekko
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
 
             string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
+            string pathAndFilename3 = tempTsdxPath + "\\" + Globals.protobufFileName3;
             databank.Trim();  //to make it smaller, slack removed from each IVariable
 
             //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
@@ -21685,7 +21687,11 @@ namespace Gekko
 
                 TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
                 Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
-                ProtobufWrite(databank, pathAndFilename2); //all trace references here are replaced by integers (stored in databank.traces)
+                List<Trace2> temp = databank.traces;
+                databank.traces = null;
+                ProtobufWrite(databank, pathAndFilename2);
+                ProtobufWrite(temp, pathAndFilename3);
+                databank.traces = temp;
                 Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
                 databank.traces = null;  //important!
 
