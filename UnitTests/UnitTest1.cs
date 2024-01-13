@@ -21719,6 +21719,47 @@ print(df2)
             _AssertSeries(First(), "xa", 2000, 888d, 0d);
             _AssertSeries(First(), "xb", 2000, 777d, 0d);
             _AssertSeries(First(), "xc", 2000, 100d, 0d);
+        }
+
+        [TestMethod]
+        public void _Test_TraceReadWrite()
+        {
+            string s0 = null;
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
+            if (true)
+            {
+                //create databank with traces                
+                int nseries = 1000;
+                int ntxt = 1000;
+                Random rnd = new Random();
+                for (int i = 0; i < nseries; i++)
+                {
+                    Series ts = new Series(EFreq.A, "ts" + i + "!a");
+                    foreach (GekkoTime gt in new GekkoTimeIterator(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2002, 1)))
+                    {
+                        ts.SetData(gt, i);
+                    }
+                    Trace2 trace = new Trace2(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2002, 1));
+                                        
+                    var builder = new StringBuilder(ntxt);
+                    char offset = 'A';
+                    const int lettersOffset = 26; // A...Z or a..z: length=26
+                    for (var ii = 0; ii < ntxt; ii++)
+                    {
+                        var char1 = (char)rnd.Next(offset, offset + lettersOffset);
+                        builder.Append(char1);
+                    }
+                    trace.contents.text = builder.ToString();
+                    Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling);
+                    Program.databanks.GetFirst().AddIVariable(ts.GetName(), ts);
+                    if (i == 0) s0 = trace.contents.text;
+                }
+            }
+            I("write tracebk;");
+            I("reset;");
+            I("read tracebk;");
+            Assert.AreEqual(s0, (Program.databanks.GetFirst().GetIVariable("ts0!a") as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
 
         }
 

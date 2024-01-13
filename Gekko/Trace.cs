@@ -801,7 +801,7 @@ namespace Gekko
             if (this.contents != null)
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
-                text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq), Program.options.freq);           
+                if (this.contents.bankAndVarnameWithFreq != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq), Program.options.freq);
                 code = this.contents.text;
                 GekkoTime t1 = this.contents.span.t1;
                 GekkoTime t2 = this.contents.span.t2;
