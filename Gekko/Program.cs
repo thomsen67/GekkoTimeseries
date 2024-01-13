@@ -5736,6 +5736,7 @@ namespace Gekko
             }
 
             Databank deserializedDatabank = null;
+            List<Trace2> traces = null;
             readInfo.fileName = originalFilePath;
             readInfo.fileNamePretty = originalFilePathPretty;
 
@@ -5758,9 +5759,13 @@ namespace Gekko
                 //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                 try
                 {
-                    DateTime dt3 = DateTime.Now;
-                    deserializedDatabank = ProtobufRead<Databank>(fileName);
-                    List<Trace2> traces = ProtobufRead<List<Trace2>>(fileName2);
+                    DateTime dt3 = DateTime.Now;                   
+                    Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are reading data and traces in parallel. 
+                    {
+                        if (number == 0) deserializedDatabank = ProtobufRead<Databank>(fileName);
+                        else if (number == 1) traces = ProtobufRead<List<Trace2>>(fileName2);
+                        else new Error("Parallel problem");
+                    });
                     deserializedDatabank.traces = traces;
                     TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
                     foreach (IVariable iv in deserializedDatabank.storage.Values)
@@ -21689,8 +21694,12 @@ namespace Gekko
                 Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
                 List<Trace2> temp = databank.traces;
                 databank.traces = null;
-                ProtobufWrite(databank, pathAndFilename2);
-                ProtobufWrite(temp, pathAndFilename3);
+                Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are writing data and traces in parallel. 
+                {
+                    if (number == 0) ProtobufWrite(databank, pathAndFilename2);
+                    else if (number == 1) ProtobufWrite(temp, pathAndFilename3);
+                    else new Error("Parallel problem");
+                });                
                 databank.traces = temp;
                 Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
                 databank.traces = null;  //important!
