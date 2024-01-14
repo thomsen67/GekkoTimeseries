@@ -156,6 +156,38 @@ namespace Gekko
         Unknown
     }
 
+    [ProtoContract]
+    public class ParallelHelper
+    {
+        [ProtoMember(1)]
+        public string name = null;
+        [ProtoMember(2)]
+        public IVariable iv = null;  //variable
+
+        [ProtoMember(3)]
+        public Trace2 trace = null;  //trace
+
+        public ParallelHelper() //just for protobuf
+        {
+        }
+
+        public ParallelHelper(string name, IVariable iv)
+        {
+            this.name = name;
+            this.iv = iv;
+        }
+        
+        public ParallelHelper(Trace2 trace)
+        {
+            this.trace = trace;
+        }
+
+        public bool isTrace()
+        {
+            return this.trace != null;
+        }
+    }
+
     /// <summary>
     /// Helpler for laspeyres indices
     /// </summary>
@@ -2592,16 +2624,16 @@ namespace Gekko
         /// <param name="k"></param>
         /// <param name="print"></param>
         /// <returns></returns>
-        private static List<List<KeyValuePair<string, IVariable>>> SplitVarsInSameSizeParts(Dictionary<string, IVariable> storage, int k, bool print)
+        private static List<List<ParallelHelper>> SplitVarsInSameSizeParts(Dictionary<string, IVariable> storage, int k, bool print)
         {
             if (k == 1)
             {
-                List<KeyValuePair<string, IVariable>> list = new List<KeyValuePair<string, IVariable>>();
+                List<ParallelHelper> list = new List<ParallelHelper>();
                 foreach (KeyValuePair<string, IVariable> kvp in storage)
                 {
-                    list.Add(kvp);
+                    list.Add(new ParallelHelper(kvp.Key, kvp.Value));
                 }
-                List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+                List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
                 lists.Add(list);
                 return lists;
             }
@@ -2620,11 +2652,11 @@ namespace Gekko
                 sum += ch.n;
             }
             var sorted = x.OrderByDescending(o => o.n);  //how fast is this? Around O(n*log(n)). So close to proportional to #elements, which is ok.
-            List<List<KeyValuePair<string, IVariable>>> rv = new List<List<KeyValuePair<string, IVariable>>>();
+            List<List<ParallelHelper>> rv = new List<List<ParallelHelper>>();
             List<int> sums = new List<int>();
             for (int i = 0; i < k; i++)
             {
-                rv.Add(new List<KeyValuePair<string, IVariable>>());
+                rv.Add(new List<ParallelHelper>());
                 sums.Add(0);
             }
 
@@ -2646,7 +2678,7 @@ namespace Gekko
                         imin = i;
                     }
                 }
-                rv[imin].Add(ch.kvp);
+                rv[imin].Add(new ParallelHelper(ch.kvp.Key, ch.kvp.Value));
                 sums[imin] += ch.n;
             }
             if (Globals.runningOnTTComputer)
@@ -3186,11 +3218,11 @@ namespace Gekko
 
             List<string> files = GetSplitCacheFileNames(k + extra, fileName, "data", null, ref hash); //the last filename is cache parameters
 
-            List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+            List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
             for (int i = 0; i < k; i++)
             {
-                lists.Add(new List<KeyValuePair<string, IVariable>>());
+                lists.Add(new List<ParallelHelper>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
             
@@ -3310,7 +3342,7 @@ namespace Gekko
             hashMs = (DateTime.Now - t).TotalMilliseconds;
 
             List<string> files = new List<string>();
-            List<List<KeyValuePair<string, IVariable>>> lists = new List<List<KeyValuePair<string, IVariable>>>();
+            List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
             List<TwoInts> twoIntss = new List<TwoInts>();
 
             string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
@@ -3324,7 +3356,7 @@ namespace Gekko
 
             for (int i = 0; i < k - extra; i++)
             {                
-                lists.Add(new List<KeyValuePair<string, IVariable>>());
+                lists.Add(new List<ParallelHelper>());
                 twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
             }
             
@@ -3336,12 +3368,12 @@ namespace Gekko
                 //About double speed on TT pc, compared to no parallel  
 
                 int i = (int)index;                
-                List<KeyValuePair<string, IVariable>> o = ProtobufRead<List<KeyValuePair<string, IVariable>>>(files[i]);
+                List<ParallelHelper> o = ProtobufRead<List<ParallelHelper>>(files[i]);
                 lists[i] = o;
                 TwoInts yearMinMax = twoIntss[i];
-                foreach (KeyValuePair<string, IVariable> kvp in lists[i])
+                foreach (ParallelHelper kvp in lists[i])
                 {
-                    kvp.Value.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
+                    kvp.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
                 }
                 return 0;
             }, _ => { });
@@ -3349,11 +3381,11 @@ namespace Gekko
             Databank databank = new Databank("temporary");
 
             DateTime t2 = DateTime.Now;
-            foreach (List<KeyValuePair<string, IVariable>> list in lists)
+            foreach (List<ParallelHelper> list in lists)
             {
-                foreach (KeyValuePair<string, IVariable> kvp in list)
+                foreach (ParallelHelper kvp in list)
                 {                    
-                    databank.storage.Add(kvp.Key, kvp.Value);
+                    databank.storage.Add(kvp.name, kvp.iv);
                 }
             }
             lists = null;  //free for GC            
