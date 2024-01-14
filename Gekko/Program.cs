@@ -3212,7 +3212,8 @@ namespace Gekko
 
         public static void WriteParallelDatabank(int k, Databank databank, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
-            int extra = 2;
+            int extra = 1;
+
             DateTime t = DateTime.Now;
             bool print = false; if (Globals.runningOnTTComputer) print = true;
 
@@ -3227,9 +3228,22 @@ namespace Gekko
             }
             
             TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
-            Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted);
+            Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted);                       
 
             lists = SplitVarsInSameSizeParts(databank.storage, k, print);
+            
+            int n = 0;
+            while (true)
+            {
+                for (int i = 0; i < k; i++)
+                {
+                    if (n >= databank.traces.Count) goto Lbl;
+                    lists[i].Add(new ParallelHelper(databank.traces[n]));
+                    n++;
+                }
+            }
+        Lbl:;
+
             lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
             {
                 try
@@ -3252,11 +3266,14 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             DateTime dt0 = DateTime.Now;
-            ProtobufWrite(databank.cacheParameters, files[k + extra - 2]);
+            ProtobufWrite(databank.cacheParameters, files[k + extra - 1]);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Write time cache params: " + G.Seconds(dt0));
             dt0 = DateTime.Now;
-            ProtobufWrite(databank.traces, files[k + extra - 1]);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Write time traces: " + G.Seconds(dt0));
+            if (false)
+            {
+                ProtobufWrite(databank.traces, files[k + extra - 1]);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Write time traces: " + G.Seconds(dt0));
+            }
 
             Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
             databank.traces = null;  //important!
@@ -3330,7 +3347,7 @@ namespace Gekko
             //
             // When we have a 1of1, just read it without parallel.foreach (same for write).
 
-            int extra = 2;
+            int extra = 1;
 
             bool print = false;
             if (Globals.runningOnTTComputer) print = true;
@@ -3371,9 +3388,9 @@ namespace Gekko
                 List<ParallelHelper> o = ProtobufRead<List<ParallelHelper>>(files[i]);
                 lists[i] = o;
                 TwoInts yearMinMax = twoIntss[i];
-                foreach (ParallelHelper kvp in lists[i])
+                foreach (ParallelHelper ph in lists[i])
                 {
-                    kvp.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
+                    if(!ph.isTrace()) ph.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
                 }
                 return 0;
             }, _ => { });
@@ -3381,11 +3398,14 @@ namespace Gekko
             Databank databank = new Databank("temporary");
 
             DateTime t2 = DateTime.Now;
+            databank.traces = new List<Trace2>();
             foreach (List<ParallelHelper> list in lists)
             {
-                foreach (ParallelHelper kvp in list)
-                {                    
-                    databank.storage.Add(kvp.name, kvp.iv);
+                foreach (ParallelHelper ph in list)
+                {
+                    if (ph.isTrace()) 
+                        databank.traces.Add(ph.trace);
+                    else databank.storage.Add(ph.name, ph.iv);
                 }
             }
             lists = null;  //free for GC            
@@ -3406,8 +3426,11 @@ namespace Gekko
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));
             dt0 = DateTime.Now;
-            databank.traces = ProtobufRead<List<Trace2>>(files[k - extra + 1]);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time traces: " + G.Seconds(dt0));
+            if (false)
+            {
+                databank.traces = ProtobufRead<List<Trace2>>(files[k - extra + 1]);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Read time traces: " + G.Seconds(dt0));
+            }
             dt0 = DateTime.Now;
             Gekko.Trace2.HandleTraceRead1(databank);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Handle time traces: " + G.Seconds(dt0));
