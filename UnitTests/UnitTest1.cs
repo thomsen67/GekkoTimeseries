@@ -8801,7 +8801,7 @@ namespace UnitTests
         public void _Test_Cache_Matrix()
         {
             //When using cache, remember to use BeforeProtobufWrite() and AfterProtobufRead(),
-            //so that matrices do not just disappear. Old bug.
+            //so that matrices do not just disappear. Old bug. 
             //May need to use [ProtoBeforeSerialization] and [ProtoAfterDeserialization], but not sure why. May therefore need to put lists into object...
 
             double cacheSize2Remember = Globals.cacheSize2;
