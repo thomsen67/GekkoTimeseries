@@ -5763,7 +5763,10 @@ namespace Gekko
                     Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are reading data and traces in parallel. 
                     {
                         if (number == 0) deserializedDatabank = ProtobufRead<Databank>(fileName);
-                        else if (number == 1) traces = ProtobufRead<List<Trace2>>(fileName2);
+                        else if (number == 1)
+                        {
+                            if (File.Exists(fileName2)) traces = ProtobufRead<List<Trace2>>(fileName2);
+                        }
                         else new Error("Parallel problem");
                     });
                     deserializedDatabank.traces = traces;
