@@ -1709,11 +1709,11 @@ namespace Gekko
                         trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                         trace.contents.text = traceString + ";";
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
-                        if (Globals.traceContainer != null && Globals.traceContainer.Count > 0)
+                        if (Globals.traceContainer != null && Globals.traceContainer.Count() > 0)
                         {
                             //trace.GetPrecedents_BewareOnlyInternalUse().SetStorage(new List<Trace2>());  //may be set to null after this method has been looped
                             int counter1 = -1;
-                            foreach (IVariable iv in Globals.traceContainer)
+                            foreach (IVariable iv in Globals.traceContainer.GetList())
                             {
                                 counter1++;
                                 Series rhs = iv as Series;

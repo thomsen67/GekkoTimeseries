@@ -3370,7 +3370,7 @@ namespace Gekko
                     {
                         //NOTE: nothing really to put into Globals.traceTime, so commented out!
                         //DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Globals.traceContainer = new List<IVariable>();
+                        Globals.traceContainer = new ListUnique<IVariable>();
                         //Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch

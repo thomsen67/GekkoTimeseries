@@ -276,7 +276,7 @@ namespace Gekko
         public static GekkoDictionary<string, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
                 
-        public static List<IVariable> traceContainer = null;
+        public static ListUnique<IVariable> traceContainer = null;
 
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";

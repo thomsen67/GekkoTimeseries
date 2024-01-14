@@ -156,7 +156,41 @@ namespace Gekko
         Unknown
     }
 
-    [ProtoContract]
+    /// <summary>
+    /// Adds elements if those have not been seen before.
+    /// Beware about comparer comparisons, especially strings (use GekkoDictionary for those).
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ListUnique<T>
+    {
+        private List<T> m = new List<T>();
+        private Dictionary<T, bool> d = new Dictionary<T, bool>();
+        public void Add(T iv)
+        {
+            if (!this.d.ContainsKey(iv))
+            {
+                this.d.Add(iv, false);
+                m.Add(iv);
+            }
+        }
+
+        public List<T> GetList()
+        {
+            return this.m;
+        }
+
+        public int Count()
+        {
+            return this.m.Count;
+        }
+    }
+
+
+    /// <summary>
+    /// Helper for protobuffing databank cache. It can basically be either a name+iv or a trace.
+    /// Use Interface to save a litte bit of space, but probably not much.
+    /// </summary>
+    [ProtoContract]    
     public class ParallelHelper
     {
         [ProtoMember(1)]
@@ -8944,10 +8978,8 @@ namespace Gekko
                     if (rv_series != null) x_objectName = rv_series.GetName();
 
                     if (!onlyTraceSeries || rv_series != null)
-                    {
-                        //looks up in list, but the list should be rather short, and equality is by reference/pointer.
-                        //but maybe for many precedents, a dict would be better. Ideally a list for < 20 elements, and a dict otherwise.
-                        if (!Globals.traceContainer.Contains(iv)) Globals.traceContainer.Add(iv);
+                    {                        
+                        Globals.traceContainer.Add(iv);  //uses dictionary internally
                     }
                     Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                 }
