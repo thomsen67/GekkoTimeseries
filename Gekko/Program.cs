@@ -9085,7 +9085,7 @@ namespace Gekko
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
-            if (Globals.workerThread != null)
+            if (Globals.workerThread != null) 
             {
                 string ss2 = G.FreqAndPeriodPretty(false, false) + banks + "    |    " + workingFolder;
                 WorkerThreadHelper1 wh = new WorkerThreadHelper1();
