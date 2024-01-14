@@ -61,6 +61,7 @@ tokens {
 	ASTOPT_STRING_KEEPTYPES;
 	ASTOPT_STRING_VARIABLECODE;
 	ASTOPT_STRING_NOCR;
+    ASTOPT_STRING_TRACE;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -1446,6 +1447,8 @@ Y2                    = 'Y2'                       ;
     TITLE         = 'TITLE'        ;
     TO               = 'TO'            ;
     TOTAL            = 'TOTAL';
+    TRACE = 'TRACE';
+    TRACE2 = 'TRACE2';
     TRANSLATE = 'TRANSLATE';
     TRANSPOSE        = 'TRANSPOSE'       ;
     TREL             = 'TREL'            ;
@@ -2107,6 +2110,8 @@ d.Add("Y" ,Y);
                                         d.Add("title"              , TITLE      );
                                         d.Add("to"      , TO        );
                                         d.Add("total"      , TOTAL        );
+                                        d.Add("TRACE", TRACE);
+                                        d.Add("TRACE2", TRACE2);
                                         d.Add("TRANSLATE", TRANSLATE);
                                         d.Add("transpose"               , TRANSPOSE       );
                                         d.Add("trel"     , TREL       );
@@ -3337,6 +3342,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						  | CREATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CREATE yesNo?)
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3714,6 +3720,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
 						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						  | VARIABLECODE (EQUAL yesNo)? -> ^(ASTOPT_STRING_VARIABLECODE yesNo?)
+                          | TRACE (EQUAL yesNo)? -> ^(ASTOPT_STRING_TRACE yesNo?)
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4333,6 +4340,8 @@ ident2: 					Ident |
   TELL|
   TIMEFILTER|
   TIME|
+  TRACE|
+  TRACE2|
   TRANSLATE|
   TRUNCATE|
   UNFIX|

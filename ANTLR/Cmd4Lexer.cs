@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2023-11-13 15:58:21
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2024-01-14 12:38:34
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -16,1458 +16,1461 @@ using Stack 		= Antlr.Runtime.Collections.StackList;
 namespace  Gekko 
 {
 public partial class Cmd4Lexer : Lexer {
-    public const int FUNCTION = 1048;
-    public const int ASTTABLESETRIGHTBORDER = 711;
-    public const int ASTUPDX = 760;
-    public const int D_ = 1432;
-    public const int UPDX = 1331;
-    public const int ASTVARIABLE = 769;
-    public const int ASTOPT_STRING_CONTINUE = 468;
-    public const int ASTHPFILTERLOG = 370;
-    public const int CONST = 950;
-    public const int ASTDOTINDEXER = 297;
+    public const int FUNCTION = 1049;
+    public const int ASTTABLESETRIGHTBORDER = 712;
+    public const int ASTUPDX = 761;
+    public const int D_ = 1435;
+    public const int UPDX = 1334;
+    public const int ASTVARIABLE = 770;
+    public const int ASTOPT_STRING_CONTINUE = 469;
+    public const int ASTHPFILTERLOG = 371;
+    public const int CONST = 951;
+    public const int ASTDOTINDEXER = 298;
     public const int ASTOPTIONSEQ = 5;
-    public const int ASTLOGICALIN = 90;
-    public const int DL = 1132;
-    public const int MACRO2 = 1110;
-    public const int ASTOPT_STRING_GDXOPT = 193;
-    public const int DP = 992;
-    public const int ASTINDEXERELEMENTBANK = 70;
-    public const int NOPCH = 1161;
-    public const int UNDO = 1325;
-    public const int ASTOPERATOR = 455;
-    public const int ASTPRINT = 113;
-    public const int GDX = 818;
-    public const int ASTLISTSUFFIX = 406;
-    public const int ASTDOLLARCONDITIONALVARIABLE = 109;
-    public const int E_ = 1430;
-    public const int ASTUNFIX = 742;
-    public const int LINEAR = 1101;
-    public const int ROWNAMES = 1114;
-    public const int ASTIMPOSE = 219;
-    public const int UPCH = 1329;
-    public const int ASTOPT_STRING_INFO = 554;
-    public const int DATECELL = 1037;
-    public const int ASTVAL = 767;
-    public const int ASTMODEQUESTION = 427;
-    public const int ASTUPDOPERATORSTARDOLLAR = 759;
-    public const int ANALYZE = 899;
-    public const int ASTOPM = 458;
-    public const int XLINEBEFORE = 845;
-    public const int ASTOPN = 460;
-    public const int ASTOPP = 461;
-    public const int CONV2 = 953;
-    public const int ASTOPQ = 462;
-    public const int YLINE = 849;
-    public const int CONV1 = 952;
-    public const int ASTTABLENEXT = 700;
-    public const int ASTOPD = 452;
-    public const int ASTTABLESETTOPBORDER = 713;
-    public const int SHOW = 1254;
-    public const int GLUE = 1381;
-    public const int MISSING = 1127;
-    public const int D = 964;
-    public const int ASTSTARS = 72;
-    public const int A = 886;
-    public const int F_ = 1443;
-    public const int L = 1133;
-    public const int AT2 = 812;
-    public const int M = 1109;
-    public const int N = 1140;
-    public const int STATIC = 1277;
-    public const int ASTTABLEMERGECOLS = 699;
-    public const int I = 1353;
-    public const int ASTOPT_STRING_MUTE = 563;
-    public const int CLOSEALL = 928;
-    public const int TESTSIM = 1299;
-    public const int ASTPREDICT = 325;
-    public const int U = 1317;
-    public const int ASTVERTICALBAR = 68;
-    public const int ASTIFOLD = 149;
-    public const int V = 1332;
-    public const int Q = 1202;
-    public const int ASTTABLESETVALUESELEMENT = 715;
-    public const int P = 1172;
-    public const int R = 1203;
-    public const int ASTOPT_VAL_POINTSIZE = 511;
-    public const int FILE = 1020;
-    public const int TRANSLATE = 1307;
-    public const int ASTSTAR5 = 77;
-    public const int ASTCLOSE = 247;
-    public const int Y = 876;
-    public const int X = 875;
-    public const int ASTOPMP = 459;
-    public const int ASTINFO = 378;
-    public const int INI = 1085;
-    public const int DASHTYPE = 867;
-    public const int ASTINDEXERELEMENTPLUS = 79;
-    public const int ASTURLFIRST3 = 764;
-    public const int FAIR = 1014;
-    public const int GROUP = 1228;
-    public const int ASTOPT_STRING_FIRST = 541;
-    public const int LEFTANGLESPECIAL = 1403;
-    public const int MDATEFORMAT = 877;
-    public const int G_ = 1444;
-    public const int ASTGENR = 356;
-    public const int ASTPRTELEMENTDASHTYPE = 640;
-    public const int LOCK_ = 1106;
-    public const int ASTFUNCTIONDEFRHSSIMPLE = 348;
-    public const int ASTOPT_STRING_DASHTYPE = 507;
-    public const int ALIAS = 801;
-    public const int ASTPRTELEMENT = 630;
-    public const int ASTUPDOPERATORHASH = 750;
-    public const int UDVALG = 1321;
-    public const int ITALIC = 806;
-    public const int ASTCELL = 241;
-    public const int DATAWIDTH = 969;
-    public const int ASTOPT_STRING_TOBANK = 97;
-    public const int ASTLAGORLEAD = 385;
-    public const int FILLSTYLE = 872;
-    public const int MAXLAG = 787;
-    public const int ITERSHOW = 1094;
-    public const int COLONGLUE = 1440;
-    public const int ASTOPT_STRING_COUNT = 94;
-    public const int ASTURLFIRST2 = 763;
-    public const int YTITLE = 848;
-    public const int ASTURLFIRST1 = 762;
-    public const int ASTSERIESLHS = 180;
-    public const int ASTDISP = 289;
-    public const int ASTOPT_STRING_GEKKO18 = 548;
-    public const int Y2MAX = 1354;
-    public const int ASTSHEET = 676;
-    public const int ASTUNSWAP = 743;
-    public const int ASTLIST4 = 390;
-    public const int ASTIMPULSES = 214;
-    public const int ASTOPT_VAL_NWIDTH = 612;
-    public const int ASTLIST3 = 389;
-    public const int ASTLIST2 = 387;
-    public const int LINES = 1102;
-    public const int FIND = 1029;
-    public const int ASTOPT_STRING_GDX = 192;
-    public const int ASTUPDOPERATORSTAR = 758;
-    public const int ASBANK = 1075;
-    public const int ASTOPT_STRING_PRINT = 96;
-    public const int ASTOPT_STRING_SUBTITLE = 471;
-    public const int DOUBLEVERTICALBAR2 = 1410;
-    public const int ASTOPT_STRING_RESPECT = 587;
-    public const int DOUBLEVERTICALBAR1 = 1409;
-    public const int ASTFUNCTIONNAKED = 726;
-    public const int ZERO = 1356;
-    public const int RETURN2 = 796;
-    public const int ASTSIGN = 679;
-    public const int AT = 1380;
-    public const int AS = 904;
-    public const int ASTOLS = 447;
-    public const int NOFILTER = 1155;
-    public const int COMPRESS = 949;
-    public const int AVG = 906;
-    public const int ASTOPT_STRING_HTML = 553;
-    public const int ASTPERCENTPAREN = 626;
-    public const int VPRT = 1339;
-    public const int TXT = 1315;
-    public const int A_ = 1433;
-    public const int TRUNCATE = 1311;
-    public const int DUMP = 996;
-    public const int ASTREADTO = 664;
-    public const int ASTASSIGNMENTEXPRESSION = 44;
-    public const int ASTBANKISSTARCHEATCODE = 236;
-    public const int ASTOPT_VAL_Y2MINSOFT = 502;
-    public const int ASTPRTTIMEFILTER = 654;
-    public const int GLUESTAR = 1412;
-    public const int SPLICE = 1271;
-    public const int STACK = 840;
-    public const int ASTOPT_STRING_GEKKO20 = 549;
-    public const int ASTUPDOPERATOREQUAL = 748;
-    public const int ASTFUNCTIONDEFARGS = 344;
-    public const int ASTPERCENTNAMESIMPLE = 625;
-    public const int PRETTY = 1191;
-    public const int ASTMETA = 422;
-    public const int MODE = 1128;
-    public const int GOAL = 1060;
-    public const int ASTOPT_STRING_GCM = 189;
-    public const int ASTOPT_STRING_Y2 = 513;
-    public const int ALIGNLEFT = 896;
-    public const int ASTDIV2 = 67;
-    public const int BY = 913;
-    public const int ASTMISSING = 423;
-    public const int IGNOREVARS = 1080;
-    public const int B_ = 1441;
-    public const int ASTOPT_STRING_DYN = 93;
-    public const int ASTMEM = 419;
-    public const int WUDVALG = 1346;
-    public const int ASTELSEIFELSE = 153;
-    public const int LISTFILE = 1104;
-    public const int LINK = 1230;
-    public const int TARGET = 1292;
-    public const int MINUS = 1360;
-    public const int HEADING = 1065;
-    public const int ASTOPT_STRING_STAMP = 597;
-    public const int ASTOPT_STRING_GBK = 547;
-    public const int NOLEV = 1158;
-    public const int LINE = 852;
-    public const int ULEV = 1324;
-    public const int ASTDOLLARHASHNAMESIMPLE = 293;
-    public const int HTTPS = 1426;
-    public const int ASTOLSELEMENTS = 449;
-    public const int COLON = 1382;
-    public const int ASTIFTRUE = 376;
-    public const int DETECT = 803;
-    public const int ASTASSIGNMENT = 50;
-    public const int ASTFORRIGHTSIDE = 334;
-    public const int C_ = 1442;
-    public const int STEPS = 828;
-    public const int ASTOPT_STRING_GNUPLOT = 552;
-    public const int ASTSYS = 691;
-    public const int XLINEAFTER = 846;
-    public const int ASTFORLEFTSIDE = 330;
-    public const int ROWS = 1227;
-    public const int ARROW = 866;
-    public const int INTERFACE = 1087;
-    public const int ASTINTERPOLATE = 221;
-    public const int ASTFUNCTIONDEFTYPE = 350;
-    public const int DYN = 986;
-    public const int GAMS = 817;
-    public const int ASTCLONE = 246;
-    public const int ASTIF2 = 151;
-    public const int ASTOPT_VAL_NDEC = 614;
-    public const int ASTOPT_DATE_XLINE = 482;
-    public const int LU = 1108;
-    public const int SPLINE = 1272;
-    public const int ASTOPT_VAL_YMAXHARD = 489;
-    public const int ADDBANK = 821;
-    public const int ENGLISH = 1004;
-    public const int RESET = 1221;
-    public const int ASTINDEXERALONE = 78;
-    public const int ASTOPT_STRING_LINEAR = 557;
-    public const int YES = 1350;
-    public const int COUNT = 958;
-    public const int ASTGLOBAL = 42;
-    public const int ALIGNRIGHT = 897;
-    public const int ASTINTEGER = 81;
-    public const int COMMAND = 945;
+    public const int ASTLOGICALIN = 91;
+    public const int DL = 1133;
+    public const int MACRO2 = 1111;
+    public const int ASTOPT_STRING_GDXOPT = 194;
+    public const int DP = 993;
+    public const int ASTINDEXERELEMENTBANK = 71;
+    public const int NOPCH = 1162;
+    public const int UNDO = 1328;
+    public const int ASTOPERATOR = 456;
+    public const int ASTPRINT = 114;
+    public const int GDX = 819;
+    public const int ASTLISTSUFFIX = 407;
+    public const int ASTDOLLARCONDITIONALVARIABLE = 110;
+    public const int E_ = 1433;
+    public const int ASTUNFIX = 743;
+    public const int LINEAR = 1102;
+    public const int ROWNAMES = 1115;
+    public const int ASTIMPOSE = 220;
+    public const int UPCH = 1332;
+    public const int ASTOPT_STRING_INFO = 555;
+    public const int DATECELL = 1038;
+    public const int ASTVAL = 768;
+    public const int ASTMODEQUESTION = 428;
+    public const int ASTUPDOPERATORSTARDOLLAR = 760;
+    public const int ANALYZE = 900;
+    public const int ASTOPM = 459;
+    public const int XLINEBEFORE = 846;
+    public const int ASTOPN = 461;
+    public const int ASTOPP = 462;
+    public const int CONV2 = 954;
+    public const int ASTOPQ = 463;
+    public const int YLINE = 850;
+    public const int CONV1 = 953;
+    public const int ASTTABLENEXT = 701;
+    public const int ASTOPD = 453;
+    public const int ASTTABLESETTOPBORDER = 714;
+    public const int SHOW = 1255;
+    public const int GLUE = 1384;
+    public const int MISSING = 1128;
+    public const int D = 965;
+    public const int ASTSTARS = 73;
+    public const int A = 887;
+    public const int F_ = 1446;
+    public const int L = 1134;
+    public const int AT2 = 813;
+    public const int M = 1110;
+    public const int N = 1141;
+    public const int STATIC = 1278;
+    public const int ASTTABLEMERGECOLS = 700;
+    public const int I = 1356;
+    public const int ASTOPT_STRING_MUTE = 564;
+    public const int CLOSEALL = 929;
+    public const int TESTSIM = 1300;
+    public const int ASTPREDICT = 326;
+    public const int U = 1320;
+    public const int ASTVERTICALBAR = 69;
+    public const int ASTIFOLD = 150;
+    public const int V = 1335;
+    public const int Q = 1203;
+    public const int ASTTABLESETVALUESELEMENT = 716;
+    public const int P = 1173;
+    public const int R = 1204;
+    public const int ASTOPT_VAL_POINTSIZE = 512;
+    public const int FILE = 1021;
+    public const int TRANSLATE = 1310;
+    public const int ASTSTAR5 = 78;
+    public const int ASTCLOSE = 248;
+    public const int Y = 877;
+    public const int X = 876;
+    public const int ASTOPMP = 460;
+    public const int ASTINFO = 379;
+    public const int INI = 1086;
+    public const int DASHTYPE = 868;
+    public const int ASTINDEXERELEMENTPLUS = 80;
+    public const int ASTURLFIRST3 = 765;
+    public const int FAIR = 1015;
+    public const int GROUP = 1229;
+    public const int ASTOPT_STRING_FIRST = 542;
+    public const int LEFTANGLESPECIAL = 1406;
+    public const int MDATEFORMAT = 878;
+    public const int G_ = 1447;
+    public const int ASTGENR = 357;
+    public const int ASTPRTELEMENTDASHTYPE = 641;
+    public const int LOCK_ = 1107;
+    public const int ASTFUNCTIONDEFRHSSIMPLE = 349;
+    public const int ASTOPT_STRING_DASHTYPE = 508;
+    public const int ALIAS = 802;
+    public const int ASTPRTELEMENT = 631;
+    public const int ASTUPDOPERATORHASH = 751;
+    public const int UDVALG = 1324;
+    public const int ITALIC = 807;
+    public const int ASTCELL = 242;
+    public const int DATAWIDTH = 970;
+    public const int ASTOPT_STRING_TOBANK = 98;
+    public const int ASTLAGORLEAD = 386;
+    public const int FILLSTYLE = 873;
+    public const int MAXLAG = 788;
+    public const int ITERSHOW = 1095;
+    public const int COLONGLUE = 1443;
+    public const int ASTURLFIRST2 = 764;
+    public const int ASTOPT_STRING_COUNT = 95;
+    public const int YTITLE = 849;
+    public const int ASTURLFIRST1 = 763;
+    public const int ASTSERIESLHS = 181;
+    public const int ASTDISP = 290;
+    public const int ASTOPT_STRING_GEKKO18 = 549;
+    public const int Y2MAX = 1357;
+    public const int ASTSHEET = 677;
+    public const int ASTUNSWAP = 744;
+    public const int ASTLIST4 = 391;
+    public const int ASTIMPULSES = 215;
+    public const int ASTOPT_VAL_NWIDTH = 613;
+    public const int ASTLIST3 = 390;
+    public const int ASTLIST2 = 388;
+    public const int LINES = 1103;
+    public const int FIND = 1030;
+    public const int ASTOPT_STRING_GDX = 193;
+    public const int ASTUPDOPERATORSTAR = 759;
+    public const int ASBANK = 1076;
+    public const int ASTOPT_STRING_PRINT = 97;
+    public const int ASTOPT_STRING_SUBTITLE = 472;
+    public const int DOUBLEVERTICALBAR2 = 1413;
+    public const int ASTOPT_STRING_RESPECT = 588;
+    public const int DOUBLEVERTICALBAR1 = 1412;
+    public const int ASTFUNCTIONNAKED = 727;
+    public const int ZERO = 1359;
+    public const int RETURN2 = 797;
+    public const int ASTSIGN = 680;
+    public const int AT = 1383;
+    public const int AS = 905;
+    public const int ASTOLS = 448;
+    public const int NOFILTER = 1156;
+    public const int COMPRESS = 950;
+    public const int AVG = 907;
+    public const int ASTOPT_STRING_HTML = 554;
+    public const int ASTPERCENTPAREN = 627;
+    public const int VPRT = 1342;
+    public const int TXT = 1318;
+    public const int A_ = 1436;
+    public const int TRUNCATE = 1314;
+    public const int DUMP = 997;
+    public const int ASTREADTO = 665;
+    public const int ASTASSIGNMENTEXPRESSION = 45;
+    public const int ASTBANKISSTARCHEATCODE = 237;
+    public const int ASTOPT_VAL_Y2MINSOFT = 503;
+    public const int ASTPRTTIMEFILTER = 655;
+    public const int GLUESTAR = 1415;
+    public const int SPLICE = 1272;
+    public const int STACK = 841;
+    public const int ASTOPT_STRING_GEKKO20 = 550;
+    public const int ASTUPDOPERATOREQUAL = 749;
+    public const int ASTFUNCTIONDEFARGS = 345;
+    public const int ASTPERCENTNAMESIMPLE = 626;
+    public const int PRETTY = 1192;
+    public const int ASTOPT_STRING_TRACE = 34;
+    public const int ASTMETA = 423;
+    public const int MODE = 1129;
+    public const int GOAL = 1061;
+    public const int ASTOPT_STRING_GCM = 190;
+    public const int ASTOPT_STRING_Y2 = 514;
+    public const int ALIGNLEFT = 897;
+    public const int ASTDIV2 = 68;
+    public const int BY = 914;
+    public const int ASTMISSING = 424;
+    public const int IGNOREVARS = 1081;
+    public const int B_ = 1444;
+    public const int ASTOPT_STRING_DYN = 94;
+    public const int ASTMEM = 420;
+    public const int WUDVALG = 1349;
+    public const int ASTELSEIFELSE = 154;
+    public const int LISTFILE = 1105;
+    public const int LINK = 1231;
+    public const int TARGET = 1293;
+    public const int MINUS = 1363;
+    public const int HEADING = 1066;
+    public const int ASTOPT_STRING_STAMP = 598;
+    public const int ASTOPT_STRING_GBK = 548;
+    public const int NOLEV = 1159;
+    public const int LINE = 853;
+    public const int ULEV = 1327;
+    public const int ASTDOLLARHASHNAMESIMPLE = 294;
+    public const int HTTPS = 1429;
+    public const int ASTOLSELEMENTS = 450;
+    public const int COLON = 1385;
+    public const int ASTIFTRUE = 377;
+    public const int DETECT = 804;
+    public const int ASTASSIGNMENT = 51;
+    public const int ASTFORRIGHTSIDE = 335;
+    public const int C_ = 1445;
+    public const int STEPS = 829;
+    public const int ASTOPT_STRING_GNUPLOT = 553;
+    public const int ASTSYS = 692;
+    public const int XLINEAFTER = 847;
+    public const int ASTFORLEFTSIDE = 331;
+    public const int ROWS = 1228;
+    public const int ARROW = 867;
+    public const int INTERFACE = 1088;
+    public const int ASTINTERPOLATE = 222;
+    public const int ASTFUNCTIONDEFTYPE = 351;
+    public const int DYN = 987;
+    public const int GAMS = 818;
+    public const int ASTCLONE = 247;
+    public const int ASTIF2 = 152;
+    public const int ASTOPT_VAL_NDEC = 615;
+    public const int ASTOPT_DATE_XLINE = 483;
+    public const int LU = 1109;
+    public const int SPLINE = 1273;
+    public const int ASTOPT_VAL_YMAXHARD = 490;
+    public const int ADDBANK = 822;
+    public const int ENGLISH = 1005;
+    public const int RESET = 1222;
+    public const int ASTINDEXERALONE = 79;
+    public const int ASTOPT_STRING_LINEAR = 558;
+    public const int YES = 1353;
+    public const int COUNT = 959;
+    public const int ASTGLOBAL = 43;
+    public const int ALIGNRIGHT = 898;
+    public const int ASTINTEGER = 82;
+    public const int COMMAND = 946;
     public const int ASTDECOMPENDO = 15;
-    public const int CODE = 931;
-    public const int ASTSPLICE = 685;
-    public const int ASTABS = 225;
+    public const int CODE = 932;
+    public const int ASTSPLICE = 686;
+    public const int ASTABS = 226;
     public const int ASTLOCAL = 25;
-    public const int ASTPRTELEMENTPOINTSIZE = 644;
-    public const int ASTOPT_STRING_ERRORS = 577;
-    public const int PATH = 1175;
-    public const int MP = 1131;
-    public const int ASTSTRINGSTATEMENT = 690;
-    public const int SHOWBANK = 822;
-    public const int RIGHTCURLY = 1368;
-    public const int ASTFINDMISSINGDATA = 324;
-    public const int ASTOPT_VAL_PWIDTH = 613;
-    public const int ASTLOCK = 409;
-    public const int ASTHAT2 = 111;
-    public const int COMMENT = 1428;
-    public const int INVERT = 1089;
-    public const int NODIF = 1153;
-    public const int M_ = 1431;
-    public const int ARRAY = 936;
-    public const int ASTOPT_STRING_POINTTYPE = 510;
-    public const int ASTHASH = 60;
-    public const int EXIT = 1008;
-    public const int SETVALUES = 1252;
-    public const int ASTPRTELEMENTY2 = 646;
-    public const int ASTOPT_VAL_DEC = 610;
-    public const int ASTOPT_STRING_NAMECELL = 102;
-    public const int PERIOD = 1183;
-    public const int ASTADD = 227;
-    public const int ASERIES = 808;
-    public const int NO = 1150;
-    public const int ASTBANKVARNAME2 = 59;
-    public const int ASTHASHPAREN = 365;
-    public const int ASTMATRIXCOL = 134;
-    public const int ASTCLS = 251;
-    public const int ASTFRML = 339;
-    public const int ASTHANDLEFILENAME = 362;
-    public const int ASTOPT_STRING_KEY = 476;
-    public const int ASTPERCENT2 = 53;
-    public const int ASTPRTUSING = 224;
-    public const int N_ = 1448;
-    public const int ENDO = 1003;
-    public const int DATABANK = 968;
-    public const int STAMP = 1275;
-    public const int ASTTABLESETBORDER = 707;
-    public const int ASTOPT_ = 465;
-    public const int ASTOPT_STRING_SEC = 591;
-    public const int ASTRETURN = 167;
-    public const int EVAL = 978;
-    public const int EXCEL = 1006;
-    public const int ASTLISTFILE = 136;
-    public const int OP = 903;
-    public const int FILEWIDTH = 1021;
-    public const int HPFILTER = 1071;
-    public const int MEM = 1118;
-    public const int OR = 1171;
-    public const int DigitsEDigits = 1405;
-    public const int FILTER = 1022;
-    public const int SPECIALMINUS = 1270;
-    public const int ASTCOPYWILDCARD4 = 259;
-    public const int ASTCOPYWILDCARD3 = 258;
-    public const int ASTCOPYWILDCARD2 = 257;
+    public const int ASTPRTELEMENTPOINTSIZE = 645;
+    public const int ASTOPT_STRING_ERRORS = 578;
+    public const int PATH = 1176;
+    public const int MP = 1132;
+    public const int ASTSTRINGSTATEMENT = 691;
+    public const int SHOWBANK = 823;
+    public const int RIGHTCURLY = 1371;
+    public const int ASTFINDMISSINGDATA = 325;
+    public const int ASTOPT_VAL_PWIDTH = 614;
+    public const int ASTLOCK = 410;
+    public const int ASTHAT2 = 112;
+    public const int COMMENT = 1431;
+    public const int INVERT = 1090;
+    public const int NODIF = 1154;
+    public const int M_ = 1434;
+    public const int ARRAY = 937;
+    public const int ASTOPT_STRING_POINTTYPE = 511;
+    public const int ASTHASH = 61;
+    public const int EXIT = 1009;
+    public const int SETVALUES = 1253;
+    public const int ASTPRTELEMENTY2 = 647;
+    public const int ASTOPT_VAL_DEC = 611;
+    public const int ASTOPT_STRING_NAMECELL = 103;
+    public const int PERIOD = 1184;
+    public const int ASTADD = 228;
+    public const int ASERIES = 809;
+    public const int NO = 1151;
+    public const int ASTBANKVARNAME2 = 60;
+    public const int ASTHASHPAREN = 366;
+    public const int ASTMATRIXCOL = 135;
+    public const int ASTCLS = 252;
+    public const int ASTFRML = 340;
+    public const int ASTHANDLEFILENAME = 363;
+    public const int ASTOPT_STRING_KEY = 477;
+    public const int ASTPERCENT2 = 54;
+    public const int ASTPRTUSING = 225;
+    public const int N_ = 1451;
+    public const int ENDO = 1004;
+    public const int DATABANK = 969;
+    public const int STAMP = 1276;
+    public const int ASTTABLESETBORDER = 708;
+    public const int ASTOPT_ = 466;
+    public const int ASTOPT_STRING_SEC = 592;
+    public const int ASTRETURN = 168;
+    public const int EVAL = 979;
+    public const int EXCEL = 1007;
+    public const int ASTLISTFILE = 137;
+    public const int OP = 904;
+    public const int FILEWIDTH = 1022;
+    public const int HPFILTER = 1072;
+    public const int MEM = 1119;
+    public const int OR = 1172;
+    public const int DigitsEDigits = 1408;
+    public const int FILTER = 1023;
+    public const int SPECIALMINUS = 1271;
+    public const int ASTCOPYWILDCARD4 = 260;
+    public const int ASTCOPYWILDCARD3 = 259;
+    public const int ASTCOPYWILDCARD2 = 258;
     public const int ASTDECOMPLINK1 = 12;
-    public const int ASTCOPYWILDCARD1 = 256;
-    public const int ASTNAME2 = 435;
-    public const int ASTPRTELEMENTNDEC = 632;
-    public const int ASTFLEXIBLELIST = 119;
-    public const int ASTMINUS2 = 64;
-    public const int SETBOTTOMBORDER = 1246;
-    public const int SOLVE = 1265;
+    public const int ASTCOPYWILDCARD1 = 257;
+    public const int ASTNAME2 = 436;
+    public const int ASTPRTELEMENTNDEC = 633;
+    public const int ASTFLEXIBLELIST = 120;
+    public const int ASTMINUS2 = 65;
+    public const int SETBOTTOMBORDER = 1247;
+    public const int SOLVE = 1266;
     public const int ASTLIBRARYNAME = 24;
-    public const int ASTCLOSEALL = 248;
-    public const int O_ = 1449;
-    public const int ASTGENRINDEXER = 357;
-    public const int LEFTBRACKET = 1401;
-    public const int ASTDATESTATEMENT = 274;
-    public const int ASTNAMEDIGIT = 436;
-    public const int ASTOPT_STRING_PARAM = 569;
-    public const int ASTOPT_STRING_ABS = 523;
-    public const int NDEC = 1143;
-    public const int ASTOPT2 = 464;
-    public const int HIDE = 1067;
-    public const int ASTOPT1 = 463;
-    public const int ASTLISTDEF = 141;
-    public const int ASTFUNCTIONDEF2 = 165;
-    public const int ASTFORNAME = 331;
-    public const int ASTHPFILTERLAMBDA = 369;
-    public const int ASTDOLLARPERCENTPAREN = 296;
-    public const int ASTVARIABLELAGLEAD = 770;
-    public const int POINTS = 1188;
-    public const int ASTFUNCTION = 88;
-    public const int SPLIT = 1273;
-    public const int MAX = 1116;
-    public const int H_ = 1421;
-    public const int MAT = 1112;
-    public const int HTML = 1072;
-    public const int ASTTABLEALIGNLEFT = 694;
-    public const int EXPAND = 1024;
-    public const int ANNUAL = 811;
-    public const int DATEFORMAT = 942;
-    public const int IF = 1073;
-    public const int ASTOPT_STRING_STATIC = 598;
-    public const int TREL = 1309;
-    public const int ASTLIBRARY = 215;
-    public const int IN = 797;
-    public const int ASTHPFILTER = 368;
-    public const int ASTDECOMPITEMS = 279;
+    public const int ASTCLOSEALL = 249;
+    public const int O_ = 1452;
+    public const int ASTGENRINDEXER = 358;
+    public const int LEFTBRACKET = 1404;
+    public const int ASTDATESTATEMENT = 275;
+    public const int ASTNAMEDIGIT = 437;
+    public const int ASTOPT_STRING_PARAM = 570;
+    public const int ASTOPT_STRING_ABS = 524;
+    public const int NDEC = 1144;
+    public const int ASTOPT2 = 465;
+    public const int HIDE = 1068;
+    public const int ASTOPT1 = 464;
+    public const int ASTLISTDEF = 142;
+    public const int ASTFUNCTIONDEF2 = 166;
+    public const int ASTFORNAME = 332;
+    public const int ASTHPFILTERLAMBDA = 370;
+    public const int ASTDOLLARPERCENTPAREN = 297;
+    public const int ASTVARIABLELAGLEAD = 771;
+    public const int POINTS = 1189;
+    public const int ASTFUNCTION = 89;
+    public const int SPLIT = 1274;
+    public const int MAX = 1117;
+    public const int H_ = 1424;
+    public const int MAT = 1113;
+    public const int HTML = 1073;
+    public const int ASTTABLEALIGNLEFT = 695;
+    public const int EXPAND = 1025;
+    public const int ANNUAL = 812;
+    public const int DATEFORMAT = 943;
+    public const int IF = 1074;
+    public const int ASTOPT_STRING_STATIC = 599;
+    public const int TREL = 1312;
+    public const int ASTLIBRARY = 216;
+    public const int IN = 798;
+    public const int ASTHPFILTER = 369;
+    public const int ASTDECOMPITEMS = 280;
     public const int ASTOPT_STRING_VARIABLECODE = 32;
-    public const int PYTHON = 1030;
-    public const int EQUAL = 1389;
-    public const int ASTOPT_STRING_AREMOS = 526;
-    public const int ASTPRTELEMENTFILLSTYLE = 645;
-    public const int ASTNAKEDLIST = 40;
-    public const int ASTHASH2 = 52;
-    public const int FAILSAFE = 1013;
-    public const int NEXT = 1148;
-    public const int I_ = 1445;
-    public const int NORMAL = 1263;
-    public const int ASTSTAR2 = 65;
-    public const int ASTSCALAR = 672;
-    public const int ASTFLAT = 327;
-    public const int ASTSTAMP = 686;
-    public const int GBK = 1050;
-    public const int DFMIN = 788;
-    public const int TERMINAL = 1295;
-    public const int ZVAR = 1358;
-    public const int DEFAULT = 887;
-    public const int ASTDECOMPITEMSNAME = 281;
-    public const int ASTDOWNLOAD = 299;
-    public const int NONMODEL = 1160;
-    public const int J_ = 1446;
-    public const int ASTBANKVARNAMELIST = 310;
-    public const int ASTPRTELEMENTLINEWIDTH = 641;
-    public const int ASTPROCEDUREDEFNAME = 170;
-    public const int ASTFORRIGHTSIDE2 = 332;
-    public const int PROCEDURE = 833;
-    public const int WRITE = 1345;
-    public const int ASTELSEIF = 152;
-    public const int HIDELEFTBORDER = 1068;
-    public const int ASTPRTITEMS = 647;
+    public const int PYTHON = 1031;
+    public const int EQUAL = 1392;
+    public const int ASTOPT_STRING_AREMOS = 527;
+    public const int ASTPRTELEMENTFILLSTYLE = 646;
+    public const int ASTNAKEDLIST = 41;
+    public const int ASTHASH2 = 53;
+    public const int FAILSAFE = 1014;
+    public const int NEXT = 1149;
+    public const int I_ = 1448;
+    public const int NORMAL = 1264;
+    public const int ASTSTAR2 = 66;
+    public const int ASTSCALAR = 673;
+    public const int ASTFLAT = 328;
+    public const int ASTSTAMP = 687;
+    public const int GBK = 1051;
+    public const int DFMIN = 789;
+    public const int TERMINAL = 1296;
+    public const int ZVAR = 1361;
+    public const int DEFAULT = 888;
+    public const int ASTDECOMPITEMSNAME = 282;
+    public const int ASTDOWNLOAD = 300;
+    public const int NONMODEL = 1161;
+    public const int J_ = 1449;
+    public const int ASTBANKVARNAMELIST = 311;
+    public const int ASTPRTELEMENTLINEWIDTH = 642;
+    public const int ASTPROCEDUREDEFNAME = 171;
+    public const int ASTFORRIGHTSIDE2 = 333;
+    public const int PROCEDURE = 834;
+    public const int WRITE = 1348;
+    public const int ASTELSEIF = 153;
+    public const int HIDELEFTBORDER = 1069;
+    public const int ASTPRTITEMS = 648;
     public const int ASTDECOMPLINK = 11;
-    public const int PUDVALG = 1200;
-    public const int QUESTION = 1397;
-    public const int ASTOPT_STRING_Y2TITLE = 495;
-    public const int ERRORS = 851;
-    public const int GCM = 938;
-    public const int MAP = 798;
-    public const int K_ = 1447;
+    public const int PUDVALG = 1201;
+    public const int QUESTION = 1400;
+    public const int ASTOPT_STRING_Y2TITLE = 496;
+    public const int GCM = 939;
+    public const int ERRORS = 852;
+    public const int MAP = 799;
+    public const int K_ = 1450;
     public const int ASTDECOMPFROM = 14;
-    public const int ASTDATESSTATEMENT = 273;
-    public const int GROWTH = 1063;
-    public const int ASTOPT_STRING_MISSING = 575;
-    public const int TICS = 836;
-    public const int ASTOPT_STRING_FLAT = 607;
-    public const int ASTLISTITEMWILDRANGE = 401;
-    public const int ASTTUPLE = 736;
-    public const int LEFTBRACKETGLUE = 1400;
-    public const int NWIDTH = 1166;
-    public const int POINTSIZE = 871;
-    public const int CLONE = 924;
-    public const int REMOVE = 926;
-    public const int ASTOBJFUNCTION = 446;
-    public const int ASTOPT_STRING_YMIRROR = 485;
-    public const int ASTSL = 431;
-    public const int PARAM = 1173;
-    public const int ASTOPT_STRING_PRTCODE = 573;
-    public const int ASTSN = 683;
-    public const int ASTTIMEFILTERPERIODS = 725;
-    public const int U_ = 1436;
-    public const int ASTPROCEDUREDEFTYPE = 169;
-    public const int UNFIX = 1326;
-    public const int ASTSP = 684;
-    public const int ASTOPT_STRING_TSDX = 602;
-    public const int ASTSD = 673;
-    public const int ASTIFOPERATOR = 155;
-    public const int TYPE = 1316;
-    public const int NFAIR = 1149;
-    public const int MINUSEQUAL = 1391;
-    public const int TRANSPOSE = 1308;
-    public const int ASTPRTOPTIONFIELD = 651;
-    public const int ASTSPECIALARGS = 54;
-    public const int ASTEXOQUESTION = 311;
-    public const int ASTOPT_STRING_SPLINE = 596;
-    public const int ASTOPT_STRING_COLLAPSE = 530;
-    public const int XLSX = 1349;
-    public const int T_ = 1422;
-    public const int COLS = 940;
-    public const int YMIRROR = 847;
-    public const int ASTTUPLEITEMS = 739;
-    public const int ASTPRTOPTIONFIELD2 = 649;
-    public const int ASTTABLESETLEFTBORDER = 710;
-    public const int ASTPRTOPTIONFIELD3 = 650;
-    public const int DOUBLEAND = 1361;
-    public const int PRIM = 1193;
-    public const int Y2 = 874;
-    public const int ASTOPT_STRING_FILENAME = 544;
-    public const int ASTCOMPARE2 = 163;
-    public const int ASTOPT_STRING_TSP = 603;
-    public const int ASTOPT_STRING_GMS = 183;
-    public const int KEY = 838;
-    public const int GRID = 837;
-    public const int ASTBANK = 235;
-    public const int ASTELSESTATEMENTS = 115;
-    public const int ASTOPT_VAL_SKIP = 618;
-    public const int ASTOPT_STRING_LABELS = 556;
-    public const int ASTASSIGNVARIABLE = 232;
-    public const int ASTOPT_STRING_TSD = 601;
-    public const int W_ = 1435;
-    public const int WAIT = 1340;
-    public const int ASTOPERATORDOLLAR = 456;
-    public const int ASTOPT_STRING_PALETTE = 477;
-    public const int ABS = 889;
-    public const int MERGECOLS = 1122;
-    public const int ASTLISTDIFFERENCE = 393;
-    public const int MODERNLOOK = 1130;
-    public const int Ident = 1416;
-    public const int IF_OLD = 1074;
-    public const int READ = 1212;
-    public const int ASTFUNCTIONDEFARG = 343;
-    public const int TESTRANDOMMODEL = 1297;
-    public const int ASTEXPRESSION = 312;
-    public const int V_ = 1451;
-    public const int STYLE = 1180;
-    public const int StringInQuotes = 1366;
-    public const int ASTNEWTABLE = 442;
-    public const int ASTFORVAL = 337;
-    public const int ASTXEDIT = 786;
-    public const int ASTENDO = 306;
-    public const int SIZE = 834;
-    public const int CALC = 915;
-    public const int ASTOPT_VAL_ABS = 196;
-    public const int HELP = 1066;
-    public const int ASTOPT_STRING_LINECOLOR = 509;
-    public const int RD = 1210;
-    public const int EDIT = 998;
-    public const int ASTOPT_STRING_PRN = 579;
-    public const int ASTOPT_STRING_ERROR = 521;
-    public const int RP = 1232;
-    public const int ASTBOOL = 238;
-    public const int RN = 1226;
-    public const int ASTTRIPLESTARS = 73;
-    public const int RL = 1135;
-    public const int ASTUPDADVANCED = 745;
-    public const int ASTYMIN = 784;
-    public const int RING = 1225;
-    public const int ASTTABLEINPUTFILE = 698;
-    public const int ALIGNCENTER = 895;
-    public const int ASTEMPTYRANGEELEMENT = 76;
-    public const int ASTOPT_DATE_XLINEBEFORE = 483;
-    public const int Q_ = 1434;
+    public const int ASTDATESSTATEMENT = 274;
+    public const int GROWTH = 1064;
+    public const int ASTOPT_STRING_MISSING = 576;
+    public const int TICS = 837;
+    public const int ASTOPT_STRING_FLAT = 608;
+    public const int ASTLISTITEMWILDRANGE = 402;
+    public const int ASTTUPLE = 737;
+    public const int LEFTBRACKETGLUE = 1403;
+    public const int NWIDTH = 1167;
+    public const int POINTSIZE = 872;
+    public const int CLONE = 925;
+    public const int REMOVE = 927;
+    public const int ASTOBJFUNCTION = 447;
+    public const int ASTOPT_STRING_YMIRROR = 486;
+    public const int ASTSL = 432;
+    public const int PARAM = 1174;
+    public const int ASTOPT_STRING_PRTCODE = 574;
+    public const int ASTSN = 684;
+    public const int ASTTIMEFILTERPERIODS = 726;
+    public const int U_ = 1439;
+    public const int ASTPROCEDUREDEFTYPE = 170;
+    public const int UNFIX = 1329;
+    public const int ASTSP = 685;
+    public const int ASTOPT_STRING_TSDX = 603;
+    public const int ASTSD = 674;
+    public const int ASTIFOPERATOR = 156;
+    public const int TYPE = 1319;
+    public const int NFAIR = 1150;
+    public const int MINUSEQUAL = 1394;
+    public const int TRANSPOSE = 1311;
+    public const int ASTPRTOPTIONFIELD = 652;
+    public const int ASTSPECIALARGS = 55;
+    public const int ASTEXOQUESTION = 312;
+    public const int ASTOPT_STRING_SPLINE = 597;
+    public const int ASTOPT_STRING_COLLAPSE = 531;
+    public const int XLSX = 1352;
+    public const int T_ = 1425;
+    public const int COLS = 941;
+    public const int YMIRROR = 848;
+    public const int ASTTUPLEITEMS = 740;
+    public const int ASTPRTOPTIONFIELD2 = 650;
+    public const int ASTTABLESETLEFTBORDER = 711;
+    public const int ASTPRTOPTIONFIELD3 = 651;
+    public const int DOUBLEAND = 1364;
+    public const int PRIM = 1194;
+    public const int Y2 = 875;
+    public const int ASTOPT_STRING_FILENAME = 545;
+    public const int ASTCOMPARE2 = 164;
+    public const int ASTOPT_STRING_TSP = 604;
+    public const int ASTOPT_STRING_GMS = 184;
+    public const int KEY = 839;
+    public const int GRID = 838;
+    public const int ASTBANK = 236;
+    public const int ASTELSESTATEMENTS = 116;
+    public const int ASTOPT_VAL_SKIP = 619;
+    public const int ASTOPT_STRING_LABELS = 557;
+    public const int ASTASSIGNVARIABLE = 233;
+    public const int ASTOPT_STRING_TSD = 602;
+    public const int W_ = 1438;
+    public const int WAIT = 1343;
+    public const int ASTOPERATORDOLLAR = 457;
+    public const int ASTOPT_STRING_PALETTE = 478;
+    public const int ABS = 890;
+    public const int MERGECOLS = 1123;
+    public const int ASTLISTDIFFERENCE = 394;
+    public const int MODERNLOOK = 1131;
+    public const int Ident = 1419;
+    public const int IF_OLD = 1075;
+    public const int READ = 1213;
+    public const int ASTFUNCTIONDEFARG = 344;
+    public const int TESTRANDOMMODEL = 1298;
+    public const int ASTEXPRESSION = 313;
+    public const int V_ = 1454;
+    public const int STYLE = 1181;
+    public const int StringInQuotes = 1369;
+    public const int ASTNEWTABLE = 443;
+    public const int ASTFORVAL = 338;
+    public const int ASTXEDIT = 787;
+    public const int ASTENDO = 307;
+    public const int SIZE = 835;
+    public const int CALC = 916;
+    public const int ASTOPT_VAL_ABS = 197;
+    public const int HELP = 1067;
+    public const int ASTOPT_STRING_LINECOLOR = 510;
+    public const int RD = 1211;
+    public const int EDIT = 999;
+    public const int ASTOPT_STRING_PRN = 580;
+    public const int ASTOPT_STRING_ERROR = 522;
+    public const int RP = 1233;
+    public const int ASTBOOL = 239;
+    public const int RN = 1227;
+    public const int ASTTRIPLESTARS = 74;
+    public const int RL = 1136;
+    public const int ASTUPDADVANCED = 746;
+    public const int ASTYMIN = 785;
+    public const int RING = 1226;
+    public const int ASTTABLEINPUTFILE = 699;
+    public const int ALIGNCENTER = 896;
+    public const int ASTEMPTYRANGEELEMENT = 77;
+    public const int ASTOPT_DATE_XLINEBEFORE = 484;
+    public const int Q_ = 1437;
     public const int ASTDECOMPCOLS = 16;
-    public const int XZEROAXIS = 858;
-    public const int ASTOPT_STRING_TABLE = 532;
-    public const int ASTOPT_STRING_CREATE = 542;
-    public const int TIME = 1300;
-    public const int ASTFUNCTIONDEFNAME = 347;
-    public const int SUFFIX = 1282;
+    public const int XZEROAXIS = 859;
+    public const int ASTOPT_STRING_TABLE = 533;
+    public const int ASTOPT_STRING_CREATE = 543;
+    public const int TIME = 1301;
+    public const int ASTFUNCTIONDEFNAME = 348;
+    public const int SUFFIX = 1283;
     public const int ASTDOLLAR = 4;
-    public const int ASTOPT_STRING_SOURCE = 595;
-    public const int REPLACE = 1219;
-    public const int ASTCNAME = 51;
-    public const int ASTRES = 668;
-    public const int ASTNAME = 117;
-    public const int ASTAPPEND = 229;
-    public const int P_ = 1423;
-    public const int PX = 935;
-    public const int ADD = 892;
-    public const int CAPS = 916;
-    public const int LINESPOINTS = 825;
-    public const int REMOTE = 800;
-    public const int ASTREPLACE = 667;
-    public const int PATCH = 1174;
-    public const int ASTOPT_STRING_BOLD = 186;
-    public const int COMMAND2 = 947;
-    public const int XFLAT = 934;
-    public const int ASTLISTITEMSNEW = 400;
-    public const int COMMAND1 = 946;
-    public const int TO = 1305;
-    public const int PCIMSTYLE = 1179;
-    public const int ITER = 1091;
-    public const int ASTIFFALSE = 375;
-    public const int ASTACCEPT = 226;
-    public const int EFTER = 999;
-    public const int ASTOPT_VAL_Y2MIN = 500;
-    public const int ASTOPT_STRING_REMOVE = 517;
-    public const int R_RUN = 1206;
-    public const int ASTBANKVARNAME = 57;
-    public const int MIN = 1125;
-    public const int DATES = 971;
-    public const int IGNORE = 853;
-    public const int MULPCT = 1137;
-    public const int ASTOPT_VAL_YMINHARD = 492;
-    public const int ASTWILDQUESTION = 775;
-    public const int LINECOLOR = 869;
-    public const int ASTTIMEFILTER = 723;
-    public const int CURRENT = 815;
-    public const int CHANGE = 918;
-    public const int S_ = 1425;
-    public const int ASTOPT_STRING_PAUSE = 467;
-    public const int ASTOPT_STRING_SERIES = 593;
-    public const int DIF = 982;
-    public const int ASTOPT_STRING_PLOTCODE = 572;
-    public const int CLOSE = 927;
-    public const int ASTTABLEHIDERIGHTBORDER = 697;
-    public const int MOVE = 925;
+    public const int ASTOPT_STRING_SOURCE = 596;
+    public const int REPLACE = 1220;
+    public const int ASTCNAME = 52;
+    public const int ASTRES = 669;
+    public const int ASTNAME = 118;
+    public const int ASTAPPEND = 230;
+    public const int P_ = 1426;
+    public const int PX = 936;
+    public const int ADD = 893;
+    public const int CAPS = 917;
+    public const int LINESPOINTS = 826;
+    public const int REMOTE = 801;
+    public const int ASTREPLACE = 668;
+    public const int PATCH = 1175;
+    public const int ASTOPT_STRING_BOLD = 187;
+    public const int COMMAND2 = 948;
+    public const int XFLAT = 935;
+    public const int ASTLISTITEMSNEW = 401;
+    public const int COMMAND1 = 947;
+    public const int TO = 1306;
+    public const int PCIMSTYLE = 1180;
+    public const int ITER = 1092;
+    public const int ASTIFFALSE = 376;
+    public const int ASTACCEPT = 227;
+    public const int EFTER = 1000;
+    public const int ASTOPT_VAL_Y2MIN = 501;
+    public const int ASTOPT_STRING_REMOVE = 518;
+    public const int R_RUN = 1207;
+    public const int ASTBANKVARNAME = 58;
+    public const int MIN = 1126;
+    public const int DATES = 972;
+    public const int IGNORE = 854;
+    public const int MULPCT = 1138;
+    public const int ASTOPT_VAL_YMINHARD = 493;
+    public const int ASTWILDQUESTION = 776;
+    public const int LINECOLOR = 870;
+    public const int ASTTIMEFILTER = 724;
+    public const int CURRENT = 816;
+    public const int CHANGE = 919;
+    public const int S_ = 1428;
+    public const int ASTOPT_STRING_PAUSE = 468;
+    public const int ASTOPT_STRING_SERIES = 594;
+    public const int DIF = 983;
+    public const int ASTOPT_STRING_PLOTCODE = 573;
+    public const int CLOSE = 928;
+    public const int ASTTABLEHIDERIGHTBORDER = 698;
+    public const int MOVE = 926;
     public const int ASTOPT_STRING_DUMPOPTIONS = 28;
     public const int ASTOPT_STRING_NOCR = 33;
-    public const int ASTOPT_VAL_WIDTH = 609;
-    public const int ASTSTAR = 129;
-    public const int ASTWILDCARD = 773;
-    public const int ASTMULBK = 433;
-    public const int CLEAR2 = 921;
-    public const int MAXLINES = 1117;
-    public const int DIV = 1362;
-    public const int SHOWBORDERS = 1255;
-    public const int SHEET = 1253;
-    public const int BETWEEN = 813;
+    public const int ASTOPT_VAL_WIDTH = 610;
+    public const int ASTSTAR = 130;
+    public const int ASTWILDCARD = 774;
+    public const int ASTMULBK = 434;
+    public const int CLEAR2 = 922;
+    public const int MAXLINES = 1118;
+    public const int DIV = 1365;
+    public const int SHOWBORDERS = 1256;
+    public const int SHEET = 1254;
+    public const int BETWEEN = 814;
     public const int ASTNAKEDLISTMISS = 22;
-    public const int ASTSEQITEMMINUS = 112;
-    public const int ASTOPT_STRING_SAVE = 590;
-    public const int Integer = 1365;
-    public const int R_ = 1450;
-    public const int FIRST = 1033;
-    public const int ASTLISTOR = 84;
-    public const int GDIF = 1051;
-    public const int COLORS = 939;
-    public const int ASTOPT_VAL_N = 611;
-    public const int ASTTUPLESIMPLE = 740;
-    public const int INTERNAL = 1088;
-    public const int ASTINDEXERELEMENT = 69;
+    public const int ASTSEQITEMMINUS = 113;
+    public const int ASTOPT_STRING_SAVE = 591;
+    public const int Integer = 1368;
+    public const int R_ = 1453;
+    public const int FIRST = 1034;
+    public const int ASTLISTOR = 85;
+    public const int GDIF = 1052;
+    public const int COLORS = 940;
+    public const int ASTOPT_VAL_N = 612;
+    public const int ASTTUPLESIMPLE = 741;
+    public const int INTERNAL = 1089;
+    public const int ASTINDEXERELEMENT = 70;
     public const int ASTDECOMPGROUP = 10;
-    public const int BROWSER = 1032;
-    public const int ASTOPT_STRING_MOVE = 516;
-    public const int ASTOPT_STRING_LINETYPE = 506;
-    public const int ASTLIBRARYCLEAR = 217;
-    public const int ASTINDEXERELEMENTIDENT = 110;
-    public const int ASTLIBRARYQUESTION = 218;
-    public const int ASTOPT_VAL_REPLACE = 619;
-    public const int LEAD = 789;
-    public const int DIVEQUAL = 1393;
-    public const int ASTOPT_STRING_X2ZEROAXIS = 503;
-    public const int ASTTABLEPRINT = 706;
-    public const int ASTMATRIX = 417;
-    public const int ASTPRTOPTION = 648;
-    public const int PYTHON_RUN = 1209;
-    public const int ASTDATE = 270;
-    public const int ASTOPT_STRING_TITLE = 470;
-    public const int ASTOPT_STRING_STACK = 478;
-    public const int YMAXSOFT = 855;
-    public const int ASTNONCURLY = 564;
+    public const int BROWSER = 1033;
+    public const int ASTOPT_STRING_MOVE = 517;
+    public const int ASTOPT_STRING_LINETYPE = 507;
+    public const int ASTLIBRARYCLEAR = 218;
+    public const int ASTINDEXERELEMENTIDENT = 111;
+    public const int ASTLIBRARYQUESTION = 219;
+    public const int ASTOPT_VAL_REPLACE = 620;
+    public const int LEAD = 790;
+    public const int DIVEQUAL = 1396;
+    public const int ASTOPT_STRING_X2ZEROAXIS = 504;
+    public const int ASTTABLEPRINT = 707;
+    public const int ASTMATRIX = 418;
+    public const int ASTPRTOPTION = 649;
+    public const int PYTHON_RUN = 1210;
+    public const int ASTDATE = 271;
+    public const int ASTOPT_STRING_TITLE = 471;
+    public const int ASTOPT_STRING_STACK = 479;
+    public const int YMAXSOFT = 856;
+    public const int ASTNONCURLY = 565;
     public const int ASTDECOMPWHERE = 9;
-    public const int ASTTEST = 719;
-    public const int ASTPOINTS = 212;
-    public const int ASTDATA = 266;
-    public const int ASTCREATE = 262;
-    public const int ASTOPT_STRING_PREFIX = 191;
-    public const int ASTNEW = 441;
-    public const int OLS = 1168;
-    public const int ASTNULL = 444;
-    public const int VARIABLECODE = 1025;
-    public const int ASTPRTELEMENTOPTIONFIELD = 634;
-    public const int VIEW = 1026;
-    public const int ASTCREATEQUESTION = 264;
-    public const int ASTCOMPARECOMMAND = 254;
-    public const int UABS = 1318;
-    public const int ASTSTRINGINQUOTES = 92;
-    public const int ASTCURLYSIMPLE = 124;
-    public const int ASTPROCEDUREDEFARG = 175;
-    public const int HORIZON = 1070;
-    public const int YMINHARD = 856;
-    public const int ASTEXPRESSIONNEW = 118;
-    public const int RESTART = 1224;
-    public const int NEWTON = 1147;
-    public const int ASTURLPART = 765;
+    public const int ASTTEST = 720;
+    public const int ASTPOINTS = 213;
+    public const int ASTDATA = 267;
+    public const int ASTCREATE = 263;
+    public const int ASTOPT_STRING_PREFIX = 192;
+    public const int ASTNEW = 442;
+    public const int OLS = 1169;
+    public const int ASTNULL = 445;
+    public const int VARIABLECODE = 1026;
+    public const int ASTPRTELEMENTOPTIONFIELD = 635;
+    public const int VIEW = 1027;
+    public const int ASTCREATEQUESTION = 265;
+    public const int ASTCOMPARECOMMAND = 255;
+    public const int UABS = 1321;
+    public const int ASTSTRINGINQUOTES = 93;
+    public const int ASTCURLYSIMPLE = 125;
+    public const int ASTPROCEDUREDEFARG = 176;
+    public const int HORIZON = 1071;
+    public const int YMINHARD = 857;
+    public const int ASTEXPRESSIONNEW = 119;
+    public const int RESTART = 1225;
+    public const int NEWTON = 1148;
+    public const int ASTURLPART = 766;
     public const int ASTOPT_STRING_DATEFORMAT = 29;
-    public const int ASTOPT_STRING_AFTER = 524;
-    public const int LABELS = 1096;
-    public const int NAMES = 1142;
-    public const int TSD = 1312;
-    public const int ASTMODELFILE = 426;
-    public const int XLINE = 844;
-    public const int VAR_KDUSJFLQO2 = 1335;
-    public const int ASTNAMEWITHDOT = 440;
-    public const int ASTSERIESQUESTION = 675;
-    public const int ASTTUPLEFUNCTIONSIMPLE = 737;
-    public const int ASTOPT_STRING_XZEROAXIS = 494;
-    public const int TEST = 1296;
+    public const int ASTOPT_STRING_AFTER = 525;
+    public const int LABELS = 1097;
+    public const int NAMES = 1143;
+    public const int TSD = 1315;
+    public const int ASTMODELFILE = 427;
+    public const int XLINE = 845;
+    public const int VAR_KDUSJFLQO2 = 1338;
+    public const int ASTNAMEWITHDOT = 441;
+    public const int ASTSERIESQUESTION = 676;
+    public const int ASTTUPLEFUNCTIONSIMPLE = 738;
+    public const int ASTOPT_STRING_XZEROAXIS = 495;
+    public const int TEST = 1297;
     public const int ASTNUMBERMINUS = 7;
-    public const int ASTOPT_STRING_TICS = 474;
-    public const int ASTOPT_STRING_SHARES = 576;
-    public const int TSP = 1314;
-    public const int PDEC = 1182;
-    public const int ASTCLOSESTAR = 250;
-    public const int ASTTABLEOUTPUTTYPE = 705;
-    public const int BACKSLASH = 1399;
-    public const int ASTPRTELEMENTPDEC = 635;
-    public const int Y_ = 1453;
-    public const int ASTOPT_STRING_STOP = 469;
-    public const int ASTIDENTDIGIT = 126;
-    public const int ASTSTRING = 688;
-    public const int NOGDIFF = 1157;
-    public const int Y2MINHARD = 863;
-    public const int UNSWAP = 1328;
-    public const int OVERLAY = 1057;
-    public const int DOC = 990;
-    public const int DateDef = 1406;
-    public const int ASTOPT_STRING_SORT = 100;
-    public const int ASTMAPITEM = 138;
-    public const int UGDIF = 1322;
-    public const int FOR = 1042;
-    public const int NOMAX = 795;
-    public const int PCTPRT = 1181;
-    public const int ASTRESTART = 669;
-    public const int AND = 900;
-    public const int NDIFPRT = 1144;
-    public const int PROT = 1197;
-    public const int X_ = 1452;
-    public const int SPEEDUP = 1327;
-    public const int CONTINUE = 831;
-    public const int GEKKO18 = 1053;
-    public const int ASTRANGEGENERAL = 82;
-    public const int COPY = 954;
-    public const int IdentStartingWithInt = 1407;
-    public const int ALL = 898;
-    public const int ASTIFOPERATOR1 = 156;
-    public const int ASTIFOPERATOR2 = 157;
-    public const int ASTIFOPERATOR4 = 159;
-    public const int ASTIFOPERATOR3 = 158;
-    public const int ASTIFOPERATOR6 = 161;
-    public const int ASTOPT_STRING_SHOWBANK = 519;
-    public const int ASTIFOPERATOR5 = 160;
-    public const int ASTDOTS = 213;
-    public const int ASTIFOPERATOR7 = 162;
-    public const int Y2MAXSOFT = 862;
-    public const int ASTFORSTATEMENTS = 335;
-    public const int FROMBANK = 1077;
-    public const int ASTPROCEDURE_Q = 122;
-    public const int DOT = 1373;
-    public const int ASTOPT_STRING_FONT = 472;
-    public const int ASTGENERIC1 = 355;
-    public const int ASTVERS = 772;
-    public const int PRORATE = 883;
-    public const int LINEWIDTH = 868;
-    public const int ASTWILDCARDWITHBANK = 774;
-    public const int FLAT = 1036;
-    public const int HASH = 1375;
-    public const int ASTFUNCTIONDEFCODE = 345;
-    public const int ASTTUPLEITEM = 738;
-    public const int ASTFILENAMEPART = 320;
-    public const int ASTOPT_STRING_NAMES = 566;
-    public const int ASTCLOSEBANKS = 249;
-    public const int FEED = 1017;
-    public const int COMMA2 = 1379;
-    public const int ASTTABLESETTEXT = 712;
-    public const int GEKKO20 = 1054;
-    public const int PLOTCODE = 1186;
-    public const int ASTTELL = 718;
-    public const int ASTOPT_STRING_BROWSER = 95;
-    public const int ASTMACROPLUS = 414;
-    public const int ASTTABLEALIGNCENTER = 693;
-    public const int ASTOPT_STRING_PRIM = 578;
-    public const int Z_ = 1454;
-    public const int ASTSHOW = 678;
-    public const int CONV = 951;
-    public const int ASTMERGE = 421;
-    public const int ASTNUMBER = 445;
-    public const int ASTTABLEHIDELEFTBORDER = 696;
-    public const int ASTDECOMP = 276;
-    public const int ASTPCH = 624;
-    public const int ASTPRTELEMENTWIDTH = 638;
-    public const int PALETTE = 839;
-    public const int BANK2 = 911;
-    public const int ASTIDENT = 123;
-    public const int ABSOLUTE = 890;
-    public const int ASTINI = 379;
-    public const int ASTFORLEFTSIDE2 = 329;
-    public const int METHOD = 1124;
-    public const int BANK1 = 910;
-    public const int COMMENT_MULTILINE = 1429;
-    public const int DUMOFF = 994;
-    public const int IMPULSES = 830;
-    public const int ASTPOW = 74;
-    public const int ASTOPT_VAL_FONTSIZE = 473;
-    public const int ASTOPT_VAL_BOXGAP = 480;
-    public const int ASTFILLEDCURVES = 210;
-    public const int ASTRESET = 166;
-    public const int GRAPH = 1062;
-    public const int ASTFILENAME2 = 315;
-    public const int ASTFILENAME1 = 314;
-    public const int ASTGOTO = 361;
-    public const int ASTDISPLAY = 290;
-    public const int ASTTARGET = 717;
-    public const int MULBK = 1136;
-    public const int ASTTABLESETBOTTOMBORDER = 708;
-    public const int ISSMALLEROREQUAL = 1388;
-    public const int ASTCOLLAPSE = 252;
-    public const int SYS = 1285;
-    public const int CLEAR = 920;
-    public const int ASTHDG = 366;
-    public const int ASTOPT_STRING_VIEW = 533;
-    public const int ASTHELP = 367;
-    public const int ASTR_EXPORT = 657;
-    public const int GLUEDOTNUMBER = 1437;
-    public const int CREATE = 960;
-    public const int SHOWFREQ = 823;
-    public const int ASTTABLEOPTIONFIELDWINDOW = 703;
-    public const int ASTDATAORIENTATION = 269;
-    public const int ASTIF = 150;
-    public const int ASTPROCEDUREDEF = 172;
-    public const int ASTOPT_STRING_PCIM = 570;
-    public const int STRING2 = 799;
-    public const int ASTWRITE = 777;
-    public const int ASTOBJECTFUNCTIONNAKED = 143;
-    public const int ASTOPT_VAL_PDEC = 615;
-    public const int FONTSIZE = 1041;
-    public const int TELL = 1293;
-    public const int NONANNUAL = 814;
-    public const int ASTDOTORINDEXER = 55;
-    public const int FONT = 1040;
-    public const int ASTPROCEDURE = 121;
-    public const int CLIP = 922;
-    public const int ASTPRTTYPE = 655;
-    public const int ASTGENRLISTINDEXER2 = 359;
-    public const int ASTDECOMPTYPE = 283;
-    public const int ASTOPT_DATE_I = 182;
-    public const int ASTTIMEQUESTION = 730;
-    public const int DANISH = 966;
-    public const int ASTOPT_STRING_KEEP = 555;
-    public const int ASTOPT_STRING_METHOD = 104;
-    public const int ASTLIST = 391;
-    public const int MUTE = 1139;
-    public const int ASTOPT_STRING_DUMP = 514;
-    public const int TEMP = 1294;
+    public const int ASTOPT_STRING_TICS = 475;
+    public const int ASTOPT_STRING_SHARES = 577;
+    public const int TSP = 1317;
+    public const int PDEC = 1183;
+    public const int ASTCLOSESTAR = 251;
+    public const int ASTTABLEOUTPUTTYPE = 706;
+    public const int BACKSLASH = 1402;
+    public const int ASTPRTELEMENTPDEC = 636;
+    public const int Y_ = 1456;
+    public const int ASTOPT_STRING_STOP = 470;
+    public const int ASTIDENTDIGIT = 127;
+    public const int ASTSTRING = 689;
+    public const int NOGDIFF = 1158;
+    public const int Y2MINHARD = 864;
+    public const int UNSWAP = 1331;
+    public const int OVERLAY = 1058;
+    public const int DOC = 991;
+    public const int DateDef = 1409;
+    public const int ASTOPT_STRING_SORT = 101;
+    public const int ASTMAPITEM = 139;
+    public const int UGDIF = 1325;
+    public const int FOR = 1043;
+    public const int NOMAX = 796;
+    public const int PCTPRT = 1182;
+    public const int ASTRESTART = 670;
+    public const int AND = 901;
+    public const int NDIFPRT = 1145;
+    public const int PROT = 1198;
+    public const int X_ = 1455;
+    public const int SPEEDUP = 1330;
+    public const int CONTINUE = 832;
+    public const int GEKKO18 = 1054;
+    public const int ASTRANGEGENERAL = 83;
+    public const int COPY = 955;
+    public const int IdentStartingWithInt = 1410;
+    public const int ALL = 899;
+    public const int ASTIFOPERATOR1 = 157;
+    public const int ASTIFOPERATOR2 = 158;
+    public const int ASTIFOPERATOR4 = 160;
+    public const int ASTIFOPERATOR3 = 159;
+    public const int ASTIFOPERATOR6 = 162;
+    public const int ASTOPT_STRING_SHOWBANK = 520;
+    public const int ASTIFOPERATOR5 = 161;
+    public const int ASTDOTS = 214;
+    public const int ASTIFOPERATOR7 = 163;
+    public const int Y2MAXSOFT = 863;
+    public const int ASTFORSTATEMENTS = 336;
+    public const int FROMBANK = 1078;
+    public const int ASTPROCEDURE_Q = 123;
+    public const int DOT = 1376;
+    public const int ASTOPT_STRING_FONT = 473;
+    public const int ASTGENERIC1 = 356;
+    public const int ASTVERS = 773;
+    public const int PRORATE = 884;
+    public const int LINEWIDTH = 869;
+    public const int ASTWILDCARDWITHBANK = 775;
+    public const int FLAT = 1037;
+    public const int HASH = 1378;
+    public const int ASTFUNCTIONDEFCODE = 346;
+    public const int ASTTUPLEITEM = 739;
+    public const int ASTFILENAMEPART = 321;
+    public const int ASTOPT_STRING_NAMES = 567;
+    public const int ASTCLOSEBANKS = 250;
+    public const int FEED = 1018;
+    public const int COMMA2 = 1382;
+    public const int ASTTABLESETTEXT = 713;
+    public const int GEKKO20 = 1055;
+    public const int PLOTCODE = 1187;
+    public const int ASTTELL = 719;
+    public const int ASTOPT_STRING_BROWSER = 96;
+    public const int ASTMACROPLUS = 415;
+    public const int ASTTABLEALIGNCENTER = 694;
+    public const int ASTOPT_STRING_PRIM = 579;
+    public const int Z_ = 1457;
+    public const int ASTSHOW = 679;
+    public const int CONV = 952;
+    public const int ASTMERGE = 422;
+    public const int ASTNUMBER = 446;
+    public const int ASTTABLEHIDELEFTBORDER = 697;
+    public const int ASTDECOMP = 277;
+    public const int ASTPCH = 625;
+    public const int ASTPRTELEMENTWIDTH = 639;
+    public const int PALETTE = 840;
+    public const int BANK2 = 912;
+    public const int ASTIDENT = 124;
+    public const int ABSOLUTE = 891;
+    public const int ASTFORLEFTSIDE2 = 330;
+    public const int ASTINI = 380;
+    public const int METHOD = 1125;
+    public const int BANK1 = 911;
+    public const int COMMENT_MULTILINE = 1432;
+    public const int DUMOFF = 995;
+    public const int IMPULSES = 831;
+    public const int ASTPOW = 75;
+    public const int ASTOPT_VAL_FONTSIZE = 474;
+    public const int ASTOPT_VAL_BOXGAP = 481;
+    public const int ASTFILLEDCURVES = 211;
+    public const int ASTRESET = 167;
+    public const int GRAPH = 1063;
+    public const int ASTFILENAME2 = 316;
+    public const int ASTFILENAME1 = 315;
+    public const int ASTGOTO = 362;
+    public const int ASTDISPLAY = 291;
+    public const int ASTTARGET = 718;
+    public const int MULBK = 1137;
+    public const int ASTTABLESETBOTTOMBORDER = 709;
+    public const int ISSMALLEROREQUAL = 1391;
+    public const int ASTCOLLAPSE = 253;
+    public const int SYS = 1286;
+    public const int CLEAR = 921;
+    public const int ASTHDG = 367;
+    public const int ASTOPT_STRING_VIEW = 534;
+    public const int ASTHELP = 368;
+    public const int ASTR_EXPORT = 658;
+    public const int GLUEDOTNUMBER = 1440;
+    public const int CREATE = 961;
+    public const int SHOWFREQ = 824;
+    public const int ASTTABLEOPTIONFIELDWINDOW = 704;
+    public const int ASTDATAORIENTATION = 270;
+    public const int ASTIF = 151;
+    public const int ASTPROCEDUREDEF = 173;
+    public const int ASTOPT_STRING_PCIM = 571;
+    public const int STRING2 = 800;
+    public const int ASTWRITE = 778;
+    public const int ASTOBJECTFUNCTIONNAKED = 144;
+    public const int ASTOPT_VAL_PDEC = 616;
+    public const int FONTSIZE = 1042;
+    public const int TELL = 1294;
+    public const int NONANNUAL = 815;
+    public const int ASTDOTORINDEXER = 56;
+    public const int FONT = 1041;
+    public const int ASTPROCEDURE = 122;
+    public const int CLIP = 923;
+    public const int ASTPRTTYPE = 656;
+    public const int ASTGENRLISTINDEXER2 = 360;
+    public const int ASTDECOMPTYPE = 284;
+    public const int ASTOPT_DATE_I = 183;
+    public const int ASTTIMEQUESTION = 731;
+    public const int DANISH = 967;
+    public const int ASTOPT_STRING_KEEP = 556;
+    public const int ASTOPT_STRING_METHOD = 105;
+    public const int ASTLIST = 392;
+    public const int MUTE = 1140;
+    public const int ASTOPT_STRING_DUMP = 515;
+    public const int TEMP = 1295;
     public const int ASTARGS = 26;
-    public const int ASTFILENAME = 316;
-    public const int SER2 = 1238;
-    public const int SER3 = 1239;
-    public const int SHARES = 850;
-    public const int XLS = 1348;
-    public const int WHITESPACE = 1427;
-    public const int STOP = 1280;
-    public const int ASTPYTHON_RUN = 661;
-    public const int VALUE = 1336;
-    public const int ASTLEV = 386;
-    public const int REORDER = 1216;
-    public const int ASTSTOP = 687;
-    public const int TOBANK = 1076;
-    public const int ASTEXPORTR = 333;
-    public const int CUT = 1187;
-    public const int ASTDOLLARPERCENTNAMESIMPLE = 295;
-    public const int UDIF = 1319;
-    public const int ASTZERO = 785;
-    public const int WPLOT = 1344;
-    public const int ASTPRT = 629;
-    public const int ASTLISTWITHBANK = 408;
-    public const int YLABELS = 810;
-    public const int ASTBRACKET = 239;
-    public const int ASTUNDOSIM = 741;
-    public const int ASTINDEX = 377;
-    public const int WIDTH = 1341;
-    public const int ASTUPDOPERATORPERCENT = 754;
-    public const int ASTSERIESRHS = 181;
-    public const int CONSTANT = 881;
-    public const int SEARCH = 1235;
+    public const int ASTFILENAME = 317;
+    public const int SER2 = 1239;
+    public const int SER3 = 1240;
+    public const int SHARES = 851;
+    public const int XLS = 1351;
+    public const int WHITESPACE = 1430;
+    public const int STOP = 1281;
+    public const int ASTPYTHON_RUN = 662;
+    public const int VALUE = 1339;
+    public const int ASTLEV = 387;
+    public const int REORDER = 1217;
+    public const int ASTSTOP = 688;
+    public const int TOBANK = 1077;
+    public const int ASTEXPORTR = 334;
+    public const int CUT = 1188;
+    public const int ASTDOLLARPERCENTNAMESIMPLE = 296;
+    public const int UDIF = 1322;
+    public const int ASTZERO = 786;
+    public const int WPLOT = 1347;
+    public const int ASTPRT = 630;
+    public const int ASTLISTWITHBANK = 409;
+    public const int YLABELS = 811;
+    public const int ASTBRACKET = 240;
+    public const int ASTUNDOSIM = 742;
+    public const int ASTINDEX = 378;
+    public const int WIDTH = 1344;
+    public const int ASTUPDOPERATORPERCENT = 755;
+    public const int ASTSERIESRHS = 182;
+    public const int CONSTANT = 882;
+    public const int SEARCH = 1236;
     public const int ASTFORTYPE1 = 6;
-    public const int SETRIGHTBORDER = 1249;
-    public const int STACKED = 1274;
+    public const int SETRIGHTBORDER = 1250;
+    public const int STACKED = 1275;
     public const int ASTFORTYPE2 = 21;
-    public const int ASTSTEPS = 211;
-    public const int ASTDOLLARHASHPAREN = 294;
-    public const int ASTCURLY = 125;
-    public const int ASTASSIGNSTATEMENT = 231;
-    public const int ASTOPT_VAL_YLINE = 487;
-    public const int POINTTYPE = 870;
-    public const int ASTOPT_STRING_ITALIC = 187;
-    public const int YMAXHARD = 854;
-    public const int NAN = 1261;
-    public const int ASTTABLESHOWBORDERS = 716;
-    public const int CPLOT = 959;
-    public const int PRTX = 1199;
-    public const int ASTSIMPLEFUNCTION = 681;
-    public const int ASTPRTELEMENTLINETYPE = 639;
-    public const int ASTOPT_VAL_LINEWIDTH = 508;
-    public const int ASTSHEETIMPORT = 677;
-    public const int TOTAL = 1306;
-    public const int ASTLISTITEMS1 = 397;
-    public const int NOCR = 1152;
-    public const int ASTLISTITEMS0 = 396;
-    public const int ASTGENRLHSFUNCTION = 358;
-    public const int ASTFILENAMELIST = 139;
-    public const int ASTLISTITEMS2 = 398;
-    public const int TABLE = 1287;
-    public const int SOURCE = 1269;
-    public const int VERSION = 1338;
-    public const int ASTMENUTABLE = 420;
-    public const int ASTOPT_VAL_YMAXSOFT = 490;
-    public const int PWIDTH = 1201;
-    public const int DEBUG = 972;
-    public const int ASTOPTION = 621;
-    public const int ASTRANGEWITHBANK = 662;
-    public const int ASTDISPSEARCH = 291;
-    public const int ASTDIV = 130;
-    public const int ASTFRMLCODE = 340;
-    public const int ASTPRTELEMENTS = 637;
-    public const int ASTCLEARALL = 245;
-    public const int PREDICT = 1028;
-    public const int MIXED = 1126;
-    public const int ISEQUAL = 1386;
-    public const int AUTO = 905;
-    public const int SETTEXT = 1250;
-    public const int MESSAGE = 1123;
-    public const int PLUS = 1359;
-    public const int ASTDL = 430;
-    public const int ASTDP = 300;
-    public const int INFOFILE = 1084;
-    public const int ASTAT = 233;
-    public const int ASTEMPTY = 305;
-    public const int ASTAS = 230;
-    public const int PCIM = 1178;
-    public const int DETAILS = 980;
-    public const int ASTDIFPRT = 287;
-    public const int ASTRUN = 164;
-    public const int MERGE = 1121;
-    public const int ASTOPT_STRING_MERGE = 559;
-    public const int INTERPOLATE = 882;
-    public const int ASTCOPYWILDCARD = 260;
-    public const int ASTLISTAND = 83;
-    public const int SORT = 1267;
-    public const int ASTDIF = 286;
-    public const int ASTIFSTATEMENTS = 114;
-    public const int ASTCREATEEXPRESSION = 263;
-    public const int NYTVINDU = 1167;
-    public const int ZOOM = 1357;
-    public const int MAXLEAD = 791;
-    public const int ASTWILDSTAR = 776;
-    public const int MULPRT = 1138;
-    public const int ASTOPT_STRING_ARROW = 505;
-    public const int ASTLISTPREFIX = 403;
-    public const int ASTPRT2 = 628;
-    public const int BLOCK = 1222;
-    public const int ASTTABLESETVALUES = 714;
-    public const int TESTRANDOMMODELCHECK = 1298;
-    public const int ASER = 807;
-    public const int ASTOPT_STRING_YTITLE = 486;
-    public const int ASTOPT_STRING_GRIDSTYLE = 188;
-    public const int SERIES2 = 1241;
-    public const int SERIES3 = 1242;
-    public const int ASTDOUBLE = 108;
-    public const int FORMAT = 1043;
-    public const int ASTMATRIXROW = 135;
-    public const int X2ZEROAXIS = 865;
-    public const int STAREQUAL = 1392;
-    public const int GLUEBACKSLASH = 1398;
-    public const int LAGFIX = 820;
-    public const int TITLE = 1304;
-    public const int FIT = 792;
-    public const int PREFIX = 1190;
-    public const int ASTDOC = 292;
-    public const int DECOMP2 = 976;
-    public const int ROBUST = 1090;
-    public const int COLNAMES = 1115;
-    public const int UGDIFF = 1323;
-    public const int DECOMP3 = 977;
-    public const int ASTOPT_VAL_Y2LINE = 496;
-    public const int FIX = 1035;
-    public const int CLIPBOARD = 923;
-    public const int ASTOPT_VAL_POS = 620;
-    public const int BUGFIX = 937;
-    public const int ASTTRANSPOSE = 734;
-    public const int DATETYPE = 943;
-    public const int ASTRETURNTUPLE = 670;
-    public const int ASTOR = 145;
-    public const int ASTASSIGNMENTQUESTION = 66;
-    public const int FOLDER = 1039;
-    public const int ASTLISTINTERSECTION = 394;
-    public const int ASTGDIF = 352;
-    public const int ASTLABEL1 = 382;
-    public const int NEW = 1146;
-    public const int ASTTIME = 722;
-    public const int ASTFUNCTION_Q = 89;
-    public const int Y2LINE = 860;
-    public const int GDIFF = 1052;
-    public const int ASTBLOCKSTATEMENTS = 38;
-    public const int ASTTABLEOPTIONFIELD = 702;
-    public const int ASTOPT_VAL_Y2MINHARD = 501;
-    public const int ASTOPT_VAL_LAG = 617;
-    public const int ASTOPT_LIST_ROWNAMES = 415;
-    public const int ASTR_RUN = 660;
-    public const int MENUTABLE = 1120;
-    public const int ASTDATES2 = 116;
-    public const int ASTOPT_STRING_BANK = 515;
-    public const int ASTOPT_STRING_COLORS = 531;
-    public const int HAT = 1402;
-    public const int RES = 1220;
-    public const int VERTICALBAR = 1384;
-    public const int ASTOPT_STRING_EXPAND = 540;
-    public const int SYSTEM = 1286;
-    public const int ASTREPSTAR = 75;
-    public const int ASTOPT_STRING_XLSX = 606;
-    public const int ASTDATE2 = 91;
-    public const int BOXGAP = 842;
-    public const int TSDX = 1313;
-    public const int ASTOPT_VAL_Y2MAXHARD = 498;
-    public const int VAL = 1333;
-    public const int ASTIDENTADVANCEDDOT = 372;
-    public const int VAR = 1334;
-    public const int ISNOTQUAL = 1376;
-    public const int ASTOPT_VAL_IGNORE = 616;
-    public const int ASTOPT_STRING_FILLSTYLE = 512;
-    public const int DECOMP = 975;
-    public const int ASTPRTELEMENTNWIDTH = 633;
-    public const int ASTNAMESLIST = 120;
-    public const int ASTOBJECTFUNCTIONNAKED_Q = 144;
-    public const int ASTVALSTATEMENT = 768;
-    public const int ASTPOWER = 131;
-    public const int ASTDUMOF = 301;
-    public const int ASTOPT_STRING_TYPE = 200;
-    public const int THOUSANDSSEPARATOR = 878;
-    public const int ASTMP = 428;
-    public const int SWAP = 1284;
-    public const int ASTIDENTITYCODE = 373;
-    public const int ASTDATES = 271;
-    public const int ASTDUMON = 302;
-    public const int ASTLABELS = 384;
-    public const int ASTWRITEWITHOPTIONS = 779;
-    public const int ITERMIN = 1093;
-    public const int ASTEVAL = 275;
-    public const int ISLARGEROREQUAL = 1387;
+    public const int ASTSTEPS = 212;
+    public const int ASTDOLLARHASHPAREN = 295;
+    public const int ASTCURLY = 126;
+    public const int ASTASSIGNSTATEMENT = 232;
+    public const int ASTOPT_VAL_YLINE = 488;
+    public const int POINTTYPE = 871;
+    public const int ASTOPT_STRING_ITALIC = 188;
+    public const int YMAXHARD = 855;
+    public const int NAN = 1262;
+    public const int ASTTABLESHOWBORDERS = 717;
+    public const int CPLOT = 960;
+    public const int PRTX = 1200;
+    public const int ASTSIMPLEFUNCTION = 682;
+    public const int ASTPRTELEMENTLINETYPE = 640;
+    public const int ASTOPT_VAL_LINEWIDTH = 509;
+    public const int ASTSHEETIMPORT = 678;
+    public const int TOTAL = 1307;
+    public const int ASTLISTITEMS1 = 398;
+    public const int NOCR = 1153;
+    public const int ASTLISTITEMS0 = 397;
+    public const int ASTGENRLHSFUNCTION = 359;
+    public const int ASTFILENAMELIST = 140;
+    public const int ASTLISTITEMS2 = 399;
+    public const int TABLE = 1288;
+    public const int SOURCE = 1270;
+    public const int VERSION = 1341;
+    public const int ASTMENUTABLE = 421;
+    public const int ASTOPT_VAL_YMAXSOFT = 491;
+    public const int PWIDTH = 1202;
+    public const int DEBUG = 973;
+    public const int ASTOPTION = 622;
+    public const int ASTRANGEWITHBANK = 663;
+    public const int ASTDISPSEARCH = 292;
+    public const int ASTDIV = 131;
+    public const int ASTFRMLCODE = 341;
+    public const int ASTPRTELEMENTS = 638;
+    public const int ASTCLEARALL = 246;
+    public const int PREDICT = 1029;
+    public const int MIXED = 1127;
+    public const int ISEQUAL = 1389;
+    public const int AUTO = 906;
+    public const int SETTEXT = 1251;
+    public const int MESSAGE = 1124;
+    public const int PLUS = 1362;
+    public const int ASTDL = 431;
+    public const int ASTDP = 301;
+    public const int INFOFILE = 1085;
+    public const int ASTAT = 234;
+    public const int ASTEMPTY = 306;
+    public const int ASTAS = 231;
+    public const int PCIM = 1179;
+    public const int DETAILS = 981;
+    public const int ASTDIFPRT = 288;
+    public const int ASTRUN = 165;
+    public const int MERGE = 1122;
+    public const int ASTOPT_STRING_MERGE = 560;
+    public const int INTERPOLATE = 883;
+    public const int ASTCOPYWILDCARD = 261;
+    public const int ASTLISTAND = 84;
+    public const int SORT = 1268;
+    public const int ASTDIF = 287;
+    public const int ASTIFSTATEMENTS = 115;
+    public const int ASTCREATEEXPRESSION = 264;
+    public const int NYTVINDU = 1168;
+    public const int ZOOM = 1360;
+    public const int MAXLEAD = 792;
+    public const int ASTWILDSTAR = 777;
+    public const int MULPRT = 1139;
+    public const int ASTOPT_STRING_ARROW = 506;
+    public const int ASTLISTPREFIX = 404;
+    public const int ASTPRT2 = 629;
+    public const int TRACE2 = 1309;
+    public const int BLOCK = 1223;
+    public const int ASTTABLESETVALUES = 715;
+    public const int TESTRANDOMMODELCHECK = 1299;
+    public const int ASER = 808;
+    public const int ASTOPT_STRING_YTITLE = 487;
+    public const int ASTOPT_STRING_GRIDSTYLE = 189;
+    public const int SERIES2 = 1242;
+    public const int SERIES3 = 1243;
+    public const int ASTDOUBLE = 109;
+    public const int FORMAT = 1044;
+    public const int ASTMATRIXROW = 136;
+    public const int X2ZEROAXIS = 866;
+    public const int STAREQUAL = 1395;
+    public const int GLUEBACKSLASH = 1401;
+    public const int LAGFIX = 821;
+    public const int TITLE = 1305;
+    public const int FIT = 793;
+    public const int PREFIX = 1191;
+    public const int ASTDOC = 293;
+    public const int DECOMP2 = 977;
+    public const int ROBUST = 1091;
+    public const int COLNAMES = 1116;
+    public const int UGDIFF = 1326;
+    public const int DECOMP3 = 978;
+    public const int ASTOPT_VAL_Y2LINE = 497;
+    public const int FIX = 1036;
+    public const int CLIPBOARD = 924;
+    public const int ASTOPT_VAL_POS = 621;
+    public const int BUGFIX = 938;
+    public const int ASTTRANSPOSE = 735;
+    public const int DATETYPE = 944;
+    public const int ASTRETURNTUPLE = 671;
+    public const int ASTOR = 146;
+    public const int ASTASSIGNMENTQUESTION = 67;
+    public const int FOLDER = 1040;
+    public const int ASTLISTINTERSECTION = 395;
+    public const int ASTGDIF = 353;
+    public const int TRACE = 1308;
+    public const int ASTLABEL1 = 383;
+    public const int NEW = 1147;
+    public const int ASTTIME = 723;
+    public const int ASTFUNCTION_Q = 90;
+    public const int Y2LINE = 861;
+    public const int GDIFF = 1053;
+    public const int ASTBLOCKSTATEMENTS = 39;
+    public const int ASTTABLEOPTIONFIELD = 703;
+    public const int ASTOPT_VAL_Y2MINHARD = 502;
+    public const int ASTOPT_VAL_LAG = 618;
+    public const int ASTOPT_LIST_ROWNAMES = 416;
+    public const int ASTR_RUN = 661;
+    public const int MENUTABLE = 1121;
+    public const int ASTDATES2 = 117;
+    public const int ASTOPT_STRING_BANK = 516;
+    public const int ASTOPT_STRING_COLORS = 532;
+    public const int HAT = 1405;
+    public const int RES = 1221;
+    public const int VERTICALBAR = 1387;
+    public const int ASTOPT_STRING_EXPAND = 541;
+    public const int SYSTEM = 1287;
+    public const int ASTREPSTAR = 76;
+    public const int ASTOPT_STRING_XLSX = 607;
+    public const int ASTDATE2 = 92;
+    public const int BOXGAP = 843;
+    public const int TSDX = 1316;
+    public const int ASTOPT_VAL_Y2MAXHARD = 499;
+    public const int VAL = 1336;
+    public const int ASTIDENTADVANCEDDOT = 373;
+    public const int VAR = 1337;
+    public const int ISNOTQUAL = 1379;
+    public const int ASTOPT_VAL_IGNORE = 617;
+    public const int ASTOPT_STRING_FILLSTYLE = 513;
+    public const int DECOMP = 976;
+    public const int ASTPRTELEMENTNWIDTH = 634;
+    public const int ASTNAMESLIST = 121;
+    public const int ASTOBJECTFUNCTIONNAKED_Q = 145;
+    public const int ASTVALSTATEMENT = 769;
+    public const int ASTPOWER = 132;
+    public const int ASTDUMOF = 302;
+    public const int ASTOPT_STRING_TYPE = 201;
+    public const int THOUSANDSSEPARATOR = 879;
+    public const int ASTMP = 429;
+    public const int SWAP = 1285;
+    public const int ASTIDENTITYCODE = 374;
+    public const int ASTDATES = 272;
+    public const int ASTDUMON = 303;
+    public const int ASTLABELS = 385;
+    public const int ASTWRITEWITHOPTIONS = 780;
+    public const int ITERMIN = 1094;
+    public const int ASTEVAL = 276;
+    public const int ISLARGEROREQUAL = 1390;
     public const int ASTDECOMPITEMOPTION = 8;
-    public const int ASTOPT_LIST_XFLAT = 106;
-    public const int ASTOPT_STRING_DATECELL = 103;
-    public const int ASTYLINE = 205;
-    public const int AREMOS = 902;
-    public const int DELETE = 979;
-    public const int SUGGESTIONS = 1283;
-    public const int ASTOPT_STRING_RES = 586;
-    public const int YMINSOFT = 857;
-    public const int ERROR = 1005;
-    public const int HATEQUAL = 1394;
-    public const int ASTFILENAMEPARTBACKSLASH = 321;
-    public const int ASTRENAME = 666;
-    public const int ASTGDIFF = 353;
-    public const int ASTOLSELEMENT = 448;
-    public const int ASTOPT_STRING_REF = 592;
-    public const int ASTLISTCONCATENATION = 392;
-    public const int ASTFORSTRING = 336;
-    public const int ASTLABEL2 = 383;
-    public const int ASTNO = 443;
-    public const int ENGINE = 1262;
-    public const int DOWNLOAD = 991;
-    public const int ASTMAPDEF = 137;
-    public const int ASTTABLEALIGNRIGHT = 695;
-    public const int ASTREADWITHOPTIONS = 665;
-    public const int UNLOCK_ = 1107;
-    public const int ASTOPT_STRING_GEOMETRIC = 550;
-    public const int ASTOPT_STRING_CONSTANT = 529;
-    public const int SECONDCOLWIDTH = 1237;
-    public const int ITERMAX = 1092;
-    public const int ASTOPT_VAL_YMINSOFT = 493;
-    public const int DUMPOPTIONS = 997;
-    public const int FALSE = 1015;
-    public const int TABLE1 = 1288;
-    public const int PERCENTEQUAL = 1395;
-    public const int STARTFILE = 1276;
-    public const int ASTWRITEOPTION = 778;
-    public const int LAG = 1097;
-    public const int ASTOPT_STRING_PYTHON = 608;
-    public const int ASTNUMBERLIST = 46;
-    public const int TABLE2 = 1289;
-    public const int ASTINDEXER = 133;
+    public const int ASTOPT_LIST_XFLAT = 107;
+    public const int ASTOPT_STRING_DATECELL = 104;
+    public const int ASTYLINE = 206;
+    public const int AREMOS = 903;
+    public const int DELETE = 980;
+    public const int SUGGESTIONS = 1284;
+    public const int ASTOPT_STRING_RES = 587;
+    public const int YMINSOFT = 858;
+    public const int ERROR = 1006;
+    public const int HATEQUAL = 1397;
+    public const int ASTFILENAMEPARTBACKSLASH = 322;
+    public const int ASTRENAME = 667;
+    public const int ASTGDIFF = 354;
+    public const int ASTOLSELEMENT = 449;
+    public const int ASTOPT_STRING_REF = 593;
+    public const int ASTLISTCONCATENATION = 393;
+    public const int ASTFORSTRING = 337;
+    public const int ASTLABEL2 = 384;
+    public const int ASTNO = 444;
+    public const int ENGINE = 1263;
+    public const int DOWNLOAD = 992;
+    public const int ASTMAPDEF = 138;
+    public const int ASTTABLEALIGNRIGHT = 696;
+    public const int ASTREADWITHOPTIONS = 666;
+    public const int UNLOCK_ = 1108;
+    public const int ASTOPT_STRING_GEOMETRIC = 551;
+    public const int ASTOPT_STRING_CONSTANT = 530;
+    public const int SECONDCOLWIDTH = 1238;
+    public const int ITERMAX = 1093;
+    public const int ASTOPT_VAL_YMINSOFT = 494;
+    public const int DUMPOPTIONS = 998;
+    public const int FALSE = 1016;
+    public const int TABLE1 = 1289;
+    public const int PERCENTEQUAL = 1398;
+    public const int STARTFILE = 1277;
+    public const int ASTWRITEOPTION = 779;
+    public const int LAG = 1098;
+    public const int ASTOPT_STRING_PYTHON = 609;
+    public const int ASTNUMBERLIST = 47;
+    public const int TABLE2 = 1290;
+    public const int ASTINDEXER = 134;
     public const int ASTPARENTDIRECTORY = 23;
-    public const int ASTPIPE = 627;
-    public const int APPEND = 901;
-    public const int CHECKOFF = 919;
-    public const int DEC = 973;
-    public const int WHERE = 1231;
-    public const int VERS = 1337;
-    public const int FORWARD = 1044;
-    public const int PCH = 1177;
-    public const int ASTL0 = 34;
-    public const int DIRECT = 987;
-    public const int ASTL1 = 41;
-    public const int ASTUPDOPERATOREQUALDOLLAR = 749;
-    public const int DEP = 1031;
-    public const int COPYLOCAL = 955;
-    public const int ASTTIMEOPTIONFIELD = 728;
-    public const int SETLEFTBORDER = 1248;
-    public const int ASTOPT_STRING_NONMODEL = 567;
-    public const int ASTSERIESOPERATOR = 177;
-    public const int ASTREAD = 663;
-    public const int ASTNOT = 147;
-    public const int HDG = 1064;
-    public const int TIMEFILTER = 1301;
-    public const int ASTOBJECTFUNCTION = 47;
-    public const int ASTOPENHELPER = 454;
-    public const int ASTUPDOPERATORPLUSDOLLAR = 757;
-    public const int ASTFORDATE = 328;
-    public const int DUMOF = 993;
+    public const int ASTPIPE = 628;
+    public const int APPEND = 902;
+    public const int CHECKOFF = 920;
+    public const int DEC = 974;
+    public const int WHERE = 1232;
+    public const int VERS = 1340;
+    public const int FORWARD = 1045;
+    public const int PCH = 1178;
+    public const int ASTL0 = 35;
+    public const int DIRECT = 988;
+    public const int ASTL1 = 42;
+    public const int ASTUPDOPERATOREQUALDOLLAR = 750;
+    public const int DEP = 1032;
+    public const int COPYLOCAL = 956;
+    public const int ASTTIMEOPTIONFIELD = 729;
+    public const int SETLEFTBORDER = 1249;
+    public const int ASTOPT_STRING_NONMODEL = 568;
+    public const int ASTSERIESOPERATOR = 178;
+    public const int ASTREAD = 664;
+    public const int ASTNOT = 148;
+    public const int HDG = 1065;
+    public const int TIMEFILTER = 1302;
+    public const int ASTOBJECTFUNCTION = 48;
+    public const int ASTOPENHELPER = 455;
+    public const int ASTUPDOPERATORPLUSDOLLAR = 758;
+    public const int ASTFORDATE = 329;
+    public const int DUMOF = 994;
     public const int ASTDECOMPROWS = 17;
-    public const int R_FILE = 1205;
-    public const int COMMA = 944;
-    public const int SOME = 1266;
-    public const int ASTPRTELEMENTLINECOLOR = 642;
-    public const int DIALOG = 981;
-    public const int ASTPLUS2 = 63;
-    public const int DUMON = 995;
-    public const int ASTOPT_STRING_DL = 562;
-    public const int MODEL = 1129;
-    public const int OPERATORS = 1195;
-    public const int ASTVARNAME = 85;
-    public const int DIGIT = 1419;
-    public const int ASTLISTDEFITEM = 142;
-    public const int ASTBLOCK = 58;
-    public const int ASTOPT_VAL_Y2MAX = 497;
-    public const int NOABS = 1151;
-    public const int ASTIN = 43;
-    public const int ASTX12A = 780;
-    public const int ASTFUNCTIONSCALAR = 351;
-    public const int TABS = 1291;
-    public const int ASTPRTROWS = 652;
-    public const int ASTOPERATORNODOLLAR = 457;
-    public const int BANK = 909;
-    public const int REP = 1217;
-    public const int NEGATE = 1145;
-    public const int SAVE = 1162;
-    public const int REL = 1214;
-    public const int CLOSEBANKS = 929;
-    public const int FIRSTCOLWIDTH = 1034;
-    public const int ELEMENTS = 794;
-    public const int ASTYMAX = 783;
-    public const int ASTOPT_STRING_GRID = 475;
-    public const int PLOT = 1185;
-    public const int REF = 1213;
-    public const int ASTBLOCKOPTION = 37;
-    public const int ELSEIF = 1001;
-    public const int ASTLISTSORT = 404;
-    public const int ASTHANDLEFILENAME2 = 363;
-    public const int ASTLIBRARYCLOSE = 216;
-    public const int ASTFOR = 168;
-    public const int ASTLEFTSIDE = 49;
-    public const int GNUPLOT = 1059;
-    public const int ASTUPDOPERATORHASHDOLLAR = 751;
-    public const int LABEL = 873;
-    public const int ASTOPT_VAL_BOXWIDTH = 479;
-    public const int ASTDATAADVANCED = 267;
-    public const int KEEP = 1095;
-    public const int SETDATES = 1247;
-    public const int ASTDATES_TYPE2 = 272;
-    public const int ASTUPDDATA = 746;
-    public const int RDP = 1211;
-    public const int CURROW = 963;
-    public const int WINDOW = 1342;
-    public const int RDL = 1134;
-    public const int ASTOLSEXPRESSION = 450;
-    public const int ASTNAKEDLISTITEM = 39;
-    public const int RIGHTANGLE = 1377;
-    public const int ASTPRTELEMENTPOINTTYPE = 643;
-    public const int GLOBAL = 957;
-    public const int LEV = 1100;
-    public const int ASTR_EXPORTITEMS = 658;
-    public const int GAUSS = 1049;
-    public const int ASTOPT_STRING_USING = 522;
-    public const int ASTDOT = 87;
-    public const int WORKING = 1343;
-    public const int ASTOPT_STRING_ADDBANK = 518;
-    public const int ASTCAPS = 240;
-    public const int LOGIC = 888;
-    public const int STAR = 1413;
-    public const int Y2MINSOFT = 864;
-    public const int ASTTIMEFILTERPERIOD = 724;
-    public const int LETTER = 1420;
-    public const int ASTMINUS = 128;
-    public const int ASTPERCENT = 61;
-    public const int NODIFF = 1154;
-    public const int ASTHASHNAMESIMPLE = 364;
-    public const int NOV = 1165;
-    public const int ASTOPT_STRING_EDIT = 539;
-    public const int ASTOPT_STRING_UNITS = 99;
-    public const int ASTOPT_STRING_PRESERVE = 574;
-    public const int NOT = 1163;
-    public const int CACHE = 914;
+    public const int R_FILE = 1206;
+    public const int COMMA = 945;
+    public const int SOME = 1267;
+    public const int ASTPRTELEMENTLINECOLOR = 643;
+    public const int DIALOG = 982;
+    public const int ASTPLUS2 = 64;
+    public const int DUMON = 996;
+    public const int ASTOPT_STRING_DL = 563;
+    public const int MODEL = 1130;
+    public const int OPERATORS = 1196;
+    public const int ASTVARNAME = 86;
+    public const int DIGIT = 1422;
+    public const int ASTLISTDEFITEM = 143;
+    public const int ASTBLOCK = 59;
+    public const int ASTOPT_VAL_Y2MAX = 498;
+    public const int NOABS = 1152;
+    public const int ASTIN = 44;
+    public const int ASTX12A = 781;
+    public const int ASTFUNCTIONSCALAR = 352;
+    public const int TABS = 1292;
+    public const int ASTPRTROWS = 653;
+    public const int ASTOPERATORNODOLLAR = 458;
+    public const int BANK = 910;
+    public const int REP = 1218;
+    public const int NEGATE = 1146;
+    public const int SAVE = 1163;
+    public const int REL = 1215;
+    public const int CLOSEBANKS = 930;
+    public const int FIRSTCOLWIDTH = 1035;
+    public const int ELEMENTS = 795;
+    public const int ASTYMAX = 784;
+    public const int ASTOPT_STRING_GRID = 476;
+    public const int PLOT = 1186;
+    public const int REF = 1214;
+    public const int ASTBLOCKOPTION = 38;
+    public const int ELSEIF = 1002;
+    public const int ASTLISTSORT = 405;
+    public const int ASTHANDLEFILENAME2 = 364;
+    public const int ASTLIBRARYCLOSE = 217;
+    public const int ASTFOR = 169;
+    public const int ASTLEFTSIDE = 50;
+    public const int GNUPLOT = 1060;
+    public const int ASTUPDOPERATORHASHDOLLAR = 752;
+    public const int LABEL = 874;
+    public const int ASTOPT_VAL_BOXWIDTH = 480;
+    public const int ASTDATAADVANCED = 268;
+    public const int KEEP = 1096;
+    public const int SETDATES = 1248;
+    public const int ASTDATES_TYPE2 = 273;
+    public const int ASTUPDDATA = 747;
+    public const int RDP = 1212;
+    public const int CURROW = 964;
+    public const int WINDOW = 1345;
+    public const int RDL = 1135;
+    public const int ASTOLSEXPRESSION = 451;
+    public const int ASTNAKEDLISTITEM = 40;
+    public const int RIGHTANGLE = 1380;
+    public const int ASTPRTELEMENTPOINTTYPE = 644;
+    public const int GLOBAL = 958;
+    public const int LEV = 1101;
+    public const int ASTR_EXPORTITEMS = 659;
+    public const int GAUSS = 1050;
+    public const int ASTOPT_STRING_USING = 523;
+    public const int ASTDOT = 88;
+    public const int WORKING = 1346;
+    public const int ASTOPT_STRING_ADDBANK = 519;
+    public const int ASTCAPS = 241;
+    public const int LOGIC = 889;
+    public const int STAR = 1416;
+    public const int Y2MINSOFT = 865;
+    public const int ASTTIMEFILTERPERIOD = 725;
+    public const int LETTER = 1423;
+    public const int ASTMINUS = 129;
+    public const int ASTPERCENT = 62;
+    public const int NODIFF = 1155;
+    public const int ASTHASHNAMESIMPLE = 365;
+    public const int NOV = 1166;
+    public const int ASTOPT_STRING_EDIT = 540;
+    public const int ASTOPT_STRING_UNITS = 100;
+    public const int ASTOPT_STRING_PRESERVE = 575;
+    public const int NOT = 1164;
+    public const int CACHE = 915;
     public const int EOF = -1;
-    public const int ASTTESTRANDOMMODELCHECK = 721;
+    public const int ASTTESTRANDOMMODELCHECK = 722;
     public const int ASTDECOMPGROUP1d = 20;
-    public const int ASTOPT_STRING_ROWS = 588;
-    public const int LEFTPAREN = 1378;
-    public const int ASTTABLE = 692;
-    public const int ASTOPT_STRING_TARGET = 599;
-    public const int IMPORT = 1081;
-    public const int YMAX = 1351;
-    public const int BOLD = 805;
-    public const int EXCLAMATION = 1383;
-    public const int ASTTRUNCATE = 735;
-    public const int USING = 885;
-    public const int LEFTCURLY = 1408;
-    public const int SIM = 1258;
-    public const int ASTEDIT = 303;
-    public const int TIMESPAN = 1303;
-    public const int ASTURL = 761;
-    public const int ASTEXCLAMATION = 411;
-    public const int LEFTANGLESIMPLE = 1404;
-    public const int IMPOSE = 880;
-    public const int ASTOPT_STRING_LIST = 581;
-    public const int ASTDOLLARCONDITIONAL = 140;
-    public const int EXPORT = 1011;
-    public const int GOTO = 1061;
-    public const int ASTPRTELEMENTPWIDTH = 636;
-    public const int ASTR_FILE = 659;
-    public const int ASTOPT_STRING_CAPS = 527;
-    public const int ASTFREQ = 338;
-    public const int ASTOPT_STRING_R = 194;
-    public const int Double = 1411;
-    public const int ASTPRTELEMENTDEC = 631;
-    public const int ASTOPT_STRING_S = 589;
-    public const int COLLAPSE = 932;
-    public const int ASTOPT_STRING_P = 568;
-    public const int ASTTIMESPAN = 731;
-    public const int ASTOPT_STRING_Q = 584;
-    public const int BOXES = 826;
-    public const int R_EXPORT = 1204;
-    public const int SMOOTH = 1264;
-    public const int ASTTABLEOLD = 701;
-    public const int ASTUNLOCK = 410;
-    public const int ASTTABLEMAIN = 222;
-    public const int ELSE = 1000;
-    public const int RIGHTBRACKET = 1367;
-    public const int ASTSDP = 674;
-    public const int ASTGEKKOLABEL = 354;
-    public const int SEPARATE = 843;
-    public const int SEMICOLON = 1374;
-    public const int ASTSDL = 432;
-    public const int ASTPROCEDUREDEFARGS = 173;
-    public const int ASTOPT_LIST_XTREND = 105;
-    public const int ASTOPT_STRING_D = 536;
-    public const int ASTFILENAMEQUOTES = 322;
-    public const int REBASE = 824;
-    public const int ASTFUNCTIONDEF = 342;
-    public const int ASTOPT_STRING_SPLIT = 202;
-    public const int ASTOPT_VAL_YMAX = 488;
-    public const int ASTOPT_STRING_N = 565;
-    public const int ASTOPT_STRING_LAST = 543;
-    public const int ASTYES2 = 782;
-    public const int ASTOPT_STRING_M = 558;
-    public const int DIFPRT = 984;
-    public const int ASTOPT_STRING_L = 561;
-    public const int ASTSTRINGINQUOTESWITHCURLIES = 80;
-    public const int Y2MAXHARD = 861;
-    public const int ASTSERIES = 179;
-    public const int ASTPAUSE = 623;
+    public const int ASTOPT_STRING_ROWS = 589;
+    public const int LEFTPAREN = 1381;
+    public const int ASTTABLE = 693;
+    public const int ASTOPT_STRING_TARGET = 600;
+    public const int IMPORT = 1082;
+    public const int YMAX = 1354;
+    public const int BOLD = 806;
+    public const int EXCLAMATION = 1386;
+    public const int ASTTRUNCATE = 736;
+    public const int USING = 886;
+    public const int LEFTCURLY = 1411;
+    public const int SIM = 1259;
+    public const int ASTEDIT = 304;
+    public const int TIMESPAN = 1304;
+    public const int ASTURL = 762;
+    public const int ASTEXCLAMATION = 412;
+    public const int LEFTANGLESIMPLE = 1407;
+    public const int IMPOSE = 881;
+    public const int ASTOPT_STRING_LIST = 582;
+    public const int ASTDOLLARCONDITIONAL = 141;
+    public const int EXPORT = 1012;
+    public const int GOTO = 1062;
+    public const int ASTPRTELEMENTPWIDTH = 637;
+    public const int ASTR_FILE = 660;
+    public const int ASTOPT_STRING_CAPS = 528;
+    public const int ASTFREQ = 339;
+    public const int ASTOPT_STRING_R = 195;
+    public const int Double = 1414;
+    public const int ASTPRTELEMENTDEC = 632;
+    public const int ASTOPT_STRING_S = 590;
+    public const int COLLAPSE = 933;
+    public const int ASTOPT_STRING_P = 569;
+    public const int ASTTIMESPAN = 732;
+    public const int ASTOPT_STRING_Q = 585;
+    public const int BOXES = 827;
+    public const int R_EXPORT = 1205;
+    public const int SMOOTH = 1265;
+    public const int ASTTABLEOLD = 702;
+    public const int ASTUNLOCK = 411;
+    public const int ASTTABLEMAIN = 223;
+    public const int ELSE = 1001;
+    public const int RIGHTBRACKET = 1370;
+    public const int ASTSDP = 675;
+    public const int ASTGEKKOLABEL = 355;
+    public const int SEPARATE = 844;
+    public const int SEMICOLON = 1377;
+    public const int ASTSDL = 433;
+    public const int ASTPROCEDUREDEFARGS = 174;
+    public const int ASTOPT_LIST_XTREND = 106;
+    public const int ASTOPT_STRING_D = 537;
+    public const int ASTFILENAMEQUOTES = 323;
+    public const int REBASE = 825;
+    public const int ASTFUNCTIONDEF = 343;
+    public const int ASTOPT_STRING_SPLIT = 203;
+    public const int ASTOPT_VAL_YMAX = 489;
+    public const int ASTOPT_STRING_N = 566;
+    public const int ASTOPT_STRING_LAST = 544;
+    public const int ASTYES2 = 783;
+    public const int ASTOPT_STRING_M = 559;
+    public const int DIFPRT = 985;
+    public const int ASTOPT_STRING_L = 562;
+    public const int ASTSTRINGINQUOTESWITHCURLIES = 81;
+    public const int Y2MAXHARD = 862;
+    public const int ASTSERIES = 180;
+    public const int ASTPAUSE = 624;
     public const int ASTDECOMPGROUP1c = 19;
-    public const int ASTNAMEHELPER = 220;
-    public const int LANGUAGE = 1098;
-    public const int ASTGENRLISTINDEXER = 360;
-    public const int HIDERIGHTBORDER = 1069;
-    public const int ASTUPDOPERATORPERCENTDOLLAR = 755;
-    public const int LEVEL = 1229;
-    public const int DIFF = 983;
-    public const int ASTNAMEWITHBANK = 439;
-    public const int ASTOPT_STRING_DIRECT = 538;
-    public const int NONE = 1159;
-    public const int TRIM = 884;
-    public const int ASTLINESPOINTS = 207;
-    public const int REPEAT = 1218;
-    public const int ASTDATAFORMAT = 268;
-    public const int ASTCOPY = 255;
-    public const int END = 1002;
-    public const int ASTOPT_STRING_SHOWFREQ = 520;
-    public const int ASTFILENAMESTAR = 323;
-    public const int INIT = 1086;
-    public const int Y2MIN = 1355;
-    public const int ASTBASEBANK = 237;
-    public const int KEEPTYPES = 1027;
-    public const int RENAME = 1215;
-    public const int ASTUPDOPERATOR = 747;
-    public const int ASTNAMESUBSIMPLE = 438;
-    public const int ASTELSEIFSTATEMENTS = 154;
-    public const int GENR = 1055;
-    public const int OPTION = 1170;
-    public const int HTTP = 1424;
-    public const int TRIPLESTARS = 1415;
-    public const int ASTEXO = 309;
-    public const int ASTOPT_STRING_SEPARATE = 481;
-    public const int ASTENDOQUESTION = 307;
-    public const int ASTHTTP = 371;
-    public const int ASTEFTER = 304;
-    public const int ASTEXIT = 308;
-    public const int ASTOPT_STRING_CSV = 535;
-    public const int GLUEDOT = 1372;
-    public const int ASTOPT_STRING_LINE = 203;
-    public const int STEP = 1279;
-    public const int LIBRARY = 1234;
-    public const int ASTCOLORS = 253;
-    public const int XEDIT = 879;
-    public const int ASTLISTITEM = 395;
-    public const int DING = 985;
-    public const int ASTP = 622;
-    public const int ASTOBJECTFUNCTION_Q = 48;
-    public const int DAMP = 965;
-    public const int ASTQ = 656;
-    public const int ASTN = 434;
-    public const int ASTL = 429;
-    public const int ASTM = 412;
-    public const int ASTCURLYALONE = 45;
-    public const int XTREND = 933;
-    public const int SEC = 1236;
-    public const int ASTDECOMP2 = 277;
-    public const int HASHEQUAL = 1396;
-    public const int ASTDECOMP3 = 278;
-    public const int ASTOPT_LIST_COLNAMES = 416;
-    public const int OFFSET = 802;
-    public const int ASTD = 265;
-    public const int ASTOPT_STRING_ALL = 101;
-    public const int ASTCOMPARE = 148;
-    public const int Y2TITLE = 859;
-    public const int PIPE = 1184;
-    public const int BACKTRACK = 908;
-    public const int FREQ = 1045;
-    public const int ASTOPT_STRING_SIZE = 466;
-    public const int ASTUPDOPERATORPLUS = 756;
-    public const int ASTOPT_VAL_PCH = 198;
-    public const int ASTV = 766;
-    public const int ASTS = 671;
-    public const int TABLEOLD = 1290;
-    public const int SUBTITLE = 835;
-    public const int ASTLINES = 208;
-    public const int ASTCUT = 176;
-    public const int SHOWPCH = 1256;
-    public const int SER = 1240;
-    public const int FAST = 1016;
-    public const int ASTOPT_VAL_REL = 197;
-    public const int SET = 1244;
-    public const int ASTMODE = 424;
-    public const int ASTPLUS = 127;
-    public const int ASTTOTAL = 732;
-    public const int NAMECELL = 1038;
-    public const int ASTDECOMPITEMS2 = 280;
-    public const int ACCEPT = 891;
-    public const int PRINT = 1194;
+    public const int ASTNAMEHELPER = 221;
+    public const int LANGUAGE = 1099;
+    public const int ASTGENRLISTINDEXER = 361;
+    public const int HIDERIGHTBORDER = 1070;
+    public const int ASTUPDOPERATORPERCENTDOLLAR = 756;
+    public const int LEVEL = 1230;
+    public const int DIFF = 984;
+    public const int ASTNAMEWITHBANK = 440;
+    public const int ASTOPT_STRING_DIRECT = 539;
+    public const int NONE = 1160;
+    public const int TRIM = 885;
+    public const int ASTLINESPOINTS = 208;
+    public const int REPEAT = 1219;
+    public const int ASTDATAFORMAT = 269;
+    public const int ASTCOPY = 256;
+    public const int END = 1003;
+    public const int ASTOPT_STRING_SHOWFREQ = 521;
+    public const int ASTFILENAMESTAR = 324;
+    public const int INIT = 1087;
+    public const int Y2MIN = 1358;
+    public const int ASTBASEBANK = 238;
+    public const int KEEPTYPES = 1028;
+    public const int RENAME = 1216;
+    public const int ASTUPDOPERATOR = 748;
+    public const int ASTNAMESUBSIMPLE = 439;
+    public const int ASTELSEIFSTATEMENTS = 155;
+    public const int GENR = 1056;
+    public const int OPTION = 1171;
+    public const int HTTP = 1427;
+    public const int TRIPLESTARS = 1418;
+    public const int ASTEXO = 310;
+    public const int ASTOPT_STRING_SEPARATE = 482;
+    public const int ASTENDOQUESTION = 308;
+    public const int ASTHTTP = 372;
+    public const int ASTEFTER = 305;
+    public const int ASTEXIT = 309;
+    public const int ASTOPT_STRING_CSV = 536;
+    public const int GLUEDOT = 1375;
+    public const int ASTOPT_STRING_LINE = 204;
+    public const int STEP = 1280;
+    public const int LIBRARY = 1235;
+    public const int ASTCOLORS = 254;
+    public const int XEDIT = 880;
+    public const int ASTLISTITEM = 396;
+    public const int DING = 986;
+    public const int ASTP = 623;
+    public const int ASTOBJECTFUNCTION_Q = 49;
+    public const int DAMP = 966;
+    public const int ASTQ = 657;
+    public const int ASTN = 435;
+    public const int ASTL = 430;
+    public const int ASTM = 413;
+    public const int ASTCURLYALONE = 46;
+    public const int XTREND = 934;
+    public const int SEC = 1237;
+    public const int ASTDECOMP2 = 278;
+    public const int HASHEQUAL = 1399;
+    public const int ASTDECOMP3 = 279;
+    public const int ASTOPT_LIST_COLNAMES = 417;
+    public const int OFFSET = 803;
+    public const int ASTD = 266;
+    public const int ASTOPT_STRING_ALL = 102;
+    public const int ASTCOMPARE = 149;
+    public const int Y2TITLE = 860;
+    public const int PIPE = 1185;
+    public const int BACKTRACK = 909;
+    public const int FREQ = 1046;
+    public const int ASTOPT_STRING_SIZE = 467;
+    public const int ASTUPDOPERATORPLUS = 757;
+    public const int ASTOPT_VAL_PCH = 199;
+    public const int ASTV = 767;
+    public const int ASTS = 672;
+    public const int TABLEOLD = 1291;
+    public const int SUBTITLE = 836;
+    public const int ASTLINES = 209;
+    public const int ASTCUT = 177;
+    public const int SHOWPCH = 1257;
+    public const int SER = 1241;
+    public const int FAST = 1017;
+    public const int ASTOPT_VAL_REL = 198;
+    public const int SET = 1245;
+    public const int ASTMODE = 425;
+    public const int ASTPLUS = 128;
+    public const int ASTTOTAL = 733;
+    public const int NAMECELL = 1039;
+    public const int ASTDECOMPITEMS2 = 281;
+    public const int ACCEPT = 892;
+    public const int PRINT = 1195;
     public const int ASTDECOMPWHERE2 = 13;
-    public const int X12A = 1347;
-    public const int ASTXLINE = 204;
-    public const int ASTTRANSLATE = 733;
-    public const int ASTPROCEDUREDEFRHSSIMPLE = 174;
+    public const int X12A = 1350;
+    public const int ASTXLINE = 205;
+    public const int ASTTRANSLATE = 734;
+    public const int ASTPROCEDUREDEFRHSSIMPLE = 175;
     public const int ASTOPT_STRING_KEEPTYPES = 31;
-    public const int ASTSERIESDOLLARCONDITION = 178;
-    public const int RIGHTPAREN = 1364;
-    public const int ASTUPD = 744;
-    public const int ASTOPT_STRING_MP = 560;
-    public const int PYTHON_EXPORT = 1207;
-    public const int CREATEVARS = 961;
-    public const int STARS = 1414;
-    public const int DECIMALSEPARATOR = 974;
-    public const int ASTAVG = 234;
-    public const int GRIDSTYLE = 804;
-    public const int DELIMITER = 941;
-    public const int SIGN = 1257;
-    public const int ASTDOUBLENEGATIVE = 298;
-    public const int EXTERNAL = 1012;
-    public const int UPDATEFREQ = 1330;
-    public const int ASTSPECIALARGSDEF = 56;
-    public const int ASTOPT_STRING_FILE = 199;
-    public const int ASTIFCONDITION = 374;
-    public const int ASTOPT_STRING_SHEET = 594;
-    public const int ASTFRMLTUPLE = 341;
-    public const int LOG = 1105;
-    public const int ASTPRTSTAMP = 653;
-    public const int ASTFUNCTIONDEFLHSTUPLE = 346;
-    public const int ASTITERSHOW = 381;
-    public const int AFTER2 = 894;
-    public const int ASTCOUNT = 261;
-    public const int ASTFILENAMEFIRST3 = 319;
-    public const int ASTOPT_STRING_PX = 184;
-    public const int ASTFILENAMEFIRST2 = 318;
-    public const int ASTNEGATE = 132;
-    public const int ASTFILENAMEFIRST1 = 317;
-    public const int GEOMETRIC = 1056;
-    public const int UNITS = 1302;
-    public const int ASTOPT_STRING_OVERLAY = 551;
-    public const int NAME = 1141;
-    public const int ASTMACRO = 413;
-    public const int EXE = 1007;
-    public const int EXP = 1010;
+    public const int ASTSERIESDOLLARCONDITION = 179;
+    public const int RIGHTPAREN = 1367;
+    public const int ASTUPD = 745;
+    public const int ASTOPT_STRING_MP = 561;
+    public const int PYTHON_EXPORT = 1208;
+    public const int CREATEVARS = 962;
+    public const int STARS = 1417;
+    public const int DECIMALSEPARATOR = 975;
+    public const int ASTAVG = 235;
+    public const int GRIDSTYLE = 805;
+    public const int DELIMITER = 942;
+    public const int SIGN = 1258;
+    public const int ASTDOUBLENEGATIVE = 299;
+    public const int EXTERNAL = 1013;
+    public const int UPDATEFREQ = 1333;
+    public const int ASTSPECIALARGSDEF = 57;
+    public const int ASTOPT_STRING_FILE = 200;
+    public const int ASTIFCONDITION = 375;
+    public const int ASTOPT_STRING_SHEET = 595;
+    public const int ASTFRMLTUPLE = 342;
+    public const int LOG = 1106;
+    public const int ASTPRTSTAMP = 654;
+    public const int ASTFUNCTIONDEFLHSTUPLE = 347;
+    public const int ASTITERSHOW = 382;
+    public const int AFTER2 = 895;
+    public const int ASTCOUNT = 262;
+    public const int ASTFILENAMEFIRST3 = 320;
+    public const int ASTOPT_STRING_PX = 185;
+    public const int ASTFILENAMEFIRST2 = 319;
+    public const int ASTNEGATE = 133;
+    public const int ASTFILENAMEFIRST1 = 318;
+    public const int GEOMETRIC = 1057;
+    public const int UNITS = 1303;
+    public const int ASTOPT_STRING_OVERLAY = 552;
+    public const int NAME = 1142;
+    public const int ASTMACRO = 414;
+    public const int EXE = 1008;
+    public const int EXP = 1011;
     public const int ASTCOLON = 27;
-    public const int EXO = 1009;
-    public const int POS = 1189;
-    public const int ASTFUNCTIONNAKED_Q = 727;
-    public const int ASTOPEN = 453;
-    public const int ASTOPT_STRING_PROT = 583;
-    public const int ASTSIM = 680;
-    public const int ASTDECOMPITEMSEXPR = 282;
-    public const int ASTPLACEHOLDER = 86;
-    public const int ASTOPT_STRING_FROMBANK = 98;
-    public const int ASTOPT_STRING_ARRAY = 201;
-    public const int VOID = 832;
-    public const int ASTOPT_STRING_OP = 190;
-    public const int LAST = 1099;
-    public const int ASTOPT_STRING_REPEAT = 585;
-    public const int ASTOPT_STRING_MAP = 582;
-    public const int GDXOPT = 819;
-    public const int CLS = 930;
-    public const int SETTOPBORDER = 1251;
-    public const int SOUND = 1268;
-    public const int MATRIX = 1113;
-    public const int YMIN = 1352;
-    public const int ASTLISTITEMWILDRANGEBANK = 402;
-    public const int ASTOPT_STRING_DATES = 537;
-    public const int ASTLISTUNION = 407;
-    public const int ASTDATES_BLOCK = 71;
-    public const int NEWLINE2 = 1417;
-    public const int ASTOPT_STRING_WINDOW = 604;
-    public const int NEWLINE3 = 1418;
-    public const int ASTOPT_STRING_FIX = 545;
+    public const int EXO = 1010;
+    public const int POS = 1190;
+    public const int ASTFUNCTIONNAKED_Q = 728;
+    public const int ASTOPEN = 454;
+    public const int ASTOPT_STRING_PROT = 584;
+    public const int ASTSIM = 681;
+    public const int ASTDECOMPITEMSEXPR = 283;
+    public const int ASTPLACEHOLDER = 87;
+    public const int ASTOPT_STRING_FROMBANK = 99;
+    public const int ASTOPT_STRING_ARRAY = 202;
+    public const int VOID = 833;
+    public const int ASTOPT_STRING_OP = 191;
+    public const int LAST = 1100;
+    public const int ASTOPT_STRING_REPEAT = 586;
+    public const int ASTOPT_STRING_MAP = 583;
+    public const int GDXOPT = 820;
+    public const int CLS = 931;
+    public const int SETTOPBORDER = 1252;
+    public const int SOUND = 1269;
+    public const int MATRIX = 1114;
+    public const int YMIN = 1355;
+    public const int ASTLISTITEMWILDRANGEBANK = 403;
+    public const int ASTOPT_STRING_DATES = 538;
+    public const int ASTLISTUNION = 408;
+    public const int ASTDATES_BLOCK = 72;
+    public const int NEWLINE2 = 1420;
+    public const int ASTOPT_STRING_WINDOW = 605;
+    public const int NEWLINE3 = 1421;
+    public const int ASTOPT_STRING_FIX = 546;
     public const int ASTOPT_STRING_DATETYPE = 30;
-    public const int ASTOPT_STRING_PLOT = 571;
-    public const int BOWL = 912;
-    public const int ASTUPDOPERATORHAT = 752;
-    public const int GMS = 793;
-    public const int LOCAL = 956;
-    public const int LIST = 1103;
-    public const int FINDMISSINGDATA = 1023;
-    public const int ASTMODEL = 425;
-    public const int ASTOPT_VAL_YMIN = 491;
-    public const int ASTLISTTRIM = 223;
-    public const int ASTTABLESETDATES = 709;
-    public const int SKIP = 1260;
-    public const int ASTINTEGERNEGATIVE = 380;
-    public const int RESPECT = 1223;
-    public const int ASTFUNCTIONDEFRHSTUPLE = 349;
-    public const int ASTOPT_STRING_XLS = 605;
-    public const int ASTSMOOTH = 682;
-    public const int ASTCHECKOFF = 242;
-    public const int PAUSE = 1176;
-    public const int ASTLISTITEMS = 399;
-    public const int ASTOPT_STRING_APPEND = 525;
-    public const int DISPLAY = 989;
-    public const int SETBORDER = 1245;
-    public const int CHECK = 1278;
-    public const int ASTOPT_VAL_Y2MAXSOFT = 499;
-    public const int ASTOPT_VAL_INDEX = 195;
-    public const int ASTANALYZE = 228;
-    public const int FROM = 1047;
-    public const int SIMPLE = 1259;
-    public const int ASTMATRIXINDEXER = 418;
-    public const int ASTREBASE = 206;
-    public const int FEEDBACK = 1018;
-    public const int DOLLAR = 1363;
-    public const int ASTCLEAR = 244;
-    public const int ASTOPT_DATE_XLINEAFTER = 484;
-    public const int MAIN = 1111;
-    public const int PRT = 1198;
-    public const int BOXWIDTH = 841;
-    public const int IGNOREMISSINGVARS = 1079;
-    public const int DIGITS = 816;
+    public const int ASTOPT_STRING_PLOT = 572;
+    public const int BOWL = 913;
+    public const int ASTUPDOPERATORHAT = 753;
+    public const int GMS = 794;
+    public const int LOCAL = 957;
+    public const int LIST = 1104;
+    public const int FINDMISSINGDATA = 1024;
+    public const int ASTMODEL = 426;
+    public const int ASTOPT_VAL_YMIN = 492;
+    public const int ASTLISTTRIM = 224;
+    public const int ASTTABLESETDATES = 710;
+    public const int SKIP = 1261;
+    public const int ASTINTEGERNEGATIVE = 381;
+    public const int RESPECT = 1224;
+    public const int ASTFUNCTIONDEFRHSTUPLE = 350;
+    public const int ASTOPT_STRING_XLS = 606;
+    public const int ASTSMOOTH = 683;
+    public const int ASTCHECKOFF = 243;
+    public const int PAUSE = 1177;
+    public const int ASTLISTITEMS = 400;
+    public const int ASTOPT_STRING_APPEND = 526;
+    public const int DISPLAY = 990;
+    public const int SETBORDER = 1246;
+    public const int CHECK = 1279;
+    public const int ASTOPT_VAL_Y2MAXSOFT = 500;
+    public const int ASTOPT_VAL_INDEX = 196;
+    public const int ASTANALYZE = 229;
+    public const int FROM = 1048;
+    public const int SIMPLE = 1260;
+    public const int ASTMATRIXINDEXER = 419;
+    public const int ASTREBASE = 207;
+    public const int FEEDBACK = 1019;
+    public const int DOLLAR = 1366;
+    public const int ASTCLEAR = 245;
+    public const int ASTOPT_DATE_XLINEAFTER = 485;
+    public const int MAIN = 1112;
+    public const int PRT = 1199;
+    public const int BOXWIDTH = 842;
+    public const int IGNOREMISSINGVARS = 1080;
+    public const int DIGITS = 817;
     public const int ASTDECOMPGROUP1 = 18;
-    public const int ASTBOXES = 209;
-    public const int ASTOPT_STRING_LABEL = 504;
-    public const int XLABELS = 809;
-    public const int PRI = 1192;
-    public const int DOTS = 829;
-    public const int Exponent = 1438;
-    public const int CELL = 917;
-    public const int ASTUPDOPERATORHATDOLLAR = 753;
-    public const int ASTSTRINGSIMPLE = 689;
-    public const int ASTOPT_STRING_NOMAX = 185;
-    public const int PRN = 1196;
-    public const int ASTDECOMPSELECT = 35;
-    public const int PLUSEQUAL = 1390;
-    public const int ASTTABLEOUTPUTFILE = 704;
-    public const int INDEX = 1082;
-    public const int CSV = 962;
-    public const int ASTOPT_STRING_TO = 600;
-    public const int UDIFF = 1320;
-    public const int REKUR = 790;
-    public const int ASTOPT_STRING_CELL = 528;
-    public const int TILDE = 1439;
-    public const int COMPARE = 948;
-    public const int ASTANALYZEEXPRESSION = 451;
-    public const int STRIP = 1281;
-    public const int ASTDELETE = 284;
-    public const int FRML = 1046;
-    public const int FILLEDCURVES = 827;
-    public const int GMULPRT = 1058;
-    public const int ASTFIND = 326;
-    public const int ASTOPT_STRING_COLS = 534;
-    public const int ASTOPT_VAR_DEP = 107;
-    public const int PERCENT = 1385;
-    public const int PYTHON_FILE = 1208;
-    public const int SERIES = 1243;
-    public const int ASTTIMEPERIOD = 729;
-    public const int ASTLISTSTRIP = 405;
-    public const int INDICATOR = 907;
-    public const int IGNOREMISSING = 1078;
-    public const int ASTDELETEALL = 285;
-    public const int DISP = 988;
-    public const int FIELDS = 1019;
-    public const int AFTER = 893;
-    public const int ASTOPT_STRING_MATRIX = 580;
-    public const int TRUE = 1310;
-    public const int INFO = 1083;
-    public const int ASTNAMESTATEMENT = 437;
-    public const int ASTFILENAMESTRING = 36;
-    public const int ASTAND = 146;
-    public const int OPEN = 1169;
-    public const int RUN = 1233;
-    public const int ASTVARNAMEORLIST = 771;
-    public const int ASTYES = 781;
-    public const int StringInQuotes3 = 1371;
-    public const int StringInQuotes2 = 1370;
-    public const int ASTPROCEDUREDEFCODE = 171;
-    public const int NOTIFY = 1164;
-    public const int StringInQuotes1 = 1369;
-    public const int ASTCLEAR2 = 243;
-    public const int ASTDIRECT = 288;
-    public const int ASTEXPRESSIONTUPLE = 313;
-    public const int MENU = 1119;
-    public const int ASTSEQ7 = 62;
-    public const int NOGDIF = 1156;
-    public const int DATE = 970;
-    public const int ASTTESTRANDOMMODEL = 720;
-    public const int ASTLIST2OLD = 388;
-    public const int ASTOPT_STRING_FROM = 546;
-    public const int DATA = 967;
+    public const int ASTBOXES = 210;
+    public const int ASTOPT_STRING_LABEL = 505;
+    public const int XLABELS = 810;
+    public const int PRI = 1193;
+    public const int DOTS = 830;
+    public const int Exponent = 1441;
+    public const int CELL = 918;
+    public const int ASTUPDOPERATORHATDOLLAR = 754;
+    public const int ASTSTRINGSIMPLE = 690;
+    public const int ASTOPT_STRING_NOMAX = 186;
+    public const int PRN = 1197;
+    public const int ASTDECOMPSELECT = 36;
+    public const int PLUSEQUAL = 1393;
+    public const int ASTTABLEOUTPUTFILE = 705;
+    public const int INDEX = 1083;
+    public const int CSV = 963;
+    public const int ASTOPT_STRING_TO = 601;
+    public const int UDIFF = 1323;
+    public const int REKUR = 791;
+    public const int ASTOPT_STRING_CELL = 529;
+    public const int TILDE = 1442;
+    public const int COMPARE = 949;
+    public const int ASTANALYZEEXPRESSION = 452;
+    public const int STRIP = 1282;
+    public const int ASTDELETE = 285;
+    public const int FRML = 1047;
+    public const int FILLEDCURVES = 828;
+    public const int GMULPRT = 1059;
+    public const int ASTFIND = 327;
+    public const int ASTOPT_STRING_COLS = 535;
+    public const int ASTOPT_VAR_DEP = 108;
+    public const int PERCENT = 1388;
+    public const int PYTHON_FILE = 1209;
+    public const int SERIES = 1244;
+    public const int ASTTIMEPERIOD = 730;
+    public const int ASTLISTSTRIP = 406;
+    public const int INDICATOR = 908;
+    public const int IGNOREMISSING = 1079;
+    public const int ASTDELETEALL = 286;
+    public const int DISP = 989;
+    public const int FIELDS = 1020;
+    public const int AFTER = 894;
+    public const int ASTOPT_STRING_MATRIX = 581;
+    public const int TRUE = 1313;
+    public const int INFO = 1084;
+    public const int ASTNAMESTATEMENT = 438;
+    public const int ASTFILENAMESTRING = 37;
+    public const int ASTAND = 147;
+    public const int OPEN = 1170;
+    public const int RUN = 1234;
+    public const int ASTVARNAMEORLIST = 772;
+    public const int ASTYES = 782;
+    public const int StringInQuotes3 = 1374;
+    public const int StringInQuotes2 = 1373;
+    public const int ASTPROCEDUREDEFCODE = 172;
+    public const int NOTIFY = 1165;
+    public const int StringInQuotes1 = 1372;
+    public const int ASTCLEAR2 = 244;
+    public const int ASTDIRECT = 289;
+    public const int ASTEXPRESSIONTUPLE = 314;
+    public const int MENU = 1120;
+    public const int ASTSEQ7 = 63;
+    public const int NOGDIF = 1157;
+    public const int DATE = 971;
+    public const int ASTTESTRANDOMMODEL = 721;
+    public const int ASTLIST2OLD = 389;
+    public const int ASTOPT_STRING_FROM = 547;
+    public const int DATA = 968;
 
 
                                     private int stringCounter = 0;
@@ -2025,6 +2028,8 @@ public partial class Cmd4Lexer : Lexer {
                                             d.Add("title"              , TITLE      );
                                             d.Add("to"      , TO        );
                                             d.Add("total"      , TOTAL        );
+                                            d.Add("TRACE", TRACE);
+                                            d.Add("TRACE2", TRACE2);
                                             d.Add("TRANSLATE", TRANSLATE);
                                             d.Add("transpose"               , TRANSPOSE       );
                                             d.Add("trel"     , TREL       );
@@ -2121,8 +2126,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:633:8: ( 'MAXLAG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:633:10: 'MAXLAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:635:8: ( 'MAXLAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:635:10: 'MAXLAG'
             {
             	Match("MAXLAG"); 
 
@@ -2145,8 +2150,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DFMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:634:7: ( 'DFMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:634:9: 'DFMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:636:7: ( 'DFMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:636:9: 'DFMIN'
             {
             	Match("DFMIN"); 
 
@@ -2169,8 +2174,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:635:6: ( 'LEAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:635:8: 'LEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:637:6: ( 'LEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:637:8: 'LEAD'
             {
             	Match("LEAD"); 
 
@@ -2193,8 +2198,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REKUR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:636:7: ( 'REKUR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:636:9: 'REKUR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:638:7: ( 'REKUR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:638:9: 'REKUR'
             {
             	Match("REKUR"); 
 
@@ -2217,8 +2222,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:637:9: ( 'MAXLEAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:637:11: 'MAXLEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:639:9: ( 'MAXLEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:639:11: 'MAXLEAD'
             {
             	Match("MAXLEAD"); 
 
@@ -2241,8 +2246,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:638:5: ( 'FIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:638:7: 'FIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:640:5: ( 'FIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:640:7: 'FIT'
             {
             	Match("FIT"); 
 
@@ -2265,8 +2270,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:639:5: ( 'GMS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:639:7: 'GMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:641:5: ( 'GMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:641:7: 'GMS'
             {
             	Match("GMS"); 
 
@@ -2289,8 +2294,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELEMENTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:640:10: ( 'ELEMENTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:640:12: 'ELEMENTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:642:10: ( 'ELEMENTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:642:12: 'ELEMENTS'
             {
             	Match("ELEMENTS"); 
 
@@ -2313,8 +2318,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:641:7: ( 'NOMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:641:9: 'NOMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:643:7: ( 'NOMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:643:9: 'NOMAX'
             {
             	Match("NOMAX"); 
 
@@ -2337,8 +2342,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RETURN2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:642:9: ( 'RETURN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:642:11: 'RETURN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:644:9: ( 'RETURN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:644:11: 'RETURN'
             {
             	Match("RETURN"); 
 
@@ -2361,8 +2366,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:643:4: ( 'IN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:643:6: 'IN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:645:4: ( 'IN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:645:6: 'IN'
             {
             	Match("IN"); 
 
@@ -2385,8 +2390,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:644:5: ( 'MAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:644:7: 'MAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:646:5: ( 'MAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:646:7: 'MAP'
             {
             	Match("MAP"); 
 
@@ -2409,8 +2414,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STRING2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:645:9: ( 'STRING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:645:11: 'STRING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:647:9: ( 'STRING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:647:11: 'STRING'
             {
             	Match("STRING"); 
 
@@ -2433,8 +2438,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REMOTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:646:8: ( 'REMOTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:646:10: 'REMOTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:648:8: ( 'REMOTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:648:10: 'REMOTE'
             {
             	Match("REMOTE"); 
 
@@ -2457,8 +2462,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIAS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:647:7: ( 'ALIAS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:647:9: 'ALIAS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:649:7: ( 'ALIAS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:649:9: 'ALIAS'
             {
             	Match("ALIAS"); 
 
@@ -2481,8 +2486,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OFFSET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:648:8: ( 'OFFSET' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:648:10: 'OFFSET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:650:8: ( 'OFFSET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:650:10: 'OFFSET'
             {
             	Match("OFFSET"); 
 
@@ -2505,8 +2510,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DETECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:649:8: ( 'DETECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:649:10: 'DETECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:651:8: ( 'DETECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:651:10: 'DETECT'
             {
             	Match("DETECT"); 
 
@@ -2529,8 +2534,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRIDSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:650:11: ( 'GRIDSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:650:13: 'GRIDSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:652:11: ( 'GRIDSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:652:13: 'GRIDSTYLE'
             {
             	Match("GRIDSTYLE"); 
 
@@ -2553,8 +2558,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:651:6: ( 'BOLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:651:8: 'BOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:653:6: ( 'BOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:653:8: 'BOLD'
             {
             	Match("BOLD"); 
 
@@ -2577,8 +2582,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITALIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:652:8: ( 'ITALIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:652:10: 'ITALIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:654:8: ( 'ITALIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:654:10: 'ITALIC'
             {
             	Match("ITALIC"); 
 
@@ -2601,8 +2606,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:653:6: ( 'ASER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:653:8: 'ASER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:655:6: ( 'ASER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:655:8: 'ASER'
             {
             	Match("ASER"); 
 
@@ -2625,8 +2630,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:654:9: ( 'ASERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:654:11: 'ASERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:656:9: ( 'ASERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:656:11: 'ASERIES'
             {
             	Match("ASERIES"); 
 
@@ -2649,8 +2654,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:655:9: ( 'XLABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:655:11: 'XLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:657:9: ( 'XLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:657:11: 'XLABELS'
             {
             	Match("XLABELS"); 
 
@@ -2673,8 +2678,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:656:9: ( 'YLABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:656:11: 'YLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:658:9: ( 'YLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:658:11: 'YLABELS'
             {
             	Match("YLABELS"); 
 
@@ -2697,8 +2702,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:657:8: ( 'ANNUAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:657:10: 'ANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:8: ( 'ANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:10: 'ANNUAL'
             {
             	Match("ANNUAL"); 
 
@@ -2721,8 +2726,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AT2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:658:5: ( 'AT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:658:7: 'AT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:5: ( 'AT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:7: 'AT'
             {
             	Match("AT"); 
 
@@ -2745,8 +2750,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BETWEEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:9: ( 'BETWEEN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:11: 'BETWEEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:9: ( 'BETWEEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:11: 'BETWEEN'
             {
             	Match("BETWEEN"); 
 
@@ -2769,8 +2774,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:11: ( 'NONANNUAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:13: 'NONANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:11: ( 'NONANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:13: 'NONANNUAL'
             {
             	Match("NONANNUAL"); 
 
@@ -2793,8 +2798,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CURRENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:9: ( 'CURRENT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:11: 'CURRENT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:9: ( 'CURRENT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:11: 'CURRENT'
             {
             	Match("CURRENT"); 
 
@@ -2817,8 +2822,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIGITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:8: ( 'DIGITS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:10: 'DIGITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:8: ( 'DIGITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:10: 'DIGITS'
             {
             	Match("DIGITS"); 
 
@@ -2841,8 +2846,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GAMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:6: ( 'GAMS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:8: 'GAMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:6: ( 'GAMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:8: 'GAMS'
             {
             	Match("GAMS"); 
 
@@ -2865,8 +2870,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:5: ( 'GDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:7: 'GDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:5: ( 'GDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:7: 'GDX'
             {
             	Match("GDX"); 
 
@@ -2889,8 +2894,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDXOPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:8: ( 'GDXOPT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:10: 'GDXOPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:8: ( 'GDXOPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:10: 'GDXOPT'
             {
             	Match("GDXOPT"); 
 
@@ -2913,8 +2918,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:8: ( 'LAGFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:10: 'LAGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:8: ( 'LAGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:10: 'LAGFIX'
             {
             	Match("LAGFIX"); 
 
@@ -2937,8 +2942,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADDBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:9: ( 'ADDBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:11: 'ADDBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:9: ( 'ADDBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:11: 'ADDBANK'
             {
             	Match("ADDBANK"); 
 
@@ -2961,8 +2966,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:10: ( 'SHOWBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:12: 'SHOWBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:10: ( 'SHOWBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:12: 'SHOWBANK'
             {
             	Match("SHOWBANK"); 
 
@@ -2985,8 +2990,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:10: ( 'SHOWFREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:12: 'SHOWFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:10: ( 'SHOWFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:12: 'SHOWFREQ'
             {
             	Match("SHOWFREQ"); 
 
@@ -3009,8 +3014,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REBASE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:8: ( 'REBASE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:10: 'REBASE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:8: ( 'REBASE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:10: 'REBASE'
             {
             	Match("REBASE"); 
 
@@ -3033,8 +3038,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINESPOINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:13: ( 'LINESPOINTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:15: 'LINESPOINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:13: ( 'LINESPOINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:15: 'LINESPOINTS'
             {
             	Match("LINESPOINTS"); 
 
@@ -3057,8 +3062,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:7: ( 'BOXES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:9: 'BOXES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:7: ( 'BOXES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:9: 'BOXES'
             {
             	Match("BOXES"); 
 
@@ -3081,8 +3086,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILLEDCURVES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:14: ( 'FILLEDCURVES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:16: 'FILLEDCURVES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:14: ( 'FILLEDCURVES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:16: 'FILLEDCURVES'
             {
             	Match("FILLEDCURVES"); 
 
@@ -3105,8 +3110,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STEPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:7: ( 'STEPS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:9: 'STEPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:7: ( 'STEPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:9: 'STEPS'
             {
             	Match("STEPS"); 
 
@@ -3129,8 +3134,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:6: ( 'DOTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:8: 'DOTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:6: ( 'DOTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:8: 'DOTS'
             {
             	Match("DOTS"); 
 
@@ -3153,8 +3158,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPULSES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:10: ( 'IMPULSES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:12: 'IMPULSES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:10: ( 'IMPULSES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:12: 'IMPULSES'
             {
             	Match("IMPULSES"); 
 
@@ -3177,8 +3182,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONTINUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:10: ( 'CONTINUE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:12: 'CONTINUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:10: ( 'CONTINUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:12: 'CONTINUE'
             {
             	Match("CONTINUE"); 
 
@@ -3201,8 +3206,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VOID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:6: ( 'VOID' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:8: 'VOID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:6: ( 'VOID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:8: 'VOID'
             {
             	Match("VOID"); 
 
@@ -3225,8 +3230,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PROCEDURE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:11: ( 'PROCEDURE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:13: 'PROCEDURE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:11: ( 'PROCEDURE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:13: 'PROCEDURE'
             {
             	Match("PROCEDURE"); 
 
@@ -3249,8 +3254,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:6: ( 'SIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:8: 'SIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:6: ( 'SIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:8: 'SIZE'
             {
             	Match("SIZE"); 
 
@@ -3273,8 +3278,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUBTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:10: ( 'SUBTITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:12: 'SUBTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:10: ( 'SUBTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:12: 'SUBTITLE'
             {
             	Match("SUBTITLE"); 
 
@@ -3297,8 +3302,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TICS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:6: ( 'TICS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:8: 'TICS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:6: ( 'TICS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:8: 'TICS'
             {
             	Match("TICS"); 
 
@@ -3321,8 +3326,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:6: ( 'GRID' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:8: 'GRID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:6: ( 'GRID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:8: 'GRID'
             {
             	Match("GRID"); 
 
@@ -3345,8 +3350,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:5: ( 'KEY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:7: 'KEY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:5: ( 'KEY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:7: 'KEY'
             {
             	Match("KEY"); 
 
@@ -3369,8 +3374,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PALETTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:9: ( 'PALETTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:11: 'PALETTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:9: ( 'PALETTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:11: 'PALETTE'
             {
             	Match("PALETTE"); 
 
@@ -3393,8 +3398,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:7: ( 'STACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:9: 'STACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:7: ( 'STACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:9: 'STACK'
             {
             	Match("STACK"); 
 
@@ -3417,8 +3422,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:10: ( 'BOXWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:12: 'BOXWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:10: ( 'BOXWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:12: 'BOXWIDTH'
             {
             	Match("BOXWIDTH"); 
 
@@ -3441,8 +3446,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXGAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:8: ( 'BOXGAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:10: 'BOXGAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:8: ( 'BOXGAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:10: 'BOXGAP'
             {
             	Match("BOXGAP"); 
 
@@ -3465,8 +3470,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEPARATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:10: ( 'SEPARATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:12: 'SEPARATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:10: ( 'SEPARATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:12: 'SEPARATE'
             {
             	Match("SEPARATE"); 
 
@@ -3489,8 +3494,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:7: ( 'XLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:9: 'XLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:7: ( 'XLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:9: 'XLINE'
             {
             	Match("XLINE"); 
 
@@ -3513,8 +3518,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINEBEFORE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:13: ( 'XLINEBEFORE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:15: 'XLINEBEFORE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:13: ( 'XLINEBEFORE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:15: 'XLINEBEFORE'
             {
             	Match("XLINEBEFORE"); 
 
@@ -3537,8 +3542,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINEAFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:12: ( 'XLINEAFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:14: 'XLINEAFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:12: ( 'XLINEAFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:14: 'XLINEAFTER'
             {
             	Match("XLINEAFTER"); 
 
@@ -3561,8 +3566,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMIRROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:9: ( 'YMIRROR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:11: 'YMIRROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:9: ( 'YMIRROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:11: 'YMIRROR'
             {
             	Match("YMIRROR"); 
 
@@ -3585,8 +3590,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:8: ( 'YTITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:10: 'YTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:8: ( 'YTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:10: 'YTITLE'
             {
             	Match("YTITLE"); 
 
@@ -3609,8 +3614,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:7: ( 'YLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:9: 'YLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:7: ( 'YLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:9: 'YLINE'
             {
             	Match("YLINE"); 
 
@@ -3633,8 +3638,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHARES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:8: ( 'SHARES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:10: 'SHARES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:8: ( 'SHARES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:10: 'SHARES'
             {
             	Match("SHARES"); 
 
@@ -3657,8 +3662,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ERRORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:8: ( 'ERRORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:10: 'ERRORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:8: ( 'ERRORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:10: 'ERRORS'
             {
             	Match("ERRORS"); 
 
@@ -3681,8 +3686,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:6: ( 'LINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:8: 'LINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:6: ( 'LINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:8: 'LINE'
             {
             	Match("LINE"); 
 
@@ -3705,8 +3710,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNORE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:8: ( 'IGNORE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:10: 'IGNORE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:8: ( 'IGNORE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:10: 'IGNORE'
             {
             	Match("IGNORE"); 
 
@@ -3729,8 +3734,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:10: ( 'YMAXHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:12: 'YMAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:10: ( 'YMAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:12: 'YMAXHARD'
             {
             	Match("YMAXHARD"); 
 
@@ -3753,8 +3758,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:10: ( 'YMAXSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:12: 'YMAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:10: ( 'YMAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:12: 'YMAXSOFT'
             {
             	Match("YMAXSOFT"); 
 
@@ -3777,8 +3782,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:10: ( 'YMINHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:12: 'YMINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:10: ( 'YMINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:12: 'YMINHARD'
             {
             	Match("YMINHARD"); 
 
@@ -3801,8 +3806,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:10: ( 'YMINSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:12: 'YMINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:10: ( 'YMINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:12: 'YMINSOFT'
             {
             	Match("YMINSOFT"); 
 
@@ -3825,8 +3830,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:11: ( 'XZEROAXIS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:13: 'XZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:11: ( 'XZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:13: 'XZEROAXIS'
             {
             	Match("XZEROAXIS"); 
 
@@ -3849,8 +3854,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:9: ( 'Y2TITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:11: 'Y2TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:9: ( 'Y2TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:11: 'Y2TITLE'
             {
             	Match("Y2TITLE"); 
 
@@ -3873,8 +3878,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2LINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:8: ( 'Y2LINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:10: 'Y2LINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:8: ( 'Y2LINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:10: 'Y2LINE'
             {
             	Match("Y2LINE"); 
 
@@ -3897,8 +3902,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:11: ( 'Y2MAXHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:13: 'Y2MAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:11: ( 'Y2MAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:13: 'Y2MAXHARD'
             {
             	Match("Y2MAXHARD"); 
 
@@ -3921,8 +3926,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:11: ( 'Y2MAXSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:13: 'Y2MAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:11: ( 'Y2MAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:13: 'Y2MAXSOFT'
             {
             	Match("Y2MAXSOFT"); 
 
@@ -3945,8 +3950,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:11: ( 'Y2MINHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:13: 'Y2MINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:11: ( 'Y2MINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:13: 'Y2MINHARD'
             {
             	Match("Y2MINHARD"); 
 
@@ -3969,8 +3974,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:11: ( 'Y2MINSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:13: 'Y2MINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:11: ( 'Y2MINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:13: 'Y2MINSOFT'
             {
             	Match("Y2MINSOFT"); 
 
@@ -3993,8 +3998,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X2ZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:12: ( 'X2ZEROAXIS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:14: 'X2ZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:12: ( 'X2ZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:14: 'X2ZEROAXIS'
             {
             	Match("X2ZEROAXIS"); 
 
@@ -4017,8 +4022,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ARROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:7: ( 'ARROW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:9: 'ARROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:7: ( 'ARROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:9: 'ARROW'
             {
             	Match("ARROW"); 
 
@@ -4041,8 +4046,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DASHTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:10: ( 'DASHTYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:12: 'DASHTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:10: ( 'DASHTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:12: 'DASHTYPE'
             {
             	Match("DASHTYPE"); 
 
@@ -4065,8 +4070,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:11: ( 'LINEWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:13: 'LINEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:11: ( 'LINEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:13: 'LINEWIDTH'
             {
             	Match("LINEWIDTH"); 
 
@@ -4089,8 +4094,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINECOLOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:11: ( 'LINECOLOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:13: 'LINECOLOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:11: ( 'LINECOLOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:13: 'LINECOLOR'
             {
             	Match("LINECOLOR"); 
 
@@ -4113,8 +4118,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:11: ( 'POINTTYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:13: 'POINTTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:11: ( 'POINTTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:13: 'POINTTYPE'
             {
             	Match("POINTTYPE"); 
 
@@ -4137,8 +4142,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:11: ( 'POINTSIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:13: 'POINTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:11: ( 'POINTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:13: 'POINTSIZE'
             {
             	Match("POINTSIZE"); 
 
@@ -4161,8 +4166,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILLSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:11: ( 'FILLSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:13: 'FILLSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:11: ( 'FILLSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:13: 'FILLSTYLE'
             {
             	Match("FILLSTYLE"); 
 
@@ -4185,8 +4190,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LABEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:7: ( 'LABEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:9: 'LABEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:7: ( 'LABEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:9: 'LABEL'
             {
             	Match("LABEL"); 
 
@@ -4209,8 +4214,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:4: ( 'Y2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:6: 'Y2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:4: ( 'Y2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:6: 'Y2'
             {
             	Match("Y2"); 
 
@@ -4233,8 +4238,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:3: ( 'X' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:5: 'X'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:3: ( 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:5: 'X'
             {
             	Match('X'); 
 
@@ -4256,8 +4261,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:3: ( 'Y' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:5: 'Y'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:3: ( 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:5: 'Y'
             {
             	Match('Y'); 
 
@@ -4279,8 +4284,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MDATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:13: ( 'MDATEFORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:15: 'MDATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:13: ( 'MDATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:15: 'MDATEFORMAT'
             {
             	Match("MDATEFORMAT"); 
 
@@ -4303,8 +4308,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = THOUSANDSSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:20: ( 'THOUSANDSSEPARATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:22: 'THOUSANDSSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:20: ( 'THOUSANDSSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:22: 'THOUSANDSSEPARATOR'
             {
             	Match("THOUSANDSSEPARATOR"); 
 
@@ -4327,8 +4332,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XEDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:7: ( 'XEDIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:9: 'XEDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:7: ( 'XEDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:9: 'XEDIT'
             {
             	Match("XEDIT"); 
 
@@ -4351,8 +4356,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:8: ( 'IMPOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:10: 'IMPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:8: ( 'IMPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:10: 'IMPOSE'
             {
             	Match("IMPOSE"); 
 
@@ -4375,8 +4380,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONSTANT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:10: ( 'CONSTANT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:12: 'CONSTANT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:10: ( 'CONSTANT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:12: 'CONSTANT'
             {
             	Match("CONSTANT"); 
 
@@ -4399,8 +4404,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERPOLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:13: ( 'INTERPOLATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:15: 'INTERPOLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:13: ( 'INTERPOLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:15: 'INTERPOLATE'
             {
             	Match("INTERPOLATE"); 
 
@@ -4423,8 +4428,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRORATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:9: ( 'PRORATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:11: 'PRORATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:9: ( 'PRORATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:11: 'PRORATE'
             {
             	Match("PRORATE"); 
 
@@ -4447,8 +4452,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:6: ( 'TRIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:8: 'TRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:6: ( 'TRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:8: 'TRIM'
             {
             	Match("TRIM"); 
 
@@ -4471,8 +4476,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = USING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:7: ( 'USING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:9: 'USING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:7: ( 'USING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:9: 'USING'
             {
             	Match("USING"); 
 
@@ -4495,8 +4500,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:3: ( 'A' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:5: 'A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:3: ( 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:5: 'A'
             {
             	Match('A'); 
 
@@ -4518,8 +4523,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEFAULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:9: ( 'DEFAULT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:11: 'DEFAULT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:9: ( 'DEFAULT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:11: 'DEFAULT'
             {
             	Match("DEFAULT"); 
 
@@ -4542,8 +4547,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOGIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:7: ( 'LOGIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:9: 'LOGIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:7: ( 'LOGIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:9: 'LOGIC'
             {
             	Match("LOGIC"); 
 
@@ -4566,8 +4571,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:5: ( 'ABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:7: 'ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:5: ( 'ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:7: 'ABS'
             {
             	Match("ABS"); 
 
@@ -4590,8 +4595,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ABSOLUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:10: ( 'absolute' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:12: 'absolute'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:10: ( 'absolute' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:12: 'absolute'
             {
             	Match("absolute"); 
 
@@ -4614,8 +4619,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ACCEPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:8: ( 'ACCEPT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:10: 'ACCEPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:8: ( 'ACCEPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:10: 'ACCEPT'
             {
             	Match("ACCEPT"); 
 
@@ -4638,8 +4643,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:5: ( 'ADD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:7: 'ADD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:5: ( 'ADD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:7: 'ADD'
             {
             	Match("ADD"); 
 
@@ -4662,8 +4667,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:7: ( 'AFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:9: 'AFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:7: ( 'AFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:9: 'AFTER'
             {
             	Match("AFTER"); 
 
@@ -4686,8 +4691,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AFTER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:8: ( 'AFTER2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:10: 'AFTER2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:8: ( 'AFTER2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:10: 'AFTER2'
             {
             	Match("AFTER2"); 
 
@@ -4710,8 +4715,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNCENTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:13: ( 'ALIGNCENTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:15: 'ALIGNCENTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:13: ( 'ALIGNCENTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:15: 'ALIGNCENTER'
             {
             	Match("ALIGNCENTER"); 
 
@@ -4734,8 +4739,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNLEFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:11: ( 'ALIGNLEFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:13: 'ALIGNLEFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:11: ( 'ALIGNLEFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:13: 'ALIGNLEFT'
             {
             	Match("ALIGNLEFT"); 
 
@@ -4758,8 +4763,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNRIGHT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:12: ( 'ALIGNRIGHT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:14: 'ALIGNRIGHT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:12: ( 'ALIGNRIGHT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:14: 'ALIGNRIGHT'
             {
             	Match("ALIGNRIGHT"); 
 
@@ -4782,8 +4787,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:5: ( 'ALL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:7: 'ALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:5: ( 'ALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:7: 'ALL'
             {
             	Match("ALL"); 
 
@@ -4806,8 +4811,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ANALYZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:9: ( 'ANALYZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:11: 'ANALYZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:9: ( 'ANALYZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:11: 'ANALYZE'
             {
             	Match("ANALYZE"); 
 
@@ -4830,8 +4835,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:5: ( 'AND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:7: 'AND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:5: ( 'AND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:7: 'AND'
             {
             	Match("AND"); 
 
@@ -4854,8 +4859,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = APPEND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:8: ( 'APPEND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:10: 'APPEND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:8: ( 'APPEND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:10: 'APPEND'
             {
             	Match("APPEND"); 
 
@@ -4878,8 +4883,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AREMOS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:8: ( 'AREMOS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:10: 'AREMOS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:8: ( 'AREMOS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:10: 'AREMOS'
             {
             	Match("AREMOS"); 
 
@@ -4902,8 +4907,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:4: ( 'OP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:6: 'OP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:4: ( 'OP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:6: 'OP'
             {
             	Match("OP"); 
 
@@ -4926,8 +4931,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:4: ( 'AS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:6: 'AS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:4: ( 'AS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:6: 'AS'
             {
             	Match("AS"); 
 
@@ -4950,8 +4955,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AUTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:6: ( 'AUTO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:8: 'AUTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:6: ( 'AUTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:8: 'AUTO'
             {
             	Match("AUTO"); 
 
@@ -4974,8 +4979,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AVG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:5: ( 'AVG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:7: 'AVG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:5: ( 'AVG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:7: 'AVG'
             {
             	Match("AVG"); 
 
@@ -4998,8 +5003,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INDICATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:11: ( 'INDICATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:13: 'INDICATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:11: ( 'INDICATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:13: 'INDICATOR'
             {
             	Match("INDICATOR"); 
 
@@ -5022,8 +5027,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BACKTRACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:11: ( 'BACKTRACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:13: 'BACKTRACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:11: ( 'BACKTRACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:13: 'BACKTRACK'
             {
             	Match("BACKTRACK"); 
 
@@ -5046,8 +5051,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:6: ( 'BANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:8: 'BANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:6: ( 'BANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:8: 'BANK'
             {
             	Match("BANK"); 
 
@@ -5070,8 +5075,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:7: ( 'BANK1' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:9: 'BANK1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:7: ( 'BANK1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:9: 'BANK1'
             {
             	Match("BANK1"); 
 
@@ -5094,8 +5099,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:7: ( 'BANK2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:9: 'BANK2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:7: ( 'BANK2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:9: 'BANK2'
             {
             	Match("BANK2"); 
 
@@ -5118,8 +5123,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOWL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:6: ( 'BOWL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:8: 'BOWL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:6: ( 'BOWL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:8: 'BOWL'
             {
             	Match("BOWL"); 
 
@@ -5142,8 +5147,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:4: ( 'BY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:6: 'BY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:4: ( 'BY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:6: 'BY'
             {
             	Match("BY"); 
 
@@ -5166,8 +5171,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CACHE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:7: ( 'CACHE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:9: 'CACHE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:7: ( 'CACHE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:9: 'CACHE'
             {
             	Match("CACHE"); 
 
@@ -5190,8 +5195,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CALC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:6: ( 'CALC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:8: 'CALC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:6: ( 'CALC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:8: 'CALC'
             {
             	Match("CALC"); 
 
@@ -5214,8 +5219,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CAPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:6: ( 'CAPS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:8: 'CAPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:6: ( 'CAPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:8: 'CAPS'
             {
             	Match("CAPS"); 
 
@@ -5238,8 +5243,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:6: ( 'CELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:8: 'CELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:6: ( 'CELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:8: 'CELL'
             {
             	Match("CELL"); 
 
@@ -5262,8 +5267,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHANGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:8: ( 'CHANGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:10: 'CHANGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:8: ( 'CHANGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:10: 'CHANGE'
             {
             	Match("CHANGE"); 
 
@@ -5286,8 +5291,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHECKOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:10: ( 'CHECKOFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:12: 'CHECKOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:10: ( 'CHECKOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:12: 'CHECKOFF'
             {
             	Match("CHECKOFF"); 
 
@@ -5310,8 +5315,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:7: ( 'CLEAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:9: 'CLEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:7: ( 'CLEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:9: 'CLEAR'
             {
             	Match("CLEAR"); 
 
@@ -5334,8 +5339,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLEAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:8: ( 'CLEAR2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:10: 'CLEAR2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:8: ( 'CLEAR2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:10: 'CLEAR2'
             {
             	Match("CLEAR2"); 
 
@@ -5358,8 +5363,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:6: ( 'CLIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:8: 'CLIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:6: ( 'CLIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:8: 'CLIP'
             {
             	Match("CLIP"); 
 
@@ -5382,8 +5387,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLIPBOARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:11: ( 'CLIPBOARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:13: 'CLIPBOARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:11: ( 'CLIPBOARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:13: 'CLIPBOARD'
             {
             	Match("CLIPBOARD"); 
 
@@ -5406,8 +5411,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:7: ( 'CLONE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:9: 'CLONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:7: ( 'CLONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:9: 'CLONE'
             {
             	Match("CLONE"); 
 
@@ -5430,8 +5435,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:6: ( 'MOVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:8: 'MOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:6: ( 'MOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:8: 'MOVE'
             {
             	Match("MOVE"); 
 
@@ -5454,8 +5459,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REMOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:8: ( 'REMOVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:10: 'REMOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:8: ( 'REMOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:10: 'REMOVE'
             {
             	Match("REMOVE"); 
 
@@ -5478,8 +5483,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:7: ( 'CLOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:9: 'CLOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:7: ( 'CLOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:9: 'CLOSE'
             {
             	Match("CLOSE"); 
 
@@ -5502,8 +5507,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSEALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:10: ( 'CLOSEALL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:12: 'CLOSEALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:10: ( 'CLOSEALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:12: 'CLOSEALL'
             {
             	Match("CLOSEALL"); 
 
@@ -5526,8 +5531,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSEBANKS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:12: ( 'CLOSEBANKS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:14: 'CLOSEBANKS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:12: ( 'CLOSEBANKS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:14: 'CLOSEBANKS'
             {
             	Match("CLOSEBANKS"); 
 
@@ -5550,8 +5555,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:5: ( 'CLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:7: 'CLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:5: ( 'CLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:7: 'CLS'
             {
             	Match("CLS"); 
 
@@ -5574,8 +5579,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:6: ( 'CODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:8: 'CODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:6: ( 'CODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:8: 'CODE'
             {
             	Match("CODE"); 
 
@@ -5598,8 +5603,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLLAPSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:10: ( 'COLLAPSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:12: 'COLLAPSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:10: ( 'COLLAPSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:12: 'COLLAPSE'
             {
             	Match("COLLAPSE"); 
 
@@ -5622,8 +5627,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XTREND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:8: ( 'XTREND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:10: 'XTREND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:8: ( 'XTREND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:10: 'XTREND'
             {
             	Match("XTREND"); 
 
@@ -5646,8 +5651,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XFLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:7: ( 'XFLAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:9: 'XFLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:7: ( 'XFLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:9: 'XFLAT'
             {
             	Match("XFLAT"); 
 
@@ -5670,8 +5675,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:4: ( 'PX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:6: 'PX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:4: ( 'PX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:6: 'PX'
             {
             	Match("PX"); 
 
@@ -5694,8 +5699,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ARRAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:7: ( 'ARRAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:9: 'ARRAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:7: ( 'ARRAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:9: 'ARRAY'
             {
             	Match("ARRAY"); 
 
@@ -5718,8 +5723,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BUGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:8: ( 'BUGFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:10: 'BUGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:8: ( 'BUGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:10: 'BUGFIX'
             {
             	Match("BUGFIX"); 
 
@@ -5742,8 +5747,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GCM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:5: ( 'GCM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:7: 'GCM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:5: ( 'GCM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:7: 'GCM'
             {
             	Match("GCM"); 
 
@@ -5766,8 +5771,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:8: ( 'COLORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:10: 'COLORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:8: ( 'COLORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:10: 'COLORS'
             {
             	Match("COLORS"); 
 
@@ -5790,8 +5795,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:6: ( 'COLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:8: 'COLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:6: ( 'COLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:8: 'COLS'
             {
             	Match("COLS"); 
 
@@ -5814,8 +5819,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DELIMITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:11: ( 'DELIMITER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:13: 'DELIMITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:11: ( 'DELIMITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:13: 'DELIMITER'
             {
             	Match("DELIMITER"); 
 
@@ -5838,8 +5843,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:12: ( 'DATEFORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:14: 'DATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:12: ( 'DATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:14: 'DATEFORMAT'
             {
             	Match("DATEFORMAT"); 
 
@@ -5862,8 +5867,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATETYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:10: ( 'DATETYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:12: 'DATETYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:10: ( 'DATETYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:12: 'DATETYPE'
             {
             	Match("DATETYPE"); 
 
@@ -5886,8 +5891,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:7: ( 'COMMA' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:9: 'COMMA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:7: ( 'COMMA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:9: 'COMMA'
             {
             	Match("COMMA"); 
 
@@ -5910,8 +5915,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:9: ( 'COMMAND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:11: 'COMMAND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:9: ( 'COMMAND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:11: 'COMMAND'
             {
             	Match("COMMAND"); 
 
@@ -5934,8 +5939,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:10: ( 'COMMAND1' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:12: 'COMMAND1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:10: ( 'COMMAND1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:12: 'COMMAND1'
             {
             	Match("COMMAND1"); 
 
@@ -5958,8 +5963,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:10: ( 'COMMAND2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:12: 'COMMAND2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:10: ( 'COMMAND2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:12: 'COMMAND2'
             {
             	Match("COMMAND2"); 
 
@@ -5982,8 +5987,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMPARE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:9: ( 'COMPARE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:11: 'COMPARE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:9: ( 'COMPARE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:11: 'COMPARE'
             {
             	Match("COMPARE"); 
 
@@ -6006,8 +6011,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMPRESS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:10: ( 'COMPRESS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:12: 'COMPRESS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:10: ( 'COMPRESS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:12: 'COMPRESS'
             {
             	Match("COMPRESS"); 
 
@@ -6030,8 +6035,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:7: ( 'CONST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:9: 'CONST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:7: ( 'CONST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:9: 'CONST'
             {
             	Match("CONST"); 
 
@@ -6054,8 +6059,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:6: ( 'CONV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:8: 'CONV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:6: ( 'CONV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:8: 'CONV'
             {
             	Match("CONV"); 
 
@@ -6078,8 +6083,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:7: ( 'CONV1' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:9: 'CONV1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:7: ( 'CONV1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:9: 'CONV1'
             {
             	Match("CONV1"); 
 
@@ -6102,8 +6107,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:7: ( 'CONV2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:9: 'CONV2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:7: ( 'CONV2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:9: 'CONV2'
             {
             	Match("CONV2"); 
 
@@ -6126,8 +6131,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COPY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:6: ( 'COPY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:8: 'COPY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:6: ( 'COPY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:8: 'COPY'
             {
             	Match("COPY"); 
 
@@ -6150,8 +6155,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COPYLOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:11: ( 'COPYLOCAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:13: 'COPYLOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:11: ( 'COPYLOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:13: 'COPYLOCAL'
             {
             	Match("COPYLOCAL"); 
 
@@ -6174,8 +6179,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:7: ( 'LOCAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:9: 'LOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:7: ( 'LOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:9: 'LOCAL'
             {
             	Match("LOCAL"); 
 
@@ -6198,8 +6203,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLOBAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:8: ( 'GLOBAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:10: 'GLOBAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:8: ( 'GLOBAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:10: 'GLOBAL'
             {
             	Match("GLOBAL"); 
 
@@ -6222,8 +6227,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COUNT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:7: ( 'COUNT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:9: 'COUNT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:7: ( 'COUNT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:9: 'COUNT'
             {
             	Match("COUNT"); 
 
@@ -6246,8 +6251,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:7: ( 'CPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:9: 'CPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:7: ( 'CPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:9: 'CPLOT'
             {
             	Match("CPLOT"); 
 
@@ -6270,8 +6275,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CREATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:8: ( 'CREATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:10: 'CREATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:8: ( 'CREATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:10: 'CREATE'
             {
             	Match("CREATE"); 
 
@@ -6294,8 +6299,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CREATEVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:12: ( 'CREATEVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:14: 'CREATEVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:12: ( 'CREATEVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:14: 'CREATEVARS'
             {
             	Match("CREATEVARS"); 
 
@@ -6318,8 +6323,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CSV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:5: ( 'CSV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:7: 'CSV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:5: ( 'CSV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:7: 'CSV'
             {
             	Match("CSV"); 
 
@@ -6342,8 +6347,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CURROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:8: ( 'CURROW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:10: 'CURROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:8: ( 'CURROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:10: 'CURROW'
             {
             	Match("CURROW"); 
 
@@ -6366,8 +6371,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = D;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:3: ( 'D' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:5: 'D'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:3: ( 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:5: 'D'
             {
             	Match('D'); 
 
@@ -6389,8 +6394,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:6: ( 'DAMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:8: 'DAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:6: ( 'DAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:8: 'DAMP'
             {
             	Match("DAMP"); 
 
@@ -6413,8 +6418,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DANISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:8: ( 'DANISH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:10: 'DANISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:8: ( 'DANISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:10: 'DANISH'
             {
             	Match("DANISH"); 
 
@@ -6437,8 +6442,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:6: ( 'DATA' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:8: 'DATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:6: ( 'DATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:8: 'DATA'
             {
             	Match("DATA"); 
 
@@ -6461,8 +6466,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATABANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:10: ( 'DATABANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:12: 'DATABANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:10: ( 'DATABANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:12: 'DATABANK'
             {
             	Match("DATABANK"); 
 
@@ -6485,8 +6490,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATAWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:11: ( 'DATAWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:13: 'DATAWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:11: ( 'DATAWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:13: 'DATAWIDTH'
             {
             	Match("DATAWIDTH"); 
 
@@ -6509,8 +6514,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:6: ( 'DATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:8: 'DATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:6: ( 'DATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:8: 'DATE'
             {
             	Match("DATE"); 
 
@@ -6533,8 +6538,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:7: ( 'DATES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:9: 'DATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:7: ( 'DATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:9: 'DATES'
             {
             	Match("DATES"); 
 
@@ -6557,8 +6562,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEBUG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:7: ( 'DEBUG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:9: 'DEBUG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:7: ( 'DEBUG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:9: 'DEBUG'
             {
             	Match("DEBUG"); 
 
@@ -6581,8 +6586,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:5: ( 'DEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:7: 'DEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:5: ( 'DEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:7: 'DEC'
             {
             	Match("DEC"); 
 
@@ -6605,8 +6610,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECIMALSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:18: ( 'DECIMALSEPARATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:20: 'DECIMALSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:18: ( 'DECIMALSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:20: 'DECIMALSEPARATOR'
             {
             	Match("DECIMALSEPARATOR"); 
 
@@ -6629,8 +6634,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:8: ( 'DECOMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:10: 'DECOMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:8: ( 'DECOMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:10: 'DECOMP'
             {
             	Match("DECOMP"); 
 
@@ -6653,8 +6658,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:9: ( 'DECOMP2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:11: 'DECOMP2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:9: ( 'DECOMP2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:11: 'DECOMP2'
             {
             	Match("DECOMP2"); 
 
@@ -6677,8 +6682,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:9: ( 'DECOMP3' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:11: 'DECOMP3'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:9: ( 'DECOMP3' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:11: 'DECOMP3'
             {
             	Match("DECOMP3"); 
 
@@ -6701,8 +6706,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EVAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:6: ( 'EVAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:8: 'EVAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:6: ( 'EVAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:8: 'EVAL'
             {
             	Match("EVAL"); 
 
@@ -6725,8 +6730,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DELETE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:8: ( 'DELETE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:10: 'DELETE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:8: ( 'DELETE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:10: 'DELETE'
             {
             	Match("DELETE"); 
 
@@ -6749,8 +6754,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DETAILS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:9: ( 'DETAILS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:11: 'DETAILS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:9: ( 'DETAILS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:11: 'DETAILS'
             {
             	Match("DETAILS"); 
 
@@ -6773,8 +6778,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIALOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:8: ( 'DIALOG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:10: 'DIALOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:8: ( 'DIALOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:10: 'DIALOG'
             {
             	Match("DIALOG"); 
 
@@ -6797,8 +6802,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:5: ( 'DIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:7: 'DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:5: ( 'DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:7: 'DIF'
             {
             	Match("DIF"); 
 
@@ -6821,8 +6826,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:6: ( 'DIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:8: 'DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:6: ( 'DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:8: 'DIFF'
             {
             	Match("DIFF"); 
 
@@ -6845,8 +6850,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:8: ( 'DIFPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:10: 'DIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:8: ( 'DIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:10: 'DIFPRT'
             {
             	Match("DIFPRT"); 
 
@@ -6869,8 +6874,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:6: ( 'DING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:8: 'DING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:6: ( 'DING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:8: 'DING'
             {
             	Match("DING"); 
 
@@ -6893,8 +6898,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DYN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:5: ( 'DYN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:7: 'DYN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:5: ( 'DYN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:7: 'DYN'
             {
             	Match("DYN"); 
 
@@ -6917,8 +6922,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIRECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:8: ( 'DIRECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:10: 'DIRECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:8: ( 'DIRECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:10: 'DIRECT'
             {
             	Match("DIRECT"); 
 
@@ -6941,8 +6946,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DISP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:6: ( 'DISP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:8: 'DISP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:6: ( 'DISP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:8: 'DISP'
             {
             	Match("DISP"); 
 
@@ -6965,8 +6970,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DISPLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:9: ( 'DISPLAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:11: 'DISPLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:9: ( 'DISPLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:11: 'DISPLAY'
             {
             	Match("DISPLAY"); 
 
@@ -6989,8 +6994,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:5: ( 'DOC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:7: 'DOC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:5: ( 'DOC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:7: 'DOC'
             {
             	Match("DOC"); 
 
@@ -7013,8 +7018,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOWNLOAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:10: ( 'DOWNLOAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:12: 'DOWNLOAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:10: ( 'DOWNLOAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:12: 'DOWNLOAD'
             {
             	Match("DOWNLOAD"); 
 
@@ -7037,8 +7042,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:4: ( 'DP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:6: 'DP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:4: ( 'DP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:6: 'DP'
             {
             	Match("DP"); 
 
@@ -7061,8 +7066,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMOF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:7: ( 'DUMOF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:9: 'DUMOF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:7: ( 'DUMOF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:9: 'DUMOF'
             {
             	Match("DUMOF"); 
 
@@ -7085,8 +7090,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:8: ( 'DUMOFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:10: 'DUMOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:8: ( 'DUMOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:10: 'DUMOFF'
             {
             	Match("DUMOFF"); 
 
@@ -7109,8 +7114,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:7: ( 'DUMON' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:9: 'DUMON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:7: ( 'DUMON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:9: 'DUMON'
             {
             	Match("DUMON"); 
 
@@ -7133,8 +7138,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:6: ( 'DUMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:8: 'DUMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:6: ( 'DUMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:8: 'DUMP'
             {
             	Match("DUMP"); 
 
@@ -7157,8 +7162,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMPOPTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:13: ( 'DUMPOPTIONS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:15: 'DUMPOPTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:13: ( 'DUMPOPTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:15: 'DUMPOPTIONS'
             {
             	Match("DUMPOPTIONS"); 
 
@@ -7181,8 +7186,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:6: ( 'EDIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:8: 'EDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:6: ( 'EDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:8: 'EDIT'
             {
             	Match("EDIT"); 
 
@@ -7205,8 +7210,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:7: ( 'EFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:9: 'EFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:7: ( 'EFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:9: 'EFTER'
             {
             	Match("EFTER"); 
 
@@ -7229,8 +7234,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:6: ( 'ELSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:8: 'ELSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:6: ( 'ELSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:8: 'ELSE'
             {
             	Match("ELSE"); 
 
@@ -7253,8 +7258,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELSEIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:8: ( 'ELSEIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:10: 'ELSEIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:8: ( 'ELSEIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:10: 'ELSEIF'
             {
             	Match("ELSEIF"); 
 
@@ -7277,8 +7282,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = END;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:5: ( 'END' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:7: 'END'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:5: ( 'END' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:7: 'END'
             {
             	Match("END"); 
 
@@ -7301,8 +7306,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:6: ( 'ENDO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:8: 'ENDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:6: ( 'ENDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:8: 'ENDO'
             {
             	Match("ENDO"); 
 
@@ -7325,8 +7330,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENGLISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:9: ( 'ENGLISH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:11: 'ENGLISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:9: ( 'ENGLISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:11: 'ENGLISH'
             {
             	Match("ENGLISH"); 
 
@@ -7349,8 +7354,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ERROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:7: ( 'ERROR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:9: 'ERROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:7: ( 'ERROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:9: 'ERROR'
             {
             	Match("ERROR"); 
 
@@ -7373,8 +7378,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXCEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:7: ( 'EXCEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:9: 'EXCEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:7: ( 'EXCEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:9: 'EXCEL'
             {
             	Match("EXCEL"); 
 
@@ -7397,8 +7402,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:5: ( 'EXE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:7: 'EXE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:5: ( 'EXE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:7: 'EXE'
             {
             	Match("EXE"); 
 
@@ -7421,8 +7426,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:6: ( 'EXIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:8: 'EXIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:6: ( 'EXIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:8: 'EXIT'
             {
             	Match("EXIT"); 
 
@@ -7445,8 +7450,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:5: ( 'EXO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:7: 'EXO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:5: ( 'EXO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:7: 'EXO'
             {
             	Match("EXO"); 
 
@@ -7469,8 +7474,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:5: ( 'EXP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:7: 'EXP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:5: ( 'EXP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:7: 'EXP'
             {
             	Match("EXP"); 
 
@@ -7493,8 +7498,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:8: ( 'EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:10: 'EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:8: ( 'EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:10: 'EXPORT'
             {
             	Match("EXPORT"); 
 
@@ -7517,8 +7522,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:10: ( 'EXTERNAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:12: 'EXTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:10: ( 'EXTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:12: 'EXTERNAL'
             {
             	Match("EXTERNAL"); 
 
@@ -7541,8 +7546,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAILSAFE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:10: ( 'FAILSAFE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:12: 'FAILSAFE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:10: ( 'FAILSAFE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:12: 'FAILSAFE'
             {
             	Match("FAILSAFE"); 
 
@@ -7565,8 +7570,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:6: ( 'FAIR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:8: 'FAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:6: ( 'FAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:8: 'FAIR'
             {
             	Match("FAIR"); 
 
@@ -7589,8 +7594,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FALSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:7: ( 'false' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:9: 'false'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:7: ( 'false' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:9: 'false'
             {
             	Match("false"); 
 
@@ -7613,8 +7618,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:6: ( 'FAST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:8: 'FAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:6: ( 'FAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:8: 'FAST'
             {
             	Match("FAST"); 
 
@@ -7637,8 +7642,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FEED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:6: ( 'FEED' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:8: 'FEED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:6: ( 'FEED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:8: 'FEED'
             {
             	Match("FEED"); 
 
@@ -7661,8 +7666,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FEEDBACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:10: ( 'FEEDBACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:12: 'FEEDBACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:10: ( 'FEEDBACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:12: 'FEEDBACK'
             {
             	Match("FEEDBACK"); 
 
@@ -7685,8 +7690,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIELDS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:8: ( 'FIELDS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:10: 'FIELDS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:8: ( 'FIELDS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:10: 'FIELDS'
             {
             	Match("FIELDS"); 
 
@@ -7709,8 +7714,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:6: ( 'FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:8: 'FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:6: ( 'FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:8: 'FILE'
             {
             	Match("FILE"); 
 
@@ -7733,8 +7738,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:11: ( 'FILEWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:13: 'FILEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:11: ( 'FILEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:13: 'FILEWIDTH'
             {
             	Match("FILEWIDTH"); 
 
@@ -7757,8 +7762,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:8: ( 'FILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:10: 'FILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:8: ( 'FILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:10: 'FILTER'
             {
             	Match("FILTER"); 
 
@@ -7781,8 +7786,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FINDMISSINGDATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:17: ( 'FINDMISSINGDATA' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:19: 'FINDMISSINGDATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:17: ( 'FINDMISSINGDATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:19: 'FINDMISSINGDATA'
             {
             	Match("FINDMISSINGDATA"); 
 
@@ -7805,8 +7810,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXPAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:8: ( 'EXPAND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:10: 'EXPAND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:8: ( 'EXPAND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:10: 'EXPAND'
             {
             	Match("EXPAND"); 
 
@@ -7829,8 +7834,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VARIABLECODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:14: ( 'VARIABLECODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:16: 'VARIABLECODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:14: ( 'VARIABLECODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:16: 'VARIABLECODE'
             {
             	Match("VARIABLECODE"); 
 
@@ -7853,8 +7858,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VIEW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:6: ( 'VIEW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:8: 'VIEW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:6: ( 'VIEW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:8: 'VIEW'
             {
             	Match("VIEW"); 
 
@@ -7877,8 +7882,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEEPTYPES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:11: ( 'KEEPTYPES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:13: 'KEEPTYPES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:11: ( 'KEEPTYPES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:13: 'KEEPTYPES'
             {
             	Match("KEEPTYPES"); 
 
@@ -7901,8 +7906,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PREDICT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:9: ( 'PREDICT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:11: 'PREDICT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:9: ( 'PREDICT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:11: 'PREDICT'
             {
             	Match("PREDICT"); 
 
@@ -7925,8 +7930,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:6: ( 'FIND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:8: 'FIND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:6: ( 'FIND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:8: 'FIND'
             {
             	Match("FIND"); 
 
@@ -7949,8 +7954,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:8: ( 'PYTHON' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:10: 'PYTHON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:8: ( 'PYTHON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:10: 'PYTHON'
             {
             	Match("PYTHON"); 
 
@@ -7973,8 +7978,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:5: ( 'DEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:7: 'DEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:5: ( 'DEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:7: 'DEP'
             {
             	Match("DEP"); 
 
@@ -7997,8 +8002,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BROWSER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:9: ( 'BROWSER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:11: 'BROWSER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:9: ( 'BROWSER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:11: 'BROWSER'
             {
             	Match("BROWSER"); 
 
@@ -8021,8 +8026,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIRST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:7: ( 'FIRST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:9: 'FIRST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:7: ( 'FIRST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:9: 'FIRST'
             {
             	Match("FIRST"); 
 
@@ -8045,8 +8050,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIRSTCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:15: ( 'FIRSTCOLWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:17: 'FIRSTCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:15: ( 'FIRSTCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:17: 'FIRSTCOLWIDTH'
             {
             	Match("FIRSTCOLWIDTH"); 
 
@@ -8069,8 +8074,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:5: ( 'FIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:7: 'FIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:5: ( 'FIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:7: 'FIX'
             {
             	Match("FIX"); 
 
@@ -8093,8 +8098,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:6: ( 'FLAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:8: 'FLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:6: ( 'FLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:8: 'FLAT'
             {
             	Match("FLAT"); 
 
@@ -8117,8 +8122,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:10: ( 'DATECELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:12: 'DATECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:10: ( 'DATECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:12: 'DATECELL'
             {
             	Match("DATECELL"); 
 
@@ -8141,8 +8146,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAMECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:10: ( 'NAMECELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:12: 'NAMECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:10: ( 'NAMECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:12: 'NAMECELL'
             {
             	Match("NAMECELL"); 
 
@@ -8165,8 +8170,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FOLDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:8: ( 'FOLDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:10: 'FOLDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:8: ( 'FOLDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:10: 'FOLDER'
             {
             	Match("FOLDER"); 
 
@@ -8189,8 +8194,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FONT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:6: ( 'FONT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:8: 'FONT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:6: ( 'FONT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:8: 'FONT'
             {
             	Match("FONT"); 
 
@@ -8213,8 +8218,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FONTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:10: ( 'FONTSIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:12: 'FONTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:10: ( 'FONTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:12: 'FONTSIZE'
             {
             	Match("FONTSIZE"); 
 
@@ -8237,8 +8242,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:5: ( 'FOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:7: 'FOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:5: ( 'FOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:7: 'FOR'
             {
             	Match("FOR"); 
 
@@ -8261,8 +8266,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:8: ( 'FORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:10: 'FORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:8: ( 'FORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:10: 'FORMAT'
             {
             	Match("FORMAT"); 
 
@@ -8285,8 +8290,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FORWARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:9: ( 'FORWARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:11: 'FORWARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:9: ( 'FORWARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:11: 'FORWARD'
             {
             	Match("FORWARD"); 
 
@@ -8309,8 +8314,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:6: ( 'FREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:8: 'FREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:6: ( 'FREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:8: 'FREQ'
             {
             	Match("FREQ"); 
 
@@ -8333,8 +8338,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FRML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:6: ( 'FRML' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:8: 'FRML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:6: ( 'FRML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:8: 'FRML'
             {
             	Match("FRML"); 
 
@@ -8357,8 +8362,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FROM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:6: ( 'FROM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:8: 'FROM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:6: ( 'FROM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:8: 'FROM'
             {
             	Match("FROM"); 
 
@@ -8381,8 +8386,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FUNCTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:10: ( 'FUNCTION' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:12: 'FUNCTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:10: ( 'FUNCTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:12: 'FUNCTION'
             {
             	Match("FUNCTION"); 
 
@@ -8405,8 +8410,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GAUSS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:7: ( 'GAUSS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:9: 'GAUSS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:7: ( 'GAUSS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:9: 'GAUSS'
             {
             	Match("GAUSS"); 
 
@@ -8429,8 +8434,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:5: ( 'GBK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:7: 'GBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:5: ( 'GBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:7: 'GBK'
             {
             	Match("GBK"); 
 
@@ -8453,8 +8458,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:6: ( 'GDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:8: 'GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:6: ( 'GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:8: 'GDIF'
             {
             	Match("GDIF"); 
 
@@ -8477,8 +8482,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:7: ( 'GDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:9: 'GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:7: ( 'GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:9: 'GDIFF'
             {
             	Match("GDIFF"); 
 
@@ -8501,8 +8506,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEKKO18;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:9: ( 'GEKKO18' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:11: 'GEKKO18'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:9: ( 'GEKKO18' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:11: 'GEKKO18'
             {
             	Match("GEKKO18"); 
 
@@ -8525,8 +8530,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEKKO20;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:9: ( 'GEKKO20' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:11: 'GEKKO20'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:9: ( 'GEKKO20' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:11: 'GEKKO20'
             {
             	Match("GEKKO20"); 
 
@@ -8549,8 +8554,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GENR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:6: ( 'GENR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:8: 'GENR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:6: ( 'GENR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:8: 'GENR'
             {
             	Match("GENR"); 
 
@@ -8573,8 +8578,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEOMETRIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:11: ( 'GEOMETRIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:13: 'GEOMETRIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:11: ( 'GEOMETRIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:13: 'GEOMETRIC'
             {
             	Match("GEOMETRIC"); 
 
@@ -8597,8 +8602,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OVERLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:9: ( 'OVERLAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:11: 'OVERLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:9: ( 'OVERLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:11: 'OVERLAY'
             {
             	Match("OVERLAY"); 
 
@@ -8621,8 +8626,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GMULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:9: ( 'GMULPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:11: 'GMULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:9: ( 'GMULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:11: 'GMULPRT'
             {
             	Match("GMULPRT"); 
 
@@ -8645,8 +8650,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GNUPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:9: ( 'GNUPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:11: 'GNUPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:9: ( 'GNUPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:11: 'GNUPLOT'
             {
             	Match("GNUPLOT"); 
 
@@ -8669,8 +8674,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GOAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:6: ( 'GOAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:8: 'GOAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:6: ( 'GOAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:8: 'GOAL'
             {
             	Match("GOAL"); 
 
@@ -8693,8 +8698,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GOTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:6: ( 'GOTO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:8: 'GOTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:6: ( 'GOTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:8: 'GOTO'
             {
             	Match("GOTO"); 
 
@@ -8717,8 +8722,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRAPH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:7: ( 'GRAPH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:9: 'GRAPH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:7: ( 'GRAPH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:9: 'GRAPH'
             {
             	Match("GRAPH"); 
 
@@ -8741,8 +8746,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GROWTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:8: ( 'GROWTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:10: 'GROWTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:8: ( 'GROWTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:10: 'GROWTH'
             {
             	Match("GROWTH"); 
 
@@ -8765,8 +8770,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HDG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:5: ( 'HDG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:7: 'HDG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:5: ( 'HDG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:7: 'HDG'
             {
             	Match("HDG"); 
 
@@ -8789,8 +8794,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HEADING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:9: ( 'HEADING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:11: 'HEADING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:9: ( 'HEADING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:11: 'HEADING'
             {
             	Match("HEADING"); 
 
@@ -8813,8 +8818,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HELP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:6: ( 'HELP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:8: 'HELP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:6: ( 'HELP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:8: 'HELP'
             {
             	Match("HELP"); 
 
@@ -8837,8 +8842,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:6: ( 'HIDE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:8: 'HIDE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:6: ( 'HIDE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:8: 'HIDE'
             {
             	Match("HIDE"); 
 
@@ -8861,8 +8866,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDELEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:16: ( 'HIDELEFTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:18: 'HIDELEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:16: ( 'HIDELEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:18: 'HIDELEFTBORDER'
             {
             	Match("HIDELEFTBORDER"); 
 
@@ -8885,8 +8890,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDERIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:17: ( 'HIDERIGHTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:19: 'HIDERIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:17: ( 'HIDERIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:19: 'HIDERIGHTBORDER'
             {
             	Match("HIDERIGHTBORDER"); 
 
@@ -8909,8 +8914,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HORIZON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:9: ( 'HORIZON' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:11: 'HORIZON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:9: ( 'HORIZON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:11: 'HORIZON'
             {
             	Match("HORIZON"); 
 
@@ -8933,8 +8938,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HPFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:10: ( 'HPFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:12: 'HPFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:10: ( 'HPFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:12: 'HPFILTER'
             {
             	Match("HPFILTER"); 
 
@@ -8957,8 +8962,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:6: ( 'HTML' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:8: 'HTML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:6: ( 'HTML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:8: 'HTML'
             {
             	Match("HTML"); 
 
@@ -8981,8 +8986,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:4: ( 'IF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:6: 'IF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:4: ( 'IF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:6: 'IF'
             {
             	Match("IF"); 
 
@@ -9005,8 +9010,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IF_OLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:8: ( 'IF_OLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:10: 'IF_OLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:8: ( 'IF_OLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:10: 'IF_OLD'
             {
             	Match("IF_OLD"); 
 
@@ -9029,8 +9034,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:8: ( 'ASBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:10: 'ASBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:8: ( 'ASBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:10: 'ASBANK'
             {
             	Match("ASBANK"); 
 
@@ -9053,8 +9058,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TOBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:8: ( 'TOBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:10: 'TOBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:8: ( 'TOBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:10: 'TOBANK'
             {
             	Match("TOBANK"); 
 
@@ -9077,8 +9082,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FROMBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:10: ( 'FROMBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:12: 'FROMBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:10: ( 'FROMBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:12: 'FROMBANK'
             {
             	Match("FROMBANK"); 
 
@@ -9101,8 +9106,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREMISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:15: ( 'IGNOREMISSING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:17: 'IGNOREMISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:15: ( 'IGNOREMISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:17: 'IGNOREMISSING'
             {
             	Match("IGNOREMISSING"); 
 
@@ -9125,8 +9130,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREMISSINGVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:19: ( 'IGNOREMISSINGVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:21: 'IGNOREMISSINGVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:19: ( 'IGNOREMISSINGVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:21: 'IGNOREMISSINGVARS'
             {
             	Match("IGNOREMISSINGVARS"); 
 
@@ -9149,8 +9154,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:12: ( 'IGNOREVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:14: 'IGNOREVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:12: ( 'IGNOREVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:14: 'IGNOREVARS'
             {
             	Match("IGNOREVARS"); 
 
@@ -9173,8 +9178,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:8: ( 'IMPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:10: 'IMPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:8: ( 'IMPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:10: 'IMPORT'
             {
             	Match("IMPORT"); 
 
@@ -9197,8 +9202,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INDEX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:7: ( 'INDEX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:9: 'INDEX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:7: ( 'INDEX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:9: 'INDEX'
             {
             	Match("INDEX"); 
 
@@ -9221,8 +9226,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INFO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:6: ( 'INFO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:8: 'INFO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:6: ( 'INFO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:8: 'INFO'
             {
             	Match("INFO"); 
 
@@ -9245,8 +9250,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INFOFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:10: ( 'INFOFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:12: 'INFOFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:10: ( 'INFOFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:12: 'INFOFILE'
             {
             	Match("INFOFILE"); 
 
@@ -9269,8 +9274,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:5: ( 'INI' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:7: 'INI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:5: ( 'INI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:7: 'INI'
             {
             	Match("INI"); 
 
@@ -9293,8 +9298,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:6: ( 'INIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:8: 'INIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:6: ( 'INIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:8: 'INIT'
             {
             	Match("INIT"); 
 
@@ -9317,8 +9322,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERFACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:11: ( 'INTERFACE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:13: 'INTERFACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:11: ( 'INTERFACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:13: 'INTERFACE'
             {
             	Match("INTERFACE"); 
 
@@ -9341,8 +9346,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:10: ( 'INTERNAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:12: 'INTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:10: ( 'INTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:12: 'INTERNAL'
             {
             	Match("INTERNAL"); 
 
@@ -9365,8 +9370,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INVERT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:8: ( 'INVERT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:10: 'INVERT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:8: ( 'INVERT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:10: 'INVERT'
             {
             	Match("INVERT"); 
 
@@ -9389,8 +9394,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROBUST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:8: ( 'ROBUST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:10: 'ROBUST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:8: ( 'ROBUST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:10: 'ROBUST'
             {
             	Match("ROBUST"); 
 
@@ -9413,8 +9418,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:6: ( 'ITER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:8: 'ITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:6: ( 'ITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:8: 'ITER'
             {
             	Match("ITER"); 
 
@@ -9437,8 +9442,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:9: ( 'ITERMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:11: 'ITERMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:9: ( 'ITERMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:11: 'ITERMAX'
             {
             	Match("ITERMAX"); 
 
@@ -9461,8 +9466,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:9: ( 'ITERMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:11: 'ITERMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:9: ( 'ITERMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:11: 'ITERMIN'
             {
             	Match("ITERMIN"); 
 
@@ -9485,8 +9490,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERSHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:10: ( 'ITERSHOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:12: 'ITERSHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:10: ( 'ITERSHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:12: 'ITERSHOW'
             {
             	Match("ITERSHOW"); 
 
@@ -9509,8 +9514,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:6: ( 'KEEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:8: 'KEEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:6: ( 'KEEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:8: 'KEEP'
             {
             	Match("KEEP"); 
 
@@ -9533,8 +9538,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:8: ( 'LABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:10: 'LABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:8: ( 'LABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:10: 'LABELS'
             {
             	Match("LABELS"); 
 
@@ -9557,8 +9562,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:5: ( 'LAG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:7: 'LAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:5: ( 'LAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:7: 'LAG'
             {
             	Match("LAG"); 
 
@@ -9581,8 +9586,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LANGUAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:10: ( 'LANGUAGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:12: 'LANGUAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:10: ( 'LANGUAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:12: 'LANGUAGE'
             {
             	Match("LANGUAGE"); 
 
@@ -9605,8 +9610,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:6: ( 'LAST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:8: 'LAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:6: ( 'LAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:8: 'LAST'
             {
             	Match("LAST"); 
 
@@ -9629,8 +9634,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:5: ( 'LEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:7: 'LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:5: ( 'LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:7: 'LEV'
             {
             	Match("LEV"); 
 
@@ -9653,8 +9658,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:8: ( 'LINEAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:10: 'LINEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:8: ( 'LINEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:10: 'LINEAR'
             {
             	Match("LINEAR"); 
 
@@ -9677,8 +9682,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:7: ( 'LINES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:9: 'LINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:7: ( 'LINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:9: 'LINES'
             {
             	Match("LINES"); 
 
@@ -9701,8 +9706,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LIST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:6: ( 'LIST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:8: 'LIST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:6: ( 'LIST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:8: 'LIST'
             {
             	Match("LIST"); 
 
@@ -9725,8 +9730,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LISTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:10: ( 'LISTFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:12: 'LISTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:10: ( 'LISTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:12: 'LISTFILE'
             {
             	Match("LISTFILE"); 
 
@@ -9749,8 +9754,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:5: ( 'LOG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:7: 'LOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:5: ( 'LOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:7: 'LOG'
             {
             	Match("LOG"); 
 
@@ -9773,8 +9778,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:7: ( 'LOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:9: 'LOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:7: ( 'LOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:9: 'LOCK'
             {
             	Match("LOCK"); 
 
@@ -9797,8 +9802,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNLOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:9: ( 'UNLOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:11: 'UNLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:9: ( 'UNLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:11: 'UNLOCK'
             {
             	Match("UNLOCK"); 
 
@@ -9821,8 +9826,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:4: ( 'LU' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:6: 'LU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:4: ( 'LU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:6: 'LU'
             {
             	Match("LU"); 
 
@@ -9845,8 +9850,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = M;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:3: ( 'M' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:5: 'M'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:3: ( 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:5: 'M'
             {
             	Match('M'); 
 
@@ -9868,8 +9873,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MACRO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:8: ( 'MACRO2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:10: 'MACRO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:8: ( 'MACRO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:10: 'MACRO2'
             {
             	Match("MACRO2"); 
 
@@ -9892,8 +9897,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:6: ( 'MAIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:8: 'MAIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:6: ( 'MAIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:8: 'MAIN'
             {
             	Match("MAIN"); 
 
@@ -9916,8 +9921,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:5: ( 'MAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:7: 'MAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:5: ( 'MAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:7: 'MAT'
             {
             	Match("MAT"); 
 
@@ -9940,8 +9945,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MATRIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:8: ( 'MATRIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:10: 'MATRIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:8: ( 'MATRIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:10: 'MATRIX'
             {
             	Match("MATRIX"); 
 
@@ -9964,8 +9969,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROWNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:10: ( 'ROWNAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:12: 'ROWNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:10: ( 'ROWNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:12: 'ROWNAMES'
             {
             	Match("ROWNAMES"); 
 
@@ -9988,8 +9993,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:10: ( 'COLNAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:12: 'COLNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:10: ( 'COLNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:12: 'COLNAMES'
             {
             	Match("COLNAMES"); 
 
@@ -10012,8 +10017,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:5: ( 'MAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:7: 'MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:5: ( 'MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:7: 'MAX'
             {
             	Match("MAX"); 
 
@@ -10036,8 +10041,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:10: ( 'MAXLINES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:12: 'MAXLINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:10: ( 'MAXLINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:12: 'MAXLINES'
             {
             	Match("MAXLINES"); 
 
@@ -10060,8 +10065,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:5: ( 'MEM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:7: 'MEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:5: ( 'MEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:7: 'MEM'
             {
             	Match("MEM"); 
 
@@ -10084,8 +10089,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MENU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:6: ( 'MENU' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:8: 'MENU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:6: ( 'MENU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:8: 'MENU'
             {
             	Match("MENU"); 
 
@@ -10108,8 +10113,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MENUTABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:11: ( 'MENUTABLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:13: 'MENUTABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:11: ( 'MENUTABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:13: 'MENUTABLE'
             {
             	Match("MENUTABLE"); 
 
@@ -10132,8 +10137,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MERGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:7: ( 'MERGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:9: 'MERGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:7: ( 'MERGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:9: 'MERGE'
             {
             	Match("MERGE"); 
 
@@ -10156,8 +10161,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MERGECOLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:11: ( 'MERGECOLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:13: 'MERGECOLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:11: ( 'MERGECOLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:13: 'MERGECOLS'
             {
             	Match("MERGECOLS"); 
 
@@ -10180,8 +10185,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MESSAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:9: ( 'MESSAGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:11: 'MESSAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:9: ( 'MESSAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:11: 'MESSAGE'
             {
             	Match("MESSAGE"); 
 
@@ -10204,8 +10209,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = METHOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:8: ( 'METHOD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:10: 'METHOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:8: ( 'METHOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:10: 'METHOD'
             {
             	Match("METHOD"); 
 
@@ -10228,8 +10233,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:5: ( 'MIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:7: 'MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:5: ( 'MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:7: 'MIN'
             {
             	Match("MIN"); 
 
@@ -10252,8 +10257,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MIXED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:7: ( 'MIXED' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:9: 'MIXED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:7: ( 'MIXED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:9: 'MIXED'
             {
             	Match("MIXED"); 
 
@@ -10276,8 +10281,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:9: ( 'MISSING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:11: 'MISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:9: ( 'MISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:11: 'MISSING'
             {
             	Match("MISSING"); 
 
@@ -10300,8 +10305,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:6: ( 'MODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:8: 'MODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:6: ( 'MODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:8: 'MODE'
             {
             	Match("MODE"); 
 
@@ -10324,8 +10329,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:7: ( 'MODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:9: 'MODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:7: ( 'MODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:9: 'MODEL'
             {
             	Match("MODEL"); 
 
@@ -10348,8 +10353,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODERNLOOK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:12: ( 'MODERNLOOK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:14: 'MODERNLOOK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:12: ( 'MODERNLOOK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:14: 'MODERNLOOK'
             {
             	Match("MODERNLOOK"); 
 
@@ -10372,8 +10377,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:4: ( 'MP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:6: 'MP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:4: ( 'MP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:6: 'MP'
             {
             	Match("MP"); 
 
@@ -10396,8 +10401,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:4: ( 'DL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:6: 'DL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:4: ( 'DL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:6: 'DL'
             {
             	Match("DL"); 
 
@@ -10420,8 +10425,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = L;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:3: ( 'L' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:5: 'L'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:3: ( 'L' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:5: 'L'
             {
             	Match('L'); 
 
@@ -10443,8 +10448,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RDL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:5: ( 'RDL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:7: 'RDL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:5: ( 'RDL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:7: 'RDL'
             {
             	Match("RDL"); 
 
@@ -10467,8 +10472,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:4: ( 'RL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:6: 'RL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:4: ( 'RL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:6: 'RL'
             {
             	Match("RL"); 
 
@@ -10491,8 +10496,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:7: ( 'MULBK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:9: 'MULBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:7: ( 'MULBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:9: 'MULBK'
             {
             	Match("MULBK"); 
 
@@ -10515,8 +10520,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULPCT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:8: ( 'MULPCT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:10: 'MULPCT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:8: ( 'MULPCT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:10: 'MULPCT'
             {
             	Match("MULPCT"); 
 
@@ -10539,8 +10544,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:8: ( 'MULPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:10: 'MULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:8: ( 'MULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:10: 'MULPRT'
             {
             	Match("MULPRT"); 
 
@@ -10563,8 +10568,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:6: ( 'MUTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:8: 'MUTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:6: ( 'MUTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:8: 'MUTE'
             {
             	Match("MUTE"); 
 
@@ -10587,8 +10592,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = N;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:3: ( 'N' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:5: 'N'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:3: ( 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:5: 'N'
             {
             	Match('N'); 
 
@@ -10610,8 +10615,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:6: ( 'NAME' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:8: 'NAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:6: ( 'NAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:8: 'NAME'
             {
             	Match("NAME"); 
 
@@ -10634,8 +10639,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:7: ( 'NAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:9: 'NAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:7: ( 'NAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:9: 'NAMES'
             {
             	Match("NAMES"); 
 
@@ -10658,8 +10663,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:6: ( 'NDEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:8: 'NDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:6: ( 'NDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:8: 'NDEC'
             {
             	Match("NDEC"); 
 
@@ -10682,8 +10687,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NDIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:9: ( 'NDIFPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:11: 'NDIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:9: ( 'NDIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:11: 'NDIFPRT'
             {
             	Match("NDIFPRT"); 
 
@@ -10706,8 +10711,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:5: ( 'NEW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:7: 'NEW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:5: ( 'NEW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:7: 'NEW'
             {
             	Match("NEW"); 
 
@@ -10730,8 +10735,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEWTON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:8: ( 'NEWTON' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:10: 'NEWTON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:8: ( 'NEWTON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:10: 'NEWTON'
             {
             	Match("NEWTON"); 
 
@@ -10754,8 +10759,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:6: ( 'NEXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:8: 'NEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:6: ( 'NEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:8: 'NEXT'
             {
             	Match("NEXT"); 
 
@@ -10778,8 +10783,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NFAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:7: ( 'NFAIR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:9: 'NFAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:7: ( 'NFAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:9: 'NFAIR'
             {
             	Match("NFAIR"); 
 
@@ -10802,8 +10807,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:4: ( 'no' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:6: 'no'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:4: ( 'no' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:6: 'no'
             {
             	Match("no"); 
 
@@ -10826,8 +10831,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:7: ( 'NOABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:9: 'NOABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:7: ( 'NOABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:9: 'NOABS'
             {
             	Match("NOABS"); 
 
@@ -10850,8 +10855,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOCR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:6: ( 'NOCR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:8: 'NOCR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:6: ( 'NOCR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:8: 'NOCR'
             {
             	Match("NOCR"); 
 
@@ -10874,8 +10879,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NODIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:7: ( 'NODIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:9: 'NODIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:7: ( 'NODIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:9: 'NODIF'
             {
             	Match("NODIF"); 
 
@@ -10898,8 +10903,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NODIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:8: ( 'NODIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:10: 'NODIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:8: ( 'NODIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:10: 'NODIFF'
             {
             	Match("NODIFF"); 
 
@@ -10922,8 +10927,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:10: ( 'NOFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:12: 'NOFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:10: ( 'NOFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:12: 'NOFILTER'
             {
             	Match("NOFILTER"); 
 
@@ -10946,8 +10951,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:8: ( 'NOGDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:10: 'NOGDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:8: ( 'NOGDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:10: 'NOGDIF'
             {
             	Match("NOGDIF"); 
 
@@ -10970,8 +10975,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:9: ( 'NOGDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:11: 'NOGDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:9: ( 'NOGDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:11: 'NOGDIFF'
             {
             	Match("NOGDIFF"); 
 
@@ -10994,8 +10999,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOLEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:7: ( 'NOLEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:9: 'NOLEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:7: ( 'NOLEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:9: 'NOLEV'
             {
             	Match("NOLEV"); 
 
@@ -11018,8 +11023,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:6: ( 'NONE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:8: 'NONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:6: ( 'NONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:8: 'NONE'
             {
             	Match("NONE"); 
 
@@ -11042,8 +11047,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:10: ( 'NONMODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:12: 'NONMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:10: ( 'NONMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:12: 'NONMODEL'
             {
             	Match("NONMODEL"); 
 
@@ -11066,8 +11071,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:7: ( 'NOPCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:9: 'NOPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:7: ( 'NOPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:9: 'NOPCH'
             {
             	Match("NOPCH"); 
 
@@ -11090,8 +11095,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SAVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:6: ( 'SAVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:8: 'SAVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:6: ( 'SAVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:8: 'SAVE'
             {
             	Match("SAVE"); 
 
@@ -11114,8 +11119,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:5: ( 'NOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:7: 'NOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:5: ( 'NOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:7: 'NOT'
             {
             	Match("NOT"); 
 
@@ -11138,8 +11143,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOTIFY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:8: ( 'NOTIFY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:10: 'NOTIFY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:8: ( 'NOTIFY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:10: 'NOTIFY'
             {
             	Match("NOTIFY"); 
 
@@ -11162,8 +11167,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:5: ( 'NOV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:7: 'NOV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:5: ( 'NOV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:7: 'NOV'
             {
             	Match("NOV"); 
 
@@ -11186,8 +11191,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:8: ( 'NWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:10: 'NWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:8: ( 'NWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:10: 'NWIDTH'
             {
             	Match("NWIDTH"); 
 
@@ -11210,8 +11215,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NYTVINDU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:10: ( 'NYTVINDU' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:12: 'NYTVINDU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:10: ( 'NYTVINDU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:12: 'NYTVINDU'
             {
             	Match("NYTVINDU"); 
 
@@ -11234,8 +11239,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:5: ( 'OLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:7: 'OLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:5: ( 'OLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:7: 'OLS'
             {
             	Match("OLS"); 
 
@@ -11258,8 +11263,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:6: ( 'OPEN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:8: 'OPEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:6: ( 'OPEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:8: 'OPEN'
             {
             	Match("OPEN"); 
 
@@ -11282,8 +11287,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:8: ( 'OPTION' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:10: 'OPTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:8: ( 'OPTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:10: 'OPTION'
             {
             	Match("OPTION"); 
 
@@ -11306,8 +11311,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:4: ( 'OR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:6: 'OR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:4: ( 'OR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:6: 'OR'
             {
             	Match("OR"); 
 
@@ -11330,8 +11335,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = P;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:3: ( 'P' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:5: 'P'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:3: ( 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:5: 'P'
             {
             	Match('P'); 
 
@@ -11353,8 +11358,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PARAM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:7: ( 'PARAM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:9: 'PARAM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:7: ( 'PARAM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:9: 'PARAM'
             {
             	Match("PARAM"); 
 
@@ -11377,8 +11382,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PATCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:7: ( 'PATCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:9: 'PATCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:7: ( 'PATCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:9: 'PATCH'
             {
             	Match("PATCH"); 
 
@@ -11401,8 +11406,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PATH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:6: ( 'PATH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:8: 'PATH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:6: ( 'PATH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:8: 'PATH'
             {
             	Match("PATH"); 
 
@@ -11425,8 +11430,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PAUSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:7: ( 'PAUSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:9: 'PAUSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:7: ( 'PAUSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:9: 'PAUSE'
             {
             	Match("PAUSE"); 
 
@@ -11449,8 +11454,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:5: ( 'PCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:7: 'PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:5: ( 'PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:7: 'PCH'
             {
             	Match("PCH"); 
 
@@ -11473,8 +11478,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:6: ( 'PCIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:8: 'PCIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:6: ( 'PCIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:8: 'PCIM'
             {
             	Match("PCIM"); 
 
@@ -11497,8 +11502,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCIMSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:11: ( 'PCIMSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:13: 'PCIMSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:11: ( 'PCIMSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:13: 'PCIMSTYLE'
             {
             	Match("PCIMSTYLE"); 
 
@@ -11521,8 +11526,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:7: ( 'STYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:9: 'STYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:7: ( 'STYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:9: 'STYLE'
             {
             	Match("STYLE"); 
 
@@ -11545,8 +11550,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCTPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:8: ( 'PCTPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:10: 'PCTPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:8: ( 'PCTPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:10: 'PCTPRT'
             {
             	Match("PCTPRT"); 
 
@@ -11569,8 +11574,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:6: ( 'PDEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:8: 'PDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:6: ( 'PDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:8: 'PDEC'
             {
             	Match("PDEC"); 
 
@@ -11593,8 +11598,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERIOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:8: ( 'PERIOD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:10: 'PERIOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:8: ( 'PERIOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:10: 'PERIOD'
             {
             	Match("PERIOD"); 
 
@@ -11617,8 +11622,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PIPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:6: ( 'PIPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:8: 'PIPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:6: ( 'PIPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:8: 'PIPE'
             {
             	Match("PIPE"); 
 
@@ -11641,8 +11646,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:6: ( 'PLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:8: 'PLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:6: ( 'PLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:8: 'PLOT'
             {
             	Match("PLOT"); 
 
@@ -11665,8 +11670,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLOTCODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:10: ( 'PLOTCODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:12: 'PLOTCODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:10: ( 'PLOTCODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:12: 'PLOTCODE'
             {
             	Match("PLOTCODE"); 
 
@@ -11689,8 +11694,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CUT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:5: ( 'CUT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:7: 'CUT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:5: ( 'CUT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:7: 'CUT'
             {
             	Match("CUT"); 
 
@@ -11713,8 +11718,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:8: ( 'POINTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:10: 'POINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:8: ( 'POINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:10: 'POINTS'
             {
             	Match("POINTS"); 
 
@@ -11737,8 +11742,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:5: ( 'POS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:7: 'POS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:5: ( 'POS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:7: 'POS'
             {
             	Match("POS"); 
 
@@ -11761,8 +11766,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PREFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:8: ( 'PREFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:10: 'PREFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:8: ( 'PREFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:10: 'PREFIX'
             {
             	Match("PREFIX"); 
 
@@ -11785,8 +11790,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRETTY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:8: ( 'PRETTY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:10: 'PRETTY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:8: ( 'PRETTY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:10: 'PRETTY'
             {
             	Match("PRETTY"); 
 
@@ -11809,8 +11814,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:5: ( 'PRI' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:7: 'PRI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:5: ( 'PRI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:7: 'PRI'
             {
             	Match("PRI"); 
 
@@ -11833,8 +11838,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:6: ( 'PRIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:8: 'PRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:6: ( 'PRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:8: 'PRIM'
             {
             	Match("PRIM"); 
 
@@ -11857,8 +11862,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRINT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:7: ( 'PRINT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:9: 'PRINT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:7: ( 'PRINT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:9: 'PRINT'
             {
             	Match("PRINT"); 
 
@@ -11881,8 +11886,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPERATORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:11: ( 'OPERATORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:13: 'OPERATORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:11: ( 'OPERATORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:13: 'OPERATORS'
             {
             	Match("OPERATORS"); 
 
@@ -11905,8 +11910,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:5: ( 'PRN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:7: 'PRN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:5: ( 'PRN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:7: 'PRN'
             {
             	Match("PRN"); 
 
@@ -11929,8 +11934,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PROT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:6: ( 'PROT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:8: 'PROT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:6: ( 'PROT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:8: 'PROT'
             {
             	Match("PROT"); 
 
@@ -11953,8 +11958,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:5: ( 'PRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:7: 'PRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:5: ( 'PRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:7: 'PRT'
             {
             	Match("PRT"); 
 
@@ -11977,8 +11982,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRTX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:6: ( 'PRTX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:8: 'PRTX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:6: ( 'PRTX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:8: 'PRTX'
             {
             	Match("PRTX"); 
 
@@ -12001,8 +12006,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:9: ( 'PUDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:11: 'PUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:9: ( 'PUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:11: 'PUDVALG'
             {
             	Match("PUDVALG"); 
 
@@ -12025,8 +12030,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:8: ( 'PWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:10: 'PWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:8: ( 'PWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:10: 'PWIDTH'
             {
             	Match("PWIDTH"); 
 
@@ -12049,8 +12054,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Q;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:3: ( 'Q' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:5: 'Q'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:3: ( 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:5: 'Q'
             {
             	Match('Q'); 
 
@@ -12072,8 +12077,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:3: ( 'R' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:5: 'R'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:3: ( 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:5: 'R'
             {
             	Match('R'); 
 
@@ -12095,8 +12100,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:10: ( 'R_EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:12: 'R_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:10: ( 'R_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:12: 'R_EXPORT'
             {
             	Match("R_EXPORT"); 
 
@@ -12119,8 +12124,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:8: ( 'R_FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:10: 'R_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:8: ( 'R_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:10: 'R_FILE'
             {
             	Match("R_FILE"); 
 
@@ -12143,8 +12148,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:7: ( 'R_RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:9: 'R_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:7: ( 'R_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:9: 'R_RUN'
             {
             	Match("R_RUN"); 
 
@@ -12167,8 +12172,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:15: ( 'PYTHON_EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:17: 'PYTHON_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:15: ( 'PYTHON_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:17: 'PYTHON_EXPORT'
             {
             	Match("PYTHON_EXPORT"); 
 
@@ -12191,8 +12196,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:13: ( 'PYTHON_FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:15: 'PYTHON_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:13: ( 'PYTHON_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:15: 'PYTHON_FILE'
             {
             	Match("PYTHON_FILE"); 
 
@@ -12215,8 +12220,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:12: ( 'PYTHON_RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:14: 'PYTHON_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:12: ( 'PYTHON_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:14: 'PYTHON_RUN'
             {
             	Match("PYTHON_RUN"); 
 
@@ -12239,8 +12244,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:4: ( 'RD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:6: 'RD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:4: ( 'RD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:6: 'RD'
             {
             	Match("RD"); 
 
@@ -12263,8 +12268,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RDP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:5: ( 'RDP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:7: 'RDP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:5: ( 'RDP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:7: 'RDP'
             {
             	Match("RDP"); 
 
@@ -12287,8 +12292,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = READ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:6: ( 'READ' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:8: 'READ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:6: ( 'READ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:8: 'READ'
             {
             	Match("READ"); 
 
@@ -12311,8 +12316,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:5: ( 'REF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:7: 'REF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:5: ( 'REF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:7: 'REF'
             {
             	Match("REF"); 
 
@@ -12335,8 +12340,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:5: ( 'REL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:7: 'REL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:5: ( 'REL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:7: 'REL'
             {
             	Match("REL"); 
 
@@ -12359,8 +12364,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RENAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:8: ( 'RENAME' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:10: 'RENAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:8: ( 'RENAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:10: 'RENAME'
             {
             	Match("RENAME"); 
 
@@ -12383,8 +12388,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:9: ( 'REORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:11: 'REORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:9: ( 'REORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:11: 'REORDER'
             {
             	Match("REORDER"); 
 
@@ -12407,8 +12412,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:5: ( 'REP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:7: 'REP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:5: ( 'REP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:7: 'REP'
             {
             	Match("REP"); 
 
@@ -12431,8 +12436,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REPEAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:8: ( 'REPEAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:10: 'REPEAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:8: ( 'REPEAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:10: 'REPEAT'
             {
             	Match("REPEAT"); 
 
@@ -12455,8 +12460,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REPLACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:9: ( 'REPLACE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:11: 'REPLACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:9: ( 'REPLACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:11: 'REPLACE'
             {
             	Match("REPLACE"); 
 
@@ -12479,8 +12484,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:5: ( 'RES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:7: 'RES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:5: ( 'RES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:7: 'RES'
             {
             	Match("RES"); 
 
@@ -12503,8 +12508,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:7: ( 'RESET' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:9: 'RESET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:7: ( 'RESET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:9: 'RESET'
             {
             	Match("RESET"); 
 
@@ -12527,8 +12532,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BLOCK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:7: ( 'BLOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:9: 'BLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:7: ( 'BLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:9: 'BLOCK'
             {
             	Match("BLOCK"); 
 
@@ -12551,8 +12556,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESPECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:9: ( 'RESPECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:11: 'RESPECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:9: ( 'RESPECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:11: 'RESPECT'
             {
             	Match("RESPECT"); 
 
@@ -12575,8 +12580,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESTART;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:9: ( 'RESTART' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:11: 'RESTART'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:9: ( 'RESTART' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:11: 'RESTART'
             {
             	Match("RESTART"); 
 
@@ -12599,8 +12604,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:6: ( 'RING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:8: 'RING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:6: ( 'RING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:8: 'RING'
             {
             	Match("RING"); 
 
@@ -12623,8 +12628,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:4: ( 'RN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:6: 'RN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:4: ( 'RN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:6: 'RN'
             {
             	Match("RN"); 
 
@@ -12647,8 +12652,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROWS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:6: ( 'ROWS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:8: 'ROWS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:6: ( 'ROWS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:8: 'ROWS'
             {
             	Match("ROWS"); 
 
@@ -12671,8 +12676,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GROUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:7: ( 'GROUP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:9: 'GROUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:7: ( 'GROUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:9: 'GROUP'
             {
             	Match("GROUP"); 
 
@@ -12695,8 +12700,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEVEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:7: ( 'LEVEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:9: 'LEVEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:7: ( 'LEVEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:9: 'LEVEL'
             {
             	Match("LEVEL"); 
 
@@ -12719,8 +12724,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:6: ( 'LINK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:8: 'LINK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:6: ( 'LINK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:8: 'LINK'
             {
             	Match("LINK"); 
 
@@ -12743,8 +12748,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WHERE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:7: ( 'WHERE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:9: 'WHERE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:7: ( 'WHERE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:9: 'WHERE'
             {
             	Match("WHERE"); 
 
@@ -12767,8 +12772,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:4: ( 'RP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:6: 'RP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:4: ( 'RP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:6: 'RP'
             {
             	Match("RP"); 
 
@@ -12791,8 +12796,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:5: ( 'RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:7: 'RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:5: ( 'RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:7: 'RUN'
             {
             	Match("RUN"); 
 
@@ -12815,8 +12820,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LIBRARY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:9: ( 'LIBRARY' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:11: 'LIBRARY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:9: ( 'LIBRARY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:11: 'LIBRARY'
             {
             	Match("LIBRARY"); 
 
@@ -12839,8 +12844,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEARCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:8: ( 'SEARCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:10: 'SEARCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:8: ( 'SEARCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:10: 'SEARCH'
             {
             	Match("SEARCH"); 
 
@@ -12863,8 +12868,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:5: ( 'SEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:7: 'SEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:5: ( 'SEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:7: 'SEC'
             {
             	Match("SEC"); 
 
@@ -12887,8 +12892,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SECONDCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:16: ( 'SECONDCOLWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:18: 'SECONDCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:16: ( 'SECONDCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:18: 'SECONDCOLWIDTH'
             {
             	Match("SECONDCOLWIDTH"); 
 
@@ -12911,8 +12916,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:6: ( 'S___ER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:8: 'S___ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:6: ( 'S___ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:8: 'S___ER'
             {
             	Match("S___ER"); 
 
@@ -12935,8 +12940,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:6: ( 'S____ER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:8: 'S____ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:6: ( 'S____ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:8: 'S____ER'
             {
             	Match("S____ER"); 
 
@@ -12959,8 +12964,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:5: ( 'SER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:7: 'SER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:5: ( 'SER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:7: 'SER'
             {
             	Match("SER"); 
 
@@ -12983,8 +12988,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:9: ( 'S___ERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:11: 'S___ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:9: ( 'S___ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:11: 'S___ERIES'
             {
             	Match("S___ERIES"); 
 
@@ -13007,8 +13012,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:9: ( 'S____ERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:11: 'S____ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:9: ( 'S____ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:11: 'S____ERIES'
             {
             	Match("S____ERIES"); 
 
@@ -13031,8 +13036,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:8: ( 'SERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:10: 'SERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:8: ( 'SERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:10: 'SERIES'
             {
             	Match("SERIES"); 
 
@@ -13055,8 +13060,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:5: ( 'SET' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:7: 'SET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:5: ( 'SET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:7: 'SET'
             {
             	Match("SET"); 
 
@@ -13079,8 +13084,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:11: ( 'SETBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:13: 'SETBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:11: ( 'SETBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:13: 'SETBORDER'
             {
             	Match("SETBORDER"); 
 
@@ -13103,8 +13108,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETBOTTOMBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:17: ( 'SETBOTTOMBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:19: 'SETBOTTOMBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:17: ( 'SETBOTTOMBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:19: 'SETBOTTOMBORDER'
             {
             	Match("SETBOTTOMBORDER"); 
 
@@ -13127,8 +13132,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETDATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:10: ( 'SETDATES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:12: 'SETDATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:10: ( 'SETDATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:12: 'SETDATES'
             {
             	Match("SETDATES"); 
 
@@ -13151,8 +13156,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETLEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:15: ( 'SETLEFTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:17: 'SETLEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:15: ( 'SETLEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:17: 'SETLEFTBORDER'
             {
             	Match("SETLEFTBORDER"); 
 
@@ -13175,8 +13180,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETRIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:16: ( 'SETRIGHTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:18: 'SETRIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:16: ( 'SETRIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:18: 'SETRIGHTBORDER'
             {
             	Match("SETRIGHTBORDER"); 
 
@@ -13199,8 +13204,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETTEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:9: ( 'SETTEXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:11: 'SETTEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:9: ( 'SETTEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:11: 'SETTEXT'
             {
             	Match("SETTEXT"); 
 
@@ -13223,8 +13228,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETTOPBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:14: ( 'SETTOPBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:16: 'SETTOPBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:14: ( 'SETTOPBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:16: 'SETTOPBORDER'
             {
             	Match("SETTOPBORDER"); 
 
@@ -13247,8 +13252,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETVALUES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:11: ( 'SETVALUES' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:13: 'SETVALUES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:11: ( 'SETVALUES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:13: 'SETVALUES'
             {
             	Match("SETVALUES"); 
 
@@ -13271,8 +13276,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHEET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:7: ( 'SHEET' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:9: 'SHEET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:7: ( 'SHEET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:9: 'SHEET'
             {
             	Match("SHEET"); 
 
@@ -13295,8 +13300,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:6: ( 'SHOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:8: 'SHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:6: ( 'SHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:8: 'SHOW'
             {
             	Match("SHOW"); 
 
@@ -13319,8 +13324,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWBORDERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:13: ( 'SHOWBORDERS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:15: 'SHOWBORDERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:13: ( 'SHOWBORDERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:15: 'SHOWBORDERS'
             {
             	Match("SHOWBORDERS"); 
 
@@ -13343,8 +13348,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:9: ( 'SHOWPCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:11: 'SHOWPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:9: ( 'SHOWPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:11: 'SHOWPCH'
             {
             	Match("SHOWPCH"); 
 
@@ -13367,8 +13372,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIGN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:6: ( 'SIGN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:8: 'SIGN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:6: ( 'SIGN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:8: 'SIGN'
             {
             	Match("SIGN"); 
 
@@ -13391,8 +13396,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:5: ( 'SIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:7: 'SIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:5: ( 'SIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:7: 'SIM'
             {
             	Match("SIM"); 
 
@@ -13415,8 +13420,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:8: ( 'SIMPLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:10: 'SIMPLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:8: ( 'SIMPLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:10: 'SIMPLE'
             {
             	Match("SIMPLE"); 
 
@@ -13439,8 +13444,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SKIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:6: ( 'SKIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:8: 'SKIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:6: ( 'SKIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:8: 'SKIP'
             {
             	Match("SKIP"); 
 
@@ -13463,8 +13468,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:5: ( 'NAN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:7: 'NAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:5: ( 'NAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:7: 'NAN'
             {
             	Match("NAN"); 
 
@@ -13487,8 +13492,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENGINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:8: ( 'ENGINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:10: 'ENGINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:8: ( 'ENGINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:10: 'ENGINE'
             {
             	Match("ENGINE"); 
 
@@ -13511,8 +13516,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NORMAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:8: ( 'NORMAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:10: 'NORMAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:8: ( 'NORMAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:10: 'NORMAL'
             {
             	Match("NORMAL"); 
 
@@ -13535,8 +13540,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SMOOTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:8: ( 'SMOOTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:10: 'SMOOTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:8: ( 'SMOOTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:10: 'SMOOTH'
             {
             	Match("SMOOTH"); 
 
@@ -13559,8 +13564,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOLVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:7: ( 'SOLVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:9: 'SOLVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:7: ( 'SOLVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:9: 'SOLVE'
             {
             	Match("SOLVE"); 
 
@@ -13583,8 +13588,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:6: ( 'SOME' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:8: 'SOME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:6: ( 'SOME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:8: 'SOME'
             {
             	Match("SOME"); 
 
@@ -13607,8 +13612,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:6: ( 'SORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:8: 'SORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:6: ( 'SORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:8: 'SORT'
             {
             	Match("SORT"); 
 
@@ -13631,8 +13636,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOUND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:7: ( 'SOUND' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:9: 'SOUND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:7: ( 'SOUND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:9: 'SOUND'
             {
             	Match("SOUND"); 
 
@@ -13655,8 +13660,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOURCE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:8: ( 'SOURCE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:10: 'SOURCE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:8: ( 'SOURCE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:10: 'SOURCE'
             {
             	Match("SOURCE"); 
 
@@ -13679,8 +13684,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPECIALMINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:14: ( 'SPECIALMINUS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:16: 'SPECIALMINUS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:14: ( 'SPECIALMINUS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:16: 'SPECIALMINUS'
             {
             	Match("SPECIALMINUS"); 
 
@@ -13703,8 +13708,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLICE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:8: ( 'SPLICE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:10: 'SPLICE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:8: ( 'SPLICE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:10: 'SPLICE'
             {
             	Match("SPLICE"); 
 
@@ -13727,8 +13732,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:8: ( 'SPLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:10: 'SPLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:8: ( 'SPLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:10: 'SPLINE'
             {
             	Match("SPLINE"); 
 
@@ -13751,8 +13756,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:7: ( 'SPLIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:9: 'SPLIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:7: ( 'SPLIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:9: 'SPLIT'
             {
             	Match("SPLIT"); 
 
@@ -13775,8 +13780,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STACKED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:9: ( 'STACKED' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:11: 'STACKED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:9: ( 'STACKED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:11: 'STACKED'
             {
             	Match("STACKED"); 
 
@@ -13799,8 +13804,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:7: ( 'STAMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:9: 'STAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:7: ( 'STAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:9: 'STAMP'
             {
             	Match("STAMP"); 
 
@@ -13823,8 +13828,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STARTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:11: ( 'STARTFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:13: 'STARTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:11: ( 'STARTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:13: 'STARTFILE'
             {
             	Match("STARTFILE"); 
 
@@ -13847,8 +13852,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STATIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:8: ( 'STATIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:10: 'STATIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:8: ( 'STATIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:10: 'STATIC'
             {
             	Match("STATIC"); 
 
@@ -13871,8 +13876,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:7: ( 'CHECK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:9: 'CHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:7: ( 'CHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:9: 'CHECK'
             {
             	Match("CHECK"); 
 
@@ -13895,8 +13900,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:6: ( 'STEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:8: 'STEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:6: ( 'STEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:8: 'STEP'
             {
             	Match("STEP"); 
 
@@ -13919,8 +13924,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STOP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:6: ( 'STOP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:8: 'STOP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:6: ( 'STOP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:8: 'STOP'
             {
             	Match("STOP"); 
 
@@ -13943,8 +13948,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STRIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:7: ( 'STRIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:9: 'STRIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:7: ( 'STRIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:9: 'STRIP'
             {
             	Match("STRIP"); 
 
@@ -13967,8 +13972,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUFFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:8: ( 'SUFFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:10: 'SUFFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:8: ( 'SUFFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:10: 'SUFFIX'
             {
             	Match("SUFFIX"); 
 
@@ -13991,8 +13996,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUGGESTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:13: ( 'SUGGESTIONS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:15: 'SUGGESTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:13: ( 'SUGGESTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:15: 'SUGGESTIONS'
             {
             	Match("SUGGESTIONS"); 
 
@@ -14015,8 +14020,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:6: ( 'SWAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:8: 'SWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:6: ( 'SWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:8: 'SWAP'
             {
             	Match("SWAP"); 
 
@@ -14039,8 +14044,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SYS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:5: ( 'SYS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:7: 'SYS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:5: ( 'SYS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:7: 'SYS'
             {
             	Match("SYS"); 
 
@@ -14063,8 +14068,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SYSTEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:8: ( 'SYSTEM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:10: 'SYSTEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:8: ( 'SYSTEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:10: 'SYSTEM'
             {
             	Match("SYSTEM"); 
 
@@ -14087,8 +14092,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:7: ( 'TABLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:9: 'TABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:7: ( 'TABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:9: 'TABLE'
             {
             	Match("TABLE"); 
 
@@ -14111,8 +14116,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:8: ( 'TABLE1' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:10: 'TABLE1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:8: ( 'TABLE1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:10: 'TABLE1'
             {
             	Match("TABLE1"); 
 
@@ -14135,8 +14140,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:8: ( 'TABLE2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:10: 'TABLE2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:8: ( 'TABLE2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:10: 'TABLE2'
             {
             	Match("TABLE2"); 
 
@@ -14159,8 +14164,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLEOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:10: ( 'TABLEOLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:12: 'TABLEOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:10: ( 'TABLEOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:12: 'TABLEOLD'
             {
             	Match("TABLEOLD"); 
 
@@ -14183,8 +14188,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:6: ( 'TABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:8: 'TABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:6: ( 'TABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:8: 'TABS'
             {
             	Match("TABS"); 
 
@@ -14207,8 +14212,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TARGET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:8: ( 'TARGET' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:10: 'TARGET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:8: ( 'TARGET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:10: 'TARGET'
             {
             	Match("TARGET"); 
 
@@ -14231,8 +14236,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:6: ( 'TELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:8: 'TELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:6: ( 'TELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:8: 'TELL'
             {
             	Match("TELL"); 
 
@@ -14255,8 +14260,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TEMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:6: ( 'TEMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:8: 'TEMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:6: ( 'TEMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:8: 'TEMP'
             {
             	Match("TEMP"); 
 
@@ -14279,8 +14284,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TERMINAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:10: ( 'TERMINAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:12: 'TERMINAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:10: ( 'TERMINAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:12: 'TERMINAL'
             {
             	Match("TERMINAL"); 
 
@@ -14303,8 +14308,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TEST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:6: ( 'TEST' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:8: 'TEST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:6: ( 'TEST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:8: 'TEST'
             {
             	Match("TEST"); 
 
@@ -14327,8 +14332,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:17: ( 'TESTRANDOMMODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:19: 'TESTRANDOMMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:17: ( 'TESTRANDOMMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:19: 'TESTRANDOMMODEL'
             {
             	Match("TESTRANDOMMODEL"); 
 
@@ -14351,8 +14356,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODELCHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:22: ( 'TESTRANDOMMODELCHECK' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:24: 'TESTRANDOMMODELCHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:22: ( 'TESTRANDOMMODELCHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:24: 'TESTRANDOMMODELCHECK'
             {
             	Match("TESTRANDOMMODELCHECK"); 
 
@@ -14375,8 +14380,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTSIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:9: ( 'TESTSIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:11: 'TESTSIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:9: ( 'TESTSIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:11: 'TESTSIM'
             {
             	Match("TESTSIM"); 
 
@@ -14399,8 +14404,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:6: ( 'TIME' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:8: 'TIME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:6: ( 'TIME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:8: 'TIME'
             {
             	Match("TIME"); 
 
@@ -14423,8 +14428,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIMEFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:12: ( 'TIMEFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:14: 'TIMEFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:12: ( 'TIMEFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:14: 'TIMEFILTER'
             {
             	Match("TIMEFILTER"); 
 
@@ -14447,8 +14452,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:7: ( 'UNITS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:9: 'UNITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:7: ( 'UNITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:9: 'UNITS'
             {
             	Match("UNITS"); 
 
@@ -14471,8 +14476,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIMESPAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:10: ( 'TIMESPAN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:12: 'TIMESPAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:10: ( 'TIMESPAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:12: 'TIMESPAN'
             {
             	Match("TIMESPAN"); 
 
@@ -14495,8 +14500,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:7: ( 'TITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:9: 'TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:7: ( 'TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:9: 'TITLE'
             {
             	Match("TITLE"); 
 
@@ -14519,8 +14524,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:4: ( 'TO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:6: 'TO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:4: ( 'TO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:6: 'TO'
             {
             	Match("TO"); 
 
@@ -14543,8 +14548,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TOTAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:7: ( 'TOTAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:9: 'TOTAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:7: ( 'TOTAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:9: 'TOTAL'
             {
             	Match("TOTAL"); 
 
@@ -14560,6 +14565,54 @@ public partial class Cmd4Lexer : Lexer {
     }
     // $ANTLR end "TOTAL"
 
+    // $ANTLR start "TRACE"
+    public void mTRACE() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = TRACE;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:7: ( 'TRACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:9: 'TRACE'
+            {
+            	Match("TRACE"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "TRACE"
+
+    // $ANTLR start "TRACE2"
+    public void mTRACE2() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = TRACE2;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:8: ( 'TRACE2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:10: 'TRACE2'
+            {
+            	Match("TRACE2"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "TRACE2"
+
     // $ANTLR start "TRANSLATE"
     public void mTRANSLATE() // throws RecognitionException [2]
     {
@@ -14567,8 +14620,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRANSLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:11: ( 'TRANSLATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:13: 'TRANSLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:11: ( 'TRANSLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:13: 'TRANSLATE'
             {
             	Match("TRANSLATE"); 
 
@@ -14591,8 +14644,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRANSPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:11: ( 'TRANSPOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:13: 'TRANSPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:11: ( 'TRANSPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:13: 'TRANSPOSE'
             {
             	Match("TRANSPOSE"); 
 
@@ -14615,8 +14668,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TREL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:6: ( 'TREL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:8: 'TREL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:6: ( 'TREL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:8: 'TREL'
             {
             	Match("TREL"); 
 
@@ -14639,8 +14692,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:6: ( 'true' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:8: 'true'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:6: ( 'true' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:8: 'true'
             {
             	Match("true"); 
 
@@ -14663,8 +14716,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRUNCATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:10: ( 'TRUNCATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:12: 'TRUNCATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:10: ( 'TRUNCATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:12: 'TRUNCATE'
             {
             	Match("TRUNCATE"); 
 
@@ -14687,8 +14740,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:5: ( 'TSD' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:7: 'TSD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:5: ( 'TSD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:7: 'TSD'
             {
             	Match("TSD"); 
 
@@ -14711,8 +14764,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:6: ( 'TSDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:8: 'TSDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:6: ( 'TSDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:8: 'TSDX'
             {
             	Match("TSDX"); 
 
@@ -14735,8 +14788,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:5: ( 'TSP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:7: 'TSP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:5: ( 'TSP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:7: 'TSP'
             {
             	Match("TSP"); 
 
@@ -14759,8 +14812,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:5: ( 'TXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:7: 'TXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:5: ( 'TXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:7: 'TXT'
             {
             	Match("TXT"); 
 
@@ -14783,8 +14836,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:6: ( 'TYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:8: 'TYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:6: ( 'TYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:8: 'TYPE'
             {
             	Match("TYPE"); 
 
@@ -14807,8 +14860,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = U;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:3: ( 'U' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:5: 'U'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:3: ( 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:5: 'U'
             {
             	Match('U'); 
 
@@ -14830,8 +14883,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:6: ( '_ABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:8: '_ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:6: ( '_ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:8: '_ABS'
             {
             	Match("_ABS"); 
 
@@ -14854,8 +14907,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:6: ( '_DIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:8: '_DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:6: ( '_DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:8: '_DIF'
             {
             	Match("_DIF"); 
 
@@ -14878,8 +14931,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:7: ( '_DIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:9: '_DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:7: ( '_DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:9: '_DIFF'
             {
             	Match("_DIFF"); 
 
@@ -14902,8 +14955,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:8: ( 'UDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:10: 'UDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:8: ( 'UDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:10: 'UDVALG'
             {
             	Match("UDVALG"); 
 
@@ -14926,8 +14979,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:7: ( '_GDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:9: '_GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:7: ( '_GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:9: '_GDIF'
             {
             	Match("_GDIF"); 
 
@@ -14950,8 +15003,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:8: ( '_GDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:10: '_GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:8: ( '_GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:10: '_GDIFF'
             {
             	Match("_GDIFF"); 
 
@@ -14974,8 +15027,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ULEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:6: ( '_LEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:8: '_LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:6: ( '_LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:8: '_LEV'
             {
             	Match("_LEV"); 
 
@@ -14998,8 +15051,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:6: ( 'UNDO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:8: 'UNDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:6: ( 'UNDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:8: 'UNDO'
             {
             	Match("UNDO"); 
 
@@ -15022,8 +15075,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:7: ( 'UNFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:9: 'UNFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:7: ( 'UNFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:9: 'UNFIX'
             {
             	Match("UNFIX"); 
 
@@ -15046,8 +15099,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPEEDUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:9: ( 'SPEEDUP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:11: 'SPEEDUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:9: ( 'SPEEDUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:11: 'SPEEDUP'
             {
             	Match("SPEEDUP"); 
 
@@ -15070,8 +15123,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNSWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:8: ( 'UNSWAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:10: 'UNSWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:8: ( 'UNSWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:10: 'UNSWAP'
             {
             	Match("UNSWAP"); 
 
@@ -15094,8 +15147,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:6: ( '_PCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:8: '_PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:6: ( '_PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:8: '_PCH'
             {
             	Match("_PCH"); 
 
@@ -15118,8 +15171,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPDATEFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:12: ( 'UPDATEFREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:14: 'UPDATEFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:12: ( 'UPDATEFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:14: 'UPDATEFREQ'
             {
             	Match("UPDATEFREQ"); 
 
@@ -15142,8 +15195,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:6: ( 'UPDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:8: 'UPDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:6: ( 'UPDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:8: 'UPDX'
             {
             	Match("UPDX"); 
 
@@ -15166,8 +15219,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = V;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:3: ( 'V' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:5: 'V'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:3: ( 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:5: 'V'
             {
             	Match('V'); 
 
@@ -15189,8 +15242,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:5: ( 'VAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:7: 'VAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:5: ( 'VAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:7: 'VAL'
             {
             	Match("VAL"); 
 
@@ -15213,8 +15266,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:5: ( 'VAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:7: 'VAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:5: ( 'VAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:7: 'VAR'
             {
             	Match("VAR"); 
 
@@ -15237,8 +15290,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAR_KDUSJFLQO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:16: ( 'VAR_KDUSJFLQO2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:18: 'VAR_KDUSJFLQO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:16: ( 'VAR_KDUSJFLQO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:18: 'VAR_KDUSJFLQO2'
             {
             	Match("VAR_KDUSJFLQO2"); 
 
@@ -15261,8 +15314,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VALUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:7: ( 'VALUE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:9: 'VALUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:7: ( 'VALUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:9: 'VALUE'
             {
             	Match("VALUE"); 
 
@@ -15285,8 +15338,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:6: ( 'VERS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:8: 'VERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:6: ( 'VERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:8: 'VERS'
             {
             	Match("VERS"); 
 
@@ -15309,8 +15362,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERSION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:9: ( 'VERSION' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:11: 'VERSION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:9: ( 'VERSION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:11: 'VERSION'
             {
             	Match("VERSION"); 
 
@@ -15333,8 +15386,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:6: ( 'VPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:8: 'VPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:6: ( 'VPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:8: 'VPRT'
             {
             	Match("VPRT"); 
 
@@ -15357,8 +15410,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WAIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:6: ( 'WAIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:8: 'WAIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:6: ( 'WAIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:8: 'WAIT'
             {
             	Match("WAIT"); 
 
@@ -15381,8 +15434,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:7: ( 'WIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:9: 'WIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:7: ( 'WIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:9: 'WIDTH'
             {
             	Match("WIDTH"); 
 
@@ -15405,8 +15458,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WINDOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:8: ( 'WINDOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:10: 'WINDOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:8: ( 'WINDOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:10: 'WINDOW'
             {
             	Match("WINDOW"); 
 
@@ -15429,8 +15482,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WORKING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:9: ( 'WORKING' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:11: 'WORKING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:9: ( 'WORKING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:11: 'WORKING'
             {
             	Match("WORKING"); 
 
@@ -15453,8 +15506,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:7: ( 'WPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:9: 'WPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:7: ( 'WPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:9: 'WPLOT'
             {
             	Match("WPLOT"); 
 
@@ -15477,8 +15530,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WRITE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:7: ( 'WRITE' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:9: 'WRITE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:7: ( 'WRITE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:9: 'WRITE'
             {
             	Match("WRITE"); 
 
@@ -15501,8 +15554,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:9: ( 'WUDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:11: 'WUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:9: ( 'WUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:11: 'WUDVALG'
             {
             	Match("WUDVALG"); 
 
@@ -15525,8 +15578,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X12A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:6: ( 'X12A' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:8: 'X12A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:6: ( 'X12A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:8: 'X12A'
             {
             	Match("X12A"); 
 
@@ -15549,8 +15602,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:5: ( 'XLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:7: 'XLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:5: ( 'XLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:7: 'XLS'
             {
             	Match("XLS"); 
 
@@ -15573,8 +15626,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLSX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:6: ( 'XLSX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:8: 'XLSX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:6: ( 'XLSX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:8: 'XLSX'
             {
             	Match("XLSX"); 
 
@@ -15597,8 +15650,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:5: ( 'yes' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:7: 'yes'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:5: ( 'yes' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:7: 'yes'
             {
             	Match("yes"); 
 
@@ -15621,8 +15674,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:6: ( 'YMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:8: 'YMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:6: ( 'YMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:8: 'YMAX'
             {
             	Match("YMAX"); 
 
@@ -15645,8 +15698,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:6: ( 'YMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:8: 'YMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:6: ( 'YMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:8: 'YMIN'
             {
             	Match("YMIN"); 
 
@@ -15669,8 +15722,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = I;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:3: ( 'I' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:5: 'I'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:3: ( 'I' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:5: 'I'
             {
             	Match('I'); 
 
@@ -15692,8 +15745,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:7: ( 'Y2MAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:9: 'Y2MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:7: ( 'Y2MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:9: 'Y2MAX'
             {
             	Match("Y2MAX"); 
 
@@ -15716,8 +15769,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:7: ( 'Y2MIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:9: 'Y2MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1204:7: ( 'Y2MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1204:9: 'Y2MIN'
             {
             	Match("Y2MIN"); 
 
@@ -15740,8 +15793,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZERO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:6: ( 'ZERO' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:8: 'ZERO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1205:6: ( 'ZERO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1205:8: 'ZERO'
             {
             	Match("ZERO"); 
 
@@ -15764,8 +15817,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZOOM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:6: ( 'ZOOM' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:8: 'ZOOM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1206:6: ( 'ZOOM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1206:8: 'ZOOM'
             {
             	Match("ZOOM"); 
 
@@ -15788,8 +15841,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZVAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:6: ( 'ZVAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:8: 'ZVAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1207:6: ( 'ZVAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1207:8: 'ZVAR'
             {
             	Match("ZVAR"); 
 
@@ -15810,8 +15863,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5293:18: ( '\\n' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5293:29: '\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5302:18: ( '\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5302:29: '\\n'
             {
             	Match('\n'); 
 
@@ -15829,8 +15882,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5294:18: ( '\\r\\n' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5294:29: '\\r\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:18: ( '\\r\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:29: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -15849,8 +15902,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5295:15: ( '0' .. '9' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5295:29: '0' .. '9'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:15: ( '0' .. '9' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:29: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -15868,7 +15921,7 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5296:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5305:16: ( 'a' .. 'z' | 'A' .. 'Z' )
             // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -15899,16 +15952,16 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTTP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5298:5: ( H_ T_ T_ P_ ':' ( '//' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5298:29: H_ T_ T_ P_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:5: ( H_ T_ T_ P_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:29: H_ T_ T_ P_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
             	mT_(); 
             	mP_(); 
             	Match(':'); 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5298:46: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5298:47: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:46: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:47: '//'
             	{
             		Match("//"); 
 
@@ -15934,8 +15987,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTTPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5299:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5299:29: H_ T_ T_ P_ S_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5308:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5308:29: H_ T_ T_ P_ S_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
@@ -15943,8 +15996,8 @@ public partial class Cmd4Lexer : Lexer {
             	mP_(); 
             	mS_(); 
             	Match(':'); 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5299:49: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5299:50: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5308:49: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5308:50: '//'
             	{
             		Match("//"); 
 
@@ -15970,10 +16023,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             	int cnt1 = 0;
             	do 
             	{
@@ -16011,35 +16064,35 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:31: '\\t'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:31: '\\t'
             			    {
             			    	Match('\t'); 
 
             			    }
             			    break;
             			case 2 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:38: ' '
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:38: ' '
             			    {
             			    	Match(' '); 
 
             			    }
             			    break;
             			case 3 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:44: '\\u000C'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:44: '\\u000C'
             			    {
             			    	Match('\f'); 
 
             			    }
             			    break;
             			case 4 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:54: NEWLINE2
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:54: NEWLINE2
             			    {
             			    	mNEWLINE2(); 
 
             			    }
             			    break;
             			case 5 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5301:65: NEWLINE3
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5310:65: NEWLINE3
             			    {
             			    	mNEWLINE3(); 
 
@@ -16078,18 +16131,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:29: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:30: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:29: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:30: '//'
             	{
             		Match("//"); 
 
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
             	    int alt2 = 2;
@@ -16104,7 +16157,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt2) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5303:37: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5312:37: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -16149,12 +16202,12 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMENT_MULTILINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5313:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5313:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
             {
             	Match("/*"); 
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5313:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
             	do 
             	{
             	    int alt3 = 3;
@@ -16199,14 +16252,14 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt3) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:60: COMMENT_MULTILINE
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5313:60: COMMENT_MULTILINE
             			    {
             			    	mCOMMENT_MULTILINE(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5304:80: .
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5313:80: .
             			    {
             			    	MatchAny(); 
 
@@ -16243,8 +16296,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5316:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5316:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -16257,7 +16310,7 @@ public partial class Cmd4Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5307:42: ( DIGIT | LETTER | '_' )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5316:42: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt4 = 2;
@@ -16317,10 +16370,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5309:8: ( ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5309:29: ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:8: ( ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:29: ( DIGIT )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5309:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:29: ( DIGIT )+
             	int cnt5 = 0;
             	do 
             	{
@@ -16336,7 +16389,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5309:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16374,10 +16427,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DigitsEDigits;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:29: ( DIGIT )+
             	int cnt6 = 0;
             	do 
             	{
@@ -16393,7 +16446,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt6) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16412,14 +16465,14 @@ public partial class Cmd4Lexer : Lexer {
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:37: ( E_ )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:39: E_
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:37: ( E_ )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:39: E_
             	{
             		mE_(); 
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:45: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:45: ( DIGIT )+
             	int cnt7 = 0;
             	do 
             	{
@@ -16435,7 +16488,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt7) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5311:45: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5320:45: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -16473,15 +16526,15 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DateDef;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
             int alt14 = 3;
             alt14 = dfa14.Predict(input);
             switch (alt14) 
             {
                 case 1 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:14: ( DIGIT )+
                     	int cnt8 = 0;
                     	do 
                     	{
@@ -16497,7 +16550,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt8) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16517,7 +16570,7 @@ public partial class Cmd4Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop8' has no statements
 
                     	mM_(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:24: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:24: ( DIGIT )+
                     	int cnt9 = 0;
                     	do 
                     	{
@@ -16533,7 +16586,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt9) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:24: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:24: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16553,7 +16606,7 @@ public partial class Cmd4Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop9' has no statements
 
                     	mD_(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:34: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:34: ( DIGIT )+
                     	int cnt10 = 0;
                     	do 
                     	{
@@ -16569,7 +16622,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt10) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5317:34: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5326:34: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16592,9 +16645,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:11: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:11: ( DIGIT )+
                     	int cnt11 = 0;
                     	do 
                     	{
@@ -16610,7 +16663,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt11) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:11: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:11: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16640,7 +16693,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    Recover(mse);
                     	    throw mse;}
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:45: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:45: ( DIGIT )+
                     	int cnt12 = 0;
                     	do 
                     	{
@@ -16656,7 +16709,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt12) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5318:45: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:45: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16679,9 +16732,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5319:14: ( DIGIT )+ ( A_ | U_ )
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:14: ( DIGIT )+ ( A_ | U_ )
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5319:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:14: ( DIGIT )+
                     	int cnt13 = 0;
                     	do 
                     	{
@@ -16697,7 +16750,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt13) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5319:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16748,10 +16801,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IdentStartingWithInt;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5322:21: ( ( DIGIT | LETTER | '_' )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5322:29: ( DIGIT | LETTER | '_' )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5331:21: ( ( DIGIT | LETTER | '_' )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5331:29: ( DIGIT | LETTER | '_' )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5322:29: ( DIGIT | LETTER | '_' )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5331:29: ( DIGIT | LETTER | '_' )+
             	int cnt15 = 0;
             	do 
             	{
@@ -16815,15 +16868,15 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
             int alt22 = 3;
             alt22 = dfa22.Predict(input);
             switch (alt22) 
             {
                 case 1 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:29: ( DIGIT )+
                     	int cnt16 = 0;
                     	do 
                     	{
@@ -16839,7 +16892,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt16) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16860,7 +16913,7 @@ public partial class Cmd4Lexer : Lexer {
 
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:54: ( DIGIT )*
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:54: ( DIGIT )*
                     	do 
                     	{
                     	    int alt17 = 2;
@@ -16875,7 +16928,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt17) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:54: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:54: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16890,7 +16943,7 @@ public partial class Cmd4Lexer : Lexer {
                     	loop17:
                     		;	// Stops C# compiler whining that label 'loop17' has no statements
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:61: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:61: ( Exponent )?
                     	int alt18 = 2;
                     	int LA18_0 = input.LA(1);
 
@@ -16901,7 +16954,7 @@ public partial class Cmd4Lexer : Lexer {
                     	switch (alt18) 
                     	{
                     	    case 1 :
-                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5327:61: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5336:61: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -16914,9 +16967,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:29: ( DIGIT )+ Exponent
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5337:29: ( DIGIT )+ Exponent
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5337:29: ( DIGIT )+
                     	int cnt19 = 0;
                     	do 
                     	{
@@ -16932,7 +16985,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt19) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5328:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5337:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16956,11 +17009,11 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5329:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5338:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
                     {
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5329:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5338:29: ( DIGIT )+
                     	int cnt20 = 0;
                     	do 
                     	{
@@ -16976,7 +17029,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt20) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5329:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5338:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -16995,7 +17048,7 @@ public partial class Cmd4Lexer : Lexer {
                     	loop20:
                     		;	// Stops C# compiler whining that label 'loop20' has no statements
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5329:36: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5338:36: ( Exponent )?
                     	int alt21 = 2;
                     	int LA21_0 = input.LA(1);
 
@@ -17006,7 +17059,7 @@ public partial class Cmd4Lexer : Lexer {
                     	switch (alt21) 
                     	{
                     	    case 1 :
-                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5329:36: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5338:36: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -17034,11 +17087,11 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5332:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5332:29: E_ ( '+' | '-' )? ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5341:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5341:29: E_ ( '+' | '-' )? ( DIGIT )+
             {
             	mE_(); 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5332:32: ( '+' | '-' )?
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5341:32: ( '+' | '-' )?
             	int alt23 = 2;
             	int LA23_0 = input.LA(1);
 
@@ -17068,7 +17121,7 @@ public partial class Cmd4Lexer : Lexer {
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5332:47: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5341:47: ( DIGIT )+
             	int cnt24 = 0;
             	do 
             	{
@@ -17084,7 +17137,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt24) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5332:47: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5341:47: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -17120,14 +17173,14 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
             	{
             		Match('\''); 
-            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
             		do 
             		{
             		    int alt25 = 4;
@@ -17172,7 +17225,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt25) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:36: '~\\''
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:36: '~\\''
             				    {
             				    	Match("~'"); 
 
@@ -17180,7 +17233,7 @@ public partial class Cmd4Lexer : Lexer {
             				    }
             				    break;
             				case 2 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:44: '~{'
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:44: '~{'
             				    {
             				    	Match("~{"); 
 
@@ -17188,7 +17241,7 @@ public partial class Cmd4Lexer : Lexer {
             				    }
             				    break;
             				case 3 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5352:51: ~ ( '\\'' | '{' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:51: ~ ( '\\'' | '{' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17236,18 +17289,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 0 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes1", " stringCounter == 0 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('\''); 
-            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:61: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:61: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt26 = 2;
@@ -17262,7 +17315,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt26) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5353:62: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5362:62: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17311,18 +17364,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes2", " stringCounter == 1 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:56: '}' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:56: '}' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('}'); 
-            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt27 = 2;
@@ -17337,7 +17390,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt27) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5354:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17385,18 +17438,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes3", " stringCounter == 1 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
-            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:56: '}' (~ ( '{' | '\\'' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:56: '}' (~ ( '{' | '\\'' ) )* '\\''
             	{
             		Match('}'); 
-            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt28 = 2;
@@ -17411,7 +17464,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt28) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5355:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17460,8 +17513,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5358:10: ( '+=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5358:29: '+='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5367:10: ( '+=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5367:29: '+='
             {
             	Match("+="); 
 
@@ -17484,8 +17537,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5359:10: ( '*=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5359:29: '*='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5368:10: ( '*=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5368:29: '*='
             {
             	Match("*="); 
 
@@ -17508,8 +17561,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERCENTEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:13: ( '%=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5361:29: '%='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5370:13: ( '%=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5370:29: '%='
             {
             	Match("%="); 
 
@@ -17532,8 +17585,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HASHEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:10: ( '#=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5363:29: '#='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5372:10: ( '#=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5372:29: '#='
             {
             	Match("#="); 
 
@@ -17556,8 +17609,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HATEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:9: ( '^=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5364:29: '^='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5373:9: ( '^=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5373:29: '^='
             {
             	Match("^="); 
 
@@ -17580,8 +17633,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5367:5: ( '¨' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5367:29: '¨'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5376:5: ( '¨' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5376:29: '¨'
             {
             	Match('\u00A8'); 
 
@@ -17603,8 +17656,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5368:8: ( '£' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5368:29: '£'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5377:8: ( '£' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5377:29: '£'
             {
             	Match('\u00A3'); 
 
@@ -17626,8 +17679,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEDOTNUMBER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5369:14: ( '§' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5369:29: '§'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5378:14: ( '§' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5378:29: '§'
             {
             	Match('\u00A7'); 
 
@@ -17649,8 +17702,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUESTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5370:9: ( '½' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5370:29: '½'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5379:9: ( '½' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5379:29: '½'
             {
             	Match('\u00BD'); 
 
@@ -17672,8 +17725,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTANGLESPECIAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5371:17: ( '<=<' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5371:29: '<=<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5380:17: ( '<=<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5380:29: '<=<'
             {
             	Match("<=<"); 
 
@@ -17696,8 +17749,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEBACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5374:14: ( '¨\\\\' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5374:29: '¨\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5383:14: ( '¨\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5383:29: '¨\\\\'
             {
             	Match("¨\\"); 
 
@@ -17720,8 +17773,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5379:8: ( '==' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5379:29: '=='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5388:8: ( '==' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5388:29: '=='
             {
             	Match("=="); 
 
@@ -17744,8 +17797,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISNOTQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5380:10: ( '<>' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5380:29: '<>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5389:10: ( '<>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5389:29: '<>'
             {
             	Match("<>"); 
 
@@ -17768,8 +17821,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISLARGEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5381:16: ( '>=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5381:20: '>='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5390:16: ( '>=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5390:20: '>='
             {
             	Match(">="); 
 
@@ -17792,8 +17845,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISSMALLEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5382:17: ( '<=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5382:29: '<='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5391:17: ( '<=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5391:29: '<='
             {
             	Match("<="); 
 
@@ -17816,8 +17869,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXCLAMATION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5384:12: ( '!' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5384:29: '!'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5393:12: ( '!' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5393:29: '!'
             {
             	Match('!'); 
 
@@ -17839,8 +17892,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TILDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5385:6: ( '~' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5385:16: '~'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5394:6: ( '~' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5394:16: '~'
             {
             	Match('~'); 
 
@@ -17862,8 +17915,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5386:3: ( '@' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5386:29: '@'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5395:3: ( '@' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5395:29: '@'
             {
             	Match('@'); 
 
@@ -17885,8 +17938,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5387:4: ( '^' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5387:29: '^'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5396:4: ( '^' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5396:29: '^'
             {
             	Match('^'); 
 
@@ -17908,8 +17961,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEMICOLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5388:10: ( ';' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5388:29: ';'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5397:10: ( ';' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5397:29: ';'
             {
             	Match(';'); 
 
@@ -17931,8 +17984,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLONGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5389:10: ( ':|' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5389:29: ':|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5398:10: ( ':|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5398:29: ':|'
             {
             	Match(":|"); 
 
@@ -17955,8 +18008,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5390:6: ( ':' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5390:29: ':'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5399:6: ( ':' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5399:29: ':'
             {
             	Match(':'); 
 
@@ -17978,8 +18031,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMA2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5391:7: ( ',' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5391:29: ','
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5400:7: ( ',' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5400:29: ','
             {
             	Match(','); 
 
@@ -18001,8 +18054,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5392:4: ( '.' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5392:29: '.'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5401:4: ( '.' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5401:29: '.'
             {
             	Match('.'); 
 
@@ -18024,8 +18077,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5393:5: ( '#' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5393:29: '#'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5402:5: ( '#' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5402:29: '#'
             {
             	Match('#'); 
 
@@ -18047,8 +18100,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERCENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5394:8: ( '%' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5394:29: '%'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5403:8: ( '%' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5403:29: '%'
             {
             	Match('%'); 
 
@@ -18070,8 +18123,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5395:7: ( '$' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5395:29: '$'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5404:7: ( '$' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5404:29: '$'
             {
             	Match('$'); 
 
@@ -18093,8 +18146,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5396:10: ( '{' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5396:29: '{'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5405:10: ( '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5405:29: '{'
             {
             	Match('{'); 
 
@@ -18116,8 +18169,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5397:11: ( '}' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5397:29: '}'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5406:11: ( '}' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5406:29: '}'
             {
             	Match('}'); 
 
@@ -18139,8 +18192,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5398:10: ( '(' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5398:29: '('
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5407:10: ( '(' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5407:29: '('
             {
             	Match('('); 
 
@@ -18162,8 +18215,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5399:11: ( ')' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5399:29: ')'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5408:11: ( ')' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5408:29: ')'
             {
             	Match(')'); 
 
@@ -18185,8 +18238,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTBRACKETGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5400:16: ( '[_[' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5400:29: '[_['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5409:16: ( '[_[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5409:29: '[_['
             {
             	Match("[_["); 
 
@@ -18209,8 +18262,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5402:12: ( '[' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5402:29: '['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5411:12: ( '[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5411:29: '['
             {
             	Match('['); 
 
@@ -18232,8 +18285,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5403:13: ( ']' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5403:29: ']'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5412:13: ( ']' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5412:29: ']'
             {
             	Match(']'); 
 
@@ -18255,8 +18308,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTANGLESIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5406:16: ( '<' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5406:29: '<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5415:16: ( '<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5415:29: '<'
             {
             	Match('<'); 
 
@@ -18278,8 +18331,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTANGLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5407:11: ( '>' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5407:29: '>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5416:11: ( '>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5416:29: '>'
             {
             	Match('>'); 
 
@@ -18301,8 +18354,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5408:5: ( '*' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5408:29: '*'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5417:5: ( '*' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5417:29: '*'
             {
             	Match('*'); 
 
@@ -18324,8 +18377,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5409:19: ( '||' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5409:29: '||'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5418:19: ( '||' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5418:29: '||'
             {
             	Match("||"); 
 
@@ -18348,8 +18401,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5410:10: ( '&&' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5410:29: '&&'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5419:10: ( '&&' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5419:29: '&&'
             {
             	Match("&&"); 
 
@@ -18372,8 +18425,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5411:19: ( '|¨|' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5411:29: '|¨|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5420:19: ( '|¨|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5420:29: '|¨|'
             {
             	Match("|¨|"); 
 
@@ -18396,8 +18449,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERTICALBAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5413:12: ( '|' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5413:29: '|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5422:12: ( '|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5422:29: '|'
             {
             	Match('|'); 
 
@@ -18419,8 +18472,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5414:5: ( '+' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5414:29: '+'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5423:5: ( '+' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5423:29: '+'
             {
             	Match('+'); 
 
@@ -18442,8 +18495,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5415:6: ( '-' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5415:29: '-'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5424:6: ( '-' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5424:29: '-'
             {
             	Match('-'); 
 
@@ -18465,8 +18518,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5416:4: ( '/' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5416:29: '/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5425:4: ( '/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5425:29: '/'
             {
             	Match('/'); 
 
@@ -18488,8 +18541,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRIPLESTARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5417:12: ( '***' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5417:29: '***'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5426:12: ( '***' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5426:29: '***'
             {
             	Match("***"); 
 
@@ -18512,8 +18565,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5418:6: ( '**' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5418:29: '**'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5427:6: ( '**' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5427:29: '**'
             {
             	Match("**"); 
 
@@ -18536,8 +18589,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5420:6: ( '=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5420:29: '='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5429:6: ( '=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5429:29: '='
             {
             	Match('='); 
 
@@ -18559,8 +18612,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MINUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5421:11: ( '-=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5421:29: '-='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5430:11: ( '-=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5430:29: '-='
             {
             	Match("-="); 
 
@@ -18583,8 +18636,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIVEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5422:9: ( '/=' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5422:29: '/='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5431:9: ( '/=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5431:29: '/='
             {
             	Match("/="); 
 
@@ -18607,8 +18660,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5424:10: ( '\\\\' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5424:29: '\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5433:10: ( '\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5433:29: '\\\\'
             {
             	Match('\\'); 
 
@@ -18630,8 +18683,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = QUESTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5425:9: ( '?' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5425:29: '?'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5434:9: ( '?' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5434:29: '?'
             {
             	Match('?'); 
 
@@ -18651,8 +18704,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5427:12: ( ( 'a' | 'A' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5427:13: ( 'a' | 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5436:12: ( ( 'a' | 'A' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5436:13: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -18680,8 +18733,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5428:12: ( ( 'b' | 'B' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5428:13: ( 'b' | 'B' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5437:12: ( ( 'b' | 'B' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5437:13: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -18709,8 +18762,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5429:12: ( ( 'c' | 'C' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5429:13: ( 'c' | 'C' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5438:12: ( ( 'c' | 'C' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5438:13: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -18738,8 +18791,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5430:12: ( ( 'd' | 'D' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5430:13: ( 'd' | 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5439:12: ( ( 'd' | 'D' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5439:13: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -18767,8 +18820,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5431:12: ( ( 'e' | 'E' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5431:13: ( 'e' | 'E' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5440:12: ( ( 'e' | 'E' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5440:13: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -18796,8 +18849,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5432:12: ( ( 'f' | 'F' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5432:13: ( 'f' | 'F' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5441:12: ( ( 'f' | 'F' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5441:13: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -18825,8 +18878,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5433:12: ( ( 'g' | 'G' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5433:13: ( 'g' | 'G' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5442:12: ( ( 'g' | 'G' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5442:13: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -18854,8 +18907,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5434:12: ( ( 'h' | 'H' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5434:13: ( 'h' | 'H' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5443:12: ( ( 'h' | 'H' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5443:13: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -18883,8 +18936,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5435:12: ( ( 'i' | 'I' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5435:13: ( 'i' | 'I' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5444:12: ( ( 'i' | 'I' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5444:13: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -18912,8 +18965,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5436:12: ( ( 'j' | 'J' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5436:13: ( 'j' | 'J' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5445:12: ( ( 'j' | 'J' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5445:13: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -18941,8 +18994,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5437:12: ( ( 'k' | 'K' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5437:13: ( 'k' | 'K' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5446:12: ( ( 'k' | 'K' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5446:13: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -18970,8 +19023,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5439:12: ( ( 'm' | 'M' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5439:13: ( 'm' | 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5448:12: ( ( 'm' | 'M' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5448:13: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -18999,8 +19052,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5440:12: ( ( 'n' | 'N' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5440:13: ( 'n' | 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5449:12: ( ( 'n' | 'N' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5449:13: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -19028,8 +19081,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5441:12: ( ( 'o' | 'O' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5441:13: ( 'o' | 'O' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5450:12: ( ( 'o' | 'O' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5450:13: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -19057,8 +19110,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5442:12: ( ( 'p' | 'P' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5442:13: ( 'p' | 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5451:12: ( ( 'p' | 'P' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5451:13: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -19086,8 +19139,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5443:12: ( ( 'q' | 'Q' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5443:13: ( 'q' | 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5452:12: ( ( 'q' | 'Q' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5452:13: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -19115,8 +19168,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5444:12: ( ( 'r' | 'R' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5444:13: ( 'r' | 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5453:12: ( ( 'r' | 'R' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5453:13: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -19144,8 +19197,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5445:12: ( ( 's' | 'S' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5445:13: ( 's' | 'S' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5454:12: ( ( 's' | 'S' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5454:13: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -19173,8 +19226,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5446:12: ( ( 't' | 'T' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5446:13: ( 't' | 'T' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5455:12: ( ( 't' | 'T' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5455:13: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -19202,8 +19255,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5447:12: ( ( 'u' | 'U' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5447:13: ( 'u' | 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5456:12: ( ( 'u' | 'U' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5456:13: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -19231,8 +19284,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5448:12: ( ( 'v' | 'V' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5448:13: ( 'v' | 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5457:12: ( ( 'v' | 'V' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5457:13: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -19260,8 +19313,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5449:12: ( ( 'w' | 'W' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5449:13: ( 'w' | 'W' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5458:12: ( ( 'w' | 'W' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5458:13: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -19289,8 +19342,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5450:12: ( ( 'x' | 'X' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5450:13: ( 'x' | 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5459:12: ( ( 'x' | 'X' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5459:13: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -19318,8 +19371,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5451:12: ( ( 'y' | 'Y' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5451:13: ( 'y' | 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5460:12: ( ( 'y' | 'Y' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5460:13: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -19347,8 +19400,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5452:12: ( ( 'z' | 'Z' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5452:13: ( 'z' | 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5461:12: ( ( 'z' | 'Z' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5461:13: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -19373,8 +19426,8 @@ public partial class Cmd4Lexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
-        int alt29 = 637;
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
+        int alt29 = 639;
         alt29 = dfa29.Predict(input);
         switch (alt29) 
         {
@@ -23012,826 +23065,840 @@ public partial class Cmd4Lexer : Lexer {
                 }
                 break;
             case 520 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3564: TRANSLATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3564: TRACE
+                {
+                	mTRACE(); 
+
+                }
+                break;
+            case 521 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3570: TRACE2
+                {
+                	mTRACE2(); 
+
+                }
+                break;
+            case 522 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3577: TRANSLATE
                 {
                 	mTRANSLATE(); 
 
                 }
                 break;
-            case 521 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3574: TRANSPOSE
+            case 523 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3587: TRANSPOSE
                 {
                 	mTRANSPOSE(); 
 
                 }
                 break;
-            case 522 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3584: TREL
+            case 524 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3597: TREL
                 {
                 	mTREL(); 
 
                 }
                 break;
-            case 523 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3589: TRUE
+            case 525 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3602: TRUE
                 {
                 	mTRUE(); 
 
                 }
                 break;
-            case 524 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3594: TRUNCATE
+            case 526 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3607: TRUNCATE
                 {
                 	mTRUNCATE(); 
 
                 }
                 break;
-            case 525 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3603: TSD
+            case 527 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3616: TSD
                 {
                 	mTSD(); 
 
                 }
                 break;
-            case 526 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3607: TSDX
+            case 528 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3620: TSDX
                 {
                 	mTSDX(); 
 
                 }
                 break;
-            case 527 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3612: TSP
+            case 529 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3625: TSP
                 {
                 	mTSP(); 
 
                 }
                 break;
-            case 528 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3616: TXT
+            case 530 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3629: TXT
                 {
                 	mTXT(); 
 
                 }
                 break;
-            case 529 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3620: TYPE
+            case 531 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3633: TYPE
                 {
                 	mTYPE(); 
 
                 }
                 break;
-            case 530 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3625: U
+            case 532 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3638: U
                 {
                 	mU(); 
 
                 }
                 break;
-            case 531 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3627: UABS
+            case 533 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3640: UABS
                 {
                 	mUABS(); 
 
                 }
                 break;
-            case 532 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3632: UDIF
+            case 534 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3645: UDIF
                 {
                 	mUDIF(); 
 
                 }
                 break;
-            case 533 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3637: UDIFF
+            case 535 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3650: UDIFF
                 {
                 	mUDIFF(); 
 
                 }
                 break;
-            case 534 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3643: UDVALG
+            case 536 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3656: UDVALG
                 {
                 	mUDVALG(); 
 
                 }
                 break;
-            case 535 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3650: UGDIF
+            case 537 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3663: UGDIF
                 {
                 	mUGDIF(); 
 
                 }
                 break;
-            case 536 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3656: UGDIFF
+            case 538 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3669: UGDIFF
                 {
                 	mUGDIFF(); 
 
                 }
                 break;
-            case 537 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3663: ULEV
+            case 539 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3676: ULEV
                 {
                 	mULEV(); 
 
                 }
                 break;
-            case 538 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3668: UNDO
+            case 540 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3681: UNDO
                 {
                 	mUNDO(); 
 
                 }
                 break;
-            case 539 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3673: UNFIX
+            case 541 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3686: UNFIX
                 {
                 	mUNFIX(); 
 
                 }
                 break;
-            case 540 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3679: SPEEDUP
+            case 542 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3692: SPEEDUP
                 {
                 	mSPEEDUP(); 
 
                 }
                 break;
-            case 541 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3687: UNSWAP
+            case 543 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3700: UNSWAP
                 {
                 	mUNSWAP(); 
 
                 }
                 break;
-            case 542 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3694: UPCH
+            case 544 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3707: UPCH
                 {
                 	mUPCH(); 
 
                 }
                 break;
-            case 543 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3699: UPDATEFREQ
+            case 545 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3712: UPDATEFREQ
                 {
                 	mUPDATEFREQ(); 
 
                 }
                 break;
-            case 544 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3710: UPDX
+            case 546 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3723: UPDX
                 {
                 	mUPDX(); 
 
                 }
                 break;
-            case 545 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3715: V
+            case 547 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3728: V
                 {
                 	mV(); 
 
                 }
                 break;
-            case 546 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3717: VAL
+            case 548 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3730: VAL
                 {
                 	mVAL(); 
 
                 }
                 break;
-            case 547 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3721: VAR
+            case 549 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3734: VAR
                 {
                 	mVAR(); 
 
                 }
                 break;
-            case 548 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3725: VAR_KDUSJFLQO2
+            case 550 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3738: VAR_KDUSJFLQO2
                 {
                 	mVAR_KDUSJFLQO2(); 
 
                 }
                 break;
-            case 549 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3740: VALUE
+            case 551 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3753: VALUE
                 {
                 	mVALUE(); 
 
                 }
                 break;
-            case 550 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3746: VERS
+            case 552 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3759: VERS
                 {
                 	mVERS(); 
 
                 }
                 break;
-            case 551 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3751: VERSION
+            case 553 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3764: VERSION
                 {
                 	mVERSION(); 
 
                 }
                 break;
-            case 552 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3759: VPRT
+            case 554 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3772: VPRT
                 {
                 	mVPRT(); 
 
                 }
                 break;
-            case 553 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3764: WAIT
+            case 555 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3777: WAIT
                 {
                 	mWAIT(); 
 
                 }
                 break;
-            case 554 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3769: WIDTH
+            case 556 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3782: WIDTH
                 {
                 	mWIDTH(); 
 
                 }
                 break;
-            case 555 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3775: WINDOW
+            case 557 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3788: WINDOW
                 {
                 	mWINDOW(); 
 
                 }
                 break;
-            case 556 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3782: WORKING
+            case 558 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3795: WORKING
                 {
                 	mWORKING(); 
 
                 }
                 break;
-            case 557 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3790: WPLOT
+            case 559 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3803: WPLOT
                 {
                 	mWPLOT(); 
 
                 }
                 break;
-            case 558 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3796: WRITE
+            case 560 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3809: WRITE
                 {
                 	mWRITE(); 
 
                 }
                 break;
-            case 559 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3802: WUDVALG
+            case 561 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3815: WUDVALG
                 {
                 	mWUDVALG(); 
 
                 }
                 break;
-            case 560 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3810: X12A
+            case 562 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3823: X12A
                 {
                 	mX12A(); 
 
                 }
                 break;
-            case 561 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3815: XLS
+            case 563 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3828: XLS
                 {
                 	mXLS(); 
 
                 }
                 break;
-            case 562 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3819: XLSX
+            case 564 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3832: XLSX
                 {
                 	mXLSX(); 
 
                 }
                 break;
-            case 563 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3824: YES
+            case 565 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3837: YES
                 {
                 	mYES(); 
 
                 }
                 break;
-            case 564 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3828: YMAX
+            case 566 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3841: YMAX
                 {
                 	mYMAX(); 
 
                 }
                 break;
-            case 565 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3833: YMIN
+            case 567 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3846: YMIN
                 {
                 	mYMIN(); 
 
                 }
                 break;
-            case 566 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3838: I
+            case 568 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3851: I
                 {
                 	mI(); 
 
                 }
                 break;
-            case 567 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3840: Y2MAX
+            case 569 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3853: Y2MAX
                 {
                 	mY2MAX(); 
 
                 }
                 break;
-            case 568 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3846: Y2MIN
+            case 570 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3859: Y2MIN
                 {
                 	mY2MIN(); 
 
                 }
                 break;
-            case 569 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3852: ZERO
+            case 571 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3865: ZERO
                 {
                 	mZERO(); 
 
                 }
                 break;
-            case 570 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3857: ZOOM
+            case 572 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3870: ZOOM
                 {
                 	mZOOM(); 
 
                 }
                 break;
-            case 571 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3862: ZVAR
+            case 573 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3875: ZVAR
                 {
                 	mZVAR(); 
 
                 }
                 break;
-            case 572 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3867: HTTP
+            case 574 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3880: HTTP
                 {
                 	mHTTP(); 
 
                 }
                 break;
-            case 573 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3872: HTTPS
+            case 575 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3885: HTTPS
                 {
                 	mHTTPS(); 
 
                 }
                 break;
-            case 574 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3878: WHITESPACE
+            case 576 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3891: WHITESPACE
                 {
                 	mWHITESPACE(); 
 
                 }
                 break;
-            case 575 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3889: COMMENT
+            case 577 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3902: COMMENT
                 {
                 	mCOMMENT(); 
 
                 }
                 break;
-            case 576 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3897: COMMENT_MULTILINE
+            case 578 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3910: COMMENT_MULTILINE
                 {
                 	mCOMMENT_MULTILINE(); 
 
                 }
                 break;
-            case 577 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3915: Ident
+            case 579 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3928: Ident
                 {
                 	mIdent(); 
 
                 }
                 break;
-            case 578 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3921: Integer
+            case 580 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3934: Integer
                 {
                 	mInteger(); 
 
                 }
                 break;
-            case 579 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3929: DigitsEDigits
+            case 581 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3942: DigitsEDigits
                 {
                 	mDigitsEDigits(); 
 
                 }
                 break;
-            case 580 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3943: DateDef
+            case 582 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3956: DateDef
                 {
                 	mDateDef(); 
 
                 }
                 break;
-            case 581 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3951: IdentStartingWithInt
+            case 583 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3964: IdentStartingWithInt
                 {
                 	mIdentStartingWithInt(); 
 
                 }
                 break;
-            case 582 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3972: Double
+            case 584 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3985: Double
                 {
                 	mDouble(); 
 
                 }
                 break;
-            case 583 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3979: StringInQuotes
+            case 585 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3992: StringInQuotes
                 {
                 	mStringInQuotes(); 
 
                 }
                 break;
-            case 584 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3994: StringInQuotes1
+            case 586 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4007: StringInQuotes1
                 {
                 	mStringInQuotes1(); 
 
                 }
                 break;
-            case 585 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4010: StringInQuotes2
+            case 587 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4023: StringInQuotes2
                 {
                 	mStringInQuotes2(); 
 
                 }
                 break;
-            case 586 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4026: StringInQuotes3
+            case 588 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4039: StringInQuotes3
                 {
                 	mStringInQuotes3(); 
 
                 }
                 break;
-            case 587 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4042: PLUSEQUAL
+            case 589 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4055: PLUSEQUAL
                 {
                 	mPLUSEQUAL(); 
 
                 }
                 break;
-            case 588 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4052: STAREQUAL
+            case 590 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4065: STAREQUAL
                 {
                 	mSTAREQUAL(); 
 
                 }
                 break;
-            case 589 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4062: PERCENTEQUAL
+            case 591 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4075: PERCENTEQUAL
                 {
                 	mPERCENTEQUAL(); 
 
                 }
                 break;
-            case 590 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4075: HASHEQUAL
+            case 592 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4088: HASHEQUAL
                 {
                 	mHASHEQUAL(); 
 
                 }
                 break;
-            case 591 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4085: HATEQUAL
+            case 593 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4098: HATEQUAL
                 {
                 	mHATEQUAL(); 
 
                 }
                 break;
-            case 592 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4094: GLUE
+            case 594 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4107: GLUE
                 {
                 	mGLUE(); 
 
                 }
                 break;
-            case 593 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4099: GLUEDOT
+            case 595 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4112: GLUEDOT
                 {
                 	mGLUEDOT(); 
 
                 }
                 break;
-            case 594 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4107: GLUEDOTNUMBER
+            case 596 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4120: GLUEDOTNUMBER
                 {
                 	mGLUEDOTNUMBER(); 
 
                 }
                 break;
-            case 595 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4121: GLUESTAR
+            case 597 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4134: GLUESTAR
                 {
                 	mGLUESTAR(); 
 
                 }
                 break;
-            case 596 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4130: LEFTANGLESPECIAL
+            case 598 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4143: LEFTANGLESPECIAL
                 {
                 	mLEFTANGLESPECIAL(); 
 
                 }
                 break;
-            case 597 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4147: GLUEBACKSLASH
+            case 599 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4160: GLUEBACKSLASH
                 {
                 	mGLUEBACKSLASH(); 
 
                 }
                 break;
-            case 598 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4161: ISEQUAL
+            case 600 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4174: ISEQUAL
                 {
                 	mISEQUAL(); 
 
                 }
                 break;
-            case 599 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4169: ISNOTQUAL
+            case 601 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4182: ISNOTQUAL
                 {
                 	mISNOTQUAL(); 
 
                 }
                 break;
-            case 600 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4179: ISLARGEROREQUAL
+            case 602 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4192: ISLARGEROREQUAL
                 {
                 	mISLARGEROREQUAL(); 
 
                 }
                 break;
-            case 601 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4195: ISSMALLEROREQUAL
+            case 603 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4208: ISSMALLEROREQUAL
                 {
                 	mISSMALLEROREQUAL(); 
 
                 }
                 break;
-            case 602 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4212: EXCLAMATION
+            case 604 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4225: EXCLAMATION
                 {
                 	mEXCLAMATION(); 
 
                 }
                 break;
-            case 603 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4224: TILDE
+            case 605 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4237: TILDE
                 {
                 	mTILDE(); 
 
                 }
                 break;
-            case 604 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4230: AT
+            case 606 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4243: AT
                 {
                 	mAT(); 
 
                 }
                 break;
-            case 605 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4233: HAT
+            case 607 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4246: HAT
                 {
                 	mHAT(); 
 
                 }
                 break;
-            case 606 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4237: SEMICOLON
+            case 608 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4250: SEMICOLON
                 {
                 	mSEMICOLON(); 
 
                 }
                 break;
-            case 607 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4247: COLONGLUE
+            case 609 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4260: COLONGLUE
                 {
                 	mCOLONGLUE(); 
 
                 }
                 break;
-            case 608 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4257: COLON
+            case 610 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4270: COLON
                 {
                 	mCOLON(); 
 
                 }
                 break;
-            case 609 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4263: COMMA2
+            case 611 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4276: COMMA2
                 {
                 	mCOMMA2(); 
 
                 }
                 break;
-            case 610 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4270: DOT
+            case 612 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4283: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
-            case 611 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4274: HASH
+            case 613 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4287: HASH
                 {
                 	mHASH(); 
 
                 }
                 break;
-            case 612 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4279: PERCENT
+            case 614 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4292: PERCENT
                 {
                 	mPERCENT(); 
 
                 }
                 break;
-            case 613 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4287: DOLLAR
+            case 615 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4300: DOLLAR
                 {
                 	mDOLLAR(); 
 
                 }
                 break;
-            case 614 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4294: LEFTCURLY
+            case 616 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4307: LEFTCURLY
                 {
                 	mLEFTCURLY(); 
 
                 }
                 break;
-            case 615 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4304: RIGHTCURLY
+            case 617 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4317: RIGHTCURLY
                 {
                 	mRIGHTCURLY(); 
 
                 }
                 break;
-            case 616 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4315: LEFTPAREN
+            case 618 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4328: LEFTPAREN
                 {
                 	mLEFTPAREN(); 
 
                 }
                 break;
-            case 617 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4325: RIGHTPAREN
+            case 619 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4338: RIGHTPAREN
                 {
                 	mRIGHTPAREN(); 
 
                 }
                 break;
-            case 618 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4336: LEFTBRACKETGLUE
+            case 620 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4349: LEFTBRACKETGLUE
                 {
                 	mLEFTBRACKETGLUE(); 
 
                 }
                 break;
-            case 619 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4352: LEFTBRACKET
+            case 621 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4365: LEFTBRACKET
                 {
                 	mLEFTBRACKET(); 
 
                 }
                 break;
-            case 620 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4364: RIGHTBRACKET
+            case 622 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4377: RIGHTBRACKET
                 {
                 	mRIGHTBRACKET(); 
 
                 }
                 break;
-            case 621 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4377: LEFTANGLESIMPLE
+            case 623 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4390: LEFTANGLESIMPLE
                 {
                 	mLEFTANGLESIMPLE(); 
 
                 }
                 break;
-            case 622 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4393: RIGHTANGLE
+            case 624 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4406: RIGHTANGLE
                 {
                 	mRIGHTANGLE(); 
 
                 }
                 break;
-            case 623 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4404: STAR
+            case 625 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4417: STAR
                 {
                 	mSTAR(); 
 
                 }
                 break;
-            case 624 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4409: DOUBLEVERTICALBAR1
+            case 626 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4422: DOUBLEVERTICALBAR1
                 {
                 	mDOUBLEVERTICALBAR1(); 
 
                 }
                 break;
-            case 625 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4428: DOUBLEAND
+            case 627 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4441: DOUBLEAND
                 {
                 	mDOUBLEAND(); 
 
                 }
                 break;
-            case 626 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4438: DOUBLEVERTICALBAR2
+            case 628 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4451: DOUBLEVERTICALBAR2
                 {
                 	mDOUBLEVERTICALBAR2(); 
 
                 }
                 break;
-            case 627 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4457: VERTICALBAR
+            case 629 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4470: VERTICALBAR
                 {
                 	mVERTICALBAR(); 
 
                 }
                 break;
-            case 628 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4469: PLUS
+            case 630 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4482: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
-            case 629 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4474: MINUS
+            case 631 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4487: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
-            case 630 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4480: DIV
+            case 632 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4493: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
-            case 631 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4484: TRIPLESTARS
+            case 633 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4497: TRIPLESTARS
                 {
                 	mTRIPLESTARS(); 
 
                 }
                 break;
-            case 632 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4496: STARS
+            case 634 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4509: STARS
                 {
                 	mSTARS(); 
 
                 }
                 break;
-            case 633 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4502: EQUAL
+            case 635 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4515: EQUAL
                 {
                 	mEQUAL(); 
 
                 }
                 break;
-            case 634 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4508: MINUSEQUAL
+            case 636 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4521: MINUSEQUAL
                 {
                 	mMINUSEQUAL(); 
 
                 }
                 break;
-            case 635 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4519: DIVEQUAL
+            case 637 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4532: DIVEQUAL
                 {
                 	mDIVEQUAL(); 
 
                 }
                 break;
-            case 636 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4528: BACKSLASH
+            case 638 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4541: BACKSLASH
                 {
                 	mBACKSLASH(); 
 
                 }
                 break;
-            case 637 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4538: QUESTION
+            case 639 :
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4551: QUESTION
                 {
                 	mQUESTION(); 
 
@@ -23857,28 +23924,28 @@ public partial class Cmd4Lexer : Lexer {
 	}
 
     const string DFA14_eotS =
-        "\x02\uffff\x01\x05\x03\uffff\x01\x04\x01\uffff";
+        "\x03\uffff\x01\x06\x01\uffff\x01\x04\x02\uffff";
     const string DFA14_eofS =
         "\x08\uffff";
     const string DFA14_minS =
-        "\x04\x30\x02\uffff\x01\x30\x01\uffff";
+        "\x04\x30\x01\uffff\x01\x30\x02\uffff";
     const string DFA14_maxS =
-        "\x01\x39\x01\x77\x02\x39\x02\uffff\x01\x64\x01\uffff";
+        "\x01\x39\x01\x77\x02\x39\x01\uffff\x01\x64\x02\uffff";
     const string DFA14_acceptS =
-        "\x04\uffff\x01\x02\x01\x03\x01\uffff\x01\x01";
+        "\x04\uffff\x01\x02\x01\uffff\x01\x03\x01\x01";
     const string DFA14_specialS =
         "\x08\uffff}>";
     static readonly string[] DFA14_transitionS = {
             "\x0a\x01",
-            "\x0a\x01\x07\uffff\x01\x02\x0b\uffff\x01\x03\x03\uffff\x01"+
-            "\x04\x03\uffff\x01\x02\x01\uffff\x01\x04\x09\uffff\x01\x02\x0b"+
-            "\uffff\x01\x03\x03\uffff\x01\x04\x03\uffff\x01\x02\x01\uffff"+
+            "\x0a\x01\x07\uffff\x01\x03\x0b\uffff\x01\x02\x03\uffff\x01"+
+            "\x04\x03\uffff\x01\x03\x01\uffff\x01\x04\x09\uffff\x01\x03\x0b"+
+            "\uffff\x01\x02\x03\uffff\x01\x04\x03\uffff\x01\x03\x01\uffff"+
             "\x01\x04",
+            "\x0a\x05",
             "\x0a\x04",
-            "\x0a\x06",
             "",
+            "\x0a\x05\x0a\uffff\x01\x07\x1f\uffff\x01\x07",
             "",
-            "\x0a\x06\x0a\uffff\x01\x07\x1f\uffff\x01\x07",
             ""
     };
 
@@ -23908,7 +23975,7 @@ public partial class Cmd4Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5317:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
+            get { return "5326:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
         }
 
     }
@@ -23960,7 +24027,7 @@ public partial class Cmd4Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5327:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+            get { return "5336:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
         }
 
     }
@@ -23981,7 +24048,7 @@ public partial class Cmd4Lexer : Lexer {
         "\x02\x6f\x01\u0212\x03\x6f\x01\u0219\x0a\x6f\x01\uffff\x03\x6f\x01"+
         "\u022e\x01\uffff\x0e\x6f\x01\uffff\x03\x6f\x01\u0255\x08\x6f\x01"+
         "\uffff\x03\x6f\x01\u026a\x0a\x6f\x01\uffff\x09\x6f\x01\u0289\x01"+
-        "\uffff\x11\x6f\x05\uffff\x01\u029d\x02\u0112\x02\uffff\x01\u0112"+
+        "\uffff\x11\x6f\x06\uffff\x02\u0112\x01\u029f\x01\uffff\x01\u0112"+
         "\x0c\uffff\x01\u02a2\x09\uffff\x01\u02a4\x0f\uffff\x01\u02a6\x01"+
         "\u02a7\x02\x6f\x01\u02ab\x03\x6f\x01\u02af\x04\x6f\x01\u02b4\x02"+
         "\x6f\x01\uffff\x07\x6f\x01\u02c3\x01\u02c4\x02\x6f\x01\u02c9\x04"+
@@ -24000,196 +24067,197 @@ public partial class Cmd4Lexer : Lexer {
         "\x06\x6f\x01\uffff\x05\x6f\x01\u03b9\x0e\x6f\x01\uffff\x01\x6f\x01"+
         "\u03cb\x0f\x6f\x01\u03e2\x02\x6f\x01\u03e5\x01\x6f\x01\u03e9\x01"+
         "\u03eb\x05\x6f\x01\u03f7\x01\u03f8\x01\u03fa\x05\x6f\x01\u0401\x01"+
-        "\uffff\x01\x6f\x01\u0403\x12\x6f\x01\uffff\x06\x6f\x01\u041e\x01"+
-        "\u041f\x01\u0420\x01\x6f\x01\u0422\x0b\x6f\x01\u042f\x07\x6f\x01"+
-        "\uffff\x0e\x6f\x01\u0445\x03\x6f\x01\u029d\x01\uffff\x01\u0449\x01"+
-        "\u029d\x01\u0116\x04\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u044f\x01"+
-        "\x6f\x01\uffff\x01\x6f\x01\u0452\x01\u0455\x01\uffff\x01\u0457\x03"+
-        "\x6f\x01\uffff\x04\x6f\x01\u0460\x09\x6f\x02\uffff\x02\x6f\x01\u046c"+
-        "\x01\x6f\x01\uffff\x01\u046e\x01\x6f\x01\u0471\x01\u0472\x01\uffff"+
-        "\x02\x6f\x01\u0479\x01\u047c\x01\u047d\x01\x6f\x01\uffff\x01\x6f"+
-        "\x01\u0482\x01\u0483\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f"+
-        "\x01\u0488\x01\u048d\x01\u048e\x01\u0490\x02\x6f\x01\uffff\x01\x6f"+
-        "\x01\u0494\x04\x6f\x01\u049a\x02\uffff\x04\x6f\x01\uffff\x03\x6f"+
-        "\x01\uffff\x02\x6f\x01\u04a4\x02\uffff\x03\x6f\x01\u04a8\x02\uffff"+
-        "\x01\x6f\x01\u04ac\x02\x6f\x01\u04b0\x01\x6f\x01\uffff\x01\x6f\x01"+
-        "\u04b3\x01\u04b4\x01\u04b6\x01\u04b7\x01\x6f\x01\u04ba\x02\x6f\x01"+
-        "\uffff\x01\u04bd\x01\u04be\x01\u04c0\x01\x6f\x01\uffff\x01\x6f\x01"+
-        "\u04c4\x03\x6f\x01\u04c8\x02\x6f\x01\uffff\x01\u04cc\x01\uffff\x01"+
-        "\x6f\x01\uffff\x01\x6f\x01\u04cf\x02\x6f\x01\u04d2\x01\u04d3\x01"+
-        "\x6f\x01\u04d6\x01\x6f\x01\u04d8\x01\u04d9\x01\x6f\x01\u04db\x01"+
-        "\uffff\x03\x6f\x01\uffff\x01\u04df\x01\uffff\x02\x6f\x01\uffff\x03"+
-        "\x6f\x01\u04e5\x02\x6f\x01\u04e8\x06\x6f\x02\uffff\x01\x6f\x01\u04f2"+
-        "\x01\uffff\x01\u04f3\x02\x6f\x01\uffff\x01\u04f6\x06\x6f\x01\u04fe"+
-        "\x01\u04ff\x01\uffff\x02\x6f\x01\u0504\x05\x6f\x01\u050d\x05\x6f"+
-        "\x01\u0513\x01\u0517\x02\x6f\x01\u051a\x01\u051b\x01\x6f\x01\uffff"+
-        "\x06\x6f\x01\uffff\x01\x6f\x01\uffff\x06\x6f\x01\uffff\x01\u052b"+
-        "\x01\x6f\x01\u052e\x02\x6f\x01\u0531\x01\u0532\x05\x6f\x01\u053a"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u053f\x03\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x03\x6f\x01\uffff\x03\x6f\x01\u054a\x01\uffff"+
-        "\x01\x6f\x01\u054c\x03\x6f\x01\uffff\x01\u0550\x03\x6f\x01\u0554"+
-        "\x02\x6f\x01\u0559\x05\x6f\x01\u055f\x01\uffff\x05\x6f\x01\u0565"+
-        "\x03\x6f\x01\u056b\x01\u056e\x06\x6f\x01\uffff\x02\x6f\x01\u057a"+
-        "\x01\u057b\x02\x6f\x01\u057e\x03\x6f\x01\u0584\x02\x6f\x01\u0587"+
-        "\x01\u0588\x01\u0589\x03\x6f\x01\u058e\x02\x6f\x01\uffff\x02\x6f"+
-        "\x01\uffff\x01\u0593\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0597"+
-        "\x01\u0599\x01\u059a\x02\x6f\x01\u059d\x03\x6f\x01\u05a1\x01\x6f"+
-        "\x02\uffff\x01\u05a3\x01\uffff\x03\x6f\x01\u05a7\x02\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x01\u05ac\x01\x6f\x01\u05ae\x01\x6f\x01\u05b0"+
-        "\x01\u05b2\x02\x6f\x01\u05b5\x01\u05b8\x02\x6f\x01\u05bb\x01\x6f"+
-        "\x01\u05bd\x04\x6f\x01\u05c2\x01\x6f\x01\u05c4\x01\u05c5\x01\x6f"+
-        "\x01\u05c9\x01\u05ca\x03\uffff\x01\u05cb\x01\uffff\x01\u05cd\x03"+
-        "\x6f\x01\u05d1\x04\x6f\x01\u05d6\x02\x6f\x01\uffff\x01\x6f\x01\u05da"+
-        "\x01\u05dd\x02\x6f\x01\u05e0\x02\x6f\x01\u05e4\x06\x6f\x01\u05eb"+
-        "\x01\u05ec\x01\u05ee\x01\x6f\x01\u05f0\x01\u05f1\x01\uffff\x01\u05f2"+
-        "\x01\u05f3\x01\u05f4\x01\uffff\x01\u0112\x04\x6f\x01\uffff\x02\x6f"+
-        "\x01\uffff\x01\u05fc\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0600"+
-        "\x02\x6f\x01\u0603\x01\x6f\x01\u0605\x02\x6f\x01\uffff\x01\u0608"+
-        "\x05\x6f\x01\u060e\x04\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x02"+
-        "\uffff\x04\x6f\x01\u061a\x01\x6f\x01\uffff\x02\x6f\x02\uffff\x01"+
-        "\x6f\x01\u0620\x01\u0621\x01\x6f\x02\uffff\x01\u0623\x01\x6f\x01"+
-        "\u0626\x01\x6f\x01\uffff\x01\u0629\x03\x6f\x02\uffff\x01\x6f\x01"+
-        "\uffff\x01\x6f\x01\u062f\x01\u0630\x01\uffff\x01\u0631\x04\x6f\x01"+
-        "\uffff\x04\x6f\x01\u063a\x04\x6f\x01\uffff\x02\x6f\x01\u0641\x01"+
-        "\uffff\x03\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u0649\x01\x6f\x02"+
+        "\uffff\x01\x6f\x01\u0403\x12\x6f\x01\uffff\x06\x6f\x01\u041f\x01"+
+        "\u0420\x01\u0421\x01\x6f\x01\u0423\x0b\x6f\x01\u0430\x07\x6f\x01"+
+        "\uffff\x0e\x6f\x01\u0446\x03\x6f\x01\u029f\x01\u044b\x01\u029f\x01"+
+        "\uffff\x01\u0116\x04\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u0450\x01"+
+        "\x6f\x01\uffff\x01\x6f\x01\u0453\x01\u0456\x01\uffff\x01\u0458\x03"+
+        "\x6f\x01\uffff\x04\x6f\x01\u0461\x09\x6f\x02\uffff\x02\x6f\x01\u046d"+
+        "\x01\x6f\x01\uffff\x01\u046f\x01\x6f\x01\u0472\x01\u0473\x01\uffff"+
+        "\x02\x6f\x01\u047a\x01\u047d\x01\u047e\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\u0483\x01\u0484\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f"+
+        "\x01\u0489\x01\u048e\x01\u048f\x01\u0491\x02\x6f\x01\uffff\x01\x6f"+
+        "\x01\u0495\x04\x6f\x01\u049b\x02\uffff\x04\x6f\x01\uffff\x03\x6f"+
+        "\x01\uffff\x02\x6f\x01\u04a5\x02\uffff\x03\x6f\x01\u04a9\x02\uffff"+
+        "\x01\x6f\x01\u04ad\x02\x6f\x01\u04b1\x01\x6f\x01\uffff\x01\x6f\x01"+
+        "\u04b4\x01\u04b5\x01\u04b7\x01\u04b8\x01\x6f\x01\u04bb\x02\x6f\x01"+
+        "\uffff\x01\u04be\x01\u04bf\x01\u04c1\x01\x6f\x01\uffff\x01\x6f\x01"+
+        "\u04c5\x03\x6f\x01\u04c9\x02\x6f\x01\uffff\x01\u04cd\x01\uffff\x01"+
+        "\x6f\x01\uffff\x01\x6f\x01\u04d0\x02\x6f\x01\u04d3\x01\u04d4\x01"+
+        "\x6f\x01\u04d7\x01\x6f\x01\u04d9\x01\u04da\x01\x6f\x01\u04dc\x01"+
+        "\uffff\x03\x6f\x01\uffff\x01\u04e0\x01\uffff\x02\x6f\x01\uffff\x03"+
+        "\x6f\x01\u04e6\x02\x6f\x01\u04e9\x06\x6f\x02\uffff\x01\x6f\x01\u04f3"+
+        "\x01\uffff\x01\u04f4\x02\x6f\x01\uffff\x01\u04f7\x06\x6f\x01\u04ff"+
+        "\x01\u0500\x01\uffff\x02\x6f\x01\u0505\x05\x6f\x01\u050e\x05\x6f"+
+        "\x01\u0514\x01\u0518\x02\x6f\x01\u051b\x01\u051c\x01\x6f\x01\uffff"+
+        "\x06\x6f\x01\uffff\x01\x6f\x01\uffff\x06\x6f\x01\uffff\x01\u052c"+
+        "\x01\x6f\x01\u052f\x02\x6f\x01\u0532\x01\u0533\x05\x6f\x01\u053b"+
+        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0540\x03\x6f\x01\uffff"+
+        "\x01\x6f\x01\uffff\x03\x6f\x01\uffff\x03\x6f\x01\u054b\x01\uffff"+
+        "\x01\x6f\x01\u054d\x03\x6f\x01\uffff\x01\u0551\x03\x6f\x01\u0555"+
+        "\x02\x6f\x01\u055a\x05\x6f\x01\u0560\x01\uffff\x05\x6f\x01\u0566"+
+        "\x03\x6f\x01\u056c\x01\u056f\x06\x6f\x01\uffff\x02\x6f\x01\u057b"+
+        "\x01\u057c\x02\x6f\x01\u057f\x03\x6f\x01\u0585\x02\x6f\x01\u0588"+
+        "\x01\u0589\x01\u058a\x03\x6f\x01\u058f\x02\x6f\x01\uffff\x02\x6f"+
+        "\x01\uffff\x01\u0594\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0598"+
+        "\x01\u059a\x01\u059b\x02\x6f\x01\u059e\x03\x6f\x01\u05a2\x01\x6f"+
+        "\x02\uffff\x01\u05a4\x01\uffff\x03\x6f\x01\u05a8\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\uffff\x01\u05ad\x01\x6f\x01\u05af\x01\x6f\x01\u05b1"+
+        "\x01\u05b3\x02\x6f\x01\u05b6\x01\u05b9\x02\x6f\x01\u05bc\x02\x6f"+
+        "\x01\u05bf\x04\x6f\x01\u05c4\x01\x6f\x01\u05c6\x01\u05c7\x01\x6f"+
+        "\x01\u05cb\x01\u05cc\x03\uffff\x01\u05cd\x01\uffff\x01\u05cf\x03"+
+        "\x6f\x01\u05d3\x04\x6f\x01\u05d8\x02\x6f\x01\uffff\x01\x6f\x01\u05dc"+
+        "\x01\u05df\x02\x6f\x01\u05e2\x02\x6f\x01\u05e6\x06\x6f\x01\u05ed"+
+        "\x01\u05ee\x01\u05f0\x01\x6f\x01\u05f2\x01\u05f3\x01\uffff\x01\u05f4"+
+        "\x01\u05f5\x01\u05f6\x01\u0112\x01\uffff\x04\x6f\x01\uffff\x02\x6f"+
+        "\x01\uffff\x01\u05fe\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0602"+
+        "\x02\x6f\x01\u0605\x01\x6f\x01\u0607\x02\x6f\x01\uffff\x01\u060a"+
+        "\x05\x6f\x01\u0610\x04\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x02"+
+        "\uffff\x04\x6f\x01\u061c\x01\x6f\x01\uffff\x02\x6f\x02\uffff\x01"+
+        "\x6f\x01\u0622\x01\u0623\x01\x6f\x02\uffff\x01\u0625\x01\x6f\x01"+
+        "\u0628\x01\x6f\x01\uffff\x01\u062b\x03\x6f\x02\uffff\x01\x6f\x01"+
+        "\uffff\x01\x6f\x01\u0631\x01\u0632\x01\uffff\x01\u0633\x04\x6f\x01"+
+        "\uffff\x04\x6f\x01\u063c\x04\x6f\x01\uffff\x02\x6f\x01\u0643\x01"+
+        "\uffff\x03\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u064b\x01\x6f\x02"+
         "\uffff\x01\x6f\x02\uffff\x02\x6f\x01\uffff\x02\x6f\x02\uffff\x01"+
-        "\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u0654\x01\x6f\x01\u0656\x01"+
-        "\uffff\x01\u0657\x01\x6f\x01\u0659\x01\uffff\x02\x6f\x01\uffff\x02"+
-        "\x6f\x02\uffff\x02\x6f\x01\uffff\x01\u0662\x02\uffff\x01\u0663\x01"+
-        "\uffff\x02\x6f\x01\u0666\x01\uffff\x03\x6f\x01\u066a\x01\x6f\x01"+
-        "\uffff\x01\x6f\x01\u066d\x01\uffff\x01\u066f\x02\x6f\x01\u0672\x01"+
-        "\u0673\x03\x6f\x01\u0677\x02\uffff\x02\x6f\x01\uffff\x01\u067a\x04"+
-        "\x6f\x01\u0681\x01\x6f\x02\uffff\x04\x6f\x01\uffff\x06\x6f\x01\u068e"+
-        "\x01\u068f\x01\uffff\x01\u0691\x01\u0692\x02\x6f\x01\u0695\x01\uffff"+
-        "\x03\x6f\x01\uffff\x01\x6f\x01\u069b\x02\uffff\x0f\x6f\x01\uffff"+
-        "\x02\x6f\x01\uffff\x01\x6f\x01\u06af\x02\uffff\x01\u06b0\x05\x6f"+
-        "\x01\u06b6\x01\uffff\x01\x6f\x01\u06b8\x02\x6f\x01\uffff\x04\x6f"+
-        "\x01\u06c1\x01\u06c2\x02\x6f\x01\u06c6\x01\x6f\x01\uffff\x01\x6f"+
-        "\x01\uffff\x03\x6f\x01\uffff\x01\u06cc\x02\x6f\x01\uffff\x02\x6f"+
-        "\x01\u06d1\x01\u06d2\x01\uffff\x02\x6f\x01\u06d5\x01\x6f\x01\u06d9"+
-        "\x01\uffff\x02\x6f\x01\u06dc\x01\x6f\x01\u06de\x01\uffff\x01\x6f"+
-        "\x01\u06e0\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x03\x6f\x01\u06eb"+
-        "\x01\u06ee\x03\x6f\x01\u06f3\x01\u06f4\x01\u06f5\x02\uffff\x02\x6f"+
-        "\x01\uffff\x01\x6f\x01\u06fa\x03\x6f\x01\uffff\x01\u06fe\x01\u06ff"+
-        "\x03\uffff\x01\x6f\x01\u0702\x01\u0704\x01\x6f\x01\uffff\x01\u0706"+
-        "\x01\u0709\x01\u070a\x01\x6f\x01\uffff\x02\x6f\x01\u070e\x01\uffff"+
-        "\x01\x6f\x02\uffff\x02\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u0715"+
-        "\x01\uffff\x01\x6f\x01\u0717\x01\u0718\x01\uffff\x01\u0719\x03\x6f"+
+        "\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u0656\x01\x6f\x01\u0658\x01"+
+        "\uffff\x01\u0659\x01\x6f\x01\u065b\x01\uffff\x02\x6f\x01\uffff\x02"+
+        "\x6f\x02\uffff\x02\x6f\x01\uffff\x01\u0664\x02\uffff\x01\u0665\x01"+
+        "\uffff\x02\x6f\x01\u0668\x01\uffff\x03\x6f\x01\u066c\x01\x6f\x01"+
+        "\uffff\x01\x6f\x01\u066f\x01\uffff\x01\u0671\x02\x6f\x01\u0674\x01"+
+        "\u0675\x03\x6f\x01\u0679\x02\uffff\x02\x6f\x01\uffff\x01\u067c\x04"+
+        "\x6f\x01\u0683\x01\x6f\x02\uffff\x04\x6f\x01\uffff\x06\x6f\x01\u0690"+
+        "\x01\u0691\x01\uffff\x01\u0693\x01\u0694\x02\x6f\x01\u0697\x01\uffff"+
+        "\x03\x6f\x01\uffff\x01\x6f\x01\u069d\x02\uffff\x0f\x6f\x01\uffff"+
+        "\x02\x6f\x01\uffff\x01\x6f\x01\u06b1\x02\uffff\x01\u06b2\x05\x6f"+
+        "\x01\u06b8\x01\uffff\x01\x6f\x01\u06ba\x02\x6f\x01\uffff\x04\x6f"+
+        "\x01\u06c3\x01\u06c4\x02\x6f\x01\u06c8\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\uffff\x03\x6f\x01\uffff\x01\u06ce\x02\x6f\x01\uffff\x02\x6f"+
+        "\x01\u06d3\x01\u06d4\x01\uffff\x02\x6f\x01\u06d7\x01\x6f\x01\u06db"+
+        "\x01\uffff\x02\x6f\x01\u06de\x01\x6f\x01\u06e0\x01\uffff\x01\x6f"+
+        "\x01\u06e2\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x03\x6f\x01\u06ed"+
+        "\x01\u06f0\x03\x6f\x01\u06f5\x01\u06f6\x01\u06f7\x02\uffff\x02\x6f"+
+        "\x01\uffff\x01\x6f\x01\u06fc\x03\x6f\x01\uffff\x01\u0700\x01\u0701"+
+        "\x03\uffff\x01\x6f\x01\u0704\x01\u0706\x01\x6f\x01\uffff\x01\u0708"+
+        "\x01\u070b\x01\u070c\x01\x6f\x01\uffff\x02\x6f\x01\u0710\x01\uffff"+
+        "\x01\x6f\x02\uffff\x02\x6f\x01\uffff\x03\x6f\x01\uffff\x01\u0717"+
+        "\x01\uffff\x01\x6f\x01\u0719\x01\u071a\x01\uffff\x01\u071b\x03\x6f"+
         "\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x01\uffff"+
-        "\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0725\x01\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\u072b\x01\u072f\x01\uffff\x01\x6f"+
-        "\x02\uffff\x03\x6f\x03\uffff\x01\x6f\x01\uffff\x01\u0735\x01\x6f"+
-        "\x01\u0737\x01\uffff\x01\u0738\x03\x6f\x01\uffff\x01\x6f\x01\u073d"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01"+
-        "\uffff\x01\u0744\x01\uffff\x01\u0745\x02\x6f\x01\u0748\x01\u0749"+
-        "\x01\x6f\x02\uffff\x01\u074b\x01\uffff\x01\u074d\x05\uffff\x01\u029d"+
-        "\x01\u074e\x02\x6f\x01\u0751\x01\u0752\x01\x6f\x01\uffff\x03\x6f"+
-        "\x01\uffff\x01\x6f\x01\u0758\x01\uffff\x01\x6f\x01\uffff\x01\u075a"+
-        "\x01\u075b\x01\uffff\x01\u075c\x03\x6f\x01\u0760\x01\uffff\x01\x6f"+
-        "\x01\u0764\x01\u0765\x01\u0766\x01\u0767\x01\u0768\x05\x6f\x01\uffff"+
-        "\x03\x6f\x01\u0771\x01\u0772\x02\uffff\x01\x6f\x01\uffff\x01\u0774"+
-        "\x01\u0775\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u077a\x02\x6f"+
-        "\x03\uffff\x01\u077d\x01\u077e\x01\u077f\x01\u0780\x01\u0781\x01"+
-        "\x6f\x01\u0783\x01\x6f\x01\uffff\x02\x6f\x01\u0787\x02\x6f\x01\u078a"+
-        "\x01\uffff\x03\x6f\x01\u078e\x01\u078f\x02\x6f\x01\uffff\x02\x6f"+
-        "\x01\u0794\x01\x6f\x01\u0796\x05\x6f\x01\uffff\x01\u079c\x02\uffff"+
-        "\x01\u079d\x01\uffff\x01\u079e\x05\x6f\x01\u07a4\x01\u07a5\x02\uffff"+
-        "\x01\x6f\x01\u07a7\x01\uffff\x01\u07a8\x01\u07a9\x01\x6f\x01\uffff"+
-        "\x02\x6f\x01\uffff\x01\u07ad\x01\uffff\x01\x6f\x01\u07b0\x02\uffff"+
-        "\x01\u07b1\x01\u07b2\x01\x6f\x01\uffff\x01\x6f\x01\u07b5\x01\uffff"+
-        "\x01\u07b6\x05\x6f\x01\uffff\x01\x6f\x01\u07bd\x01\u07be\x04\x6f"+
-        "\x01\u07c3\x01\u07c4\x01\u07c7\x01\u07c8\x01\u07c9\x02\uffff\x01"+
-        "\x6f\x02\uffff\x01\x6f\x01\u07cc\x01\uffff\x04\x6f\x01\u07d1\x01"+
-        "\uffff\x01\u07d2\x01\x6f\x01\u07d4\x02\x6f\x01\u07d7\x01\x6f\x01"+
-        "\u07d9\x08\x6f\x01\u07e3\x01\x6f\x01\u07e5\x02\uffff\x01\u07e6\x02"+
-        "\x6f\x01\u07e9\x01\u07ea\x01\uffff\x01\u07eb\x01\uffff\x04\x6f\x01"+
-        "\u07f0\x01\u07f1\x02\x6f\x02\uffff\x01\u07f4\x01\u07f5\x01\u07f6"+
-        "\x01\uffff\x01\u07f7\x01\u07f8\x01\x6f\x01\u07fa\x01\x6f\x01\uffff"+
-        "\x01\x6f\x01\u07fd\x02\x6f\x02\uffff\x01\u0800\x01\x6f\x01\uffff"+
-        "\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0807\x01\uffff\x01\x6f"+
-        "\x01\uffff\x05\x6f\x01\u080e\x01\x6f\x01\u0810\x02\x6f\x01\uffff"+
-        "\x02\x6f\x01\uffff\x01\x6f\x01\u0816\x02\x6f\x03\uffff\x01\x6f\x01"+
-        "\u081a\x02\x6f\x01\uffff\x03\x6f\x02\uffff\x01\u0820\x01\x6f\x01"+
-        "\uffff\x01\u0822\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x02\uffff\x01"+
-        "\u0827\x02\x6f\x01\uffff\x04\x6f\x01\u082e\x01\u082f\x01\uffff\x01"+
-        "\x6f\x03\uffff\x01\x6f\x01\u0833\x01\u0835\x01\x6f\x01\u0837\x01"+
-        "\u0838\x02\x6f\x01\u083b\x02\x6f\x01\uffff\x04\x6f\x01\u0842\x01"+
-        "\uffff\x01\u0843\x01\u0844\x01\x6f\x01\uffff\x01\u0846\x04\x6f\x01"+
-        "\uffff\x01\u084b\x02\uffff\x01\u084c\x01\u084d\x02\x6f\x01\uffff"+
-        "\x05\x6f\x03\uffff\x01\u0855\x01\x6f\x02\uffff\x01\x6f\x01\uffff"+
-        "\x01\u0858\x02\uffff\x01\u0859\x01\x6f\x02\uffff\x04\x6f\x01\u085f"+
-        "\x01\uffff\x01\u0860\x03\uffff\x01\u0861\x01\u0862\x01\x6f\x01\uffff"+
-        "\x01\x6f\x01\u0865\x01\u0866\x05\uffff\x01\u0867\x07\x6f\x02\uffff"+
-        "\x01\x6f\x02\uffff\x04\x6f\x01\uffff\x01\x6f\x01\u0875\x05\uffff"+
-        "\x01\u0876\x01\uffff\x01\u0877\x01\u0878\x01\u0879\x01\uffff\x02"+
-        "\x6f\x01\uffff\x03\x6f\x02\uffff\x04\x6f\x01\uffff\x01\x6f\x01\uffff"+
-        "\x01\u0884\x02\x6f\x01\u0887\x01\x6f\x03\uffff\x01\u0889\x01\u088a"+
-        "\x01\x6f\x01\u088c\x01\x6f\x02\uffff\x01\u088e\x03\uffff\x03\x6f"+
-        "\x01\uffff\x01\x6f\x01\u0893\x03\uffff\x01\x6f\x01\u0895\x02\uffff"+
-        "\x06\x6f\x02\uffff\x01\u089c\x01\u089d\x02\x6f\x02\uffff\x02\x6f"+
-        "\x03\uffff\x01\u08a2\x01\x6f\x01\uffff\x03\x6f\x01\u08a7\x02\uffff"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x05\x6f\x01"+
-        "\u08b1\x03\x6f\x01\uffff\x01\u08b6\x02\uffff\x01\x6f\x01\u08b8\x03"+
-        "\uffff\x03\x6f\x01\u08bc\x02\uffff\x01\u08bd\x01\u08be\x05\uffff"+
-        "\x01\x6f\x01\uffff\x01\u08c0\x01\x6f\x01\uffff\x01\u08c2\x01\x6f"+
-        "\x01\uffff\x01\u08c4\x01\u08c5\x04\x6f\x01\uffff\x01\u08ca\x01\u08cb"+
-        "\x04\x6f\x01\uffff\x01\u08d0\x01\uffff\x04\x6f\x01\u08d5\x01\uffff"+
-        "\x03\x6f\x01\uffff\x01\x6f\x01\u08dc\x01\u08dd\x02\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x04\x6f\x01\uffff\x02\x6f\x01\u08e7\x01\x6f\x01"+
-        "\u08e9\x01\u08ea\x02\uffff\x01\u08eb\x02\x6f\x01\uffff\x01\x6f\x01"+
-        "\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u08f3\x01\uffff\x06\x6f\x03"+
-        "\uffff\x01\x6f\x01\uffff\x02\x6f\x01\u08fd\x01\x6f\x03\uffff\x02"+
-        "\x6f\x01\u0901\x02\x6f\x01\u0904\x01\x6f\x01\uffff\x01\u0906\x01"+
-        "\u0907\x02\uffff\x01\u0908\x04\x6f\x04\uffff\x02\x6f\x03\uffff\x01"+
-        "\u090f\x01\u0910\x01\x6f\x01\u0912\x01\u0913\x01\u0914\x02\x6f\x01"+
-        "\u0917\x03\x6f\x01\u091b\x05\uffff\x01\u091c\x01\u091d\x05\x6f\x01"+
-        "\u0923\x01\u0924\x01\u0925\x01\uffff\x01\u0926\x01\u0927\x01\uffff"+
-        "\x01\x6f\x02\uffff\x01\x6f\x01\uffff\x01\u092a\x01\uffff\x01\u092b"+
-        "\x01\x6f\x01\u092d\x01\u092e\x01\uffff\x01\u092f\x01\uffff\x01\u0930"+
-        "\x02\x6f\x01\u0933\x01\x6f\x01\u0935\x02\uffff\x01\u0936\x01\u0937"+
-        "\x02\x6f\x01\uffff\x01\x6f\x01\u093b\x01\x6f\x01\u093d\x01\uffff"+
-        "\x01\u093e\x01\x6f\x01\u0940\x03\x6f\x01\u0944\x02\x6f\x01\uffff"+
-        "\x04\x6f\x01\uffff\x01\x6f\x01\uffff\x03\x6f\x03\uffff\x01\x6f\x01"+
-        "\uffff\x01\u0950\x01\uffff\x01\x6f\x02\uffff\x04\x6f\x02\uffff\x01"+
-        "\u0956\x01\u0957\x01\u0958\x01\u0959\x01\uffff\x04\x6f\x01\uffff"+
-        "\x01\u095e\x01\u095f\x01\u0960\x01\u0961\x01\u0962\x01\u0963\x02"+
-        "\uffff\x01\u0964\x01\x6f\x01\u0966\x01\x6f\x01\u0968\x04\x6f\x01"+
-        "\uffff\x01\x6f\x03\uffff\x06\x6f\x01\u0974\x01\uffff\x01\x6f\x01"+
-        "\u0976\x03\x6f\x01\u097a\x01\u097b\x01\u097c\x01\x6f\x01\uffff\x02"+
-        "\x6f\x01\u0980\x01\uffff\x02\x6f\x01\uffff\x01\u0983\x03\uffff\x02"+
-        "\x6f\x01\u0986\x01\u0987\x01\u0988\x01\x6f\x02\uffff\x01\x6f\x03"+
-        "\uffff\x01\u098b\x01\x6f\x01\uffff\x01\x6f\x01\u098e\x01\u098f\x03"+
-        "\uffff\x01\x6f\x01\u0991\x01\u0992\x02\x6f\x05\uffff\x01\u0995\x01"+
-        "\u0996\x02\uffff\x01\u0997\x04\uffff\x01\x6f\x01\u0999\x01\uffff"+
-        "\x01\u099a\x03\uffff\x02\x6f\x01\u099d\x01\uffff\x01\x6f\x02\uffff"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u09a1\x01\x6f\x01\uffff\x03\x6f\x01"+
-        "\u09a6\x01\u09a7\x03\x6f\x01\u09ab\x01\x6f\x01\u09ad\x01\uffff\x01"+
-        "\u09ae\x02\x6f\x01\u09b1\x01\x6f\x04\uffff\x01\u09b3\x01\u09b4\x01"+
-        "\u09b5\x01\u09b6\x07\uffff\x01\u09b7\x01\uffff\x01\u09b8\x01\uffff"+
-        "\x04\x6f\x01\u09bd\x01\u09be\x01\u09bf\x03\x6f\x01\u09c3\x01\uffff"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u09c6\x01\u09c7\x03\uffff\x01\x6f"+
-        "\x01\u09c9\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\u09ce"+
-        "\x03\uffff\x01\x6f\x01\u09d0\x01\uffff\x02\x6f\x02\uffff\x01\x6f"+
-        "\x02\uffff\x02\x6f\x03\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u09d8"+
-        "\x01\uffff\x03\x6f\x01\uffff\x04\x6f\x02\uffff\x01\u09e0\x02\x6f"+
-        "\x01\uffff\x01\u09e3\x02\uffff\x01\x6f\x01\u09e5\x01\uffff\x01\u09e6"+
-        "\x06\uffff\x01\u09e7\x01\u09e8\x02\x6f\x03\uffff\x02\x6f\x01\u09ed"+
-        "\x01\uffff\x01\u09ee\x01\x6f\x02\uffff\x01\x6f\x01\uffff\x01\u09f1"+
-        "\x02\x6f\x01\u09f4\x01\uffff\x01\x6f\x01\uffff\x01\u09f6\x01\u09f7"+
-        "\x03\x6f\x01\u09fb\x01\x6f\x01\uffff\x01\u09fd\x01\u09fe\x05\x6f"+
-        "\x01\uffff\x01\x6f\x01\u0a05\x01\uffff\x01\u0a06\x04\uffff\x03\x6f"+
-        "\x01\u0a0a\x02\uffff\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f"+
-        "\x02\uffff\x01\u0a10\x02\x6f\x01\uffff\x01\x6f\x02\uffff\x04\x6f"+
-        "\x01\u0a18\x01\u0a19\x02\uffff\x01\u0a1a\x02\x6f\x01\uffff\x05\x6f"+
-        "\x01\uffff\x01\x6f\x01\u0a23\x01\u0a25\x02\x6f\x01\u0a28\x01\x6f"+
-        "\x03\uffff\x01\x6f\x01\u0a2b\x06\x6f\x01\uffff\x01\x6f\x01\uffff"+
-        "\x01\u0a33\x01\x6f\x01\uffff\x01\u0a35\x01\u0a36\x01\uffff\x02\x6f"+
-        "\x01\u0a39\x02\x6f\x01\u0a3c\x01\x6f\x01\uffff\x01\u0a3e\x02\uffff"+
-        "\x01\x6f\x01\u0a41\x01\uffff\x01\u0a42\x01\u0a43\x01\uffff\x01\x6f"+
-        "\x01\uffff\x02\x6f\x03\uffff\x01\u0a47\x02\x6f\x01\uffff\x01\u0a4a"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u0a4d\x01\uffff";
+        "\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0727\x01\x6f\x01\uffff"+
+        "\x01\u072a\x01\x6f\x01\uffff\x02\x6f\x01\u072f\x01\u0733\x01\uffff"+
+        "\x01\x6f\x02\uffff\x03\x6f\x03\uffff\x01\x6f\x01\uffff\x01\u0739"+
+        "\x01\x6f\x01\u073b\x01\uffff\x01\u073c\x03\x6f\x01\uffff\x01\x6f"+
+        "\x01\u0741\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\uffff\x01\u0748\x01\uffff\x01\u0749\x02\x6f\x01\u074c"+
+        "\x01\u074d\x01\x6f\x02\uffff\x01\u074f\x01\uffff\x01\u0751\x05\uffff"+
+        "\x01\u029f\x01\u0752\x02\x6f\x01\u0755\x01\u0756\x01\x6f\x01\uffff"+
+        "\x03\x6f\x01\uffff\x01\x6f\x01\u075c\x01\uffff\x01\x6f\x01\uffff"+
+        "\x01\u075e\x01\u075f\x01\uffff\x01\u0760\x03\x6f\x01\u0764\x01\uffff"+
+        "\x01\x6f\x01\u0768\x01\u0769\x01\u076a\x01\u076b\x01\u076c\x05\x6f"+
+        "\x01\uffff\x03\x6f\x01\u0775\x01\u0776\x02\uffff\x01\x6f\x01\uffff"+
+        "\x01\u0778\x01\u0779\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u077e"+
+        "\x02\x6f\x03\uffff\x01\u0781\x01\u0782\x01\u0783\x01\u0784\x01\u0785"+
+        "\x01\x6f\x01\u0787\x01\x6f\x01\uffff\x02\x6f\x01\u078b\x02\x6f\x01"+
+        "\u078e\x01\uffff\x03\x6f\x01\u0792\x01\u0793\x02\x6f\x01\uffff\x02"+
+        "\x6f\x01\u0798\x01\x6f\x01\u079a\x05\x6f\x01\uffff\x01\u07a0\x02"+
+        "\uffff\x01\u07a1\x01\uffff\x01\u07a2\x05\x6f\x01\u07a8\x01\u07a9"+
+        "\x02\uffff\x01\x6f\x01\u07ab\x01\uffff\x01\u07ac\x01\u07ad\x01\x6f"+
+        "\x01\uffff\x02\x6f\x01\uffff\x01\u07b1\x01\uffff\x01\x6f\x01\u07b4"+
+        "\x02\uffff\x01\u07b5\x01\u07b6\x01\x6f\x01\uffff\x01\x6f\x01\u07b9"+
+        "\x01\uffff\x01\u07ba\x05\x6f\x01\uffff\x01\x6f\x01\u07c1\x01\u07c2"+
+        "\x04\x6f\x01\u07c7\x01\u07c8\x01\u07cb\x01\u07cc\x01\u07cd\x02\uffff"+
+        "\x01\x6f\x02\uffff\x01\x6f\x01\u07d0\x01\uffff\x04\x6f\x01\u07d5"+
+        "\x01\uffff\x01\u07d6\x01\x6f\x01\u07d8\x02\x6f\x01\u07db\x01\x6f"+
+        "\x01\u07dd\x08\x6f\x01\u07e7\x01\x6f\x01\u07e9\x02\uffff\x01\u07ea"+
+        "\x02\x6f\x01\u07ed\x01\u07ee\x01\uffff\x01\u07ef\x01\uffff\x04\x6f"+
+        "\x01\u07f4\x01\u07f5\x02\x6f\x02\uffff\x01\u07f8\x01\u07f9\x01\u07fa"+
+        "\x01\uffff\x01\u07fb\x01\u07fc\x01\x6f\x01\u07fe\x01\x6f\x01\uffff"+
+        "\x01\x6f\x01\u0801\x02\x6f\x02\uffff\x01\u0804\x01\x6f\x01\uffff"+
+        "\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u080b\x01\uffff\x01\x6f"+
+        "\x01\uffff\x05\x6f\x01\u0812\x01\x6f\x01\u0814\x02\x6f\x01\uffff"+
+        "\x02\x6f\x01\uffff\x01\x6f\x01\u081a\x02\x6f\x03\uffff\x01\x6f\x01"+
+        "\u081e\x02\x6f\x01\uffff\x03\x6f\x02\uffff\x01\u0824\x01\x6f\x01"+
+        "\uffff\x01\u0826\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x02\uffff\x01"+
+        "\u082b\x02\x6f\x01\uffff\x04\x6f\x01\u0832\x01\u0833\x01\uffff\x01"+
+        "\x6f\x03\uffff\x01\x6f\x01\u0837\x01\u0839\x01\x6f\x01\u083b\x01"+
+        "\u083c\x02\x6f\x01\u083f\x02\x6f\x01\uffff\x01\x6f\x01\u0843\x01"+
+        "\uffff\x03\x6f\x01\u0847\x01\uffff\x01\u0848\x01\u0849\x01\x6f\x01"+
+        "\uffff\x01\u084b\x04\x6f\x01\uffff\x01\u0850\x02\uffff\x01\u0851"+
+        "\x01\u0852\x02\x6f\x01\uffff\x05\x6f\x03\uffff\x01\u085a\x01\x6f"+
+        "\x02\uffff\x01\x6f\x01\uffff\x01\u085d\x02\uffff\x01\u085e\x01\x6f"+
+        "\x02\uffff\x04\x6f\x01\u0864\x01\uffff\x01\u0865\x03\uffff\x01\u0866"+
+        "\x01\u0867\x01\x6f\x01\uffff\x01\x6f\x01\u086a\x01\u086b\x05\uffff"+
+        "\x01\u086c\x07\x6f\x02\uffff\x01\x6f\x02\uffff\x04\x6f\x01\uffff"+
+        "\x01\x6f\x01\u087a\x05\uffff\x01\u087b\x01\uffff\x01\u087c\x01\u087d"+
+        "\x01\u087e\x01\uffff\x02\x6f\x01\uffff\x03\x6f\x02\uffff\x04\x6f"+
+        "\x01\uffff\x01\x6f\x01\uffff\x01\u0889\x02\x6f\x01\u088c\x01\x6f"+
+        "\x03\uffff\x01\u088e\x01\u088f\x01\x6f\x01\u0891\x01\x6f\x02\uffff"+
+        "\x01\u0893\x03\uffff\x03\x6f\x01\uffff\x01\x6f\x01\u0898\x03\uffff"+
+        "\x01\x6f\x01\u089a\x02\uffff\x06\x6f\x02\uffff\x01\u08a1\x01\u08a2"+
+        "\x02\x6f\x02\uffff\x02\x6f\x03\uffff\x01\u08a7\x01\x6f\x01\uffff"+
+        "\x03\x6f\x01\u08ac\x02\uffff\x01\x6f\x01\uffff\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\uffff\x05\x6f\x01\u08b6\x03\x6f\x01\uffff\x01\u08bb"+
+        "\x02\uffff\x01\x6f\x01\u08bd\x03\uffff\x03\x6f\x01\u08c1\x02\uffff"+
+        "\x01\u08c2\x01\u08c3\x05\uffff\x01\x6f\x01\uffff\x01\u08c5\x01\x6f"+
+        "\x01\uffff\x01\u08c7\x01\x6f\x01\uffff\x01\u08c9\x01\u08ca\x04\x6f"+
+        "\x01\uffff\x01\u08cf\x01\u08d0\x04\x6f\x01\uffff\x01\u08d5\x01\uffff"+
+        "\x04\x6f\x01\u08da\x01\uffff\x03\x6f\x01\uffff\x01\x6f\x01\u08e1"+
+        "\x01\u08e2\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x04\x6f\x01\uffff"+
+        "\x02\x6f\x01\u08ec\x01\x6f\x01\u08ee\x01\u08ef\x02\uffff\x01\u08f0"+
+        "\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x02\uffff\x01\x6f\x01"+
+        "\u08f8\x01\uffff\x03\x6f\x01\uffff\x03\x6f\x03\uffff\x01\x6f\x01"+
+        "\uffff\x02\x6f\x01\u0902\x01\x6f\x03\uffff\x02\x6f\x01\u0906\x02"+
+        "\x6f\x01\u0909\x01\x6f\x01\uffff\x01\u090b\x01\u090c\x02\uffff\x01"+
+        "\u090d\x04\x6f\x04\uffff\x02\x6f\x03\uffff\x01\u0914\x01\u0915\x01"+
+        "\x6f\x01\u0917\x01\u0918\x01\u0919\x02\x6f\x01\u091c\x03\x6f\x01"+
+        "\u0920\x05\uffff\x01\u0921\x01\u0922\x05\x6f\x01\u0928\x01\u0929"+
+        "\x01\u092a\x01\uffff\x01\u092b\x01\u092c\x01\uffff\x01\x6f\x02\uffff"+
+        "\x01\x6f\x01\uffff\x01\u092f\x01\uffff\x01\u0930\x01\x6f\x01\u0932"+
+        "\x01\u0933\x01\uffff\x01\u0934\x01\uffff\x01\u0935\x02\x6f\x01\u0938"+
+        "\x01\x6f\x01\u093a\x02\uffff\x01\u093b\x01\u093c\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\u0940\x01\x6f\x01\u0942\x01\uffff\x01\u0943\x01\x6f"+
+        "\x01\u0945\x03\x6f\x01\u0949\x02\x6f\x01\uffff\x04\x6f\x01\uffff"+
+        "\x01\x6f\x01\uffff\x03\x6f\x03\uffff\x01\x6f\x01\uffff\x01\u0955"+
+        "\x01\uffff\x01\x6f\x02\uffff\x04\x6f\x02\uffff\x01\u095b\x01\u095c"+
+        "\x01\u095d\x01\u095e\x01\uffff\x04\x6f\x01\uffff\x01\u0963\x01\u0964"+
+        "\x01\u0965\x01\u0966\x01\u0967\x01\u0968\x02\uffff\x01\u0969\x01"+
+        "\x6f\x01\u096b\x01\x6f\x01\u096d\x04\x6f\x01\uffff\x01\x6f\x03\uffff"+
+        "\x06\x6f\x01\u0979\x01\uffff\x01\x6f\x01\u097b\x03\x6f\x01\u097f"+
+        "\x01\u0980\x01\u0981\x01\x6f\x01\uffff\x02\x6f\x01\u0985\x01\uffff"+
+        "\x02\x6f\x01\uffff\x01\u0988\x03\uffff\x02\x6f\x01\u098b\x01\u098c"+
+        "\x01\u098d\x01\x6f\x02\uffff\x01\x6f\x03\uffff\x01\u0990\x01\x6f"+
+        "\x01\uffff\x01\x6f\x01\u0993\x01\u0994\x03\uffff\x01\x6f\x01\u0996"+
+        "\x01\u0997\x02\x6f\x05\uffff\x01\u099a\x01\u099b\x02\uffff\x01\u099c"+
+        "\x04\uffff\x01\x6f\x01\u099e\x01\uffff\x01\u099f\x03\uffff\x02\x6f"+
+        "\x01\u09a2\x01\uffff\x01\x6f\x02\uffff\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\u09a6\x01\x6f\x01\uffff\x03\x6f\x01\u09ab\x01\u09ac\x03\x6f"+
+        "\x01\u09b0\x01\x6f\x01\u09b2\x01\uffff\x01\u09b3\x02\x6f\x01\u09b6"+
+        "\x01\x6f\x04\uffff\x01\u09b8\x01\u09b9\x01\u09ba\x01\u09bb\x07\uffff"+
+        "\x01\u09bc\x01\uffff\x01\u09bd\x01\uffff\x04\x6f\x01\u09c2\x01\u09c3"+
+        "\x01\u09c4\x03\x6f\x01\u09c8\x01\uffff\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\u09cb\x01\u09cc\x03\uffff\x01\x6f\x01\u09ce\x01\x6f\x01\uffff"+
+        "\x02\x6f\x01\uffff\x01\x6f\x01\u09d3\x03\uffff\x01\x6f\x01\u09d5"+
+        "\x01\uffff\x02\x6f\x02\uffff\x01\x6f\x02\uffff\x02\x6f\x03\uffff"+
+        "\x01\x6f\x02\uffff\x01\x6f\x01\u09dd\x01\uffff\x03\x6f\x01\uffff"+
+        "\x04\x6f\x02\uffff\x01\u09e5\x02\x6f\x01\uffff\x01\u09e8\x02\uffff"+
+        "\x01\x6f\x01\u09ea\x01\uffff\x01\u09eb\x06\uffff\x01\u09ec\x01\u09ed"+
+        "\x02\x6f\x03\uffff\x02\x6f\x01\u09f2\x01\uffff\x01\u09f3\x01\x6f"+
+        "\x02\uffff\x01\x6f\x01\uffff\x01\u09f6\x02\x6f\x01\u09f9\x01\uffff"+
+        "\x01\x6f\x01\uffff\x01\u09fb\x01\u09fc\x03\x6f\x01\u0a00\x01\x6f"+
+        "\x01\uffff\x01\u0a02\x01\u0a03\x05\x6f\x01\uffff\x01\x6f\x01\u0a0a"+
+        "\x01\uffff\x01\u0a0b\x04\uffff\x03\x6f\x01\u0a0f\x02\uffff\x02\x6f"+
+        "\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x02\uffff\x01\u0a15\x02\x6f"+
+        "\x01\uffff\x01\x6f\x02\uffff\x04\x6f\x01\u0a1d\x01\u0a1e\x02\uffff"+
+        "\x01\u0a1f\x02\x6f\x01\uffff\x05\x6f\x01\uffff\x01\x6f\x01\u0a28"+
+        "\x01\u0a2a\x02\x6f\x01\u0a2d\x01\x6f\x03\uffff\x01\x6f\x01\u0a30"+
+        "\x06\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0a38\x01\x6f\x01\uffff"+
+        "\x01\u0a3a\x01\u0a3b\x01\uffff\x02\x6f\x01\u0a3e\x02\x6f\x01\u0a41"+
+        "\x01\x6f\x01\uffff\x01\u0a43\x02\uffff\x01\x6f\x01\u0a46\x01\uffff"+
+        "\x01\u0a47\x01\u0a48\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x03\uffff"+
+        "\x01\u0a4c\x02\x6f\x01\uffff\x01\u0a4f\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\u0a52\x01\uffff";
     const string DFA29_eofS =
-        "\u0a4e\uffff";
+        "\u0a53\uffff";
     const string DFA29_minS =
         "\x01\x09\x20\x30\x01\uffff\x01\x2a\x02\x30\x01\x2e\x02\x00\x01"+
         "\x3d\x01\x2a\x03\x3d\x01\x5c\x02\uffff\x03\x3d\x04\uffff\x01\x7c"+
@@ -24197,115 +24265,116 @@ public partial class Cmd4Lexer : Lexer {
         "\x07\x30\x01\uffff\x0a\x30\x01\uffff\x05\x30\x01\uffff\x09\x30\x01"+
         "\uffff\x07\x30\x01\uffff\x18\x30\x01\uffff\x05\x30\x01\uffff\x19"+
         "\x30\x01\uffff\x13\x30\x01\uffff\x04\x30\x01\uffff\x0e\x30\x01\uffff"+
-        "\x0c\x30\x01\uffff\x0e\x30\x01\uffff\x0a\x30\x01\uffff\x11\x30\x05"+
-        "\uffff\x01\x30\x01\x2b\x01\x30\x02\uffff\x01\x30\x01\uffff\x01\x00"+
+        "\x0c\x30\x01\uffff\x0e\x30\x01\uffff\x0a\x30\x01\uffff\x11\x30\x06"+
+        "\uffff\x01\x30\x01\x2b\x01\x30\x01\uffff\x01\x30\x01\uffff\x01\x00"+
         "\x01\uffff\x01\x00\x01\uffff\x01\x00\x06\uffff\x01\x2a\x09\uffff"+
         "\x01\x3c\x0f\uffff\x10\x30\x01\uffff\x17\x30\x01\uffff\x01\x30\x01"+
         "\uffff\x0b\x30\x01\uffff\x0f\x30\x02\uffff\x04\x30\x02\uffff\x4c"+
         "\x30\x01\uffff\x05\x30\x01\uffff\x23\x30\x01\uffff\x03\x30\x01\uffff"+
         "\x0c\x30\x01\uffff\x02\x30\x01\uffff\x06\x30\x01\uffff\x14\x30\x01"+
-        "\uffff\x26\x30\x01\uffff\x14\x30\x01\uffff\x1e\x30\x01\uffff\x13"+
-        "\x30\x01\uffff\x02\x30\x01\x00\x04\uffff\x01\x30\x02\uffff\x03\x30"+
-        "\x01\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff\x0e\x30\x02\uffff"+
-        "\x04\x30\x01\uffff\x04\x30\x01\uffff\x06\x30\x01\uffff\x04\x30\x01"+
-        "\uffff\x01\x30\x01\uffff\x08\x30\x01\uffff\x07\x30\x02\uffff\x04"+
-        "\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x02\uffff\x04\x30\x02\uffff"+
-        "\x06\x30\x01\uffff\x09\x30\x01\uffff\x04\x30\x01\uffff\x08\x30\x01"+
-        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x0d\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x0d\x30\x02\uffff"+
-        "\x02\x30\x01\uffff\x03\x30\x01\uffff\x09\x30\x01\uffff\x15\x30\x01"+
-        "\uffff\x06\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x01\uffff\x0e"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x04\x30\x01\uffff\x05\x30\x01\uffff\x0e\x30\x01"+
-        "\uffff\x11\x30\x01\uffff\x16\x30\x01\uffff\x02\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x0b\x30\x02\uffff\x01\x30\x01\uffff"+
-        "\x06\x30\x01\uffff\x01\x30\x01\uffff\x1a\x30\x03\uffff\x01\x30\x01"+
-        "\uffff\x0c\x30\x01\uffff\x15\x30\x01\uffff\x03\x30\x01\uffff\x05"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff"+
-        "\x08\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02"+
-        "\uffff\x06\x30\x01\uffff\x02\x30\x02\uffff\x04\x30\x02\uffff\x04"+
-        "\x30\x01\uffff\x04\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff"+
-        "\x05\x30\x01\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x02\uffff\x02"+
-        "\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x01\uffff\x09\x30\x02\uffff"+
-        "\x02\x30\x01\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff\x08\x30\x01"+
-        "\uffff\x05\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x0f"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x07\x30\x01\uffff"+
-        "\x04\x30\x01\uffff\x0a\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff\x05\x30\x01\uffff\x05"+
-        "\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x01\uffff\x0b\x30\x02\uffff"+
-        "\x02\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x03\uffff\x04\x30\x01"+
-        "\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x02"+
-        "\x30\x01\uffff\x03\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff"+
-        "\x04\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x02\uffff\x03\x30\x03\uffff"+
-        "\x01\x30\x01\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x06\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x05\uffff"+
-        "\x07\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x05\x30\x01\uffff\x0b\x30\x01\uffff\x05"+
-        "\x30\x02\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff"+
-        "\x05\x30\x03\uffff\x08\x30\x01\uffff\x06\x30\x01\uffff\x07\x30\x01"+
-        "\uffff\x0a\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x08"+
+        "\uffff\x26\x30\x01\uffff\x14\x30\x01\uffff\x1e\x30\x01\uffff\x15"+
+        "\x30\x01\uffff\x01\x00\x04\uffff\x01\x30\x02\uffff\x03\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x04\x30\x01\uffff\x0e\x30\x02\uffff\x04\x30\x01"+
+        "\uffff\x04\x30\x01\uffff\x06\x30\x01\uffff\x04\x30\x01\uffff\x01"+
+        "\x30\x01\uffff\x08\x30\x01\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x03\x30\x02\uffff\x04\x30\x02\uffff\x06\x30\x01"+
+        "\uffff\x09\x30\x01\uffff\x04\x30\x01\uffff\x08\x30\x01\uffff\x01"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x0d\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x02\x30\x01\uffff\x0d\x30\x02\uffff\x02\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x09\x30\x01\uffff\x15\x30\x01\uffff\x06"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x01\uffff\x0e\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x01"+
+        "\uffff\x04\x30\x01\uffff\x05\x30\x01\uffff\x0e\x30\x01\uffff\x11"+
+        "\x30\x01\uffff\x16\x30\x01\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x0b\x30\x02\uffff\x01\x30\x01\uffff\x06\x30\x01"+
+        "\uffff\x01\x30\x01\uffff\x1b\x30\x03\uffff\x01\x30\x01\uffff\x0c"+
+        "\x30\x01\uffff\x15\x30\x01\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x08\x30\x01"+
+        "\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff\x06"+
+        "\x30\x01\uffff\x02\x30\x02\uffff\x04\x30\x02\uffff\x04\x30\x01\uffff"+
+        "\x04\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x05\x30\x01"+
+        "\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff"+
+        "\x02\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x02"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x05\x30\x01\uffff\x02\x30\x01\uffff\x09\x30\x02\uffff\x02\x30\x01"+
+        "\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff\x08\x30\x01\uffff\x05"+
+        "\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x0f\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x02\x30\x02\uffff\x07\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x0a\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x04\x30\x01\uffff\x05\x30\x01\uffff\x05\x30\x01\uffff"+
+        "\x05\x30\x01\uffff\x02\x30\x01\uffff\x0b\x30\x02\uffff\x02\x30\x01"+
+        "\uffff\x05\x30\x01\uffff\x02\x30\x03\uffff\x04\x30\x01\uffff\x04"+
+        "\x30\x01\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff"+
+        "\x04\x30\x01\uffff\x01\x30\x02\uffff\x03\x30\x03\uffff\x01\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff"+
+        "\x06\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x05\uffff\x07\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x05\x30\x01\uffff\x0b\x30\x01\uffff\x05\x30\x02\uffff"+
+        "\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x05\x30\x03"+
+        "\uffff\x08\x30\x01\uffff\x06\x30\x01\uffff\x07\x30\x01\uffff\x0a"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x08\x30\x02\uffff"+
+        "\x02\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x02\x30\x02\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x06"+
+        "\x30\x01\uffff\x0c\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff"+
+        "\x05\x30\x01\uffff\x13\x30\x02\uffff\x05\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x08\x30\x02\uffff\x03\x30\x01\uffff\x05\x30\x01\uffff\x04"+
         "\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x02\x30\x02\uffff\x03\x30\x01\uffff\x02\x30\x01"+
-        "\uffff\x06\x30\x01\uffff\x0c\x30\x02\uffff\x01\x30\x02\uffff\x02"+
-        "\x30\x01\uffff\x05\x30\x01\uffff\x13\x30\x02\uffff\x05\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x08\x30\x02\uffff\x03\x30\x01\uffff\x05\x30\x01"+
-        "\uffff\x04\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x02"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x0a\x30\x01\uffff"+
-        "\x02\x30\x01\uffff\x04\x30\x03\uffff\x04\x30\x01\uffff\x03\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02"+
-        "\x30\x02\uffff\x03\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x03\uffff"+
-        "\x0b\x30\x01\uffff\x05\x30\x01\uffff\x03\x30\x01\uffff\x05\x30\x01"+
-        "\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff\x05\x30\x03\uffff\x02"+
-        "\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x02\uffff"+
-        "\x05\x30\x01\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x03\x30\x05"+
-        "\uffff\x08\x30\x02\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff\x02"+
-        "\x30\x05\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff"+
-        "\x03\x30\x02\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x05\x30\x03"+
-        "\uffff\x05\x30\x02\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x02"+
-        "\x30\x03\uffff\x02\x30\x02\uffff\x06\x30\x02\uffff\x04\x30\x02\uffff"+
-        "\x02\x30\x03\uffff\x02\x30\x01\uffff\x04\x30\x02\uffff\x01\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x09\x30\x01\uffff\x01"+
-        "\x30\x02\uffff\x02\x30\x03\uffff\x04\x30\x02\uffff\x02\x30\x05\uffff"+
-        "\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x06\x30\x01"+
-        "\uffff\x06\x30\x01\uffff\x01\x30\x01\uffff\x05\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x05\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01\uffff"+
-        "\x06\x30\x02\uffff\x03\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x06\x30\x03\uffff\x01\x30\x01\uffff\x04"+
-        "\x30\x03\uffff\x07\x30\x01\uffff\x02\x30\x02\uffff\x05\x30\x04\uffff"+
-        "\x02\x30\x03\uffff\x0d\x30\x05\uffff\x0a\x30\x01\uffff\x02\x30\x01"+
-        "\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x04"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x02\uffff\x04\x30\x01\uffff"+
-        "\x04\x30\x01\uffff\x09\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x03\x30\x03\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x01"+
-        "\x30\x02\uffff\x04\x30\x02\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff"+
-        "\x06\x30\x02\uffff\x09\x30\x01\uffff\x01\x30\x03\uffff\x07\x30\x01"+
-        "\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01"+
-        "\x30\x03\uffff\x06\x30\x02\uffff\x01\x30\x03\uffff\x02\x30\x01\uffff"+
-        "\x03\x30\x03\uffff\x05\x30\x05\uffff\x02\x30\x02\uffff\x01\x30\x04"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x01"+
-        "\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x0b\x30\x01\uffff"+
-        "\x05\x30\x04\uffff\x04\x30\x07\uffff\x01\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03\uffff\x03"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x03\uffff\x02\x30\x01\uffff"+
-        "\x02\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x03\uffff\x01\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x04\x30\x02\uffff\x03"+
-        "\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x01\x30\x06\uffff"+
-        "\x04\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x01"+
-        "\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x07\x30\x01\uffff\x07"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x04\uffff\x04\x30\x02\uffff"+
-        "\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x03\x30\x01"+
-        "\uffff\x01\x30\x02\uffff\x06\x30\x02\uffff\x03\x30\x01\uffff\x05"+
-        "\x30\x01\uffff\x07\x30\x03\uffff\x08\x30\x01\uffff\x01\x30\x01\uffff"+
-        "\x02\x30\x01\uffff\x02\x30\x01\uffff\x07\x30\x01\uffff\x01\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x02"+
-        "\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff";
+        "\x01\x30\x01\uffff\x01\x30\x01\uffff\x0a\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x04\x30\x03\uffff\x04\x30\x01\uffff\x03\x30\x02\uffff\x02"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff"+
+        "\x03\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x03\uffff\x0b\x30\x01"+
+        "\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x05"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff\x05\x30\x03\uffff"+
+        "\x02\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x02"+
+        "\uffff\x05\x30\x01\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x05\uffff\x08\x30\x02\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff"+
+        "\x02\x30\x05\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x03\x30\x02\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x05"+
+        "\x30\x03\uffff\x05\x30\x02\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff"+
+        "\x02\x30\x03\uffff\x02\x30\x02\uffff\x06\x30\x02\uffff\x04\x30\x02"+
+        "\uffff\x02\x30\x03\uffff\x02\x30\x01\uffff\x04\x30\x02\uffff\x01"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x09\x30\x01\uffff"+
+        "\x01\x30\x02\uffff\x02\x30\x03\uffff\x04\x30\x02\uffff\x02\x30\x05"+
+        "\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x06"+
+        "\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x01\uffff\x05\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x06\x30\x02\uffff\x03\x30\x01\uffff\x01\x30\x01\uffff\x01"+
+        "\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x03\uffff"+
+        "\x01\x30\x01\uffff\x04\x30\x03\uffff\x07\x30\x01\uffff\x02\x30\x02"+
+        "\uffff\x05\x30\x04\uffff\x02\x30\x03\uffff\x0d\x30\x05\uffff\x0a"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x02"+
+        "\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x09\x30\x01\uffff\x04"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03\uffff\x01\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x01\x30\x02\uffff\x04\x30\x02\uffff\x04\x30\x01"+
+        "\uffff\x04\x30\x01\uffff\x06\x30\x02\uffff\x09\x30\x01\uffff\x01"+
+        "\x30\x03\uffff\x07\x30\x01\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x01\x30\x03\uffff\x06\x30\x02\uffff\x01\x30\x03"+
+        "\uffff\x02\x30\x01\uffff\x03\x30\x03\uffff\x05\x30\x05\uffff\x02"+
+        "\x30\x02\uffff\x01\x30\x04\uffff\x02\x30\x01\uffff\x01\x30\x03\uffff"+
+        "\x03\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01"+
+        "\uffff\x0b\x30\x01\uffff\x05\x30\x04\uffff\x04\x30\x07\uffff\x01"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff"+
+        "\x03\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x03"+
+        "\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x02\uffff\x02"+
+        "\x30\x03\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x04\x30\x02\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01"+
+        "\uffff\x01\x30\x06\uffff\x04\x30\x03\uffff\x03\x30\x01\uffff\x02"+
+        "\x30\x02\uffff\x01\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff"+
+        "\x07\x30\x01\uffff\x07\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x04"+
+        "\uffff\x04\x30\x02\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01"+
+        "\x30\x02\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x06\x30\x02\uffff"+
+        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x07\x30\x03\uffff\x08\x30\x01"+
+        "\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x07"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x02\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x02\x30\x01\uffff";
     const string DFA29_maxS =
         "\x01\u00bd\x20\x7a\x01\uffff\x01\x3d\x01\x7a\x01\u00a7\x01\x2e"+
         "\x02\uffff\x05\x3d\x01\x5c\x02\uffff\x01\x3e\x02\x3d\x04\uffff\x01"+
@@ -24314,138 +24383,138 @@ public partial class Cmd4Lexer : Lexer {
         "\x7a\x01\uffff\x07\x7a\x01\uffff\x18\x7a\x01\uffff\x05\x7a\x01\uffff"+
         "\x19\x7a\x01\uffff\x13\x7a\x01\uffff\x04\x7a\x01\uffff\x0e\x7a\x01"+
         "\uffff\x0c\x7a\x01\uffff\x0e\x7a\x01\uffff\x0a\x7a\x01\uffff\x11"+
-        "\x7a\x05\uffff\x01\x7a\x02\x39\x02\uffff\x01\x39\x01\uffff\x01\uffff"+
+        "\x7a\x06\uffff\x02\x39\x01\x7a\x01\uffff\x01\x39\x01\uffff\x01\uffff"+
         "\x01\uffff\x01\uffff\x01\uffff\x01\uffff\x06\uffff\x01\x2a\x09\uffff"+
         "\x01\x3c\x0f\uffff\x10\x7a\x01\uffff\x17\x7a\x01\uffff\x01\x7a\x01"+
         "\uffff\x0b\x7a\x01\uffff\x0f\x7a\x02\uffff\x04\x7a\x02\uffff\x4c"+
         "\x7a\x01\uffff\x05\x7a\x01\uffff\x23\x7a\x01\uffff\x03\x7a\x01\uffff"+
         "\x0c\x7a\x01\uffff\x02\x7a\x01\uffff\x06\x7a\x01\uffff\x14\x7a\x01"+
-        "\uffff\x26\x7a\x01\uffff\x14\x7a\x01\uffff\x1e\x7a\x01\uffff\x13"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x04\uffff\x01\x7a\x02\uffff\x03"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x0e\x7a\x02\uffff"+
-        "\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x06\x7a\x01\uffff\x04\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x08\x7a\x01\uffff\x07\x7a\x02\uffff\x04"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x02\uffff"+
-        "\x06\x7a\x01\uffff\x09\x7a\x01\uffff\x04\x7a\x01\uffff\x08\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0d\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x0d\x7a\x02\uffff"+
-        "\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x09\x7a\x01\uffff\x15\x7a\x01"+
-        "\uffff\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x06\x7a\x01\uffff\x0e"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x05\x7a\x01\uffff\x0e\x7a\x01"+
-        "\uffff\x11\x7a\x01\uffff\x16\x7a\x01\uffff\x02\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x0b\x7a\x02\uffff\x01\x7a\x01\uffff"+
-        "\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x1a\x7a\x03\uffff\x01\x7a\x01"+
-        "\uffff\x0c\x7a\x01\uffff\x15\x7a\x01\uffff\x03\x7a\x01\uffff\x01"+
-        "\x39\x04\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a"+
-        "\x01\uffff\x08\x7a\x01\uffff\x0b\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x02\x7a\x02\uffff\x06\x7a\x01\uffff\x02\x7a\x02\uffff\x04\x7a\x02"+
-        "\uffff\x04\x7a\x01\uffff\x04\x7a\x02\uffff\x01\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x05\x7a\x01\uffff\x09\x7a\x01\uffff\x03\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x02"+
-        "\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff"+
-        "\x02\x7a\x02\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01"+
-        "\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x01\uffff\x09"+
-        "\x7a\x02\uffff\x02\x7a\x01\uffff\x07\x7a\x02\uffff\x04\x7a\x01\uffff"+
-        "\x08\x7a\x01\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x02"+
-        "\uffff\x0f\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x07"+
-        "\x7a\x01\uffff\x04\x7a\x01\uffff\x0a\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x05\x7a\x01"+
-        "\uffff\x05\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x01\uffff\x0b"+
-        "\x7a\x02\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x03\uffff"+
-        "\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x02"+
-        "\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x02\uffff\x03"+
-        "\x7a\x03\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x06\x7a\x02\uffff\x01\x7a\x01\uffff\x01"+
-        "\x7a\x05\uffff\x07\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x0b\x7a\x01"+
-        "\uffff\x05\x7a\x02\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x05\x7a\x03\uffff\x08\x7a\x01\uffff\x06\x7a\x01\uffff"+
-        "\x07\x7a\x01\uffff\x0a\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01"+
-        "\uffff\x08\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x03\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x06\x7a\x01\uffff\x0c\x7a\x02\uffff\x01\x7a\x02"+
-        "\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x13\x7a\x02\uffff\x05"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x08\x7a\x02\uffff\x03\x7a\x01\uffff"+
-        "\x05\x7a\x01\uffff\x04\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0a"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x04\x7a\x03\uffff\x04\x7a\x01\uffff"+
-        "\x03\x7a\x02\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x02\x7a\x02\uffff\x03\x7a\x01\uffff\x06\x7a\x01\uffff\x01"+
-        "\x7a\x03\uffff\x0b\x7a\x01\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff"+
-        "\x05\x7a\x01\uffff\x01\x7a\x02\uffff\x04\x7a\x01\uffff\x05\x7a\x03"+
-        "\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x02\uffff\x02"+
-        "\x7a\x02\uffff\x05\x7a\x01\uffff\x01\x7a\x03\uffff\x03\x7a\x01\uffff"+
-        "\x03\x7a\x05\uffff\x08\x7a\x02\uffff\x01\x7a\x02\uffff\x04\x7a\x01"+
-        "\uffff\x02\x7a\x05\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x05\x7a\x03\uffff\x05\x7a\x02\uffff\x01\x7a\x03\uffff\x03\x7a\x01"+
-        "\uffff\x02\x7a\x03\uffff\x02\x7a\x02\uffff\x06\x7a\x02\uffff\x04"+
-        "\x7a\x02\uffff\x02\x7a\x03\uffff\x02\x7a\x01\uffff\x04\x7a\x02\uffff"+
-        "\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x09\x7a\x01"+
-        "\uffff\x01\x7a\x02\uffff\x02\x7a\x03\uffff\x04\x7a\x02\uffff\x02"+
-        "\x7a\x05\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff"+
-        "\x06\x7a\x01\uffff\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x05\x7a\x01"+
-        "\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x01\x7a\x01\uffff\x04"+
-        "\x7a\x01\uffff\x06\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x06\x7a\x03\uffff\x01\x7a\x01"+
-        "\uffff\x04\x7a\x03\uffff\x07\x7a\x01\uffff\x02\x7a\x02\uffff\x05"+
-        "\x7a\x04\uffff\x02\x7a\x03\uffff\x0d\x7a\x05\uffff\x0a\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x06\x7a\x02\uffff\x04"+
-        "\x7a\x01\uffff\x04\x7a\x01\uffff\x09\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x03\x7a\x03\uffff\x01\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x01\x7a\x02\uffff\x04\x7a\x02\uffff\x04\x7a\x01\uffff\x04"+
-        "\x7a\x01\uffff\x06\x7a\x02\uffff\x09\x7a\x01\uffff\x01\x7a\x03\uffff"+
-        "\x07\x7a\x01\uffff\x09\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01"+
-        "\uffff\x01\x7a\x03\uffff\x06\x7a\x02\uffff\x01\x7a\x03\uffff\x02"+
-        "\x7a\x01\uffff\x03\x7a\x03\uffff\x05\x7a\x05\uffff\x02\x7a\x02\uffff"+
-        "\x01\x7a\x04\uffff\x02\x7a\x01\uffff\x01\x7a\x03\uffff\x03\x7a\x01"+
-        "\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x0b"+
-        "\x7a\x01\uffff\x05\x7a\x04\uffff\x04\x7a\x07\uffff\x01\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x0b\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x03"+
-        "\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x03\uffff\x02"+
-        "\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x02\uffff\x02\x7a\x03\uffff"+
-        "\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x02"+
-        "\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x01"+
-        "\x7a\x06\uffff\x04\x7a\x03\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff"+
-        "\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x07\x7a\x01"+
-        "\uffff\x07\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x04\uffff\x04"+
-        "\x7a\x02\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff"+
-        "\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x06\x7a\x02\uffff\x03\x7a\x01"+
-        "\uffff\x05\x7a\x01\uffff\x07\x7a\x03\uffff\x08\x7a\x01\uffff\x01"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x07\x7a\x01\uffff"+
-        "\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x02\x7a\x03\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff";
+        "\uffff\x26\x7a\x01\uffff\x14\x7a\x01\uffff\x1e\x7a\x01\uffff\x15"+
+        "\x7a\x01\uffff\x01\uffff\x04\uffff\x01\x7a\x02\uffff\x03\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x0e\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x06\x7a\x01\uffff\x04\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x08\x7a\x01\uffff\x07\x7a\x02\uffff\x04\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x02\uffff\x06"+
+        "\x7a\x01\uffff\x09\x7a\x01\uffff\x04\x7a\x01\uffff\x08\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0d\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x0d\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x09\x7a\x01\uffff\x15\x7a\x01\uffff"+
+        "\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x06\x7a\x01\uffff\x0e\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x05\x7a\x01\uffff\x0e\x7a\x01\uffff"+
+        "\x11\x7a\x01\uffff\x16\x7a\x01\uffff\x02\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x0b\x7a\x02\uffff\x01\x7a\x01\uffff\x06"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x1b\x7a\x03\uffff\x01\x7a\x01\uffff"+
+        "\x0c\x7a\x01\uffff\x15\x7a\x01\uffff\x03\x7a\x01\x39\x01\uffff\x04"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x08\x7a\x01\uffff\x0b\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02"+
+        "\uffff\x06\x7a\x01\uffff\x02\x7a\x02\uffff\x04\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x04\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff"+
+        "\x05\x7a\x01\uffff\x09\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x02"+
+        "\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x01\uffff\x09\x7a\x02\uffff"+
+        "\x02\x7a\x01\uffff\x07\x7a\x02\uffff\x04\x7a\x01\uffff\x08\x7a\x01"+
+        "\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff\x0f"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x07\x7a\x01\uffff"+
+        "\x04\x7a\x01\uffff\x0a\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x05\x7a\x01\uffff\x05"+
+        "\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x01\uffff\x0b\x7a\x02\uffff"+
+        "\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x03\uffff\x04\x7a\x01"+
+        "\uffff\x04\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff"+
+        "\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x02"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x02\uffff\x03\x7a\x03\uffff"+
+        "\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x06\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x05\uffff"+
+        "\x07\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x0b\x7a\x01\uffff\x05"+
+        "\x7a\x02\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x05\x7a\x03\uffff\x08\x7a\x01\uffff\x06\x7a\x01\uffff\x07\x7a\x01"+
+        "\uffff\x0a\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x08"+
+        "\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x03\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x06\x7a\x01\uffff\x0c\x7a\x02\uffff\x01\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x05\x7a\x01\uffff\x13\x7a\x02\uffff\x05\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x08\x7a\x02\uffff\x03\x7a\x01\uffff\x05\x7a\x01"+
+        "\uffff\x04\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x02"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0a\x7a\x01\uffff"+
+        "\x02\x7a\x01\uffff\x04\x7a\x03\uffff\x04\x7a\x01\uffff\x03\x7a\x02"+
+        "\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x02"+
+        "\x7a\x02\uffff\x03\x7a\x01\uffff\x06\x7a\x01\uffff\x01\x7a\x03\uffff"+
+        "\x0b\x7a\x01\uffff\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x05\x7a\x01\uffff\x01\x7a\x02\uffff\x04\x7a\x01\uffff\x05"+
+        "\x7a\x03\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x02\uffff"+
+        "\x02\x7a\x02\uffff\x05\x7a\x01\uffff\x01\x7a\x03\uffff\x03\x7a\x01"+
+        "\uffff\x03\x7a\x05\uffff\x08\x7a\x02\uffff\x01\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x02\x7a\x05\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff"+
+        "\x02\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x05\x7a\x03\uffff\x05\x7a\x02\uffff\x01\x7a\x03\uffff\x03"+
+        "\x7a\x01\uffff\x02\x7a\x03\uffff\x02\x7a\x02\uffff\x06\x7a\x02\uffff"+
+        "\x04\x7a\x02\uffff\x02\x7a\x03\uffff\x02\x7a\x01\uffff\x04\x7a\x02"+
+        "\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x09"+
+        "\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x03\uffff\x04\x7a\x02\uffff"+
+        "\x02\x7a\x05\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x06\x7a\x01\uffff\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x05"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x04\x7a\x01\uffff\x06\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x03"+
+        "\x7a\x03\uffff\x01\x7a\x01\uffff\x04\x7a\x03\uffff\x07\x7a\x01\uffff"+
+        "\x02\x7a\x02\uffff\x05\x7a\x04\uffff\x02\x7a\x03\uffff\x0d\x7a\x05"+
+        "\uffff\x0a\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x01"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x06\x7a\x02\uffff\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x09\x7a\x01"+
+        "\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x03\uffff\x01"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x02\uffff\x04\x7a\x02\uffff"+
+        "\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x06\x7a\x02\uffff\x09\x7a\x01"+
+        "\uffff\x01\x7a\x03\uffff\x07\x7a\x01\uffff\x09\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x03\uffff\x06\x7a\x02\uffff"+
+        "\x01\x7a\x03\uffff\x02\x7a\x01\uffff\x03\x7a\x03\uffff\x05\x7a\x05"+
+        "\uffff\x02\x7a\x02\uffff\x01\x7a\x04\uffff\x02\x7a\x01\uffff\x01"+
+        "\x7a\x03\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x0b\x7a\x01\uffff\x05\x7a\x04\uffff\x04\x7a\x07"+
+        "\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0b\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x03\x7a\x03\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x02\x7a\x03\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x02"+
+        "\uffff\x02\x7a\x03\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x04\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff"+
+        "\x02\x7a\x01\uffff\x01\x7a\x06\uffff\x04\x7a\x03\uffff\x03\x7a\x01"+
+        "\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x07\x7a\x01\uffff\x07\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x01\x7a\x04\uffff\x04\x7a\x02\uffff\x02\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x01\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x06"+
+        "\x7a\x02\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x07\x7a\x03\uffff"+
+        "\x08\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x07\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x02"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x03\uffff\x03\x7a\x01\uffff"+
+        "\x02\x7a\x01\uffff\x02\x7a\x01\uffff";
     const string DFA29_acceptS =
-        "\x21\uffff\x01\u023e\x0c\uffff\x01\u0251\x01\u0253\x03\uffff\x01"+
-        "\u025a\x01\u025b\x01\u025c\x01\u025e\x01\uffff\x01\u0261\x01\u0262"+
-        "\x01\u0265\x01\u0266\x01\u0268\x01\u0269\x01\uffff\x01\u026c\x01"+
-        "\uffff\x01\u0271\x01\uffff\x01\u027c\x01\u027d\x07\uffff\x01\u0143"+
+        "\x21\uffff\x01\u0240\x0c\uffff\x01\u0253\x01\u0255\x03\uffff\x01"+
+        "\u025c\x01\u025d\x01\u025e\x01\u0260\x01\uffff\x01\u0263\x01\u0264"+
+        "\x01\u0267\x01\u0268\x01\u026a\x01\u026b\x01\uffff\x01\u026e\x01"+
+        "\uffff\x01\u0273\x01\uffff\x01\u027e\x01\u027f\x07\uffff\x01\u0143"+
         "\x0a\uffff\x01\u00b2\x05\uffff\x01\u015b\x09\uffff\x01\u01a0\x07"+
-        "\uffff\x01\u0241\x18\uffff\x01\u0162\x05\uffff\x01\u0236\x19\uffff"+
-        "\x01\x64\x13\uffff\x01\x59\x04\uffff\x01\x5a\x0e\uffff\x01\u0221"+
-        "\x0c\uffff\x01\u0181\x0e\uffff\x01\u0212\x0a\uffff\x01\u019f\x11"+
-        "\uffff\x01\u023f\x01\u0240\x01\u027b\x01\u0276\x01\u0242\x03\uffff"+
-        "\x01\u0246\x01\u0245\x01\uffff\x01\u0252\x01\uffff\x01\u0248\x01"+
-        "\uffff\x01\u0247\x01\uffff\x01\u024a\x01\u0249\x01\u0267\x01\u024b"+
-        "\x01\u0274\x01\u024c\x01\uffff\x01\u026f\x01\u024d\x01\u0264\x01"+
-        "\u024e\x01\u0263\x01\u024f\x01\u025d\x01\u0255\x01\u0250\x01\uffff"+
-        "\x01\u0257\x01\u026d\x01\u0256\x01\u0279\x01\u0258\x01\u026e\x01"+
-        "\u025f\x01\u0260\x01\u026a\x01\u026b\x01\u0270\x01\u0272\x01\u0273"+
-        "\x01\u027a\x01\u0275\x10\uffff\x01\u0159\x17\uffff\x01\u00ce\x01"+
+        "\uffff\x01\u0243\x18\uffff\x01\u0162\x05\uffff\x01\u0238\x19\uffff"+
+        "\x01\x64\x13\uffff\x01\x59\x04\uffff\x01\x5a\x0e\uffff\x01\u0223"+
+        "\x0c\uffff\x01\u0181\x0e\uffff\x01\u0214\x0a\uffff\x01\u019f\x11"+
+        "\uffff\x01\u0241\x01\u0242\x01\u027d\x01\u0278\x01\u0244\x01\u0248"+
+        "\x03\uffff\x01\u0247\x01\uffff\x01\u0254\x01\uffff\x01\u024a\x01"+
+        "\uffff\x01\u0249\x01\uffff\x01\u024b\x01\u024c\x01\u0269\x01\u024d"+
+        "\x01\u0276\x01\u024e\x01\uffff\x01\u0271\x01\u024f\x01\u0266\x01"+
+        "\u0250\x01\u0265\x01\u0251\x01\u025f\x01\u0257\x01\u0252\x01\uffff"+
+        "\x01\u0259\x01\u026f\x01\u0258\x01\u027b\x01\u025a\x01\u0270\x01"+
+        "\u0261\x01\u0262\x01\u026c\x01\u026d\x01\u0272\x01\u0274\x01\u0275"+
+        "\x01\u027c\x01\u0277\x10\uffff\x01\u0159\x17\uffff\x01\u00ce\x01"+
         "\uffff\x01\u015a\x0b\uffff\x01\u0142\x0f\uffff\x01\u01a7\x01\u015d"+
         "\x04\uffff\x01\u01b7\x01\u01bd\x4c\uffff\x01\x0b\x05\uffff\x01\u011f"+
         "\x23\uffff\x01\x76\x03\uffff\x01\x1a\x0c\uffff\x01\x75\x02\uffff"+
         "\x01\u0180\x06\uffff\x01\x7f\x14\uffff\x01\x58\x26\uffff\x01\u0095"+
-        "\x14\uffff\x01\u0206\x1e\uffff\x01\u016b\x13\uffff\x01\u0244\x03"+
-        "\uffff\x01\u0277\x01\u0278\x01\u0254\x01\u0259\x01\uffff\x01\u014a"+
+        "\x14\uffff\x01\u0206\x1e\uffff\x01\u016b\x15\uffff\x01\u0246\x01"+
+        "\uffff\x01\u0279\x01\u027a\x01\u0256\x01\u025b\x01\uffff\x01\u014a"+
         "\x01\x0c\x03\uffff\x01\u0146\x03\uffff\x01\u014c\x04\uffff\x01\u0153"+
         "\x0e\uffff\x01\u00bb\x01\u00f5\x04\uffff\x01\u00c4\x04\uffff\x01"+
         "\u00cc\x06\uffff\x01\u00c8\x04\uffff\x01\u013a\x01\uffff\x01\u0137"+
@@ -24459,11 +24528,11 @@ public partial class Cmd4Lexer : Lexer {
         "\uffff\x01\u01c1\x01\uffff\x01\u01c5\x06\uffff\x01\u01c9\x0e\uffff"+
         "\x01\u01f2\x02\uffff\x01\x70\x04\uffff\x01\x72\x01\uffff\x01\x6a"+
         "\x03\uffff\x01\x67\x04\uffff\x01\x78\x05\uffff\x01\u017d\x0e\uffff"+
-        "\x01\u0231\x11\uffff\x01\u0190\x16\uffff\x01\u0090\x02\uffff\x01"+
-        "\u00b0\x03\uffff\x01\u0223\x01\uffff\x01\u0222\x0b\uffff\x01\u0195"+
+        "\x01\u0233\x11\uffff\x01\u0190\x16\uffff\x01\u0090\x02\uffff\x01"+
+        "\u00b0\x03\uffff\x01\u0225\x01\uffff\x01\u0224\x0b\uffff\x01\u0195"+
         "\x01\u0199\x01\uffff\x01\u019b\x06\uffff\x01\u0192\x01\uffff\x01"+
-        "\u0186\x1a\uffff\x01\u020d\x01\u020f\x01\u0210\x01\uffff\x01\x34"+
-        "\x0c\uffff\x01\u0116\x15\uffff\x01\u0233\x03\uffff\x01\u0243\x05"+
+        "\u0186\x1b\uffff\x01\u020f\x01\u0211\x01\u0212\x01\uffff\x01\x34"+
+        "\x0c\uffff\x01\u0116\x15\uffff\x01\u0235\x04\uffff\x01\u0245\x04"+
         "\uffff\x01\u0145\x02\uffff\x01\u008b\x02\uffff\x01\u0156\x01\uffff"+
         "\x01\u014d\x08\uffff\x01\u0161\x0b\uffff\x01\u00c5\x01\uffff\x01"+
         "\u00c7\x02\uffff\x01\u00ca\x01\x2b\x06\uffff\x01\u00b8\x02\uffff"+
@@ -24482,20 +24551,20 @@ public partial class Cmd4Lexer : Lexer {
         "\x0f\uffff\x01\u0177\x02\uffff\x01\u01d9\x02\uffff\x01\u01df\x01"+
         "\u01e0\x07\uffff\x01\u01f1\x04\uffff\x01\x15\x0a\uffff\x01\x77\x01"+
         "\uffff\x01\u017e\x03\uffff\x01\x13\x03\uffff\x01\x7e\x04\uffff\x01"+
-        "\x7b\x05\uffff\x01\u0232\x05\uffff\x01\u0230\x05\uffff\x01\u0235"+
-        "\x02\uffff\x01\u0234\x0b\uffff\x01\u00a5\x01\u0091\x02\uffff\x01"+
+        "\x7b\x05\uffff\x01\u0234\x05\uffff\x01\u0232\x05\uffff\x01\u0237"+
+        "\x02\uffff\x01\u0236\x0b\uffff\x01\u00a5\x01\u0091\x02\uffff\x01"+
         "\u009a\x05\uffff\x01\u00a8\x02\uffff\x01\u0081\x01\u0082\x01\u0083"+
         "\x04\uffff\x01\u0088\x04\uffff\x01\x2e\x03\uffff\x01\u00f0\x01\uffff"+
-        "\x01\u0226\x01\u0228\x02\uffff\x01\u019a\x03\uffff\x01\u0196\x01"+
+        "\x01\u0228\x01\u022a\x02\uffff\x01\u019a\x03\uffff\x01\u0196\x01"+
         "\uffff\x01\u019c\x03\uffff\x01\u0184\x04\uffff\x01\u0187\x01\uffff"+
         "\x01\u018b\x01\uffff\x01\u018d\x01\uffff\x01\u018e\x02\uffff\x01"+
-        "\x32\x02\uffff\x01\u0201\x02\uffff\x01\x62\x01\uffff\x01\u020a\x04"+
+        "\x32\x02\uffff\x01\u0201\x02\uffff\x01\x62\x02\uffff\x01\u020c\x04"+
         "\uffff\x01\u01f8\x01\uffff\x01\u01fa\x01\u01fb\x03\uffff\x01\u01fd"+
-        "\x01\u020e\x01\u0211\x01\uffff\x01\u0135\x03\uffff\x01\u021a\x04"+
-        "\uffff\x01\u0220\x03\uffff\x01\u0118\x02\uffff\x01\u0119\x02\uffff"+
-        "\x01\u011e\x01\uffff\x01\u023c\x01\uffff\x01\u0229\x06\uffff\x01"+
-        "\u020b\x01\u0213\x01\uffff\x01\u0214\x01\uffff\x01\u0219\x01\u021e"+
-        "\x01\u0239\x01\u023a\x01\u023b\x07\uffff\x01\u0157\x03\uffff\x01"+
+        "\x01\u0210\x01\u0213\x01\uffff\x01\u0135\x03\uffff\x01\u021c\x04"+
+        "\uffff\x01\u0222\x03\uffff\x01\u0118\x02\uffff\x01\u0119\x02\uffff"+
+        "\x01\u011e\x01\uffff\x01\u023e\x01\uffff\x01\u022b\x06\uffff\x01"+
+        "\u020d\x01\u0215\x01\uffff\x01\u0216\x01\uffff\x01\u021b\x01\u0220"+
+        "\x01\u023b\x01\u023c\x01\u023d\x07\uffff\x01\u0157\x03\uffff\x01"+
         "\u014f\x02\uffff\x01\u0154\x01\uffff\x01\u015e\x02\uffff\x01\x02"+
         "\x05\uffff\x01\u00ba\x0b\uffff\x01\u00b9\x05\uffff\x01\u00cf\x01"+
         "\u00d1\x01\uffff\x01\u01ba\x02\uffff\x01\x57\x02\uffff\x01\u013c"+
@@ -24510,50 +24579,51 @@ public partial class Cmd4Lexer : Lexer {
         "\x0f\x08\uffff\x01\x50\x01\u0096\x03\uffff\x01\x6b\x05\uffff\x01"+
         "\x28\x04\uffff\x01\x7c\x01\x7d\x02\uffff\x01\u01b3\x03\uffff\x01"+
         "\x3a\x02\uffff\x01\x5d\x01\uffff\x01\u0094\x01\uffff\x01\x3f\x0a"+
-        "\uffff\x01\u0237\x02\uffff\x01\u0238\x04\uffff\x01\u00a4\x01\u00a6"+
+        "\uffff\x01\u0239\x02\uffff\x01\u023a\x04\uffff\x01\u00a4\x01\u00a6"+
         "\x01\u00a7\x04\uffff\x01\u009e\x03\uffff\x01\u00ac\x01\u0080\x02"+
         "\uffff\x01\u01eb\x01\uffff\x01\u0086\x01\uffff\x01\u008a\x02\uffff"+
-        "\x01\u008d\x01\u00ad\x03\uffff\x01\u0225\x06\uffff\x01\u0197\x01"+
-        "\uffff\x01\u0182\x01\u0183\x01\u0185\x0b\uffff\x01\u0205\x05\uffff"+
-        "\x01\u0207\x03\uffff\x01\u01f4\x05\uffff\x01\x63\x01\uffff\x01\u0203"+
-        "\x01\u021b\x04\uffff\x01\u00e5\x05\uffff\x01\u023d\x01\u01bc\x01"+
-        "\u022a\x02\uffff\x01\u022d\x01\u022e\x01\uffff\x01\u0215\x01\uffff"+
-        "\x01\u0217\x01\x01\x02\uffff\x01\u0144\x01\u0147\x05\uffff\x01\u0152"+
-        "\x01\uffff\x01\u015f\x01\u0160\x01\x11\x03\uffff\x01\u00c1\x03\uffff"+
-        "\x01\u00bd\x01\x1e\x01\u00c3\x01\u00c6\x01\u00c9\x08\uffff\x01\u00b4"+
-        "\x01\u00d0\x01\uffff\x01\x22\x01\u0136\x04\uffff\x01\u013b\x02\uffff"+
-        "\x01\x0a\x01\x0e\x01\u008c\x01\x26\x01\u01ac\x01\uffff\x01\u01af"+
-        "\x03\uffff\x01\u0130\x02\uffff\x01\u01a2\x03\uffff\x01\u00ec\x01"+
-        "\u00e9\x04\uffff\x01\u00fd\x01\uffff\x01\u0101\x05\uffff\x01\u0115"+
-        "\x01\x21\x01\u00ab\x05\uffff\x01\u00d7\x01\x41\x01\uffff\x01\u01db"+
-        "\x01\u00e1\x01\u00ee\x03\uffff\x01\u016f\x02\uffff\x01\u0171\x01"+
-        "\u0179\x01\u01dc\x02\uffff\x01\u0168\x01\u017b\x06\uffff\x01\u012f"+
-        "\x01\x14\x04\uffff\x01\x5e\x01\u0127\x02\uffff\x01\x43\x01\u0120"+
-        "\x01\x0d\x02\uffff\x01\u01ea\x04\uffff\x01\x40\x01\u01d8\x01\uffff"+
-        "\x01\u01ef\x02\uffff\x01\u01c0\x01\uffff\x01\u01c8\x09\uffff\x01"+
-        "\u01c3\x01\uffff\x01\u01dd\x01\u01e2\x02\uffff\x01\u01e4\x01\u01e5"+
-        "\x01\u01f3\x04\uffff\x01\u0121\x01\x19\x02\uffff\x01\x74\x01\x69"+
-        "\x01\x6c\x01\x73\x01\x10\x01\uffff\x01\u017f\x02\uffff\x01\x38\x02"+
-        "\uffff\x01\u0097\x06\uffff\x01\u0093\x06\uffff\x01\x3e\x01\uffff"+
-        "\x01\x4a\x05\uffff\x01\u00b1\x03\uffff\x01\u0099\x05\uffff\x01\u0084"+
-        "\x01\uffff\x01\u0087\x04\uffff\x01\u00ae\x06\uffff\x01\u0193\x01"+
-        "\u0194\x03\uffff\x01\u0191\x01\uffff\x01\u00f4\x01\uffff\x01\u018a"+
-        "\x01\u018c\x02\uffff\x01\u019e\x06\uffff\x01\u0122\x01\u01f5\x01"+
-        "\u01f6\x01\uffff\x01\u01f9\x04\uffff\x01\u0141\x01\u021d\x01\u0216"+
-        "\x07\uffff\x01\u022b\x02\uffff\x01\u0218\x01\x05\x05\uffff\x01\u0151"+
-        "\x01\u0155\x01\u00c2\x01\x65\x02\uffff\x01\u00be\x01\u00bf\x01\u00cb"+
-        "\x0d\uffff\x01\u01bf\x01\u01ad\x01\u01b0\x01\u01b4\x01\u01b5\x0a"+
-        "\uffff\x01\u0102\x02\uffff\x01\u0110\x01\uffff\x01\u010b\x01\u010c"+
-        "\x01\uffff\x01\u0111\x01\uffff\x01\u00da\x04\uffff\x01\u0172\x01"+
-        "\uffff\x01\u0166\x06\uffff\x01\u0132\x01\u0133\x04\uffff\x01\u01e7"+
-        "\x04\uffff\x01\u01d5\x09\uffff\x01\u01cf\x04\uffff\x01\u01c4\x01"+
-        "\uffff\x01\u021c\x03\uffff\x01\x16\x01\x71\x01\x23\x01\uffff\x01"+
-        "\u010f\x01\uffff\x01\x1b\x01\uffff\x01\u00f6\x01\x17\x04\uffff\x01"+
-        "\x18\x01\x3d\x04\uffff\x01\x49\x04\uffff\x01\x1d\x06\uffff\x01\u009f"+
-        "\x01\u00a2\x09\uffff\x01\u0227\x01\uffff\x01\x61\x01\u00f2\x01\x35"+
-        "\x07\uffff\x01\u019d\x09\uffff\x01\u0200\x03\uffff\x01\u0117\x02"+
-        "\uffff\x01\u011c\x01\uffff\x01\u022c\x01\u022f\x01\u014b\x06\uffff"+
-        "\x01\u00cd\x01\x51\x01\uffff\x01\u009d\x01\u00fb\x01\u00b6\x02\uffff"+
+        "\x01\u008d\x01\u00ad\x03\uffff\x01\u0227\x06\uffff\x01\u0197\x01"+
+        "\uffff\x01\u0182\x01\u0183\x01\u0185\x0b\uffff\x01\u0205\x02\uffff"+
+        "\x01\u0208\x04\uffff\x01\u0207\x03\uffff\x01\u01f4\x05\uffff\x01"+
+        "\x63\x01\uffff\x01\u0203\x01\u021d\x04\uffff\x01\u00e5\x05\uffff"+
+        "\x01\u023f\x01\u01bc\x01\u022c\x02\uffff\x01\u022f\x01\u0230\x01"+
+        "\uffff\x01\u0217\x01\uffff\x01\u0219\x01\x01\x02\uffff\x01\u0144"+
+        "\x01\u0147\x05\uffff\x01\u0152\x01\uffff\x01\u015f\x01\u0160\x01"+
+        "\x11\x03\uffff\x01\u00c1\x03\uffff\x01\u00bd\x01\x1e\x01\u00c3\x01"+
+        "\u00c6\x01\u00c9\x08\uffff\x01\u00b4\x01\u00d0\x01\uffff\x01\x22"+
+        "\x01\u0136\x04\uffff\x01\u013b\x02\uffff\x01\x0a\x01\x0e\x01\u008c"+
+        "\x01\x26\x01\u01ac\x01\uffff\x01\u01af\x03\uffff\x01\u0130\x02\uffff"+
+        "\x01\u01a2\x03\uffff\x01\u00ec\x01\u00e9\x04\uffff\x01\u00fd\x01"+
+        "\uffff\x01\u0101\x05\uffff\x01\u0115\x01\x21\x01\u00ab\x05\uffff"+
+        "\x01\u00d7\x01\x41\x01\uffff\x01\u01db\x01\u00e1\x01\u00ee\x03\uffff"+
+        "\x01\u016f\x02\uffff\x01\u0171\x01\u0179\x01\u01dc\x02\uffff\x01"+
+        "\u0168\x01\u017b\x06\uffff\x01\u012f\x01\x14\x04\uffff\x01\x5e\x01"+
+        "\u0127\x02\uffff\x01\x43\x01\u0120\x01\x0d\x02\uffff\x01\u01ea\x04"+
+        "\uffff\x01\x40\x01\u01d8\x01\uffff\x01\u01ef\x02\uffff\x01\u01c0"+
+        "\x01\uffff\x01\u01c8\x09\uffff\x01\u01c3\x01\uffff\x01\u01dd\x01"+
+        "\u01e2\x02\uffff\x01\u01e4\x01\u01e5\x01\u01f3\x04\uffff\x01\u0121"+
+        "\x01\x19\x02\uffff\x01\x74\x01\x69\x01\x6c\x01\x73\x01\x10\x01\uffff"+
+        "\x01\u017f\x02\uffff\x01\x38\x02\uffff\x01\u0097\x06\uffff\x01\u0093"+
+        "\x06\uffff\x01\x3e\x01\uffff\x01\x4a\x05\uffff\x01\u00b1\x03\uffff"+
+        "\x01\u0099\x05\uffff\x01\u0084\x01\uffff\x01\u0087\x04\uffff\x01"+
+        "\u00ae\x06\uffff\x01\u0193\x01\u0194\x03\uffff\x01\u0191\x01\uffff"+
+        "\x01\u00f4\x01\uffff\x01\u018a\x01\u018c\x02\uffff\x01\u019e\x03"+
+        "\uffff\x01\u0209\x03\uffff\x01\u0122\x01\u01f5\x01\u01f6\x01\uffff"+
+        "\x01\u01f9\x04\uffff\x01\u0141\x01\u021f\x01\u0218\x07\uffff\x01"+
+        "\u022d\x02\uffff\x01\u021a\x01\x05\x05\uffff\x01\u0151\x01\u0155"+
+        "\x01\u00c2\x01\x65\x02\uffff\x01\u00be\x01\u00bf\x01\u00cb\x0d\uffff"+
+        "\x01\u01bf\x01\u01ad\x01\u01b0\x01\u01b4\x01\u01b5\x0a\uffff\x01"+
+        "\u0102\x02\uffff\x01\u0110\x01\uffff\x01\u010b\x01\u010c\x01\uffff"+
+        "\x01\u0111\x01\uffff\x01\u00da\x04\uffff\x01\u0172\x01\uffff\x01"+
+        "\u0166\x06\uffff\x01\u0132\x01\u0133\x04\uffff\x01\u01e7\x04\uffff"+
+        "\x01\u01d5\x09\uffff\x01\u01cf\x04\uffff\x01\u01c4\x01\uffff\x01"+
+        "\u021e\x03\uffff\x01\x16\x01\x71\x01\x23\x01\uffff\x01\u010f\x01"+
+        "\uffff\x01\x1b\x01\uffff\x01\u00f6\x01\x17\x04\uffff\x01\x18\x01"+
+        "\x3d\x04\uffff\x01\x49\x04\uffff\x01\x1d\x06\uffff\x01\u009f\x01"+
+        "\u00a2\x09\uffff\x01\u0229\x01\uffff\x01\x61\x01\u00f2\x01\x35\x07"+
+        "\uffff\x01\u019d\x09\uffff\x01\u0200\x03\uffff\x01\u0117\x02\uffff"+
+        "\x01\u011c\x01\uffff\x01\u022e\x01\u0231\x01\u014b\x06\uffff\x01"+
+        "\u00cd\x01\x51\x01\uffff\x01\u009d\x01\u00fb\x01\u00b6\x02\uffff"+
         "\x01\u0138\x03\uffff\x01\u013e\x01\u0148\x01\u01a1\x05\uffff\x01"+
         "\u00e3\x01\u00e8\x01\u00ff\x01\u0123\x01\u0106\x02\uffff\x01\x08"+
         "\x01\u00e2\x01\uffff\x01\u0175\x01\u0170\x01\u00fc\x01\u017c\x02"+
@@ -24562,7 +24632,7 @@ public partial class Cmd4Lexer : Lexer {
         "\u01cc\x0b\uffff\x01\x37\x05\uffff\x01\x46\x01\x47\x01\x44\x01\x45"+
         "\x04\uffff\x01\x2d\x01\x5f\x01\u0092\x01\u0149\x01\u00a0\x01\u00a1"+
         "\x01\u00a3\x01\uffff\x01\u0085\x01\uffff\x01\u008e\x0b\uffff\x01"+
-        "\u018f\x01\uffff\x01\u0204\x03\uffff\x01\u020c\x01\u01f7\x01\u01fc"+
+        "\u018f\x01\uffff\x01\u0204\x03\uffff\x01\u020e\x01\u01f7\x01\u01fc"+
         "\x03\uffff\x01\x68\x02\uffff\x01\u011d\x02\uffff\x01\u014e\x01\u0150"+
         "\x01\u009b\x02\uffff\x01\u00b7\x02\uffff\x01\x52\x01\x53\x01\uffff"+
         "\x01\x56\x01\u00eb\x02\uffff\x01\x12\x01\u010e\x01\x1c\x01\uffff"+
@@ -24570,21 +24640,21 @@ public partial class Cmd4Lexer : Lexer {
         "\x01\u01d1\x01\u01c6\x03\uffff\x01\x6e\x01\uffff\x01\u0198\x01\x7a"+
         "\x02\uffff\x01\x48\x01\uffff\x01\x4b\x01\x4c\x01\x4d\x01\x4e\x01"+
         "\u00a9\x01\u0089\x04\uffff\x01\x2f\x01\x54\x01\x55\x03\uffff\x01"+
-        "\u0188\x02\uffff\x01\u0208\x01\u0209\x01\uffff\x01\u00f1\x04\uffff"+
+        "\u0188\x02\uffff\x01\u020a\x01\u020b\x01\uffff\x01\u00f1\x04\uffff"+
         "\x01\u0158\x01\uffff\x01\u009c\x07\uffff\x01\u0126\x07\uffff\x01"+
         "\u01c7\x02\uffff\x01\x6f\x01\uffff\x01\x3c\x01\x4f\x01\u008f\x01"+
-        "\u00af\x04\uffff\x01\u01a6\x01\u0202\x02\uffff\x01\u021f\x02\uffff"+
+        "\u00af\x04\uffff\x01\u01a6\x01\u0202\x02\uffff\x01\u0221\x02\uffff"+
         "\x01\x5b\x01\uffff\x01\u00d3\x01\x27\x03\uffff\x01\x60\x01\uffff"+
         "\x01\u01d4\x01\u01f0\x06\uffff\x01\x6d\x01\x3b\x03\uffff\x01\u01a5"+
         "\x05\uffff\x01\x29\x07\uffff\x01\u01d0\x01\u01e3\x01\u00ef\x08\uffff"+
         "\x01\u00f8\x01\uffff\x01\u0124\x02\uffff\x01\u01cd\x02\uffff\x01"+
-        "\u01a4\x07\uffff\x01\u01c2\x01\uffff\x01\u01ce\x01\u0224\x02\uffff"+
+        "\u01a4\x07\uffff\x01\u01c2\x01\uffff\x01\u01ce\x01\u0226\x02\uffff"+
         "\x01\u011a\x02\uffff\x01\u00ed\x01\uffff\x01\u01cb\x02\uffff\x01"+
         "\u01fe\x01\u011b\x01\u00bc\x03\uffff\x01\u0125\x02\uffff\x01\x5c"+
         "\x02\uffff\x01\u01ff";
     const string DFA29_specialS =
-        "\x26\uffff\x01\x00\x01\x02\u00ed\uffff\x01\x03\x01\uffff\x01\x01"+
-        "\x01\uffff\x01\x04\u0186\uffff\x01\x05\u07ad\uffff}>";
+        "\x26\uffff\x01\x00\x01\x02\u00ed\uffff\x01\x04\x01\uffff\x01\x01"+
+        "\x01\uffff\x01\x03\u0186\uffff\x01\x05\u07b2\uffff}>";
     static readonly string[] DFA29_transitionS = {
             "\x02\x21\x01\uffff\x02\x21\x12\uffff\x01\x21\x01\x33\x01\uffff"+
             "\x01\x2b\x01\x3a\x01\x2a\x01\x41\x01\x26\x01\x3c\x01\x3d\x01"+
@@ -24696,16 +24766,16 @@ public partial class Cmd4Lexer : Lexer {
             "\x01\u010a\x04\uffff\x01\u0109\x0d\uffff\x01\u010b",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x24\x07\uffff\x01\u010e\x03\u0112\x01\u010f\x07\u0112"+
-            "\x01\u0110\x03\u0112\x01\u0113\x03\u0112\x01\u010e\x01\u0112"+
-            "\x01\u0113\x03\u0112\x04\uffff\x01\u0112\x01\uffff\x01\u010e"+
-            "\x03\u0112\x01\u010f\x07\u0112\x01\u0110\x03\u0112\x01\u0113"+
-            "\x03\u0112\x01\u010e\x01\u0112\x01\u0113\x03\u0112\x2c\uffff"+
-            "\x01\u0111",
-            "\x01\u0111",
+            "\x0a\x24\x07\uffff\x01\u0111\x03\u0112\x01\u0110\x07\u0112"+
+            "\x01\u010f\x03\u0112\x01\u0113\x03\u0112\x01\u0111\x01\u0112"+
+            "\x01\u0113\x03\u0112\x04\uffff\x01\u0112\x01\uffff\x01\u0111"+
+            "\x03\u0112\x01\u0110\x07\u0112\x01\u010f\x03\u0112\x01\u0113"+
+            "\x03\u0112\x01\u0111\x01\u0112\x01\u0113\x03\u0112\x2c\uffff"+
+            "\x01\u010e",
+            "\x01\u010e",
             "\x27\u0117\x01\u0118\x53\u0117\x01\u0116\x02\u0117\x01\u0115"+
             "\uff81\u0117",
-            "\x27\u0119\x01\u011a\x53\u0119\x01\u011b\uff84\u0119",
+            "\x27\u0119\x01\u011b\x53\u0119\x01\u011a\uff84\u0119",
             "\x01\u011d",
             "\x01\u0120\x12\uffff\x01\u011f",
             "\x01\u0122",
@@ -25139,13 +25209,13 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\u029c\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
-            "\x1a\u0112",
-            "\x01\u0111\x01\uffff\x01\u0111\x02\uffff\x0a\u029e",
-            "\x0a\u029f",
-            "",
             "",
             "\x0a\u029c",
+            "\x01\u010e\x01\uffff\x01\u010e\x02\uffff\x0a\u029d",
+            "\x0a\u029e\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
+            "\x1a\u0112",
+            "",
+            "\x0a\u029e",
             "",
             "\x27\u0117\x01\u0118\x53\u0117\x01\u02a0\x02\u0117\x01\u0115"+
             "\uff81\u0117",
@@ -25153,7 +25223,7 @@ public partial class Cmd4Lexer : Lexer {
             "\x27\u0117\x01\u0118\x53\u0117\x01\u0116\x02\u0117\x01\u0115"+
             "\uff81\u0117",
             "",
-            "\x27\u0119\x01\u011a\x53\u0119\x01\u011b\uff84\u0119",
+            "\x27\u0119\x01\u011b\x53\u0119\x01\u011a\uff84\u0119",
             "",
             "",
             "",
@@ -25770,694 +25840,694 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0410\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0411\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0411\x0a\x4d\x01\u0412\x0c"+
+            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0413\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0412\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0414\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0413\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0414\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x01\u0415\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0416\x06\x4d\x01\u0417\x07"+
-            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0418\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0419\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u041a\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u041b\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u041c\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u041d\x02\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0421\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0423\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0424\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0425\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0426\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0427\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0428\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0429\x03\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u042a\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0416\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u042b\x16\x4d\x01\u042c\x02\x4d\x04"+
+            "",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0417\x06\x4d\x01\u0418\x07"+
+            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0419\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u041a\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u041b\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u041c\x0d\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u041d\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u041e\x02\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0422\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0424\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0425\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0426\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0427\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0428\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0429\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u042a\x03\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u042b\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u042c\x16\x4d\x01\u042d\x02\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x0e"+
-            "\x4d\x01\u042d\x0b\x4d",
+            "\x4d\x01\u042e\x0b\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x12"+
-            "\x4d\x01\u042e\x07\x4d",
+            "\x4d\x01\u042f\x07\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0430\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0431\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0431\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0432\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0432\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0433\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0433\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x08\x4d\x01\u0434\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0435\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0435\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0436\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x0f\x4d\x01\u0436\x0a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0436\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0437\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x0f\x4d\x01\u0437\x0a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0437\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0438\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0438\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x13\x4d\x01\u0439\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u043a\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u043a\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u043b\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u043b\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u043c\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u043c\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u043d\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u043d\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u043e\x04\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u043e\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u043f\x04\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x04"+
-            "\x4d\x01\u043f\x15\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0440\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\u0440\x15\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0441\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0441\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0442\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0442\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0443\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0443\x04\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0444\x04\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0444\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0445\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0446\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0447\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0447\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0448\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0448\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0449\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\u029c\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
+            "\x0a\u029c\x07\uffff\x03\u0112\x01\u044a\x16\u0112\x04\uffff"+
+            "\x01\u0112\x01\uffff\x03\u0112\x01\u044a\x16\u0112",
+            "\x0a\u029d\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
             "\x1a\u0112",
-            "",
             "\x0a\u029e\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
             "\x1a\u0112",
-            "\x0a\u029f\x07\uffff\x03\u0112\x01\u044a\x16\u0112\x04\uffff"+
-            "\x01\u0112\x01\uffff\x03\u0112\x01\u044a\x16\u0112",
+            "",
             "\x7b\u0118\x01\uffff\uff84\u0118",
             "",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x01\u044b\x03\x4d\x01\u044c\x03\x4d\x01"+
-            "\u044d\x11\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u044c\x03\x4d\x01\u044d\x03\x4d\x01"+
+            "\u044e\x11\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u044e\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u044f\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0450\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0451\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0451\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0452\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0453\x05\x4d\x01\u0454\x08"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0454\x05\x4d\x01\u0455\x08"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0456\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0457\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0458\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0459\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0459\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u045a\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u045a\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u045b\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u045b\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u045c\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u045c\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u045d\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u045d\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u045e\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u045e\x0e\x4d\x01\u045f\x08"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u045f\x0e\x4d\x01\u0460\x08"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0461\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0462\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0462\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0463\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0463\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0464\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0464\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0465\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0465\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0466\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0466\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0467\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0467\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0468\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0468\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0469\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u046a\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u046a\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u046b\x0b\x4d\x04\uffff\x01"+
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u046b\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u046c\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u046d\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u046e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u046f\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0470\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0470\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0471\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0473\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0474\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0474\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0475\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0478\x02\x4d\x01\u0475\x0c"+
-            "\x4d\x01\u0477\x01\u0476\x06\x4d\x04\uffff\x01\x4d\x01\uffff"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0479\x02\x4d\x01\u0476\x0c"+
+            "\x4d\x01\u0478\x01\u0477\x06\x4d\x04\uffff\x01\x4d\x01\uffff"+
             "\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u047a\x14\x4d\x01\u047b\x03"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u047b\x14\x4d\x01\u047c\x03"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u047e\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u047f\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u047f\x07\x4d\x01\u0480\x0c"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0480\x07\x4d\x01\u0481\x0c"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0481\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0482\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0484\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0485\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0485\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0486\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0486\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0487\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0487\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0488\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u048c\x01\x4d\x01\u048b\x0f\x4d\x01"+
-            "\u0489\x03\x4d\x01\u048a\x03\x4d\x04\uffff\x01\x4d\x01\uffff"+
+            "\x0a\x4d\x07\uffff\x01\u048d\x01\x4d\x01\u048c\x0f\x4d\x01"+
+            "\u048a\x03\x4d\x01\u048b\x03\x4d\x04\uffff\x01\x4d\x01\uffff"+
             "\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u048f\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0490\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0491\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0492\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0492\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0493\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0493\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0494\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0495\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u0496\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0497\x01\x4d\x01\u0498\x04"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0497\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0498\x01\x4d\x01\u0499\x04"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0499\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u049a\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u049b\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u049c\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u049c\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u049d\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u049d\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x01\u049e\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u049f\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04a0\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u04a1\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u049f\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04a2\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04a0\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u04a3\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04a1\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u04a2\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04a3\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u04a4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04a5\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04a6\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04a6\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04a7\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04a7\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04a8\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04a9\x0d\x4d\x01\u04aa\x07"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04aa\x0d\x4d\x01\u04ab\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u04ab\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u04ac\x03\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04ad\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04ae\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u04ae\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u04af\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u04af\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u04b0\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04b1\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04b2\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04b2\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04b3\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u04b5\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u04b6\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04b8\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04b9\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04b9\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04ba\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u04bb\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x01\u04bc\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u04bf\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04c1\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04c2\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04c3\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u04c5\x12\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04c6\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04c7\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04c9\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04ca\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04cb\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x01\u04cd\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u04bd\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04ce\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04d0\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04d1\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04d4\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u04c0\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04d5\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04d7\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04da\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04dc\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04dd\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04de\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04c2\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04e0\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04c3\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04e1\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04c4\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04e2\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u04c6\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u04e3\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04c7\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04e4\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04c8\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04e6\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04ca\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04e7\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04e9\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04ea\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04eb\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u04ec\x04\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u04ed\x12\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04ee\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04cb\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04cc\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u04ef\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u04ce\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u04f0\x0f\x4d\x01\u04f1\x07"+
+            "",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04cf\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04d1\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04d2\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u04d5\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04d6\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04d8\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04db\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04dd\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04de\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04df\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04e1\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04e2\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04e3\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u04e4\x02\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u04e5\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04e7\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u04e8\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04ea\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u04eb\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04ec\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u04ed\x04\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u04ee\x12\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04ef\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u04f0\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u04f1\x0f\x4d\x01\u04f2\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04f4\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u04f5\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04f5\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u04f6\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04f7\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04f8\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04f8\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u04f9\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04f9\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u04fa\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04fa\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u04fb\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u04fb\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u04fc\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u04fc\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u04fd\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04fd\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u04fe\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0500\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0501\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0501\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0502\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0502\x05\x4d\x01\u0503\x07"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0503\x05\x4d\x01\u0504\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0505\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0506\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0507\x01\u0506\x07\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0508\x01\u0507\x07\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0508\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0509\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0509\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u050a\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u050a\x01\x4d\x01\u050b\x0a"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u050b\x01\x4d\x01\u050c\x0a"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u050c\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u050d\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u050e\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u050f\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u050f\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0510\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0510\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0511\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0511\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0512\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0512\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0514\x03\x4d\x01\u0515\x09"+
-            "\x4d\x01\u0516\x0a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0518\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0519\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0513\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0515\x03\x4d\x01\u0516\x09"+
+            "\x4d\x01\u0517\x0a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0519\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u051a\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u051c\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u051d\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u051d\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x08\x4d\x01\u051e\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u051f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u051f\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0520\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0520\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0521\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0521\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0522\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0522\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0523\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0523\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0524\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0524\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0525\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0525\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0526\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0526\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0527\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0527\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0528\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0528\x09\x4d\x01\u0529\x0b"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0529\x09\x4d\x01\u052a\x0b"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u052a\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u052b\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u052c\x15\x4d\x04\uffff\x01"+
-            "\u052d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u052d\x15\x4d\x04\uffff\x01"+
+            "\u052e\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u052f\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0530\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0530\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0531\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0533\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0534\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0534\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0535\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0535\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0536\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0536\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0537\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0537\x0a\x4d\x01\u0538\x05"+
-            "\x4d\x01\u0539\x06\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0538\x0a\x4d\x01\u0539\x05"+
+            "\x4d\x01\u053a\x06\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u053b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u053c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u053c\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u053d\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u053d\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u053e\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u053e\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u053f\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0540\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0541\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0541\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0542\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0542\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0543\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0543\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0544\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0544\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0545\x03\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0545\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0546\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0546\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0547\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0547\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0548\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0548\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0549\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0549\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u054a\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u054b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u054c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u054d\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u054e\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u054e\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u054f\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u054f\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0550\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0551\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0552\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0552\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0553\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0553\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0554\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0555\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0556\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0556\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0557\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x01\x4d\x01\u0557\x01\u0558\x07\x4d\x07\uffff\x1a\x4d\x04"+
+            "\x01\x4d\x01\u0558\x01\u0559\x07\x4d\x07\uffff\x1a\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u055a\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u055b\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u055b\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u055c\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u055c\x0f\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u055d\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u055d\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u055e\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u055f\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0560\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0561\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0561\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0562\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0562\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0563\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0563\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0564\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0564\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0565\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0566\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0567\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0568\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0568\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0569\x0a\x4d\x01\u056a\x07"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0569\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u056a\x0a\x4d\x01\u056b\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u056c\x0a\x4d\x01\u056d\x07"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u056d\x0a\x4d\x01\u056e\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u056f\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0570\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0570\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0571\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0571\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0572\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0572\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0573\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0573\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0574\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0574\x09\x4d\x01\u0575\x0b"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0575\x09\x4d\x01\u0576\x0b"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0576\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0577\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0577\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0578\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x01\x4d\x01\u0578\x01\u0579\x07\x4d\x07\uffff\x1a\x4d\x04"+
+            "\x01\x4d\x01\u0579\x01\u057a\x07\x4d\x07\uffff\x1a\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u057c\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u057d\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u057d\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u057e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u057f\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x01\u0580\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0581\x10\x4d\x01\u0582\x08\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x01\u0581\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0582\x10\x4d\x01\u0583\x08\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0583\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0584\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0585\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0586\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0586\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0587\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -26465,126 +26535,128 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u058a\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u058b\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u058b\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u058c\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u058c\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u058d\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u058d\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u058f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u058e\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0590\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0591\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0591\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x13\x4d\x01\u0592\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0593\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0594\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0595\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0595\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0596\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0596\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0597\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0598\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0599\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u059b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u059c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u059c\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u059d\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u059e\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x08\x4d\x01\u059f\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a0\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05a0\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a1\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a2\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a3\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a4\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a5\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u05a5\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u05a6\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u05a6\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u05a7\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05a8\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05a9\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05a9\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05aa\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05aa\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05ab\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05ab\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05ac\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u05ad\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05af\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u05ae\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05b1\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05b0\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u05b3\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05b2\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u05b4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05b4\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05b5\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05b6\x0c\x4d\x01\u05b7\x07"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05b7\x0c\x4d\x01\u05b8\x07"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05b9\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05ba\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05ba\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05bc\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05bb\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05be\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05bd\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05bf\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05c0\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05c1\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05be\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05c0\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05c1\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05c2\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u05c3\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05c5\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05c6\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05c8\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u05c7\x01\u05c8\x07\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u05c9\x01\u05ca\x07\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -26594,206 +26666,206 @@ public partial class Cmd4Lexer : Lexer {
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05cc\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05ce\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u05ce\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u05d0\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05cf\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05d1\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05d0\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u05d2\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u05d2\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u05d4\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u05d3\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u05d5\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05d4\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05d6\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05d5\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05d7\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x0b"+
-            "\x4d\x01\u05d7\x0e\x4d",
+            "\x4d\x01\u05d9\x0e\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x04"+
-            "\x4d\x01\u05d8\x15\x4d",
+            "\x4d\x01\u05da\x15\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05d9\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05db\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05db\x05\x4d\x01\u05dc\x08"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05dd\x05\x4d\x01\u05de\x08"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x19\x4d\x01\u05de\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x19\x4d\x01\u05e0\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05df\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u05e1\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x01\u05e2\x06\uffff\x12\x4d\x01\u05e1\x07\x4d\x04"+
-            "\uffff\x01\x4d\x01\uffff\x12\x4d\x01\u05e1\x07\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05e3\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x01\u05e4\x06\uffff\x12\x4d\x01\u05e3\x07\x4d\x04"+
+            "\uffff\x01\x4d\x01\uffff\x12\x4d\x01\u05e3\x07\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05e5\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u05e5\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u05e7\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05e6\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u05e8\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05e7\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u05e9\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05e8\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u05ea\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05e9\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u05eb\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u05ea\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u05ec\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05ed\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x05\x4d\x01\u05ef\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\u05f5",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u05f6\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05f1\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u05f7\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\u05f7",
+            "",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u05f8\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u05f9\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05f8\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05fa\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x02\x4d\x01\u05f9\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x02\x4d\x01\u05fb\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u05fa\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u05fc\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05fb\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u05fd\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05fd\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u05ff\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u05fe\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0600\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u05ff\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0601\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0601\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0603\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0602\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0604\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0604\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0606\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0606\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0607\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0608\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x13\x4d\x01\u0609\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u060a\x0e\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u060b\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u060b\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u060c\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u060c\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u060d\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u060d\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u060e\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u060f\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u060f\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0611\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0610\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0612\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0611\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0613\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0612\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0613\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0614\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0614\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0615\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0615\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0616\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0617\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0616\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0617\x01\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0618\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x18\x4d\x01\u0619\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u061a\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u061b\x01\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u061b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u061d\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u061c\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u061e\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u061d\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u061f\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u061e\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0620\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u061f\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0621\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0622\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0624\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0624\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0626\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0625\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0627\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0627\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0629\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0628\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u062a\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u062a\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u062c\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u062b\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u062d\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u062c\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u062d\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u062e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u062f\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0630\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -26801,274 +26873,274 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0632\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0633\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0634\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0634\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0635\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0636\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0637\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0638\x06\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0638\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0639\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0639\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u063a\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x02\x4d\x01\u063b\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u063c\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u063d\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u063d\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u063e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u063e\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u063f\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0640\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u063f\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0641\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0640\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0642\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0642\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0644\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0643\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0645\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0644\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0645\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0646\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0647\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0646\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0648\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0647\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u064a\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0648\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0649\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u064a\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u064c\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x01\u064b\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u064d\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u064c\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u064e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u064d\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u064e\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u064f\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u064f\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0650\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0651\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0650\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x01\u0652\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0651\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0653\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0652\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0654\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0653\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0655\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0655\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0657\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0658\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u065a\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u065a\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u065c\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x01\x4d\x01\u065b\x01\u065c\x07\x4d\x07\uffff\x1a\x4d\x04"+
+            "\x01\x4d\x01\u065d\x01\u065e\x07\x4d\x07\uffff\x1a\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u065d\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u065f\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u065e\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u065f\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0660\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0660\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0661\x07\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0661\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0662\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0663\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0664\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0666\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0665\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0667\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0667\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0669\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0668\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u066a\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0669\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "\x0a\x4d\x07\uffff\x0d\x4d\x01\u066b\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u066d\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u066c\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u066e\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u066e\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0670\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0670\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0672\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0671\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0673\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0674\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0676\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0675\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0677\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0676\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0678\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0678\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u067a\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0679\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u067b\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u067b\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u067d\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u067c\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u067e\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u067e\x07\x4d\x01\u067f\x01"+
-            "\x4d\x01\u067d\x0a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0680\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0680\x07\x4d\x01\u0681\x01"+
+            "\x4d\x01\u067f\x0a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0682\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0682\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0684\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0683\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0685\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0684\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0686\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0685\x07\x4d\x01\u0686\x11\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x01\u0687\x07\x4d\x01\u0688\x11\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0687\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0689\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0688\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0689\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u068a\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u068a\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u068b\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u068c\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u068c\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u068d\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u068d\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0690\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u068e\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u068f\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0693\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0694\x17\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0696\x0d\x4d\x01\u0697\x0b\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0692\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0695\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0696\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u0698\x0d\x4d\x01\u0699\x0b\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0698\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u069a\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0699\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u069b\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u069a\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u069c\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u069c\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u069e\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u069d\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u069f\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u069e\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u06a0\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u069f\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06a1\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06a0\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u06a2\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06a1\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06a3\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06a2\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06a4\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06a3\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06a5\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06a4\x01\x4d\x01\u06a5\x06"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06a6\x01\x4d\x01\u06a7\x06"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06a6\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06a8\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u06a7\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u06a9\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u06a8\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u06aa\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u06a9\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u06ab\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06aa\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06ac\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06ab\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06ac\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06ad\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06ad\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06ae\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06ae\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06af\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06b0\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27076,130 +27148,130 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b1\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b3\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06b2\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u06b4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u06b3\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u06b5\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b4\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b6\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b5\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06b7\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u06b7\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u06b9\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u06b9\x08\x4d\x01\u06ba\x05"+
-            "\x4d\x01\u06bb\x08\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06bc\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u06bb\x08\x4d\x01\u06bc\x05"+
+            "\x4d\x01\u06bd\x08\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06be\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u06bd\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u06bf\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06be\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06c0\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x19\x4d\x01\u06bf\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x19\x4d\x01\u06c1\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06c0\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06c2\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06c3\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06c5\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06c4\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06c6\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x02\x4d\x01\u06c5\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x02\x4d\x01\u06c7\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06c7\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06c8\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06c9\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06c9\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06ca\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06ca\x0c\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u06cb\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06cb\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06cc\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u06cd\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06cd\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06cf\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06ce\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06d0\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06cf\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06d1\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06d0\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06d2\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u06d3\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u06d5\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06d4\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06d6\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06d6\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06d8\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06d8\x01\u06d7\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\u06da\x01\u06d9\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u06da\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u06dc\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06db\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06dd\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06dd\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u06df\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06df\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06e1\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06e1\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06e2\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06e3\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x01\u06e4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06e5\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06e6\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\u06e6\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06e7\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06e7\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u06e8\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06e9\x0a\x4d\x01\u06ea\x07"+
-            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06ec\x0a\x4d\x01\u06ed\x07"+
-            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06ef\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u06e9\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u06f0\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06ea\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06eb\x0a\x4d\x01\u06ec\x07"+
+            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u06ee\x0a\x4d\x01\u06ef\x07"+
+            "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06f1\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u06f2\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u06f2\x03\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06f3\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u06f4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27207,175 +27279,177 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06f6\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u06f8\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06f7\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u06f8\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06f9\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06fb\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06fc\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06fd\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u06f9\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0700\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u06fa\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0701\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u06fb\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x02\x4d\x01\u0703\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u06fd\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0705\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u06fe\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u06ff\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0707\x01\u0708\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u070b\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u070c\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u070d\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u070f\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0710\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0711\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0712\x17\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0713\x02\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0714\x01\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0716\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0702\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0703\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x02\x4d\x01\u0705\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0707\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u071b\x01\u071a\x06\x4d\x04"+
+            "\x0a\x4d\x07\uffff\x01\u0709\x01\u070a\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u070d\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u070e\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u070f\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0711\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0712\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0713\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0714\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0715\x02\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0716\x01\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0718\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u071d\x01\u071c\x06\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u071c\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u071e\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u071d\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u071e\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u071f\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u071f\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0720\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0720\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0721\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0721\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0722\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0722\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0723\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0723\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0724\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0724\x12\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0725\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0726\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0726\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0728\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0727\x03\x4d\x01\u0728\x0a"+
+            "\x02\x4d\x01\u0729\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u072b\x03\x4d\x01\u072c\x0a"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0729\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u072d\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u072a\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u072e\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x01\x4d\x01\u072c\x01\u072d\x07\x4d\x07\uffff\x0e\x4d\x01"+
-            "\u072e\x0b\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x01\x4d\x01\u0730\x01\u0731\x07\x4d\x07\uffff\x0e\x4d\x01"+
+            "\u0732\x0b\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0730\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0734\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0731\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0735\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0732\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0736\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0733\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0737\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0734\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0738\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0736\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u073a\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0739\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u073d\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u073a\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u073e\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u073b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u073f\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x14"+
-            "\x4d\x01\u073c\x05\x4d",
+            "\x4d\x01\u0740\x05\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u073e\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0742\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u073f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0743\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0740\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0741\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0742\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0744\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x01\u0743\x06\uffff\x1a\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0745\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0746\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x01\u0747\x06\uffff\x1a\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -27383,77 +27457,77 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0746\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u074a\x03\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0747\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u074b\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u074a\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u074e\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u074c\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0750\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
             "",
             "",
-            "\x0a\u05f5\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
+            "\x0a\u05f7\x07\uffff\x1a\u0112\x04\uffff\x01\u0112\x01\uffff"+
             "\x1a\u0112",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u074f\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0753\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0750\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0754\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0753\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0757\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0754\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0758\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0755\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0759\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0756\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0757\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0759\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u075a\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u075d\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u075e\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u075f\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u075b\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0761\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u075d\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x02\x4d\x01\u0762\x01\u0763\x06\x4d\x07\uffff\x1a\x4d\x04"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0761\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0762\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0763\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0765\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x02\x4d\x01\u0766\x01\u0767\x06\x4d\x07\uffff\x1a\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27463,119 +27537,119 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0769\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u076d\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u076a\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u076e\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u076b\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u076f\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u076c\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0770\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u076d\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u076e\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u076f\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0770\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0773\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0771\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0772\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0773\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0774\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0776\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0777\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0778\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0777\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0779\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u077b\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u077c\x01\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0782\x08\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u077a\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0784\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u077b\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0785\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u077c\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0786\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u077d\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u077f\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0780\x01\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0786\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0788\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0789\x08\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0789\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u078a\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u078c\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u078d\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u078b\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u078f\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u078c\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0790\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u078d\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0791\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0790\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0794\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0791\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0795\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0792\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0796\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0793\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0797\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x19\x4d\x01\u0795\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x19\x4d\x01\u0799\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0797\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u079b\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0798\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u079c\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0799\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u079d\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u079a\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u079e\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u079b\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u079f\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -27587,15 +27661,15 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x08\x4d\x01\u079f\x01\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x08\x4d\x01\u07a3\x01\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x01\u07a0\x09\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01"+
+            "\x01\u07a4\x09\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07a1\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07a5\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07a2\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07a6\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07a3\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07a7\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27603,7 +27677,7 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07a6\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07aa\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27612,67 +27686,67 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u07aa\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u07ae\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u07ab\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u07af\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07ac\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07b0\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07ae\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07b2\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u07af\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07b3\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u07b3\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07b4\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07b7\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07b7\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07b8\x0b\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07b8\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u07b9\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07bb\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07bc\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u07bd\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u07ba\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u07be\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07bb\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07bf\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07bc\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07c0\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u07bf\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u07c3\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u07c0\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u07c4\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07c1\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07c5\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07c2\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07c6\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u07c5\x08\x4d\x01\u07c6\x04"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u07c9\x08\x4d\x01\u07ca\x04"+
             "\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27680,61 +27754,61 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07ca\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07ce\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07cb\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u07cd\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07ce\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07cf\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07d0\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07cf\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07d3\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u07d1\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07d2\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07d3\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07d4\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07d5\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07d6\x06\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07d7\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u07d8\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07d9\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07da\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07da\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u07dc\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07db\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07dc\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07dd\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07de\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u07de\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x13\x4d\x01\u07df\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u07e0\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07e0\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u07e1\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07e1\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07e2\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u07e2\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07e4\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07e3\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u07e4\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u07e5\x05\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07e6\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u07e8\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27742,9 +27816,9 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07e7\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u07eb\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u07e8\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u07ec\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27754,21 +27828,21 @@ public partial class Cmd4Lexer : Lexer {
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07ec\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07f0\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07ed\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07f1\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07ee\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u07f2\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u07ef\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u07f3\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07f2\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u07f6\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u07f3\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u07f7\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
@@ -27783,172 +27857,175 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07f9\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u07fd\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u07fb\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u07ff\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u07fc\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0800\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u07fe\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0802\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u07ff\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0803\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0801\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0805\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0802\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0806\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0803\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0807\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0804\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0808\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0805\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0809\x02\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0806\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u080a\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0808\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u080c\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0809\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u080d\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u080a\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u080e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u080b\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u080f\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u080c\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0810\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u080d\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u080f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0811\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0811\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0813\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0815\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0812\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0816\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0813\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0817\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0814\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0818\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0815\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0819\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0817\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u081b\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0818\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u081c\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0819\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u081d\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u081b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u081f\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u081c\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u081d\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u081e\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u081f\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0820\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0821\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0821\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0822\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0823\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x01\u0823\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0824\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0825\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0825\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u0827\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0826\x04\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0828\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0829\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0829\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u082a\x04\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u082c\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u082d\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u082a\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u082e\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u082b\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u082f\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u082c\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u082d\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0830\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0831\x01\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0832\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\u0834\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0836\x01\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0831\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0839\x16\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0834\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u083a\x13\x4d\x04\uffff\x01"+
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u0835\x01\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0836\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\u0838\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x18\x4d\x01\u083a\x01\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u083c\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u083d\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u083d\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u083e\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0840\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0841\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u083e\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0842\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u083f\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u0844\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0840\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0845\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0841\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0846\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -27957,18 +28034,18 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0845\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u084a\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0847\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u084c\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0848\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u084d\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0849\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u084e\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u084a\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u084f\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -27979,32 +28056,32 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u084e\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0853\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x13"+
-            "\x4d\x01\u084f\x06\x4d",
+            "\x4d\x01\u0854\x06\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0850\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0855\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0851\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u0856\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0852\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0853\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0854\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0856\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
             "\x0a\x4d\x07\uffff\x06\x4d\x01\u0857\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0858\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0859\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u085b\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u085c\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28012,76 +28089,76 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u085a\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u085f\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u085b\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0860\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u085c\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0861\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u085d\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0862\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u085e\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0863\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0864\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0863\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
             "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0868\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0869\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0868\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u086d\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0869\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u086e\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u086a\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u086f\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u086b\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u086c\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u086d\x0f\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u086e\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u086f\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0870\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0871\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0871\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0872\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0872\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0873\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0873\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0874\x15\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0874\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0875\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0876\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0877\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0878\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0879\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28099,71 +28176,57 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u087a\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u087b\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u087c\x05\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u087d\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u087e\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
             "",
             "\x0a\x4d\x07\uffff\x12\x4d\x01\u087f\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0880\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0881\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0882\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0880\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0883\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0881\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0885\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0882\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0886\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0888\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0883\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u088b\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0884\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u088d\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0885\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0886\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0887\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0888\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u088f\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u088a\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0890\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0891\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u088b\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u088d\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0892\x08\x4d\x04\uffff\x01"+
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0890\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0892\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
@@ -28171,21 +28234,35 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0894\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0895\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0896\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0897\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0896\x05\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0897\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0898\x17\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0899\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u089a\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u089b\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u089b\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u089c\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u089d\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u089e\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u089f\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08a0\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
@@ -28193,80 +28270,80 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u089e\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u08a3\x03\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u089f\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08a4\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08a0\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08a5\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u08a1\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u08a6\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08a3\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08a8\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u08a4\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u08a9\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08a5\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08aa\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x10\x4d\x01\u08a6\x09\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x10\x4d\x01\u08ab\x09\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08a8\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08ad\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08a9\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08ae\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08aa\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u08ab\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08af\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08ac\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u08b0\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u08ad\x0b\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08b1\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08ae\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u08af\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08b0\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "\x0a\x4d\x07\uffff\x0e\x4d\x01\u08b2\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08b3\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08b3\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08b4\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u08b4\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08b5\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u08b7\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08b8\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08b9\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08b5\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08ba\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u08b7\x0d\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u08bc\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08b9\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08be\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08ba\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08bf\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u08bb\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u08c0\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28281,198 +28358,199 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08bf\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08c4\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u08c1\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u08c6\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u08c3\x17\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08c6\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08c7\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08c8\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u08c9\x02\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u08c8\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08cc\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08cb\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08cd\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08cc\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08ce\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u08cd\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08cf\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u08ce\x02\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08d1\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08d2\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08d3\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08d4\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08d1\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08d6\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08d2\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08d7\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08d3\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08d8\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08d4\x14\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08d9\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08d6\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08db\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08d7\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08dc\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08d8\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08dd\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08d9\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08de\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x01\x4d\x01\u08da\x01\u08db\x07\x4d\x07\uffff\x1a\x4d\x04"+
+            "\x01\x4d\x01\u08df\x01\u08e0\x07\x4d\x07\uffff\x1a\x4d\x04"+
             "\uffff\x01\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08de\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u08df\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08e0\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08e1\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08e2\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08e3\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08e3\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x01\u08e4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08e5\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u08e5\x14\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08e6\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08e8\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u08ec\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08e6\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x19\x4d\x01\u08ed\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08e7\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08e8\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u08e9\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08ee\x01\u08ef\x0b\x4d\x01"+
-            "\u08f0\x08\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08ea\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08eb\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08ed\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08f1\x0e\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u08f1\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x19\x4d\x01\u08f2\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08f3\x01\u08f4\x0b\x4d\x01"+
+            "\u08f5\x08\x4d\x04\uffff\x01\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08f6\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08f2\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08f7\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08f4\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08f9\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08f5\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u08fa\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08f6\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08f7\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08f8\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u08f9\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08fb\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08fa\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u08fc\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u08fb\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u08fd\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08fc\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u08fe\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u08ff\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u08ff\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0900\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0901\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0903\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0904\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x04"+
-            "\x4d\x01\u0900\x15\x4d",
+            "\x4d\x01\u0905\x15\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0902\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0907\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0903\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0908\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0905\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u090a\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0909\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u090a\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u090b\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u090c\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u090d\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u090e\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0911\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u090e\x0d\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u090f\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0910\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0911\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0912\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0913\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0916\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28480,17 +28558,17 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0915\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u091a\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0916\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u091b\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0918\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u091d\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0919\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u091e\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u091a\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u091f\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28503,15 +28581,15 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u091e\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0923\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u091f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0924\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0920\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0925\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0921\x11\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0926\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0922\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u0927\x03\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28525,11 +28603,11 @@ public partial class Cmd4Lexer : Lexer {
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0928\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u092d\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0929\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u092e\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -28537,7 +28615,7 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u092c\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0931\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28549,93 +28627,93 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0931\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0936\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0932\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0937\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0934\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0938\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u0939\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u093a\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u093c\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u093f\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0941\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u093d\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0942\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0943\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0945\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0946\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u093e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u093f\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0941\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0944\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0946\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u0947\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0948\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u0948\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0949\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u094a\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u094b\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u094c\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u094d\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u094e\x12\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u094f\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u094a\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u094b\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0951\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u094c\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u094d\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u094e\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u094f\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0950\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0951\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0952\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0953\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0952\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0953\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
+            "",
             "\x0a\x4d\x07\uffff\x12\x4d\x01\u0954\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0955\x11\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0956\x0f\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0957\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0958\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0959\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u095a\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
@@ -28648,77 +28726,77 @@ public partial class Cmd4Lexer : Lexer {
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u095a\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u095f\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u095b\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0960\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u095c\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0961\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u095d\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0965\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0967\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0969\x0f\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u096a\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u096b\x17\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x09\x4d\x01\u096c\x10\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0962\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u096d\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u096a\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u096c\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u096e\x0f\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u096f\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0970\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x09\x4d\x01\u0971\x10\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0972\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u096e\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u096f\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0970\x02\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0971\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0972\x05\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0973\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0975\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0974\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0977\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x17\x4d\x01\u0975\x02\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0976\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u0977\x05\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u0978\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0979\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u097a\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u097c\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u097d\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u097e\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28726,19 +28804,19 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u097d\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0982\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u097e\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0983\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u097f\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0984\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0981\x18\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u0986\x18\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0982\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0987\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -28746,9 +28824,9 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0984\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0989\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0985\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u098a\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28756,57 +28834,57 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0989\x0a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u098e\x0a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u098a\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u098f\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u098c\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0991\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u098d\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0992\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0995\x04\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0998\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0999\x11\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0990\x04\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0993\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u0994\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0998\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u099d\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -28816,113 +28894,68 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u099b\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09a0\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u099c\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u099e\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u099f\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x16\x4d\x01\u09a0\x03\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09a1\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u09a2\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u09a3\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09a4\x0b\x4d\x04\uffff\x01"+
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09a4\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09a5\x16\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x16\x4d\x01\u09a5\x03\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u09a7\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09a8\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09a9\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09aa\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09a8\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09ad\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09a9\x0c\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09ae\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09aa\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09ac\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09af\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09af\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09b0\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09b1\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09b2\x07\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09b4\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09b5\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09b7\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09b9\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09ba\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09bb\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x05\x4d\x01\u09bc\x14\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u09c0\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u09c1\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09c2\x0c\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09c4\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09c5\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -28930,86 +28963,131 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u09c8\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x10\x4d\x01\u09ca\x09\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09cb\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\x4d\x01\u09cc\x18\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09cd\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09be\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09bf\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09c0\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x05\x4d\x01\u09c1\x14\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u09c5\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u09c6\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09c7\x0c\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09c9\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09ca\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x01\u09cf\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u09cd\x0d\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x10\x4d\x01\u09cf\x09\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09d0\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\x4d\x01\u09d1\x18\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09d2\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u09d4\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09d1\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09d6\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09d2\x07\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09d3\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09d7\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u09d4\x13\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09d5\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09d8\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09d6\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u09d9\x13\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09da\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u09d7\x11\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09db\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u09dc\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09d9\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09de\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09da\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09df\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x08\x4d\x01\u09db\x11\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09dc\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09dd\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09de\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09df\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x08\x4d\x01\u09e0\x11\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x14\x4d\x01\u09e1\x05\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09e1\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09e2\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09e2\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09e3\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x04\x4d\x01\u09e4\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x14\x4d\x01\u09e6\x05\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09e7\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09e9\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
@@ -29025,72 +29103,72 @@ public partial class Cmd4Lexer : Lexer {
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09e9\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09ee\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u09ea\x0e\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u09ef\x0e\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09eb\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09f0\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09ec\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09f1\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09ef\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u09f4\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u09f0\x0d\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09f2\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09f3\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09f5\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0c\x4d\x01\u09f5\x0d\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09f8\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09f7\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09f9\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09fa\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u09f8\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u09fc\x0c\x4d\x04\uffff\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u09fa\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09ff\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u09fd\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a00\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u09fe\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a01\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u09ff\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a02\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a03\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x0d\x4d\x01\u0a01\x0c\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0a04\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a04\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a05\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a06\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a07\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a08\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0a09\x07\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -29101,48 +29179,48 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a07\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a0c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x10\x4d\x01\u0a08\x09\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a09\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0a0b\x0a\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a0c\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a0d\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x10\x4d\x01\u0a0d\x09\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a0e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x01\u0a0f\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "",
+            "\x0a\x4d\x07\uffff\x0f\x4d\x01\u0a10\x0a\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a11\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a12\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a13\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x01\u0a14\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0a11\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0a16\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a12\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a17\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0a13\x13\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x06\x4d\x01\u0a18\x13\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a14\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a19\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a15\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a1a\x16\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a16\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a1b\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a17\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a1c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -29152,91 +29230,62 @@ public partial class Cmd4Lexer : Lexer {
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a1b\x0b\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a1c\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x01\u0a1d\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a1e\x16\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a1f\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a20\x16\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a20\x0b\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a21\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a22\x06\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0a22\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a23\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a24\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x03\x4d\x01\u0a25\x16\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a26\x06\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a27\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0a24\x04\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x15\x4d\x01\u0a29\x04\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a26\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a2b\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a27\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a29\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "",
-            "",
-            "\x02\x4d\x01\u0a2a\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a2c\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a2c\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a2d\x15\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a2e\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a2f\x15\x4d\x04\uffff\x01"+
+            "",
+            "",
+            "",
+            "\x02\x4d\x01\u0a2f\x07\x4d\x07\uffff\x1a\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a30\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a31\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x01\u0a31\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a32\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a33\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a34\x15\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a35\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x01\u0a36\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x01\u0a32\x19\x4d\x04\uffff\x01\x4d\x01"+
-            "\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a34\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
             "",
             "\x0a\x4d\x07\uffff\x01\u0a37\x19\x4d\x04\uffff\x01\x4d\x01"+
             "\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0a38\x0e\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a3a\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a3b\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
-            "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a3d\x08\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "",
-            "",
-            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a3f\x06\x4d\x04\uffff\x01"+
-            "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0a40\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a39\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
@@ -29244,29 +29293,58 @@ public partial class Cmd4Lexer : Lexer {
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0a44\x07\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x01\u0a3c\x19\x4d\x04\uffff\x01\x4d\x01"+
+            "\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x0b\x4d\x01\u0a3d\x0e\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a3f\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a40\x08\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a42\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a45\x0b\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "",
+            "\x0a\x4d\x07\uffff\x13\x4d\x01\u0a44\x06\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a46\x12\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0a45\x17\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
+            "\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x12\x4d\x01\u0a49\x07\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "",
+            "\x0a\x4d\x07\uffff\x0e\x4d\x01\u0a4a\x0b\x4d\x04\uffff\x01"+
+            "\x4d\x01\uffff\x1a\x4d",
+            "\x0a\x4d\x07\uffff\x07\x4d\x01\u0a4b\x12\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a48\x08\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x11\x4d\x01\u0a4d\x08\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
-            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a49\x15\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x04\x4d\x01\u0a4e\x15\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
-            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0a4b\x17\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x02\x4d\x01\u0a50\x17\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "",
-            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0a4c\x0f\x4d\x04\uffff\x01"+
+            "\x0a\x4d\x07\uffff\x0a\x4d\x01\u0a51\x0f\x4d\x04\uffff\x01"+
             "\x4d\x01\uffff\x1a\x4d",
             "\x0a\x4d\x07\uffff\x1a\x4d\x04\uffff\x01\x4d\x01\uffff\x1a"+
             "\x4d",
@@ -29299,7 +29377,7 @@ public partial class Cmd4Lexer : Lexer {
 
         override public string Description
         {
-            get { return "1:1: Tokens : ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION );"; }
+            get { return "1:1: Tokens : ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION );"; }
         }
 
     }
@@ -29358,9 +29436,9 @@ public partial class Cmd4Lexer : Lexer {
                    	s = -1;
                    	if ( ((LA29_39 >= '\u0000' && LA29_39 <= '&') || (LA29_39 >= '(' && LA29_39 <= 'z') || (LA29_39 >= '|' && LA29_39 <= '\uFFFF')) && (( stringCounter == 1 )) ) { s = 281; }
 
-                   	else if ( (LA29_39 == '\'') && (( stringCounter == 1 )) ) { s = 282; }
+                   	else if ( (LA29_39 == '{') && (( stringCounter == 1 )) ) { s = 282; }
 
-                   	else if ( (LA29_39 == '{') && (( stringCounter == 1 )) ) { s = 283; }
+                   	else if ( (LA29_39 == '\'') && (( stringCounter == 1 )) ) { s = 283; }
 
                    	else s = 284;
 
@@ -29369,6 +29447,23 @@ public partial class Cmd4Lexer : Lexer {
                    	if ( s >= 0 ) return s;
                    	break;
                	case 3 : 
+                   	int LA29_281 = input.LA(1);
+
+                   	 
+                   	int index29_281 = input.Index();
+                   	input.Rewind();
+                   	s = -1;
+                   	if ( (LA29_281 == '{') && (( stringCounter == 1 )) ) { s = 282; }
+
+                   	else if ( ((LA29_281 >= '\u0000' && LA29_281 <= '&') || (LA29_281 >= '(' && LA29_281 <= 'z') || (LA29_281 >= '|' && LA29_281 <= '\uFFFF')) && (( stringCounter == 1 )) ) { s = 281; }
+
+                   	else if ( (LA29_281 == '\'') && (( stringCounter == 1 )) ) { s = 283; }
+
+                   	 
+                   	input.Seek(index29_281);
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 4 : 
                    	int LA29_277 = input.LA(1);
 
                    	s = -1;
@@ -29380,23 +29475,6 @@ public partial class Cmd4Lexer : Lexer {
 
                    	else if ( ((LA29_277 >= '\u0000' && LA29_277 <= '&') || (LA29_277 >= '(' && LA29_277 <= 'z') || (LA29_277 >= '|' && LA29_277 <= '}') || (LA29_277 >= '\u007F' && LA29_277 <= '\uFFFF')) ) { s = 279; }
 
-                   	if ( s >= 0 ) return s;
-                   	break;
-               	case 4 : 
-                   	int LA29_281 = input.LA(1);
-
-                   	 
-                   	int index29_281 = input.Index();
-                   	input.Rewind();
-                   	s = -1;
-                   	if ( (LA29_281 == '{') && (( stringCounter == 1 )) ) { s = 283; }
-
-                   	else if ( ((LA29_281 >= '\u0000' && LA29_281 <= '&') || (LA29_281 >= '(' && LA29_281 <= 'z') || (LA29_281 >= '|' && LA29_281 <= '\uFFFF')) && (( stringCounter == 1 )) ) { s = 281; }
-
-                   	else if ( (LA29_281 == '\'') && (( stringCounter == 1 )) ) { s = 282; }
-
-                   	 
-                   	input.Seek(index29_281);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 5 : 

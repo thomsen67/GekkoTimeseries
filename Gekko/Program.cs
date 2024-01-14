@@ -5088,6 +5088,8 @@ namespace Gekko
                 cacheParameters.option_gams_time_offset = Program.options.gams_time_offset;
                 cacheParameters.option_gams_time_detect_auto = Program.options.gams_time_detect_auto;
                 cacheParameters.option_gams_trim = Program.options.gams_trim;
+                //gbk
+                cacheParameters.trace = oRead.trace;
             }            
             
             if (cache_loadedFromProtobuf && cacheParameters.IsSame(databankTemp.cacheParameters))
@@ -5802,13 +5804,14 @@ namespace Gekko
                 //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                 try
                 {
-                    DateTime dt3 = DateTime.Now;                   
+                    DateTime dt3 = DateTime.Now;
                     Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are reading data and traces in parallel. 
                     {
+                        //traces read may be skipped if <trace=no> or traces.data file does not exist.
                         if (number == 0) deserializedDatabank = ProtobufRead<Databank>(fileName);
                         else if (number == 1)
                         {
-                            if (File.Exists(fileName2)) traces = ProtobufRead<List<Trace2>>(fileName2);
+                            if (oRead.trace && File.Exists(fileName2)) traces = ProtobufRead<List<Trace2>>(fileName2);
                         }
                         else new Error("Parallel problem");
                     });
@@ -33771,6 +33774,7 @@ namespace Gekko
         public string sheet = null;
         public bool isVariablecode = false;
         public string gekkocode;
+        public bool trace = true;  //default
         public string FileName
         {
             get { return fileName; }

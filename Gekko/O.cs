@@ -6830,6 +6830,7 @@ namespace Gekko
             public string opt_dateformat = null;
             public string opt_datetype = null;
             public string opt_variablecode = null;
+            public string opt_trace = "yes"; //default
 
             public P p = null;
             public void Exe()
@@ -6909,6 +6910,7 @@ namespace Gekko
                     if (G.Equal(this.opt_flat, "yes")) oRead.Type = EDataFormat.Flat;
                     if (G.Equal(this.opt_aremos, "yes")) oRead.Type = EDataFormat.Aremos;
                     if (G.Equal(this.opt_cols, "yes")) oRead.Orientation = "cols";
+                    if (G.Equal(this.opt_trace, "no")) oRead.trace = false;
 
                     oRead.gdxopt = this.opt_gdxopt;
 
@@ -8288,6 +8290,7 @@ namespace Gekko
             public string opt_save = null;
             public double opt_pos = double.NaN;
             public string opt_create = null;  //may use OPEN b1, where b1.gbk does not exist (like OPEN<edit>b1).
+            public string opt_trace = "yes"; //default
             public P p = null;
 
             public void Exe()
@@ -8348,6 +8351,7 @@ namespace Gekko
                 if (this.opt_gdx == "yes") oRead.Type = EDataFormat.Gdx;
                 if (this.opt_px == "yes") oRead.Type = EDataFormat.Px;
                 if (this.opt_cols == "yes") oRead.Orientation = "cols";
+                if (G.Equal(this.opt_trace, "no")) oRead.trace = false;
 
                 oRead.gdxopt = this.opt_gdxopt;
                 //oRead.isVariablecode is not activated from <> options at the moment...

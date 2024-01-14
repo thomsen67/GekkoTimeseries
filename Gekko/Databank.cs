@@ -427,6 +427,7 @@ namespace Gekko
         public bool variablecode;
 
         //Gdx ---------------------------------------------------------------------------       
+
         [ProtoMember(9)]
         public string option_gams_time_freq;
 
@@ -444,6 +445,11 @@ namespace Gekko
 
         [ProtoMember(14)]
         public int option_gams_trim;
+
+        //Gbk ---------------------------------------------------------------------------       
+
+        [ProtoMember(15)]
+        public bool trace;
 
         /// <summary>
         /// Tests if one object is equal (equal fields) to another.
@@ -472,6 +478,8 @@ namespace Gekko
             if (this.option_gams_time_offset != other.option_gams_time_offset) return false;
             if (this.option_gams_time_detect_auto != other.option_gams_time_detect_auto) return false;
             if (this.option_gams_trim != other.option_gams_trim) return false;
+            //gbk
+            if (this.trace != other.trace) return false;
             return true;
         }
     }
