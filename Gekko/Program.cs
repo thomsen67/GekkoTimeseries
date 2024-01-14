@@ -3269,12 +3269,6 @@ namespace Gekko
             ProtobufWrite(databank.cacheParameters, files[k + extra - 1]);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Write time cache params: " + G.Seconds(dt0));
             dt0 = DateTime.Now;
-            if (false)
-            {
-                ProtobufWrite(databank.traces, files[k + extra - 1]);
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Write time traces: " + G.Seconds(dt0));
-            }
-
             Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
             databank.traces = null;  //important!
 
@@ -3424,13 +3418,7 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             DateTime dt0 = DateTime.Now;
             databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));
-            dt0 = DateTime.Now;
-            if (false)
-            {
-                databank.traces = ProtobufRead<List<Trace2>>(files[k - extra + 1]);
-                if (Globals.runningOnTTComputer) new Writeln("TTH: Read time traces: " + G.Seconds(dt0));
-            }
+            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));                        
             dt0 = DateTime.Now;
             Gekko.Trace2.HandleTraceRead1(databank);
             if (Globals.runningOnTTComputer) new Writeln("TTH: Handle time traces: " + G.Seconds(dt0));
