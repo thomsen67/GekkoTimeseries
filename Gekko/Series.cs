@@ -199,7 +199,8 @@ namespace Gekko
 
         /// <summary>
         /// Gets databank that the series, subseries or array-series resides in.
-        /// Will return null if the series resides inside a map.
+        /// Will return null if the series resides inside a map. May also return null
+        /// if the series is for instance imported.
         /// 
         /// </summary>
         /// <returns></returns>
@@ -212,9 +213,12 @@ namespace Gekko
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
-                return this.mmi.parent.meta.parentDatabank;
+                return this.mmi?.parent?.meta?.parentDatabank;
             }
-            else return this.meta.parentDatabank;
+            else
+            {                
+                return this.meta?.parentDatabank;
+            }
         }
 
         public string GetNameWithoutCurrentFreq(bool onlyRemoveCurrentFreq)

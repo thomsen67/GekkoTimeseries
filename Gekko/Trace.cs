@@ -219,8 +219,8 @@ namespace Gekko
         /// <returns></returns>
         private static string TraceGetNameDecorated(Series rhs, bool hasTrace)  //See #9khsigra7ioau
         {
-            string prefix = null;
-            string databankName = rhs.GetParentDatabank().GetName();
+            string prefix = null;            
+            string databankName = rhs.GetParentDatabank()?.GetName();  //databank may be null, for instance an imported series
             bool isFirst = G.Equal(databankName, Program.databanks.GetFirst().GetName());
             bool isCurrentFreq = rhs.freq == Program.options.freq;
             if (hasTrace)
@@ -422,21 +422,21 @@ namespace Gekko
             }            
             else if (th.type == ETraceHelper.GetTimeShadowInfo)
             {
-                ScalarVal temp = null; th.timeShadowing.TryGetValue(this, out temp);
+                string temp = null; th.timeShadowing.TryGetValue(this, out temp);
                 if (temp == null)
                 {
-                    th.timeShadowing.Add(this, Globals.scalarVal1);
+                    th.timeShadowing.Add(this, "");  //will be interned
                     if (this.precedents.Count() > 0)
-                    {
-                        th.input += this.precedents.Count();
-                        List<TraceAndPeriods> shadow = this.TimeShadow2(true);
-                        th.output += shadow.Count;
+                    {                        
+                        List<TraceAndPeriods> shadow = this.TimeShadow2(true);                        
                         if (shadow.Count > precedents.Count())
                         {
                             new Error("Hov!");
                         }
                         else if (shadow.Count != precedents.Count())
                         {
+                            int cuts = precedents.Count() - shadow.Count;
+                            th.timeShadowingCuts += cuts;
                             this.precedents = new Precedents();
                             foreach (TraceAndPeriods temp2 in shadow)
                             {
@@ -1112,10 +1112,9 @@ namespace Gekko
         //Hmm, isn't Precedents already a part of the key? Anyway, the depth needs to be inside an object anyway to be altered.
         public Dictionary<Trace2, PrecedentsAndDepth> tracesDepth2 = new Dictionary<Trace2, PrecedentsAndDepth>();
         //
-        // --- this is for time-shadowing
-        public int input = 0;
-        public int output = 0;
-        public Dictionary<Trace2, ScalarVal> timeShadowing = new Dictionary<Trace2, ScalarVal>();
+        // --- this is for time-shadowing        
+        public Dictionary<Trace2, string> timeShadowing = new Dictionary<Trace2, string>();
+        public int timeShadowingCuts = 0;
 
     }
 
