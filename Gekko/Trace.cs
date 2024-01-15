@@ -422,7 +422,7 @@ namespace Gekko
             }            
             else if (th.type == ETraceHelper.GetTimeShadowInfo)
             {
-                string temp = null; th.timeShadowing.TryGetValue(this, out temp);
+                string temp = null; th.timeShadowing.TryGetValue(this, out temp);  //do not look at the same trace object > 1 time.
                 if (temp == null)
                 {
                     th.timeShadowing.Add(this, "");  //will be interned
@@ -843,6 +843,9 @@ namespace Gekko
             string stamp = null;
             string stampDetailed = null;
             List<string> precedentsNames = null;
+
+            //List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+
             if (this.contents != null)
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
@@ -851,7 +854,8 @@ namespace Gekko
                 GekkoTime t1 = this.contents.span.t1;
                 GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
-                else period = "" + t1.ToString() + "-" + t2.ToString() + "";
+                else period = "" + t1.ToString() + "-" + t2.ToString() + "";                
+
                 int counter = 0;
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine))
                 {
@@ -863,94 +867,7 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
                 stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
                 stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-
-                if (this.contents.precedentsNames != null)
-                {
-                    List<string> list = new List<string>();
-                    foreach (string s in this.contents.precedentsNames)
-                    {
-                        string type = s.Substring(0, 1);
-                        string name = s.Substring(2);
-                        //See #9khsigra7ioau regarding 8 types
-
-                        bool removeBank = false;
-                        bool removeFreq = false;
-
-                        //We are not currently using whether it has trace or not (1, 2, 5, 6).
-                        //But that info may become useful later on.
-
-                        if (type == "1")
-                        {
-                            //has trace
-                            //is first-position databank  
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "2")
-                        {
-                            //has trace
-                            //is first-position databank  
-                            //is "other" frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no")) removeFreq = true;
-                        }
-                        else if (type == "3")
-                        {
-                            //has trace
-                            //is "other" open databank
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "4")
-                        {
-                            //has trace
-                            //is "other" open databank
-                            //is "other" frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no")) removeFreq = true;
-                        }
-                        else if (type == "5")
-                        {
-                            //has no trace
-                            //is first-position databank  
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "6")
-                        {
-                            //has no trace
-                            //is first-position databank  
-                            //is "other" frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no")) removeFreq = true;
-                        }
-                        else if (type == "7")
-                        {
-                            //has no trace
-                            //is "other" open databank
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "8")
-                        {
-                            //has no trace
-                            //is "other" open databank
-                            //is "other" frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no")) removeFreq = true;
-                        }
-
-                        if (removeBank) name = G.Chop_RemoveBank(name);
-                        if (removeFreq) name = G.Chop_RemoveFreq(name);
-
-                        list.Add(name);
-                    }
-                    precedentsNames = list;
-                }
+                if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
             }
             
             Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
@@ -979,14 +896,101 @@ namespace Gekko
             return newNode;
         }
 
+        private List<string> GetPrecedentsNames(string showFreq, string showDatabank)
+        {
+            List<string> precedentsNames;
+            List<string> list = new List<string>();
+            foreach (string s in this.contents.precedentsNames)
+            {
+                string type = s.Substring(0, 1);
+                string name = s.Substring(2);
+                //See #9khsigra7ioau regarding 8 types
+
+                bool removeBank = false;
+                bool removeFreq = false;
+
+                //We are not currently using whether it has trace or not (1, 2, 5, 6).
+                //But that info may become useful later on.
+
+                if (type == "1")
+                {
+                    //has trace
+                    //is first-position databank  
+                    //is current frequency
+                    if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                    if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                }
+                else if (type == "2")
+                {
+                    //has trace
+                    //is first-position databank  
+                    //is "other" frequency
+                    if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                    if (G.Equal(showFreq, "no")) removeFreq = true;
+                }
+                else if (type == "3")
+                {
+                    //has trace
+                    //is "other" open databank
+                    //is current frequency
+                    if (G.Equal(showDatabank, "no")) removeBank = true;
+                    if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                }
+                else if (type == "4")
+                {
+                    //has trace
+                    //is "other" open databank
+                    //is "other" frequency
+                    if (G.Equal(showDatabank, "no")) removeBank = true;
+                    if (G.Equal(showFreq, "no")) removeFreq = true;
+                }
+                else if (type == "5")
+                {
+                    //has no trace
+                    //is first-position databank  
+                    //is current frequency
+                    if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                    if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                }
+                else if (type == "6")
+                {
+                    //has no trace
+                    //is first-position databank  
+                    //is "other" frequency
+                    if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                    if (G.Equal(showFreq, "no")) removeFreq = true;
+                }
+                else if (type == "7")
+                {
+                    //has no trace
+                    //is "other" open databank
+                    //is current frequency
+                    if (G.Equal(showDatabank, "no")) removeBank = true;
+                    if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                }
+                else if (type == "8")
+                {
+                    //has no trace
+                    //is "other" open databank
+                    //is "other" frequency
+                    if (G.Equal(showDatabank, "no")) removeBank = true;
+                    if (G.Equal(showFreq, "no")) removeFreq = true;
+                }
+
+                if (removeBank) name = G.Chop_RemoveBank(name);
+                if (removeFreq) name = G.Chop_RemoveFreq(name);
+
+                list.Add(name);
+            }
+            precedentsNames = list;
+            return precedentsNames;
+        }
 
         public static Item ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
-        {
-            
+        {            
             
             Item copy = trace.CopyToItems(0, 0);
-            return copy;
-            
+            return copy;            
             
             //{
 
