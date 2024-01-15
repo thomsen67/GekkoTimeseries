@@ -211,10 +211,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used in trace: .precedentsNames. For a series x!a in databank b, theres is a prefix {i}¤ on names, where i is an integer 1, 2, 3 or 4.
-        /// If the series has trace, the prefix is '1' if the series is from
-        /// the first-position databank, else '2'. If the series has no trace, the prefix is '3' if the series is from
-        /// the first-position databank, else '4'. For example 3¤b:x!a.
+        /// Used in trace: .precedentsNames. For a series x!a in databank b, theres is a prefix {i}¤ on names, where i is an integer from 1 to 8.
+        /// See code: it is combinations of has trace, is first-pos databank, and is current freq.
         /// </summary>
         /// <param name="rhs"></param>
         /// <param name="hasTrace"></param>
@@ -225,29 +223,29 @@ namespace Gekko
             string databankName = rhs.GetParentDatabank().GetName();
             bool isFirst = G.Equal(databankName, Program.databanks.GetFirst().GetName());
             bool isCurrentFreq = rhs.freq == Program.options.freq;
-            if (isCurrentFreq)
+            if (hasTrace)
             {
-                if (hasTrace)
+                if (isFirst)
                 {
-                    if (isFirst) prefix = "1";
+                    if (isCurrentFreq) prefix = "1";
                     else prefix = "2";
                 }
                 else
                 {
-                    if (isFirst) prefix = "3";
+                    if (isCurrentFreq) prefix = "3";
                     else prefix = "4";
                 }
             }
             else
             {
-                if (hasTrace)
+                if (isFirst)
                 {
-                    if (isFirst) prefix = "5";
+                    if (isCurrentFreq) prefix = "5";
                     else prefix = "6";
                 }
                 else
                 {
-                    if (isFirst) prefix = "7";
+                    if (isCurrentFreq) prefix = "7";
                     else prefix = "8";
                 }
             }
@@ -880,11 +878,11 @@ namespace Gekko
 
                         //We are not currently using whether it has trace or not (1, 2, 5, 6).
                         //But that info may become useful later on.
-                        
+
                         if (type == "1")
                         {
                             //has trace
-                            //is first-position databank
+                            //is first-position databank  
                             //is current frequency
                             if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
                             if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
@@ -892,50 +890,50 @@ namespace Gekko
                         else if (type == "2")
                         {
                             //has trace
-                            //is "other" open databank
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "3")
-                        {
-                            //has no trace
-                            //is first-position databank
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "4")
-                        {
-                            //has no trace
-                            //is "other" open databank
-                            //is current frequency
-                            if (G.Equal(showDatabank, "no")) removeBank = true;
-                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
-                        }
-                        else if (type == "5")
-                        {
-                            //has trace
-                            //is first-position databank
+                            //is first-position databank  
                             //is "other" frequency
                             if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
                             if (G.Equal(showFreq, "no")) removeFreq = true;
                         }
-                        else if (type == "6")
+                        else if (type == "3")
+                        {
+                            //has trace
+                            //is "other" open databank
+                            //is current frequency
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                        }
+                        else if (type == "4")
                         {
                             //has trace
                             //is "other" open databank
                             //is "other" frequency
                             if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                        }
+                        else if (type == "5")
+                        {
+                            //has no trace
+                            //is first-position databank  
+                            //is current frequency
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                        }
+                        else if (type == "6")
+                        {
+                            //has no trace
+                            //is first-position databank  
+                            //is "other" frequency
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
                             if (G.Equal(showFreq, "no")) removeFreq = true;
                         }
                         else if (type == "7")
                         {
                             //has no trace
-                            //is first-position databank
-                            //is "other" frequency
-                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
-                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                            //is "other" open databank
+                            //is current frequency
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
                         }
                         else if (type == "8")
                         {
