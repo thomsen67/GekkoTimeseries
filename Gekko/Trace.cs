@@ -283,9 +283,7 @@ namespace Gekko
         /// With shadowedTracesAreRemoved == false, the count of the list returned will be the same as the count of the
         /// count of this.precedents (so we also get null-dividers). The included list includes period information, and
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
-        /// </summary>
-        /// <param name="shadowedTracesAreRemoved"></param>
-        /// <returns></returns>
+        /// </summary>        
         public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved)
         {            
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
@@ -842,9 +840,7 @@ namespace Gekko
             string fileDetailed = null;
             string stamp = null;
             string stampDetailed = null;
-            List<string> precedentsNames = null;
-
-            //List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+            List<string> precedentsNames = null;            
 
             if (this.contents != null)
             {
@@ -854,8 +850,7 @@ namespace Gekko
                 GekkoTime t1 = this.contents.span.t1;
                 GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
-                else period = "" + t1.ToString() + "-" + t2.ToString() + "";                
-
+                else period = "" + t1.ToString() + "-" + t2.ToString() + "";
                 int counter = 0;
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine))
                 {
@@ -873,17 +868,19 @@ namespace Gekko
             Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             if (depth < 5)
             {
-                if (this.precedents.GetStorage() != null)
+                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(false);
+                if (traceAndPeriods.Count > 0)
                 {
                     int n = -1;
-                    foreach (Trace2 child in this.precedents.GetStorage())
-                    {
+                                        
+                    foreach (TraceAndPeriods child in traceAndPeriods)
+                    {                        
                         n++;
                         Item newChild = null;
                         if (child != null)
                         {
                             //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
-                            newChild = child.CopyToItems(depth + 1, cnt + 1);
+                            newChild = child.trace.CopyToItems(depth + 1, cnt + 1);
                             newNode.Children.Add(newChild);
                         }
                         else
