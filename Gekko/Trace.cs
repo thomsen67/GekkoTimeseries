@@ -735,7 +735,7 @@ namespace Gekko
                             {
                                 TreeGridModel model = new TreeGridModel();
 
-                                Item temp = trace.CopyToItems(0, 0);
+                                Item temp = trace.CopyToItems(0, 0, null);
                                 foreach (Item item in temp.Children)
                                 {
                                     model.Add(item);
@@ -827,7 +827,7 @@ namespace Gekko
         //  d=2, c=0, DIVIDER      --> x3=x1+x2
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
-        public Item CopyToItems(int depth, int cnt)
+        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods)
         {
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
@@ -851,6 +851,18 @@ namespace Gekko
                 GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
+
+
+                period = null;
+                bool first = true;
+                foreach (GekkoTimeSpanSimple gts in periods)
+                {
+                    if (!first) period += ", ";
+                    period += gts.t1.ToString() + "-" + gts.t2.ToString();                    
+                    first = false;
+                }                
+
+
                 int counter = 0;
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine))
                 {
@@ -880,7 +892,7 @@ namespace Gekko
                         if (child != null)
                         {
                             //G.Writeln("depth " + depth + " alternative " + n + " cnt " + cnt);
-                            newChild = child.trace.CopyToItems(depth + 1, cnt + 1);
+                            newChild = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods);
                             newNode.Children.Add(newChild);
                         }
                         else
@@ -986,7 +998,7 @@ namespace Gekko
         public static Item ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
         {            
             
-            Item copy = trace.CopyToItems(0, 0);
+            Item copy = trace.CopyToItems(0, 0, null);
             return copy;            
             
             //{
