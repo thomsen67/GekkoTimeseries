@@ -642,22 +642,22 @@ namespace Gekko
         public string Name { get; private set; }
         public string Code { get; private set; }
         public string Period { get; private set; }
-
+        public string Active { get; private set; }
+        public string ActiveDetailed { get; private set; }
         public string Stamp { get; private set; }
-
         public string StampDetailed { get; private set; }
         public string File { get; private set; }
-
         public string FileDetailed { get; private set; }
-
         public List<string> PrecedentsNames { get; private set; }
 
-        public Item(string name, string code, string period, string stamp, string stampDetailed, string file, string fileDetailed, List<string>precedentsNames, bool hasChildren)
+        public Item(string name, string code, string period, string active, string activeDetailed, string stamp, string stampDetailed, string file, string fileDetailed, List<string>precedentsNames, bool hasChildren)
         {
             // Initialize the item
             Name = name;
             Code = code;
             Period = period;
+            Active =   active;
+            ActiveDetailed = activeDetailed;
             Stamp = stamp;
             StampDetailed = stampDetailed;
             File = file;
@@ -708,7 +708,7 @@ namespace Gekko
             for (int count = 0; count < Roots; count++)
             {
                 // Create the root item
-                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "2020", "today", "file", "file", null, true);
+                Item root = new Item(String.Format("Root {0}", count), "" + value++, "2020", "2020", "2020", "2020", "today", "file", "file", null, true);
 
                 // Add children to the root
                 AddChildren(root);
@@ -745,7 +745,7 @@ namespace Gekko
             for (int count = 0; count < ItemsPerLevel; count++)
             {
                 // Create the child
-                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "2020", "today", "file", "file", null, hasChildren);
+                Item child = new Item(String.Format("Child {0}, Level {1}", count, level), "" + value++, "2020", "2020", "2020", "2020", "today", "file", "file", null, hasChildren);
 
                 // Does the child have children?
                 if (hasChildren)
@@ -765,7 +765,7 @@ namespace Gekko
             string text = null;
             text = "Name: " + item.Name + G.NL;
             text += "Code: " + item.Code + G.NL;
-            text += "Period: " + item.Period + G.NL;
+            text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;
             text += "Stamp: " + item.StampDetailed + G.NL;
             text += "File: " + item.FileDetailed + G.NL;
             if (item.PrecedentsNames != null && item.PrecedentsNames.Count > 0) text += "Vars: " + Stringlist.GetListWithCommas(item.PrecedentsNames);

@@ -836,6 +836,8 @@ namespace Gekko
             string text = "null";
             string code = "null";
             string period = null;
+            string active = null;
+            string activeDetailed = null;
             string file = null;
             string fileDetailed = null;
             string stamp = null;
@@ -851,18 +853,22 @@ namespace Gekko
                 GekkoTime t2 = this.contents.span.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
-
-
-                period = null;
-                bool first = true;
+                int n = -1;
                 foreach (GekkoTimeSpanSimple gts in periods)
                 {
-                    if (!first) period += ", ";
-                    period += gts.t1.ToString() + "-" + gts.t2.ToString();                    
-                    first = false;
-                }                
-
-
+                    n++;
+                    if (n > 0) active += ", ";
+                    if (n > 0) activeDetailed += ", ";
+                    if (n <= 1)
+                    {
+                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                    }
+                    else
+                    {
+                        active += "...";
+                    }
+                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
+                }
                 int counter = 0;
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine))
                 {
@@ -877,7 +883,7 @@ namespace Gekko
                 if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
             }
             
-            Item newNode = new Item(text, code, period, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            Item newNode = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             if (depth < 5)
             {
                 List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(false);
