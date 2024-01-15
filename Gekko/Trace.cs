@@ -224,15 +224,32 @@ namespace Gekko
             string prefix = null;
             string databankName = rhs.GetParentDatabank().GetName();
             bool isFirst = G.Equal(databankName, Program.databanks.GetFirst().GetName());
-            if (hasTrace)
+            bool isCurrentFreq = rhs.freq == Program.options.freq;
+            if (isCurrentFreq)
             {
-                if (isFirst) prefix = "1";
-                else prefix = "2";
+                if (hasTrace)
+                {
+                    if (isFirst) prefix = "1";
+                    else prefix = "2";
+                }
+                else
+                {
+                    if (isFirst) prefix = "3";
+                    else prefix = "4";
+                }
             }
             else
             {
-                if (isFirst) prefix = "3";
-                else prefix = "4";
+                if (hasTrace)
+                {
+                    if (isFirst) prefix = "5";
+                    else prefix = "6";
+                }
+                else
+                {
+                    if (isFirst) prefix = "7";
+                    else prefix = "8";
+                }
             }
             return prefix + Globals.tracePrecedentsTypeDelimiter + rhs.GetNameAndParentDatabank();
         }
@@ -816,7 +833,7 @@ namespace Gekko
 
         public Item CopyToItems(int depth, int cnt)
         {
-            bool showFreq = false;
+            string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
@@ -856,37 +873,81 @@ namespace Gekko
                     {
                         string type = s.Substring(0, 1);
                         string name = s.Substring(2);
-                        //See #9khsigra7ioau regarding 4 types
+                        //See #9khsigra7ioau regarding 8 types
 
                         bool removeBank = false;
+                        bool removeFreq = false;
+
+                        //We are not currently using whether it has trace or not (1, 2, 5, 6).
+                        //But that info may become useful later on.
                         
                         if (type == "1")
                         {
                             //has trace
                             //is first-position databank
+                            //is current frequency
                             if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
                         }
                         else if (type == "2")
                         {
                             //has trace
                             //is "other" open databank
+                            //is current frequency
                             if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
                         }
                         else if (type == "3")
                         {
                             //has no trace
                             //is first-position databank
+                            //is current frequency
                             if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
                         }
                         else if (type == "4")
                         {
                             //has no trace
                             //is "other" open databank
+                            //is current frequency
                             if (G.Equal(showDatabank, "no")) removeBank = true;
-                        }                        
+                            if (G.Equal(showFreq, "no") || G.Equal(showFreq, "maybe")) removeFreq = true;
+                        }
+                        else if (type == "5")
+                        {
+                            //has trace
+                            //is first-position databank
+                            //is "other" frequency
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                        }
+                        else if (type == "6")
+                        {
+                            //has trace
+                            //is "other" open databank
+                            //is "other" frequency
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                        }
+                        else if (type == "7")
+                        {
+                            //has no trace
+                            //is first-position databank
+                            //is "other" frequency
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                        }
+                        else if (type == "8")
+                        {
+                            //has no trace
+                            //is "other" open databank
+                            //is "other" frequency
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                            if (G.Equal(showFreq, "no")) removeFreq = true;
+                        }
 
                         if (removeBank) name = G.Chop_RemoveBank(name);
-                        if (!showFreq) name = G.Chop_RemoveFreq(name);
+                        if (removeFreq) name = G.Chop_RemoveFreq(name);
 
                         list.Add(name);
                     }
