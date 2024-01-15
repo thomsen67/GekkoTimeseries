@@ -168,11 +168,12 @@ namespace Gekko
         /// <param name="trace"></param>
         /// <param name="rhs"></param>
         public static void AddRangeFromSeries1(Trace2 trace, Series rhs)
-        {            
+        {
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
 
             if (trace.contents.precedentsNames == null) trace.contents.precedentsNames = new List<string>();
-            trace.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs.GetNameAndParentDatabank());
+
+            trace.contents.precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
 
             if (hasTrace && rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
@@ -209,6 +210,33 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Used in trace: .precedentsNames. For a series x!a in databank b, theres is a prefix {i}¤ on names, where i is an integer 1, 2, 3 or 4.
+        /// If the series has trace, the prefix is '1' if the series is from
+        /// the first-position databank, else '2'. If the series has no trace, the prefix is '3' if the series is from
+        /// the first-position databank, else '4'. For example 3¤b:x!a.
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="hasTrace"></param>
+        /// <returns></returns>
+        private static string TraceGetNameDecorated(Series rhs, bool hasTrace)  //See #9khsigra7ioau
+        {
+            string prefix = null;
+            string databankName = rhs.GetParentDatabank().GetName();
+            bool isFirst = G.Equal(databankName, Program.databanks.GetFirst().GetName());
+            if (hasTrace)
+            {
+                if (isFirst) prefix = "1";
+                else prefix = "2";
+            }
+            else
+            {
+                if (isFirst) prefix = "3";
+                else prefix = "4";
+            }
+            return prefix + Globals.tracePrecedentsTypeDelimiter + rhs.GetNameAndParentDatabank();
+        }
+
 
         /// <summary>
         /// Get all traces from series rhs into lhs. Safer to use than AddRange(). Method does nothing if rhs == null, rhs.meta == null or rhs.meta.trace2 == null.
@@ -222,7 +250,7 @@ namespace Gekko
             if (rhs.type == ESeriesType.ArraySuper) return; //do not do this for array-series parent
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
             if (this.contents.precedentsNames == null) this.contents.precedentsNames = new List<string>();
-            this.contents.precedentsNames.Add((hasTrace ? Globals.precedentHasTrace : null) + rhs.GetNameAndParentDatabank());
+            this.contents.precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
             if (hasTrace) this.GetPrecedents_BewareOnlyInternalUse().AddRange(rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse()); //may come from an old Gekko databank where .trace2 == null.           
         }
 
@@ -787,7 +815,9 @@ namespace Gekko
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
         public Item CopyToItems(int depth, int cnt)
-        {            
+        {
+            bool showFreq = false;
+            string showDatabank = "maybe";  //"yes", "no", "maybe"
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
@@ -824,7 +854,41 @@ namespace Gekko
                     List<string> list = new List<string>();
                     foreach (string s in this.contents.precedentsNames)
                     {
-                        list.Add(G.Chop_RemoveFreq(G.Chop_RemoveBank(s.Replace(Globals.precedentHasTrace, "")), Program.options.freq));
+                        string type = s.Substring(0, 1);
+                        string name = s.Substring(2);
+                        //See #9khsigra7ioau regarding 4 types
+
+                        bool removeBank = false;
+                        
+                        if (type == "1")
+                        {
+                            //has trace
+                            //is first-position databank
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                        }
+                        else if (type == "2")
+                        {
+                            //has trace
+                            //is "other" open databank
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                        }
+                        else if (type == "3")
+                        {
+                            //has no trace
+                            //is first-position databank
+                            if (G.Equal(showDatabank, "no") || G.Equal(showDatabank, "maybe")) removeBank = true;
+                        }
+                        else if (type == "4")
+                        {
+                            //has no trace
+                            //is "other" open databank
+                            if (G.Equal(showDatabank, "no")) removeBank = true;
+                        }                        
+
+                        if (removeBank) name = G.Chop_RemoveBank(name);
+                        if (!showFreq) name = G.Chop_RemoveFreq(name);
+
+                        list.Add(name);
                     }
                     precedentsNames = list;
                 }
