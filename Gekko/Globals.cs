@@ -800,6 +800,7 @@ namespace Gekko
             "TELL",
             "TIME",
             "TIMEFILTER",
+            "TRACE2",
             "TRANSLATE",
             "TRUNCATE",
             "UNFIX",

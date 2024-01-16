@@ -23,7 +23,7 @@ namespace Gekko
     public class DecompPrecedent
     {
         public string s = null;
-        
+
         public DecompPrecedent(string s, IVariable iv)
         {
             this.s = s;
@@ -84,18 +84,18 @@ namespace Gekko
         public short depth = 0; //used to avoid recursions with #alias list. #6324987324234       
 
         public LookupSettings()
-        {            
+        {
         }
 
         public LookupSettings(O.ELookupType type)
         {
-            this.type = type;            
+            this.type = type;
         }
 
         public LookupSettings(O.ELookupType type, O.ECreatePossibilities create)
         {
             this.type = type;
-            this.create = create;            
+            this.create = create;
         }
 
         public LookupSettings(O.ELookupType type, O.ECreatePossibilities create, bool canSearch)
@@ -103,7 +103,7 @@ namespace Gekko
             this.type = type;
             this.create = create;
             this.canSearch = canSearch;
-        }               
+        }
     }
 
     /// <summary>
@@ -577,7 +577,7 @@ namespace Gekko
                 s = s.Replace("/", "\\");
                 change = true;
             }
-            
+
             string[] ss = s.Split(':');
             if (ss.Length == 2)
             {
@@ -806,7 +806,7 @@ namespace Gekko
                 {
                     fileName3 = fileName3.Replace("*", "(STARSTARSTAR)");
                 }
-                
+
                 rv = Path.GetFullPath(fileName3);
 
                 if (star)
@@ -844,7 +844,7 @@ namespace Gekko
         /// </summary>
         /// <param name="path"></param>
         public static void PrintOptions(string path, bool question)
-        {            
+        {
             Program.options.Write(path, question);
         }
 
@@ -858,7 +858,7 @@ namespace Gekko
         public static void HandleOptions(string s, int isBlock, P p)
         {
             string s2 = s.Replace("Program.options.", "");
-                        
+
             if (G.Equal(s2, "freq"))
             {
                 //see also #89073589324
@@ -1213,7 +1213,7 @@ namespace Gekko
         /// <param name="helper"></param>
         /// <param name="type"></param>
         public static void HandleEndoExo(GekkoTimes global, List<HandleEndoHelper> helper, bool type)
-        {            
+        {
             if (type)
             {
                 Globals.endo = new HandleEndoHelper2();
@@ -1914,7 +1914,7 @@ namespace Gekko
             else
             {
                 Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);                
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
                 Program.RunGekkoCommands("", fileName2, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
@@ -2156,7 +2156,7 @@ namespace Gekko
             string path = ffh.realPathAndFileName;
 
             if (path == null)
-            {                
+            {
                 G.Writeln2("Could not find the help system file ('gekko.chm').");
                 return false;
             }
@@ -2605,7 +2605,7 @@ namespace Gekko
         private static List ReadListFile(string varname, P p)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            fileName = G.AddExtension(fileName, "." + "lst");                        
+            fileName = G.AddExtension(fileName, "." + "lst");
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
@@ -3351,7 +3351,7 @@ namespace Gekko
         /// <param name="check_20"></param>
         /// <param name="o"></param>
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o, P p)
-        {            
+        {
             MissingMemory missing = null;
             if (o.opt_missing != null)
             {
@@ -3365,7 +3365,7 @@ namespace Gekko
             try
             {
                 if (Program.options.databank_trace)
-                {                    
+                {
                     try
                     {
                         //NOTE: nothing really to put into Globals.traceTime, so commented out!
@@ -3378,7 +3378,7 @@ namespace Gekko
                         new Error(Globals.traceError);
                     }
                 }
-                
+
                 //check_20() just checks if the RHS is a timeseries or not. If not, there is no point
                 //in looping over periods anyway.
                 //
@@ -3395,7 +3395,7 @@ namespace Gekko
                         bool remember = Program.options.databank_trace;
                         if (counter > 0) Program.options.databank_trace = false;
                         try
-                        {                            
+                        {
                             assign_20();
                         }
                         finally
@@ -3416,7 +3416,7 @@ namespace Gekko
                 Globals.traceContainer = null;  //only traces assigns.
 
                 if (o.opt_missing != null)
-                {                    
+                {
                     if (Program.options.bugfix_missingignore == true)
                     {
                         //skip
@@ -3761,12 +3761,12 @@ namespace Gekko
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                if (rhsData[i] == Globals.skippedObservationArtificialNumber) 
+                if (rhsData[i] == Globals.skippedObservationArtificialNumber)
                 {
                     //skip if LHS $ tells it to skip
                     Globals.bugfixLhsDollar++;
                 }
-                else 
+                else
                 {
                     double d = double.NaN;
                     if (operatorType == ESeriesUpdTypes.m)  //+
@@ -5316,7 +5316,7 @@ namespace Gekko
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
-                
+
         // Code to handle LIBRARY loading        
 
         public static void Add0_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, IVariable> f)
@@ -5461,7 +5461,7 @@ namespace Gekko
             Gekko.Library library = Program.libraries.GetLibrary(libraryName, false);
             if (library == null)
             {
-                new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");                
+                new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");
             }
             GekkoFunction function = library.GetFunction(functionName, false);
             if (function == null)
@@ -5525,9 +5525,9 @@ namespace Gekko
         /// <param name="functionName"></param>
         /// <returns></returns>
         public static string LastText(string functionName, string fileName)
-        {            
+        {
             return G.FromLibraryToFunctionProcedureName(functionName, 4) + ", " + fileName + "";
-        }        
+        }
 
         /// <summary>
         /// Used for Gekko user-defined functions.
@@ -5575,7 +5575,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(P p, string library, string name)
-        {   
+        {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
             GekkoFunction f = Program.libraries.GetFunction(p.GetCurrentLibrary(p.GetDepthM1()), library, name);
@@ -5822,7 +5822,7 @@ namespace Gekko
             {
                 error.MainAdd("The function '" + name + "' was found in the library '" + f.libraryName + "', but not in a variant with " + (i - 2) + " arguments.");
                 List<string> v = new List<string>();
-                 //if (f.function0 != null) v.Add("");
+                //if (f.function0 != null) v.Add("");
                 //if (f.function1 != null) v.Add("");
                 if (f.function2 != null) v.Add("0");
                 if (f.function3 != null) v.Add("1");
@@ -5851,7 +5851,7 @@ namespace Gekko
                 //do not compile
             }
             else
-            {                
+            {
                 foreach (GekkoFunctionCode gfc in f.overloads)
                 {
                     //See also this: #08975389245253
@@ -5864,7 +5864,7 @@ namespace Gekko
                     ph.fileName = gfc.fileNameWithPath + "*" + gfc.line;  //the "*" is illegal as filename character. The line is used as offset. If this snippet fails in its own line 4, this may mean line 13 in the original file.
                     Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                     ch.commandsText = commandLinesFlat;
-                    Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);                    
+                    Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 }
                 f.hasBeenCompiled = true;
             }
@@ -5911,8 +5911,8 @@ namespace Gekko
                 temp[i] = m.data[i, 0];
             }
             return tsl;
-        }        
-        
+        }
+
         /// <summary>
         /// Helper for avgt() and sumt() functions.
         /// </summary>
@@ -6330,7 +6330,7 @@ namespace Gekko
             mat.data = m;
             return mat;
         }
-        
+
         /// <summary>
         /// Returns number of subperiods for current freq. Does not work for D freq.
         /// </summary>
@@ -6342,7 +6342,7 @@ namespace Gekko
             else if (Program.options.freq == EFreq.M) lag = Globals.freqMSubperiods;
             return lag;
         }
-        
+
         /// <summary>
         /// Is this used?
         /// </summary>
@@ -6351,7 +6351,7 @@ namespace Gekko
         public static List<string> GetList(List<string> l)
         {
             return l;
-        }        
+        }
 
         /// <summary>
         /// Is this used?
@@ -6364,7 +6364,7 @@ namespace Gekko
         {
             return a.GetValOLD(smpl);
         }
-        
+
 
         // ------------------- type checks start ---------------------------
         // we do type checks as explicit functions since it is faster than using a switch
@@ -6400,7 +6400,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "series", type);                    
+                    TypeErrorString(position, "series", type);
                 }
             }
             else
@@ -6418,7 +6418,7 @@ namespace Gekko
         /// <param name="position"></param>
         /// <returns></returns>
         public static IVariable TypeCheck_val(IVariable x, int position)
-        {            
+        {
             if (x.Type() != EVariableType.Val)
             {
                 string type = G.GetTypeString(x);
@@ -6428,7 +6428,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "val", type);                    
+                    TypeErrorString(position, "val", type);
                 }
             }
             return x;
@@ -6479,7 +6479,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "name", type);                    
+                    TypeErrorString(position, "name", type);
                 }
             }
             return x;
@@ -6558,7 +6558,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "list", type);                    
+                    TypeErrorString(position, "list", type);
                 }
             }
             else
@@ -6575,7 +6575,7 @@ namespace Gekko
         /// <param name="position"></param>
         /// <returns></returns>
         public static IVariable TypeCheck_matrix(IVariable x, int position)
-        {            
+        {
             if (x.Type() != EVariableType.Matrix)
             {
                 string type = G.GetTypeString(x);
@@ -6585,7 +6585,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "matrix", type);                    
+                    TypeErrorString(position, "matrix", type);
                 }
             }
             else
@@ -6642,7 +6642,7 @@ namespace Gekko
                 {
                     txt.MainAdd("Argument #" + (position - 2) + " is " + inputType + " type, but should be " + type + " type. ");
                     txt.MoreAdd(extra + "When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.");
-                }                
+                }
             }
         }
 
@@ -6825,7 +6825,7 @@ namespace Gekko
             public string opt_method = null;
             public string opt_collapse = null;
             public string opt_sheet = null;
-            public string opt_all = null;            
+            public string opt_all = null;
             public string type = null;  //read or import
             public string opt_dateformat = null;
             public string opt_datetype = null;
@@ -6834,7 +6834,7 @@ namespace Gekko
 
             public P p = null;
             public void Exe()
-            {                
+            {
                 G.CheckLegalPeriod(this.t1, this.t2);
 
                 if (opt_collapse != null)
@@ -6844,7 +6844,7 @@ namespace Gekko
                 else
                 {
                     GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect, this.opt_all, this.type);
-                    
+
                     ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                     if (truncate != null)
                     {
@@ -6876,7 +6876,7 @@ namespace Gekko
                         }
                         else
                         {   //read
-                            new Error("READ<prim> is obsolete, use READ<first>.");                            
+                            new Error("READ<prim> is obsolete, use READ<first>.");
                         }
                     }
 
@@ -6990,12 +6990,12 @@ namespace Gekko
                         {
                             if (Globals.modeIntendedWarning)
                             {
-                                new Warning("READ<ref> is not intended for data-mode.");                                
+                                new Warning("READ<ref> is not intended for data-mode.");
                             }
                         }
                     }
 
-                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();                    
+                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
 
                     bool open = false;
                     if (isTo)
@@ -7166,7 +7166,7 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                if ( G.Contains(this.dbUrl, "jobindsats"))
+                if (G.Contains(this.dbUrl, "jobindsats"))
                 {
                     OnlineDatabanks.DownloadJobindsats(this);
                 }
@@ -7177,7 +7177,7 @@ namespace Gekko
             }
         }
 
-        
+
         //See O.Prt for SHEET in export mode
         public class SheetImport
         {
@@ -7241,7 +7241,7 @@ namespace Gekko
             }
         }
 
-        
+
 
         public class Clear
         {
@@ -7254,7 +7254,7 @@ namespace Gekko
                 Program.Clear(this, p);
             }
         }
-               
+
 
         public class Restart
         {
@@ -7279,10 +7279,10 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                O.Close o1 = new Close();                
+                O.Close o1 = new Close();
                 o1.listItems = new List(new List<IVariable>() { new ScalarString("*") });
                 o1.Exe();
-                O.Clear o2 = new Clear();                
+                O.Clear o2 = new Clear();
                 o2.p = p;
                 o2.Exe();
             }
@@ -7298,7 +7298,7 @@ namespace Gekko
             public string opt_geometric = null;
             public string opt_linear = null;
             public string opt_repeat = null;
-            public string opt_overlay = null;            
+            public string opt_overlay = null;
 
             public P p = null;
             public void Exe()
@@ -7332,7 +7332,7 @@ namespace Gekko
                 else if (G.Equal(Program.options.smooth_method, "spline")) method = ESmoothTypes.Spline;
                 else if (G.Equal(Program.options.smooth_method, "repeat")) method = ESmoothTypes.Repeat;
                 else if (G.Equal(Program.options.smooth_method, "overlay")) method = ESmoothTypes.Overlay;
-                                
+
                 //If a local method is set
                 if (G.Equal(opt_geometric, "yes")) method = ESmoothTypes.Geometric;
                 if (G.Equal(opt_linear, "yes")) method = ESmoothTypes.Linear;
@@ -7349,7 +7349,7 @@ namespace Gekko
                 lhs.SetDirty(true);
 
                 if (Program.options.databank_trace)
-                {                    
+                {
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
@@ -7368,7 +7368,7 @@ namespace Gekko
                 }
 
                 G.ServiceMessage("Smoothed " + lhs.GetName() + " from " + rhs.GetName() + ", method = " + method.ToString().ToLower(), p);
-            }            
+            }
         }
 
         public class SpliceHelper
@@ -7382,7 +7382,7 @@ namespace Gekko
         }
 
         public class Splice
-        {                       
+        {
             public List names0 = null; //old remove
             public List names1 = null; //old remove
             public List names2 = null; //old remove
@@ -7405,10 +7405,10 @@ namespace Gekko
                     return;
                 }
 
-                Series ts_lhs = SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);                               
-                
+                Series ts_lhs = SpliceHelper(this.lhs, this.rhs, this.opt_type, this.opt_first, this.opt_last, this.opt_n, false);
+
                 if (Program.options.databank_trace)
-                {                    
+                {
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
@@ -7449,7 +7449,7 @@ namespace Gekko
             /// <param name="isFunction"></param>
             /// <returns></returns>
             public static Series SpliceHelper(List lhs, List rhs, string opt_type, string opt_first, string opt_last, double opt_n, bool isFunction)
-            {                
+            {
                 //
                 // rel1: R = ((y1 + y2 + y3)/3) / ((x1 + x2 + x3)/3)
                 // rel2: R = (y1/x1 + y2/x2 + y3/x3)/3 
@@ -7878,7 +7878,7 @@ namespace Gekko
                         else
                         {
                             alternative_adjusted.SetData(t, alternative.GetDataSimple(t) + factor);
-                        }                        
+                        }
                     }
                     else if (type == ESpliceType.Rel1 || type == ESpliceType.Rel2)
                     {
@@ -7925,7 +7925,7 @@ namespace Gekko
                 try { alternativeStart = data[i].t[1].Add(1); } catch { };
                 try { alternativeEnd = data[i + 1].t[1]; } catch { };
             }
-            
+
 
             private void Splice_OLDREMOVE()
             {
@@ -8054,7 +8054,7 @@ namespace Gekko
         }
 
         public class LibraryClose
-        {            
+        {
             public List listItems = null;
             public void Exe()
             {
@@ -8088,7 +8088,7 @@ namespace Gekko
             public string opt_last = null;
 
             public void Exe()
-            {                
+            {
                 Program.libraries.LoadLibraryFromZip(this);
             }
 
@@ -8317,12 +8317,12 @@ namespace Gekko
                 {
                     create = true;
                 }
-                
+
                 oRead.openFileNames = new List<List<string>>();
 
                 if (openFileNamesAs != null && openFileNames.list.Count != openFileNamesAs.list.Count)
                 {
-                    new Error("Provided " + openFileNames.list.Count + " filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");                    
+                    new Error("Provided " + openFileNames.list.Count + " filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");
                 }
 
                 for (int i = 0; i < openFileNames.list.Count; i++)
@@ -8368,7 +8368,7 @@ namespace Gekko
                 }
                 if (G.Equal(opt_edit, "yes") && posCounter > 0)
                 {
-                    new Error("You cannot mix 'edit' with first/last/pos/ref designations inside <>-field");                    
+                    new Error("You cannot mix 'edit' with first/last/pos/ref designations inside <>-field");
                 }
                 if (G.Equal(opt_first, "yes"))
                 {
@@ -8385,8 +8385,8 @@ namespace Gekko
                 }
                 if (G.Equal(opt_ref, "yes"))
                 {
-                    new Error("OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");                    
-                    oRead.openType = EOpenType.Ref;                    
+                    new Error("OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");
+                    oRead.openType = EOpenType.Ref;
                 }
                 if (G.Equal(opt_sec, "yes"))
                 {
@@ -8435,7 +8435,7 @@ namespace Gekko
             {
                 Program.Run(this);
             }
-        }                
+        }
 
         public class Doc
         {
@@ -8493,7 +8493,7 @@ namespace Gekko
             public string opt_source = null;
             public string opt_units = null;
             public string opt_stamp = null;
-            public string opt_dyn = null;            
+            public string opt_dyn = null;
             public string opt_lsfunc = null;  //left-side function
             public string opt_missing = null;
             public string opt_trace = null;  //only machine generated
@@ -8510,7 +8510,7 @@ namespace Gekko
                 string msg = O.ConvertToString(message);
                 msg = Program.HandleNewlines(msg);
                 string varname = name.ConvertToString();
-                
+
                 string txt = null;
 
                 if (Program.InputBox("Accept", msg, ref inputValue) == DialogResult.OK)
@@ -8520,7 +8520,7 @@ namespace Gekko
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, iv);
                     G.Writeln2(this.type.ToString().ToUpper() + " " + varname + " = " + s);
                 }
-            }            
+            }
         }
 
         public class Analyze
@@ -8559,7 +8559,7 @@ namespace Gekko
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 Program.Copy(this);
-            }            
+            }
 
             public static Databank SetPossibleToBank(Databank localOptionToBank)
             {
@@ -8610,7 +8610,7 @@ namespace Gekko
                     counter++;
                     ts.Stamp();
                     if (Program.options.databank_trace)
-                    {                        
+                    {
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
@@ -8670,7 +8670,7 @@ namespace Gekko
             }
         }
 
-        
+
         public class Delete
         {
             public List names = null;
@@ -8723,7 +8723,7 @@ namespace Gekko
                 {
                     bool found = false;
                     foreach (List<EquationHelper> equs in lists)
-                    {                        
+                    {
                         foreach (EquationHelper eh in equs)
                         {
                             if (G.Equal(eh.lhs, s))
@@ -8732,7 +8732,7 @@ namespace Gekko
                                 found = true;
                                 goto label1;
                             }
-                        }                    
+                        }
                     }
 
                 label1:;
@@ -8756,7 +8756,7 @@ namespace Gekko
 
                 if (!ok)
                 {
-                    
+
                     int counter = -1;
                     StringBuilder sb = new StringBuilder();
                     foreach (EquationHelper eh in eqs)
@@ -8780,15 +8780,15 @@ namespace Gekko
                         eh.predictAction = Globals.predictActions[counter];
                     }
                 }
-                                
+
                 foreach (EquationHelper eh in eqs)
-                {                    
+                {
                     foreach (GekkoTime gt in new GekkoTimeIterator(this.t1, this.t2))
                     {
                         eh.predictAction(eh.lhs, gt);
                     }
                 }
-            }            
+            }
         }
 
         public class Disp
@@ -8803,10 +8803,10 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                                
+
                 if (G.Equal(this.opt_info, "yes"))
                 {
-                    Program.Info(this.t1, this.t2, iv);                    
+                    Program.Info(this.t1, this.t2, iv);
                 }
                 else
                 {
@@ -8821,6 +8821,26 @@ namespace Gekko
                 }
             }
         }
+
+        public class TraceCommand2
+        {
+            public List iv = null;
+            public string searchName = null;
+
+            public void Exe()
+            {
+
+                if (this.searchName == null)
+                {
+                    Program.TraceCommand2(this);
+                }
+                else
+                {
+                    //Program.TraceSearch2(this.searchName);
+                }
+            }
+        }
+    
 
         public class Find
         {

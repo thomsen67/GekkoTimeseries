@@ -121,6 +121,8 @@ tokens {
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
+    ASTTRACESEARCH2;
+    ASTTRACE2;
 	ASTOPT_STRING_DYN;
 	ASTOPT_STRING_COUNT;
 	ASTOPT_STRING_BROWSER;
@@ -2675,6 +2677,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
+                          | trace2               SEMICOLON!
 						  | translate            SEMICOLON!
 						  | truncate             SEMICOLON!
 						  | unlock_              SEMICOLON!
@@ -3913,6 +3916,14 @@ oneDate:                    expression;
 timefilter:                 TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, input.LT(1).Line)} timefilterperiods);
 timefilterperiods:		    (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIMEFILTERPERIODS timefilterperiod+);
 timefilterperiod:           expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TRACE2
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+trace2:						TRACE2 stringInQuotes -> ^({token("ASTTRACESEARCH2", ASTTRACESEARCH2, input.LT(1).Line)} stringInQuotes)
+						  | TRACE2 seqOfBankvarnames -> ^({token("ASTTRACE2", ASTTRACE2, input.LT(1).Line)} seqOfBankvarnames)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // UNFIX

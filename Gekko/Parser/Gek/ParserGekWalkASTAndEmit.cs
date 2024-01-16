@@ -5076,6 +5076,13 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
+                case "ASTTRACE2":
+                    {
+                        node.Code.A("O.TraceCommand2 o" + Num(node) + " = new O.TraceCommand2();" + G.NL);                        
+                        node.Code.A("o" + Num(node) + ".iv = " + node[0].Code + ";" + G.NL);
+                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    }
+                    break;
                 case "ASTPREDICT":
                     {
                         node.Code.A("O.Predict o" + Num(node) + " = new O.Predict();" + G.NL);

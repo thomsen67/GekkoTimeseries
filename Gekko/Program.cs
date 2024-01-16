@@ -15775,6 +15775,37 @@ namespace Gekko
             }
         }
 
+        public static void TraceCommand2(O.TraceCommand2 o)
+        {
+            List<string> names = null;
+            List<IVariable> m = new List<IVariable>();
+            //See also #87582903573829
+            names = Program.Search(o.iv, null, EVariableType.Var);
+            foreach (string s in names)
+            {
+                m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true));
+            }
+            int count = 0;
+            foreach (IVariable iv in m)
+            {                
+                Series ts = iv as Series;
+                if (ts == null) continue;
+                Trace2 trace = ts.meta.trace2;
+                if (trace == null)
+                {
+                    new Writeln("Series '" + ts.GetNameAndParentDatabank() + "' does not have any data traces.");
+                    continue;
+                }
+                count++;
+                if (count > 10)
+                {
+                    new Writeln("Limit of 10 consecutive data trace windows exceeded.");
+                    break;
+                }
+                Trace2.CallTraceViewer(trace);
+            }
+        }
+
         private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, List originalList, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
         {
             for (int i5 = 0; i5 < m.Count; i5++)
