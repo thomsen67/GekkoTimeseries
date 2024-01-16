@@ -817,7 +817,7 @@ namespace Gekko
             string s = null;            
             s = "| ";            
             
-            if (trace == null)
+            if (trace.type == ETraceType.Divider)
             {
                 G.Write(s);
                 G.Writeln("---", Globals.MiddleGray);
@@ -1171,7 +1171,7 @@ namespace Gekko
                 foreach (Trace2 trace in this.GetStorage())
                 {
                     TraceID2 temp = null;
-                    if (trace == null)
+                    if (trace.type == ETraceType.Divider)
                     {
                         temp = new TraceID2();
                         temp.counter = long.MinValue;  //negative, signals null
