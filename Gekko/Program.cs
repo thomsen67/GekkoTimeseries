@@ -15785,6 +15785,27 @@ namespace Gekko
             {
                 m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true));
             }
+
+            if (m.Count == 0)
+            {
+                G.Writeln2("Did not find any series for trace viewer");
+                //See also #87582903573829
+                SearchHelper1 helper = Program.SearchAllBanksAllFreqs(true, o.iv, null, EVariableType.Var);
+                if (helper.allBanks.count > 0)
+                {                    
+                    G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + helper.allBanks.count + " matches");
+                }
+                if (helper.allFreqs.count > 0)
+                {                    
+                    G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + helper.allFreqs.count + " matches");
+                }
+                if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count)
+                {                    
+                    G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + helper.allBanksAndFreqs.count + " matches");
+                }
+                return;
+            }
+
             int count = 0;
             foreach (IVariable iv in m)
             {                
