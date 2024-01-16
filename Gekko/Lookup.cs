@@ -1698,7 +1698,7 @@ namespace Gekko
 
                     if (traceString != null)
                     {
-                        if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Normal, ETraceParentOrChild.Parent);
+                        if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
                         // ---------
                         GekkoTime tEnd = t2;
                         if (G.Equal(o.opt_dyn, "yes")) tEnd = t3;

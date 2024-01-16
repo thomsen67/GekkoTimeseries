@@ -137,8 +137,9 @@ namespace Gekko
         /// <param name="childOrParentType"></param>
         public Trace2(ETraceType type, ETraceParentOrChild childOrParentType)
         {
-            //if (type != ETraceType.Normal) new Error("Trace constructor problem");
-            if (childOrParentType == ETraceParentOrChild.Child) new Error("Trace constructor problem");            
+            //if (type != ETraceType.Normal) new Error("Trace constructor problem");            
+            if (childOrParentType == ETraceParentOrChild.Child) new Error("Trace constructor problem");
+            this.type = type;
         }
 
         /// <summary>
@@ -148,9 +149,10 @@ namespace Gekko
         /// <param name="t2"></param>
         public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
         {
-            //if (type != ETraceType.Normal) new Error("Trace constructor problem");
+            //if (type != ETraceType.Normal) new Error("Trace constructor problem");            
             if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");
-            this.contents = new TraceContents(t1, t2);
+            this.type = type;
+            this.contents = new TraceContents(t1, t2);            
         }
 
         public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2, false)
@@ -160,6 +162,7 @@ namespace Gekko
 
         public Trace2(ETraceType type, bool isNullTime)
         {
+            this.type = type;
             if (isNullTime)
             {
                 this.contents = new TraceContents(isNullTime);
@@ -307,7 +310,7 @@ namespace Gekko
             if (this.precedents.Count() > 0)
             {
                 //Remove the if below at some point, just for sanity now            
-                if (this.precedents[0] == null || this.precedents[this.precedents.Count() - 1] == null) new Error("Unexpected");
+                if (this.precedents[0].type == ETraceType.Divider || this.precedents[this.precedents.Count() - 1].type == ETraceType.Divider) new Error("Unexpected");
                 List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first
                 int lastNull = this.precedents.Count();
                 int counterI = -1;
@@ -324,7 +327,7 @@ namespace Gekko
                         spansList.Add(tmp);
                     }
 
-                    if (i == 0 || traceNew == null)
+                    if (i == 0 || traceNew.type == ETraceType.Divider)
                     {
                         int count = -1;
                         for (int k = 0; k < spansList.Count; k++)
@@ -340,7 +343,13 @@ namespace Gekko
                                 rv.Add(tap);
                             }
                         }
-                        if (i > 0) rv.Add(null); //divider, use ETraceType.Divider  ??????? QWERTY
+                        if (i > 0)
+                        {
+                            TraceAndPeriods tap = new TraceAndPeriods();
+                            tap.trace = new Trace2(ETraceType.Divider, true);
+                            tap.periods = new List<GekkoTimeSpanSimple>();
+                            //rv.Add(new Trace2(ETraceType.Divider, true)); //divider, use ETraceType.Divider  ??????? QWERTY
+                        }
                         counterI = -1;
                         spansList.Clear();
                         lastNull = i;
@@ -352,7 +361,7 @@ namespace Gekko
                     {
                         counterJ++;
                         Trace2 traceOld = this.precedents[j];
-                        if (traceOld == null) break;
+                        if (traceOld.type == ETraceType.Divider) break;
 
                         if (counterI == 0)
                         {
@@ -391,8 +400,8 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsInvisibleTrace(Trace2 trace)
         {
-            if (trace.type == ETraceType.Normal) return true;
-            return false;
+            if (trace.type == ETraceType.Normal) return false;
+            return true;
         }
 
         public string ToString()
@@ -490,6 +499,7 @@ namespace Gekko
             if (known == null)
             {
                 trace2 = new Trace2();
+                trace2.type = this.type;
                 if (this.contents != null)
                 {
                     trace2.contents = this.contents.DeepClone();
