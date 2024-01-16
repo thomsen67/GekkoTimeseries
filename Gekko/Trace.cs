@@ -348,6 +348,7 @@ namespace Gekko
                             TraceAndPeriods tap = new TraceAndPeriods();
                             tap.trace = new Trace2(ETraceType.Divider, true);
                             tap.periods = new List<GekkoTimeSpanSimple>();
+                            rv.Add(tap);
                             //rv.Add(new Trace2(ETraceType.Divider, true)); //divider, use ETraceType.Divider  ??????? QWERTY
                         }
                         counterI = -1;
@@ -439,7 +440,7 @@ namespace Gekko
                 {
                     foreach (Trace2 trace in this.precedents.GetStorage())
                     {
-                        if (trace == null) continue;                        
+                        if (trace.type == ETraceType.Divider) continue;                        
                         trace.DeepTrace(th, depth + 1);
                     }
                 }
@@ -481,7 +482,7 @@ namespace Gekko
                 {
                     foreach (Trace2 trace in this.precedents.GetStorage())
                     {
-                        if (trace == null) continue;
+                        if (trace.type == ETraceType.Divider) continue;
                         trace.DeepTrace(th, depth + 1);
                     }
                 }

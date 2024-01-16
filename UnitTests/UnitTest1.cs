@@ -13468,7 +13468,7 @@ namespace UnitTests
             Assert.AreEqual(2002, m[i].periods[0].t1.super);
             Assert.AreEqual(2004, m[i].periods[0].t2.super);
             i++;
-            Assert.IsNull(m[i]); //---------------------------------------------
+            Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
             //i++;
             //Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
             //Assert.AreEqual(0, m[i].periods.Count);
@@ -13498,7 +13498,7 @@ namespace UnitTests
             Assert.AreEqual(2003, m[i].periods[0].t1.super);
             Assert.AreEqual(2003, m[i].periods[0].t2.super);
             i++;
-            Assert.IsNull(m[i]); //---------------------------------------------
+            Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
             i++;
             Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
             Assert.AreEqual(2, m[i].periods.Count);
@@ -14467,7 +14467,7 @@ namespace UnitTests
 
         public static void Helper_WalkTrace(Trace2 trace, String2 m, int depth)
         {
-            if (trace == null)
+            if (trace.type == ETraceType.Divider)
             {
                 Assert.IsNull(m);
             }
