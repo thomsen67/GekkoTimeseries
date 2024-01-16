@@ -2072,7 +2072,7 @@ namespace Gekko
                     {
                         if (endoNoLagPointers[b] == 1)
                         {
-                            Trace2 trace = new Trace2(tStart, tEnd);
+                            Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
                             trace.contents.text = src;
                             trace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
                             trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);

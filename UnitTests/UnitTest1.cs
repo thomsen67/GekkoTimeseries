@@ -13338,16 +13338,16 @@ namespace UnitTests
             string path = Globals.ttPath2 + @"\regres\Databanks\temp";
 
             SeriesMetaInformation meta1 = new SeriesMetaInformation();
-            meta1.trace2 = new Trace2(true);
+            meta1.trace2 = new Trace2(ETraceType.GluedToSeries, true);
             //dict1.Add(meta1.trace, dict1.Count);
             meta1.trace2.SetPrecedents_BewareOnlyInternalUse(new Precedents());
-            Trace2 xx1 = new Trace2(true);
+            Trace2 xx1 = new Trace2(ETraceType.Normal, true);
             xx1.contents.text = "xx1";
             meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
-            Trace2 xx2 = new Trace2(true);
+            Trace2 xx2 = new Trace2(ETraceType.Normal, true);
             xx2.contents.text = "xx2";
             meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
-            Trace2 xx3 = new Trace2(true);
+            Trace2 xx3 = new Trace2(ETraceType.Normal, true);
             xx3.contents.text = "xx3";
             meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx3);
             xx3.SetPrecedents_BewareOnlyInternalUse(new Precedents());
@@ -21747,7 +21747,7 @@ print(df2)
                         {
                             ts.SetData(gt, i);
                         }
-                        Trace2 trace = new Trace2(new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2002, 1));
+                        Trace2 trace = new Trace2(ETraceType.Normal, new GekkoTime(EFreq.A, 2001, 1), new GekkoTime(EFreq.A, 2002, 1));
 
                         var builder = new StringBuilder(ntxt);
                         char offset = 'A';

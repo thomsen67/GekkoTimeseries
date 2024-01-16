@@ -7,11 +7,20 @@ using System.Windows;
 
 namespace Gekko
 {
+    /// 
+    public enum ETraceType
+    {
+        Normal,
+        GluedToSeries,
+        Divider,
+        Dangling
+    }
+
     /// <summary>
     /// Used for the .trace field of timeseries
     /// </summary>    
     /// 
-    public enum ETraceType
+    public enum ETraceParentOrChild
     {
         Parent,
         Child
@@ -90,6 +99,8 @@ namespace Gekko
         }
     }
 
+
+
     /// <summary>    
     /// Trace
     /// x.id (TraceID), is a DateTime and random long.
@@ -107,9 +118,12 @@ namespace Gekko
         public TraceID2 id = new TraceID2();
 
         [ProtoMember(2)]
-        public TraceContents contents = null;
+        public ETraceType type = ETraceType.Normal;  //default
 
         [ProtoMember(3)]
+        public TraceContents contents = null;
+
+        [ProtoMember(4)]
         private Precedents precedents = new Precedents();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()        
 
         private Trace2()
@@ -120,10 +134,11 @@ namespace Gekko
         /// <summary>
         /// Construct a parent trace. For this, .contents will be == null.
         /// </summary>
-        /// <param name="type"></param>
-        public Trace2(ETraceType type)
+        /// <param name="childOrParentType"></param>
+        public Trace2(ETraceType type, ETraceParentOrChild childOrParentType)
         {
-            if (type == ETraceType.Child) new Error("Trace constructor problem");            
+            //if (type != ETraceType.Normal) new Error("Trace constructor problem");
+            if (childOrParentType == ETraceParentOrChild.Child) new Error("Trace constructor problem");            
         }
 
         /// <summary>
@@ -131,17 +146,19 @@ namespace Gekko
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
-        public Trace2(GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
+        public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2, bool nullPeriodAccepted)
         {
+            //if (type != ETraceType.Normal) new Error("Trace constructor problem");
             if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");
             this.contents = new TraceContents(t1, t2);
         }
 
-        public Trace2(GekkoTime t1, GekkoTime t2) : this(t1, t2, false)
+        public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2, false)
         {
+            //overload
         }
 
-        public Trace2(bool isNullTime)
+        public Trace2(ETraceType type, bool isNullTime)
         {
             if (isNullTime)
             {
@@ -202,7 +219,7 @@ namespace Gekko
                         }
                         if (counter2 == 0 && trace.precedents.GetStorage().Count > 0 && trace.precedents.GetStorage()[trace.precedents.GetStorage().Count - 1] != null)
                         {
-                            trace.precedents.GetStorage().Add(null);  //divider
+                            trace.precedents.GetStorage().Add(new Trace2(ETraceType.Divider, true));  //divider  
                         }
                         trace.precedents.GetStorage().Add(childTrace2);
                     }
@@ -323,7 +340,7 @@ namespace Gekko
                                 rv.Add(tap);
                             }
                         }
-                        if (i > 0) rv.Add(null); //divider
+                        if (i > 0) rv.Add(null); //divider, use ETraceType.Divider  ??????? QWERTY
                         counterI = -1;
                         spansList.Clear();
                         lastNull = i;
@@ -374,14 +391,14 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsInvisibleTrace(Trace2 trace)
         {
-            if (trace == null) return false;
-            return trace.contents == null;
+            if (trace.type == ETraceType.Normal) return true;
+            return false;
         }
 
         public string ToString()
         {
             string s = null;
-            if (this.GetTraceType() == ETraceType.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
+            if (this.GetTraceType() == ETraceParentOrChild.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
             else s = this.contents.span.t1 + "-" + this.contents.span.t2 + ": " + this.contents.text;
             return s;
         }        
@@ -438,8 +455,7 @@ namespace Gekko
                             this.precedents = new Precedents();
                             foreach (TraceAndPeriods temp2 in shadow)
                             {
-                                if (temp2 == null) this.precedents.Add(null);
-                                else this.precedents.Add(temp2.trace);
+                                this.precedents.Add(temp2.trace);
                             }
                         }
                     }
@@ -526,10 +542,10 @@ namespace Gekko
         /// Returns .Parent if .contents == null.
         /// </summary>
         /// <returns></returns>
-        public ETraceType GetTraceType()
+        public ETraceParentOrChild GetTraceType()
         {
-            ETraceType x = ETraceType.Child;
-            if (this.contents == null) x = ETraceType.Parent;
+            ETraceParentOrChild x = ETraceParentOrChild.Child;
+            if (this.contents == null) x = ETraceParentOrChild.Parent;
             return x;
         }
 
@@ -564,7 +580,7 @@ namespace Gekko
             if (trace.contents.text == null) new Error("Trace problem: trace.contents.text == null");
             if (ts.meta == null) new Error("Trace problem: ts.meta == null");
             
-            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.Parent);            
+            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);            
             if (type == ETracePushType.NewParent)
             {                   
                 trace.AddRangeFromSeries2(null, ts);
@@ -1169,7 +1185,7 @@ namespace Gekko
                 {
                     if (id.counter == long.MinValue)
                     {
-                        this.storage.Add(null);
+                        this.storage.Add(new Trace2(ETraceType.Divider, true));
                     }
                     else
                     {
@@ -1203,14 +1219,7 @@ namespace Gekko
                 precedents.storage = new List<Trace2>();
                 foreach (Trace2 trace in this.storage)
                 {
-                    if (trace == null)
-                    {
-                        precedents.Add(null);
-                    }
-                    else
-                    {
-                        precedents.storage.Add(trace.DeepClone(cloneHelper));
-                    }
+                    precedents.storage.Add(trace.DeepClone(cloneHelper));
                 }
             }
             return precedents;

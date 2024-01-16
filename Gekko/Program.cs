@@ -4804,16 +4804,16 @@ namespace Gekko
                                                     if (t1.IsNull())
                                                     {
                                                         //can happen that a series is empty of data
-                                                        newTrace = new Trace2(true);
+                                                        newTrace = new Trace2(ETraceType.Normal, true);
                                                     }
                                                     else
                                                     {
-                                                        newTrace = new Trace2(t1, t2);
+                                                        newTrace = new Trace2(ETraceType.Normal, t1, t2);
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    newTrace = new Trace2(periods.t1, periods.t2);
+                                                    newTrace = new Trace2(ETraceType.Normal, periods.t1, periods.t2);
                                                 }
 
                                                 if (tsExisting != null)
@@ -7941,7 +7941,7 @@ namespace Gekko
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
-                                Trace2 newTrace = new Trace2(gt_start, gt_end);
+                                Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
                                 newTrace.contents.text = downloadHelper.gekkoCode + ";";
                                 newTrace.contents.dataFile = downloadHelper.dataFile;
                                 newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
@@ -8002,7 +8002,7 @@ namespace Gekko
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
-                                Trace2 newTrace = new Trace2(gt_start, gt_end);
+                                Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
                                 newTrace.contents.text = downloadHelper.gekkoCode + ";";
                                 newTrace.contents.dataFile = downloadHelper.dataFile;
                                 newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
@@ -16902,7 +16902,7 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(true);
+                        Trace2 newTrace = new Trace2(ETraceType.Normal, true);
                         newTrace.contents.text = o.gekkocode + ";";
                         //newTrace.contents.text = "Renamed " + output.s1 + " as " + output.s2;
                         newTrace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
@@ -17028,7 +17028,7 @@ namespace Gekko
                                 try
                                 {
                                     DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                                    Trace2 newTrace = new Trace2(o.t1, o.t2, true);
+                                    Trace2 newTrace = new Trace2(ETraceType.Normal, o.t1, o.t2, true);
                                     newTrace.contents.text = o.gekkocode + ";";
                                     //newTrace.contents.text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
                                     newTrace.contents.bankAndVarnameWithFreq = existing_series.GetNameAndParentDatabank();
@@ -17058,7 +17058,7 @@ namespace Gekko
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                            Trace2 newTrace = new Trace2(ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast(), true);
+                            Trace2 newTrace = new Trace2(ETraceType.Normal, ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast(), true);
                             newTrace.contents.text = o.gekkocode + ";";
                             //newTrace.contents.text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                             newTrace.contents.bankAndVarnameWithFreq = ts_clone.GetNameAndParentDatabank();
@@ -24363,7 +24363,7 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
+                        Trace2 newTrace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         newTrace.contents.text = gekkocode + ";";
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();
                         newTrace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
@@ -24691,7 +24691,7 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
+                        Trace2 newTrace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         newTrace.contents.text = gekkocode + ";";
                         //newTrace.contents.text = "Interpolated from " + ts_rhs.GetName();
                         newTrace.contents.bankAndVarnameWithFreq = ts_lhs.GetNameAndParentDatabank();

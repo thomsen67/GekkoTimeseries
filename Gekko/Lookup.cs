@@ -1698,11 +1698,11 @@ namespace Gekko
 
                     if (traceString != null)
                     {
-                        if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Parent);
+                        if (lhs_series.meta.trace2 == null) lhs_series.meta.trace2 = new Trace2(ETraceType.Normal, ETraceParentOrChild.Parent);
                         // ---------
                         GekkoTime tEnd = t2;
                         if (G.Equal(o.opt_dyn, "yes")) tEnd = t3;
-                        Trace2 trace = new Trace2(t1, tEnd);  //if <dyn>, only the first of the iterations will have a trace, and this trace has to be modified regarding end period.
+                        Trace2 trace = new Trace2(ETraceType.Normal, t1, tEnd);  //if <dyn>, only the first of the iterations will have a trace, and this trace has to be modified regarding end period.
                         string b = null;
                         if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
                         trace.contents.bankAndVarnameWithFreq = b + lhs_series.GetName();
