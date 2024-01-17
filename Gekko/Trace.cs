@@ -160,6 +160,11 @@ namespace Gekko
             //overload
         }
 
+        /// <summary>
+        /// Must be called with isNullTime == true.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="isNullTime"></param>
         public Trace2(ETraceType type, bool isNullTime)
         {
             this.type = type;
@@ -168,6 +173,17 @@ namespace Gekko
                 this.contents = new TraceContents(isNullTime);
             }
             else new Error("Trace period problem");
+            
+            if (type == ETraceType.Divider)
+            {
+                //This is done for size reasons (ram size, gbk size).
+                //A bit inefficient since .id and .precedents objects are
+                //first created (in the constructur) and since deleted.
+                //We can live with that inefficiency.
+                this.id = null;
+                this.contents = null;
+                this.precedents = null;
+            }
         }
 
         /// <summary>
@@ -512,11 +528,14 @@ namespace Gekko
             {
                 trace2 = new Trace2();
                 trace2.type = this.type;
-                if (this.contents != null)
+                if (trace2.type != ETraceType.Divider)
                 {
-                    trace2.contents = this.contents.DeepClone();
+                    if (this.contents != null)
+                    {
+                        trace2.contents = this.contents.DeepClone();
+                    }
+                    trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 }
-                trace2.precedents = this.precedents.DeepClone(cloneHelper);
                 if (cloneHelper != null)
                 {
                     cloneHelper.dict.Add(this, trace2);
@@ -1148,7 +1167,7 @@ namespace Gekko
         public void Add(Trace2 trace)
         {
             if (this.storage == null) this.storage = new List<Trace2>();
-            if (trace != null && trace.contents == null) throw new GekkoException();
+            if (trace.type != ETraceType.Divider && trace.contents == null) throw new GekkoException();
             this.storage.Add(trace);
         }
 
