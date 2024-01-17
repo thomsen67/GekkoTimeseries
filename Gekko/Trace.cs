@@ -399,9 +399,9 @@ namespace Gekko
         /// Remember that a divider trace can have .contents == null! (this will also return true and should also not be counted)
         /// </summary>
         /// <returns></returns>
-        public static bool IsInvisibleTrace(Trace2 trace)
+        public bool IsInvisibleTrace()
         {
-            if (trace.type == ETraceType.Normal) return false;
+            if (this.type == ETraceType.Normal) return false;
             return true;
         }
 
@@ -431,7 +431,7 @@ namespace Gekko
                     if (!Globals.traceWalkAllCombinations) return;
                 }
 
-                if (!Trace2.IsInvisibleTrace(this))
+                if (!this.IsInvisibleTrace())
                 {                    
                     if (!th.traces.ContainsKey(this)) th.traces.Add(this, this.precedents);                    
                 }
@@ -805,7 +805,7 @@ namespace Gekko
             int n = 0;
             foreach (Trace2 trace2 in dict.Keys)
             {
-                if (Trace2.IsInvisibleTrace(trace2)) continue;
+                if (trace2.IsInvisibleTrace()) continue;
                 n++;
             }
             return n;
@@ -824,7 +824,7 @@ namespace Gekko
             }
             else
             {
-                if (!Trace2.IsInvisibleTrace(trace))
+                if (!trace.IsInvisibleTrace())
                 {
                     TwoStrings s2 = trace.Text(d);
                     G.Write(s + s2.s1);
@@ -861,6 +861,7 @@ namespace Gekko
         {
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
+            bool showDividers = false;
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
@@ -916,20 +917,15 @@ namespace Gekko
             Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             if (depth < 5)
             {
-                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(false);
+                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(true);
                 if (traceAndPeriods.Count > 0)
                 {
-                    int n = -1;
-                                        
                     foreach (TraceAndPeriods child in traceAndPeriods)
-                    {                        
-                        n++;
+                    {
+                        if (!showDividers && child.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item newChildItem = null;
-                        if (child != null)
-                        {
-                            newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods);
-                            newItem.Children.Add(newChildItem);
-                        }                        
+                        newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods);
+                        newItem.Children.Add(newChildItem);
                     }
                 }
             }
