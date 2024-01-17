@@ -53,7 +53,7 @@ namespace Gekko
         public string text = null;
 
         [ProtoMember(3)]
-        public string name = null;
+        public string name = null;  //with bank and freq
 
         [ProtoMember(4)]
         public string commandFileAndLine = null;
@@ -65,7 +65,7 @@ namespace Gekko
         public string dataFile = null;               
 
         [ProtoMember(6)]
-        public List<string> precedentsNames = null;
+        public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
 
         public TraceContents DeepClone()
         {            
