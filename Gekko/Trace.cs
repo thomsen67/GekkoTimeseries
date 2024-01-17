@@ -36,7 +36,7 @@ namespace Gekko
     {        
         GetAllMetasAndTraces,
         OnlyGetMetas,
-        GetTimeShadowInfo
+        TrimWithTimeShadowing
     }
 
     [ProtoContract]
@@ -228,6 +228,17 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes time-shadowed traces from a Gekko databank. Used just before writing the databank.
+        /// Too costly to run all the time when traces change.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <returns></returns>
+        public static TraceHelper TraceTrim(Databank db)
+        {
+            return Trace2.CollectAllTraces(db, ETraceHelper.TrimWithTimeShadowing);
         }
 
         /// <summary>
@@ -445,7 +456,7 @@ namespace Gekko
                     }
                 }
             }            
-            else if (th.type == ETraceHelper.GetTimeShadowInfo)
+            else if (th.type == ETraceHelper.TrimWithTimeShadowing)
             {
                 string temp = null; th.timeShadowing.TryGetValue(this, out temp);  //do not look at the same trace object > 1 time.
                 if (temp == null)
@@ -859,9 +870,15 @@ namespace Gekko
 
         public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods)
         {
+            // =========================================================================
+            // Settings for the data trace viewer
+            // =========================================================================
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
             bool showDividers = false;
+            bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
+            // =========================================================================
+            
             bool hasChildren = false;
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
@@ -917,7 +934,7 @@ namespace Gekko
             Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             if (depth < 5)
             {
-                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(true);
+                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(trim);
                 if (traceAndPeriods.Count > 0)
                 {
                     foreach (TraceAndPeriods child in traceAndPeriods)

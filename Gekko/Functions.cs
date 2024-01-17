@@ -5589,11 +5589,13 @@ namespace Gekko
         public static void tracetrim2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             //Removes shadowed references
+            //Note that the trace viewer does not show shadowed traces, and 
+            //these traces are also deleted when writing a databank.
             DateTime t0 = DateTime.Now;
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
-            TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetTimeShadowInfo);
+            TraceHelper th = Trace2.TraceTrim(db);
             new Writeln("Removed " + th.timeShadowingCuts + " trace connections. Use tracestats2() to see resulting trace counts (" + G.Seconds(t0) + ").");
-        }
+        }        
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {

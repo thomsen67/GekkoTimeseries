@@ -59,6 +59,7 @@ namespace Gekko
 
         public bool databank_trace = true;
         public int databank_trace_depth = -1;
+        public bool databank_trace_trim = true;
 
         // ---
         public int decomp_maxlag = 10;
@@ -347,6 +348,7 @@ namespace Gekko
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DEPTH", Globals.xint);
+            Add("DATABANK TRACE TRIM", Globals.xbool);
 
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);

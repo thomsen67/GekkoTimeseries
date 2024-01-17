@@ -14248,7 +14248,21 @@ namespace UnitTests
 
                         Trace2 trace1 = null;
                         if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
-                        else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2;                         
+                        else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
+
+                        try
+                        {
+                            Globals.traceWalkAllCombinations = true;
+                            TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                            Assert.AreEqual(4, th2.seriesObjectCount);
+                            //Traces are not trimmed, so we get this:
+                            Assert.AreEqual(10, th2.tracesDepth2.Count);
+                            Assert.AreEqual(23, th2.unittestTraceCountIncludeInvisible);
+                        }
+                        finally
+                        {
+                            Globals.traceWalkAllCombinations = false;
+                        }
 
                         // ---------------------------------
                         // ---------------------------------                    
@@ -14290,20 +14304,12 @@ namespace UnitTests
                             Globals.traceWalkAllCombinations = true;
                             TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
                             Assert.AreEqual(4, th2.seriesObjectCount);
-                            if (true)
-                            {
-                                Assert.AreEqual(10, th2.tracesDepth2.Count);
-                                Assert.AreEqual(23, th2.unittestTraceCountIncludeInvisible);
-                            }
-                            else
-                            {
-                                //If traces were compacted first, we would get this. See also above.
-                                Assert.AreEqual(9, th2.tracesDepth2.Count);
-                                Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
-                            }
+                            //Traces are trimmed in gbk, so we get this: (* note: different from a collect before write+read.
+                            Assert.AreEqual(9, th2.tracesDepth2.Count);
+                            Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
                         }
                         finally
-                        {                            
+                        {
                             Globals.traceWalkAllCombinations = false;
                         }                        
 
@@ -14398,22 +14404,22 @@ namespace UnitTests
                         string s = Globals.unitTestScreenOutput.ToString();
                         if (true)
                         {
+                            Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 19 reachable traces in total."));
+                            Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                            Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                            Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
+                            Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
+                            Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
+                        }
+                        else
+                        {
+                            //If traces were not compacted/trimmed first in gbk, we would get this. See also above.
                             Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 reachable traces in total."));
                             Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
                             Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
                             Assert.IsTrue(s.Contains("depth: 2, traces: 6"));
                             Assert.IsTrue(s.Contains("depth: 3, traces: 5"));
                             Assert.IsTrue(s.Contains("depth: 4, traces: 4"));
-                        }
-                        else
-                        {
-                            //If traces were compacted first, we would get this. See also above.
-                            Assert.IsTrue(s.Contains("Databank Work: 3 series with 19 traces in total."));
-                            Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
-                            Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
-                            Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
-                            Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
-                            Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
                         }
                     }
                 }
