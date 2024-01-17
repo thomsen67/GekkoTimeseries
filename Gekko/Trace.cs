@@ -879,7 +879,7 @@ namespace Gekko
             bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
             // =========================================================================
             
-            bool hasChildren = false;
+            bool hasChildren = false; 
             if (this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
             string code = "null";
