@@ -47,13 +47,13 @@ namespace Gekko
         /// </summary>        
 
         [ProtoMember(1)]
-        public GekkoTimeSpanSimple span = null;
+        public GekkoTimeSpanSimple period = null;
 
         [ProtoMember(2)]
         public string text = null;
 
         [ProtoMember(3)]
-        public string bankAndVarnameWithFreq = null;
+        public string name = null;
 
         [ProtoMember(4)]
         public string commandFileAndLine = null;
@@ -70,8 +70,8 @@ namespace Gekko
         public TraceContents DeepClone()
         {            
             TraceContents trace2 = new TraceContents();
-            trace2.span = this.span;  //it is immutable
-            trace2.bankAndVarnameWithFreq = this.bankAndVarnameWithFreq;
+            trace2.period = this.period;  //it is immutable
+            trace2.name = this.name;
             trace2.commandFileAndLine = this.commandFileAndLine;
             trace2.text = this.text;
             trace2.dataFile = this.dataFile;
@@ -86,14 +86,14 @@ namespace Gekko
 
         public TraceContents(GekkoTime t1, GekkoTime t2)
         {
-            this.span = new GekkoTimeSpanSimple(t1, t2);
+            this.period = new GekkoTimeSpanSimple(t1, t2);
         }
 
         public TraceContents(bool isNullTime)
         {
             if (isNullTime)
             {
-                this.span = new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull);
+                this.period = new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull);
             }
             else new Error("TraceContents time error");
         }
@@ -350,7 +350,7 @@ namespace Gekko
                     {
                         //To get the first one going.
                         List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
-                        tmp.Add(traceNew.contents.span);
+                        tmp.Add(traceNew.contents.period);
                         spansList.Add(tmp);
                     }
 
@@ -393,7 +393,7 @@ namespace Gekko
 
                         if (counterI == 0)
                         {
-                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.span, traceOld.contents.span);
+                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.period, traceOld.contents.period);
                             spansList.Add(spans);
                         }
                         else
@@ -402,7 +402,7 @@ namespace Gekko
                             List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
                             foreach (GekkoTimeSpanSimple spanTemp in spansList[k2])
                             {
-                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.span, spanTemp);
+                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.period, spanTemp);
                                 newList.AddRange(spans);
                             }
                             spansList[k2] = newList;
@@ -435,8 +435,8 @@ namespace Gekko
         public string ToString()
         {
             string s = null;
-            if (this.GetTraceType() == ETraceParentOrChild.Parent) s = "------- meta parent entry: " + this.contents.bankAndVarnameWithFreq + " -------";
-            else s = this.contents.span.t1 + "-" + this.contents.span.t2 + ": " + this.contents.text;
+            if (this.GetTraceType() == ETraceParentOrChild.Parent) s = "------- meta parent entry: " + this.contents.name + " -------";
+            else s = this.contents.period.t1 + "-" + this.contents.period.t2 + ": " + this.contents.text;
             return s;
         }        
 
@@ -597,7 +597,7 @@ namespace Gekko
             if (true)
             {
                 s1 = this.contents.text;
-                string period = this.contents.span.t1 + "-" + this.contents.span.t2;
+                string period = this.contents.period.t1 + "-" + this.contents.period.t2;
                 int len = "---".Length;
                 if (s1 != null) len = s1.Length;
                 s2 += G.Blanks(50 - len - 2 * d) + " --> period: " + period;
@@ -820,7 +820,7 @@ namespace Gekko
             }
             WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
             string v = null;
-            if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.bankAndVarnameWithFreq, Program.databanks.GetFirst().name) + " - ";
+            if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.name, Program.databanks.GetFirst().name) + " - ";
             w.Title = v + "Gekko trace";
             w.ShowDialog();
         }
@@ -914,10 +914,10 @@ namespace Gekko
             if (this.contents != null)
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
-                if (this.contents.bankAndVarnameWithFreq != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.bankAndVarnameWithFreq), Program.options.freq);
+                if (this.contents.name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.name), Program.options.freq);
                 code = this.contents.text;
-                GekkoTime t1 = this.contents.span.t1;
-                GekkoTime t2 = this.contents.span.t2;
+                GekkoTime t1 = this.contents.period.t1;
+                GekkoTime t2 = this.contents.period.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
                 int n = -1;

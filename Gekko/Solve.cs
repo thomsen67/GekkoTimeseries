@@ -2074,7 +2074,7 @@ namespace Gekko
                         {
                             Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
                             trace.contents.text = src;
-                            trace.contents.bankAndVarnameWithFreq = ts.GetNameAndParentDatabank();
+                            trace.contents.name = ts.GetNameAndParentDatabank();
                             trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling);                            
                             //ts.meta.source = src;
