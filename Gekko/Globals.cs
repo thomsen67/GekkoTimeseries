@@ -326,7 +326,7 @@ namespace Gekko
 
         public static string protobufFileName = "databank.bin";
         public static string protobufFileName2 = "databank.data"; //In Gekko 2.2 it might be wise to change to for instance databank.data, this setting is only for reading, and it tests Program.options.databank_file_gbk_internal too
-        public static string protobufFileName3 = "traces.data";
+        public static string protobufFileName3 = "trace.data";
 
         public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;

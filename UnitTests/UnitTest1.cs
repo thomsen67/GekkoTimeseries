@@ -21659,11 +21659,11 @@ print(df2)
         {
             I("RESET;");
             I("TIME 2000 2000;");
-            I("OPEN<edit>sletmig1;");
+            I("OPEN<edit>sletmig1; clear sletmig1;");
             I("CREATE a, b, c;");
             I("a = 100; b = 100; c = 100;");
             I("CLOSE *;");
-            I("OPEN<edit>sletmig2;");
+            I("OPEN<edit>sletmig2; clear sletmig2;");
             I("CREATE a, b;");
             I("a = 777; b = 777;");
             I("CLOSE *;");

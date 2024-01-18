@@ -5841,7 +5841,7 @@ namespace Gekko
                     DateTime dt3 = DateTime.Now;
                     Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are reading data and traces in parallel. 
                     {
-                        //traces read may be skipped if <trace=no> or traces.data file does not exist.
+                        //traces read may be skipped if <trace=no> or trace.data file does not exist.
                         if (number == 0) deserializedDatabank = ProtobufRead<Databank>(fileName);
                         else if (number == 1)
                         {
