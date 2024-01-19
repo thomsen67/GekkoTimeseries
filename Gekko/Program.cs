@@ -5713,6 +5713,7 @@ namespace Gekko
             //file = tempTsdxPath + "\\" + unzippedFile;
             file = tempTsdxPath + "\\" + foundTsdFile;
             string databankVersion = null;
+            string traceVersion = null;
 
             XmlDocument doc = new XmlDocument();
             //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
@@ -5733,6 +5734,8 @@ namespace Gekko
 
                 databankVersion = root.GetAttribute("databankVersion").Trim();
                 if (databankVersion == "") databankVersion = "1.0";
+                traceVersion = root.GetAttribute("traceVersion").Trim();
+                if (traceVersion == "") traceVersion = "1.0";
                 string gekkoVersion = root.GetAttribute("gekkoVersion").Trim();
                 if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
 
@@ -5845,7 +5848,11 @@ namespace Gekko
                         if (number == 0) deserializedDatabank = ProtobufRead<Databank>(fileName);
                         else if (number == 1)
                         {
-                            if (oRead.trace && File.Exists(fileName2)) traces = ProtobufRead<List<Trace2>>(fileName2);
+                            if (oRead.trace && File.Exists(fileName2))
+                            {
+                                if(traceVersion != "1.0")
+                                traces = ProtobufRead<List<Trace2>>(fileName2);
+                            }
                         }
                         else new Error("Parallel problem");
                     });
@@ -21745,7 +21752,8 @@ namespace Gekko
 
             int count = 0;
 
-            string tsdxVersion = "1.2"; //Gekko 3.0
+            string databankVersion = "1.2"; //Gekko 3.0+
+            string traceVersion = "1.0";    //Gekko 3.1.16 --trace--> 1.0
 
             //try to zip it to this local folder
             tempTsdxPath = CreateTempFolderPath("temptsdxfolder");
@@ -21759,7 +21767,7 @@ namespace Gekko
             }
             //pathAndFilename = tempTsdxPath + "\\" + "databank" + ".tsd";
 
-            CreateDatabankXmlInfo(databank, tempTsdxPath, tsdxVersion, isCloseCommand);
+            CreateDatabankXmlInfo(databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
 
@@ -22057,7 +22065,7 @@ namespace Gekko
             }
         }
 
-        private static void CreateDatabankXmlInfo(Databank databank, string tempTsdxPath, string tsdxVersion, bool isCloseCommand)
+        private static void CreateDatabankXmlInfo(Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand)
         {
 
             // Create the xml document containe
@@ -22067,7 +22075,8 @@ namespace Gekko
             doc.AppendChild(dec);// Create the root element
             //Using PascalCase for elements, and camelCase for attributes.
             XmlElement root = doc.CreateElement("DatabankInfo");
-            root.SetAttribute("databankVersion", tsdxVersion);  //needs to be changed if Databank/Series change
+            root.SetAttribute("databankVersion", databankVersion);  //needs to be changed if Databank/Series change
+            root.SetAttribute("traceVersion", traceVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("gekkoVersion", Globals.gekkoVersion);
             doc.AppendChild(root);
 

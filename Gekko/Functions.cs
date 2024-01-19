@@ -1515,6 +1515,43 @@ namespace Gekko
             return clone;
         }
 
+        public static IVariable design(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //aggretation matrix, input n x 1 matrix, returns n x k matrix.
+            Matrix m = O.ConvertToMatrix(x);
+            if (m.data.GetLength(1) != 1) new Error("design() expects n x 1 matrix as input.");            
+            
+            Dictionary<int, bool> dict = new Dictionary<int, bool>();
+            int jmax = 0;
+            int i = 0;
+            foreach (double d in m.data)
+            {
+                i++;
+                int j = G.ConvertToInt(d);
+                if (j < 1) new Error("Function design(): Element " + i + ": all input elements must be > 0");
+                jmax = Math.Max(jmax, j);
+                if (!dict.ContainsKey(j)) dict.Add(j, true);
+            }
+
+            for (int k = 1; k <= jmax; k++)
+            {
+                if (!dict.ContainsKey(k)) new Error("Function design(): Could not find any element with value " + k + " in the input");
+            }
+
+            double[,] dd = new double[m.data.GetLength(0), jmax];
+            i = 0;
+            foreach (double d in m.data)
+            {
+                i++;
+                int j = G.ConvertToInt(d);
+                dd[i - 1, j - 1] = 1;
+            }
+            Matrix rv = new Matrix();
+            rv.data = dd;
+            return rv;
+        }
+
+
         public static IVariable zeros(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             int n1 = O.ConvertToInt(x1);

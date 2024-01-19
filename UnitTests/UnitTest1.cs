@@ -27753,7 +27753,7 @@ print(df2)
 
         [TestMethod]
         public void _Test_Matrix()
-        {
+        {            
 
             //I("time 2001 2003; xx = [1; 2; 3];");
             //_AssertSeries(First(), "xx", 2000, double.NaN, sharedDelta);
@@ -28643,6 +28643,30 @@ print(df2)
             Assert.AreEqual(m.colnames.Count, 4);
             I("PRT #a;");
 
+            //Aggregation matrix
+            //See https://docs.aptech.com/gauss/design.html, design() function.
+            I("reset;");
+            I("#a = [3; 1; 1; 3; 2];");
+            I("#m = design(#a);");
+            Matrix mm = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as Matrix;
+            Assert.AreEqual(mm.data.GetLength(0), 5);
+            Assert.AreEqual(mm.data.GetLength(1), 3);
+            _AssertMatrix(First(), "#m", 1, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 3, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 3, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 3, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 3, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 4, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 4, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 4, 3, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 5, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#m", 5, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 5, 3, 0d, sharedDelta);
+
             if (Globals.UNITTESTFOLLOWUP_important)
             {
                 I("time 2001 2004;");
@@ -28650,6 +28674,7 @@ print(df2)
                 I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
             }
 
+            
         }
 
         [TestMethod]
