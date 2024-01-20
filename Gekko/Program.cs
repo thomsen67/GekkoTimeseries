@@ -5739,12 +5739,12 @@ namespace Gekko
                 string gekkoVersion = root.GetAttribute("gekkoVersion").Trim();
                 if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
 
-                if (!Globals.tsdxVersions.Contains(databankVersion))
+                if (!Globals.gbkVersions.Contains(databankVersion))
                 {
                     using (Error e = new Error())
                     {
                         e.MainAdd("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ").");
-                        e.MainAdd("Known databank versions: " + Stringlist.GetListWithCommas(Globals.tsdxVersions) + ".");
+                        e.MainAdd("Known databank versions: " + Stringlist.GetListWithCommas(Globals.gbkVersions) + ".");
                         e.MainAdd("The databank seems to have been written by Gekko version " + gekkoVersion + ".");
                         e.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
                     }
@@ -5850,8 +5850,31 @@ namespace Gekko
                         {
                             if (oRead.trace && File.Exists(fileName2))
                             {
-                                if(traceVersion != "1.0")
-                                traces = ProtobufRead<List<Trace2>>(fileName2);
+                                bool success = false;
+                                bool unknowVersion = false;
+                                if (traceVersion == "1.0")
+                                {
+                                    try
+                                    {
+                                        traces = ProtobufRead<List<Trace2>>(fileName2);
+                                        success = true;
+                                    }
+                                    catch { }
+                                }
+                                else
+                                {
+                                    unknowVersion = true;
+                                }
+                                if (!success)
+                                {                                    
+                                    using (var txt = new Warning())
+                                    {
+                                        if (unknowVersion) txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
+                                        else txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ". This data trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
+                                        txt.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
+                                    }
+                                    new Note();
+                                }
                             }
                         }
                         else new Error("Parallel problem");

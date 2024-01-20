@@ -3318,7 +3318,7 @@ namespace Gekko
 
         private void deleteTempFilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult myDialogResult = MessageBox.Show("Cache files are Gekko-made temporary files, most notably " + G.NL + " cached model files in binary form. Clicking 'Yes' now will delete " + G.NL + " these files, saving some room on the hard disk, and forcing  " + G.NL + " Gekko to re-read databanks and models.", "Delete cache files", MessageBoxButtons.YesNo);
+            DialogResult myDialogResult = MessageBox.Show("Cache files are Gekko-made temporary files, most notably " + G.NL + "cached model files in binary form. Clicking 'Yes' now will delete " + G.NL + "these files, saving some room on the hard disk, and forcing  " + G.NL + "Gekko to re-read databanks and models." + G.NL + "(This can also be done with the flush() function).", "Delete cache files", MessageBoxButtons.YesNo);
             if (myDialogResult == DialogResult.Yes)
             {
                 Program.Flush(true);

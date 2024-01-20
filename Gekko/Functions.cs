@@ -2367,7 +2367,7 @@ namespace Gekko
         public static void flush(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             Program.Flush(true);  //removes cached models
-            new Writeln("Gekko cache files deleted");
+            new Writeln("Gekko cache files deleted. This function is intended for occasional manual use, not for putting inside a Gekko program.");
         }
 
         //Expect time dimension to be last for each "record", like (('a', 'b', '2001'), ('a', 'c', '2002'))
