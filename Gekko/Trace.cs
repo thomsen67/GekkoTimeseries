@@ -790,7 +790,7 @@ namespace Gekko
                         {
                             Action<GAO> a = (gao) =>
                             {
-                                CallTraceViewer(trace);
+                                CallTraceViewer(trace, true, int.MaxValue);
                             };
                             s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
@@ -810,19 +810,31 @@ namespace Gekko
             }
         }
 
-        public static void CallTraceViewer(Trace2 trace)
-        {
+        public static int CallTraceViewer(Trace2 trace, bool treatAsDag, int maxDepth)
+        {            
+            // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
+            // sith graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
+
+            Dictionary<Trace2, Item> dict = null;
+            if (treatAsDag) dict = new Dictionary<Trace2, Item>();
+
             TreeGridModel model = new TreeGridModel();
-            Item temp = trace.CopyToItems(0, 0, null);
-            foreach (Item item in temp.Children)
+            int nn = 0;
+            Item temp = trace.CopyToItems(0, 0, null, dict, maxDepth, ref nn);
+
+            if (!G.IsUnitTesting())
             {
-                model.Add(item);
+                foreach (Item item in temp.Children)
+                {
+                    model.Add(item);
+                }
+                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                string v = null;
+                if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.name, Program.databanks.GetFirst().name) + " - ";
+                w.Title = v + "Gekko data trace";
+                w.ShowDialog();
             }
-            WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-            string v = null;
-            if (trace.contents != null) v = G.Chop_RemoveBank(trace.contents.name, Program.databanks.GetFirst().name) + " - ";
-            w.Title = v + "Gekko trace";
-            w.ShowDialog();
+            return nn;
         }
 
         /// <summary>
@@ -887,8 +899,44 @@ namespace Gekko
         //  d=2, c=0, DIVIDER      --> x3=x1+x2
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
-        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods)
+        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods, Dictionary<Trace2, Item> dict, int max, ref int nn)
         {
+            Item knownItem = null;
+            if (dict != null) dict.TryGetValue(this, out knownItem);
+            if (knownItem == null)
+            {
+                //will be added later on
+            }
+            else
+            {
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!  periods shadown will typically be wrong, should be done dynamically from Item, when unfolding a trace
+                //BEWARE!!!  perhaps hook up each Item with its Trace2.
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //BEWARE!!!
+                //already known
+
+                //Item newChildItem = null;
+                //newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods, dict);
+                //newItem.Children.Add(newChildItem);
+
+                return knownItem;
+            }
+
             // =========================================================================
             // Settings for the data trace viewer
             // =========================================================================
@@ -949,9 +997,11 @@ namespace Gekko
                 stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
                 if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
             }
-            
+
+            nn++;
             Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
-            if (depth < 5)
+            if (dict != null) dict.Add(this, newItem);
+            if (depth < max)
             {
                 List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(trim);
                 if (traceAndPeriods.Count > 0)
@@ -960,7 +1010,7 @@ namespace Gekko
                     {
                         if (!showDividers && child.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item newChildItem = null;
-                        newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods);
+                        newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods, dict, max, ref nn);
                         newItem.Children.Add(newChildItem);
                     }
                 }
@@ -1056,12 +1106,6 @@ namespace Gekko
             }
             precedentsNames = list;
             return precedentsNames;
-        }
-
-        public static Item ViewerTraceHelper(Trace2 trace, int d, bool all, Item parent)
-        {            
-            Item copy = trace.CopyToItems(0, 0, null);
-            return copy;
         }
     }
 

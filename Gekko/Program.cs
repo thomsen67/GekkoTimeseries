@@ -15853,7 +15853,7 @@ namespace Gekko
                     new Writeln("Limit of 10 consecutive data trace windows exceeded.");
                     break;
                 }
-                Trace2.CallTraceViewer(trace);
+                Trace2.CallTraceViewer(trace, true, int.MaxValue);
             }
         }
 
