@@ -34,6 +34,10 @@ namespace Gekko
 
         public ObservableCollection<TreeGridElement> GetChildren()
         {
+            if ((this as Item).trace != null)
+            {
+
+            }
             return this.children;
         }
 
