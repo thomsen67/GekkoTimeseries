@@ -29,7 +29,22 @@ namespace Gekko
 
         public TreeGridElement Parent { get; private set; }
         public TreeGridModel Model { get; private set; }
-        public ObservableCollection<TreeGridElement> Children { get; private set; }
+        public ObservableCollection<TreeGridElement> Children
+        {
+            get; private set;
+
+            //get
+            //{
+            //    ObservableCollection<TreeGridElement> items = new ObservableCollection<TreeGridElement>();
+            //    items.Add(null);
+            //    return items;
+            //    //return Children;
+            //}
+            //private set
+            //{
+            //    Children = null;
+            //}
+        }
 
         static TreeGridElement()
         {
@@ -624,7 +639,8 @@ namespace Gekko
     }
 
     public class Item : TreeGridElement
-    {        
+    {
+        Trace2 trace = null;
         public string Name { get; private set; }
         public string Code { get; private set; }
         public string Period { get; private set; }
