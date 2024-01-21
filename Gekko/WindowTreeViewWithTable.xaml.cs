@@ -355,6 +355,8 @@ namespace Gekko
             // Iterate through all of the children within the items
             foreach (TreeGridElement child in items)
             {
+                MessageBox.Show("AddChild = " + (child as Item).Code);
+
                 // Add the child to the model
                 Insert(index++, child);
 
@@ -433,6 +435,8 @@ namespace Gekko
                 // We do not need to expand the item
                 return;
             }
+
+            MessageBox.Show("Expanding = " + (item as Item).Code);
 
             // Clear the item cache
             itemCache.Clear();
@@ -588,24 +592,6 @@ namespace Gekko
         }
     }
 
-    //public class TestProgram
-    //{
-    //    [STAThread]
-    //    public static void Main2(string[] args)
-    //    {
-    //        // Create the app
-    //        Application app = new Application();
-
-    //        // Create the main window
-    //        app.MainWindow = new WindowTreeViewWithTable();
-
-    //        // Show the main window
-    //        app.MainWindow.Show();
-
-    //        // Run the app
-    //        app.Run();
-    //    }
-    //}
 
     public class VisibilityConverter : IValueConverter
     {
@@ -784,46 +770,7 @@ namespace Gekko
         }
     }
 
-    //public partial class WindowTreeViewWithTable : Window
-    //{
-    //    private const int Levels = 3;
-    //    private const int Roots = 100;
-    //    private const int ItemsPerLevel = 5;
-    //    private int value;
-    //    //public TreeGridModel model;
-
-    //    public WindowTreeViewWithTable(TreeGridModel model)
-    //    {
-    //        // Initialize the component
-    //        InitializeComponent();
-
-    //        // Initialize the model
-    //        //InitModel();
-
-    //        // Set the model for the grid
-    //        grid.ItemsSource = model.FlatModel;
-    //    }
-
-    //    private void SelectionChanged(object sender, SelectionChangedEventArgs e)
-    //    {
-    //        //object o = ((DataGrid)grid.SelectedItem).SelectedItem;
-    //        Item item = (sender as DataGrid).SelectedItem as Item;
-    //        //MessageBox.Show("Selected " + item.Name + "¤" + item.Level);
-    //        text.Text = "Selected " + item.Name + "¤" + item.Level;
-    //    }
-
-    //    private void SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
-    //    {
-    //        //Item item = (sender as DataGrid).SelectedItem as Item;
-    //    }
-
-    //    private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
-    //    {
-    //        //DataGridRow row = sender as DataGridRow;			
-    //        //Item xx = row.Item as Item;
-    //    }
-    //}
-
+    
 
 
 }
