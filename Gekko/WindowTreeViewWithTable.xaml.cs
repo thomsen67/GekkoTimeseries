@@ -370,7 +370,7 @@ namespace Gekko
             // Iterate through all of the children within the items
             foreach (TreeGridElement child in items)
             {
-                MessageBox.Show("AddChild = " + (child as Item).Code);
+                //MessageBox.Show("AddChild = " + (child as Item).Code);
 
                 // Add the child to the model
                 Insert(index++, child);
@@ -451,7 +451,7 @@ namespace Gekko
                 return;
             }
 
-            MessageBox.Show("Expanding = " + (item as Item).Code);
+            //MessageBox.Show("Expanding = " + (item as Item).Code);
 
             // Clear the item cache
             itemCache.Clear();
@@ -640,7 +640,7 @@ namespace Gekko
 
     public class Item : TreeGridElement
     {
-        Trace2 trace = null;
+        public Trace2 trace = null;
         public string Name { get; private set; }
         public string Code { get; private set; }
         public string Period { get; private set; }

@@ -790,7 +790,7 @@ namespace Gekko
                         {
                             Action<GAO> a = (gao) =>
                             {
-                                CallTraceViewer(trace, true, int.MaxValue);
+                                CallTraceViewer(trace, false, int.MaxValue);
                             };
                             s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
@@ -811,22 +811,34 @@ namespace Gekko
         }
 
         public static int CallTraceViewer(Trace2 trace, bool treatAsDag, int maxDepth)
-        {            
+        {
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
             // sith graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
+
+            bool lazy = false;
 
             Dictionary<Trace2, Item> dict = null;
             if (treatAsDag) dict = new Dictionary<Trace2, Item>();
 
             TreeGridModel model = new TreeGridModel();
             int nn = 0;
-            Item temp = trace.CopyToItems(0, 0, null, dict, maxDepth, ref nn);
+            Item temp = null;
+
+            if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
+            else temp = trace.CopyToItems(0, 0, null, dict, maxDepth, ref nn);
 
             if (!G.IsUnitTesting())
             {
-                foreach (Item item in temp.Children)
+                if (lazy)
                 {
-                    model.Add(item);
+                    model.Add(temp);
+                }
+                else
+                {
+                    foreach (Item item in temp.Children)
+                    {
+                        model.Add(item);
+                    }
                 }
                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                 string v = null;
@@ -1000,6 +1012,7 @@ namespace Gekko
 
             nn++;
             Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            newItem.trace = this;
             if (dict != null) dict.Add(this, newItem);
             if (depth < max)
             {
@@ -1015,6 +1028,75 @@ namespace Gekko
                     }
                 }
             }
+            return newItem;
+        }
+
+        public Item Get1Item(List<GekkoTimeSpanSimple> periods)
+        {           
+
+            // =========================================================================
+            // Settings for the data trace viewer
+            // =========================================================================
+            string showFreq = "maybe";  //"yes", "no", "maybe
+            string showDatabank = "maybe";  //"yes", "no", "maybe"
+            bool showDividers = false;
+            bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
+                                                             // =========================================================================
+                                                                         
+            bool hasChildren = false;
+            if (this.precedents != null && this.precedents.Count() > 0) hasChildren = true;
+            string text = "null";
+            string code = "null";
+            string period = null;
+            string active = null;
+            string activeDetailed = null;
+            string file = null;
+            string fileDetailed = null;
+            string stamp = null;
+            string stampDetailed = null;
+            List<string> precedentsNames = null;
+
+            if (this.contents != null)
+            {
+                //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
+                if (this.contents.name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.name), Program.options.freq);
+                code = this.contents.text;
+                GekkoTime t1 = this.contents.period.t1;
+                GekkoTime t2 = this.contents.period.t2;
+                if (t1.IsNull() && t2.IsNull()) period = "";
+                else period = "" + t1.ToString() + "-" + t2.ToString() + "";
+                int n = -1;
+                foreach (GekkoTimeSpanSimple gts in periods)
+                {
+                    n++;
+                    if (n > 0) active += ", ";
+                    if (n > 0) activeDetailed += ", ";
+                    if (n <= 1)
+                    {
+                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                    }
+                    else
+                    {
+                        active += "...";
+                    }
+                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
+                }
+                int counter = 0;
+                if (!G.NullOrBlanks(this.contents.commandFileAndLine))
+                {
+                    string[] ss = this.contents.commandFileAndLine.Split('¤');
+                    file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
+                    fileDetailed = ss[0] + " line " + ss[1];
+                }
+                if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.contents.dataFile) + ")";
+                if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
+                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
+            }
+            
+            Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            newItem.trace = this;
             return newItem;
         }
 
