@@ -37,6 +37,13 @@ namespace Gekko
             Trace2 trace = (this as Item).trace;
 
             if (false)
+            {                
+                this.children = new ObservableCollection<TreeGridElement>();
+                this.children.Add(new Item("Aaa", "", "", "", "", "", "", "", "", null, true));
+                this.children.Add(new Item("Baa", "", "", "", "", "", "", "", "", null, true));
+            }
+
+            if (false)
             {
                 var temp = this.children;
                 this.children = new ObservableCollection<TreeGridElement>();
