@@ -34,9 +34,16 @@ namespace Gekko
 
         public ObservableCollection<TreeGridElement> GetChildren()
         {
-            if ((this as Item).trace != null)
+            Trace2 trace = (this as Item).trace;
+            if (false && this.children.Count > 0 && trace != null && trace.type == ETraceType.Normal)
             {
-
+                this.children = new ObservableCollection<TreeGridElement>();
+                List<TraceAndPeriods> taps = trace.TimeShadow2();
+                foreach (TraceAndPeriods tap in taps)
+                {
+                    Item item = tap.trace.Get1Item(tap.periods);
+                    this.children.Add(item);
+                }                
             }
             return this.children;
         }
