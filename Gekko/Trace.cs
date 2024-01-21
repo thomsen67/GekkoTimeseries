@@ -835,7 +835,7 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (Item item in temp.Children)
+                    foreach (Item item in temp.GetChildren())
                     {
                         model.Add(item);
                     }
@@ -1024,7 +1024,7 @@ namespace Gekko
                         if (!showDividers && child.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item newChildItem = null;
                         newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods, dict, max, ref nn);
-                        newItem.Children.Add(newChildItem);
+                        newItem.GetChildren().Add(newChildItem);
                     }
                 }
             }

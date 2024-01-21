@@ -29,22 +29,32 @@ namespace Gekko
 
         public TreeGridElement Parent { get; private set; }
         public TreeGridModel Model { get; private set; }
-        public ObservableCollection<TreeGridElement> Children
-        {
-            get; private set;
 
-            //get
-            //{
-            //    ObservableCollection<TreeGridElement> items = new ObservableCollection<TreeGridElement>();
-            //    items.Add(null);
-            //    return items;
-            //    //return Children;
-            //}
-            //private set
-            //{
-            //    Children = null;
-            //}
+        private ObservableCollection<TreeGridElement> children = new ObservableCollection<TreeGridElement>();
+
+        public ObservableCollection<TreeGridElement> GetChildren()
+        {
+            return this.children;
         }
+
+        public void SetChildren(ObservableCollection<TreeGridElement> x)
+        {
+            this.children = x;
+        }
+
+
+        //get
+        //{
+        //    ObservableCollection<TreeGridElement> items = new ObservableCollection<TreeGridElement>();
+        //    items.Add(null);
+        //    return items;
+        //    //return Children;
+        //}
+        //private set
+        //{
+        //    Children = null;
+        //}
+    
 
         static TreeGridElement()
         {
@@ -63,10 +73,10 @@ namespace Gekko
         public TreeGridElement()
         {
             // Initialize the element
-            Children = new ObservableCollection<TreeGridElement>();
+            SetChildren(new ObservableCollection<TreeGridElement>());
 
             // Attach events
-            Children.CollectionChanged += OnChildrenChanged;
+            GetChildren().CollectionChanged += OnChildrenChanged;
         }
 
         internal void SetModel(TreeGridModel model, TreeGridElement parent = null)
@@ -77,7 +87,7 @@ namespace Gekko
             Level = ((parent != null) ? parent.Level + 1 : 0);
 
             // Iterate through all child elements
-            foreach (TreeGridElement child in Children)
+            foreach (TreeGridElement child in GetChildren())
             {
                 // Set the model for the child
                 child.SetModel(model, this);
@@ -541,7 +551,7 @@ namespace Gekko
         private void CacheFlatChildren(TreeGridElement item)
         {
             // Iterate through all of the children within the item
-            foreach (TreeGridElement child in item.Children)
+            foreach (TreeGridElement child in item.GetChildren())
             {
                 // Add the child to the item cache
                 itemCache.Add(child);
@@ -558,10 +568,10 @@ namespace Gekko
         private int CountFlatChildren(TreeGridElement item)
         {
             // Initialize child count
-            int children = item.Children.Count;
+            int children = item.GetChildren().Count;
 
             // Iterate through each child
-            foreach (TreeGridElement child in item.Children)
+            foreach (TreeGridElement child in item.GetChildren())
             {
                 // Is the child expanded?
                 if (child.IsExpanded)
@@ -579,7 +589,7 @@ namespace Gekko
         {
             // Get the search information
             TreeGridElement parent = item.Parent;
-            IList<TreeGridElement> items = ((parent != null) ? parent.Children : this);
+            IList<TreeGridElement> items = ((parent != null) ? parent.GetChildren() : this);
             int index = items.IndexOf(item);
             int lastIndex = (items.Count - 1);
 
@@ -728,9 +738,9 @@ namespace Gekko
 
         private int c(Item i)
         {
-            int cnt = i.Children.Count;
+            int cnt = i.GetChildren().Count;
 
-            foreach (Item child in i.Children)
+            foreach (Item child in i.GetChildren())
             {
                 cnt += c(child);
             }
@@ -757,7 +767,7 @@ namespace Gekko
                 }
 
                 // Add the child to the item
-                item.Children.Add(child);
+                item.GetChildren().Add(child);
             }
         }
 
