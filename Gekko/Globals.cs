@@ -604,6 +604,7 @@ namespace Gekko
 
         public static List<string> checkoff = new List<string>();
 
+        public static bool isWindowTreeViewWithTableLazy = true;  //seems ok to set true: will unfold grandchildren lazily.
         public static int itemCounter = 0;
 
         public static string userSettingsPath = "";

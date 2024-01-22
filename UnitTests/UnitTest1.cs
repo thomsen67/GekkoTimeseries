@@ -13315,6 +13315,15 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceViewer()
         {
+
+            I("reset;");
+            I("x1 = 1;");
+            I("y = x1 + 1;");
+            I("x1 <2020 2021> = 2;");
+            I("z = x1 + y;");
+            I("disp z;");
+            Assert.Fail("Somehow do a test of this. The x1 = 1 trace appears two times when z traces are unfolded, first with active in two parts then in 1 part. With x1 <2020 2021> = 2, the x1 = 1 trace only appear 1 time when unfolded.");
+
             I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read makrobk;");
             Series q = O.GetIVariableFromString("qBNP!a", ECreatePossibilities.NoneReportError) as Series;

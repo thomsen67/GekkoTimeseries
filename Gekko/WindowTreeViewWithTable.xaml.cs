@@ -84,26 +84,29 @@ namespace Gekko
         /// <summary>
         /// It would be nice if we in the event could just add the direct children before expanding, but then
         /// a lot of wiring goes wrong in the WPF. Therefore, the grandchildren are added to the children instead.
-        /// But still, this is lazy loading!
+        /// But still, this is lazy loading! This is more or less the only internal part of  https://www.codeproject.com/Articles/1213466/WPF-TreeGrid-using-a-DataGrid    
+        /// that is touched/altered.
         /// </summary>
         protected virtual void OnExpanding()
         {
-            //return;
-            Item item = this as Item;
-            foreach (Item itemChild in item.GetChildren())
-            {                
-                Trace2 traceChild = itemChild.trace;
-                if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
-
-                List<TraceAndPeriods> taps = traceChild.TimeShadow2();
-                foreach (TraceAndPeriods tap in taps)
+            if (Globals.isWindowTreeViewWithTableLazy)
+            {
+                //return;
+                Item item = this as Item;
+                foreach (Item itemChild in item.GetChildren())
                 {
-                    if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                    Item itemGChild = tap.trace.Get1Item(tap.periods);
-                    itemChild.GetChildren().Add(itemGChild);
+                    Trace2 traceChild = itemChild.trace;
+                    if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
+
+                    List<TraceAndPeriods> taps = traceChild.TimeShadow2();
+                    foreach (TraceAndPeriods tap in taps)
+                    {
+                        if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                        Item itemGChild = tap.trace.Get1Item(tap.periods);
+                        itemChild.GetChildren().Add(itemGChild);
+                    }
                 }
             }
-            
         }
         protected virtual void OnExpanded() { }
         protected virtual void OnCollapsing() { }
@@ -708,7 +711,7 @@ namespace Gekko
             {
                 // Initialize the component
                 InitializeComponent();           
-                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Note: the trace viewer shows max 4 levels deep for now (this will be fixed).")));
+                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Click '>' x1xto unfold sub-traces. Click a row to see more trace info.")));
 
                 // Set the model for the grid
                 grid.ItemsSource = model.FlatModel;

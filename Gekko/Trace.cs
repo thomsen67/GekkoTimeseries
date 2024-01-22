@@ -829,7 +829,9 @@ namespace Gekko
             Item temp = null;
 
             //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
-            temp = trace.CopyToItems(0, 0, null, dict, 2, ref nn);
+            int maxDepth2 = int.MaxValue;
+            if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
+            temp = trace.CopyToItems(0, 0, null, dict, maxDepth2, ref nn);
 
             if (!G.IsUnitTesting())
             {
