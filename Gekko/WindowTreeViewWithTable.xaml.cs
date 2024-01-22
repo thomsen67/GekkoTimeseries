@@ -88,7 +88,7 @@ namespace Gekko
         /// </summary>
         protected virtual void OnExpanding()
         {
-            return;
+            //return;
             Item item = this as Item;
             foreach (Item itemChild in item.GetChildren())
             {                

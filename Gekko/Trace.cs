@@ -828,8 +828,8 @@ namespace Gekko
             int nn = 0;
             Item temp = null;
 
-            if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
-            else temp = trace.CopyToItems(0, 0, null, dict, maxDepth, ref nn);
+            //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
+            temp = trace.CopyToItems(0, 0, null, dict, 2, ref nn);
 
             if (!G.IsUnitTesting())
             {
@@ -850,7 +850,7 @@ namespace Gekko
                 w.Title = v + "Gekko data trace";
                 w.ShowDialog();
             }
-            new Writeln("TTH: items " + Globals.itemCounter);
+            if(Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
             return nn;
         }
 
