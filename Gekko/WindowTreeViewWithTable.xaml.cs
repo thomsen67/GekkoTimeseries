@@ -34,33 +34,7 @@ namespace Gekko
         private ObservableCollection<TreeGridElement> children = new ObservableCollection<TreeGridElement>();
 
         public ObservableCollection<TreeGridElement> GetChildren()
-        {
-            Trace2 trace = (this as Item).trace;
-
-            if (false)
-            {                
-                this.children = new ObservableCollection<TreeGridElement>();
-                this.children.Add(new Item("Aaa", "", "", "", "", "", "", "", "", null, true));
-                this.children.Add(new Item("Baa", "", "", "", "", "", "", "", "", null, true));
-            }
-
-            if (false)
-            {
-                var temp = this.children;
-                this.children = new ObservableCollection<TreeGridElement>();
-                foreach (TreeGridElement x in temp) this.children.Add(x);
-            }
-
-            if (false && this.children.Count > 0 && trace != null && trace.type == ETraceType.Normal)
-            {
-                this.children = new ObservableCollection<TreeGridElement>();
-                List<TraceAndPeriods> taps = trace.TimeShadow2();
-                foreach (TraceAndPeriods tap in taps)
-                {
-                    Item item = tap.trace.Get1Item(tap.periods);
-                    this.children.Add(item);
-                }                
-            }
+        {            
             return this.children;
         }
 
@@ -68,20 +42,6 @@ namespace Gekko
         {
             this.children = x;
         }
-
-
-        //get
-        //{
-        //    ObservableCollection<TreeGridElement> items = new ObservableCollection<TreeGridElement>();
-        //    items.Add(null);
-        //    return items;
-        //    //return Children;
-        //}
-        //private set
-        //{
-        //    Children = null;
-        //}
-    
 
         static TreeGridElement()
         {
@@ -121,8 +81,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// It would be nice if we in the event could just add the direct children before expanding, but then
+        /// a lot of wiring goes wrong in the WPF. Therefore, the grandchildren are added to the children instead.
+        /// But still, this is lazy loading!
+        /// </summary>
         protected virtual void OnExpanding()
-        {
+        {            
             Item item = this as Item;
             foreach (Item itemChild in item.GetChildren())
             {                
@@ -132,15 +97,10 @@ namespace Gekko
                 List<TraceAndPeriods> taps = traceChild.TimeShadow2();
                 foreach (TraceAndPeriods tap in taps)
                 {
-
                     if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
                     Item itemGChild = tap.trace.Get1Item(tap.periods);
                     itemChild.GetChildren().Add(itemGChild);
                 }
-
-                //Item itemGChild = new Item("AAA", "CODE", "", "", "", "", "", "", "", null, true);
-                //item.trace = this;            
-                //itemChild.GetChildren().Add(itemGChild);
             }
             
         }
