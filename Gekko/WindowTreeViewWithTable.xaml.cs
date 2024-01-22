@@ -87,7 +87,8 @@ namespace Gekko
         /// But still, this is lazy loading!
         /// </summary>
         protected virtual void OnExpanding()
-        {            
+        {
+            return;
             Item item = this as Item;
             foreach (Item itemChild in item.GetChildren())
             {                
@@ -666,6 +667,7 @@ namespace Gekko
 
         public Item(string name, string code, string period, string active, string activeDetailed, string stamp, string stampDetailed, string file, string fileDetailed, List<string>precedentsNames, bool hasChildren)
         {
+            Globals.itemCounter++;
             // Initialize the item
             Name = name;
             Code = code;

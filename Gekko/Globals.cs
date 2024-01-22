@@ -604,6 +604,8 @@ namespace Gekko
 
         public static List<string> checkoff = new List<string>();
 
+        public static int itemCounter = 0;
+
         public static string userSettingsPath = "";
 
         public const string stopHelper = "calling_non_existing_function";

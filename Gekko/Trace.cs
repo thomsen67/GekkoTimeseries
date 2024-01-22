@@ -815,6 +815,10 @@ namespace Gekko
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
             // sith graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
 
+            // Items = disp = 188, new items = 432 (437)
+
+            Globals.itemCounter = 0;
+
             bool lazy = false;
 
             Dictionary<Trace2, Item> dict = null;
@@ -846,6 +850,7 @@ namespace Gekko
                 w.Title = v + "Gekko data trace";
                 w.ShowDialog();
             }
+            new Writeln("TTH: items " + Globals.itemCounter);
             return nn;
         }
 
