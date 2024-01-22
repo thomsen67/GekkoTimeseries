@@ -1011,24 +1011,24 @@ namespace Gekko
             }
 
             nn++;
-            Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
-            newItem.trace = this;
-            if (dict != null) dict.Add(this, newItem);
+            Item item = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            item.trace = this;
+            if (dict != null) dict.Add(this, item);
             if (depth < max)
             {
-                List<TraceAndPeriods> traceAndPeriods = this.TimeShadow2(trim);
-                if (traceAndPeriods.Count > 0)
+                List<TraceAndPeriods> taps = this.TimeShadow2(trim);
+                if (taps.Count > 0)
                 {
-                    foreach (TraceAndPeriods child in traceAndPeriods)
+                    foreach (TraceAndPeriods tap in taps)
                     {
-                        if (!showDividers && child.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                        Item newChildItem = null;
-                        newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods, dict, max, ref nn);
-                        newItem.GetChildren().Add(newChildItem);
+                        if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                        Item itemChild = null;
+                        itemChild = tap.trace.CopyToItems(depth + 1, cnt + 1, tap.periods, dict, max, ref nn);
+                        item.GetChildren().Add(itemChild);
                     }
                 }
             }
-            return newItem;
+            return item;
         }
 
         public Item Get1Item(List<GekkoTimeSpanSimple> periods)

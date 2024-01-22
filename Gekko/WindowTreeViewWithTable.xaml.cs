@@ -13,6 +13,7 @@ namespace Gekko
 {
     /// <summary>
     /// Interaction logic for WindowTreeViewWithTable.xaml
+    /// https://www.codeproject.com/Articles/1213466/WPF-TreeGrid-using-a-DataGrid    
     /// </summary>
 
     public class TreeGridElement : ContentElement
@@ -122,7 +123,14 @@ namespace Gekko
 
         protected virtual void OnExpanding()
         {
-
+            Item item = this as Item;
+            foreach (Item itemChild in item.GetChildren())
+            {
+                Item itemGChild = new Item("AAA", "CODE", "", "", "", "", "", "", "", null, true);
+                //item.trace = this;            
+                itemChild.GetChildren().Add(itemGChild);
+            }
+            
         }
         protected virtual void OnExpanded() { }
         protected virtual void OnCollapsing() { }
@@ -405,9 +413,7 @@ namespace Gekko
 
             // Iterate through all of the children within the items
             foreach (TreeGridElement child in items)
-            {
-                //MessageBox.Show("AddChild = " + (child as Item).Code);
-
+            {                
                 // Add the child to the model
                 Insert(index++, child);
 
@@ -485,9 +491,7 @@ namespace Gekko
             {
                 // We do not need to expand the item
                 return;
-            }
-
-            //MessageBox.Show("Expanding = " + (item as Item).Code);
+            }            
 
             // Clear the item cache
             itemCache.Clear();
