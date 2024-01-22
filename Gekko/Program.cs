@@ -15841,19 +15841,33 @@ namespace Gekko
             {                
                 Series ts = iv as Series;
                 if (ts == null) continue;
-                Trace2 trace = ts.meta.trace2;
-                if (trace == null)
+
+                if (ts.type == ESeriesType.ArraySuper)
                 {
-                    new Writeln("Series '" + ts.GetNameAndParentDatabank() + "' does not have any data traces.");
-                    continue;
+                    List<MultidimItem> keys = null;
+                    keys = ts.dimensionsStorage.storage.Keys.ToList();
+                    keys.Sort(Multidim.CompareMultidimItems);
+                    G.Writeln2("------------------------------------------------------------------------------------------");
+                    DispHelperArraySeries(ts, keys, false);
+                    G.Writeln("------------------------------------------------------------------------------------------");
+                    new Writeln("As seen above, '" + ts.GetNameAndParentDatabank() + "' is an array-series. Please choose one of its elements (sub-series) for data tracing.");                    
                 }
-                count++;
-                if (count > 10)
+                else
                 {
-                    new Writeln("Limit of 10 consecutive data trace windows exceeded.");
-                    break;
+                    Trace2 trace = ts.meta.trace2;
+                    if (trace == null)
+                    {
+                        new Writeln("Series '" + ts.GetNameAndParentDatabank() + "' does not have any data traces.");
+                        continue;
+                    }
+                    count++;
+                    if (count > 10)
+                    {
+                        new Writeln("Limit of 10 consecutive data trace windows exceeded.");
+                        break;
+                    }
+                    Trace2.CallTraceViewer(trace, int.MaxValue);
                 }
-                Trace2.CallTraceViewer(trace, false, int.MaxValue);
             }
         }
 
@@ -16476,8 +16490,6 @@ namespace Gekko
                 {
                     G.Writeln("Fixed (parameter)");
                 }
-
-
             }
         }
 

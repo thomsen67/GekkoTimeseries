@@ -790,7 +790,7 @@ namespace Gekko
                         {
                             Action<GAO> a = (gao) =>
                             {
-                                CallTraceViewer(trace, false, int.MaxValue);
+                                CallTraceViewer(trace, int.MaxValue);
                             };
                             s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                         }
@@ -810,7 +810,7 @@ namespace Gekko
             }
         }
 
-        public static int CallTraceViewer(Trace2 trace, bool treatAsDag, int maxDepth)
+        public static int CallTraceViewer(Trace2 trace, int maxDepth)
         {
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
             // sith graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
@@ -819,11 +819,6 @@ namespace Gekko
 
             Globals.itemCounter = 0;
 
-            bool lazy = false;
-
-            Dictionary<Trace2, Item> dict = null;
-            if (treatAsDag) dict = new Dictionary<Trace2, Item>();
-
             TreeGridModel model = new TreeGridModel();
             int nn = 0;
             Item temp = null;
@@ -831,20 +826,13 @@ namespace Gekko
             //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
             int maxDepth2 = int.MaxValue;
             if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-            temp = trace.CopyToItems(0, 0, null, dict, maxDepth2, Globals.showDividers, ref nn);
+            temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.showDividers, ref nn);
 
             if (!G.IsUnitTesting())
             {
-                if (lazy)
+                foreach (Item item in temp.GetChildren())
                 {
-                    model.Add(temp);
-                }
-                else
-                {
-                    foreach (Item item in temp.GetChildren())
-                    {
-                        model.Add(item);
-                    }
+                    model.Add(item);
                 }
                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                 string v = null;
@@ -852,6 +840,7 @@ namespace Gekko
                 w.Title = v + "Gekko data trace";
                 w.ShowDialog();
             }
+
             if(Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
             return nn;
         }
@@ -912,54 +901,11 @@ namespace Gekko
             }
         }
 
-        //  d=0, c=1, null         -->  aa
-        //  d=1, c=3, x3=x1+x2     -->  ---
-        //  d=2, c=0, x1=...       --> x3=x1+x2
-        //  d=2, c=0, DIVIDER      --> x3=x1+x2
-        //  d=2, c=0, x2=...       --> x3=x1+x2
-
-        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods, Dictionary<Trace2, Item> dict, int max, bool showDividers, ref int nn)
-        {
-            Item knownItem = null;
-            if (dict != null) dict.TryGetValue(this, out knownItem);
-            if (knownItem == null)
-            {
-                //will be added later on
-            }
-            else
-            {
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!  periods shadown will typically be wrong, should be done dynamically from Item, when unfolding a trace
-                //BEWARE!!!  perhaps hook up each Item with its Trace2.
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //BEWARE!!!
-                //already known
-
-                //Item newChildItem = null;
-                //newChildItem = child.trace.CopyToItems(depth + 1, cnt + 1, child.periods, dict);
-                //newItem.Children.Add(newChildItem);
-
-                return knownItem;
-            }
-            
-            Item item = Get1Item(periods, showDividers);
-            nn++;
-
-            if (dict != null) dict.Add(this, item);
+        
+        public Item FromTraceToTreeViewItemsTree(int depth, int cnt, List<GekkoTimeSpanSimple> periods, int max, bool showDividers, ref int nn)
+        {            
+            Item item = FromTraceToTreeViewItem(periods, showDividers);
+            nn++;            
             if (depth < max)
             {
                 List<TraceAndPeriods> taps = this.TimeShadow2(Program.options.databank_trace_trim);
@@ -969,7 +915,7 @@ namespace Gekko
                     {
                         if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item itemChild = null;
-                        itemChild = tap.trace.CopyToItems(depth + 1, cnt + 1, tap.periods, dict, max, showDividers, ref nn);
+                        itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, cnt + 1, tap.periods, max, showDividers, ref nn);
                         item.GetChildren().Add(itemChild);
                     }
                 }
@@ -977,7 +923,7 @@ namespace Gekko
             return item;
         }
 
-        public Item Get1Item(List<GekkoTimeSpanSimple> periods, bool showDividers)
+        public Item FromTraceToTreeViewItem(List<GekkoTimeSpanSimple> periods, bool showDividers)
         {           
 
             // =========================================================================
@@ -985,14 +931,14 @@ namespace Gekko
             // =========================================================================
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
-            //bool showDividers = false;
-            //bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
-                                                             // =========================================================================
+            // Also Globals.showDividers and Program.options.databank_trace_trim;
+            // =========================================================================
                                                                          
             bool hasChildren = false;
             if (this.precedents != null && this.precedents.Count() > 0) hasChildren = true;
             string text = "null";
             string code = "null";
+            string codeDetailed = "null";
             string period = null;
             string active = null;
             string activeDetailed = null;
@@ -1006,7 +952,8 @@ namespace Gekko
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
                 if (this.contents.name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.name), Program.options.freq);
-                code = this.contents.text;
+                codeDetailed = this.contents.text;
+                code = System.Text.RegularExpressions.Regex.Replace(codeDetailed, @"\s+", " "); //https://stackoverflow.com/questions/206717/how-do-i-replace-multiple-spaces-with-a-single-space-in-c                
                 GekkoTime t1 = this.contents.period.t1;
                 GekkoTime t2 = this.contents.period.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
@@ -1041,7 +988,7 @@ namespace Gekko
                 if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
             }
             
-            Item newItem = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            Item newItem = new Item(text, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             newItem.trace = this;
             return newItem;
         }

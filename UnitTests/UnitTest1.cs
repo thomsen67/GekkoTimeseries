@@ -13330,24 +13330,24 @@ namespace UnitTests
             Trace2 trace = q.meta.trace2;            
             
             //No DAG identified
-            Assert.AreEqual(4, Trace2.CallTraceViewer(trace, false, 2));
-            Assert.AreEqual(11, Trace2.CallTraceViewer(trace, false, 3));
-            Assert.AreEqual(35, Trace2.CallTraceViewer(trace, false, 4));
-            Assert.AreEqual(134, Trace2.CallTraceViewer(trace, false, 5));
-            Assert.AreEqual(204, Trace2.CallTraceViewer(trace, false, 6));
-            Assert.AreEqual(397, Trace2.CallTraceViewer(trace, false, 7));
-            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, false, 8));
-            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, false, 9));
+            Assert.AreEqual(4, Trace2.CallTraceViewer(trace, 2));
+            Assert.AreEqual(11, Trace2.CallTraceViewer(trace, 3));
+            Assert.AreEqual(35, Trace2.CallTraceViewer(trace, 4));
+            Assert.AreEqual(134, Trace2.CallTraceViewer(trace, 5));
+            Assert.AreEqual(204, Trace2.CallTraceViewer(trace, 6));
+            Assert.AreEqual(397, Trace2.CallTraceViewer(trace, 7));
+            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 8));
+            Assert.AreEqual(432, Trace2.CallTraceViewer(trace, 9));
 
-            //DAG identified
-            Assert.AreEqual(4, Trace2.CallTraceViewer(trace, true, 2));
-            Assert.AreEqual(11, Trace2.CallTraceViewer(trace, true, 3));
-            Assert.AreEqual(34, Trace2.CallTraceViewer(trace, true, 4));
-            Assert.AreEqual(1284, Trace2.CallTraceViewer(trace, true, 5));
-            Assert.AreEqual(166, Trace2.CallTraceViewer(trace, true, 6));
-            Assert.AreEqual(184, Trace2.CallTraceViewer(trace, true, 7));
-            Assert.AreEqual(189, Trace2.CallTraceViewer(trace, true, 8));
-            Assert.AreEqual(189, Trace2.CallTraceViewer(trace, true, 9));
+            ////DAG identified
+            //Assert.AreEqual(4, Trace2.CallTraceViewer(trace, true, 2));
+            //Assert.AreEqual(11, Trace2.CallTraceViewer(trace, true, 3));
+            //Assert.AreEqual(34, Trace2.CallTraceViewer(trace, true, 4));
+            //Assert.AreEqual(1284, Trace2.CallTraceViewer(trace, true, 5));
+            //Assert.AreEqual(166, Trace2.CallTraceViewer(trace, true, 6));
+            //Assert.AreEqual(184, Trace2.CallTraceViewer(trace, true, 7));
+            //Assert.AreEqual(189, Trace2.CallTraceViewer(trace, true, 8));
+            //Assert.AreEqual(189, Trace2.CallTraceViewer(trace, true, 9));
         }
 
         [TestMethod]
