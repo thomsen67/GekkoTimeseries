@@ -831,7 +831,7 @@ namespace Gekko
             //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
             int maxDepth2 = int.MaxValue;
             if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-            temp = trace.CopyToItems(0, 0, null, dict, maxDepth2, ref nn);
+            temp = trace.CopyToItems(0, 0, null, dict, maxDepth2, Globals.showDividers, ref nn);
 
             if (!G.IsUnitTesting())
             {
@@ -918,7 +918,7 @@ namespace Gekko
         //  d=2, c=0, DIVIDER      --> x3=x1+x2
         //  d=2, c=0, x2=...       --> x3=x1+x2
 
-        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods, Dictionary<Trace2, Item> dict, int max, ref int nn)
+        public Item CopyToItems(int depth, int cnt, List<GekkoTimeSpanSimple> periods, Dictionary<Trace2, Item> dict, int max, bool showDividers, ref int nn)
         {
             Item knownItem = null;
             if (dict != null) dict.TryGetValue(this, out knownItem);
@@ -955,82 +955,21 @@ namespace Gekko
 
                 return knownItem;
             }
-
-            // =========================================================================
-            // Settings for the data trace viewer
-            // =========================================================================
-            string showFreq = "maybe";  //"yes", "no", "maybe
-            string showDatabank = "maybe";  //"yes", "no", "maybe"
-            bool showDividers = false;
-            bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
-            // =========================================================================
             
-            bool hasChildren = false; 
-            if (this.precedents.Count() > 0) hasChildren = true;
-            string text = "null";
-            string code = "null";
-            string period = null;
-            string active = null;
-            string activeDetailed = null;
-            string file = null;
-            string fileDetailed = null;
-            string stamp = null;
-            string stampDetailed = null;
-            List<string> precedentsNames = null;            
-
-            if (this.contents != null)
-            {
-                //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
-                if (this.contents.name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.name), Program.options.freq);
-                code = this.contents.text;
-                GekkoTime t1 = this.contents.period.t1;
-                GekkoTime t2 = this.contents.period.t2;
-                if (t1.IsNull() && t2.IsNull()) period = "";
-                else period = "" + t1.ToString() + "-" + t2.ToString() + "";
-                int n = -1;
-                foreach (GekkoTimeSpanSimple gts in periods)
-                {
-                    n++;
-                    if (n > 0) active += ", ";
-                    if (n > 0) activeDetailed += ", ";
-                    if (n <= 1)
-                    {
-                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
-                    }
-                    else
-                    {
-                        active += "...";
-                    }
-                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
-                }
-                int counter = 0;
-                if (!G.NullOrBlanks(this.contents.commandFileAndLine))
-                {
-                    string[] ss = this.contents.commandFileAndLine.Split('¤');
-                    file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
-                    fileDetailed = ss[0] + " line " + ss[1];
-                }
-                if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.contents.dataFile) + ")";
-                if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-                stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-                if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
-            }
-
+            Item item = Get1Item(periods, showDividers);
             nn++;
-            Item item = new Item(text, code, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
-            item.trace = this;
+
             if (dict != null) dict.Add(this, item);
             if (depth < max)
             {
-                List<TraceAndPeriods> taps = this.TimeShadow2(trim);
+                List<TraceAndPeriods> taps = this.TimeShadow2(Program.options.databank_trace_trim);
                 if (taps.Count > 0)
                 {
                     foreach (TraceAndPeriods tap in taps)
                     {
                         if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item itemChild = null;
-                        itemChild = tap.trace.CopyToItems(depth + 1, cnt + 1, tap.periods, dict, max, ref nn);
+                        itemChild = tap.trace.CopyToItems(depth + 1, cnt + 1, tap.periods, dict, max, showDividers, ref nn);
                         item.GetChildren().Add(itemChild);
                     }
                 }
@@ -1038,7 +977,7 @@ namespace Gekko
             return item;
         }
 
-        public Item Get1Item(List<GekkoTimeSpanSimple> periods)
+        public Item Get1Item(List<GekkoTimeSpanSimple> periods, bool showDividers)
         {           
 
             // =========================================================================
@@ -1046,8 +985,8 @@ namespace Gekko
             // =========================================================================
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
-            bool showDividers = false;
-            bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
+            //bool showDividers = false;
+            //bool trim = Program.options.databank_trace_trim; //true if shadowed traces are removed (not shown). Perhaps show it greyed out, and perhaps its own option??
                                                              // =========================================================================
                                                                          
             bool hasChildren = false;
