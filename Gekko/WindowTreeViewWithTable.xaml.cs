@@ -125,10 +125,22 @@ namespace Gekko
         {
             Item item = this as Item;
             foreach (Item itemChild in item.GetChildren())
-            {
-                Item itemGChild = new Item("AAA", "CODE", "", "", "", "", "", "", "", null, true);
+            {                
+                Trace2 traceChild = itemChild.trace;
+                if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
+
+                List<TraceAndPeriods> taps = traceChild.TimeShadow2();
+                foreach (TraceAndPeriods tap in taps)
+                {
+
+                    if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                    Item itemGChild = tap.trace.Get1Item(tap.periods);
+                    itemChild.GetChildren().Add(itemGChild);
+                }
+
+                //Item itemGChild = new Item("AAA", "CODE", "", "", "", "", "", "", "", null, true);
                 //item.trace = this;            
-                itemChild.GetChildren().Add(itemGChild);
+                //itemChild.GetChildren().Add(itemGChild);
             }
             
         }
