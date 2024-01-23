@@ -332,8 +332,8 @@ namespace Gekko
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
         /// </summary>        
         public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved)
-        {            
-            List<TraceAndPeriods> rv = new List<TraceAndPeriods>();
+        {
+            List<TraceAndPeriods> rv3 = new List<TraceAndPeriods>();
             if (this.precedents.Count() > 0)
             {
                 //Remove the if below at some point, just for sanity now            
@@ -367,7 +367,7 @@ namespace Gekko
                                 tap.trace = this.precedents[lastNull - count - 1];
                                 //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
                                 tap.periods = m;
-                                rv.Add(tap);
+                                rv3.Add(tap);
                             }
                         }
                         if (i > 0)
@@ -375,7 +375,7 @@ namespace Gekko
                             TraceAndPeriods tap = new TraceAndPeriods();
                             tap.trace = new Trace2(ETraceType.Divider, true);
                             tap.periods = new List<GekkoTimeSpanSimple>();
-                            rv.Add(tap);
+                            rv3.Add(tap);
                             //rv.Add(new Trace2(ETraceType.Divider, true)); //divider, use ETraceType.Divider  ??????? QWERTY
                         }
                         counterI = -1;
@@ -410,7 +410,45 @@ namespace Gekko
                     }
                 }
             }
-            rv.Reverse();
+
+            rv3.Reverse(); //To get the input vars in the right order                
+            List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
+
+
+            if (Globals.traceInvertWallTime)
+            {
+
+                List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
+                int n = 0;
+                foreach (TraceAndPeriods tap in rv3)
+                {
+                    n++;
+                    if (tap.trace.type == ETraceType.Divider)
+                    {
+                        temp.Reverse();
+                        rv.AddRange(temp);
+                        temp.Clear();
+                        rv.Add(tap);
+                    }
+                    else
+                    {
+                        temp.Add(tap);
+                        if (n == rv3.Count)
+                        {
+                            temp.Reverse();
+                            rv.AddRange(temp);
+                            temp.Clear();
+                        }
+                    }
+                }
+                if (rv.Count != rv3.Count) new Error("TimeShadow problem");
+                if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+            }
+            else
+            {
+                rv = rv3;
+            }
             return rv;
         }
 
@@ -776,31 +814,23 @@ namespace Gekko
             Program.options.print_width = int.MaxValue;
             try
             {
-                //using (Writeln txt = new Writeln())
+                TraceHelper th = new TraceHelper();
+                trace.DeepTrace(th, 0);
+                int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
+                string s = "Traces";
+                if (true)
                 {
-                    //txt.lineWidth = int.MaxValue;
-                    TraceHelper th = new TraceHelper();
-                    trace.DeepTrace(th, 0);                    
-                    int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
-                    string s = "Traces";
-                    //if (all) s = count2 + " " + "traces (click [] to see more info)";
-                    if (true)
+                    if (trace.precedents.Count() > 0)
                     {
-                        if (trace.precedents.Count() > 0)
+                        Action<GAO> a = (gao) =>
                         {
-                            Action<GAO> a = (gao) =>
-                            {
-                                CallTraceViewer(trace, int.MaxValue);
-                            };
-                            s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
-                        }
+                            CallTraceViewer(trace, int.MaxValue);
+                        };
+                        s += " (" + G.GetLinkAction("view " + count2, new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                     }
-                    s += ":";
-                    //if (all) G.Writeln();
-                    G.Writeln(s);
-                    //txt.MainAdd(s);
-                    //txt.MainNewLineTight();
                 }
+                s += ":";
+                G.Writeln(s);
                 PrintTraceHelper(trace, 0);
             }
             finally
@@ -826,7 +856,7 @@ namespace Gekko
             //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
             int maxDepth2 = int.MaxValue;
             if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-            temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.showDividers, ref nn);
+            temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.traceShowDividers, ref nn);
 
             if (!G.IsUnitTesting())
             {
@@ -865,40 +895,29 @@ namespace Gekko
         {
             if (d > 1) return;
             string s = null;            
-            s = "| ";            
-            
-            if (trace.type == ETraceType.Divider)
-            {
-                G.Write(s);
-                G.Writeln("---", Globals.MiddleGray);
-            }
-            else
-            {
-                if (!trace.IsInvisibleTrace())
-                {
-                    TwoStrings s2 = trace.Text(d);
-                    G.Write(s + s2.s1);
-                    G.Writeln(s2.s2, Globals.MiddleGray);
-                }
+            s = "| ";
 
-                int max = 5;
-                int start = 0;
-                if (trace.precedents.Count() > max)
+            List<TraceAndPeriods> taps = trace.TimeShadow2();
+
+            int max = 5;
+            int n = 0;
+            foreach (TraceAndPeriods tap in taps)
+            {
+                if (tap.trace.type == ETraceType.Divider) continue;
+                n++;
+                if (n > max)
                 {
-                    start = trace.precedents.Count() - max;
-                    if (d < 1) G.Writeln("...omitted " + start + " older traces...", System.Drawing.Color.Gray);
-                }                
-                                
-                if (trace.precedents.Count() > 0)
-                {
-                    int counter = -1;
-                    foreach (Trace2 child in trace.precedents.GetStorage())
-                    {
-                        counter++;
-                        if (counter >= start) PrintTraceHelper(child, d + 1);
-                    }
-                }                
-            }
+                    G.Writeln("| ...see older traces in trace viewer...", System.Drawing.Color.Gray);
+                    break;
+                }
+                string code = null; string codeDetailed = null;
+                Trace2.GetCodeAsString(tap.trace.contents.text, out code, out codeDetailed);
+                string active = null; string activeDetailed = null;
+                Trace2.GetActivePeriodsAsString(tap.periods, ref active, ref activeDetailed);
+                string stamp = null; string stampDetailed = null;
+                Trace2.GetStampAsString(tap.trace.id, out stamp, out stampDetailed);
+                G.Write("| " + code); G.Writeln(G.Blanks(50 - tap.trace.contents.text.Length) + " --> " + activeDetailed + ", " + stamp, Globals.MiddleGray);
+            }            
         }
 
         
@@ -952,28 +971,13 @@ namespace Gekko
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
                 if (this.contents.name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.contents.name), Program.options.freq);
-                codeDetailed = this.contents.text;
-                code = System.Text.RegularExpressions.Regex.Replace(codeDetailed, @"\s+", " "); //https://stackoverflow.com/questions/206717/how-do-i-replace-multiple-spaces-with-a-single-space-in-c                
+                GetCodeAsString(this.contents.text, out code, out codeDetailed);
                 GekkoTime t1 = this.contents.period.t1;
                 GekkoTime t2 = this.contents.period.t2;
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
-                int n = -1;
-                foreach (GekkoTimeSpanSimple gts in periods)
-                {
-                    n++;
-                    if (n > 0) active += ", ";
-                    if (n > 0) activeDetailed += ", ";
-                    if (n <= 1)
-                    {
-                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
-                    }
-                    else
-                    {
-                        active += "...";
-                    }
-                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
-                }
+                GetActivePeriodsAsString(periods, ref active, ref activeDetailed);
+
                 int counter = 0;
                 if (!G.NullOrBlanks(this.contents.commandFileAndLine))
                 {
@@ -983,14 +987,45 @@ namespace Gekko
                 }
                 if (!G.NullOrBlanks(this.contents.dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.contents.dataFile) + ")";
                 if (!G.NullOrBlanks(this.contents.dataFile)) fileDetailed += " (data = " + this.contents.dataFile + ")";
-                stamp = this.id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
-                stampDetailed = this.id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+                Trace2.GetStampAsString(this.id, out stamp, out stampDetailed);
                 if (this.contents.precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
             }
-            
+
             Item newItem = new Item(text, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
             newItem.trace = this;
             return newItem;
+        }
+
+        public static void GetCodeAsString(string text, out string code, out string codeDetailed)
+        {
+            codeDetailed = text;
+            code = System.Text.RegularExpressions.Regex.Replace(codeDetailed, @"\s+", " "); //https://stackoverflow.com/questions/206717/how-do-i-replace-multiple-spaces-with-a-single-space-in-c                
+        }
+
+        public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
+        {
+            stamp = id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+        }
+
+        public static void GetActivePeriodsAsString(List<GekkoTimeSpanSimple> periods, ref string active, ref string activeDetailed)
+        {
+            int n = -1;
+            foreach (GekkoTimeSpanSimple gts in periods)
+            {
+                n++;
+                if (n > 0) active += ", ";
+                if (n > 0) activeDetailed += ", ";
+                if (n <= 1)
+                {
+                    active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                }
+                else
+                {
+                    active += "...";
+                }
+                activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
+            }
         }
 
         private List<string> GetPrecedentsNames(string showFreq, string showDatabank)

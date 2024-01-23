@@ -32267,6 +32267,19 @@ print(df2)
             I("SYS 'gekko.exe read '" + folder + "\\makrobk.gbk' working = 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit';");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Read 76543 variables... booh"));
 
+            // Also: check that this is time-inverted:
+            //reset;
+            //x1 = 1;
+            //x1 < 2020 2020 >= 2;
+            //x1 < 2018 2018 >= 3;
+            //x2 = 11;
+            //x2 < 2020 2020 >= 12;
+            //x2 < 2018 2018 >= 13;
+            //y = x1 + x2 + 1;
+            //y < 2016 2016 >= 100;
+            //disp y;
+            //Last ones on wall time must be shown first!
+
             Assert.Fail();  //Do a test where older databanks (tsdx, 1.0, 1.1, 1.2 etc are read, if this test is not done already...)
             //just try to find some old banks 
         }

@@ -102,7 +102,7 @@ namespace Gekko
                     foreach (TraceAndPeriods tap in taps)
                     {
                         if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                        Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.showDividers);
+                        Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
                         itemChild.GetChildren().Add(itemGChild);
                     }
                 }
