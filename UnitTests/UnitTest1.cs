@@ -2755,7 +2755,7 @@ namespace UnitTests
             I("reset; time 2001 2003; x = 100, 90, 80; xx = series(1); xx[a] = 10, 11, 12; xx[b] = 20, 21, 22; time 2002 2003;");
 
             I("x[2002] <dyn> = 2;");
-            FAIL("x[2002] = x[-1];"); //fails as expected            
+            FAIL("x[2002] = x[-1];"); //fails as expected             
             I("xx[a] = xx[b][-1] + 1;");
             FAIL("xx[a] = xx[a][-1] + 1;"); //fail because of missing <dyn>
             I("xx[a] <dyn> = xx[a][-1] + 1;");
