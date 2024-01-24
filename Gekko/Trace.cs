@@ -426,7 +426,7 @@ namespace Gekko
             }
         }
 
-        private static List<TraceAndPeriods> RevertWallTime(List<TraceAndPeriods> rv3)
+        public static List<TraceAndPeriods> RevertWallTime(List<TraceAndPeriods> rv3)
         {
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
             List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
@@ -674,6 +674,7 @@ namespace Gekko
             }            
             else if (type == ETracePushType.Sibling)
             {
+                //In something like "reset; y = 1; y = 2;" this part is called 2 times.
                 if (Globals.traceShadowAtGluedLevel)
                 {
                     ts.meta.trace2.precedents.Add(trace);
@@ -681,7 +682,7 @@ namespace Gekko
                 }
                 else
                 {
-                    ts.meta.trace2.precedents.Add(trace);  //In something like "reset; y = 1; y = 2;" this part is called 2 times.
+                    ts.meta.trace2.precedents.Add(trace);  
                 }
             }
             else new Error("Trace");
