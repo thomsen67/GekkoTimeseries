@@ -1911,220 +1911,226 @@ namespace Gekko
                 // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
                 // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
 
-                bool blue = false;
-                if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
-                if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
-                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
-                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
-                if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
-
-                if (Program.options.global_pink && blue)
+                if (false)
                 {
-                    using (Writeln text = new Writeln())
-                    {
-                        text.color = Color.Blue;
-                        text.MainNewLine();
-                        text.MainAdd("-------------------------------------------------------");
-                        text.MainNewLineTight();
-                        text.MainAdd("--- datopgek3 report start ----------------------------");
-                        text.MainNewLineTight();
-                        text.MainAdd("-------------------------------------------------------");
-                        text.MainNewLine();
-                    }
-                }
 
-                if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
-                {
-                    using (Writeln text = new Writeln())
+                    bool blue = false;
+                    if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
+                    if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
+                    if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
+                    if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
+                    if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
+
+                    blue = false;
+
+                    if (Program.options.global_pink && blue)
                     {
-                        text.color = Color.Blue; 
-                        text.MainAdd("-----------------------------------------------------------");
-                        text.MainNewLineTight();
-                        text.MainAdd("WARNING: The run contained some access to files on g:\\datopgek:");
-                        text.MainNewLineTight();
-                        foreach (string s in Globals.datopgek_errors)
+                        using (Writeln text = new Writeln())
                         {
-                            text.MainAdd("- " + s);
+                            text.color = Color.Blue;
+                            text.MainNewLine();
+                            text.MainAdd("-------------------------------------------------------");
+                            text.MainNewLineTight();
+                            text.MainAdd("--- datopgek3 report start ----------------------------");
+                            text.MainNewLineTight();
+                            text.MainAdd("-------------------------------------------------------");
+                            text.MainNewLine();
+                        }
+                    }
+
+                    if (Program.options.global_pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+                    {
+                        using (Writeln text = new Writeln())
+                        {
+                            text.color = Color.Blue;
+                            text.MainAdd("-----------------------------------------------------------");
+                            text.MainNewLineTight();
+                            text.MainAdd("WARNING: The run contained some access to files on g:\\datopgek:");
+                            text.MainNewLineTight();
+                            foreach (string s in Globals.datopgek_errors)
+                            {
+                                text.MainAdd("- " + s);
+                                text.MainNewLineTight();
+                            }
+                            text.MainAdd("-----------------------------------------------------------");
                             text.MainNewLineTight();
                         }
-                        text.MainAdd("-----------------------------------------------------------");
-                        text.MainNewLineTight();
-                    }
-                }
-
-                if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
-                {
-                    using (Writeln txt = new Writeln())
-                    {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension .gbk_gek2.");
-                        txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
-                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    using (Writeln txt = new Writeln())
+                    if (Program.options.global_pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
                     {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("// ----- Gekko code start -----");
-                        txt.MainNewLine();
-                        foreach (string s in Globals.datopgek_banks)
+                        using (Writeln txt = new Writeln())
                         {
-                            if (already.ContainsKey(s))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                already.Add(s, "");
-                            }
-                            string ss = "";
-                            if (s.ToLower().EndsWith(".gbk")) ss = G.Replace(s, ".gbk", ".gbk_gek2", StringComparison.OrdinalIgnoreCase, 1);
-                            else ss = s + ".gbk_gek2";
-                            txt.MainAdd("read <first> '" + s + "';");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("read <ref> '" + ss + "';");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("compare <2000 2022>; //or some other period...");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("edit compare_databanks.txt;");
+                            txt.color = Color.Blue;
+                            txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension .gbk_gek2.");
+                            txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
+                        }
+
+                        GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.color = Color.Blue;
+                            txt.MainAdd("// ----- Gekko code start -----");
                             txt.MainNewLine();
+                            foreach (string s in Globals.datopgek_banks)
+                            {
+                                if (already.ContainsKey(s))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    already.Add(s, "");
+                                }
+                                string ss = "";
+                                if (s.ToLower().EndsWith(".gbk")) ss = G.Replace(s, ".gbk", ".gbk_gek2", StringComparison.OrdinalIgnoreCase, 1);
+                                else ss = s + ".gbk_gek2";
+                                txt.MainAdd("read <first> '" + s + "';");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("read <ref> '" + ss + "';");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("compare <2000 2022>; //or some other period...");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("edit compare_databanks.txt;");
+                                txt.MainNewLine();
+                            }
+                            txt.MainAdd("// ----- Gekko code end -------");
+                            txt.MainNewLineTight();
                         }
-                        txt.MainAdd("// ----- Gekko code end -------");
-                        txt.MainNewLineTight();
-                    }
-                }
-
-                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
-                {
-                    using (Writeln txt = new Writeln())
-                    {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension ...._gek2.");
-                        txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
-                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                    using (Writeln txt = new Writeln())
+                    if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
                     {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("// ----- Gekko code start -----");
-                        txt.MainNewLine();
-                        foreach (string s in Globals.datopgek_otherBanks)
+                        using (Writeln txt = new Writeln())
                         {
-                            if (already.ContainsKey(s))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                already.Add(s, "");
-                            }
+                            txt.color = Color.Blue;
+                            txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following statements to the input window to compare with the original databank with extension ...._gek2.");
+                            txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
+                        }
 
-                            string ext = "???";
-                            string ss = "";
-                            bool ok = false;
-                            foreach (string type in Globals.datopgek_otherTypes)
-                            {
-                                if (s.ToLower().EndsWith("." + type))
-                                {
-                                    ss = G.Replace(s, "." + type, "." + type + "_gek2", StringComparison.OrdinalIgnoreCase, 1);
-                                    ext = type;
-                                    ok = true;
-                                    break;
-                                }
-                            }
-                            if (!ok)
-                            {
-                                if (string.IsNullOrEmpty(Path.GetExtension(s)))
-                                {
-                                    //g:\datopgek3\tsdfil
-                                    ss = s + "." + ext + "_gek2"; // --> g:\datopgek3\tsdfil.???_gek2
-                                }
-                                else ss = s + "_gek2";  //should never happen...
-                            }
+                        GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                            txt.MainAdd("read <first " + ext + "> '" + s + "';");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("read <ref " + ext + "> '" + ss + "';");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("compare <2000 2022>; //or some other period...");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("edit compare_databanks.txt;");
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.color = Color.Blue;
+                            txt.MainAdd("// ----- Gekko code start -----");
                             txt.MainNewLine();
-                        }
-                        txt.MainAdd("// ----- Gekko code end -------");
-                        txt.MainNewLineTight();
-                    }
-                }
-
-                if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
-                {
-                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                    using (Writeln txt = new Writeln())
-                    {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("The session wrote to listfiles (.lst) on g:\\datopgek3\\... . You may compare these with the original listfiles with extension .lst_gek2.");
-                        txt.MainAdd("In Total Commander, you can mark the two files (.lst and .lst_gek2) and use Files --> Compare By Content...");
-                        txt.MainNewLineTight();
-                        txt.MainAdd(" ----- Written listfiles:  -----");
-                        txt.MainNewLineTight();
-                        foreach (string s in Globals.datopgek_listfiles)
-                        {
-                            if (already.ContainsKey(s))
+                            foreach (string s in Globals.datopgek_otherBanks)
                             {
-                                continue;
+                                if (already.ContainsKey(s))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    already.Add(s, "");
+                                }
+
+                                string ext = "???";
+                                string ss = "";
+                                bool ok = false;
+                                foreach (string type in Globals.datopgek_otherTypes)
+                                {
+                                    if (s.ToLower().EndsWith("." + type))
+                                    {
+                                        ss = G.Replace(s, "." + type, "." + type + "_gek2", StringComparison.OrdinalIgnoreCase, 1);
+                                        ext = type;
+                                        ok = true;
+                                        break;
+                                    }
+                                }
+                                if (!ok)
+                                {
+                                    if (string.IsNullOrEmpty(Path.GetExtension(s)))
+                                    {
+                                        //g:\datopgek3\tsdfil
+                                        ss = s + "." + ext + "_gek2"; // --> g:\datopgek3\tsdfil.???_gek2
+                                    }
+                                    else ss = s + "_gek2";  //should never happen...
+                                }
+
+                                txt.MainAdd("read <first " + ext + "> '" + s + "';");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("read <ref " + ext + "> '" + ss + "';");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("compare <2000 2022>; //or some other period...");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("edit compare_databanks.txt;");
+                                txt.MainNewLine();
                             }
-                            else
-                            {
-                                already.Add(s, "");
-                            }
-                            txt.MainAdd(s);
+                            txt.MainAdd("// ----- Gekko code end -------");
                             txt.MainNewLineTight();
                         }
                     }
-                }
 
-                if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
-                {
-
-                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    using (Writeln txt = new Writeln())
+                    if (Program.options.global_pink && Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
                     {
-                        txt.color = Color.Blue;
-                        txt.MainAdd("The session used the Gekko SYS statement to call the Windows system. You may for instance want to check files copied 'manually' with the SYS statement.");
-                        txt.MainNewLineTight();
-                        txt.MainAdd(" ----- SYS statement contents: -----");
-                        txt.MainNewLineTight();
-                        foreach (string s in Globals.datopgek_sysCalls)
+                        GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                        using (Writeln txt = new Writeln())
                         {
-                            if (already.ContainsKey(s))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                already.Add(s, "");
-                            }
-                            txt.MainAdd(s);
+                            txt.color = Color.Blue;
+                            txt.MainAdd("The session wrote to listfiles (.lst) on g:\\datopgek3\\... . You may compare these with the original listfiles with extension .lst_gek2.");
+                            txt.MainAdd("In Total Commander, you can mark the two files (.lst and .lst_gek2) and use Files --> Compare By Content...");
                             txt.MainNewLineTight();
+                            txt.MainAdd(" ----- Written listfiles:  -----");
+                            txt.MainNewLineTight();
+                            foreach (string s in Globals.datopgek_listfiles)
+                            {
+                                if (already.ContainsKey(s))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    already.Add(s, "");
+                                }
+                                txt.MainAdd(s);
+                                txt.MainNewLineTight();
+                            }
                         }
                     }
-                }
 
-                if (Program.options.global_pink && blue)
-                {
-                    using (Writeln text = new Writeln())
+                    if (Program.options.global_pink && Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
                     {
-                        text.color = Color.Blue;
-                        text.MainNewLine();
-                        text.MainAdd("-------------------------------------------------------");
-                        text.MainNewLineTight();
-                        text.MainAdd("--- datopgek3 report end ------------------------------");
-                        text.MainNewLineTight();
-                        text.MainAdd("-------------------------------------------------------");
-                        text.MainNewLine();
+
+                        GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.color = Color.Blue;
+                            txt.MainAdd("The session used the Gekko SYS statement to call the Windows system. You may for instance want to check files copied 'manually' with the SYS statement.");
+                            txt.MainNewLineTight();
+                            txt.MainAdd(" ----- SYS statement contents: -----");
+                            txt.MainNewLineTight();
+                            foreach (string s in Globals.datopgek_sysCalls)
+                            {
+                                if (already.ContainsKey(s))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    already.Add(s, "");
+                                }
+                                txt.MainAdd(s);
+                                txt.MainNewLineTight();
+                            }
+                        }
+                    }
+
+                    if (Program.options.global_pink && blue)
+                    {
+                        using (Writeln text = new Writeln())
+                        {
+                            text.color = Color.Blue;
+                            text.MainNewLine();
+                            text.MainAdd("-------------------------------------------------------");
+                            text.MainNewLineTight();
+                            text.MainAdd("--- datopgek3 report end ------------------------------");
+                            text.MainNewLineTight();
+                            text.MainAdd("-------------------------------------------------------");
+                            text.MainNewLine();
+                        }
                     }
                 }
 
@@ -2273,7 +2279,7 @@ namespace Gekko
                         string s2 = null;                                                
                         if (Globals.traceTime != 0d)
                         {
-                            s1 = ", of which data tracing used " + G.SecondsFormat(Globals.traceTime) + "";
+                            s1 = ", of which data tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";
                         }
                         if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
                         G.Writeln();
