@@ -14132,22 +14132,22 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(3, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[0].periods.Count);
-            Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
-            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-            Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[0].periods[1].t1.super);
-            Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[0].periods[1].t2.super);
-
+            Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
+            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
+            
             Assert.AreEqual("read <2005 2006 merge tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
-            Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[2].periods.Count);
-            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
-            Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
+            Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count);
+            Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
+            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
+            Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t1.super);
+            Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t2.super);
 
             Assert.Inconclusive("The trace2 databank should have 2 traces, and the statements around read should have 2 traces too...");
         }
