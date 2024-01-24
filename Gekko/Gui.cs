@@ -809,19 +809,9 @@ namespace Gekko
                 gui.Size = new Size(us.MainWindowWidth, us.MainWindowHeight);
                 gui.Location = new Point(us.MainWindowLeftDistance, us.MainWindowTopDistance);
                 //this one can go wrong
-
-                if (false)
-                {
-                    //Does not work. Splitter drops to bottom when closing/opening several times,
-                    //even when splitter is not touched.
-                    gui.splitContainerMainTab.SplitterDistance = us.MainWindowSplitterDistance;
-                }
-                else
-                {
-                    //need to fix splitter to something fixed!
-                    //height is 358 always, but it gets ok even if we change the height of Gekko
-                    gui.splitContainerMainTab.SplitterDistance = (gui.splitContainerMainTab.Height * 65) / 100;
-                }
+                //need to fix splitter to something fixed!
+                //height is 358 always, but it gets ok even if we change the height of Gekko
+                gui.splitContainerMainTab.SplitterDistance = (gui.splitContainerMainTab.Height * 65) / 100;
             }
             catch
             {
@@ -831,7 +821,6 @@ namespace Gekko
                 gui.splitContainerMainTab.SplitterDistance = mainWindowSplitterDistanceOLD;
             }
             //window stuff end---------------------------
-
 
             if (gui.Size.Height < 20 || gui.Size.Width < 20 || gui.Location.X < 0 || gui.Location.Y < 0)
             {
