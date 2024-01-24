@@ -12939,7 +12939,7 @@ namespace UnitTests
                 else y = O.GetIVariableFromString("Work:" + "y!q[a]", ECreatePossibilities.NoneReportError) as Series;
                 List<TraceAndPeriods> m = y.meta.trace2.TimeShadow2();
                 Assert.AreEqual(2, m.Count);
-                tracec = y.meta.trace2.TimeShadow2()[1].trace.contents;
+                tracec = y.meta.trace2.TimeShadow2()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.name);
                 else Assert.AreEqual("Work:y!q[a]", tracec.name);
                 Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
@@ -12996,7 +12996,7 @@ namespace UnitTests
                     I("y = 2;");
                     I("copy <2001q2 2002q3> x1 to y;");
                     y = Program.databanks.GetFirst().GetIVariable("y!q") as Series;
-                    tracec = y.meta.trace2.TimeShadow2()[1].trace.contents; // <---------------------- note the 1 here!
+                    tracec = y.meta.trace2.TimeShadow2()[0].trace.contents; // <---------------------- note the 1 here!
                     Assert.AreEqual("Work:y!q", tracec.name);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
@@ -13184,32 +13184,32 @@ namespace UnitTests
                     I("sim;");
                     y = Program.databanks.GetFirst().GetIVariable("enl!a") as Series;
                     Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
-                    Trace2 trace1 = y.meta.trace2.TimeShadow2()[0].trace;
-                    Trace2 trace2 = y.meta.trace2.TimeShadow2()[1].trace;
+                    Trace2 trace1 = y.meta.trace2.TimeShadow2()[1].trace;
+                    Trace2 trace0 = y.meta.trace2.TimeShadow2()[0].trace;
                     // ---
-                    Assert.AreEqual("Work:ENL!a", trace2.contents.name);
+                    Assert.AreEqual("Work:ENL!a", trace0.contents.name);
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", trace1.contents.commandFileAndLine);
                     Assert.AreEqual(null, trace1.contents.dataFile);
                     Assert.AreEqual("enl <80 2020> = 12345;", trace1.contents.text);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 1980, 1, 1), trace1.contents.period.t1);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 2020, 1, 1), trace1.contents.period.t2);
 
-                    Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[0].periods.Count);
-                    Assert.AreEqual(1980, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
-                    Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
-                    Assert.AreEqual(2011, y.meta.trace2.TimeShadow2()[0].periods[1].t1.super);
-                    Assert.AreEqual(2020, y.meta.trace2.TimeShadow2()[0].periods[1].t2.super);
+                    Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+                    Assert.AreEqual(1980, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
+                    Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
+                    Assert.AreEqual(2011, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
+                    Assert.AreEqual(2020, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
                     // ---
-                    Assert.AreEqual("Work:ENL!a", trace2.contents.name);
-                    Assert.AreEqual(Globals.parserErrorSeparator + "1", trace2.contents.commandFileAndLine);
-                    Assert.AreEqual(null, trace2.contents.dataFile);
-                    Assert.AreEqual("Solve (sim) jul05.frm, hash = rtamRJATOLALMm8du5T6Ug", trace2.contents.text);
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace2.contents.period.t1);
-                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace2.contents.period.t2);                    
-                    Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
-                    Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
-                    Assert.AreEqual(2010, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
+                    Assert.AreEqual("Work:ENL!a", trace0.contents.name);
+                    Assert.AreEqual(Globals.parserErrorSeparator + "1", trace0.contents.commandFileAndLine);
+                    Assert.AreEqual(null, trace0.contents.dataFile);
+                    Assert.AreEqual("Solve (sim) jul05.frm, hash = rtamRJATOLALMm8du5T6Ug", trace0.contents.text);
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace0.contents.period.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace0.contents.period.t2);                    
+                    Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+                    Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
+                    Assert.AreEqual(2010, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
                 }                
 
                 //====================================================
