@@ -14156,8 +14156,11 @@ namespace UnitTests
         public void _Test_TraceBasics()
         {
             bool traceShadowAtGluedLevel_remember = Globals.traceShadowAtGluedLevel;
+            bool traceInvertWallTime_remember = Globals.traceInvertWallTime;
             try
             {
+                Globals.traceInvertWallTime = false;  //will have same order as statements, but Gekko does not show trace in that order. But that is a technicality, checked elsewhere.
+
                 for (int ii = 0; ii < 2; ii++)
                 {
                     if (ii == 0) Globals.traceShadowAtGluedLevel = false;
@@ -14504,6 +14507,7 @@ namespace UnitTests
             finally
             {
                 Globals.traceShadowAtGluedLevel = traceShadowAtGluedLevel_remember;
+                Globals.traceInvertWallTime = traceInvertWallTime_remember;
             }
         }
 
