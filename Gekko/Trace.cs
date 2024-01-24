@@ -136,8 +136,7 @@ namespace Gekko
         /// </summary>
         /// <param name="childOrParentType"></param>
         public Trace2(ETraceType type, ETraceParentOrChild childOrParentType)
-        {
-            //if (type != ETraceType.Normal) new Error("Trace constructor problem");            
+        {                      
             if (childOrParentType == ETraceParentOrChild.Child) new Error("Trace constructor problem");
             this.type = type;
         }
@@ -516,24 +515,7 @@ namespace Gekko
                 if (temp == null)
                 {
                     th.timeShadowing.Add(this, "");  //will be interned
-                    if (this.precedents.Count() > 0)
-                    {                        
-                        List<TraceAndPeriods> shadow = this.TimeShadow2(true);                        
-                        if (shadow.Count > precedents.Count())
-                        {
-                            new Error("Hov!");
-                        }
-                        else if (shadow.Count != precedents.Count())
-                        {
-                            int cuts = precedents.Count() - shadow.Count;
-                            th.timeShadowingCuts += cuts;
-                            this.precedents = new Precedents();
-                            foreach (TraceAndPeriods temp2 in shadow)
-                            {
-                                this.precedents.Add(temp2.trace);
-                            }
-                        }
-                    }
+                    this.PrecedentsShadowing();
                 }
                 else
                 {
@@ -552,7 +534,27 @@ namespace Gekko
                     }
                 }
             }
-        }        
+        }
+
+        private void PrecedentsShadowing()
+        {
+            if (this.precedents.Count() > 0)
+            {
+                List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+                if (shadow.Count > precedents.Count())
+                {
+                    new Error("Hov!");
+                }
+                else if (shadow.Count != precedents.Count())
+                {
+                    this.precedents = new Precedents();
+                    foreach (TraceAndPeriods temp2 in shadow)
+                    {
+                        this.precedents.Add(temp2.trace);
+                    }
+                }
+            }
+        }
 
         public Trace2 DeepClone(CloneHelper cloneHelper)
         {
@@ -667,8 +669,16 @@ namespace Gekko
                 ts.meta.trace2.precedents.Add(trace);
             }            
             else if (type == ETracePushType.Sibling)
-            {                
-                ts.meta.trace2.precedents.Add(trace);
+            {
+                if (Globals.traceShadowAtGluedLevel)
+                {
+                    ts.meta.trace2.precedents.Add(trace);
+                    ts.meta.trace2.PrecedentsShadowing();
+                }
+                else
+                {
+                    ts.meta.trace2.precedents.Add(trace);  //In something like "reset; y = 1; y = 2;" this part is called 2 times.
+                }
             }
             else new Error("Trace");
         }        
@@ -1174,7 +1184,7 @@ namespace Gekko
         //
         // --- this is for time-shadowing        
         public Dictionary<Trace2, string> timeShadowing = new Dictionary<Trace2, string>();
-        public int timeShadowingCuts = 0;
+        //public int timeShadowingCuts = 0;
 
     }
 

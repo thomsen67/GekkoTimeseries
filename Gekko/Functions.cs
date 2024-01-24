@@ -5631,7 +5631,7 @@ namespace Gekko
             DateTime t0 = DateTime.Now;
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.TraceTrim(db);
-            new Writeln("Removed " + th.timeShadowingCuts + " trace connections. Use tracestats2() to see resulting trace counts (" + G.Seconds(t0) + ").");
+            new Writeln("Removed trace connections. Use tracestats2() to see resulting trace counts (" + G.Seconds(t0) + ").");
         }        
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)

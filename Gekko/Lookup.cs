@@ -1691,7 +1691,7 @@ namespace Gekko
             {                
                 try
                 {
-                    DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
+                    DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the end of this try-catch
                     string traceString = null;
                     if (o?.opt_trace != null) traceString = o.opt_trace;  //machine generated
 
