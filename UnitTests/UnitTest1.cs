@@ -13506,6 +13506,11 @@ namespace UnitTests
                     //
                     Assert.AreEqual(10, m.Count);
                     int i = 0;
+                    Assert.AreEqual("x1 <2002 2004> = 100;", m[i].trace.contents.text);
+                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(2002, m[i].periods[0].t1.super);
+                    Assert.AreEqual(2004, m[i].periods[0].t2.super);
+                    i++;
                     Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
                     Assert.AreEqual(2, m[i].periods.Count);
                     Assert.AreEqual(2001, m[i].periods[0].t1.super);
@@ -13513,28 +13518,16 @@ namespace UnitTests
                     Assert.AreEqual(2005, m[i].periods[1].t1.super);
                     Assert.AreEqual(2005, m[i].periods[1].t2.super);
                     i++;
-                    Assert.AreEqual("x1 <2002 2004> = 100;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
-                    Assert.AreEqual(2002, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2004, m[i].periods[0].t2.super);
-                    i++;
                     Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
                                                                           //i++;
                                                                           //Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
                                                                           //Assert.AreEqual(0, m[i].periods.Count);
+
                     i++;
-                    Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
+                    Assert.AreEqual("x2 <2003 2003> = 6;", m[i].trace.contents.text);
                     Assert.AreEqual(1, m[i].periods.Count);
-                    Assert.AreEqual(2005, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2005, m[i].periods[0].t2.super);
-                    //i++;
-                    //Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
-                    //Assert.AreEqual(0, m[i].periods.Count);
-                    i++;
-                    Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
-                    Assert.AreEqual(2006, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2009, m[i].periods[0].t2.super);
+                    Assert.AreEqual(2003, m[i].periods[0].t1.super);
+                    Assert.AreEqual(2003, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x2 <2001 2004> = 5;", m[i].trace.contents.text);
                     Assert.AreEqual(2, m[i].periods.Count);
@@ -13543,12 +13536,25 @@ namespace UnitTests
                     Assert.AreEqual(2004, m[i].periods[1].t1.super);
                     Assert.AreEqual(2004, m[i].periods[1].t2.super);
                     i++;
-                    Assert.AreEqual("x2 <2003 2003> = 6;", m[i].trace.contents.text);
+                    Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
                     Assert.AreEqual(1, m[i].periods.Count);
-                    Assert.AreEqual(2003, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2003, m[i].periods[0].t2.super);
+                    Assert.AreEqual(2006, m[i].periods[0].t1.super);
+                    Assert.AreEqual(2009, m[i].periods[0].t2.super);
+                    i++;
+                    Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
+                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(2005, m[i].periods[0].t1.super);
+                    Assert.AreEqual(2005, m[i].periods[0].t2.super);
+                    //i++;
+                    //Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
+                    //Assert.AreEqual(0, m[i].periods.Count);                                  
                     i++;
                     Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
+                    i++;
+                    Assert.AreEqual("x3 <2022 2024> = 300;", m[i].trace.contents.text);
+                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(2022, m[i].periods[0].t1.super);
+                    Assert.AreEqual(2024, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
                     Assert.AreEqual(2, m[i].periods.Count);
@@ -13556,12 +13562,6 @@ namespace UnitTests
                     Assert.AreEqual(2021, m[i].periods[0].t2.super);
                     Assert.AreEqual(2025, m[i].periods[1].t1.super);
                     Assert.AreEqual(2025, m[i].periods[1].t2.super);
-                    i++;
-                    Assert.AreEqual("x3 <2022 2024> = 300;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
-                    Assert.AreEqual(2022, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2024, m[i].periods[0].t2.super);
-
 
                     // Trace objects created:
                     //
