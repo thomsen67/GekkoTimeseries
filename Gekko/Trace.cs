@@ -411,42 +411,46 @@ namespace Gekko
             }
 
             rv3.Reverse(); //To get the input vars in the right order                
-            List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
-
-
+            
             if (Globals.traceInvertWallTime)
             {
+                List<TraceAndPeriods>  rv = RevertWallTime(rv3);
+                if (rv.Count != rv3.Count) new Error("TimeShadow problem");
+                if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                return rv;
+            }
+            else
+            {
+                return rv3;
+            }
+        }
 
-                List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
-                int n = 0;
-                foreach (TraceAndPeriods tap in rv3)
+        private static List<TraceAndPeriods> RevertWallTime(List<TraceAndPeriods> rv3)
+        {
+            List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
+            List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
+            int n = 0;
+            foreach (TraceAndPeriods tap in rv3)
+            {
+                n++;
+                if (tap.trace.type == ETraceType.Divider)
                 {
-                    n++;
-                    if (tap.trace.type == ETraceType.Divider)
+                    temp.Reverse();
+                    rv.AddRange(temp);
+                    temp.Clear();
+                    rv.Add(tap);
+                }
+                else
+                {
+                    temp.Add(tap);
+                    if (n == rv3.Count)
                     {
                         temp.Reverse();
                         rv.AddRange(temp);
                         temp.Clear();
-                        rv.Add(tap);
-                    }
-                    else
-                    {
-                        temp.Add(tap);
-                        if (n == rv3.Count)
-                        {
-                            temp.Reverse();
-                            rv.AddRange(temp);
-                            temp.Clear();
-                        }
                     }
                 }
-                if (rv.Count != rv3.Count) new Error("TimeShadow problem");
-                if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-                if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-            }
-            else
-            {
-                rv = rv3;
             }
             return rv;
         }

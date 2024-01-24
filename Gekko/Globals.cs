@@ -52,8 +52,8 @@ namespace Gekko
         public static double traceTime = double.NaN;
         public static string traceError = "Something went wrong regarding {a{data tracing¤appendix_trace.htm}a}. Data tracing is experimental from Gekko 3.1.16 and on, and to deactivate it, you may set 'option databank trace = no;' at the beginning of your Gekko program.";
         public static bool traceShowDividers = false;
-        public static bool traceInvertWallTime = false;
-        public static bool traceShadowAtGluedLevel = true;
+        public static bool traceInvertWallTime = false;  //with true we get latest changes (in wall time) at top.
+        public static bool traceShadowAtGluedLevel = true; //do shadowing anytime there is a statement, not just when writing/reading banks.
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
