@@ -2276,11 +2276,8 @@ namespace Gekko
                     {
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         string s1 = null;
-                        string s2 = null;                                                
-                        if (Globals.traceTime != 0d)
-                        {
-                            s1 = ", of which data tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";
-                        }
+                        string s2 = null;                                                                        
+                        s1 = ", of which data tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";                        
                         if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);

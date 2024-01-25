@@ -523,7 +523,7 @@ namespace Gekko
                 if (temp == null)
                 {
                     th.timeShadowing.Add(this, "");  //will be interned
-                    this.PrecedentsShadowing(); //tracetrim2()
+                    this.PrecedentsShadowing(null); //tracetrim2()
                 }
                 else
                 {
@@ -547,9 +547,25 @@ namespace Gekko
         /// <summary>
         /// Used in PushIntoSeries, for a .GluedToSeries trace type. Also used for tracetrim2().
         /// Not used when viewing/printing traces: for this TimeShadow2() is used.
+        /// The traceThatIsGoingToBeAdded is about to be added, and shadowing is done after the add.
+        /// You may set traceThatIsGoingToBeAdded = null, and is so nothing is added, and shadowing is done.
         /// </summary>
-        private void PrecedentsShadowing()
+        private void PrecedentsShadowing(Trace2 traceThatIsGoingToBeAdded)
         {
+            if (traceThatIsGoingToBeAdded != null)
+            {
+                //TODO: better logic/speed here, if new trace has same period as previous trace
+                //With traceShadowAtGluedLevel, can we somehow use that none of the precedents are 
+                //completely shadowed? Maybe not. But then, could the shadowed periods be stored in the precendents
+                //lists, so .precedents is not a List<Trace2>, but a List<active-periods + normal trace> ??
+                //Like this, the same trace could appear in multiple .precedents, but not necessarily with
+                //the same active-periods. Each active-periods item could have a min and max date, so that
+                //adding a new trace is fast if the periodsof the new trace is outside min/max.
+                //Like this we know that .precedents have disjunct periods
+                //                
+
+                this.precedents.Add(traceThatIsGoingToBeAdded);
+            }
             if (this.precedents.Count() > 0)
             {
                 List<TraceAndPeriods> shadow = this.TimeShadow2(true, false);
@@ -684,9 +700,8 @@ namespace Gekko
             {
                 //In something like "reset; y = 1; y = 2;" this part is called 2 times.
                 if (Globals.traceShadowAtGluedLevel)
-                {
-                    ts.meta.trace2.precedents.Add(trace);
-                    ts.meta.trace2.PrecedentsShadowing();
+                {                    
+                    ts.meta.trace2.PrecedentsShadowing(trace);
                 }
                 else
                 {
