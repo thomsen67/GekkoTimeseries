@@ -13388,16 +13388,16 @@ namespace UnitTests
             meta1.trace2.SetPrecedents_BewareOnlyInternalUse(new Precedents2());
             Trace2 xx1 = new Trace2(ETraceType.Normal, true);
             xx1.contents.text = "xx1";
-            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(new TraceAndPeriods2(xx1, Globals.traceNullPeriods));
             Trace2 xx2 = new Trace2(ETraceType.Normal, true);
             xx2.contents.text = "xx2";
-            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(new TraceAndPeriods2(xx2, Globals.traceNullPeriods));
             Trace2 xx3 = new Trace2(ETraceType.Normal, true);
             xx3.contents.text = "xx3";
-            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx3);
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(new TraceAndPeriods2(xx3, Globals.traceNullPeriods));
             xx3.SetPrecedents_BewareOnlyInternalUse(new Precedents2());
-            xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
-            xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
+            xx3.GetPrecedents_BewareOnlyInternalUse().Add(new TraceAndPeriods2(xx1, Globals.traceNullPeriods));
+            xx3.GetPrecedents_BewareOnlyInternalUse().Add(new TraceAndPeriods2(xx2, Globals.traceNullPeriods));
 
             //gather lists
             TraceHelper th = new TraceHelper();
@@ -13440,21 +13440,21 @@ namespace UnitTests
             dict2 = null;
             dict2Inverted = null;
 
-            string z1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;  //xx1
+            string z1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text;  //xx1
             Assert.AreEqual("xx1", z1);
-            meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "yy1";
-            string s1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yy1
+            meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text = "yy1";
+            string s1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text; //yy1
             Assert.AreEqual("yy1", s1);
 
-            string z2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;  //xx1
+            string z2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text;  //xx1
             Assert.AreEqual("xx1", z2);
-            meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "yyy1";
-            string s2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yyy1
+            meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text = "yyy1";
+            string s2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text; //yyy1
             Assert.AreEqual("yyy1", s2);
 
-            string ss1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yy1
+            string ss1 = meta1.trace2.GetPrecedents_BewareOnlyInternalUse()[2].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text; //yy1
             Assert.AreEqual("yy1", ss1);
-            string ss2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].GetPrecedents_BewareOnlyInternalUse()[0].contents.text; //yyy1
+            string ss2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text; //yyy1
             Assert.AreEqual("yyy1", ss2);
         }
 
@@ -14353,8 +14353,8 @@ namespace UnitTests
                                 //I("a.traceprint();");
 
                                 Trace2 trace2 = null;
-                                if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0];
-                                else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0];
+                                if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                                else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
                                 if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.name);
                                 else Assert.AreEqual("Work:x!a[d]", trace2.contents.name);
                                 Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
@@ -14531,15 +14531,15 @@ namespace UnitTests
                 txt = "x[a] = 2, 3, 4;";
             }            
 
-            string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text;
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
-            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = "Testing-123";
-            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
-            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
-            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text = temp;
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
-            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+            string temp = (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text = "Testing-123";
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            Assert.AreEqual("Testing-123", (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text = temp;
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + a, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            Assert.AreEqual(txt, (O.GetIVariableFromString(b + d, ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
         }
 
         private static String2 Helper_Push(String2 x5a, string cImport2)
@@ -14591,7 +14591,7 @@ namespace UnitTests
                 Assert.AreEqual(trace.GetPrecedents_BewareOnlyInternalUse().Count(), m.m.Count);
                 for (int i = 0; i < trace.GetPrecedents_BewareOnlyInternalUse().Count(); i++)
                 {
-                    Helper_WalkTraceNoShadow(trace.GetPrecedents_BewareOnlyInternalUse()[i], m.m[i], depth + 1);
+                    Helper_WalkTraceNoShadow(trace.GetPrecedents_BewareOnlyInternalUse()[i].trace, m.m[i], depth + 1);
                 }
             }
         }
@@ -21858,9 +21858,9 @@ print(df2)
                 I("write tracebk;");
                 I("reset;");
                 I("read tracebk;");
-                Assert.AreEqual(s0, (Program.databanks.GetFirst().GetIVariable("ts0!a") as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+                Assert.AreEqual(s0, (Program.databanks.GetFirst().GetIVariable("ts0!a") as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 I("read tracebk;");
-                Assert.AreEqual(s0, (Program.databanks.GetFirst().GetIVariable("ts0!a") as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].contents.text);
+                Assert.AreEqual(s0, (Program.databanks.GetFirst().GetIVariable("ts0!a") as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
             }
             finally
             {
