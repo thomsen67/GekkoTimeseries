@@ -552,7 +552,7 @@ namespace Gekko
         /// </summary>
         private void PrecedentsShadowing(Trace2 traceThatIsGoingToBeAdded)
         {
-            if (traceThatIsGoingToBeAdded != null)
+            if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
             {
                 //TODO: better logic/speed here, if new trace has same period as previous trace
                 //With traceShadowAtGluedLevel, can we somehow use that none of the precedents are 
@@ -564,6 +564,13 @@ namespace Gekko
                 //Like this we know that .precedents have disjunct periods
                 //                
 
+                int n = this.precedents.Count();                
+                if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
+                {
+                    //new trace is not-null and has exactly same periods as last trace
+                    this.precedents.GetStorage()[n - 1] = traceThatIsGoingToBeAdded;
+                    return;
+                }
                 this.precedents.Add(traceThatIsGoingToBeAdded);
             }
             if (this.precedents.Count() > 0)

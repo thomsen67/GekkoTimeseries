@@ -8473,6 +8473,13 @@ namespace UnitTests
             Assert.IsTrue(s.Contains("Note: *:*!* instead of work:* --> 4 matches"));
         }
 
+        [TestMethod]
+        public void _Test_SpeedTrace()
+        {
+            I("reset; for val %i = 1950 to 2010; x <%i %i> = 100 + %i; end; x = 0; for val %i = 1 to 100000; x += 1; end;");
+            //to the test, make sure trace percentage is < 3%.
+            Assert.Fail();
+        }
 
         [TestMethod]
         public void _Test_Splice()

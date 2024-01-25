@@ -1570,7 +1570,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// True if the two GekkoTimes are same period. Because of Equals() C# method, too dangerous to use the former IsSamePeriod()
+        /// True if the two GekkoTimes are same period. Because of Equals() C# method, too dangerous to name it IsSamePeriod()
         /// </summary>
         public bool EqualsGekkoTime(GekkoTime gt2, bool check)
         {
