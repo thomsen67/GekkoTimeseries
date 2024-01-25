@@ -12895,7 +12895,7 @@ namespace UnitTests
         {
             Program.Flush();
             Series y;
-            TraceContents tracec;
+            TraceContents2 tracec;
 
             for (int i = 0; i < 2; i++)  //i=0: normal series /// i=1: array-series (NOTE + TODO: some of this is skipped)
             {
@@ -12944,7 +12944,7 @@ namespace UnitTests
                 }
                 if (i == 0) y = O.GetIVariableFromString("Work:" + "y!q", ECreatePossibilities.NoneReportError) as Series;
                 else y = O.GetIVariableFromString("Work:" + "y!q[a]", ECreatePossibilities.NoneReportError) as Series;
-                List<TraceAndPeriods> m = y.meta.trace2.TimeShadow2();
+                List<TraceAndPeriods2> m = y.meta.trace2.TimeShadow2();
                 Assert.AreEqual(2, m.Count);
                 tracec = y.meta.trace2.TimeShadow2()[0].trace.contents;
                 if (i == 0) Assert.AreEqual("Work:y!q", tracec.name);
@@ -13385,7 +13385,7 @@ namespace UnitTests
             SeriesMetaInformation meta1 = new SeriesMetaInformation();
             meta1.trace2 = new Trace2(ETraceType.GluedToSeries, true);
             //dict1.Add(meta1.trace, dict1.Count);
-            meta1.trace2.SetPrecedents_BewareOnlyInternalUse(new Precedents());
+            meta1.trace2.SetPrecedents_BewareOnlyInternalUse(new Precedents2());
             Trace2 xx1 = new Trace2(ETraceType.Normal, true);
             xx1.contents.text = "xx1";
             meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
@@ -13395,7 +13395,7 @@ namespace UnitTests
             Trace2 xx3 = new Trace2(ETraceType.Normal, true);
             xx3.contents.text = "xx3";
             meta1.trace2.GetPrecedents_BewareOnlyInternalUse().Add(xx3);
-            xx3.SetPrecedents_BewareOnlyInternalUse(new Precedents());
+            xx3.SetPrecedents_BewareOnlyInternalUse(new Precedents2());
             xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx1);
             xx3.GetPrecedents_BewareOnlyInternalUse().Add(xx2);
 
@@ -13509,7 +13509,7 @@ namespace UnitTests
                     I("x3 <2022 2024> = 300;");
                     I("x = x1 + x2 + x3;");
                     Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-                    List<TraceAndPeriods> m = x.meta.trace2.TimeShadow2()[0].trace.TimeShadow2();
+                    List<TraceAndPeriods2> m = x.meta.trace2.TimeShadow2()[0].trace.TimeShadow2();
                     //
                     Assert.AreEqual(10, m.Count);
                     int i = 0;
@@ -14566,7 +14566,7 @@ namespace UnitTests
             {
                 if (m.s == null) Assert.IsTrue(trace.contents == null);
                 else Assert.AreEqual(trace.contents.text, m.s);
-                List<TraceAndPeriods> temp = trace.TimeShadow2();
+                List<TraceAndPeriods2> temp = trace.TimeShadow2();
 
                 Assert.AreEqual(temp.Count, m.m.Count);                
                 for (int i = 0; i < temp.Count; i++)

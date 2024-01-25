@@ -98,8 +98,8 @@ namespace Gekko
                     Trace2 traceChild = itemChild.trace;
                     if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
 
-                    List<TraceAndPeriods> taps = traceChild.TimeShadow2();
-                    foreach (TraceAndPeriods tap in taps)
+                    List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
+                    foreach (TraceAndPeriods2 tap in taps)
                     {
                         if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
                         Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);

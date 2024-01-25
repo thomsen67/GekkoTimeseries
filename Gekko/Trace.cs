@@ -40,7 +40,7 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class TraceContents
+    public class TraceContents2
     {
         /// <summary>
         /// An extra char in a text string here will take up 2 bytes or 16 bits.
@@ -67,9 +67,9 @@ namespace Gekko
         [ProtoMember(6)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
 
-        public TraceContents DeepClone()
+        public TraceContents2 DeepClone()
         {            
-            TraceContents trace2 = new TraceContents();
+            TraceContents2 trace2 = new TraceContents2();
             trace2.period = this.period;  //it is immutable
             trace2.name = this.name;
             trace2.commandFileAndLine = this.commandFileAndLine;
@@ -79,17 +79,17 @@ namespace Gekko
             return trace2;
         }
 
-        public TraceContents()
+        public TraceContents2()
         {
             //for protobuf
         }
 
-        public TraceContents(GekkoTime t1, GekkoTime t2)
+        public TraceContents2(GekkoTime t1, GekkoTime t2)
         {
             this.period = new GekkoTimeSpanSimple(t1, t2);
         }
 
-        public TraceContents(bool isNullTime)
+        public TraceContents2(bool isNullTime)
         {
             if (isNullTime)
             {
@@ -121,10 +121,10 @@ namespace Gekko
         public ETraceType type = ETraceType.Normal;  //default
 
         [ProtoMember(3)]
-        public TraceContents contents = null;
+        public TraceContents2 contents = null;
 
         [ProtoMember(4)]
-        private Precedents precedents = new Precedents();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()        
+        private Precedents2 precedents = new Precedents2();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()        
 
         private Trace2()
         {
@@ -151,7 +151,7 @@ namespace Gekko
             //if (type != ETraceType.Normal) new Error("Trace constructor problem");            
             if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");
             this.type = type;
-            this.contents = new TraceContents(t1, t2);            
+            this.contents = new TraceContents2(t1, t2);            
         }
 
         public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2, false)
@@ -169,7 +169,7 @@ namespace Gekko
             this.type = type;
             if (isNullTime)
             {
-                this.contents = new TraceContents(isNullTime);
+                this.contents = new TraceContents2(isNullTime);
             }
             else new Error("Trace period problem");
             
@@ -189,7 +189,7 @@ namespace Gekko
         /// Only for internal use.
         /// </summary>
         /// <returns></returns>
-        public Precedents GetPrecedents_BewareOnlyInternalUse()
+        public Precedents2 GetPrecedents_BewareOnlyInternalUse()
         {
             return this.precedents;
         }
@@ -213,13 +213,13 @@ namespace Gekko
             if (hasTrace && rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
                 int counter2 = -1;
-                foreach (TraceAndPeriods kvp in rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                foreach (TraceAndPeriods2 kvp in rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                 {
-                    TraceAndPeriods childTrace2 = kvp;
+                    TraceAndPeriods2 childTrace2 = kvp;
                     bool known = false;
                     if (trace.precedents.GetStorage() != null)
                     {
-                        foreach (TraceAndPeriods tempElement in trace.precedents.GetStorage())
+                        foreach (TraceAndPeriods2 tempElement in trace.precedents.GetStorage())
                         {
                             if (Object.ReferenceEquals(childTrace2, tempElement))
                             {
@@ -237,7 +237,7 @@ namespace Gekko
                         }
                         if (counter2 == 0 && trace.precedents.GetStorage().Count > 0 && trace.precedents.GetStorage()[trace.precedents.GetStorage().Count - 1] != null)
                         {
-                            trace.precedents.GetStorage().Add(new TraceAndPeriods(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));  //divider  
+                            trace.precedents.GetStorage().Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));  //divider  
                         }
                         trace.precedents.GetStorage().Add(childTrace2);
                     }
@@ -319,12 +319,12 @@ namespace Gekko
         /// Only for internal use.
         /// </summary>
         /// <param name="x"></param>
-        public void SetPrecedents_BewareOnlyInternalUse(Precedents x)
+        public void SetPrecedents_BewareOnlyInternalUse(Precedents2 x)
         {
             this.precedents = x;
         }
 
-        public List<TraceAndPeriods> TimeShadow2()
+        public List<TraceAndPeriods2> TimeShadow2()
         {
             if (Globals.traceWallTimeHandledSpecialWayFor1UnitTest) return TimeShadow2(true, false);
             else return TimeShadow2(true, true);
@@ -336,9 +336,9 @@ namespace Gekko
         /// count of this.precedents (so we also get null-dividers). The included list includes period information, and
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
         /// </summary>        
-        public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
+        public List<TraceAndPeriods2> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
         {
-            List<TraceAndPeriods> rv3 = new List<TraceAndPeriods>();
+            List<TraceAndPeriods2> rv3 = new List<TraceAndPeriods2>();
             if (this.precedents.Count() > 0)
             {
                 //Remove the if below at some point, just for sanity now            
@@ -369,7 +369,7 @@ namespace Gekko
                             if (!shadowedTracesAreRemoved || m.Count > 0)
                             {
                                 //Maybe this can be done smarter now that .precedents is different??
-                                TraceAndPeriods tap = new TraceAndPeriods();
+                                TraceAndPeriods2 tap = new TraceAndPeriods2();
                                 tap.trace = this.precedents[lastNull - count - 1].trace;
                                 //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
                                 tap.periods = m;
@@ -378,7 +378,7 @@ namespace Gekko
                         }
                         if (i > 0)
                         {
-                            TraceAndPeriods tap = new TraceAndPeriods();
+                            TraceAndPeriods2 tap = new TraceAndPeriods2();
                             tap.trace = new Trace2(ETraceType.Divider, true);
                             tap.periods = new List<GekkoTimeSpanSimple>();
                             rv3.Add(tap);
@@ -424,7 +424,7 @@ namespace Gekko
                 //Do not invert when traceShadowAtGluedLevel==true: in that case this is only used for
                 //shadowing at the .GluedToSeries nodes. These should be in normal order if some trace is removed.
 
-                List<TraceAndPeriods> rv = InvertWallTime(rv3);
+                List<TraceAndPeriods2> rv = InvertWallTime(rv3);
                 if (rv.Count != rv3.Count) new Error("TimeShadow problem");
                 if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
                 if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
@@ -436,12 +436,12 @@ namespace Gekko
             }
         }
 
-        public static List<TraceAndPeriods> InvertWallTime(List<TraceAndPeriods> rv3)
+        public static List<TraceAndPeriods2> InvertWallTime(List<TraceAndPeriods2> rv3)
         {
-            List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
-            List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
+            List<TraceAndPeriods2> rv = new List<TraceAndPeriods2>(rv3.Count);
+            List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
             int n = 0;
-            foreach (TraceAndPeriods tap in rv3)
+            foreach (TraceAndPeriods2 tap in rv3)
             {
                 n++;
                 if (tap.trace.type == ETraceType.Divider)
@@ -511,7 +511,7 @@ namespace Gekko
 
                 if (this.precedents.Count() > 0)
                 {
-                    foreach (TraceAndPeriods traceAndPeriods in this.precedents.GetStorage())
+                    foreach (TraceAndPeriods2 traceAndPeriods in this.precedents.GetStorage())
                     {
                         if (traceAndPeriods.trace.type == ETraceType.Divider) continue;                        
                         traceAndPeriods.trace.DeepTrace(th, depth + 1);
@@ -536,7 +536,7 @@ namespace Gekko
                 
                 if (this.precedents.Count() > 0)
                 {
-                    foreach (TraceAndPeriods traceAndPeriods in this.precedents.GetStorage())
+                    foreach (TraceAndPeriods2 traceAndPeriods in this.precedents.GetStorage())
                     {
                         if (traceAndPeriods.trace.type == ETraceType.Divider) continue;
                         traceAndPeriods.trace.DeepTrace(th, depth + 1);
@@ -569,24 +569,24 @@ namespace Gekko
                 if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
                 {
                     //new trace is not-null and has exactly same periods as last trace
-                    this.precedents.GetStorage()[n - 1] = new TraceAndPeriods(traceThatIsGoingToBeAdded, Globals.traceNullPeriods);
+                    this.precedents.GetStorage()[n - 1] = new TraceAndPeriods2(traceThatIsGoingToBeAdded, Globals.traceNullPeriods);
                     return;
                 }
-                this.precedents.Add(new TraceAndPeriods(traceThatIsGoingToBeAdded, Globals.traceNullPeriods));
+                this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, Globals.traceNullPeriods));
             }
             if (this.precedents.Count() > 0)
             {
-                List<TraceAndPeriods> shadow = this.TimeShadow2(true, false);
+                List<TraceAndPeriods2> shadow = this.TimeShadow2(true, false);
                 if (shadow.Count > precedents.Count())
                 {
                     new Error("Hov!");
                 }
                 else if (shadow.Count != precedents.Count())
                 {
-                    this.precedents = new Precedents();
-                    foreach (TraceAndPeriods temp2 in shadow)
+                    this.precedents = new Precedents2();
+                    foreach (TraceAndPeriods2 temp2 in shadow)
                     {
-                        this.precedents.Add(new TraceAndPeriods(temp2.trace, Globals.traceNullPeriods));
+                        this.precedents.Add(new TraceAndPeriods2(temp2.trace, Globals.traceNullPeriods));
                     }
                 }
             }
@@ -701,8 +701,8 @@ namespace Gekko
             if (type == ETracePushType.NewParent)
             {                   
                 trace.AddRangeFromSeries2(null, ts);
-                ts.meta.trace2.precedents = new Precedents();
-                ts.meta.trace2.precedents.Add(new TraceAndPeriods(trace, Globals.traceNullPeriods));
+                ts.meta.trace2.precedents = new Precedents2();
+                ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, Globals.traceNullPeriods));
             }            
             else if (type == ETracePushType.Sibling)
             {
@@ -713,7 +713,7 @@ namespace Gekko
                 }
                 else
                 {
-                    ts.meta.trace2.precedents.Add(new TraceAndPeriods(trace, Globals.traceNullPeriods));
+                    ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, Globals.traceNullPeriods));
                 }
             }
             else new Error("Trace");
@@ -943,11 +943,11 @@ namespace Gekko
             string s = null;            
             s = "| ";
 
-            List<TraceAndPeriods> taps = trace.TimeShadow2();
+            List<TraceAndPeriods2> taps = trace.TimeShadow2();
 
             int max = 5;
             int n = 0;
-            foreach (TraceAndPeriods tap in taps)
+            foreach (TraceAndPeriods2 tap in taps)
             {
                 if (tap.trace.type == ETraceType.Divider) continue;
                 n++;
@@ -973,10 +973,10 @@ namespace Gekko
             nn++;            
             if (depth < max)
             {
-                List<TraceAndPeriods> taps = this.TimeShadow2();
+                List<TraceAndPeriods2> taps = this.TimeShadow2();
                 if (taps.Count > 0)
                 {
-                    foreach (TraceAndPeriods tap in taps)
+                    foreach (TraceAndPeriods2 tap in taps)
                     {
                         if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Item itemChild = null;
@@ -1212,7 +1212,7 @@ namespace Gekko
         
         // --- the following is for stats etc. ("real" traces)        
         public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not
-        public Dictionary<Trace2, Precedents> traces = new Dictionary<Trace2, Precedents>();  //value is parent (may be null)
+        public Dictionary<Trace2, Precedents2> traces = new Dictionary<Trace2, Precedents2>();  //value is parent (may be null)
                 
         // --- gbk write/read and other stuff
         //Hmm, isn't Precedents already a part of the key? Anyway, the depth needs to be inside an object anyway to be altered.
@@ -1226,7 +1226,7 @@ namespace Gekko
 
     public class PrecedentsAndDepth
     {
-        public Precedents precedents = null;
+        public Precedents2 precedents = null;
         public int depth = 0;
     }
 
@@ -1234,10 +1234,10 @@ namespace Gekko
     /// Is basically a List&lt;Trace>.
     /// </summary>
     [ProtoContract]
-    public class Precedents
+    public class Precedents2
     {        
         [ProtoMember(1)]
-        private List<TraceAndPeriods> storage = null;
+        private List<TraceAndPeriods2> storage = null;
 
         /// <summary>
         /// Pretty innocuous: using this, we can set .storage = null before protobuf.
@@ -1250,11 +1250,11 @@ namespace Gekko
         /// fail if ts.meta.trace2 is == null. In cases like that, better to use trace.GetPrecedents_BewareOnlyInternalUse().AddRangeFromSeries(ts).
         /// </summary>
         /// <param name="precedents"></param>
-        public void AddRange(Precedents precedents)
+        public void AddRange(Precedents2 precedents)
         {            
             if (precedents.storage != null)
             {
-                if (this.storage == null) this.storage = new List<TraceAndPeriods>();
+                if (this.storage == null) this.storage = new List<TraceAndPeriods2>();
                 this.storage.AddRange(precedents.storage);
             }
         }        
@@ -1264,9 +1264,9 @@ namespace Gekko
         /// </summary>
         /// <param name="traceAndPeriods"></param>
         /// <exception cref="GekkoException"></exception>
-        public void Add(TraceAndPeriods traceAndPeriods)
+        public void Add(TraceAndPeriods2 traceAndPeriods)
         {
-            if (this.storage == null) this.storage = new List<TraceAndPeriods>();
+            if (this.storage == null) this.storage = new List<TraceAndPeriods2>();
             if (traceAndPeriods.trace.type != ETraceType.Divider && traceAndPeriods.trace.contents == null) throw new GekkoException();
             this.storage.Add(traceAndPeriods);
         }
@@ -1275,7 +1275,7 @@ namespace Gekko
         /// Only for iterators! REMEMBER to put an "if (xxx.precedents.Count() > 0) {... " before iterating!!
         /// </summary>
         /// <returns></returns>
-        public List<TraceAndPeriods> GetStorage()
+        public List<TraceAndPeriods2> GetStorage()
         {
             return this.storage;
         }
@@ -1284,7 +1284,7 @@ namespace Gekko
         /// Use this with care
         /// </summary>
         /// <param name="m"></param>
-        public void SetStorage(List<TraceAndPeriods> m)
+        public void SetStorage(List<TraceAndPeriods2> m)
         {
             if (m != null && m.Count == 0) this.storage = null; //so it does not take up space
             else this.storage = m;
@@ -1292,7 +1292,7 @@ namespace Gekko
 
         public void InitWithEmptyList()
         {
-            this.storage = new List<TraceAndPeriods>();
+            this.storage = new List<TraceAndPeriods2>();
         }
 
         public  void ToID()
@@ -1300,7 +1300,7 @@ namespace Gekko
             this.storageIDTemporary = new List<TraceID2>();
             if (this.Count() > 0)
             {
-                foreach (TraceAndPeriods traceAndPeriods in this.GetStorage())
+                foreach (TraceAndPeriods2 traceAndPeriods in this.GetStorage())
                 {
                     TraceID2 temp = null;
                     if (traceAndPeriods.trace.type == ETraceType.Divider)
@@ -1323,19 +1323,19 @@ namespace Gekko
         {
             if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
             {
-                this.storage = new List<TraceAndPeriods>();
+                this.storage = new List<TraceAndPeriods2>();
                 foreach (TraceID2 id in this.storageIDTemporary)
                 {
                     if (id.counter == long.MinValue)
                     {
-                        this.storage.Add(new TraceAndPeriods(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));
+                        this.storage.Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));
                     }
                     else
                     {
                         if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
                         Trace2 trace = null; dict2.TryGetValue(id, out trace);
                         if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
-                        this.storage.Add(new TraceAndPeriods(trace, Globals.traceNullPeriods));
+                        this.storage.Add(new TraceAndPeriods2(trace, Globals.traceNullPeriods));
                     }
                 }
             }
@@ -1348,19 +1348,19 @@ namespace Gekko
             return this.storage.Count;
         }
 
-        public TraceAndPeriods this[int i]
+        public TraceAndPeriods2 this[int i]
         {
             get { return this.storage[i]; }
             set { this.storage[i] = value; }
         }
 
-        public Precedents DeepClone(CloneHelper cloneHelper)
+        public Precedents2 DeepClone(CloneHelper cloneHelper)
         {
-            Precedents precedents = new Precedents();            
+            Precedents2 precedents = new Precedents2();            
             if (this.storage != null)
             {
-                precedents.storage = new List<TraceAndPeriods>();
-                foreach (TraceAndPeriods traceAndPeriods in this.storage)
+                precedents.storage = new List<TraceAndPeriods2>();
+                foreach (TraceAndPeriods2 traceAndPeriods in this.storage)
                 {
                     precedents.storage.Add(traceAndPeriods.DeepClone(cloneHelper));
                 }
@@ -1430,7 +1430,7 @@ namespace Gekko
     /// Only used for reporting, to know how periods shadow each other.
     /// </summary>
     [ProtoContract]
-    public class TraceAndPeriods
+    public class TraceAndPeriods2
     {
         //At the moment, periods are just == null here, but in the longer run we can store them.
         //Other fields like min and max period could also be added. But wait, that is just t1 from first period
@@ -1442,18 +1442,18 @@ namespace Gekko
         [ProtoMember(2)]
         public List<GekkoTimeSpanSimple> periods = null;
 
-        public TraceAndPeriods()
+        public TraceAndPeriods2()
         {
             //for protobuf
         }
 
-        public TraceAndPeriods(Trace2 trace, List<GekkoTimeSpanSimple> periods)
+        public TraceAndPeriods2(Trace2 trace, List<GekkoTimeSpanSimple> periods)
         {
             this.trace = trace;
             this.periods = periods;
         }
 
-        public TraceAndPeriods DeepClone(CloneHelper cloneHelper)
+        public TraceAndPeriods2 DeepClone(CloneHelper cloneHelper)
         {
             List<GekkoTimeSpanSimple> xx = null;
             if (this.periods != null)
@@ -1461,7 +1461,7 @@ namespace Gekko
                 xx = new List<GekkoTimeSpanSimple>();
                 xx.AddRange(this.periods);  //the timespans themselves are immutable
             }
-            return new TraceAndPeriods(this.trace.DeepClone(cloneHelper), xx);
+            return new TraceAndPeriods2(this.trace.DeepClone(cloneHelper), xx);
         }
     }
 
