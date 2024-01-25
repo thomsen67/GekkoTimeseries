@@ -21877,12 +21877,13 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                if (Program.options.databank_trace_trim)
+                if (!Globals.traceShadowAtGluedLevel)
                 {
+                    //Trimming when writing is not necessary if it is done continuously
                     DateTime dt5 = DateTime.Now;
                     Trace2.TraceTrim(databank);  //trims traces that are time-shadowed
                     if (Globals.runningOnTTComputer) new Writeln("TTH: Trimming gbk: " + G.Seconds(dt5)); //G.Writeln("TTH: Trimming gbk: " + G.Seconds(dt5));
-                }
+                }                
 
                 TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
                 Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces

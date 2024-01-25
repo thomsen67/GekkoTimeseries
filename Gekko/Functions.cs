@@ -5616,6 +5616,7 @@ namespace Gekko
                 }
             }
             if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
+            if (Globals.runningOnTTComputer) new Warning("TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
         }
 
         public static void tracetrim2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)

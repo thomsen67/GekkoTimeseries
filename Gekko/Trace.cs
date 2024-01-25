@@ -324,13 +324,19 @@ namespace Gekko
             this.precedents = x;
         }
 
+        public List<TraceAndPeriods> TimeShadow2()
+        {
+            if (Globals.traceWallTimeHandledSpecialWayFor1UnitTest) return TimeShadow2(true, false);
+            else return TimeShadow2(true, true);
+        }
+
         /// <summary>
         /// For the list of precedents in this.precedents, the method checks which traces are shadowed by later traces.
         /// With shadowedTracesAreRemoved == false, the count of the list returned will be the same as the count of the
         /// count of this.precedents (so we also get null-dividers). The included list includes period information, and
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
         /// </summary>        
-        public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved)
+        public List<TraceAndPeriods> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
         {
             List<TraceAndPeriods> rv3 = new List<TraceAndPeriods>();
             if (this.precedents.Count() > 0)
@@ -411,10 +417,13 @@ namespace Gekko
             }
 
             rv3.Reverse(); //To get the input vars in the right order                
-            
-            if (Globals.traceInvertWallTime)
+
+            if (invertWallTime)
             {
-                List<TraceAndPeriods>  rv = RevertWallTime(rv3);
+                //Do not invert when traceShadowAtGluedLevel==true: in that case this is only used for
+                //shadowing at the .GluedToSeries nodes. These should be in normal order if some trace is removed.
+
+                List<TraceAndPeriods> rv = InvertWallTime(rv3);
                 if (rv.Count != rv3.Count) new Error("TimeShadow problem");
                 if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
                 if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
@@ -426,7 +435,7 @@ namespace Gekko
             }
         }
 
-        public static List<TraceAndPeriods> RevertWallTime(List<TraceAndPeriods> rv3)
+        public static List<TraceAndPeriods> InvertWallTime(List<TraceAndPeriods> rv3)
         {
             List<TraceAndPeriods> rv = new List<TraceAndPeriods>(rv3.Count);
             List<TraceAndPeriods> temp = new List<TraceAndPeriods>();
@@ -453,11 +462,6 @@ namespace Gekko
                 }
             }
             return rv;
-        }
-
-        public List<TraceAndPeriods> TimeShadow2()
-        {
-            return this.TimeShadow2(true);
         }
 
         /// <summary>
@@ -519,7 +523,7 @@ namespace Gekko
                 if (temp == null)
                 {
                     th.timeShadowing.Add(this, "");  //will be interned
-                    this.PrecedentsShadowing();
+                    this.PrecedentsShadowing(); //tracetrim2()
                 }
                 else
                 {
@@ -540,11 +544,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Used in PushIntoSeries, for a .GluedToSeries trace type. Also used for tracetrim2().
+        /// Not used when viewing/printing traces: for this TimeShadow2() is used.
+        /// </summary>
         private void PrecedentsShadowing()
         {
             if (this.precedents.Count() > 0)
             {
-                List<TraceAndPeriods> shadow = this.TimeShadow2(true);
+                List<TraceAndPeriods> shadow = this.TimeShadow2(true, false);
                 if (shadow.Count > precedents.Count())
                 {
                     new Error("Hov!");
@@ -942,7 +950,7 @@ namespace Gekko
             nn++;            
             if (depth < max)
             {
-                List<TraceAndPeriods> taps = this.TimeShadow2(Program.options.databank_trace_trim);
+                List<TraceAndPeriods> taps = this.TimeShadow2();
                 if (taps.Count > 0)
                 {
                     foreach (TraceAndPeriods tap in taps)
