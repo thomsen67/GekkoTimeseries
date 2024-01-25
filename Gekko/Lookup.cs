@@ -1275,7 +1275,23 @@ namespace Gekko
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                     LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
-                    LookupHandleTrace(smpl.t1, smpl.t2, smpl.t3, ib, lhs_series, isArraySubSeries, o, smpl.p);
+                                        
+                    if (Program.options.databank_trace)
+                    {
+                        //We do not count the following ConvertFreqs... in Globals.traceTime. Can't be much.
+                        GekkoTime xt1 = smpl.t1; GekkoTime xt2 = smpl.t2; GekkoTime xt3 = smpl.t3; 
+                        if (O.UseFlexFreq(smpl.t1, smpl.t2, smpl.t3, lhs_series.freq))
+                        {
+                            //We need to do this because any of smpl.t1/t2/t3 may have different freq
+                            //from lhs_series. This will not happen often, but with x!a <2001q1 2010m5> = ... and the like.
+                            //SLACK: the conversions happen later on, too, if they are relevant.
+                            //       --> so there is some double work here.
+                            xt1 = GekkoTime.ConvertFreqsFirst(lhs_series.freq, smpl.t1, null);
+                            xt2 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t2);
+                            xt3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t3);
+                        }
+                        LookupHandleTrace(xt1, xt2, xt3, ib, lhs_series, isArraySubSeries, o, smpl.p);
+                    }                    
 
                     switch (rhs.Type())
                     {
@@ -1682,14 +1698,14 @@ namespace Gekko
         }
 
         public static void LookupHandleTrace(GekkoTime t1, GekkoTime t2, GekkoTime t3, IBank ib, Series lhs_series, bool isArraySubSeries, Assignment o, P p)
-        {
-            Databank databank = null;
-            Databank parentDatabank = lhs_series.GetParentDatabank();  //for subseries where ib will be = null
-            if (parentDatabank != null) databank = parentDatabank;
-            else databank = ib as Databank;  //null if series is inside a map
-                        
+        {                        
             if (Program.options.databank_trace)
-            {                
+            {
+                Databank databank = null;
+                Databank parentDatabank = lhs_series.GetParentDatabank();  //for subseries where ib will be = null
+                if (parentDatabank != null) databank = parentDatabank;
+                else databank = ib as Databank;  //null if series is inside a map
+
                 try
                 {
                     DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the end of this try-catch

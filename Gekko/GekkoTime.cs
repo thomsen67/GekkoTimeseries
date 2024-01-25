@@ -1727,7 +1727,7 @@ namespace Gekko
         {
             t1 = smpl.t1;
             t2 = smpl.t2;
-            if (t1.freq != desiredFreq)
+            if (t1.freq != desiredFreq || t2.freq != desiredFreq)
             {
                 //for instance x!q = ... ; where global freq is !a
                 t1 = GekkoTime.ConvertFreqsFirst(desiredFreq, t1, null);
@@ -1741,7 +1741,7 @@ namespace Gekko
             t3 = smpl.t3; //is returned
             GekkoTime t1 = smpl.t1;
 
-            if (t0.freq != desiredFreq)
+            if (t0.freq != desiredFreq || t3.freq != desiredFreq)
             {
                 FreqHelper freqHelper = null;
                 int offset = t1.Subtract(t0); //lag before conversion
@@ -1754,8 +1754,7 @@ namespace Gekko
 
                 //for instance x!q = ... ; where global freq is !a
                 t0 = GekkoTime.ConvertFreqsFirst(desiredFreq, t0, freqHelper);
-                t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);               
-                
+                t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);                               
             }
         }        
 

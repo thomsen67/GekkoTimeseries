@@ -3917,6 +3917,11 @@ namespace Gekko
             return !(t1.freq == freq && t2.freq == freq);
         }
 
+        public static bool UseFlexFreq(GekkoTime t1, GekkoTime t2, GekkoTime t3, EFreq freq)
+        {            
+            return !(t1.freq == freq && t2.freq == freq && t3.freq == freq);
+        }
+
         // ==========================================================================================
         // ======================== flex freq end ===================================================
         // ==========================================================================================
