@@ -4874,7 +4874,7 @@ namespace Gekko
                                                         Precedents precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();                                                        
                                                         if (precedents != null && precedents.Count() > 0)
                                                         {
-                                                            Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0], ETracePushType.Sibling); //x = 1
+                                                            Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling); //x = 1
                                                         }
                                                     }
                                                 }
