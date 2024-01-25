@@ -15746,7 +15746,7 @@ namespace Gekko
                 }
             }
 
-            DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
+            DispHelper(tStart, tEnd, m, list, names, o?.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
 
             if (seriesCounter + nonSeries == 0)
             {
@@ -15931,36 +15931,44 @@ namespace Gekko
                         DispNonGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, variableMaybeWithFreq, bank);
                     }
                 }
-
-                
-
             }
 
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+            // ========= move this! ================================================
+
             //Print any equations now
-            
-            foreach (IVariable iv in originalList.list)
+            if (originalList != null)
             {
-                if (iv.Type() == EVariableType.String)
+                foreach (IVariable iv in originalList.list)
                 {
-                    string s = O.ConvertToString(iv);
-                    GekkoTime tUsedHere = tStart;
-                    if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
-                    string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
-                    string eq = Program.model.GetEquationText(new List<string>() { s2 }, false, tUsedHere);
-                    if (!eq.EndsWith("."))
+                    if (iv.Type() == EVariableType.String)
                     {
-                        using (var txt = new Writeln())
+                        string s = O.ConvertToString(iv);
+                        GekkoTime tUsedHere = tStart;
+                        if (model.modelGamsScalar != null) tUsedHere = model.modelGamsScalar.Maybe2000GekkoTime(tStart);
+                        string s2 = G.Chop_DimensionAddLast(s, tUsedHere.ToString(), false);
+                        string eq = Program.model.GetEquationText(new List<string>() { s2 }, false, tUsedHere);
+                        if (!eq.EndsWith("."))
                         {
-                            txt.MainAdd("=========================================================================");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("Equation " + s + " (period " + tStart + ")");
-                            txt.MainNewLineTight();
-                            txt.MainAdd("=========================================================================");
-                            txt.MainNewLine();
-                            txt.MainAdd(eq);
-                            txt.MainNewLine();
-                            txt.MainAdd("=========================================================================");
-                        }                                                
+                            using (var txt = new Writeln())
+                            {
+                                txt.MainAdd("=========================================================================");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("Equation " + s + " (period " + tStart + ")");
+                                txt.MainNewLineTight();
+                                txt.MainAdd("=========================================================================");
+                                txt.MainNewLine();
+                                txt.MainAdd(eq);
+                                txt.MainNewLine();
+                                txt.MainAdd("=========================================================================");
+                            }
+                        }
                     }
                 }
             }
