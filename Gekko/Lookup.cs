@@ -1412,7 +1412,7 @@ namespace Gekko
 
                                                     if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                                     {
-                                                        if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
+                                                        if (O.UseFlexFreq(smpl.t1, smpl.t2, lhs_series.freq))
                                                         {
                                                             foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq))
                                                             {
@@ -1491,7 +1491,7 @@ namespace Gekko
                                 if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                 {
                                     //this is very similar to the same code regarding 1 x 1 MATRIX
-                                    if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
+                                    if (O.UseFlexFreq(smpl.t1, smpl.t2, lhs_series.freq))
                                     {
                                         //different freqs, for instance x!q = 2 when global freq is !a                                        
                                         foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
@@ -1575,7 +1575,7 @@ namespace Gekko
                                     if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                     {
                                         //this is very similar to the same code regarding VAL
-                                        if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
+                                        if (O.UseFlexFreq(smpl.t1, smpl.t2, lhs_series.freq))
                                         {
                                             //different freqs, for instance x!q = 2 when global freq is !a                                        
                                             foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
@@ -1596,7 +1596,7 @@ namespace Gekko
                                 {
                                     GekkoTime t1 = smpl.t1;
                                     GekkoTime t2 = smpl.t2;
-                                    if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+                                    if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
                                     int n = GekkoTime.Observations(t1, t2);
 
                                     if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
@@ -1657,7 +1657,8 @@ namespace Gekko
                         GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
 
                         GekkoTime t3 = smpl.t3; //why t3 and not t2? Never mind, t2 and t3 are equal most of the time
-                        if (O.UseFlexFreq(t3, lhs_series.freq)) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
+                        if (O.UseFlexFreq(t3, t3, lhs_series.freq)) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
+                        if (O.UseFlexFreq(tLast, tLast, lhs_series.freq)) tLast = GekkoTime.ConvertFreqsLast(lhs_series.freq, tLast);                        
 
                         foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast))
                         {
@@ -1767,7 +1768,7 @@ namespace Gekko
             string s;
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
             s = t1 + "-" + t2;
             G.ServiceMessage("series " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + s + " ", smpl.p);
         }
@@ -1849,7 +1850,7 @@ namespace Gekko
         {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             bool lastElementStar = false;
             IVariable last = rhs_list.list[rhs_list.list.Count - 1];

@@ -3656,7 +3656,7 @@ namespace Gekko
             OperatorHelper2(smpl, lhs_series.freq, operatorType, lhsData, lhsDataOriginal, rhsData);
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
             lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
         }
 
@@ -3675,7 +3675,7 @@ namespace Gekko
 
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
         }
@@ -3694,7 +3694,7 @@ namespace Gekko
         {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             rhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
@@ -3729,7 +3729,7 @@ namespace Gekko
         {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
@@ -3756,7 +3756,7 @@ namespace Gekko
         {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
+            if (O.UseFlexFreq(t1, t2, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
 
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
@@ -3904,15 +3904,17 @@ namespace Gekko
         /// If there are problems with flexible freqs, these methods can be used for tracking. 
         /// See also O.Helper_Convert03() and O.Helper_Convert12(). [3 of 3].
         /// </summary>
-        /// <param name="gt"></param>
+        /// <param name="t1"></param>
         /// <param name="freq"></param>
         /// <returns></returns>
-        public static bool UseFlexFreq(GekkoTime gt, EFreq freq)
+        public static bool UseFlexFreq(GekkoTime t1, GekkoTime t2, EFreq freq)
         {
+            //HMMMM shouldn't we test both start and end date. What if x!a <2010 2012q3> = 1, ??? --> fixed
+            //The thing is that smpl.t1 and smpl.t2 may have different freqs when called as local <> time.
             //3 of 3
             //This is just to keep the fleible freq stuff assembled in one place
             //See also Helper_Convert12() and Helper_Convert03()
-            return gt.freq != freq;
+            return !(t1.freq == freq && t2.freq == freq);
         }
 
         // ==========================================================================================
