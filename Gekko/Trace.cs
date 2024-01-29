@@ -597,17 +597,17 @@ namespace Gekko
                 //  x1 <2007 2008> = 03;   //
                 //  x1 <2006 2009> = 04;   // -->
                 //
-                //      1   2   3   4   5   6   7   8   9        NON-sorted at the moment when == is added
-                // 01  --  --          --  --
+                //      1   2   3   4   5   6   7   8   9  10     NON-sorted at the moment before == is added
+                // 01  --  --          --  --          --  --
                 // 02          --  -- 
                 // 03                          --  --
                 // 04                      ==  ==  ==  ==
                 //
                 //
-                //      1   2   3   4   5   6   7   8   9        Sorted at the moment when == is added
-                // 02          --  -x 
-                // 01  --  --          --  -x
+                //      1   2   3   4   5   6   7   8   9  10    Sorted at the moment before == is added
+                // 02          --  -x                 
                 // 03                          --  -x 
+                // 01  --  --          --  --          --  -x
                 // 04                      ==  ==  ==  ==
                 //
                 // The sorted key regarding 01 changes from 6 to 5
@@ -617,11 +617,12 @@ namespace Gekko
                 // be used in .RemoveWhere in the sortedtree.
                 // The list is a bit easier,  just recreate.
 
-                List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
+                //List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
 
                 if (this.precedents.CountSorted() > 0)
                 {
                     List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
+                    List<TraceAndPeriods2> removeInUnsorted = new List<TraceAndPeriods2>();
                     foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
                     {
                         //Look at each TraceAndPeriods2 in sorted order (last end period first)
@@ -642,21 +643,28 @@ namespace Gekko
                             //must be removed
                             //this.precedents.UpdateSorted();
                             kvp.mustBeRemoved = true;
+                            removeInUnsorted.Add(kvp.tap);
 
                         }
                         else if (!newSpans[newSpans.Count - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
-                        {
-                            //it has to be removed and added again in the SortedSet                            
+                        {                            
+                            //It must be removed and added again because the last t2 of the spans changes
                             kvp.mustBeRemoved = true;
                             addToSorted.Add(kvp.tap);
-                            this.precedents.GetStorage().Add(kvp.tap);
-                        }
-                        else
-                        {
-                            this.precedents.GetStorage().Add(kvp.tap);
-                        }
+                        }                        
                         kvp.tap.periods = newSpans;
                     }
+
+                    if (removeInUnsorted.Count > 0)
+                    {
+                        foreach (TraceAndPeriods2 tap in removeInUnsorted)
+                        {
+                            this.precedents.GetStorage().Remove(tap);  //maybe not too efficient, but usually only 1 (or a few) are removed
+                        }
+                    }
+
+                    //this.precedents.SetStorage(removeInUnsorted);
+                    this.precedents.GetStorageSorted().RemoveWhere(MustBeRemoved);
                     foreach (TraceAndPeriods2 tap in addToSorted)
                     {
                         this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
@@ -1264,6 +1272,11 @@ namespace Gekko
             precedentsNames = list;
             return precedentsNames;
         }
+
+        private static bool MustBeRemoved(SortedBagItem s)
+        {
+            return s.mustBeRemoved;
+        }
     }
 
     [ProtoContract]
@@ -1656,5 +1669,5 @@ namespace Gekko
             if (i == 0) return 1;  //so that two GekkoTimes may co-exist
             return -i; //GekkoTimes are in reverse order
         }
-    }
+    }    
 }
