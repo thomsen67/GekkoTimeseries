@@ -99,11 +99,14 @@ namespace Gekko
                     if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
 
                     List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
-                    foreach (TraceAndPeriods2 tap in taps)
+                    if (taps != null)
                     {
-                        if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                        Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
-                        itemChild.GetChildren().Add(itemGChild);
+                        foreach (TraceAndPeriods2 tap in taps)
+                        {
+                            if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                            Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
+                            itemChild.GetChildren().Add(itemGChild);
+                        }
                     }
                 }
             }

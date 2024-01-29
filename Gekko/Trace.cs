@@ -324,6 +324,10 @@ namespace Gekko
             this.precedents = x;
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <returns></returns>
         public List<TraceAndPeriods2> TimeShadow2()
         {
             if (Globals.traceWallTimeHandledSpecialWayFor1UnitTest) return TimeShadow2(true, false);
@@ -335,9 +339,14 @@ namespace Gekko
         /// With shadowedTracesAreRemoved == false, the count of the list returned will be the same as the count of the
         /// count of this.precedents (so we also get null-dividers). The included list includes period information, and
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
+        /// BEWARE: can return null!
         /// </summary>        
         public List<TraceAndPeriods2> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
         {
+            if (Globals.traceAlwaysShadow)
+            {
+                return this.precedents.GetStorage();
+            }
             List<TraceAndPeriods2> rv3 = new List<TraceAndPeriods2>();
             if (this.precedents.Count() > 0)
             {
