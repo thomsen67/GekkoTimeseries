@@ -553,19 +553,24 @@ namespace Gekko
         /// </summary>
         private void PrecedentsShadowing(Trace2 traceThatIsGoingToBeAdded)
         {
+            // When we already have shadowing, we have stuff like this
+            //
+            //            ==========                                   always 1 piece
+            //       =====          =====                              1 or 2 pieces
+            //  =====                    =====                         1-3 pieces
+            //
+            //  Maybe do a top-down search of a new piece. If the new piece is equal to or inside an existing piece
+            //  at depth d, nothing is touched lower than d.
+            //  
+            //  
+            
+            
             if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
             {
-                //TODO: better logic/speed here, if new trace has same period as previous trace
-                //With traceShadowAtGluedLevel, can we somehow use that none of the precedents are 
-                //completely shadowed? Maybe not. But then, could the shadowed periods be stored in the precendents
-                //lists, so .precedents is not a List<Trace2>, but a List<active-periods + normal trace> ??
-                //Like this, the same trace could appear in multiple .precedents, but not necessarily with
-                //the same active-periods. Each active-periods item could have a min and max date, so that
-                //adding a new trace is fast if the periodsof the new trace is outside min/max.
-                //Like this we know that .precedents have disjunct periods
-                //                
-
                 int n = this.precedents.Count();                
+                //Could perhaps also have logic that works if the previous trace has a *larger* period than the new.
+                //Then the larger trace is cut in 2 (potentially), but no more seacrhing is necessary.
+                //Think about speeding up shadowing.
                 if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
                 {
                     //new trace is not-null and has exactly same periods as last trace
@@ -1244,6 +1249,10 @@ namespace Gekko
         /// </summary>
         [ProtoMember(2)]
         public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
+
+        //This is filled whenever the precedents are used.
+        //When not null, it has same size as .storage.
+        private SortedDictionary<GekkoTime, TraceAndPeriods2> sortedMaxPeriods = null;  //is created/calculated when needed.
 
         /// <summary>
         /// Add into precedents.storage. Be careful that something like trace.GetPrecedents_BewareOnlyInternalUse().AddRange(ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse()) may

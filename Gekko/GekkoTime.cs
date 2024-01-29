@@ -2110,7 +2110,7 @@ namespace Gekko
 
     [ProtoContract]
     /// <summary>
-    /// For use with Trace. Like GekkoTime it is immutable.
+    /// For use with Trace. Like GekkoTime it is immutable, but it is not a struct. Should it be??
     /// </summary>
     public class GekkoTimeSpanSimple
     {

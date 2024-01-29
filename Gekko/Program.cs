@@ -2132,6 +2132,23 @@ namespace Gekko
     (System.Windows.SystemParameters.VirtualScreenLeft + System.Windows.SystemParameters.VirtualScreenWidth <= X) ||
     (System.Windows.SystemParameters.VirtualScreenTop + System.Windows.SystemParameters.VirtualScreenHeight <= Y);
                 new Writeln("Left " + System.Windows.SystemParameters.VirtualScreenLeft + " top " + System.Windows.SystemParameters.VirtualScreenTop + " width " + System.Windows.SystemParameters.VirtualScreenWidth + " height " + System.Windows.SystemParameters.VirtualScreenHeight);
+
+                SortedDictionary<GekkoTime, string> dict = new SortedDictionary<GekkoTime, string>();
+                dict.Add(new GekkoTime(EFreq.A, 2011, 1), "2011");
+                dict.Add(new GekkoTime(EFreq.A, 2006, 1), "2006");
+                dict.Add(new GekkoTime(EFreq.A, 2003, 1), "2003");
+                dict.Add(new GekkoTime(EFreq.A, 2004, 1), "2004");
+                foreach (string s in dict.Values)
+                {
+                    new Writeln(s);
+                }
+
+
+
+
+
+
+
             }
 
             if (false && Globals.runningOnTTComputer)
