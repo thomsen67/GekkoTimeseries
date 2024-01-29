@@ -56,6 +56,7 @@ namespace Gekko
         public static bool traceShadowAtGluedLevel = true; //do shadowing anytime there is a statement, not just when writing/reading banks.
         public static bool traceAlwaysShadow = true;
         public static List<GekkoTimeSpanSimple> traceNullPeriods = null;  //just a pointer to know where to find these
+        public static int traceN = 0;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

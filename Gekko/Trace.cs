@@ -572,6 +572,13 @@ namespace Gekko
             //  at depth d, nothing is touched lower than d.
             //  
             //              
+
+            Globals.traceN++;
+            if (Globals.traceN == 261287)
+            {
+
+            }
+            
             
             if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
             {
@@ -684,7 +691,8 @@ namespace Gekko
                     {
                         this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
                     }
-                    if (this.precedents.Count() != this.precedents.CountSorted()) new Error("Trace logic problem");
+                    if (this.precedents.Count() != this.precedents.CountSorted()) 
+                        new Error("Trace logic problem");
                 }               
 
                 this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period }));
