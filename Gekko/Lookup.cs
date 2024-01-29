@@ -1746,7 +1746,7 @@ namespace Gekko
                     }
                     Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                 }
-                catch
+                catch (Exception e)
                 {
                     new Error(Globals.traceError);
                 }                
