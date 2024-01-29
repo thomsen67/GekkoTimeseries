@@ -591,19 +591,77 @@ namespace Gekko
                     new Error("Trace logic problem");
                 }
 
+                //
+                //  x1 <2001 2010> = 01;   // 
+                //  x1 <2003 2004> = 02;   //
+                //  x1 <2007 2008> = 03;   //
+                //  x1 <2006 2009> = 04;   // -->
+                //
+                //      1   2   3   4   5   6   7   8   9        NON-sorted at the moment when == is added
+                // 01  --  --          --  --
+                // 02          --  -- 
+                // 03                          --  --
+                // 04                      ==  ==  ==  ==
+                //
+                //
+                //      1   2   3   4   5   6   7   8   9        Sorted at the moment when == is added
+                // 02          --  -x 
+                // 01  --  --          --  -x
+                // 03                          --  -x 
+                // 04                      ==  ==  ==  ==
+                //
+                // The sorted key regarding 01 changes from 6 to 5
+                // If == includes 2005, the sorted items 01 and 02 are swapped.
+                //
+                // Maybe SortedBagItem could have a bool markedForRemoval. That could 
+                // be used in .RemoveWhere in the sortedtree.
+                // The list is a bit easier,  just recreate.
+
+                List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
+
                 if (this.precedents.CountSorted() > 0)
                 {
+                    List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
                     foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
                     {
-                        if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t))
-                        {
-                            break;  //not neccessary to look any further!
-                        }
+                        //Look at each TraceAndPeriods2 in sorted order (last end period first)
+
+                        if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t)) break;  //not neccessary to look any further!
+                        
                         //Shadow
-                        List<GekkoTimeSpanSimple> newSpans = Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, kvp.tap.trace.contents.period);
+                        List<GekkoTimeSpanSimple> newSpans = new List<GekkoTimeSpanSimple>();
+                        foreach (GekkoTimeSpanSimple span in kvp.tap.periods)
+                        {
+                            //The existing precedent may have several active periods
+                            newSpans.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span));
+                        }                                                
+
+                        if (newSpans.Count == 0)
+                        {
+                            //kvp.tap must be removed from both .storage and .storageSorted
+                            //must be removed
+                            //this.precedents.UpdateSorted();
+                            kvp.mustBeRemoved = true;
+
+                        }
+                        else if (!newSpans[newSpans.Count - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
+                        {
+                            //it has to be removed and added again in the SortedSet                            
+                            kvp.mustBeRemoved = true;
+                            addToSorted.Add(kvp.tap);
+                            this.precedents.GetStorage().Add(kvp.tap);
+                        }
+                        else
+                        {
+                            this.precedents.GetStorage().Add(kvp.tap);
+                        }
                         kvp.tap.periods = newSpans;
                     }
-                }
+                    foreach (TraceAndPeriods2 tap in addToSorted)
+                    {
+                        this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
+                    }
+                }               
 
                 this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period }));
                                 
@@ -633,7 +691,7 @@ namespace Gekko
                     }
                 }
             }
-        }
+        }        
 
         public Trace2 DeepClone(CloneHelper cloneHelper)
         {
@@ -1581,6 +1639,7 @@ namespace Gekko
     {
         public GekkoTime t = GekkoTime.tNull;
         public TraceAndPeriods2 tap;
+        public bool mustBeRemoved = false;
 
         public SortedBagItem(GekkoTime t, TraceAndPeriods2 tap) 
         {
