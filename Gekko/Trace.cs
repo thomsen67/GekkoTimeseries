@@ -657,10 +657,16 @@ namespace Gekko
 
                     if (removeInUnsorted.Count > 0)
                     {
-                        foreach (TraceAndPeriods2 tap in removeInUnsorted)
+                        //This actually ought to be pretty fast
+                        //The list removeInUnsorted is usually small, if not too many existing traces are shadowed.
+                        //And because the list is small, it is pretty fast to see if it contains a TraceAndPeriods2 object.
+                        //It uses object reference compare, comparing object identity. That is fast.
+                        List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
+                        foreach (TraceAndPeriods2 tap in this.precedents.GetStorage())
                         {
-                            this.precedents.GetStorage().Remove(tap);  //maybe not too efficient, but usually only 1 (or a few) are removed
+                            if (!removeInUnsorted.Contains(tap)) temp.Add(tap);
                         }
+                        this.precedents.SetStorage(temp);
                     }
 
                     //this.precedents.SetStorage(removeInUnsorted);
@@ -669,6 +675,7 @@ namespace Gekko
                     {
                         this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
                     }
+                    if (this.precedents.Count() != this.precedents.CountSorted()) new Error("Trace logic problem");
                 }               
 
                 this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period }));
