@@ -12893,7 +12893,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePowerPointExample()
         {
-            for (int i = 0; i < 3; i++)  //0: no banks, 1: banks and flush, 2: banks no flush
+            for (int i = 0; i < 3; i++)   //0: no banks, 1: banks and flush, 2: banks no flush
             {
                 if (i == 1) I("flush();");
                 I("reset;");
