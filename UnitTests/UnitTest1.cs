@@ -12935,9 +12935,7 @@ namespace UnitTests
             Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
             Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
             Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-
             Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
-
             //#0
             Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
             Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
@@ -12950,6 +12948,30 @@ namespace UnitTests
             Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
             Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
             Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+
+            // =============================================================================================
+
+            string s4 = "x1 <2003 2003> = 3;";
+            I(s4);
+            Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
+            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+            //#0
+            //qwerty --> should be 2, but is 1 (2001)
+            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+            Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            //#1
+            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+            Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+
+
+
         }
 
         [TestMethod]
