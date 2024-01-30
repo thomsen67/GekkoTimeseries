@@ -239,7 +239,19 @@ namespace Gekko
                         {
                             trace.precedents.GetStorage().Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));  //divider  
                         }
-                        trace.precedents.GetStorage().Add(childTrace2);
+
+                        // --------- clone start ----------------
+                        //We must clone the period part of the trace+period, because otherwise it may be overwritten in a wrong way.
+                        List<GekkoTimeSpanSimple> xx = null;
+                        if (childTrace2.periods != null)
+                        {
+                            xx = new List<GekkoTimeSpanSimple>();
+                            xx.AddRange(childTrace2.periods);  //the timespans themselves are immutable
+                        }
+                        TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(childTrace2.trace, xx);
+                        // --------- clone end ----------------
+
+                        trace.precedents.GetStorage().Add(childTrace2Clone);
                     }
                 }
             }
