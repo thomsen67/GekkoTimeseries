@@ -12893,85 +12893,140 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePowerPointExample()
         {
-            I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            for (int i = 0; i < 3; i++)  //0: no banks, 1: banks and flush, 2: banks no flush
+            {
+                if (i == 1) I("flush();");
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
-            // =============================================================================================
+                // =============================================================================================
 
-            string s1 = "x1 <2001 2003> = 1;";
-            I(s1);
-            Series x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
-            Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
-            //#0
-            Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-            Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
-            Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
-            Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
-            Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                string s1 = "x1 <2001 2003> = 1;";
+                I(s1);
+                Series x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
+                Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
+                //#0
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
 
-            // =============================================================================================
+                if (i >= 1) I("write sletmig;");
+                if (i == 1) I("flush();");
+                if (i >= 1) I("flusread sletmig;");
 
-            string s2 = "x1 <2002 2002> = 2;";
-            I(s2);
-            Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
-            Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-            //#0
-            Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
-            Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
-            Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
-            Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
-            Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
-            Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
-            //#1
-            Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
-            Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
-            Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
-            Assert.AreEqual(s2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+                // =============================================================================================
 
-            // =============================================================================================
+                string s2 = "x1 <2002 2002> = 2;";
+                I(s2);
+                Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
+                Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+                //#0
+                Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+                Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+                Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                //#1
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+                Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+                Assert.AreEqual(s2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
 
-            string s3 = "x2 <2001 2003> = 2 * x1;";
-            I(s3);
-            Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
-            Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
-            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
-            //#0
-            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
-            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
-            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
-            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
-            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
-            Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
-            //#1
-            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
-            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
-            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
-            Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+                // =============================================================================================
 
-            // =============================================================================================
+                string s3 = "x2 <2001 2003> = 2 * x1;";
+                I(s3);
+                Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
+                Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                //#0
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+                Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                //#1
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+                Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
 
-            string s4 = "x1 <2003 2003> = 3;";
-            I(s4);
-            Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
-            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
-            //#0
-            //qwerty --> should be 2, but is 1 (2001)
-            Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
-            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
-            Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
-            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
-            Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
-            Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
-            //#1
-            Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
-            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
-            Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
-            Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+                // =============================================================================================
 
+                string s4 = "x1 <2003 2003> = 3;";
+                I(s4);
+                Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                //#0
+                //before a clone fix of preiods, this would become wrongly (only 1 period: 2001-2001)
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+                Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                //#1
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+                Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
 
+                // =============================================================================================
 
+                string s5 = "x2 <2003 2003> = 3 * x1;";
+                I(s5);
+                Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(3, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                //#0-0            
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+                Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                //#0-1
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+                Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+                //#1-0            
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+                //#1-1            
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
+                Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
+                Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
+                //#1-2            
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods.Count);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods[0].t1.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods[0].t2.super);
+                Assert.AreEqual(s4, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].trace.contents.text);
+
+                // A kind of random x1 and indirect x1 test at the end:
+
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
+                Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
+                Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
+                Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
+            }
         }
 
         [TestMethod]
