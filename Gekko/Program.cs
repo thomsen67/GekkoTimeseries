@@ -2153,15 +2153,15 @@ namespace Gekko
     (System.Windows.SystemParameters.VirtualScreenTop + System.Windows.SystemParameters.VirtualScreenHeight <= Y);
                 new Writeln("Left " + System.Windows.SystemParameters.VirtualScreenLeft + " top " + System.Windows.SystemParameters.VirtualScreenTop + " width " + System.Windows.SystemParameters.VirtualScreenWidth + " height " + System.Windows.SystemParameters.VirtualScreenHeight);
 
-                SortedDictionary<GekkoTime, string> dict = new SortedDictionary<GekkoTime, string>();
-                dict.Add(new GekkoTime(EFreq.A, 2011, 1), "2011");
-                dict.Add(new GekkoTime(EFreq.A, 2006, 1), "2006");
-                dict.Add(new GekkoTime(EFreq.A, 2003, 1), "2003");
-                dict.Add(new GekkoTime(EFreq.A, 2004, 1), "2004");
-                foreach (string s in dict.Values)
-                {
-                    new Writeln(s);
-                }
+                //SortedDictionary<GekkoTime, string> dict = new SortedDictionary<GekkoTime, string>();
+                //dict.Add(new GekkoTime(EFreq.A, 2011, 1), "2011");
+                //dict.Add(new GekkoTime(EFreq.A, 2006, 1), "2006");
+                //dict.Add(new GekkoTime(EFreq.A, 2003, 1), "2003");
+                //dict.Add(new GekkoTime(EFreq.A, 2004, 1), "2004");
+                //foreach (string s in dict.Values)
+                //{
+                //    new Writeln(s);
+                //}
 
 
 
@@ -21500,8 +21500,8 @@ namespace Gekko
                     CheckSomethingToWrite(list);
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
-                    {
-                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    {                        
+                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);                        
                     }
                     if (writeType == EDatabankWriteType.Tsd)
                     {
@@ -21941,7 +21941,7 @@ namespace Gekko
                     else new Error("Parallel problem");
                 });                
                 databank.traces = temp;
-                Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces
+                Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.
                 databank.traces = null;  //important!
 
                 count = databank.storage.Count;  //must be before the finally
@@ -21967,7 +21967,8 @@ namespace Gekko
                         new Note("Wrote to user-indicated folder (see 'option folder bank = ...')");
                     }
                 }
-            }
+            }            
+
             return count;
         }        
 

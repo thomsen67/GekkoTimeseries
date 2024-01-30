@@ -573,13 +573,6 @@ namespace Gekko
             //  
             //              
 
-            Globals.traceN++;
-            if (Globals.traceN == 295446)
-            {
-
-            }
-            
-            
             if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
             {
                 int n = this.precedents.Count();           
