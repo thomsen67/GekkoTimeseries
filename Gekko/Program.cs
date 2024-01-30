@@ -53,7 +53,7 @@ using System.Threading.Tasks;
 namespace Gekko
 {
 
-    
+
     public enum EDataTrace
     {
         None,
@@ -2124,6 +2124,28 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                if (false)
+                {
+                    //SortedSet<SortedBagItem> temp = new SortedSet<SortedBagItem>(new SortedBagComparer());
+                    //var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), null);
+                    //x1.mustBeRemoved = true;
+                    //temp.Add(x1);
+                    //var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), null);
+                    //x2.mustBeRemoved = false;
+                    //temp.Add(x2);
+                    //int i = temp.RemoveWhere(Trace2.MustBeRemoved);
+                }
+
+                if (false)
+                {
+                    SortedSet<YYY> temp = new SortedSet<YYY>(new ZZZ());
+                    temp.Add(new YYY() { b = true, s = "a" });
+                    temp.Add(new YYY() { b = false, s = "b" });
+                    int i = temp.RemoveWhere(XXX);
+                }
+               
+
+
                 int X = 0; int Y = 0;
                 int Width = 0; int Height = 0;
                 bool outOfBounds =
@@ -2676,7 +2698,7 @@ namespace Gekko
             }
             return rv;
         }
-
+        
         /// <summary>
         /// Splits a Dictionary of string/IVariable by size into a nested list for parallel use.
         /// Imagine splitteing the numbers 3, 6, 4, 9, 3, 10, 3, 1, 2 into three equal-size lists.

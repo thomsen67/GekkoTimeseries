@@ -2143,6 +2143,11 @@ namespace Gekko
         {
             return this.t1.IsNull() && this.t2.IsNull();
         }
+
+        public override string ToString()
+        {
+            return this.t1.ToString() + "-" + this.t2.ToString();
+        }
     }
 
     
