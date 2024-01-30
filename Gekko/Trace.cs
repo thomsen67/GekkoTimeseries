@@ -639,7 +639,7 @@ namespace Gekko
 
                 if (this.precedents.CountSorted() > 0)
                 {
-                    //List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
+                    List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
                     List<TraceAndPeriods2> removeInUnsorted = new List<TraceAndPeriods2>();
                     foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
                     {
@@ -661,7 +661,7 @@ namespace Gekko
                             //must be removed
                             //this.precedents.UpdateSorted();
                             mustUpdateSorted = true;
-                            //kvp.mustBeRemoved = true;
+                            kvp.mustBeRemoved = true;
                             removeInUnsorted.Add(kvp.tap);
 
                         }
@@ -669,8 +669,8 @@ namespace Gekko
                         {
                             //It must be removed and added again because the last t2 of the spans changes
                             mustUpdateSorted = true;
-                            //kvp.mustBeRemoved = true;
-                            //addToSorted.Add(kvp.tap);
+                            kvp.mustBeRemoved = true;
+                            addToSorted.Add(kvp.tap);
                         }                        
                         kvp.tap.periods = newSpans;
                     }
@@ -693,25 +693,28 @@ namespace Gekko
                         this.precedents.SetStorage(temp);
                     }
 
-                    if (mustUpdateSorted) this.precedents.SetStorageSorted(null);  //triggers recalc if needed
-
-                    //var zz = this.precedents.GetStorageSorted();
-                    //zz.RemoveWhere(MustBeRemoved);
-                    //this.precedents.SetStorageSorted(zz);
+                    if (mustUpdateSorted)
+                    {
+                        var zz = this.precedents.GetStorageSorted();
+                        zz.RemoveWhere(Program.MustBeRemoved);
+                        this.precedents.SetStorageSorted(zz);
+                        if (addToSorted.Count > 0)
+                        {                            
+                            //if (this.precedents.GetStorageSorted() == null) this.precedents.SetStorageSorted(new SortedSet<SortedBagItem>(new SortedBagComparer()));
+                            foreach (TraceAndPeriods2 tap in addToSorted)
+                            {
+                                this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
+                            }
+                        }
+                    }
 
                     //this.precedents.SetStorage(removeInUnsorted);                    
-                    //int ii = this.precedents.GetStorageSorted().RemoveWhere(MustBeRemoved);
+                    //int ii = this.precedents.GetStorageSorted().RemoveWhere(MustBeRemoved);                                       
 
-                    //if (addToSorted.Count > 0)
-                    //{
-                    //    this.precedents.UpdateSorted();
-                    //    foreach (TraceAndPeriods2 tap in addToSorted)
-                    //    {
-                    //        this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
-                    //    }
-                    //}
-                    if (this.precedents.GetStorageSorted()!=null && this.precedents.Count() != this.precedents.CountSorted()) 
+                    if (this.precedents.GetStorageSorted() != null && this.precedents.Count() != this.precedents.CountSorted())
+                    {
                         new Error("Trace logic problem");
+                    }
                 }               
 
                 this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period }));
@@ -1484,7 +1487,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use this with care
+        /// Use this with care. Beware that this method may set .storageSorted = null.
         /// </summary>
         /// <param name="m"></param>
         public void SetStorage(List<TraceAndPeriods2> m)
@@ -1494,12 +1497,17 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use this with care
+        /// Use this with care. Beware that this method will not set .storageSorted = null.
         /// </summary>
         /// <param name="m"></param>
         public void SetStorageSorted(SortedSet<SortedBagItem> m)
         {
-            if (m != null && m.Count == 0) this.storage = null; //so it does not take up space
+            if (false)
+            {
+                //We do not do this for .storageSorted. We want == null to mean that it is not up to date, 
+                //not that it is up to date but has 0 elements.
+                if (m != null && m.Count == 0) this.storageSorted = null; //so it does not take up space
+            }
             else this.storageSorted = m;
         }
 
@@ -1720,13 +1728,25 @@ namespace Gekko
     {
         public int Compare(SortedBagItem x, SortedBagItem y)
         {
-            //We want empty periods at the end
-            if (x.t.IsNull() && y.t.IsNull()) return 1;
-            if (x.t.IsNull()) return 1;
-            if (y.t.IsNull()) return -1;
-            int i = x.t.CompareTo(y.t);
-            if (i == 0) return 1;  //so that two GekkoTimes may co-exist
-            return -i; //GekkoTimes are in reverse order
+            if (Object.ReferenceEquals(x, y))
+            {
+                return 0;
+            }
+            else if (x.t.EqualsGekkoTime(y.t))
+            {
+                //add some salt
+                if (x.tap.trace.id.counter == y.tap.trace.id.counter) return 0; //will probably not happen because of ReferenceEquals() at the top
+                if (x.tap.trace.id.counter > y.tap.trace.id.counter) return 1; //just random, could just as well be inverse
+                else return -1; //just random, could just as well be inverse
+            }
+            else
+            {
+                if (x.t.IsNull()) return 1;  //will put x later than y
+                if (y.t.IsNull()) return -1; //will put x before y
+                int i = x.t.CompareTo(y.t);
+                if (i == 0) new Error("Compare error");
+                return -i; //GekkoTimes are in reverse order
+            }
         }
     }    
 }

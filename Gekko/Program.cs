@@ -2130,13 +2130,15 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (true)
+                if (false)
                 {
                     SortedSet<SortedBagItem> temp = new SortedSet<SortedBagItem>(new SortedBagComparer());
-                    var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), null);
+                    TraceAndPeriods2 tap1 = new TraceAndPeriods2(new Trace2(ETraceType.Normal, new GekkoTime(EFreq.A, 2021, 1), new GekkoTime(EFreq.A, 2022, 1)), null);
+                    var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), tap1);
                     x1.mustBeRemoved = true;
                     temp.Add(x1);
-                    var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), null);
+                    TraceAndPeriods2 tap2 = new TraceAndPeriods2(new Trace2(ETraceType.Normal, new GekkoTime(EFreq.A, 2021, 1), new GekkoTime(EFreq.A, 2022, 1)), null);
+                    var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), tap2);
                     x2.mustBeRemoved = false;
                     temp.Add(x2);
                     int i = temp.RemoveWhere(MustBeRemoved);
