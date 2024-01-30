@@ -1707,7 +1707,7 @@ namespace Gekko
     {
         public GekkoTime t = GekkoTime.tNull;
         public TraceAndPeriods2 tap;
-        //public bool mustBeRemoved = false;
+        public bool mustBeRemoved = false;
 
         public SortedBagItem(GekkoTime t, TraceAndPeriods2 tap) 
         {

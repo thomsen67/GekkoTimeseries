@@ -2113,7 +2113,13 @@ namespace Gekko
                     + "  (IL offset: 0x" + frame.GetILOffset().ToString("x") + ")\n" + stackTrace;
             }
             return stackTrace;
-        }        
+        }
+
+        public static bool MustBeRemoved(SortedBagItem x)
+        {
+            return x.mustBeRemoved;
+        }
+
 
         /// <summary>
         /// TELL statement.
@@ -2124,28 +2130,18 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (false)
+                if (true)
                 {
-                    //SortedSet<SortedBagItem> temp = new SortedSet<SortedBagItem>(new SortedBagComparer());
-                    //var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), null);
-                    //x1.mustBeRemoved = true;
-                    //temp.Add(x1);
-                    //var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), null);
-                    //x2.mustBeRemoved = false;
-                    //temp.Add(x2);
-                    //int i = temp.RemoveWhere(Trace2.MustBeRemoved);
+                    SortedSet<SortedBagItem> temp = new SortedSet<SortedBagItem>(new SortedBagComparer());
+                    var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), null);
+                    x1.mustBeRemoved = true;
+                    temp.Add(x1);
+                    var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), null);
+                    x2.mustBeRemoved = false;
+                    temp.Add(x2);
+                    int i = temp.RemoveWhere(MustBeRemoved);
                 }
-
-                if (false)
-                {
-                    SortedSet<YYY> temp = new SortedSet<YYY>(new ZZZ());
-                    temp.Add(new YYY() { b = true, s = "a" });
-                    temp.Add(new YYY() { b = false, s = "b" });
-                    int i = temp.RemoveWhere(XXX);
-                }
-               
-
-
+                                
                 int X = 0; int Y = 0;
                 int Width = 0; int Height = 0;
                 bool outOfBounds =
