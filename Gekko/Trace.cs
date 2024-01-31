@@ -585,22 +585,27 @@ namespace Gekko
             //  
             //              
 
-            if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
+            if (false)  //qwerty implement this again, but handle storageSorted too.
             {
-                int n = this.precedents.Count();           
-                //Could perhaps also have logic that works if the previous trace has a *larger* period than the new.
-                //Then the larger trace is cut in 2 (potentially), but no more seacrhing is necessary.
-                //Think about speeding up shadowing.
-                if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
+                if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
                 {
-                    //new trace is not-null and has exactly same periods as last trace
-                    this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;  //also implicitly changes the trace if it is also present in GetStorageSorted().
-                    return;
+                    int n = this.precedents.Count();
+                    //Could perhaps also have logic that works if the previous trace has a *larger* period than the new.
+                    //Then the larger trace is cut in 2 (potentially), but no more seacrhing is necessary.
+                    //Think about speeding up shadowing.
+                    if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
+                    {
+                        //new trace is not-null and has exactly same periods as last trace
+                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;  //also implicitly changes the trace if it is also present in GetStorageSorted().
+                        return;
+                    }
                 }
             }
 
             if (Globals.traceAlwaysShadow)
             {
+                this.precedents.RecreateSorted();
+                
                 if (this.type != ETraceType.GluedToSeries) new Error("Hov");
                 
                 if (traceThatIsGoingToBeAdded == null) return;  //would normally perform shadowing, but now everything is always up to date
@@ -1425,7 +1430,7 @@ namespace Gekko
         /// </summary>        
         private SortedSet<SortedBagItem> storageSorted = null;
 
-        public void UpdateSorted()
+        public void RecreateSorted()
         {
             if (this.Count() != 0 && this.storageSorted == null)
             {
@@ -1465,8 +1470,8 @@ namespace Gekko
         /// </summary>
         /// <param name="traceAndPeriods"></param>
         /// <exception cref="GekkoException"></exception>
-        public void Add(TraceAndPeriods2 traceAndPeriods)
-        {
+        public void Add(TraceAndPeriods2 traceAndPeriods)  //qwerty tidy up logic for this, nulls, type
+        {            
             if (traceAndPeriods.trace.type != ETraceType.Divider && traceAndPeriods.trace.contents == null) throw new GekkoException();
             if (this.storage == null)
             {
@@ -1475,7 +1480,7 @@ namespace Gekko
             }            
             //this.UpdateSorted();
             this.storage.Add(traceAndPeriods);
-            this.UpdateSorted();  //may be null
+            //this.UpdateSorted();  //may be null
             this.storageSorted.Add(new SortedBagItem(traceAndPeriods.LastPeriod(), traceAndPeriods));
         }
 

@@ -12896,9 +12896,17 @@ namespace UnitTests
             Series x1 = null;
             Series x2 = null;
 
+            I("flush();");
+
             for (int i = 0; i < 3; i++)   //0: no banks, 1: banks and flush, 2: banks no flush
             {
-                if (i == 1) I("flush();");
+
+                if (i == 1)
+                {
+
+                }
+
+                
                 I("reset;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
@@ -12906,6 +12914,7 @@ namespace UnitTests
 
                 string s1 = "x1 <2001 2003> = 1;";
                 I(s1);
+                Helper_TracePowerPointExample(i);
                 x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 //#0
@@ -12915,14 +12924,13 @@ namespace UnitTests
                 Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
 
-                if (i >= 1) I("write sletmig;");
-                if (i == 1) I("flush();");
-                if (i >= 1) I("read sletmig;");
+                
 
                 // =============================================================================================
 
                 string s2 = "x1 <2002 2002> = 2;";
                 I(s2);
+                Helper_TracePowerPointExample(i);
                 x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
@@ -12943,6 +12951,7 @@ namespace UnitTests
 
                 string s3 = "x2 <2001 2003> = 2 * x1;";
                 I(s3);
+                Helper_TracePowerPointExample(i);
                 x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
@@ -12965,6 +12974,7 @@ namespace UnitTests
 
                 string s4 = "x1 <2003 2003> = 3;";
                 I(s4);
+                Helper_TracePowerPointExample(i);
                 x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
@@ -12988,6 +12998,7 @@ namespace UnitTests
 
                 string s5 = "x2 <2003 2003> = 3 * x1;";
                 I(s5);
+                Helper_TracePowerPointExample(i);
                 x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
@@ -13036,6 +13047,14 @@ namespace UnitTests
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
                 Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
             }
+        }
+
+        private static void Helper_TracePowerPointExample(int i)
+        {
+            if (i >= 1) I("write sletmig;");
+            if (i == 1) I("flush();");
+            if (i >= 1) I("reset;");
+            if (i >= 1) I("read sletmig;");
         }
 
         [TestMethod]
