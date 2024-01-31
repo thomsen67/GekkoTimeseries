@@ -12893,6 +12893,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TracePowerPointExample()
         {
+            Series x1 = null;
+            Series x2 = null;
+
             for (int i = 0; i < 3; i++)   //0: no banks, 1: banks and flush, 2: banks no flush
             {
                 if (i == 1) I("flush();");
@@ -12903,7 +12906,7 @@ namespace UnitTests
 
                 string s1 = "x1 <2001 2003> = 1;";
                 I(s1);
-                Series x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
+                x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 //#0
                 Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
@@ -12920,6 +12923,7 @@ namespace UnitTests
 
                 string s2 = "x1 <2002 2002> = 2;";
                 I(s2);
+                x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 //#0
@@ -12939,7 +12943,8 @@ namespace UnitTests
 
                 string s3 = "x2 <2001 2003> = 2 * x1;";
                 I(s3);
-                Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
+                x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
+                x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
                 Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
@@ -12960,6 +12965,8 @@ namespace UnitTests
 
                 string s4 = "x1 <2003 2003> = 3;";
                 I(s4);
+                x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
+                x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
                 Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
@@ -12981,6 +12988,8 @@ namespace UnitTests
 
                 string s5 = "x2 <2003 2003> = 3 * x1;";
                 I(s5);
+                x1 = O.GetIVariableFromString("x1!a", ECreatePossibilities.NoneReportError) as Series;
+                x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(ETraceType.GluedToSeries, x2.meta.trace2.type);
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
