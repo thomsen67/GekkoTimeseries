@@ -635,8 +635,8 @@ namespace Gekko
             if (Globals.traceAlwaysShadow)
             {
                 this.precedents.RecreateSorted();
-                
-                if (this.type != ETraceType.GluedToSeries) new Error("Hov");
+
+                if (this.type != ETraceType.GluedToSeries) new Error("Internal error: expected ETraceType.GluedToSeries");
                 
                 if (traceThatIsGoingToBeAdded == null) return;  //would normally perform shadowing, but now everything is always up to date
 

@@ -5629,6 +5629,8 @@ namespace Gekko
             //Removes shadowed references
             //Note that the trace viewer does not show shadowed traces, and 
             //these traces are also deleted when writing a databank.
+            new Warning("Function tracetrim2() is obsolete.");
+            return;
             DateTime t0 = DateTime.Now;
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.TraceTrim(db);
