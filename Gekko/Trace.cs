@@ -375,9 +375,10 @@ namespace Gekko
                 if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
                 {
                     List<TraceAndPeriods2> rv = InvertWallTime(this.precedents.GetStorage());
-                    if (rv.Count != this.precedents.Count()) new Error("TimeShadow problem");
-                    if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-                    if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                    int count = 0; if (rv != null) count = rv.Count;
+                    if (count != this.precedents.Count()) new Error("TimeShadow problem");
+                    if (count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                    if (count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
                     return rv;
                 }
                 else
@@ -485,6 +486,7 @@ namespace Gekko
 
         public static List<TraceAndPeriods2> InvertWallTime(List<TraceAndPeriods2> rv3)
         {
+            if (rv3 == null || rv3.Count <= 1) return rv3;  //no need to do anything
             List<TraceAndPeriods2> rv = new List<TraceAndPeriods2>(rv3.Count);
             List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
             int n = 0;
