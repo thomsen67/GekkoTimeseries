@@ -597,9 +597,16 @@ namespace Gekko
             //  Maybe do a top-down search of a new piece. If the new piece is equal to or inside an existing piece
             //  at depth d, nothing is touched lower than d.
             //  
-            //              
+            //
+            //        
 
-            if (true)
+            Globals.traceN++;  //qwerty
+            if (Globals.traceN == 41)
+            {
+                //MessageBox.Show("Here, in _Test_Databanks, two precedents have overlapping periods...");
+            }
+
+            if (false)  //!!! KEEP IT FALSE FOR NOW !!!
             {
                 if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
                 {
@@ -610,8 +617,14 @@ namespace Gekko
                     if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
                     {
                         //new trace is not-null and has exactly same periods as last trace
-                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;  //also implicitly changes the trace if it is also present in GetStorageSorted().
-                        return;
+                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded; 
+                        //
+                        // PROBLEM: How to remove the last added trace from this.precedents.GetStorageSorted() in an efficient way?
+                        //          If this is implemented, test it extremely well!!
+                        //          Solving the problem may yield a little speedup, but due to sorting not in the extreme.
+                        //          Therefore better to deactivate now.
+                        //
+                        return; 
                     }
                 }
             }
@@ -709,6 +722,29 @@ namespace Gekko
 
                         foreach (TraceAndPeriods2 tap in this.precedents.GetStorage())
                         {
+                            //bool shouldBeRemoved = false;
+                            //foreach (TraceAndPeriods2 remove in removeInUnsorted)
+                            //{
+                            //    if (tap.trace.id.Equals(remove.trace.id))
+                            //    {
+                            //        if (tap.periods.Count() == remove.periods.Count())
+                            //        {
+                            //            bool isSame = true;
+                            //            for (int i = 0; i < tap.periods.Count(); i++)
+                            //            {
+                            //                if (!tap.periods[i].t1.EqualsGekkoTime(remove.periods[i].t1)) { isSame = false; break; }
+                            //                if (!tap.periods[i].t2.EqualsGekkoTime(remove.periods[i].t2)) { isSame = false; break; }
+                            //            }
+                            //            if (isSame) shouldBeRemoved = true;
+                            //        }
+                            //    }
+                            //    //if (Object.ReferenceEquals(tap, remove)) shouldBeRemoved = true;
+                            //}
+                            //if (!shouldBeRemoved)
+                            //{
+                            //    temp.Add(tap);
+                            //}
+
                             if (!removeInUnsorted.Contains(tap))
                             {
                                 temp.Add(tap);
@@ -1461,13 +1497,12 @@ namespace Gekko
 
         public void RecreateSorted()
         {
-            if (this.Count() != 0 && this.storageSorted == null)
+            if (this.storage != null && this.storageSorted == null)
             {
                 this.storageSorted = new SortedSet<SortedBagItem>(new SortedBagComparer());
                 foreach (TraceAndPeriods2 tap in this.storage)
                 {
                     GekkoTime tMax = tap.LastPeriod();
-                    //if (tMax.IsNull()) new Error("Trace logic problem"); //this may happen, for instance copy command.                    
                     this.storageSorted.Add(new SortedBagItem(tMax, tap));
                 }
                 if (this.Count() != this.storageSorted.Count)
@@ -1484,10 +1519,15 @@ namespace Gekko
         /// <param name="precedents"></param>
         public void AddRange(Precedents2 precedents)
         {            
-            if (precedents.storage != null)
+            if (precedents.storage != null && precedents.Count() > 0)
             {
-                if (this.storage == null) this.storage = new List<TraceAndPeriods2>();
-                this.storage.AddRange(precedents.storage);
+                if (this.storage == null) this.storage = new List<TraceAndPeriods2>();                
+
+                foreach (TraceAndPeriods2 xx in precedents.storage)
+                {
+                    this.Add(xx);
+                }
+                //this.storage.AddRange(precedents.storage);
             }
         }        
 
@@ -1505,6 +1545,7 @@ namespace Gekko
                 this.storage = new List<TraceAndPeriods2>();
                 this.storageSorted = new SortedSet<SortedBagItem>(new SortedBagComparer());
             }
+            RecreateSorted();
             this.storage.Add(traceAndPeriods);
             this.storageSorted.Add(new SortedBagItem(traceAndPeriods.LastPeriod(), traceAndPeriods));
         }
@@ -1727,6 +1768,8 @@ namespace Gekko
 
         [ProtoMember(2)]
         public GekkoTimeSpansSimple periods = null;
+
+        public long id = 0;  //just used to identify objects between sorted and unsorted list
 
         public TraceAndPeriods2()
         {

@@ -21957,7 +21957,10 @@ print(df2)
         [TestMethod]
         public void _Test_OpenCascading()
         {
-            I("RESET;");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("reset;");
             I("TIME 2000 2000;");
             I("OPEN<edit>sletmig1; clear sletmig1;");
             I("CREATE a, b, c;");
@@ -27824,6 +27827,11 @@ print(df2)
                                     if (jj == 0)
                                     {
                                         I("IMPORT<" + t1.ToString() + " " + t2.ToString() + " " + s + "> temp;");
+                                        
+                                        //qwerty
+                                        Series xx1 = O.GetIVariableFromString("xx1!q", ECreatePossibilities.NoneReturnNullAlways) as Series;
+                                        Trace2 trace = xx1.meta.trace2;
+
                                     }
                                     else
                                     {
