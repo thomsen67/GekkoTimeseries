@@ -12894,18 +12894,20 @@ namespace UnitTests
         public void _Test_TracePowerPointExample()
         {
             Series x1 = null;
-            Series x2 = null;
-
-            I("flush();");
+            Series x2 = null;            
 
             for (int i = 0; i < 3; i++)   //0: no banks, 1: banks and flush, 2: banks no flush
             {
 
                 if (i == 1)
                 {
-
+                    I("flush();");  //but do not do it for i == 2!
                 }
 
+                if (i >= 1)
+                {
+
+                }
                 
                 I("reset;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -13051,10 +13053,34 @@ namespace UnitTests
 
         private static void Helper_TracePowerPointExample(int i)
         {
-            if (i >= 1) I("write sletmig;");
-            if (i == 1) I("flush();");
-            if (i >= 1) I("reset;");
-            if (i >= 1) I("read sletmig;");
+            if (i >= 1)
+            {
+                double cacheSizeRemember = Globals.cacheSize2;
+                try
+                {                    
+                    Globals.cacheSize2 = 0;
+                    I("write sletmig;");
+                    I("reset;");
+                    if (true)
+                    {
+                        Globals.unitTestScreenOutput.Clear();
+                        I("read sletmig;");
+                        string s1 = Globals.unitTestScreenOutput.ToString();
+                        Assert.IsTrue(s1.Contains("Cache write time"));
+                    }
+                    if (i == 2)
+                    {
+                        Globals.unitTestScreenOutput.Clear();
+                        I("read sletmig;");  //to get cache to work
+                        string s1 = Globals.unitTestScreenOutput.ToString();
+                        Assert.IsTrue(s1.Contains("Cache read time"));
+                    }
+                }
+                finally
+                {
+                    Globals.cacheSize2 = cacheSizeRemember;
+                }
+            }
         }
 
         [TestMethod]
