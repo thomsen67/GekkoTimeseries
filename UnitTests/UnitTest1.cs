@@ -27827,11 +27827,6 @@ print(df2)
                                     if (jj == 0)
                                     {
                                         I("IMPORT<" + t1.ToString() + " " + t2.ToString() + " " + s + "> temp;");
-                                        
-                                        //qwerty
-                                        Series xx1 = O.GetIVariableFromString("xx1!q", ECreatePossibilities.NoneReturnNullAlways) as Series;
-                                        Trace2 trace = xx1.meta.trace2;
-
                                     }
                                     else
                                     {
