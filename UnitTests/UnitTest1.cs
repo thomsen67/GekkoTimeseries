@@ -12907,7 +12907,7 @@ namespace UnitTests
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 //#0
                 Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
-                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
@@ -12923,14 +12923,14 @@ namespace UnitTests
                 Assert.AreEqual(ETraceType.GluedToSeries, x1.meta.trace2.type);
                 Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 //#0
-                Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
                 Assert.AreEqual(2003, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
                 Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 //#1
-                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count());
                 Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
                 Assert.AreEqual(2002, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
                 Assert.AreEqual(s2, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
@@ -12944,14 +12944,14 @@ namespace UnitTests
                 Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
                 //#0
-                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
                 Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 //#1
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count());
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
                 Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
@@ -12965,14 +12965,14 @@ namespace UnitTests
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
                 //#0
                 //before a clone fix of preiods, this would become wrongly (only 1 period: 2001-2001)
-                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
                 Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 //#1
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count());
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
                 Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
@@ -12986,41 +12986,41 @@ namespace UnitTests
                 Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse().Count());
                 Assert.AreEqual(3, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse().Count());
                 //#0-0            
-                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t2.super);
                 Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 //#0-1
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count());
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
                 Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
                 //#1-0            
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(s1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
                 //#1-1            
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods.Count());
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t1.super);
                 Assert.AreEqual(2002, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].periods[0].t2.super);
                 Assert.AreEqual(s2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.contents.text);
                 //#1-2            
-                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods.Count);
+                Assert.AreEqual(1, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods.Count());
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods[0].t1.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].periods[0].t2.super);
                 Assert.AreEqual(s4, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetPrecedents_BewareOnlyInternalUse()[2].trace.contents.text);
 
                 // A kind of random x1 and indirect x1 test at the end:
 
-                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(s1, x1.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.contents.text);
 
-                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count);
+                Assert.AreEqual(2, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods.Count());
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t1.super);
                 Assert.AreEqual(2001, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[0].t2.super);
                 Assert.AreEqual(2003, x2.meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].periods[1].t1.super);
@@ -13340,7 +13340,7 @@ namespace UnitTests
                     Assert.AreEqual(new GekkoTime(EFreq.A, 1980, 1, 1), trace1.contents.period.t1);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 2020, 1, 1), trace1.contents.period.t2);
 
-                    Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+                    Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
                     Assert.AreEqual(1980, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
                     Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
                     Assert.AreEqual(2011, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -13353,7 +13353,7 @@ namespace UnitTests
                     Assert.AreEqual("Solve (sim) jul05.frm, hash = rtamRJATOLALMm8du5T6Ug", trace0.contents.text);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 2006, 1, 1), trace0.contents.period.t1);
                     Assert.AreEqual(new GekkoTime(EFreq.A, 2010, 1, 1), trace0.contents.period.t2);                    
-                    Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+                    Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
                     Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
                     Assert.AreEqual(2010, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
                 }                
@@ -13653,12 +13653,12 @@ namespace UnitTests
                     Assert.AreEqual(10, m.Count);
                     int i = 0;
                     Assert.AreEqual("x1 <2002 2004> = 100;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(1, m[i].periods.Count());
                     Assert.AreEqual(2002, m[i].periods[0].t1.super);
                     Assert.AreEqual(2004, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count);
+                    Assert.AreEqual(2, m[i].periods.Count());
                     Assert.AreEqual(2001, m[i].periods[0].t1.super);
                     Assert.AreEqual(2001, m[i].periods[0].t2.super);
                     Assert.AreEqual(2005, m[i].periods[1].t1.super);
@@ -13671,24 +13671,24 @@ namespace UnitTests
 
                     i++;
                     Assert.AreEqual("x2 <2003 2003> = 6;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(1, m[i].periods.Count());
                     Assert.AreEqual(2003, m[i].periods[0].t1.super);
                     Assert.AreEqual(2003, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x2 <2001 2004> = 5;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count);
+                    Assert.AreEqual(2, m[i].periods.Count());
                     Assert.AreEqual(2001, m[i].periods[0].t1.super);
                     Assert.AreEqual(2002, m[i].periods[0].t2.super);
                     Assert.AreEqual(2004, m[i].periods[1].t1.super);
                     Assert.AreEqual(2004, m[i].periods[1].t2.super);
                     i++;
                     Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(1, m[i].periods.Count());
                     Assert.AreEqual(2006, m[i].periods[0].t1.super);
                     Assert.AreEqual(2009, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(1, m[i].periods.Count());
                     Assert.AreEqual(2005, m[i].periods[0].t1.super);
                     Assert.AreEqual(2005, m[i].periods[0].t2.super);
                     //i++;
@@ -13698,12 +13698,12 @@ namespace UnitTests
                     Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
                     i++;
                     Assert.AreEqual("x3 <2022 2024> = 300;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count);
+                    Assert.AreEqual(1, m[i].periods.Count());
                     Assert.AreEqual(2022, m[i].periods[0].t1.super);
                     Assert.AreEqual(2024, m[i].periods[0].t2.super);
                     i++;
                     Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count);
+                    Assert.AreEqual(2, m[i].periods.Count());
                     Assert.AreEqual(2021, m[i].periods[0].t1.super);
                     Assert.AreEqual(2021, m[i].periods[0].t2.super);
                     Assert.AreEqual(2025, m[i].periods[1].t1.super);
@@ -13817,17 +13817,17 @@ namespace UnitTests
             }
             
             Assert.AreEqual(2, x1.meta.trace2.TimeShadow2().Count);
-            Assert.AreEqual(1, x1.meta.trace2.TimeShadow2()[0].periods.Count);
-            Assert.AreEqual(2, x1.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, x1.meta.trace2.TimeShadow2()[0].periods.Count());
+            Assert.AreEqual(2, x1.meta.trace2.TimeShadow2()[1].periods.Count());
 
             Series x2 = Program.databanks.GetFirst().GetIVariable("x2!a") as Series;
 
             Assert.AreEqual(1, x2.meta.trace2.TimeShadow2().Count); //#precedents
-            Assert.AreEqual(1, x2.meta.trace2.TimeShadow2()[0].periods.Count); //pers prec #0
+            Assert.AreEqual(1, x2.meta.trace2.TimeShadow2()[0].periods.Count()); //pers prec #0
             Assert.AreEqual(2001, x2.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2003, x2.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(1, x2.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, x2.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2001, x2.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2003, x2.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods[0].t2.super);
 
@@ -13841,11 +13841,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
@@ -13856,11 +13856,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
@@ -13871,11 +13871,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);            
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -13888,11 +13888,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
@@ -13903,11 +13903,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
@@ -13922,7 +13922,7 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
             
@@ -13936,23 +13936,23 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("y!a") as Series;
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count); //x trace has 1 period
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
             
             // -----
             I("x <2005 2005> = 2;");  //should have no effect on y, even though x gets a new trace                                    
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count); //x trace has 1 period
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
             x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, x.meta.trace2.TimeShadow2().Count); //x has 1 trace when found via series object
             
@@ -13960,13 +13960,13 @@ namespace UnitTests
             I("y <2005 2005> = 3;");
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
             
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
                         
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2().Count); //x has 1 trace
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count); //x trace has 1 period
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
             x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(1, x.meta.trace2.TimeShadow2().Count); //x has 1 trace when found via series object
 
@@ -13979,11 +13979,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -14005,11 +14005,11 @@ namespace UnitTests
             y = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -14048,11 +14048,11 @@ namespace UnitTests
             Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -14071,18 +14071,18 @@ namespace UnitTests
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual("read <2005 2006> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
                         
             {
                 Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].trace.contents.text);
-                Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count);
+                Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count());
                 Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t1.super);
                 Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t2.super);
             }           
@@ -14106,19 +14106,19 @@ namespace UnitTests
             Assert.AreEqual(3, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);                        
 
             Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t1.super);
@@ -14142,23 +14142,23 @@ namespace UnitTests
             Assert.AreEqual(3, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual("read <2005 2006 merge> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             {
                 Assert.AreEqual("x <2004 2006> = 1;", y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].trace.contents.text);
-                Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count);
+                Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count());
                 Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t1.super);
                 Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods[0].t2.super);
             }
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t1.super);
@@ -14192,12 +14192,12 @@ namespace UnitTests
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual("read <tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
@@ -14215,12 +14215,12 @@ namespace UnitTests
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual("read <2005 2006 tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);                       
 
@@ -14242,19 +14242,19 @@ namespace UnitTests
             Assert.AreEqual(3, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
             
             Assert.AreEqual("read <merge tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t1.super);
@@ -14279,17 +14279,17 @@ namespace UnitTests
             Assert.AreEqual(3, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual("x <2005 2005> = 2;", y.meta.trace2.TimeShadow2()[0].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
             Assert.AreEqual(2005, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
             
             Assert.AreEqual("read <2005 2006 merge tsd> trace2;", y.meta.trace2.TimeShadow2()[1].trace.contents.text);
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count);
+            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
             Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
 
             Assert.AreEqual("x <2003 2007> = 3;", y.meta.trace2.TimeShadow2()[2].trace.contents.text);
-            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count);
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[2].periods.Count());
             Assert.AreEqual(2003, y.meta.trace2.TimeShadow2()[2].periods[0].t1.super);
             Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[2].periods[0].t2.super);
             Assert.AreEqual(2007, y.meta.trace2.TimeShadow2()[2].periods[1].t1.super);

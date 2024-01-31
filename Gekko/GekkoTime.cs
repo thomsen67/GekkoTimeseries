@@ -2114,6 +2114,16 @@ namespace Gekko
         [ProtoMember(1)]
         public List<GekkoTimeSpanSimple> storage = new List<GekkoTimeSpanSimple>();
 
+        public GekkoTimeSpanSimple this[int i]
+        {
+            get { return this.storage[i]; }            
+        }
+
+        public int Count() 
+        {
+            return this.storage.Count;
+        }
+
         public override string ToString()
         {
             string s = null;
