@@ -32569,6 +32569,7 @@ print(df2)
         [TestMethod]
         public void _Test_ADAMworkshop2011()
         {
+            //Program.Flush();
             for (int i = 0; i < 2; i++)
             {
                 //first time, it will be parsed and compiled (since cache is always flushed before unit testing)

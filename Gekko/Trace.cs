@@ -599,7 +599,7 @@ namespace Gekko
             //  
             //              
 
-            if (true)  //qwerty implement this again, but handle storageSorted too.
+            if (true)
             {
                 if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
                 {
@@ -1499,17 +1499,16 @@ namespace Gekko
         /// </summary>
         /// <param name="traceAndPeriods"></param>
         /// <exception cref="GekkoException"></exception>
-        public void Add(TraceAndPeriods2 traceAndPeriods)  //qwerty tidy up logic for this, nulls, type
+        public void Add(TraceAndPeriods2 traceAndPeriods)
         {            
             if (traceAndPeriods.trace.type != ETraceType.Divider && traceAndPeriods.trace.contents == null) throw new GekkoException();
             if (this.storage == null)
             {
+                //Does this ever happen?
                 this.storage = new List<TraceAndPeriods2>();
                 this.storageSorted = new SortedSet<SortedBagItem>(new SortedBagComparer());
-            }            
-            //this.UpdateSorted();
+            }
             this.storage.Add(traceAndPeriods);
-            //this.UpdateSorted();  //may be null
             this.storageSorted.Add(new SortedBagItem(traceAndPeriods.LastPeriod(), traceAndPeriods));
         }
 

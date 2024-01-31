@@ -7731,8 +7731,15 @@ namespace Gekko
                 //basis
                 GekkoTime basisStart = (data[n].x as Series).GetRealDataPeriodFirst();
                 GekkoTime basisEnd = (data[n].x as Series).GetRealDataPeriodLast();
-                try { basisStart = data[n - 1].t[0]; } catch { };
-                try { basisEnd = data[n].t[1]; } catch { };
+
+                GekkoTime tt1 = GekkoTime.tNull;  bool b1 = false;
+                SpliceHelper5(data, n-1, 0, out b1, out tt1);
+                if (b1) basisStart = tt1;
+
+                GekkoTime tt2 = GekkoTime.tNull; bool b2 = false;
+                SpliceHelper5(data, n, 1, out b2, out tt2);
+                if (b2) basisEnd = tt2;                
+
                 foreach (GekkoTime t in new GekkoTimeIterator(basisStart, basisEnd))
                 {
                     rv.SetData(t, (data[n].x as Series).GetDataSimple(t));  //just a copy                    
@@ -7776,6 +7783,18 @@ namespace Gekko
 
                 return rv;
 
+            }
+
+            private static void SpliceHelper5(List<SpliceHelper> data, int n, int m, out bool b, out GekkoTime t)
+            {
+                b = true; //success
+                t = GekkoTime.tNull;
+                if (data == null) { b = false; return; }
+                if (!(n >= 0 && n < data.Count)) { b = false; return; }
+                List<GekkoTime> sub = data[n].t;
+                if (sub == null) { b = false; return; }
+                if (!(m >= 0 && m < sub.Count)) { b = false; return; }
+                t = sub[m];
             }
 
             /// <summary>

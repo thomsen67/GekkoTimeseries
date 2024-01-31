@@ -17135,7 +17135,7 @@ namespace Gekko
                                     Gekko.Trace2.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
                                     Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                 }
-                                catch
+                                catch (Exception e)
                                 {
                                     new Error(Globals.traceError);
                                 }
