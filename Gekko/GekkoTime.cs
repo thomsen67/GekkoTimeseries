@@ -2112,7 +2112,7 @@ namespace Gekko
     public class GekkoTimeSpansSimple
     {
         [ProtoMember(1)]
-        public List<GekkoTimeSpanSimple> storage = null;
+        public List<GekkoTimeSpanSimple> storage = new List<GekkoTimeSpanSimple>();
 
         public override string ToString()
         {

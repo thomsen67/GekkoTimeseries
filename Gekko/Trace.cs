@@ -242,11 +242,11 @@ namespace Gekko
 
                         // --------- clone start ----------------
                         //We must clone the period part of the trace+period, because otherwise it may be overwritten in a wrong way.
-                        List<GekkoTimeSpanSimple> xx = null;
+                        GekkoTimeSpansSimple xx = null;
                         if (childTrace2.periods != null)
                         {
-                            xx = new List<GekkoTimeSpanSimple>();
-                            xx.AddRange(childTrace2.periods);  //the timespans themselves are immutable
+                            xx = new GekkoTimeSpansSimple();
+                            xx.storage.AddRange(childTrace2.periods.storage);  //the timespans themselves are immutable
                         }
                         TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(childTrace2.trace, xx);
                         // --------- clone end ----------------
@@ -364,7 +364,7 @@ namespace Gekko
             {
                 //Remove the if below at some point, just for sanity now            
                 if (this.precedents[0].trace.type == ETraceType.Divider || this.precedents[this.precedents.Count() - 1].trace.type == ETraceType.Divider) new Error("Unexpected");
-                List<List<GekkoTimeSpanSimple>> spansList = new List<List<GekkoTimeSpanSimple>>();  //is inverted, newest first
+                List<GekkoTimeSpansSimple> spansList = new List<GekkoTimeSpansSimple>();  //is inverted, newest first
                 int lastNull = this.precedents.Count();
                 int counterI = -1;
                 for (int i = this.precedents.Count() - 1; i >= 0; i--)
@@ -375,8 +375,8 @@ namespace Gekko
                     if (counterI == 0)
                     {
                         //To get the first one going.
-                        List<GekkoTimeSpanSimple> tmp = new List<GekkoTimeSpanSimple>();
-                        tmp.Add(traceNew.contents.period);
+                        GekkoTimeSpansSimple tmp = new GekkoTimeSpansSimple();
+                        tmp.storage.Add(traceNew.contents.period);
                         spansList.Add(tmp);
                     }
 
@@ -386,8 +386,8 @@ namespace Gekko
                         for (int k = 0; k < spansList.Count; k++)
                         {
                             count++;
-                            List<GekkoTimeSpanSimple> m = spansList[k];
-                            if (!shadowedTracesAreRemoved || m.Count > 0)
+                            GekkoTimeSpansSimple m = spansList[k];
+                            if (!shadowedTracesAreRemoved || m.storage.Count > 0)
                             {
                                 //Maybe this can be done smarter now that .precedents is different??
                                 TraceAndPeriods2 tap = new TraceAndPeriods2();
@@ -401,7 +401,7 @@ namespace Gekko
                         {
                             TraceAndPeriods2 tap = new TraceAndPeriods2();
                             tap.trace = new Trace2(ETraceType.Divider, true);
-                            tap.periods = new List<GekkoTimeSpanSimple>();
+                            tap.periods = new GekkoTimeSpansSimple();
                             rv3.Add(tap);
                             //rv.Add(new Trace2(ETraceType.Divider, true)); //divider, use ETraceType.Divider  ??????? QWERTY
                         }
@@ -420,17 +420,17 @@ namespace Gekko
 
                         if (counterI == 0)
                         {
-                            List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.period, traceOld.contents.period);
+                            GekkoTimeSpansSimple spans = Trace2.TimeShadow1(traceNew.contents.period, traceOld.contents.period);
                             spansList.Add(spans);
                         }
                         else
                         {
                             int k2 = counterI + counterJ + 1;
-                            List<GekkoTimeSpanSimple> newList = new List<GekkoTimeSpanSimple>();
-                            foreach (GekkoTimeSpanSimple spanTemp in spansList[k2])
+                            GekkoTimeSpansSimple newList = new GekkoTimeSpansSimple();
+                            foreach (GekkoTimeSpanSimple spanTemp in spansList[k2].storage)
                             {
-                                List<GekkoTimeSpanSimple> spans = Trace2.TimeShadow1(traceNew.contents.period, spanTemp);
-                                newList.AddRange(spans);
+                                GekkoTimeSpansSimple spans = Trace2.TimeShadow1(traceNew.contents.period, spanTemp);
+                                newList.storage.AddRange(spans.storage);
                             }
                             spansList[k2] = newList;
                         }
@@ -653,14 +653,14 @@ namespace Gekko
                         if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t)) break;  //not neccessary to look any further!
                         
                         //Shadow
-                        List<GekkoTimeSpanSimple> newSpans = new List<GekkoTimeSpanSimple>();
-                        foreach (GekkoTimeSpanSimple span in kvp.tap.periods)
+                        GekkoTimeSpansSimple newSpans = new GekkoTimeSpansSimple();
+                        foreach (GekkoTimeSpanSimple span in kvp.tap.periods.storage)
                         {
                             //The existing precedent may have several active periods
-                            newSpans.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span));
+                            newSpans.storage.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span).storage);
                         }
                         
-                        if (newSpans.Count == 0)
+                        if (newSpans.storage.Count == 0)
                         {
                             //kvp.tap must be removed from both .storage and .storageSorted
                             //must be removed
@@ -670,7 +670,7 @@ namespace Gekko
                             removeInUnsorted.Add(kvp.tap);
 
                         }
-                        else if (!newSpans[newSpans.Count - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
+                        else if (!newSpans.storage[newSpans.storage.Count - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
                         {
                             //It must be removed and added again because the last t2 of the spans changes
                             mustUpdateSorted = true;
@@ -720,9 +720,9 @@ namespace Gekko
                     {
                         new Error("Trace logic problem");
                     }
-                }               
+                }
 
-                this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period }));
+                this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, new GekkoTimeSpansSimple() { storage = new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period } }));
                                 
             }
             else
@@ -861,8 +861,8 @@ namespace Gekko
             if (type == ETracePushType.NewParent)
             {                   
                 trace.AddRangeFromSeries2(null, ts);
-                ts.meta.trace2.precedents = new Precedents2();                
-                ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, new List<GekkoTimeSpanSimple> { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) }));
+                ts.meta.trace2.precedents = new Precedents2();
+                ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, new GekkoTimeSpansSimple() { storage = new List<GekkoTimeSpanSimple>() { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) } }));
             }            
             else if (type == ETracePushType.Sibling)
             {
@@ -886,7 +886,7 @@ namespace Gekko
         /// <param name="newSpan"></param>
         /// <param name="oldSpan"></param>
         /// <param name="periodsContainer"></param>
-        public static List<GekkoTimeSpanSimple> TimeShadow1(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan)
+        public static GekkoTimeSpansSimple TimeShadow1(GekkoTimeSpanSimple newSpan, GekkoTimeSpanSimple oldSpan)
         {
             // The code below removes the --- from the ===, so newSpan removes periods from oldSpan
             // Four possibilities
@@ -932,7 +932,7 @@ namespace Gekko
                 //D, remove --> nothing added
             }
             else new Error("Wrong logic regarding time spans");
-            return rv;
+            return new GekkoTimeSpansSimple() { storage = rv };
         }
 
         ///// <summary>
@@ -1127,7 +1127,7 @@ namespace Gekko
         }
 
         
-        public Item FromTraceToTreeViewItemsTree(int depth, int cnt, List<GekkoTimeSpanSimple> periods, int max, bool showDividers, ref int nn)
+        public Item FromTraceToTreeViewItemsTree(int depth, int cnt, GekkoTimeSpansSimple periods, int max, bool showDividers, ref int nn)
         {            
             Item item = FromTraceToTreeViewItem(periods, showDividers);
             nn++;            
@@ -1148,7 +1148,7 @@ namespace Gekko
             return item;
         }
 
-        public Item FromTraceToTreeViewItem(List<GekkoTimeSpanSimple> periods, bool showDividers)
+        public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods, bool showDividers)
         {           
 
             // =========================================================================
@@ -1214,10 +1214,10 @@ namespace Gekko
             stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
         }
 
-        public static void GetActivePeriodsAsString(List<GekkoTimeSpanSimple> periods, ref string active, ref string activeDetailed)
+        public static void GetActivePeriodsAsString(GekkoTimeSpansSimple periods, ref string active, ref string activeDetailed)
         {
             int n = -1;
-            foreach (GekkoTimeSpanSimple gts in periods)
+            foreach (GekkoTimeSpanSimple gts in periods.storage)
             {
                 n++;
                 if (n > 0) active += ", ";
@@ -1415,7 +1415,7 @@ namespace Gekko
         /// Pretty innocuous: using this, we can set .storage = null before protobuf.
         /// </summary>
         [ProtoMember(3)]
-        public List<List<GekkoTimeSpanSimple>> storagePeriodsTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
+        public List<GekkoTimeSpansSimple> storagePeriodsTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
 
         /// <summary>
         /// This is filled whenever the precedents are used.
@@ -1531,13 +1531,13 @@ namespace Gekko
         public  void ToID()
         {
             this.storageIDTemporary = new List<TraceID2>();
-            this.storagePeriodsTemporary = new List<List<GekkoTimeSpanSimple>>();
+            this.storagePeriodsTemporary = new List<GekkoTimeSpansSimple>();
             if (this.Count() > 0)
             {
                 foreach (TraceAndPeriods2 traceAndPeriods in this.GetStorage())
                 {
                     TraceID2 temp = null;
-                    List<GekkoTimeSpanSimple> temp2 = null;
+                    GekkoTimeSpansSimple temp2 = null;
                     if (traceAndPeriods.trace.type == ETraceType.Divider)
                     {
                         temp = new TraceID2();
@@ -1565,7 +1565,7 @@ namespace Gekko
                 //foreach (TraceID2 id in this.storageIDTemporary)
                 {
                     TraceID2 id = this.storageIDTemporary[i];
-                    List<GekkoTimeSpanSimple> periods = this.storagePeriodsTemporary[i];
+                    GekkoTimeSpansSimple periods = this.storagePeriodsTemporary[i];
 
                     if (id.counter == long.MinValue)
                     {
@@ -1634,28 +1634,28 @@ namespace Gekko
     public class Periods
     {
         [ProtoMember(1)]
-        private List<GekkoTimeSpanSimple> storage = null;
+        private GekkoTimeSpansSimple storage = null;
 
         /// <summary>
         /// Beware: only for iterating.
         /// </summary>
         /// <returns></returns>
-        public List<GekkoTimeSpanSimple> GetStorage()
+        public GekkoTimeSpansSimple GetStorage()
         {
             return this.storage;
         }
 
         public GekkoTimeSpanSimple this[int i]
         {
-            get { return this.storage[i]; }
-            set { this.storage[i] = value; }
+            get { return this.storage.storage[i]; }
+            set { this.storage.storage[i] = value; }
         }
 
         /// <summary>
         /// Use with care
         /// </summary>
         /// <param name="storage"></param>
-        public void SetStorage(List<GekkoTimeSpanSimple> storage)
+        public void SetStorage(GekkoTimeSpansSimple storage)
         {
             this.storage = storage;
         }
@@ -1666,19 +1666,19 @@ namespace Gekko
         /// <returns></returns>
         public void Initialize()
         {
-            this.storage = new List<GekkoTimeSpanSimple>();
+            this.storage = new GekkoTimeSpansSimple();
         }
 
         public void Add(GekkoTimeSpanSimple x)
         {
-            if (storage == null) storage = new List<GekkoTimeSpanSimple>();
-            this.storage.Add(x);
+            if (storage == null) storage = new GekkoTimeSpansSimple();
+            this.storage.storage.Add(x);
         }
 
         public int Count()
         {
             if (this.storage == null) return 0;
-            return this.storage.Count;
+            return this.storage.storage.Count;
         }
     }
 
@@ -1696,14 +1696,14 @@ namespace Gekko
         public Trace2 trace = null;
 
         [ProtoMember(2)]
-        public List<GekkoTimeSpanSimple> periods = null;
+        public GekkoTimeSpansSimple periods = null;
 
         public TraceAndPeriods2()
         {
             //for protobuf
         }
 
-        public TraceAndPeriods2(Trace2 trace, List<GekkoTimeSpanSimple> periods)
+        public TraceAndPeriods2(Trace2 trace, GekkoTimeSpansSimple periods)
         {
             this.trace = trace;
             this.periods = periods;
@@ -1715,17 +1715,17 @@ namespace Gekko
         /// <returns></returns>
         public GekkoTime LastPeriod()
         {
-            if (this.periods == null || this.periods.Count == 0) return GekkoTime.tNull;
-            return this.periods[this.periods.Count - 1].t2;
+            if (this.periods == null || this.periods.storage.Count == 0) return GekkoTime.tNull;
+            return this.periods.storage[this.periods.storage.Count - 1].t2;
         }
 
         public TraceAndPeriods2 DeepClone(CloneHelper cloneHelper)
         {
-            List<GekkoTimeSpanSimple> xx = null;
+            GekkoTimeSpansSimple xx = null;
             if (this.periods != null)
             {
-                xx = new List<GekkoTimeSpanSimple>();
-                xx.AddRange(this.periods);  //the timespans themselves are immutable
+                xx = new GekkoTimeSpansSimple();
+                xx.storage.AddRange(this.periods.storage);  //the timespans themselves are immutable
             }
             return new TraceAndPeriods2(this.trace.DeepClone(cloneHelper), xx);
         }
