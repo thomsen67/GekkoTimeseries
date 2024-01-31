@@ -12914,7 +12914,7 @@ namespace UnitTests
 
                 if (i >= 1) I("write sletmig;");
                 if (i == 1) I("flush();");
-                if (i >= 1) I("flusread sletmig;");
+                if (i >= 1) I("read sletmig;");
 
                 // =============================================================================================
 

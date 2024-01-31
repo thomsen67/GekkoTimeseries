@@ -1412,6 +1412,12 @@ namespace Gekko
         public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
 
         /// <summary>
+        /// Pretty innocuous: using this, we can set .storage = null before protobuf.
+        /// </summary>
+        [ProtoMember(3)]
+        public List<List<GekkoTimeSpanSimple>> storagePeriodsTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
+
+        /// <summary>
         /// This is filled whenever the precedents are used.
         /// When not null, it has same size as .storage.
         /// Used to loop through to find traces with end dates >= new trace start date, so that the existing traces are possibly shadowed.
@@ -1525,11 +1531,13 @@ namespace Gekko
         public  void ToID()
         {
             this.storageIDTemporary = new List<TraceID2>();
+            this.storagePeriodsTemporary = new List<List<GekkoTimeSpanSimple>>();
             if (this.Count() > 0)
             {
                 foreach (TraceAndPeriods2 traceAndPeriods in this.GetStorage())
                 {
                     TraceID2 temp = null;
+                    List<GekkoTimeSpanSimple> temp2 = null;
                     if (traceAndPeriods.trace.type == ETraceType.Divider)
                     {
                         temp = new TraceID2();
@@ -1539,8 +1547,10 @@ namespace Gekko
                     else
                     {
                         temp = traceAndPeriods.trace.id;
+                        temp2 = traceAndPeriods.periods;
                     }
                     this.storageIDTemporary.Add(temp);
+                    this.storagePeriodsTemporary.Add(temp2);
                 }
             }
             this.SetStorage(null);
@@ -1551,8 +1561,12 @@ namespace Gekko
             if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
             {
                 this.storage = new List<TraceAndPeriods2>();
-                foreach (TraceID2 id in this.storageIDTemporary)
+                for(int i = 0;i< this.storageIDTemporary.Count;i++)
+                //foreach (TraceID2 id in this.storageIDTemporary)
                 {
+                    TraceID2 id = this.storageIDTemporary[i];
+                    List<GekkoTimeSpanSimple> periods = this.storagePeriodsTemporary[i];
+
                     if (id.counter == long.MinValue)
                     {
                         this.storage.Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));
@@ -1562,11 +1576,12 @@ namespace Gekko
                         if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
                         Trace2 trace = null; dict2.TryGetValue(id, out trace);
                         if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
-                        this.storage.Add(new TraceAndPeriods2(trace, Globals.traceNullPeriods));
+                        this.storage.Add(new TraceAndPeriods2(trace, periods));
                     }
                 }
             }
             this.storageIDTemporary = null;
+            this.storagePeriodsTemporary = null;
         }
 
         /// <summary>
