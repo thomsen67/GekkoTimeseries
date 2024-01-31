@@ -370,7 +370,20 @@ namespace Gekko
         {
             if (Globals.traceAlwaysShadow)
             {
-                return this.precedents.GetStorage();
+                //qwerty
+
+                if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
+                {
+                    List<TraceAndPeriods2> rv = InvertWallTime(this.precedents.GetStorage());
+                    if (rv.Count != this.precedents.Count()) new Error("TimeShadow problem");
+                    if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                    if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                    return rv;
+                }
+                else
+                {
+                    return this.precedents.GetStorage();
+                }
             }
             List<TraceAndPeriods2> rv3 = new List<TraceAndPeriods2>();
             if (this.precedents.Count() > 0)
