@@ -2109,6 +2109,25 @@ namespace Gekko
     }
 
     [ProtoContract]
+    public class GekkoTimeSpansSimple
+    {
+        [ProtoMember(1)]
+        public List<GekkoTimeSpanSimple> storage = null;
+
+        public override string ToString()
+        {
+            string s = null;
+            foreach (GekkoTimeSpanSimple x in this.storage)
+            {
+                s += x.ToString() + ", ";
+            }
+            if (s.EndsWith(", ")) s = s.Substring(0, s.Length - ", ".Length);
+            return s;
+        }
+    }
+
+
+    [ProtoContract]
     /// <summary>
     /// For use with Trace. Like GekkoTime it is immutable, but it is not a struct. Should it be??
     /// </summary>
