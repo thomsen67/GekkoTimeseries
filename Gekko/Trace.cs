@@ -1443,13 +1443,13 @@ namespace Gekko
         /// Pretty innocuous: using this, we can set .storage = null before protobuf.
         /// </summary>
         [ProtoMember(2)]
-        public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
+        public List<TraceID2> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general. Same size as .storagePeriodsTemporary
 
         /// <summary>
         /// Pretty innocuous: using this, we can set .storage = null before protobuf.
         /// </summary>
         [ProtoMember(3)]
-        public List<GekkoTimeSpansSimple> storagePeriodsTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general.
+        public List<GekkoTimeSpansSimple> storagePeriodsTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general. Same size as .storageIDTemporary
 
         /// <summary>
         /// This is filled whenever the precedents are used.
@@ -1571,7 +1571,7 @@ namespace Gekko
                 foreach (TraceAndPeriods2 traceAndPeriods in this.GetStorage())
                 {
                     TraceID2 temp = null;
-                    GekkoTimeSpansSimple temp2 = null;
+                    GekkoTimeSpansSimple temp2 = new GekkoTimeSpansSimple();  //protobuf cannot handle if an element is == null (for dividers)
                     if (traceAndPeriods.trace.type == ETraceType.Divider)
                     {
                         temp = new TraceID2();
@@ -1584,6 +1584,11 @@ namespace Gekko
                         temp2 = traceAndPeriods.periods;
                     }
                     this.storageIDTemporary.Add(temp);
+                    //qwerty
+                    if (temp2 == null)
+                    {
+
+                    }
                     this.storagePeriodsTemporary.Add(temp2);
                 }
             }
