@@ -2112,7 +2112,7 @@ namespace Gekko
     public class GekkoTimeSpansSimple
     {
         [ProtoMember(1)]
-        public List<GekkoTimeSpanSimple> storage = new List<GekkoTimeSpanSimple>();
+        private List<GekkoTimeSpanSimple> storage = new List<GekkoTimeSpanSimple>();
 
         public GekkoTimeSpanSimple this[int i]
         {
@@ -2122,6 +2122,30 @@ namespace Gekko
         public int Count() 
         {
             return this.storage.Count;
+        }
+
+        public void Add(GekkoTimeSpanSimple gts)
+        {
+            this.storage.Add(gts);
+        }
+
+        public void AddRange(GekkoTimeSpansSimple gtss)
+        {
+            this.storage.AddRange(gtss.storage);
+        }
+
+        /// <summary>
+        /// Use for iterators only.
+        /// </summary>
+        /// <returns></returns>
+        public List<GekkoTimeSpanSimple> GetStorage()
+        {
+            return this.storage;
+        }
+
+        public void SetStorage(List<GekkoTimeSpanSimple> input)
+        {
+            this.storage = input;
         }
 
         public override string ToString()
