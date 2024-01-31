@@ -8317,7 +8317,7 @@ namespace UnitTests
         {
             //==================== INDEX ===========================================
 
-            I("RESET;");
+            I("RESET;"); 
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("index f* to #mylist;                                      //finds all series in Work and puts them in #mylist");
