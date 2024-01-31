@@ -599,7 +599,7 @@ namespace Gekko
             //  
             //              
 
-            if (false)  //qwerty implement this again, but handle storageSorted too.
+            if (true)  //qwerty implement this again, but handle storageSorted too.
             {
                 if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
                 {
