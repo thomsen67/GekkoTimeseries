@@ -55,7 +55,7 @@ namespace Gekko
         public static bool traceWallTimeHandledSpecialWayFor1UnitTest = false;  //with true we get latest changes (in wall time) at top.
         public static bool traceShadowAtGluedLevel = true; //do shadowing anytime there is a statement, not just when writing/reading banks.
         public static bool traceAlwaysShadow = true;
-        public static GekkoTimeSpansSimple traceNullPeriods = null;  //just a pointer to know where to find these
+        public static GekkoTimeSpansSimple traceNullPeriods = new GekkoTimeSpansSimple();  //just a pointer to know where to find these. Only used for "divider" traces, because a null element cannot be protobuffed
         public static int traceN = 0;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;

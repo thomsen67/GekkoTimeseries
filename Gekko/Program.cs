@@ -21988,6 +21988,23 @@ namespace Gekko
                     //And a lot of small objects are not protobuffed anyway?
                     RuntimeTypeModel serializer = RuntimeTypeModel.Create();
                     serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+                    //qwerty
+                    List<Trace2> traces = o as List<Trace2>;
+                    if (traces != null)
+                    {
+                        foreach (Trace2 trace in traces)
+                        {
+                            foreach (GekkoTimeSpansSimple spans in trace.GetPrecedents_BewareOnlyInternalUse().storagePeriodsTemporary)
+                            {
+                                if (spans == null)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+
                     serializer.Serialize(fs, o);
                 }
                 catch (Exception e)
