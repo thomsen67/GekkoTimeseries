@@ -2125,26 +2125,12 @@ namespace Gekko
         }
 
         public void Add(GekkoTimeSpanSimple gts)
-        {
-            //qwerty
-            if (gts == null)
-            {
-
-            }
+        {            
             this.storage.Add(gts);
         }
 
         public void AddRange(GekkoTimeSpansSimple gtss)
-        {
-            //qwerty
-            foreach (GekkoTimeSpanSimple xx in gtss.GetStorage())
-            {                
-                if (xx == null)
-                {
-
-                }
-            }
-            
+        {            
             this.storage.AddRange(gtss.storage);
         }
 
@@ -2158,15 +2144,7 @@ namespace Gekko
         }
 
         public void SetStorage(List<GekkoTimeSpanSimple> input)
-        {
-            //qwerty
-            foreach (GekkoTimeSpanSimple xx in input)
-            {
-                if (xx == null)
-                {
-
-                }
-            }
+        {            
             this.storage = input;
         }
 

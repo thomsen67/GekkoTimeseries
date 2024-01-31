@@ -254,19 +254,6 @@ namespace Gekko
                         // --------- clone end ----------------
 
                         trace.precedents.GetStorage().Add(childTrace2Clone);
-
-                        //qwerty
-                        if (childTrace2Clone != null && childTrace2Clone.periods != null)
-                        {
-                            foreach (GekkoTimeSpanSimple xxx in childTrace2Clone.periods.GetStorage())
-                            {
-                                if (xxx == null)
-                                {
-
-                                }
-                            }
-                        }
-
                     }
                 }
             }
@@ -372,8 +359,6 @@ namespace Gekko
         {
             if (Globals.traceAlwaysShadow)
             {
-                //qwerty
-
                 if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
                 {
                     List<TraceAndPeriods2> rv = InvertWallTime(this.precedents.GetStorage());
@@ -432,7 +417,6 @@ namespace Gekko
                             tap.trace = new Trace2(ETraceType.Divider, true);
                             tap.periods = new GekkoTimeSpansSimple();
                             rv3.Add(tap);
-                            //rv.Add(new Trace2(ETraceType.Divider, true)); //divider, use ETraceType.Divider  ??????? QWERTY
                         }
                         counterI = -1;
                         spansList.Clear();
@@ -1599,12 +1583,7 @@ namespace Gekko
                         temp = traceAndPeriods.trace.id;
                         temp2 = traceAndPeriods.periods;
                     }
-                    this.storageIDTemporary.Add(temp);
-                    //qwerty
-                    if (temp2 == null)
-                    {
-
-                    }
+                    this.storageIDTemporary.Add(temp);                    
                     this.storagePeriodsTemporary.Add(temp2);
                 }
             }
