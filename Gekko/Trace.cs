@@ -1467,10 +1467,7 @@ namespace Gekko
                 foreach (TraceAndPeriods2 tap in this.storage)
                 {
                     GekkoTime tMax = tap.LastPeriod();
-                    if (tMax.IsNull())
-                    {
-                        new Error("Trace logic problem");
-                    }
+                    //if (tMax.IsNull()) new Error("Trace logic problem"); //this may happen, for instance copy command.                    
                     this.storageSorted.Add(new SortedBagItem(tMax, tap));
                 }
                 if (this.Count() != this.storageSorted.Count)
