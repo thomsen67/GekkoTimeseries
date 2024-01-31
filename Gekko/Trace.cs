@@ -252,6 +252,19 @@ namespace Gekko
                         // --------- clone end ----------------
 
                         trace.precedents.GetStorage().Add(childTrace2Clone);
+
+                        //qwerty
+                        if (childTrace2Clone != null && childTrace2Clone.periods != null)
+                        {
+                            foreach (GekkoTimeSpanSimple xxx in childTrace2Clone.periods.storage)
+                            {
+                                if (xxx == null)
+                                {
+
+                                }
+                            }
+                        }
+
                     }
                 }
             }
