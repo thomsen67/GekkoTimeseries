@@ -41,14 +41,16 @@ namespace Gekko
 
     [ProtoContract]
     public class TraceContents2
-    {
+    {       
         /// <summary>
-        /// An extra char in a text string here will take up 2 bytes or 16 bits.
-        /// </summary>        
-
+        /// 1 timespan. This object is immutable (just as GekkoTime)
+        /// </summary>
         [ProtoMember(1)]
         public GekkoTimeSpanSimple period = null;
 
+        /// <summary>
+        /// An extra char in a text string here will take up 2 bytes or 16 bits.
+        /// </summary>        
         [ProtoMember(2)]
         public string text = null;
 
@@ -904,11 +906,10 @@ namespace Gekko
                 TraceAndPeriods2 tap6 = new TraceAndPeriods2();
                 tap6.trace = trace;
                 GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
-                xx.SetStorage(new List<GekkoTimeSpanSimple>() { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) });
+                xx.SetStorage(new List<GekkoTimeSpanSimple>() { tap6.trace.contents.period });  //should be ok to just add it here, because .contents.period never changes (is immutable anyway)
+                //xx.SetStorage(new List<GekkoTimeSpanSimple>() { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) });
                 tap6.periods = xx;
                 ts.meta.trace2.precedents.Add(tap6);
-
-
             }            
             else if (type == ETracePushType.Sibling)
             {
