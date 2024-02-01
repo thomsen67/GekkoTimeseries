@@ -651,13 +651,11 @@ namespace Gekko
                 }
 
                 if (mustUpdateSorted)
-                {
-                    var zz = this.precedents.GetStorageSorted();
-                    zz.RemoveWhere(Program.MustBeRemoved);
-                    this.precedents.SetStorageSorted(zz);
+                {                    
+                    this.precedents.GetStorageSorted().RemoveWhere(Program.MustBeRemoved);
+
                     if (addToSorted.Count > 0)
-                    {
-                        //if (this.precedents.GetStorageSorted() == null) this.precedents.SetStorageSorted(new SortedSet<SortedBagItem>(new SortedBagComparer()));
+                    {                        
                         foreach (TraceAndPeriods2 tap in addToSorted)
                         {
                             this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
@@ -1405,7 +1403,7 @@ namespace Gekko
                 this.storage = new List<TraceAndPeriods2>();
                 this.storageSorted = new SortedSet<SortedBagItem>(new SortedBagComparer());
             }
-            RecreateSorted();
+            this.RecreateSorted();
             this.storage.Add(traceAndPeriods);
             this.storageSorted.Add(new SortedBagItem(traceAndPeriods.LastPeriod(), traceAndPeriods));
         }
@@ -1436,21 +1434,6 @@ namespace Gekko
         {
             if (m != null && m.Count == 0) this.storage = null; //so it does not take up space
             else this.storage = m;
-        }
-
-        /// <summary>
-        /// Use this with care. Beware that this method will not set .storageSorted = null.
-        /// </summary>
-        /// <param name="m"></param>
-        public void SetStorageSorted(SortedSet<SortedBagItem> m)
-        {
-            if (false)
-            {
-                //We do not do this for .storageSorted. We want == null to mean that it is not up to date, 
-                //not that it is up to date but has 0 elements.
-                if (m != null && m.Count == 0) this.storageSorted = null; //so it does not take up space
-            }
-            else this.storageSorted = m;
         }
 
         public void InitWithEmptyList()

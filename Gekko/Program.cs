@@ -2130,20 +2130,6 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (false)
-                {
-                    SortedSet<SortedBagItem> temp = new SortedSet<SortedBagItem>(new SortedBagComparer());
-                    TraceAndPeriods2 tap1 = new TraceAndPeriods2(new Trace2(ETraceType.Normal, new GekkoTime(EFreq.A, 2021, 1), new GekkoTime(EFreq.A, 2022, 1)), null);
-                    var x1 = new SortedBagItem(new GekkoTime(EFreq.A, 2002, 1), tap1);
-                    x1.mustBeRemoved = true;
-                    temp.Add(x1);
-                    TraceAndPeriods2 tap2 = new TraceAndPeriods2(new Trace2(ETraceType.Normal, new GekkoTime(EFreq.A, 2021, 1), new GekkoTime(EFreq.A, 2022, 1)), null);
-                    var x2 = new SortedBagItem(new GekkoTime(EFreq.A, 2001, 1), tap2);
-                    x2.mustBeRemoved = false;
-                    temp.Add(x2);
-                    int i = temp.RemoveWhere(MustBeRemoved);
-                }
-                                
                 int X = 0; int Y = 0;
                 int Width = 0; int Height = 0;
                 bool outOfBounds =
@@ -2152,24 +2138,7 @@ namespace Gekko
     (System.Windows.SystemParameters.VirtualScreenLeft + System.Windows.SystemParameters.VirtualScreenWidth <= X) ||
     (System.Windows.SystemParameters.VirtualScreenTop + System.Windows.SystemParameters.VirtualScreenHeight <= Y);
                 new Writeln("Left " + System.Windows.SystemParameters.VirtualScreenLeft + " top " + System.Windows.SystemParameters.VirtualScreenTop + " width " + System.Windows.SystemParameters.VirtualScreenWidth + " height " + System.Windows.SystemParameters.VirtualScreenHeight);
-
-                //SortedDictionary<GekkoTime, string> dict = new SortedDictionary<GekkoTime, string>();
-                //dict.Add(new GekkoTime(EFreq.A, 2011, 1), "2011");
-                //dict.Add(new GekkoTime(EFreq.A, 2006, 1), "2006");
-                //dict.Add(new GekkoTime(EFreq.A, 2003, 1), "2003");
-                //dict.Add(new GekkoTime(EFreq.A, 2004, 1), "2004");
-                //foreach (string s in dict.Values)
-                //{
-                //    new Writeln(s);
-                //}
-
-
-
-
-
-
-
-            }
+                            }
 
             if (false && Globals.runningOnTTComputer)
             {                
