@@ -2115,10 +2115,10 @@ namespace Gekko
             return stackTrace;
         }
 
-        public static bool MustBeRemoved(SortedBagItem x)
-        {
-            return x.mustBeRemoved;
-        }
+        //public static bool MustBeRemoved(SortedBagItem x)
+        //{
+        //    return x.mustBeRemoved;
+        //}
 
 
         /// <summary>

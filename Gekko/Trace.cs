@@ -576,15 +576,16 @@ namespace Gekko
             {
                 List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
                 List<TraceAndPeriods2> removeInUnsorted = new List<TraceAndPeriods2>();
-                foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
+                List<SortedBagItem> removeInSorted = new List<SortedBagItem>();
+                foreach (SortedBagItem sbi in this.precedents.GetStorageSorted())
                 {
                     //Look at each TraceAndPeriods2 in sorted order (last end period first)
-                    if (kvp.t.IsNull()) break;  //no shadowing for null-times
-                    if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t)) break;  //not neccessary to look any further!
+                    if (sbi.t.IsNull()) break;  //no shadowing for null-times
+                    if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(sbi.t)) break;  //not neccessary to look any further!
 
                     //Shadow
                     GekkoTimeSpansSimple newSpans = new GekkoTimeSpansSimple();
-                    foreach (GekkoTimeSpanSimple span in kvp.tap.periods.GetStorage())
+                    foreach (GekkoTimeSpanSimple span in sbi.tap.periods.GetStorage())
                     {
                         //The existing precedent may have several active periods
                         newSpans.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span));
@@ -596,18 +597,20 @@ namespace Gekko
                         //must be removed
                         //this.precedents.UpdateSorted();
                         mustUpdateSorted = true;
-                        kvp.mustBeRemoved = true;
-                        removeInUnsorted.Add(kvp.tap);
+                        //sbi.mustBeRemoved = true;
+                        removeInSorted.Add(sbi);
+                        removeInUnsorted.Add(sbi.tap);
 
                     }
-                    else if (!newSpans.GetStorage()[newSpans.Count() - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
+                    else if (!newSpans.GetStorage()[newSpans.Count() - 1].t2.EqualsGekkoTime(sbi.tap.LastPeriod()))
                     {
                         //It must be removed and added again because the last t2 of the spans changes
                         mustUpdateSorted = true;
-                        kvp.mustBeRemoved = true;
-                        addToSorted.Add(kvp.tap);
+                        //sbi.mustBeRemoved = true;
+                        removeInSorted.Add(sbi);
+                        addToSorted.Add(sbi.tap);
                     }
-                    kvp.tap.periods = newSpans;  //Cannot be omitted here, this kvp is not sure to be removed later on.
+                    sbi.tap.periods = newSpans;  //Cannot be omitted here, this kvp is not sure to be removed later on.
                 }
 
                 if (removeInUnsorted.Count > 0)
@@ -652,7 +655,12 @@ namespace Gekko
 
                 if (mustUpdateSorted)
                 {                    
-                    this.precedents.GetStorageSorted().RemoveWhere(Program.MustBeRemoved);
+                    //this.precedents.GetStorageSorted().RemoveWhere(Program.MustBeRemoved);
+
+                    foreach (SortedBagItem sbi in removeInSorted)
+                    {
+                        this.precedents.GetStorageSorted().Remove(sbi);  //has O(log n), where RemoveWhere() has O(n).
+                    }
 
                     if (addToSorted.Count > 0)
                     {                        
@@ -1350,9 +1358,16 @@ namespace Gekko
         /// When not null, it has same size as .storage.
         /// Used to loop through to find traces with end dates >= new trace start date, so that the existing traces are possibly shadowed.
         /// Note: items are in reverse GekkoTime order, so traces with high ending dates are first.
+        /// It seems the tree is a self-balancing red-black tree, with O(log n) for insert, delete, and lookup.        /// 
         /// </summary>        
         private SortedSet<SortedBagItem> storageSorted = null;
 
+        /// <summary>
+        /// The .storageSorted binary tree is not kept in protobuf, but is a "helper" tree that helps .storage identifying
+        /// trace periods that are so small that they are not affected by a new trace. Using the binary tree avoids searching
+        /// the whole .storage list in a linear fashion. This will become important when -- in time -- the tracing 
+        /// lists grow in volume. So better to get it implemented and tested now.
+        /// </summary>
         public void RecreateSorted()
         {
             if (this.storage != null && this.storageSorted == null)
@@ -1379,13 +1394,11 @@ namespace Gekko
         {            
             if (precedents.storage != null && precedents.Count() > 0)
             {
-                if (this.storage == null) this.storage = new List<TraceAndPeriods2>();                
-
-                foreach (TraceAndPeriods2 xx in precedents.storage)
+                if (this.storage == null) this.storage = new List<TraceAndPeriods2>();
+                foreach (TraceAndPeriods2 tap in precedents.storage)
                 {
-                    this.Add(xx);
+                    this.Add(tap); //also updates .storageSorted
                 }
-                //this.storage.AddRange(precedents.storage);
             }
         }        
 
@@ -1653,7 +1666,7 @@ namespace Gekko
     {
         public GekkoTime t = GekkoTime.tNull;
         public TraceAndPeriods2 tap;
-        public bool mustBeRemoved = false;
+        //public bool mustBeRemoved = false;
 
         public SortedBagItem(GekkoTime t, TraceAndPeriods2 tap) 
         {
