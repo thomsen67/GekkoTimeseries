@@ -510,24 +510,28 @@ namespace Gekko
                     //Could perhaps also have logic that works if the previous trace has a *larger* period than the new.
                     //Then the larger trace is cut in 2 (potentially), but no more seacrhing is necessary.
                     //Think about speeding up shadowing.
-                    if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
+                    if (n > 0)
                     {
-                        // --- Remove from SortedSet --- 
-                        SortedBagItem sbi = new SortedBagItem(this.precedents.GetStorage()[n - 1].LastPeriod(), new TraceAndPeriods2(this.precedents.GetStorage()[n - 1].trace, this.precedents.GetStorage()[n - 1].periods));
-                        bool success = this.precedents.GetStorageSorted().Remove(sbi);  //has O(log n), where RemoveWhere() has O(n).                        
-                        if (!success) new Error("Trace: sorted set problem");  //remove this check after some time
-                        
-                        // --- Add to SortedSet --- 
-                        TraceAndPeriods2 tap = new TraceAndPeriods2();
-                        tap.trace = traceThatIsGoingToBeAdded;
-                        tap.periods = new GekkoTimeSpansSimple(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });                        
-                        this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
-                        
-                        // --- Replace in unsorted list.  --- 
-                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;                        
-                        
-                        if (this.precedents.GetStorage().Count() != this.precedents.GetStorageSorted().Count) new Error("Trace: counts do not match");
-                        return;
+                        TraceAndPeriods2 tapLast = this.precedents.GetStorage()[n - 1];
+                        if (!traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && tapLast.trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && tapLast.trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
+                        {
+                            // --- Remove from SortedSet --- 
+                            SortedBagItem sbi = new SortedBagItem(tapLast.LastPeriod(), new TraceAndPeriods2(tapLast.trace, tapLast.periods));
+                            bool success = this.precedents.GetStorageSorted().Remove(sbi);  //has O(log n), where RemoveWhere() has O(n).                        
+                            if (!success) new Error("Trace: sorted set problem");  //remove this check after some time
+
+                            // --- Add to SortedSet --- 
+                            TraceAndPeriods2 tap = new TraceAndPeriods2();
+                            tap.trace = traceThatIsGoingToBeAdded;
+                            tap.periods = new GekkoTimeSpansSimple(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });
+                            this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
+
+                            // --- Replace in unsorted list.  --- 
+                            tapLast.trace = traceThatIsGoingToBeAdded;
+
+                            if (this.precedents.GetStorage().Count() != this.precedents.GetStorageSorted().Count) new Error("Trace: counts do not match");
+                            return;
+                        }
                     }
                 }
             }
