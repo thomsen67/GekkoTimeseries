@@ -12903,11 +12903,6 @@ namespace UnitTests
                 {
                     I("flush();");  //but do not do it for i == 2!
                 }
-
-                if (i >= 1)
-                {
-
-                }
                 
                 I("reset;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");

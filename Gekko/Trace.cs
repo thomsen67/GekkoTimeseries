@@ -502,7 +502,7 @@ namespace Gekko
             //
             //        
 
-            if (false)  //!!! KEEP IT FALSE FOR NOW !!!
+            if (true)  //!!! KEEP IT FALSE FOR NOW !!!
             {
                 if (traceThatIsGoingToBeAdded != null)
                 {
@@ -512,15 +512,21 @@ namespace Gekko
                     //Think about speeding up shadowing.
                     if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
                     {
-                        //new trace is not-null and has exactly same periods as last trace
-                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;
-                        //
-                        // PROBLEM: How to remove the last added trace from this.precedents.GetStorageSorted() in an efficient way?
-                        //          Maybe via trace ID.
-                        //          If this is implemented, test it extremely well!!
-                        //          Solving the problem may yield a little speedup, but due to sorting not in the extreme.
-                        //          Therefore better to deactivate now.
-                        //
+                        // --- Remove from SortedSet --- 
+                        SortedBagItem sbi = new SortedBagItem(this.precedents.GetStorage()[n - 1].LastPeriod(), new TraceAndPeriods2(this.precedents.GetStorage()[n - 1].trace, this.precedents.GetStorage()[n - 1].periods));
+                        bool success = this.precedents.GetStorageSorted().Remove(sbi);  //has O(log n), where RemoveWhere() has O(n).                        
+                        if (!success) new Error("Trace: sorted set problem");  //remove this check after some time
+                        
+                        // --- Add to SortedSet --- 
+                        TraceAndPeriods2 tap = new TraceAndPeriods2();
+                        tap.trace = traceThatIsGoingToBeAdded;
+                        tap.periods = new GekkoTimeSpansSimple(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });                        
+                        this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
+                        
+                        // --- Replace in unsorted list.  --- 
+                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;                        
+                        
+                        if (this.precedents.GetStorage().Count() != this.precedents.GetStorageSorted().Count) new Error("Trace: counts do not match");
                         return;
                     }
                 }
@@ -655,13 +661,11 @@ namespace Gekko
 
                 if (mustUpdateSorted)
                 {                    
-                    //this.precedents.GetStorageSorted().RemoveWhere(Program.MustBeRemoved);
-
                     foreach (SortedBagItem sbi in removeInSorted)
                     {
                         this.precedents.GetStorageSorted().Remove(sbi);  //has O(log n), where RemoveWhere() has O(n).
                     }
-
+                    
                     if (addToSorted.Count > 0)
                     {                        
                         foreach (TraceAndPeriods2 tap in addToSorted)
@@ -678,10 +682,8 @@ namespace Gekko
             }
 
             TraceAndPeriods2 tap5 = new TraceAndPeriods2();
-            tap5.trace = traceThatIsGoingToBeAdded;
-            GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
-            xx.SetStorage(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });
-            tap5.periods = xx;
+            tap5.trace = traceThatIsGoingToBeAdded;            
+            tap5.periods = new GekkoTimeSpansSimple(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });
             this.precedents.Add(tap5);
         }     
 
@@ -790,8 +792,14 @@ namespace Gekko
             if (trace.contents.text == null) new Error("Trace problem: trace.contents.text == null");
             if (ts.meta == null) new Error("Trace problem: ts.meta == null");
             
-            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);            
-            if (type == ETracePushType.NewParent)
+            if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
+
+            if (type == ETracePushType.Sibling)
+            {
+                //In something like "reset; y = 1; y = 2;" this is called 2 times.
+                ts.meta.trace2.PrecedentsShadowing(trace);
+            }
+            else if (type == ETracePushType.NewParent)
             {                   
                 trace.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents2();
@@ -804,11 +812,6 @@ namespace Gekko
                 tap6.periods = xx;
                 ts.meta.trace2.precedents.Add(tap6);
             }            
-            else if (type == ETracePushType.Sibling)
-            {
-                //In something like "reset; y = 1; y = 2;" this part is called 2 times.                         
-                ts.meta.trace2.PrecedentsShadowing(trace);                
-            }
             else new Error("Trace");
         }        
 
@@ -1662,7 +1665,7 @@ namespace Gekko
         }
     }
 
-    public class SortedBagItem
+    public class SortedBagItem  //Comparer: #kjhahaiuoslkfd
     {
         public GekkoTime t = GekkoTime.tNull;
         public TraceAndPeriods2 tap;
@@ -1672,10 +1675,10 @@ namespace Gekko
         {
             this.t = t;
             this.tap = tap;
-        }
+        }    
     }
 
-    public class SortedBagComparer : IComparer<SortedBagItem>
+    public class SortedBagComparer : IComparer<SortedBagItem>  //Object: #kjhahaiuoslkfd
     {
         public int Compare(SortedBagItem x, SortedBagItem y)
         {

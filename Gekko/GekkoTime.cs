@@ -1891,17 +1891,7 @@ namespace Gekko
             var easterDay = 1 + (p + 27 + (p + 6) / 40) % 31;
             var easterMonth = 3 + (p + 26) / 30;
             return new GekkoTime(EFreq.D, year, easterMonth, easterDay);
-        }
-
-        // NOTE: It seems reflection is used and therefore Equals() checks the fields.
-        //       Using default probably means use of reflection and boxing, so could be slow
-        //       if used in a tight loop or something. For slower things probably ok.
-        //public override bool Equals(Object obj)
-        //{            
-        //}
-        //public override int GetHashCode()
-        //{         
-        //}
+        }        
 
         public int CompareTo(GekkoTime other)
         {         
@@ -2113,6 +2103,14 @@ namespace Gekko
     {
         [ProtoMember(1)]
         private List<GekkoTimeSpanSimple> storage = new List<GekkoTimeSpanSimple>();
+
+        public GekkoTimeSpansSimple()
+        {
+        }
+        public GekkoTimeSpansSimple(List<GekkoTimeSpanSimple> x)
+        {
+            this.storage = x;
+        }
 
         public GekkoTimeSpanSimple this[int i]
         {
