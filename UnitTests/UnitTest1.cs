@@ -8474,7 +8474,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_SpeedTrace()
+        public void _Test_TraceSpeed()
         {
             I("reset; for val %i = 1950 to 2010; x <%i %i> = 100 + %i; end; x = 0; for val %i = 1 to 100000; x += 1; end;");
             //to the test, make sure trace percentage is < 3%.
@@ -13674,194 +13674,176 @@ namespace UnitTests
             //                   6                                                                 1
             //So with shadowing, only the numbers nearest the bottom survive.
 
+            I("reset;");
+            I("option databank trace = yes; time 2001 2005;");
+            I("x1 <2001 2005> = 1;");
+            I("x1 <2002 2004> = 100;");
+            // --------------
+            I("x2 <2002 2008> = 1;");
+            I("x2 <2005 2005> = 2;");
+            I("x2 <2001 2003> = 3;");
+            I("x2 <2006 2009> = 4;");
+            I("x2 <2001 2004> = 5;");
+            I("x2 <2003 2003> = 6;");
+            // --------------
+            I("x3 <2021 2025> = 3;");
+            I("x3 <2022 2024> = 300;");
+            I("x = x1 + x2 + x3;");
+            Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
+            List<TraceAndPeriods2> m = x.meta.trace2.TimeShadow2()[0].trace.TimeShadow2();
+            //
+            Assert.AreEqual(10, m.Count);
+            int i = 0;
+            Assert.AreEqual("x1 <2002 2004> = 100;", m[i].trace.contents.text);
+            Assert.AreEqual(1, m[i].periods.Count());
+            Assert.AreEqual(2002, m[i].periods[0].t1.super);
+            Assert.AreEqual(2004, m[i].periods[0].t2.super);
+            i++;
+            Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
+            Assert.AreEqual(2, m[i].periods.Count());
+            Assert.AreEqual(2001, m[i].periods[0].t1.super);
+            Assert.AreEqual(2001, m[i].periods[0].t2.super);
+            Assert.AreEqual(2005, m[i].periods[1].t1.super);
+            Assert.AreEqual(2005, m[i].periods[1].t2.super);
+            i++;
+            Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
+                                                                  //i++;
+                                                                  //Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
+                                                                  //Assert.AreEqual(0, m[i].periods.Count);
 
-            bool traceShadowAtGluedLevel_remember = Globals.traceShadowAtGluedLevel;
-            try
+            i++;
+            Assert.AreEqual("x2 <2003 2003> = 6;", m[i].trace.contents.text);
+            Assert.AreEqual(1, m[i].periods.Count());
+            Assert.AreEqual(2003, m[i].periods[0].t1.super);
+            Assert.AreEqual(2003, m[i].periods[0].t2.super);
+            i++;
+            Assert.AreEqual("x2 <2001 2004> = 5;", m[i].trace.contents.text);
+            Assert.AreEqual(2, m[i].periods.Count());
+            Assert.AreEqual(2001, m[i].periods[0].t1.super);
+            Assert.AreEqual(2002, m[i].periods[0].t2.super);
+            Assert.AreEqual(2004, m[i].periods[1].t1.super);
+            Assert.AreEqual(2004, m[i].periods[1].t2.super);
+            i++;
+            Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
+            Assert.AreEqual(1, m[i].periods.Count());
+            Assert.AreEqual(2006, m[i].periods[0].t1.super);
+            Assert.AreEqual(2009, m[i].periods[0].t2.super);
+            i++;
+            Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
+            Assert.AreEqual(1, m[i].periods.Count());
+            Assert.AreEqual(2005, m[i].periods[0].t1.super);
+            Assert.AreEqual(2005, m[i].periods[0].t2.super);
+            //i++;
+            //Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
+            //Assert.AreEqual(0, m[i].periods.Count);                                  
+            i++;
+            Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
+            i++;
+            Assert.AreEqual("x3 <2022 2024> = 300;", m[i].trace.contents.text);
+            Assert.AreEqual(1, m[i].periods.Count());
+            Assert.AreEqual(2022, m[i].periods[0].t1.super);
+            Assert.AreEqual(2024, m[i].periods[0].t2.super);
+            i++;
+            Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
+            Assert.AreEqual(2, m[i].periods.Count());
+            Assert.AreEqual(2021, m[i].periods[0].t1.super);
+            Assert.AreEqual(2021, m[i].periods[0].t2.super);
+            Assert.AreEqual(2025, m[i].periods[1].t1.super);
+            Assert.AreEqual(2025, m[i].periods[1].t2.super);
+
+            // Trace objects created:
+            //
+            // <parent>
+            // x1=1
+            // x1=100
+            // <parent>
+            // x2=1
+            // x2=2
+            // x2=3
+            // x2=4
+            // x2=5
+            // x2=6
+            // <parent>
+            // x3=3
+            // x3=300
+            // <parent>
+            // x=x1+x3+x3
+            //
+            // The <parent> nodes stick out from series objects (x1, x2, x3 and x).
+            // x has 2+1+4+1+2 = 10 precedents, of which 2 are null-dividers
+            //
+            // x1 -- <parent> -- x1=1          ]
+            //                -- x1=100        ]
+            //                                 ]
+            // x2 -- <parent> -- x2=1 *dead*   ]
+            //                -- x2=2          ]
+            //                -- x2=3 *dead*   ]
+            //                -- x2=4          ] ... <---+
+            //                -- x2=5          ]         |
+            //                -- x2=6          ]         |
+            //                                 ]   points back to 2+1+4+1+2=10 traces from x1, x2 and x3,
+            // x1 -- <parent> -- x3=3          ]   including 2 null-dividers for a total of 10 children (8 real)
+            //                -- x3=300        ]         |
+            //                                           |
+            // x  -- <parent> -- x=x1+x2+x3 -------------+
+            //
+            // 
+
+            Globals.unitTestScreenOutput.Clear();
+            I("tracestats2();");
+            string s1 = Globals.unitTestScreenOutput.ToString();
+            if (false)
             {
-                for (int ii = 1; ii < 2; ii++)
-                {
-                    if (ii == 0) Globals.traceShadowAtGluedLevel = false;
-                    else Globals.traceShadowAtGluedLevel = true;
-
-                    //if (ii == 1) Assert.Inconclusive("Do this for traceShadowAtGluedLevel = true also!");
-
-
-                    I("reset;");
-                    I("option databank trace = yes; time 2001 2005;");
-                    I("x1 <2001 2005> = 1;");
-                    I("x1 <2002 2004> = 100;");
-                    // --------------
-                    I("x2 <2002 2008> = 1;");
-                    I("x2 <2005 2005> = 2;");
-                    I("x2 <2001 2003> = 3;");
-                    I("x2 <2006 2009> = 4;");
-                    I("x2 <2001 2004> = 5;");
-                    I("x2 <2003 2003> = 6;");
-                    // --------------
-                    I("x3 <2021 2025> = 3;");
-                    I("x3 <2022 2024> = 300;");
-                    I("x = x1 + x2 + x3;");
-                    Series x = Program.databanks.GetFirst().GetIVariable("x!a") as Series;
-                    List<TraceAndPeriods2> m = x.meta.trace2.TimeShadow2()[0].trace.TimeShadow2();
-                    //
-                    Assert.AreEqual(10, m.Count);
-                    int i = 0;
-                    Assert.AreEqual("x1 <2002 2004> = 100;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count());
-                    Assert.AreEqual(2002, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2004, m[i].periods[0].t2.super);
-                    i++;
-                    Assert.AreEqual("x1 <2001 2005> = 1;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count());
-                    Assert.AreEqual(2001, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2001, m[i].periods[0].t2.super);
-                    Assert.AreEqual(2005, m[i].periods[1].t1.super);
-                    Assert.AreEqual(2005, m[i].periods[1].t2.super);
-                    i++;
-                    Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
-                                                                          //i++;
-                                                                          //Assert.AreEqual("x2 <2002 2008> = 1;", m[i].trace.contents.text);
-                                                                          //Assert.AreEqual(0, m[i].periods.Count);
-
-                    i++;
-                    Assert.AreEqual("x2 <2003 2003> = 6;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count());
-                    Assert.AreEqual(2003, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2003, m[i].periods[0].t2.super);
-                    i++;
-                    Assert.AreEqual("x2 <2001 2004> = 5;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count());
-                    Assert.AreEqual(2001, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2002, m[i].periods[0].t2.super);
-                    Assert.AreEqual(2004, m[i].periods[1].t1.super);
-                    Assert.AreEqual(2004, m[i].periods[1].t2.super);
-                    i++;
-                    Assert.AreEqual("x2 <2006 2009> = 4;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count());
-                    Assert.AreEqual(2006, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2009, m[i].periods[0].t2.super);
-                    i++;
-                    Assert.AreEqual("x2 <2005 2005> = 2;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count());
-                    Assert.AreEqual(2005, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2005, m[i].periods[0].t2.super);
-                    //i++;
-                    //Assert.AreEqual("x2 <2001 2003> = 3;", m[i].trace.contents.text);
-                    //Assert.AreEqual(0, m[i].periods.Count);                                  
-                    i++;
-                    Assert.AreEqual(m[i].trace.type, ETraceType.Divider); //---------------------------------------------
-                    i++;
-                    Assert.AreEqual("x3 <2022 2024> = 300;", m[i].trace.contents.text);
-                    Assert.AreEqual(1, m[i].periods.Count());
-                    Assert.AreEqual(2022, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2024, m[i].periods[0].t2.super);
-                    i++;
-                    Assert.AreEqual("x3 <2021 2025> = 3;", m[i].trace.contents.text);
-                    Assert.AreEqual(2, m[i].periods.Count());
-                    Assert.AreEqual(2021, m[i].periods[0].t1.super);
-                    Assert.AreEqual(2021, m[i].periods[0].t2.super);
-                    Assert.AreEqual(2025, m[i].periods[1].t1.super);
-                    Assert.AreEqual(2025, m[i].periods[1].t2.super);
-
-                    // Trace objects created:
-                    //
-                    // <parent>
-                    // x1=1
-                    // x1=100
-                    // <parent>
-                    // x2=1
-                    // x2=2
-                    // x2=3
-                    // x2=4
-                    // x2=5
-                    // x2=6
-                    // <parent>
-                    // x3=3
-                    // x3=300
-                    // <parent>
-                    // x=x1+x3+x3
-                    //
-                    // The <parent> nodes stick out from series objects (x1, x2, x3 and x).
-                    // x has 2+1+4+1+2 = 10 precedents, of which 2 are null-dividers
-                    //
-                    // x1 -- <parent> -- x1=1          ]
-                    //                -- x1=100        ]
-                    //                                 ]
-                    // x2 -- <parent> -- x2=1 *dead*   ]
-                    //                -- x2=2          ]
-                    //                -- x2=3 *dead*   ]
-                    //                -- x2=4          ] ... <---+
-                    //                -- x2=5          ]         |
-                    //                -- x2=6          ]         |
-                    //                                 ]   points back to 2+1+4+1+2=10 traces from x1, x2 and x3,
-                    // x1 -- <parent> -- x3=3          ]   including 2 null-dividers for a total of 10 children (8 real)
-                    //                -- x3=300        ]         |
-                    //                                           |
-                    // x  -- <parent> -- x=x1+x2+x3 -------------+
-                    //
-                    // 
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("tracestats2();");
-                    string s1 = Globals.unitTestScreenOutput.ToString();
-                    if (false)
-                    {
-                        Assert.IsTrue(s1.Contains(" 4 series with 11 reachable traces "));
-                        Assert.IsTrue(s1.Contains("--> depth: 0, traces: 11" + G.NL));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(s1.Contains(" 4 series with 9 reachable traces "));
-                        Assert.IsTrue(s1.Contains("--> depth: 0, traces: 9" + G.NL));
-                    }
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("clone;");
-                    I("tracedelete2('ref');");
-                    string s2 = Globals.unitTestScreenOutput.ToString();
-                    if (false) Assert.IsTrue(s2.Contains("Deleted 11 data traces from databank 'Ref'"));
-                    else Assert.IsTrue(s2.Contains("Deleted 9 data traces from databank 'Ref'"));
-
-                    if (false)
-                    {
-                        Globals.unitTestScreenOutput.Clear();
-                        I("tracetrim2();");
-                        string s2a = Globals.unitTestScreenOutput.ToString();
-                        Assert.IsTrue(s2a.Contains("Removed trace connections")); //used to be: "Removed trace 4 connections" //2 shadowed traces have references cut. They are referenced from both x1 and x (therefore 4 deleted references in all).
-                    }
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("tracestats2();");
-                    string s3 = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s3.Contains(" 4 series with 9 reachable traces "));
-                    Assert.IsTrue(s3.Contains("--> depth: 0, traces: 9" + G.NL));
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("delete x1; tracestats2();");
-                    string s4 = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s4.Contains(" 3 series with 9 reachable traces "));
-                    Assert.IsTrue(s4.Contains("--> depth: 0, traces: 7" + G.NL));
-                    Assert.IsTrue(s4.Contains("--> depth: 1, traces: 2" + G.NL));
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("delete x2; tracestats2();");
-                    string s5 = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s5.Contains(" 2 series with 9 reachable traces "));
-                    Assert.IsTrue(s5.Contains("--> depth: 0, traces: 3" + G.NL));
-                    Assert.IsTrue(s5.Contains("--> depth: 1, traces: 6" + G.NL));
-
-                    Globals.unitTestScreenOutput.Clear();
-                    I("delete x3; tracestats2();");
-                    string s6 = Globals.unitTestScreenOutput.ToString();
-                    Assert.IsTrue(s6.Contains(" 1 series with 9 reachable traces "));
-                    Assert.IsTrue(s6.Contains("--> depth: 0, traces: 1" + G.NL));
-                    Assert.IsTrue(s6.Contains("--> depth: 1, traces: 8" + G.NL));
-                }
+                Assert.IsTrue(s1.Contains(" 4 series with 11 reachable traces "));
+                Assert.IsTrue(s1.Contains("--> depth: 0, traces: 11" + G.NL));
             }
-            finally
+            else
             {
-                Globals.traceShadowAtGluedLevel = traceShadowAtGluedLevel_remember;
+                Assert.IsTrue(s1.Contains(" 4 series with 9 reachable traces "));
+                Assert.IsTrue(s1.Contains("--> depth: 0, traces: 9" + G.NL));
             }
+
+            Globals.unitTestScreenOutput.Clear();
+            I("clone;");
+            I("tracedelete2('ref');");
+            string s2 = Globals.unitTestScreenOutput.ToString();
+            if (false) Assert.IsTrue(s2.Contains("Deleted 11 data traces from databank 'Ref'"));
+            else Assert.IsTrue(s2.Contains("Deleted 9 data traces from databank 'Ref'"));
+
+            if (false)
+            {
+                Globals.unitTestScreenOutput.Clear();
+                I("tracetrim2();");
+                string s2a = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s2a.Contains("Removed trace connections")); //used to be: "Removed trace 4 connections" //2 shadowed traces have references cut. They are referenced from both x1 and x (therefore 4 deleted references in all).
+            }
+
+            Globals.unitTestScreenOutput.Clear();
+            I("tracestats2();");
+            string s3 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s3.Contains(" 4 series with 9 reachable traces "));
+            Assert.IsTrue(s3.Contains("--> depth: 0, traces: 9" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x1; tracestats2();");
+            string s4 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s4.Contains(" 3 series with 9 reachable traces "));
+            Assert.IsTrue(s4.Contains("--> depth: 0, traces: 7" + G.NL));
+            Assert.IsTrue(s4.Contains("--> depth: 1, traces: 2" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x2; tracestats2();");
+            string s5 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s5.Contains(" 2 series with 9 reachable traces "));
+            Assert.IsTrue(s5.Contains("--> depth: 0, traces: 3" + G.NL));
+            Assert.IsTrue(s5.Contains("--> depth: 1, traces: 6" + G.NL));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("delete x3; tracestats2();");
+            string s6 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s6.Contains(" 1 series with 9 reachable traces "));
+            Assert.IsTrue(s6.Contains("--> depth: 0, traces: 1" + G.NL));
+            Assert.IsTrue(s6.Contains("--> depth: 1, traces: 8" + G.NL));
         }
 
         [TestMethod]
@@ -14367,367 +14349,357 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceBasics()
         {
-            bool traceShadowAtGluedLevel_remember = Globals.traceShadowAtGluedLevel;
             bool traceWallTimeHandledSpecialWayFor1UnitTest_remember = Globals.traceWallTimeHandledSpecialWayFor1UnitTest;
             try
             {
                 Globals.traceWallTimeHandledSpecialWayFor1UnitTest = true;  //will have same order as statements, but Gekko does not show trace in that order. But that is a technicality, checked elsewhere.
 
-                for (int ii = 1; ii < 2; ii++)  //NOTE NOTE NOTE: ii = 0 is no longer done !!!!!
+                double csize = Globals.cacheSize2;
+                if (true)
                 {
-                    if (ii == 0) Globals.traceShadowAtGluedLevel = false;
-                    else Globals.traceShadowAtGluedLevel = true;
-
-                    //if (ii == 1) Assert.Inconclusive("Do this for traceShadowAtGluedLevel = true also!");
-
-                    double csize = Globals.cacheSize2;
-                    if (true)
+                    try
                     {
-                        try
+                        //
+                        // TODO: Consider to unfold sum(#i, ...) or at least report #i values.
+                        //
+
+                        for (int i = 0; i < 2; i++)  //0:normal series // 1:array-series. 
                         {
-                            //
-                            // TODO: Consider to unfold sum(#i, ...) or at least report #i values.
-                            //
 
-                            for (int i = 0; i < 2; i++)  //0:normal series // 1:array-series. 
+                            Program.Flush();
+                            Globals.cacheSize2 = 1;  //set it to minimum, so that cache is produced when reading
+
+                            I("reset;");
+                            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                            I("OPTION databank trace = yes;");
+                            if (i == 1) I("x = series(1);");
+                            //Globals.traceContainer = new List<IVariable>();
+                            //TODO: maps, <dyn>
+                            string c = "time 2021 2023;";
+                            I(c);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c1 = null;
+                            if (i == 0) c1 = "a = 2, 3, 4;";
+                            else c1 = "x[a] = 2, 3, 4;";
+                            I(c1);
+                            String2 x1 = new String2(null);
+                            x1.m.Add(new String2(c1));
+                            if (i == 0) Helper_CheckTrace("a!a", x1);
+                            else Helper_CheckTrace("x!a[a]", x1);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c2_ = null;
+                            if (i == 0) c2_ = "a <2022 2022> = 123;";
+                            else c2_ = "x[a] <2022 2022> = 123;";
+                            I(c2_);
+                            String2 x2_ = G.DeepCloneSlow<String2>(x1);
+                            x2_.m.Add(new String2(c2_));
+                            if (i == 0) Helper_CheckTrace("a!a", x2_);
+                            else Helper_CheckTrace("x!a[a]", x2_);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c2 = null;
+                            if (i == 0) c2 = "a <2022 2022> = 100;"; //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
+                            else c2 = "x[a] <2022 2022> = 100;";
+                            I(c2);
+                            String2 x2 = G.DeepCloneSlow<String2>(x1);
+                            x2.m.Add(new String2(c2));
+                            if (i == 0) Helper_CheckTrace("a!a", x2);
+                            else Helper_CheckTrace("x!a[a]", x2);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c3 = null;
+                            if (i == 0) c3 = "b = 12, 13, 14;";
+                            else c3 = "x[b] = 12, 13, 14;";
+                            I(c3);
+                            String2 x3 = new String2(null);
+                            x3.m.Add(new String2(c3));
+                            if (i == 0)
                             {
+                                Helper_CheckTrace("a!a", x2);
+                                Helper_CheckTrace("b!a", x3);
+                            }
+                            else
+                            {
+                                Helper_CheckTrace("x!a[a]", x2);
+                                Helper_CheckTrace("x!a[b]", x3);
+                            }
 
-                                Program.Flush();
-                                Globals.cacheSize2 = 1;  //set it to minimum, so that cache is produced when reading
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c4 = null;
+                            if (i == 0) c4 = "c = a + b;";
+                            else c4 = "x[c] = x[a] + x[b];";
+                            I(c4);
+                            String2 x4 = new String2(null);
+                            x4.m.Add(new String2(c4));
+                            x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                            x4.m[0].m.Add(null);
+                            x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                            if (i == 0)
+                            {
+                                Helper_CheckTrace("a!a", x2);
+                                Helper_CheckTrace("b!a", x3);
+                                Helper_CheckTrace("c!a", x4);
+                            }
+                            else
+                            {
+                                Helper_CheckTrace("x!a[a]", x2);
+                                Helper_CheckTrace("x!a[b]", x3);
+                                Helper_CheckTrace("x!a[c]", x4);
+                            }
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c5 = null;
+                            if (i == 0) c5 = "d = a + b + c;";
+                            else c5 = "x[d] = x[a] + x[b] + x[c];";
+                            I(c5);
+                            String2 x5 = new String2(null);
+                            x5.m.Add(new String2(c5));
+                            x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
+                            x5.m[0].m.Add(null);
+                            x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
+                            x5.m[0].m.Add(null);
+                            x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
+                            if (i == 0)
+                            {
+                                Helper_CheckTrace("a!a", x2);
+                                Helper_CheckTrace("b!a", x3);
+                                Helper_CheckTrace("c!a", x4);
+                                Helper_CheckTrace("d!a", x5);
+                            }
+                            else
+                            {
+                                Helper_CheckTrace("x!a[a]", x2);
+                                Helper_CheckTrace("x!a[b]", x3);
+                                Helper_CheckTrace("x!a[c]", x4);
+                                Helper_CheckTrace("x!a[d]", x5);
+                            }
 
-                                I("reset;");
-                                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-                                I("OPTION databank trace = yes;");
-                                if (i == 1) I("x = series(1);");
-                                //Globals.traceContainer = new List<IVariable>();
-                                //TODO: maps, <dyn>
-                                string c = "time 2021 2023;";
-                                I(c);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c1 = null;
-                                if (i == 0) c1 = "a = 2, 3, 4;";
-                                else c1 = "x[a] = 2, 3, 4;";
-                                I(c1);
-                                String2 x1 = new String2(null);
-                                x1.m.Add(new String2(c1));
-                                if (i == 0) Helper_CheckTrace("a!a", x1);
-                                else Helper_CheckTrace("x!a[a]", x1);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c2_ = null;
-                                if (i == 0) c2_ = "a <2022 2022> = 123;";
-                                else c2_ = "x[a] <2022 2022> = 123;";
-                                I(c2_);
-                                String2 x2_ = G.DeepCloneSlow<String2>(x1);
-                                x2_.m.Add(new String2(c2_));
-                                if (i == 0) Helper_CheckTrace("a!a", x2_);
-                                else Helper_CheckTrace("x!a[a]", x2_);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c2 = null;
-                                if (i == 0) c2 = "a <2022 2022> = 100;"; //A test that this will period-shadow (competely replace) the previous c2_ over the same period.
-                                else c2 = "x[a] <2022 2022> = 100;";
-                                I(c2);
-                                String2 x2 = G.DeepCloneSlow<String2>(x1);
-                                x2.m.Add(new String2(c2));
-                                if (i == 0) Helper_CheckTrace("a!a", x2);
-                                else Helper_CheckTrace("x!a[a]", x2);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c3 = null;
-                                if (i == 0) c3 = "b = 12, 13, 14;";
-                                else c3 = "x[b] = 12, 13, 14;";
-                                I(c3);
-                                String2 x3 = new String2(null);
-                                x3.m.Add(new String2(c3));
-                                if (i == 0)
+                            try
+                            {
+                                Globals.traceWalkAllCombinations = true;
+                                TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                                //invisible, that is series objects = 4.
+                                Assert.AreEqual(4, th1.seriesObjectCount);
+                                //invisible = 4 (series objects), real traces = 5, total = 9.
+                                if (false)
                                 {
-                                    Helper_CheckTrace("a!a", x2);
-                                    Helper_CheckTrace("b!a", x3);
+                                    Assert.AreEqual(10, th1.tracesDepth2.Count); //We get 10 not 9 because traces are not compacted first.
+                                                                                 //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits. We get 23 not 19 because traces are not compacted first.
+                                    Assert.AreEqual(23, th1.unittestTraceCountIncludeInvisible);
                                 }
                                 else
                                 {
-                                    Helper_CheckTrace("x!a[a]", x2);
-                                    Helper_CheckTrace("x!a[b]", x3);
+                                    //If traces were compacted first, we would get this;
+                                    Assert.AreEqual(9, th1.tracesDepth2.Count);
+                                    //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
+                                    Assert.AreEqual(19, th1.unittestTraceCountIncludeInvisible);
                                 }
+                            }
+                            finally
+                            {
+                                Globals.traceWalkAllCombinations = false;
+                            }
 
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c4 = null;
-                                if (i == 0) c4 = "c = a + b;";
-                                else c4 = "x[c] = x[a] + x[b];";
-                                I(c4);
-                                String2 x4 = new String2(null);
-                                x4.m.Add(new String2(c4));
-                                x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
-                                x4.m[0].m.Add(null);
-                                x4.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                                if (i == 0)
+                            Trace2 trace1 = null;
+                            if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
+                            else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
+
+                            try
+                            {
+                                Globals.traceWalkAllCombinations = true;
+                                TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                                Assert.AreEqual(4, th2.seriesObjectCount);
+                                if (false)
                                 {
-                                    Helper_CheckTrace("a!a", x2);
-                                    Helper_CheckTrace("b!a", x3);
-                                    Helper_CheckTrace("c!a", x4);
-                                }
-                                else
-                                {
-                                    Helper_CheckTrace("x!a[a]", x2);
-                                    Helper_CheckTrace("x!a[b]", x3);
-                                    Helper_CheckTrace("x!a[c]", x4);
-                                }
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c5 = null;
-                                if (i == 0) c5 = "d = a + b + c;";
-                                else c5 = "x[d] = x[a] + x[b] + x[c];";
-                                I(c5);
-                                String2 x5 = new String2(null);
-                                x5.m.Add(new String2(c5));
-                                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x2).m);
-                                x5.m[0].m.Add(null);
-                                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x3).m);
-                                x5.m[0].m.Add(null);
-                                x5.m[0].m.AddRange(G.DeepCloneSlow<String2>(x4).m);
-                                if (i == 0)
-                                {
-                                    Helper_CheckTrace("a!a", x2);
-                                    Helper_CheckTrace("b!a", x3);
-                                    Helper_CheckTrace("c!a", x4);
-                                    Helper_CheckTrace("d!a", x5);
+                                    //Traces are not trimmed, so we get this:
+                                    Assert.AreEqual(10, th2.tracesDepth2.Count);
+                                    Assert.AreEqual(23, th2.unittestTraceCountIncludeInvisible);
                                 }
                                 else
                                 {
-                                    Helper_CheckTrace("x!a[a]", x2);
-                                    Helper_CheckTrace("x!a[b]", x3);
-                                    Helper_CheckTrace("x!a[c]", x4);
-                                    Helper_CheckTrace("x!a[d]", x5);
-                                }
-
-                                try
-                                {
-                                    Globals.traceWalkAllCombinations = true;
-                                    TraceHelper th1 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                                    //invisible, that is series objects = 4.
-                                    Assert.AreEqual(4, th1.seriesObjectCount);
-                                    //invisible = 4 (series objects), real traces = 5, total = 9.
-                                    if (false)
-                                    {
-                                        Assert.AreEqual(10, th1.tracesDepth2.Count); //We get 10 not 9 because traces are not compacted first.
-                                                                                     //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits. We get 23 not 19 because traces are not compacted first.
-                                        Assert.AreEqual(23, th1.unittestTraceCountIncludeInvisible);
-                                    }
-                                    else
-                                    {
-                                        //If traces were compacted first, we would get this;
-                                        Assert.AreEqual(9, th1.tracesDepth2.Count);
-                                        //a --> 1 + 2 = 3, b --> 1 + 1 = 2, c --> 1 + 1 + 3 = 5, d --> 1 + 1 + 7 = 9 ------> total = 19 visits.
-                                        Assert.AreEqual(19, th1.unittestTraceCountIncludeInvisible);
-                                    }
-                                }
-                                finally
-                                {
-                                    Globals.traceWalkAllCombinations = false;
-                                }
-
-                                Trace2 trace1 = null;
-                                if (i == 0) trace1 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
-                                else trace1 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2;
-
-                                try
-                                {
-                                    Globals.traceWalkAllCombinations = true;
-                                    TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                                    Assert.AreEqual(4, th2.seriesObjectCount);
-                                    if (false)
-                                    {
-                                        //Traces are not trimmed, so we get this:
-                                        Assert.AreEqual(10, th2.tracesDepth2.Count);
-                                        Assert.AreEqual(23, th2.unittestTraceCountIncludeInvisible);
-                                    }
-                                    else
-                                    {
-                                        //These are not checket by a human, are they ok? We are doing always-shadowing now.
-                                        Assert.AreEqual(9, th2.tracesDepth2.Count);
-                                        Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
-                                    }
-                                }
-                                finally
-                                {
-                                    Globals.traceWalkAllCombinations = false;
-                                }
-
-                                // ---------------------------------
-                                // ---------------------------------                    
-                                I("write sletmig1;"); //a, b, c, d  ... 2021-23
-                                Globals.unitTestScreenOutput.Clear();
-                                I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
-
-                                //I("d.traceprint();");
-                                //I("c.traceprint();");
-                                //I("a.traceprint();");
-
-                                Trace2 trace2 = null;
-                                if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
-                                else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
-                                if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.name);
-                                else Assert.AreEqual("Work:x!a[d]", trace2.contents.name);
-                                Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
-                                Assert.AreEqual(2021, trace2.contents.period.t1.super);
-                                Assert.AreEqual(2023, trace2.contents.period.t2.super);
-                                if (i == 0) Assert.AreEqual("d = a + b + c;", trace2.contents.text);
-                                else Assert.AreEqual("x[d] = x[a] + x[b] + x[c];", trace2.contents.text);
-                                //.dataFile is not tested, since it is null here anyway
-
-                                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
-                                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
-                                Globals.unitTestScreenOutput.Clear();
-                                I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
-                                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
-                                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
-
-                                //Test that the graph is really a DAG                        
-                                Helper_TestDAG(Program.databanks.GetFirst(), i); //will have been around protobuf
-                                Helper_TestDAG(Program.databanks.GetRef(), i);  //will have been cloned
-
-                                //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
-
-                                try
-                                {
-                                    Globals.traceWalkAllCombinations = true;
-                                    TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
-                                    Assert.AreEqual(4, th2.seriesObjectCount);
-                                    //Traces are trimmed in gbk, so we get this: (* note: different from a collect before write+read.
+                                    //These are not checket by a human, are they ok? We are doing always-shadowing now.
                                     Assert.AreEqual(9, th2.tracesDepth2.Count);
                                     Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
                                 }
-                                finally
-                                {
-                                    Globals.traceWalkAllCombinations = false;
-                                }
+                            }
+                            finally
+                            {
+                                Globals.traceWalkAllCombinations = false;
+                            }
 
-                                if (i == 0)
-                                {
-                                    Helper_CheckTrace("a!a", x2);
-                                    Helper_CheckTrace("b!a", x3);
-                                    Helper_CheckTrace("c!a", x4);
-                                    Helper_CheckTrace("d!a", x5);
-                                }
-                                else
-                                {
-                                    Helper_CheckTrace("x!a[a]", x2);
-                                    Helper_CheckTrace("x!a[b]", x3);
-                                    Helper_CheckTrace("x!a[c]", x4);
-                                    Helper_CheckTrace("x!a[d]", x5);
-                                }
-                                // ---------------------------------
-                                // ---------------------------------
+                            // ---------------------------------
+                            // ---------------------------------                    
+                            I("write sletmig1;"); //a, b, c, d  ... 2021-23
+                            Globals.unitTestScreenOutput.Clear();
+                            I("read sletmig1;"); //a, b, c, d  ... 2021-23                               
 
-                                if (i == 0)
-                                {
-                                    I("delete a, b, c;");
-                                    Helper_CheckTrace("d!a", x5);
-                                }
-                                else
-                                {
-                                    Assert.Inconclusive();  //We need to implement delete, copy, rename, etc. for array-series!!
-                                    I("delete x[a], x[b], x[c];");
-                                    Helper_CheckTrace("x!a[d]", x5);
-                                }
+                            //I("d.traceprint();");
+                            //I("c.traceprint();");
+                            //I("a.traceprint();");
 
-                                // ---------------------------------
-                                I("write sletmig2;"); //d  ... 2021-23
-                                string c5b = "read sletmig2;";
-                                I(c5b); //d  ... 2021-23
-                                if (i == 0) Helper_CheckTrace("d!a", x5);
-                                else Helper_CheckTrace("x!a[d]", x5);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c6 = "copy d to e;";
-                                I(c6);
-                                String2 x6 = Helper_Push(x5, c6);
-                                Helper_CheckTrace("e!a", x6);
-                                Helper_CheckTrace("d!a", x5);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c7 = "f = 1000;";
-                                I(c7);
-                                String2 x7 = new String2(null);
-                                x7.m.Add(new String2(c7));
-                                Helper_CheckTrace("f!a", x7);
-                                Helper_CheckTrace("e!a", x6);
-                                Helper_CheckTrace("d!a", x5);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c8 = "copy <2021 2021> f to e;";  //only partial copy                    
-                                I(c8);
-                                String2 x8 = G.DeepCloneSlow<String2>(x6);
-                                x8.m.Add(new String2(c8));
-                                x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
-                                Helper_CheckTrace("f!a", x7);
-                                Helper_CheckTrace("e!a", x8);
-                                Helper_CheckTrace("d!a", x5);
-                                // ---------------------------------
-                                // ---------------------------------
-                                string c9 = "rename e as g;";
-                                I(c9);
-                                String2 x9 = Helper_Push(x8, c9);
-                                Helper_CheckTrace("g!a", x9);
-                                Helper_CheckTrace("f!a", x7);
-                                Helper_CheckTrace("d!a", x5);
-                                // ---------------------------------
-                                // ---------------------------------
-                                I("delete d;");
-                                string c10 = "d = 5, 6, 7;";
-                                I(c10);
-                                string c10a = "import <2022 2022> sletmig2;";
-                                I(c10a);
-                                String2 x10a = new String2(c10a);
-                                x10a.m.AddRange(G.DeepCloneSlow<String2>(x5).m);
-                                String2 x10 = new String2(null);
-                                x10.m.Add(new String2(c10));
-                                x10.m.Add(x10a);
-                                Helper_CheckTrace("d!a", x10);
-                                // ---------------------------------
-                                // // ---------------------------------
-                                I("disp d;");
+                            Trace2 trace2 = null;
+                            if (i == 0) trace2 = (O.GetIVariableFromString("d!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                            else trace2 = (O.GetIVariableFromString("x!a[d]", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace;
+                            if (i == 0) Assert.AreEqual("Work:d!a", trace2.contents.name);
+                            else Assert.AreEqual("Work:x!a[d]", trace2.contents.name);
+                            Assert.AreEqual("¤1", trace2.contents.commandFileAndLine);
+                            Assert.AreEqual(2021, trace2.contents.period.t1.super);
+                            Assert.AreEqual(2023, trace2.contents.period.t2.super);
+                            if (i == 0) Assert.AreEqual("d = a + b + c;", trace2.contents.text);
+                            else Assert.AreEqual("x[d] = x[a] + x[b] + x[c];", trace2.contents.text);
+                            //.dataFile is not tested, since it is null here anyway
 
-                                Globals.unitTestScreenOutput.Clear();
-                                I("tracestats2();");
-                                string s = Globals.unitTestScreenOutput.ToString();
-                                if (true)
-                                {
-                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 19 reachable traces in total."));
-                                    Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
-                                    Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
-                                    Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
-                                    Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
-                                    Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
-                                }
-                                else
-                                {
-                                    //If traces were not compacted/trimmed first in gbk, we would get this. See also above.
-                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 reachable traces in total."));
-                                    Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
-                                    Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
-                                    Assert.IsTrue(s.Contains("depth: 2, traces: 6"));
-                                    Assert.IsTrue(s.Contains("depth: 3, traces: 5"));
-                                    Assert.IsTrue(s.Contains("depth: 4, traces: 4"));
-                                }
+                            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
+                            Globals.unitTestScreenOutput.Clear();
+                            I("read sletmig1;"); //reading it two times should trigger cache use (since Globals.cacheSize2 is set small)
+                            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Cache write time:"));
+                            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Cache read time:"));
+
+                            //Test that the graph is really a DAG                        
+                            Helper_TestDAG(Program.databanks.GetFirst(), i); //will have been around protobuf
+                            Helper_TestDAG(Program.databanks.GetRef(), i);  //will have been cloned
+
+                            //After this there are 4 entry-traces and 4 traces with "imported ..." (new). + 5?
+
+                            try
+                            {
+                                Globals.traceWalkAllCombinations = true;
+                                TraceHelper th2 = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                                Assert.AreEqual(4, th2.seriesObjectCount);
+                                //Traces are trimmed in gbk, so we get this: (* note: different from a collect before write+read.
+                                Assert.AreEqual(9, th2.tracesDepth2.Count);
+                                Assert.AreEqual(19, th2.unittestTraceCountIncludeInvisible);
+                            }
+                            finally
+                            {
+                                Globals.traceWalkAllCombinations = false;
+                            }
+
+                            if (i == 0)
+                            {
+                                Helper_CheckTrace("a!a", x2);
+                                Helper_CheckTrace("b!a", x3);
+                                Helper_CheckTrace("c!a", x4);
+                                Helper_CheckTrace("d!a", x5);
+                            }
+                            else
+                            {
+                                Helper_CheckTrace("x!a[a]", x2);
+                                Helper_CheckTrace("x!a[b]", x3);
+                                Helper_CheckTrace("x!a[c]", x4);
+                                Helper_CheckTrace("x!a[d]", x5);
+                            }
+                            // ---------------------------------
+                            // ---------------------------------
+
+                            if (i == 0)
+                            {
+                                I("delete a, b, c;");
+                                Helper_CheckTrace("d!a", x5);
+                            }
+                            else
+                            {
+                                Assert.Inconclusive();  //We need to implement delete, copy, rename, etc. for array-series!!
+                                I("delete x[a], x[b], x[c];");
+                                Helper_CheckTrace("x!a[d]", x5);
+                            }
+
+                            // ---------------------------------
+                            I("write sletmig2;"); //d  ... 2021-23
+                            string c5b = "read sletmig2;";
+                            I(c5b); //d  ... 2021-23
+                            if (i == 0) Helper_CheckTrace("d!a", x5);
+                            else Helper_CheckTrace("x!a[d]", x5);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c6 = "copy d to e;";
+                            I(c6);
+                            String2 x6 = Helper_Push(x5, c6);
+                            Helper_CheckTrace("e!a", x6);
+                            Helper_CheckTrace("d!a", x5);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c7 = "f = 1000;";
+                            I(c7);
+                            String2 x7 = new String2(null);
+                            x7.m.Add(new String2(c7));
+                            Helper_CheckTrace("f!a", x7);
+                            Helper_CheckTrace("e!a", x6);
+                            Helper_CheckTrace("d!a", x5);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c8 = "copy <2021 2021> f to e;";  //only partial copy                    
+                            I(c8);
+                            String2 x8 = G.DeepCloneSlow<String2>(x6);
+                            x8.m.Add(new String2(c8));
+                            x8.m[1].m.AddRange(G.DeepCloneSlow<String2>(x7).m);
+                            Helper_CheckTrace("f!a", x7);
+                            Helper_CheckTrace("e!a", x8);
+                            Helper_CheckTrace("d!a", x5);
+                            // ---------------------------------
+                            // ---------------------------------
+                            string c9 = "rename e as g;";
+                            I(c9);
+                            String2 x9 = Helper_Push(x8, c9);
+                            Helper_CheckTrace("g!a", x9);
+                            Helper_CheckTrace("f!a", x7);
+                            Helper_CheckTrace("d!a", x5);
+                            // ---------------------------------
+                            // ---------------------------------
+                            I("delete d;");
+                            string c10 = "d = 5, 6, 7;";
+                            I(c10);
+                            string c10a = "import <2022 2022> sletmig2;";
+                            I(c10a);
+                            String2 x10a = new String2(c10a);
+                            x10a.m.AddRange(G.DeepCloneSlow<String2>(x5).m);
+                            String2 x10 = new String2(null);
+                            x10.m.Add(new String2(c10));
+                            x10.m.Add(x10a);
+                            Helper_CheckTrace("d!a", x10);
+                            // ---------------------------------
+                            // // ---------------------------------
+                            I("disp d;");
+
+                            Globals.unitTestScreenOutput.Clear();
+                            I("tracestats2();");
+                            string s = Globals.unitTestScreenOutput.ToString();
+                            if (true)
+                            {
+                                Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 19 reachable traces in total."));
+                                Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                                Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                                Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
+                                Assert.IsTrue(s.Contains("depth: 3, traces: 4"));
+                                Assert.IsTrue(s.Contains("depth: 4, traces: 3"));
+                            }
+                            else
+                            {
+                                //If traces were not compacted/trimmed first in gbk, we would get this. See also above.
+                                Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 reachable traces in total."));
+                                Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
+                                Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
+                                Assert.IsTrue(s.Contains("depth: 2, traces: 6"));
+                                Assert.IsTrue(s.Contains("depth: 3, traces: 5"));
+                                Assert.IsTrue(s.Contains("depth: 4, traces: 4"));
                             }
                         }
-                        finally
-                        {
-                            I("OPTION databank trace = no;");  //not really necessary to switch off...
-                            Globals.traceContainer = null;
-                            Globals.precedentsContainer = null;
-                            Globals.cacheSize2 = csize;
-                        }
+                    }
+                    finally
+                    {                        
+                        //Why?
+                        Globals.traceContainer = null;
+                        Globals.precedentsContainer = null;
+                        Globals.cacheSize2 = csize;
                     }
                 }
             }
             finally
             {
-                Globals.traceShadowAtGluedLevel = traceShadowAtGluedLevel_remember;
                 Globals.traceWallTimeHandledSpecialWayFor1UnitTest = traceWallTimeHandledSpecialWayFor1UnitTest_remember;
             }
         }

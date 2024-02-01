@@ -357,116 +357,18 @@ namespace Gekko
         /// </summary>        
         public List<TraceAndPeriods2> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
         {
-            if (Globals.traceAlwaysShadow)
+            if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
             {
-                if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
-                {
-                    List<TraceAndPeriods2> rv = InvertWallTime(this.precedents.GetStorage());
-                    int count = 0; if (rv != null) count = rv.Count;
-                    if (count != this.precedents.Count()) new Error("TimeShadow problem");
-                    if (count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-                    if (count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-                    return rv;
-                }
-                else
-                {
-                    return this.precedents.GetStorage();
-                }
-            }
-            List<TraceAndPeriods2> rv3 = new List<TraceAndPeriods2>();
-            if (this.precedents.Count() > 0)
-            {
-                //Remove the if below at some point, just for sanity now            
-                if (this.precedents[0].trace.type == ETraceType.Divider || this.precedents[this.precedents.Count() - 1].trace.type == ETraceType.Divider) new Error("Unexpected");
-                List<GekkoTimeSpansSimple> spansList = new List<GekkoTimeSpansSimple>();  //is inverted, newest first
-                int lastNull = this.precedents.Count();
-                int counterI = -1;
-                for (int i = this.precedents.Count() - 1; i >= 0; i--)
-                {
-                    counterI++;
-                    Trace2 traceNew = this.precedents[i].trace;
-
-                    if (counterI == 0)
-                    {
-                        //To get the first one going.
-                        GekkoTimeSpansSimple tmp = new GekkoTimeSpansSimple();
-                        tmp.Add(traceNew.contents.period);
-                        spansList.Add(tmp);
-                    }
-
-                    if (i == 0 || traceNew.type == ETraceType.Divider)
-                    {
-                        int count = -1;
-                        for (int k = 0; k < spansList.Count; k++)
-                        {
-                            count++;
-                            GekkoTimeSpansSimple m = spansList[k];
-                            if (!shadowedTracesAreRemoved || m.Count() > 0)
-                            {
-                                //Maybe this can be done smarter now that .precedents is different??
-                                TraceAndPeriods2 tap = new TraceAndPeriods2();
-                                tap.trace = this.precedents[lastNull - count - 1].trace;
-                                //The two below are a bit wasteful. Maybe represent contents.t1|t2 via GekkoTimeSpanSimple instead.
-                                tap.periods = m;
-                                rv3.Add(tap);
-                            }
-                        }
-                        if (i > 0)
-                        {
-                            TraceAndPeriods2 tap = new TraceAndPeriods2();
-                            tap.trace = new Trace2(ETraceType.Divider, true);
-                            tap.periods = new GekkoTimeSpansSimple();
-                            rv3.Add(tap);
-                        }
-                        counterI = -1;
-                        spansList.Clear();
-                        lastNull = i;
-                        continue;
-                    }
-
-                    int counterJ = -1;
-                    for (int j = i - 1; j >= 0; j--)
-                    {
-                        counterJ++;
-                        Trace2 traceOld = this.precedents[j].trace;
-                        if (traceOld.type == ETraceType.Divider) break;
-
-                        if (counterI == 0)
-                        {
-                            GekkoTimeSpansSimple spans = Trace2.TimeShadow1(traceNew.contents.period, traceOld.contents.period);
-                            spansList.Add(spans);
-                        }
-                        else
-                        {
-                            int k2 = counterI + counterJ + 1;
-                            GekkoTimeSpansSimple newList = new GekkoTimeSpansSimple();
-                            foreach (GekkoTimeSpanSimple spanTemp in spansList[k2].GetStorage())
-                            {
-                                GekkoTimeSpansSimple spans = Trace2.TimeShadow1(traceNew.contents.period, spanTemp);
-                                newList.AddRange(spans);
-                            }
-                            spansList[k2] = newList;
-                        }
-                    }
-                }
-            }
-
-            rv3.Reverse(); //To get the input vars in the right order                
-
-            if (invertWallTime)
-            {
-                //Do not invert when traceShadowAtGluedLevel==true: in that case this is only used for
-                //shadowing at the .GluedToSeries nodes. These should be in normal order if some trace is removed.
-
-                List<TraceAndPeriods2> rv = InvertWallTime(rv3);
-                if (rv.Count != rv3.Count) new Error("TimeShadow problem");
-                if (rv.Count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
-                if (rv.Count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                List<TraceAndPeriods2> rv = InvertWallTime(this.precedents.GetStorage());
+                int count = 0; if (rv != null) count = rv.Count;
+                if (count != this.precedents.Count()) new Error("TimeShadow problem");
+                if (count > 1 && rv[0].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
+                if (count > 1 && rv[rv.Count - 1].trace.type == ETraceType.Divider) new Error("TimeShadow problem");
                 return rv;
             }
             else
             {
-                return rv3;
+                return this.precedents.GetStorage();
             }
         }
 
@@ -602,7 +504,7 @@ namespace Gekko
 
             if (false)  //!!! KEEP IT FALSE FOR NOW !!!
             {
-                if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
+                if (traceThatIsGoingToBeAdded != null)
                 {
                     int n = this.precedents.Count();
                     //Could perhaps also have logic that works if the previous trace has a *larger* period than the new.
@@ -611,214 +513,171 @@ namespace Gekko
                     if (n > 0 && !traceThatIsGoingToBeAdded.contents.period.t1.IsNull() && !traceThatIsGoingToBeAdded.contents.period.t2.IsNull() && this.precedents.GetStorage()[n - 1].trace.contents.period.t1.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t1) && this.precedents.GetStorage()[n - 1].trace.contents.period.t2.EqualsGekkoTime(traceThatIsGoingToBeAdded.contents.period.t2))
                     {
                         //new trace is not-null and has exactly same periods as last trace
-                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded; 
+                        this.precedents.GetStorage()[n - 1].trace = traceThatIsGoingToBeAdded;
                         //
                         // PROBLEM: How to remove the last added trace from this.precedents.GetStorageSorted() in an efficient way?
+                        //          Maybe via trace ID.
                         //          If this is implemented, test it extremely well!!
                         //          Solving the problem may yield a little speedup, but due to sorting not in the extreme.
                         //          Therefore better to deactivate now.
                         //
-                        return; 
+                        return;
                     }
                 }
             }
 
-            if (Globals.traceAlwaysShadow)
+
+            //
+            // NOTE: When traceAlwaysShadow == true, we are only doing shadowing at depth = 0, at .GluedToSeries
+            //       At that level (possibly also deeper), the .precedents lists of TraceAndPeriods cannot have dublets
+            //       regarding the trace inside each list item. Therefore, the trace.id equality check later on is probably
+            //       correct (instead of using ReferenceEquals).
+            //                
+
+            this.precedents.RecreateSorted();
+            if (this.type != ETraceType.GluedToSeries) new Error("Internal error: expected ETraceType.GluedToSeries");
+            if (traceThatIsGoingToBeAdded == null) return;  //would normally perform shadowing, but now everything is always up to date
+            if (this.precedents.Count() != this.precedents.CountSorted())
             {
-                this.precedents.RecreateSorted();
+                new Error("Trace logic problem");
+            }
 
-                if (this.type != ETraceType.GluedToSeries) new Error("Internal error: expected ETraceType.GluedToSeries");
-                
-                if (traceThatIsGoingToBeAdded == null) return;  //would normally perform shadowing, but now everything is always up to date
+            //
+            //  x1 <2001 2010> = 01;   // 
+            //  x1 <2003 2004> = 02;   //
+            //  x1 <2007 2008> = 03;   //
+            //  x1 <2006 2009> = 04;   // -->
+            //
+            //      1   2   3   4   5   6   7   8   9  10     NON-sorted at the moment before == is added
+            // 01  --  --          --  --          --  --
+            // 02          --  -- 
+            // 03                          --  --
+            // 04                      ==  ==  ==  ==
+            //
+            //
+            //      1   2   3   4   5   6   7   8   9  10    Sorted at the moment before == is added
+            // 02          --  -x                 
+            // 03                          --  -x 
+            // 01  --  --          --  --          --  -x
+            // 04                      ==  ==  ==  ==
+            //
+            // The sorted key regarding 01 changes from 6 to 5
+            // If == includes 2005, the sorted items 01 and 02 are swapped.
+            //
+            // Maybe SortedBagItem could have a bool markedForRemoval. That could 
+            // be used in .RemoveWhere in the sortedtree.
+            // The list is a bit easier,  just recreate.
 
-                //this.precedents.UpdateSorted();  //creates the sorted dict, if it is not already present
+            //List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
 
-                if (this.precedents.Count() != this.precedents.CountSorted())
+            bool mustUpdateSorted = false;
+
+            if (this.precedents.CountSorted() > 0)
+            {
+                List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
+                List<TraceAndPeriods2> removeInUnsorted = new List<TraceAndPeriods2>();
+                foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
+                {
+                    //Look at each TraceAndPeriods2 in sorted order (last end period first)
+                    if (kvp.t.IsNull()) break;  //no shadowing for null-times
+                    if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t)) break;  //not neccessary to look any further!
+
+                    //Shadow
+                    GekkoTimeSpansSimple newSpans = new GekkoTimeSpansSimple();
+                    foreach (GekkoTimeSpanSimple span in kvp.tap.periods.GetStorage())
+                    {
+                        //The existing precedent may have several active periods
+                        newSpans.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span));
+                    }
+
+                    if (newSpans.Count() == 0)
+                    {
+                        //kvp.tap must be removed from both .storage and .storageSorted
+                        //must be removed
+                        //this.precedents.UpdateSorted();
+                        mustUpdateSorted = true;
+                        kvp.mustBeRemoved = true;
+                        removeInUnsorted.Add(kvp.tap);
+
+                    }
+                    else if (!newSpans.GetStorage()[newSpans.Count() - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
+                    {
+                        //It must be removed and added again because the last t2 of the spans changes
+                        mustUpdateSorted = true;
+                        kvp.mustBeRemoved = true;
+                        addToSorted.Add(kvp.tap);
+                    }
+                    kvp.tap.periods = newSpans;  //Cannot be omitted here, this kvp is not sure to be removed later on.
+                }
+
+                if (removeInUnsorted.Count > 0)
+                {
+                    //This actually ought to be pretty fast
+                    //The list removeInUnsorted is usually small, if not too many existing traces are shadowed.
+                    //And because the list is small, it is pretty fast to see if it contains a TraceAndPeriods2 object.
+                    //It uses object reference compare, comparing object identity. That is fast.
+                    List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
+
+                    int count = 0;
+                    foreach (TraceAndPeriods2 tap in this.precedents.GetStorage())  //loop through items that are filtered
+                    {
+                        bool filter = false;
+                        foreach (TraceAndPeriods2 remove in removeInUnsorted)       //loop through filter items
+                        {                            
+                            //????????????????????????????????????????????????????????????????
+                            // Is this ok for identity? What about the periods? ReferenceEquals will not do (may be written and read --> new objects)
+                            //????????????????????????????????????????????????????????????????                         
+                            if (tap.trace.id.Equals(remove.trace.id))
+                            {
+                                filter = true;
+                                break;
+                            }
+                        }
+
+                        if (filter)
+                        {
+                            count++;  //we like to check there is only 1!!
+                        }
+                        else
+                        {
+                            temp.Add(tap);
+                        }
+                    }
+                    if (count != removeInUnsorted.Count)
+                    {
+                        new Error("Precedents shadowing problem");
+                    }
+                    this.precedents.SetStorage(temp);
+                }
+
+                if (mustUpdateSorted)
+                {
+                    var zz = this.precedents.GetStorageSorted();
+                    zz.RemoveWhere(Program.MustBeRemoved);
+                    this.precedents.SetStorageSorted(zz);
+                    if (addToSorted.Count > 0)
+                    {
+                        //if (this.precedents.GetStorageSorted() == null) this.precedents.SetStorageSorted(new SortedSet<SortedBagItem>(new SortedBagComparer()));
+                        foreach (TraceAndPeriods2 tap in addToSorted)
+                        {
+                            this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
+                        }
+                    }
+                }
+
+                if (this.precedents.GetStorageSorted() != null && this.precedents.Count() != this.precedents.CountSorted())
                 {
                     new Error("Trace logic problem");
                 }
-
-                //
-                //  x1 <2001 2010> = 01;   // 
-                //  x1 <2003 2004> = 02;   //
-                //  x1 <2007 2008> = 03;   //
-                //  x1 <2006 2009> = 04;   // -->
-                //
-                //      1   2   3   4   5   6   7   8   9  10     NON-sorted at the moment before == is added
-                // 01  --  --          --  --          --  --
-                // 02          --  -- 
-                // 03                          --  --
-                // 04                      ==  ==  ==  ==
-                //
-                //
-                //      1   2   3   4   5   6   7   8   9  10    Sorted at the moment before == is added
-                // 02          --  -x                 
-                // 03                          --  -x 
-                // 01  --  --          --  --          --  -x
-                // 04                      ==  ==  ==  ==
-                //
-                // The sorted key regarding 01 changes from 6 to 5
-                // If == includes 2005, the sorted items 01 and 02 are swapped.
-                //
-                // Maybe SortedBagItem could have a bool markedForRemoval. That could 
-                // be used in .RemoveWhere in the sortedtree.
-                // The list is a bit easier,  just recreate.
-
-                //List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
-
-                bool mustUpdateSorted = false;
-
-                if (this.precedents.CountSorted() > 0)
-                {
-                    List<TraceAndPeriods2> addToSorted = new List<TraceAndPeriods2>();
-                    List<TraceAndPeriods2> removeInUnsorted = new List<TraceAndPeriods2>();
-                    foreach (SortedBagItem kvp in this.precedents.GetStorageSorted())
-                    {
-                        //Look at each TraceAndPeriods2 in sorted order (last end period first)
-                        if (kvp.t.IsNull()) break;  //no shadowing for null-times
-                        if (traceThatIsGoingToBeAdded.contents.period.t1.StrictlyLargerThan(kvp.t)) break;  //not neccessary to look any further!
-                        
-                        //Shadow
-                        GekkoTimeSpansSimple newSpans = new GekkoTimeSpansSimple();
-                        foreach (GekkoTimeSpanSimple span in kvp.tap.periods.GetStorage())
-                        {
-                            //The existing precedent may have several active periods
-                            newSpans.AddRange(Trace2.TimeShadow1(traceThatIsGoingToBeAdded.contents.period, span));
-                        }
-                        
-                        if (newSpans.Count() == 0)
-                        {
-                            //kvp.tap must be removed from both .storage and .storageSorted
-                            //must be removed
-                            //this.precedents.UpdateSorted();
-                            mustUpdateSorted = true;
-                            kvp.mustBeRemoved = true;
-                            removeInUnsorted.Add(kvp.tap);
-
-                        }
-                        else if (!newSpans.GetStorage()[newSpans.Count() - 1].t2.EqualsGekkoTime(kvp.tap.LastPeriod()))
-                        {
-                            //It must be removed and added again because the last t2 of the spans changes
-                            mustUpdateSorted = true;
-                            kvp.mustBeRemoved = true;
-                            addToSorted.Add(kvp.tap);
-                        }                        
-                        kvp.tap.periods = newSpans;  //QWERTY WHY DO THIS?: this is going to be removed anyway, no?
-                    }
-
-                    if (removeInUnsorted.Count > 0)
-                    {
-                        //This actually ought to be pretty fast
-                        //The list removeInUnsorted is usually small, if not too many existing traces are shadowed.
-                        //And because the list is small, it is pretty fast to see if it contains a TraceAndPeriods2 object.
-                        //It uses object reference compare, comparing object identity. That is fast.
-                        List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
-
-                        int count = 0;
-                        foreach (TraceAndPeriods2 tap in this.precedents.GetStorage())  //loop through items that are filtered
-                        {
-                            bool filter = false;
-                            foreach (TraceAndPeriods2 remove in removeInUnsorted)       //loop through filter items
-                            {
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                // Is this ok for identity? What about the periods? ReferenceEquals will not do (may be written and read --> new objects)
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                //????????????????????????????????????????????????????????????????
-                                if (tap.trace.id.Equals(remove.trace.id))
-                                {
-                                    filter = true;
-                                    break;                                    
-                                }                               
-                                
-                            }
-
-                            if (filter)
-                            {
-                                count++;  //we like to check there is only 1!!
-                            }
-                            else
-                            {
-                                temp.Add(tap);
-                            }
-                        }
-                        if (count != removeInUnsorted.Count)
-                        {
-                            new Error("Precedents shadowing problem");
-                        }
-                        this.precedents.SetStorage(temp);
-                    }
-
-                    if (mustUpdateSorted)
-                    {
-                        var zz = this.precedents.GetStorageSorted();
-                        zz.RemoveWhere(Program.MustBeRemoved);
-                        this.precedents.SetStorageSorted(zz);
-                        if (addToSorted.Count > 0)
-                        {                            
-                            //if (this.precedents.GetStorageSorted() == null) this.precedents.SetStorageSorted(new SortedSet<SortedBagItem>(new SortedBagComparer()));
-                            foreach (TraceAndPeriods2 tap in addToSorted)
-                            {
-                                this.precedents.GetStorageSorted().Add(new SortedBagItem(tap.LastPeriod(), tap));
-                            }
-                        }
-                    }
-
-                    //this.precedents.SetStorage(removeInUnsorted);                    
-                    //int ii = this.precedents.GetStorageSorted().RemoveWhere(MustBeRemoved);                                       
-
-                    if (this.precedents.GetStorageSorted() != null && this.precedents.Count() != this.precedents.CountSorted())
-                    {
-                        new Error("Trace logic problem");
-                    }
-                }
-
-                TraceAndPeriods2 tap5 = new TraceAndPeriods2();
-                tap5.trace = traceThatIsGoingToBeAdded;
-                GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
-                xx.SetStorage(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });
-                tap5.periods = xx;
-                this.precedents.Add(tap5);
-                                
             }
-            else
-            {
 
-                if (Globals.traceShadowAtGluedLevel && traceThatIsGoingToBeAdded != null)
-                {
-                    this.precedents.Add(new TraceAndPeriods2(traceThatIsGoingToBeAdded, Globals.traceNullPeriods));
-                }
-
-                if (this.precedents.Count() > 0)
-                {
-                    List<TraceAndPeriods2> shadow = this.TimeShadow2(true, false);
-                    if (shadow.Count > precedents.Count())
-                    {
-                        new Error("Hov!");
-                    }
-                    else if (shadow.Count != precedents.Count())
-                    {
-                        this.precedents = new Precedents2();
-                        foreach (TraceAndPeriods2 temp2 in shadow)
-                        {
-                            this.precedents.Add(new TraceAndPeriods2(temp2.trace, Globals.traceNullPeriods));
-                        }
-                    }
-                }
-            }
-        }        
+            TraceAndPeriods2 tap5 = new TraceAndPeriods2();
+            tap5.trace = traceThatIsGoingToBeAdded;
+            GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
+            xx.SetStorage(new List<GekkoTimeSpanSimple>() { traceThatIsGoingToBeAdded.contents.period });
+            tap5.periods = xx;
+            this.precedents.Add(tap5);
+        }     
 
         public Trace2 DeepClone(CloneHelper cloneHelper)
         {
@@ -941,15 +800,8 @@ namespace Gekko
             }            
             else if (type == ETracePushType.Sibling)
             {
-                //In something like "reset; y = 1; y = 2;" this part is called 2 times.
-                if (Globals.traceShadowAtGluedLevel)
-                {                    
-                    ts.meta.trace2.PrecedentsShadowing(trace);
-                }
-                else
-                {
-                    ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, Globals.traceNullPeriods));
-                }
+                //In something like "reset; y = 1; y = 2;" this part is called 2 times.                         
+                ts.meta.trace2.PrecedentsShadowing(trace);                
             }
             else new Error("Trace");
         }        

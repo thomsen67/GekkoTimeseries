@@ -21922,7 +21922,7 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                if (!Globals.traceShadowAtGluedLevel)
+                if (false)
                 {
                     //Trimming when writing is not necessary if it is done continuously
                     DateTime dt5 = DateTime.Now;
