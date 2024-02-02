@@ -55,6 +55,7 @@ namespace Gekko
         public static bool traceWallTimeHandledSpecialWayFor1UnitTest = false;  //with true we get latest changes (in wall time) at top.        
         public static GekkoTimeSpansSimple traceNullPeriods = new GekkoTimeSpansSimple();  //just a pointer to know where to find these. Only used for "divider" traces, because a null element cannot be protobuffed
         public static int traceN = 0;
+        public const bool traceFix= false;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

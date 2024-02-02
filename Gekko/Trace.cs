@@ -41,7 +41,9 @@ namespace Gekko
 
     [ProtoContract]
     public class TraceContents2
-    {       
+    {
+        //In principle, these fields could be made readonly, but it would take a bit of refactoring.
+
         /// <summary>
         /// 1 timespan. This object is immutable (just as GekkoTime)
         /// </summary>
@@ -115,22 +117,34 @@ namespace Gekko
     /// </summary>
     [ProtoContract]
     public class Trace2  //Trace2 because it is experimental
-    {
+    {                
         [ProtoMember(1)]
-        public TraceID2 id = new TraceID2();
+        public readonly TraceID2 id = new TraceID2();
 
         [ProtoMember(2)]
-        public ETraceType type = ETraceType.Normal;  //default
+        public readonly ETraceType type = ETraceType.Normal;  //default
 
         [ProtoMember(3)]
-        public TraceContents2 contents = null;
+        public readonly TraceContents2 contents = null;
 
         [ProtoMember(4)]
         private Precedents2 precedents = new Precedents2();  //be careful accessing it, use GetPrecedentsAndShadowedPeriods()        
 
+        //Only for protobuf and DeepClone()
         private Trace2()
         {
-            //Only for protobuf and DeepClone()
+
+        }
+
+        public Trace2(ETraceType type, TraceContents2 contents)
+        {
+            this.type = type;
+            this.contents = contents;
+        }
+
+        public Trace2(ETraceType type)
+        {
+            this.type = type;
         }
 
         /// <summary>
@@ -686,16 +700,17 @@ namespace Gekko
             }
             if (known == null)
             {
-                trace2 = new Trace2();
-                trace2.type = this.type;
-                if (trace2.type != ETraceType.Divider)
+                if (Globals.traceFix)
                 {
-                    if (this.contents != null)
-                    {
-                        trace2.contents = this.contents.DeepClone();
-                    }
-                    trace2.precedents = this.precedents.DeepClone(cloneHelper);
+                    trace2 = this;
+                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
                 }
+                else
+                {
+                    trace2 = new Trace2(this.type, this.contents?.DeepClone());
+                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
+                }
+
                 if (cloneHelper != null)
                 {
                     cloneHelper.dict.Add(this, trace2);
@@ -1261,12 +1276,12 @@ namespace Gekko
 
     [ProtoContract]
     public class TraceID2 //TraceID2 because it is experimental
-    {
+    {       
         /// <summary>
         /// Note: resolution is about 0.01 s.
         /// </summary>
         [ProtoMember(1)]
-        public DateTime stamp = DateTime.Now;
+        public readonly DateTime stamp = DateTime.Now;
 
         /// <summary>
         /// Used to distinguish traces, especially if these are pruned off. Will be numerically > 0, and when counter is < 0 it means that the trace is stored in en external file (pruned off).
@@ -1276,7 +1291,16 @@ namespace Gekko
         /// Should never happen.
         /// </summary>
         [ProtoMember(2)]
-        public long counter = ++Globals.traceCounter;
+        public readonly long counter = ++Globals.traceCounter;
+
+        public TraceID2()
+        {
+        }
+        public TraceID2(DateTime stamp, long counter)
+        {
+            this.stamp = stamp;
+            this.counter = counter;
+        }
 
         public override bool Equals(object o)
         {
@@ -1459,9 +1483,7 @@ namespace Gekko
                     GekkoTimeSpansSimple temp2 = new GekkoTimeSpansSimple();  //protobuf cannot handle if an element is == null (for dividers)
                     if (traceAndPeriods.trace.type == ETraceType.Divider)
                     {
-                        temp = new TraceID2();
-                        temp.counter = long.MinValue;  //negative, signals null
-                        temp.stamp = DateTime.MinValue;
+                        temp = new TraceID2(DateTime.MinValue, long.MinValue);  //negative, signals null
                     }
                     else
                     {
