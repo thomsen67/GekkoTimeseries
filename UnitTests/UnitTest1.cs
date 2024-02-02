@@ -13841,6 +13841,54 @@ namespace UnitTests
             Assert.IsTrue(s6.Contains("--> depth: 1, traces: 8" + G.NL));
         }
 
+
+        [TestMethod]
+        public void _Test_TraceCopyIdIdentity()
+        {
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("reset;");
+            I("x1 <2001 2003> = 1;");
+            I("x1 <2002 2002> = 2;");
+            I("x2 <2001 2003> = 3;");
+            I("x2 <2002 2002> = 4;");
+            I("x3 = x1 + x2;");
+            long x1a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            long x1b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.id.counter;
+            long x2a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.id.counter;
+            long x2b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.id.counter;
+            long x3 = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            I("write sletmig;");
+            I("reset;");
+            I("read sletmig;");
+            long x1a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            long x1b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.id.counter;            
+            long x2a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.id.counter;
+            long x2b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.id.counter;
+            long x3_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            //good test of trace identity after write + read
+            Assert.AreEqual(x1a, x1a_i);
+            Assert.AreEqual(x1b, x1b_i);
+            Assert.AreEqual(x2a, x2a_i);
+            Assert.AreEqual(x2b, x2b_i);
+            Assert.AreEqual(x3, x3_i);
+            I("copy x3 to x4;");
+            long x1a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            long x1b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.id.counter;
+            long x2a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.id.counter;
+            long x2b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.id.counter;
+            long x3_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.id.counter;
+            //good test of trace identity after copy
+            Assert.AreEqual(x1a, x1a_ii);
+            Assert.AreEqual(x1b, x1b_ii);
+            Assert.AreEqual(x2a, x2a_ii);
+            Assert.AreEqual(x2b, x2b_ii);
+            Assert.AreEqual(x3, x3_ii);
+
+            //TODO: also for partial copy, like "copy <2001 2002> x3 to x4;"
+
+
+        }
+
         [TestMethod]
         public void _Test_TracePeriodsShadowing()
         {            

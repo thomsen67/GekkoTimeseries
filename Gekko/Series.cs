@@ -2815,7 +2815,7 @@ namespace Gekko
             //.isNotFoundArraySub... field is not cloned
             //the .isDirty and .parentDatabank fields are not cloned
 
-            Series tsCopy = new Series(this.freq, this.name);  //this will create t½he .meta object - the .data object is always there
+            Series tsCopy = new Series(this.freq, this.name);  //this will create the .meta object - the .data object is always there
 
             tsCopy.type = this.type;
 

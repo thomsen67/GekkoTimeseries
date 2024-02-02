@@ -17115,7 +17115,7 @@ namespace Gekko
 
                 if (!injectingToExistingSeries)
                 {
-                    //Brand new variable object is created
+                    //Brand new variable object is created                    
                     IVariable iv_clone = iv.DeepClone(truncateTemp, null);
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
