@@ -14820,7 +14820,7 @@ namespace UnitTests
             }
             else
             {
-                if (m.s == null) Assert.IsTrue(trace.GetContents() == null);
+                if (depth > 0 && m.s == null) Assert.IsTrue(trace.GetContents() == null);
                 else Assert.AreEqual(trace.GetContents().text, m.s);
                 List<TraceAndPeriods2> temp = trace.TimeShadow2();
                 if (temp == null) temp = new List<TraceAndPeriods2>();  //an obect with 0 elements is easier to handle in the following lines
