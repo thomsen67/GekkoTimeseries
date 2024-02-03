@@ -1724,9 +1724,9 @@ namespace Gekko
                         Trace2 trace = new Trace2(ETraceType.Normal, t1, tEnd);  //if <dyn>, only the first of the iterations will have a trace, and this trace has to be modified regarding end period.
                         string b = null;
                         if (databank != null) b = databank.GetName() + Globals.symbolBankColon;
-                        trace.contents.name = b + lhs_series.GetName();
-                        trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
-                        trace.contents.text = traceString + ";";
+                        trace.GetContents().name = b + lhs_series.GetName();
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.GetContents().text = traceString + ";";
                         //We need to point the new Trace2("y = x1 + x2") object to the 2 objects Trace2("x1 = ...") and Trace2("x2 = ...")
                         if (Globals.traceContainer != null && Globals.traceContainer.Count() > 0)
                         {

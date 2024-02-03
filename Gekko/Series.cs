@@ -3074,7 +3074,7 @@ namespace Gekko
         {
             if (this.trace2 != null)
             {
-                this.traceID2 = this.trace2.id;
+                this.traceID2 = this.trace2.GetId();
                 this.trace2 = null;
             }
         }

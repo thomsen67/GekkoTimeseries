@@ -2073,9 +2073,9 @@ namespace Gekko
                         if (endoNoLagPointers[b] == 1)
                         {
                             Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
-                            trace.contents.text = src;
-                            trace.contents.name = ts.GetNameAndParentDatabank();
-                            trace.contents.commandFileAndLine = p?.GetExecutingGcmFile(true);
+                            trace.GetContents().text = src;
+                            trace.GetContents().name = ts.GetNameAndParentDatabank();
+                            trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling);                            
                             //ts.meta.source = src;
                             ts.Stamp();
