@@ -40,7 +40,7 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class Trace777  //Trace2 because it is experimental
+    public class TraceContents2  //Trace2 because it is experimental
     {
         [ProtoMember(1)]
         public readonly TraceID2 id = new TraceID2();                
@@ -74,17 +74,17 @@ namespace Gekko
         [ProtoMember(7)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
                 
-        public Trace777()
+        public TraceContents2()
         {
             //for protobuf
         }
 
-        public Trace777(GekkoTime t1, GekkoTime t2)
+        public TraceContents2(GekkoTime t1, GekkoTime t2)
         {
             this.period = new GekkoTimeSpanSimple(t1, t2);
         }
 
-        public Trace777(bool isNullTime)
+        public TraceContents2(bool isNullTime)
         {
             if (isNullTime)
             {
@@ -117,7 +117,7 @@ namespace Gekko
         public readonly ETraceType type = ETraceType.Normal;  //default
 
         [ProtoMember(3)]
-        public readonly Trace777 trace777 = null; 
+        public readonly TraceContents2 traceContents = null; 
 
         //Only for protobuf and DeepClone()
         private Trace2()
@@ -125,17 +125,17 @@ namespace Gekko
 
         }
 
-        public Trace2(ETraceType type, Trace777 trace777)
+        public Trace2(ETraceType type, TraceContents2 traceContents)
         {
             this.type = type;
-            this.trace777 = trace777;
+            this.traceContents = traceContents;
         }
 
         public Trace2(ETraceType type)
         {
             this.type = type;
-            Trace777 trace777 = new Trace777();
-            this.trace777 = trace777;
+            TraceContents2 traceContents = new TraceContents2();
+            this.traceContents = traceContents;
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace Gekko
         {                      
             if (childOrParentType == ETraceParentOrChild.Child) new Error("Trace constructor problem");            
             this.type = type;
-            Trace777 trace777 = new Trace777();
-            this.trace777 = trace777;
+            TraceContents2 traceContents = new TraceContents2();
+            this.traceContents = traceContents;
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace Gekko
         {            
             if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");            
             this.type = type;
-            Trace777 trace777 = new Trace777(t1, t2);
-            this.trace777 = trace777;         
+            TraceContents2 traceContents = new TraceContents2(t1, t2);
+            this.traceContents = traceContents;         
         }
 
         public Trace2(ETraceType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2, false)
@@ -179,8 +179,8 @@ namespace Gekko
 
             if (isNullTime)
             {
-                Trace777 trace777 = new Trace777(isNullTime);
-                this.trace777 = trace777;
+                TraceContents2 traceContents = new TraceContents2(isNullTime);
+                this.traceContents = traceContents;
             }
             else new Error("Trace period problem");
                         
@@ -194,14 +194,14 @@ namespace Gekko
             }
         }
 
-        public Trace777 GetContents()
+        public TraceContents2 GetContents()
         {
-            return this.trace777;
+            return this.traceContents;
         }
 
         public TraceID2 GetId()
         {
-            return this.trace777.id;
+            return this.traceContents.id;
         }
 
         /// <summary>
@@ -713,7 +713,7 @@ namespace Gekko
                 {
                     if (true)
                     {
-                        trace2 = new Trace2(this.type, this.trace777);  //the .trace777 object is not cloned!
+                        trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
                         trace2.precedents = this.precedents?.DeepClone(cloneHelper);
                     }
                     else
