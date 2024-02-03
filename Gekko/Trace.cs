@@ -807,12 +807,10 @@ namespace Gekko
             {                   
                 trace.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents2();
-                //ts.meta.trace2.precedents.Add(new TraceAndPeriods2(trace, new GekkoTimeSpansSimple() { storage = new List<GekkoTimeSpanSimple>() { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) } }));
                 TraceAndPeriods2 tap6 = new TraceAndPeriods2();
                 tap6.trace = trace;
                 GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
                 xx.SetStorage(new List<GekkoTimeSpanSimple>() { tap6.trace.contents.period });  //should be ok to just add it here, because .contents.period never changes (is immutable anyway)
-                //xx.SetStorage(new List<GekkoTimeSpanSimple>() { new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull) });
                 tap6.periods = xx;
                 ts.meta.trace2.precedents.Add(tap6);
             }            
@@ -1666,13 +1664,13 @@ namespace Gekko
 
         public TraceAndPeriods2 DeepClone(CloneHelper cloneHelper)
         {
-            GekkoTimeSpansSimple xx = null;
+            GekkoTimeSpansSimple gtss = null;
             if (this.periods != null)
             {
-                xx = new GekkoTimeSpansSimple();
-                xx.AddRange(this.periods);  //the timespans themselves are immutable
+                gtss = new GekkoTimeSpansSimple();
+                gtss.AddRange(this.periods);  //the timespans themselves are immutable
             }
-            return new TraceAndPeriods2(this.trace.DeepClone(cloneHelper), xx);
+            return new TraceAndPeriods2(this.trace.DeepClone(cloneHelper), gtss);
         }
     }
 
