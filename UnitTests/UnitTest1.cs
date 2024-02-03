@@ -13083,7 +13083,7 @@ namespace UnitTests
         {
             Program.Flush();
             Series y;
-            TraceContents2 tracec;
+            Trace777 tracec;
 
             for (int i = 0; i < 2; i++)  //i=0: normal series /// i=1: array-series (NOTE + TODO: some of this is skipped)
             {

@@ -40,87 +40,59 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class TraceContents2
+    public class Trace777  //Trace2 because it is experimental
     {
+        [ProtoMember(1)]
+        public readonly TraceID2 id = new TraceID2();                
+
         //In principle, these fields could be made readonly, but it would take a bit of refactoring.
 
         /// <summary>
         /// 1 timespan. This object is immutable (just as GekkoTime)
         /// </summary>
-        [ProtoMember(1)]
+        [ProtoMember(2)]
         public GekkoTimeSpanSimple period = null;
 
         /// <summary>
         /// An extra char in a text string here will take up 2 bytes or 16 bits.
         /// </summary>        
-        [ProtoMember(2)]
+        [ProtoMember(3)]
         public string text = null;
 
-        [ProtoMember(3)]
+        [ProtoMember(4)]
         public string name = null;  //with bank and freq
 
-        [ProtoMember(4)]
+        [ProtoMember(5)]
         public string commandFileAndLine = null;
-                
+
         /// <summary>
         /// For instance the file from where data was imported. Will often be null.
         /// </summary>
-        [ProtoMember(5)]
-        public string dataFile = null;               
-
         [ProtoMember(6)]
+        public string dataFile = null;
+
+        [ProtoMember(7)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
-
-        public TraceContents2 DeepClone()
-        {            
-            TraceContents2 trace2 = new TraceContents2();
-            trace2.period = this.period;  //it is immutable
-            trace2.name = this.name;
-            trace2.commandFileAndLine = this.commandFileAndLine;
-            trace2.text = this.text;
-            trace2.dataFile = this.dataFile;
-            if (this.precedentsNames != null) trace2.precedentsNames = this.precedentsNames.ToList();
-            return trace2;
-        }
-
-        public TraceContents2()
+                
+        public Trace777()
         {
             //for protobuf
         }
 
-        public TraceContents2(GekkoTime t1, GekkoTime t2)
+        public Trace777(GekkoTime t1, GekkoTime t2)
         {
             this.period = new GekkoTimeSpanSimple(t1, t2);
         }
 
-        public TraceContents2(bool isNullTime)
+        public Trace777(bool isNullTime)
         {
             if (isNullTime)
             {
                 this.period = new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull);
             }
             else new Error("TraceContents time error");
-        }
-    }
+        }        
 
-    [ProtoContract]
-    public class Trace777  //Trace2 because it is experimental
-    {
-        [ProtoMember(1)]
-        public readonly TraceID2 id = new TraceID2();        
-
-        [ProtoMember(2)]
-        public readonly TraceContents2 contents = null;
-
-        public Trace777()
-        {
-
-        }
-
-        public Trace777(TraceContents2 contents)
-        {
-            this.contents = contents;
-        }
     }
 
 
@@ -159,13 +131,6 @@ namespace Gekko
             this.trace777 = trace777;
         }
 
-        public Trace2(ETraceType type, TraceContents2 contents)
-        {            
-            this.type = type;
-            Trace777 trace777 = new Trace777(contents);
-            this.trace777= trace777;
-        }
-
         public Trace2(ETraceType type)
         {
             this.type = type;
@@ -194,7 +159,7 @@ namespace Gekko
         {            
             if (!nullPeriodAccepted && (t1.IsNull() || t2.IsNull())) new Error("Trace time error");            
             this.type = type;
-            Trace777 trace777 = new Trace777(new TraceContents2(t1, t2));
+            Trace777 trace777 = new Trace777(t1, t2);
             this.trace777 = trace777;         
         }
 
@@ -214,7 +179,7 @@ namespace Gekko
 
             if (isNullTime)
             {
-                Trace777 trace777 = new Trace777(new TraceContents2(isNullTime));
+                Trace777 trace777 = new Trace777(isNullTime);
                 this.trace777 = trace777;
             }
             else new Error("Trace period problem");
@@ -229,9 +194,9 @@ namespace Gekko
             }
         }
 
-        public TraceContents2 GetContents()
+        public Trace777 GetContents()
         {
-            return this.trace777.contents;
+            return this.trace777;
         }
 
         public TraceID2 GetId()
@@ -753,7 +718,7 @@ namespace Gekko
                     }
                     else
                     {
-                        trace2 = new Trace2(this.type, this.GetContents()?.DeepClone());
+                        trace2 = new Trace2(this.type, this.GetContents());
                         trace2.precedents = this.precedents?.DeepClone(cloneHelper);
                     }                   
                 }
@@ -1060,7 +1025,7 @@ namespace Gekko
                 }
                 WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                 string v = null;
-                if (trace.GetContents() != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
+                if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
                 w.Title = v + "Gekko data trace";
                 w.ShowDialog();
             }
@@ -1166,8 +1131,13 @@ namespace Gekko
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
                 if (this.GetContents().name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.GetContents().name), Program.options.freq);
                 GetCodeAsString(this.GetContents().text, out code, out codeDetailed);
-                GekkoTime t1 = this.GetContents().period.t1;
-                GekkoTime t2 = this.GetContents().period.t2;
+                GekkoTime t1 = GekkoTime.tNull;
+                GekkoTime t2 = GekkoTime.tNull;
+                if (this.GetContents().period != null)
+                {
+                    t1 = this.GetContents().period.t1;
+                    t2 = this.GetContents().period.t2;
+                }
                 if (t1.IsNull() && t2.IsNull()) period = "";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
                 GetActivePeriodsAsString(periods, ref active, ref activeDetailed);
@@ -1193,7 +1163,8 @@ namespace Gekko
         public static void GetCodeAsString(string text, out string code, out string codeDetailed)
         {
             codeDetailed = text;
-            code = System.Text.RegularExpressions.Regex.Replace(codeDetailed, @"\s+", " "); //https://stackoverflow.com/questions/206717/how-do-i-replace-multiple-spaces-with-a-single-space-in-c                
+            code = null;
+            if (codeDetailed != null) code = System.Text.RegularExpressions.Regex.Replace(codeDetailed, @"\s+", " "); //https://stackoverflow.com/questions/206717/how-do-i-replace-multiple-spaces-with-a-single-space-in-c                
         }
 
         public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
@@ -1205,20 +1176,23 @@ namespace Gekko
         public static void GetActivePeriodsAsString(GekkoTimeSpansSimple periods, ref string active, ref string activeDetailed)
         {
             int n = -1;
-            foreach (GekkoTimeSpanSimple gts in periods.GetStorage())
+            if (periods != null)
             {
-                n++;
-                if (n > 0) active += ", ";
-                if (n > 0) activeDetailed += ", ";
-                if (n <= 1)
+                foreach (GekkoTimeSpanSimple gts in periods.GetStorage())
                 {
-                    active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                    n++;
+                    if (n > 0) active += ", ";
+                    if (n > 0) activeDetailed += ", ";
+                    if (n <= 1)
+                    {
+                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                    }
+                    else
+                    {
+                        active += "...";
+                    }
+                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
                 }
-                else
-                {
-                    active += "...";
-                }
-                activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
             }
         }
 
