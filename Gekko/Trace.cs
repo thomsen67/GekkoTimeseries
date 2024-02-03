@@ -153,6 +153,12 @@ namespace Gekko
 
         }
 
+        public Trace2(ETraceType type, Trace777 trace777)
+        {
+            this.type = type;
+            this.trace777 = trace777;
+        }
+
         public Trace2(ETraceType type, TraceContents2 contents)
         {            
             this.type = type;
@@ -740,8 +746,16 @@ namespace Gekko
                 }
                 else
                 {
-                    trace2 = new Trace2(this.type, this.GetContents()?.DeepClone());
-                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
+                    if (true)
+                    {
+                        trace2 = new Trace2(this.type, this.trace777);  //the .trace777 object is not cloned!
+                        trace2.precedents = this.precedents?.DeepClone(cloneHelper);
+                    }
+                    else
+                    {
+                        trace2 = new Trace2(this.type, this.GetContents()?.DeepClone());
+                        trace2.precedents = this.precedents?.DeepClone(cloneHelper);
+                    }                   
                 }
 
                 if (cloneHelper != null)
