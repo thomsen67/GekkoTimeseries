@@ -1010,9 +1010,7 @@ namespace Gekko
             int nn = 0;
 
             if (!G.IsUnitTesting())
-            {
-                
-
+            {               
 
                 Thread sta = new Thread(delegate ()
                 {
@@ -1040,25 +1038,9 @@ namespace Gekko
                 });
                 sta.SetApartmentState(ApartmentState.STA);
                 sta.Start();
-
-
-
-
-
-
-
-
-
-
-                //WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                //string v = null;
-                //if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
-                //w.Title = v + "Gekko data trace";
-                ////w.ShowDialog();
-                //w.Show();
             }
 
-            if(Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
+            if (Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
             return nn;
         }
 

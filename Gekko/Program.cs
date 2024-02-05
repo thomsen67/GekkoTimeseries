@@ -17031,6 +17031,8 @@ namespace Gekko
 
             GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, respect, null, "copy");
 
+            CloneHelper ch = new CloneHelper();
+
             foreach (ToFrom output in outputs)
             {
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);  //no search here
@@ -17116,7 +17118,7 @@ namespace Gekko
                 if (!injectingToExistingSeries)
                 {
                     //Brand new variable object is created                    
-                    IVariable iv_clone = iv.DeepClone(truncateTemp, null);
+                    IVariable iv_clone = iv.DeepClone(truncateTemp, ch);
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
 
                     Series ts_clone = iv_clone as Series;
@@ -17130,6 +17132,7 @@ namespace Gekko
                             //newTrace.GetContents().text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                            //new Writeln("qwerty pushing " + ts_clone.GetName());
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
