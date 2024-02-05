@@ -2109,8 +2109,8 @@ namespace Gekko
             if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
             if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
             if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");
-            var d1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
-            var d2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var d1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
+            var d2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !Path.GetFileNameWithoutExtension(p).StartsWith(".git")).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
             var e12 = d1.Except(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
             var e21 = d2.Except(d1, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
             var intersect = d1.Intersect(d2, StringComparer.OrdinalIgnoreCase).Distinct().ToArray();
@@ -2252,10 +2252,10 @@ namespace Gekko
                 foreach (string s in differentText)
                 {
                     string a1 = f1 + s;
-                    string b1 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s) + "," + Path.GetExtension(s).Replace(".", "") + " (1)";
+                    string b1 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s).Replace(".", ",") + "," + Path.GetExtension(s).Replace(".", "") + " (1)";
                     File.Copy(a1, b1);
                     string a2 = f2 + s;
-                    string b2 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s) + "," + Path.GetExtension(s).Replace(".", "") + " (2)";
+                    string b2 = zipper1.tempFolder + "\\" + Path.GetDirectoryName(s).Replace("\\", "--") + "--" + Path.GetFileNameWithoutExtension(s).Replace(".", ",") + "," + Path.GetExtension(s).Replace(".", "") + " (2)";
                     File.Copy(a2, b2);
                 }
                 zipper1.ZipAndCleanup();

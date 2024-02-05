@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Threading;
 
 namespace Gekko
 {
@@ -1006,28 +1007,55 @@ namespace Gekko
 
             // Items = disp = 188, new items = 432 (437)
 
-            Globals.itemCounter = 0;
-
-            TreeGridModel model = new TreeGridModel();
             int nn = 0;
-            Item temp = null;
-
-            //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
-            int maxDepth2 = int.MaxValue;
-            if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-            temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.traceShowDividers, ref nn);
 
             if (!G.IsUnitTesting())
             {
-                foreach (Item item in temp.GetChildren())
+                
+
+
+                Thread sta = new Thread(delegate ()
                 {
-                    model.Add(item);
-                }
-                WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                string v = null;
-                if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
-                w.Title = v + "Gekko data trace";
-                w.ShowDialog();
+                    Globals.itemCounter = 0;
+
+                    TreeGridModel model = new TreeGridModel();
+                    
+                    Item temp = null;
+
+                    //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
+                    int maxDepth2 = int.MaxValue;
+                    if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
+                    temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.traceShowDividers, ref nn);
+                    foreach (Item item in temp.GetChildren())
+                    {
+                        model.Add(item);
+                    }
+                    WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                    string v = null;
+                    if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
+                    w.Title = v + "Gekko data trace";
+                    //w.ShowDialog();
+                    w.Show();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                sta.SetApartmentState(ApartmentState.STA);
+                sta.Start();
+
+
+
+
+
+
+
+
+
+
+                //WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                //string v = null;
+                //if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
+                //w.Title = v + "Gekko data trace";
+                ////w.ShowDialog();
+                //w.Show();
             }
 
             if(Globals.runningOnTTComputer) new Writeln("TTH: items " + Globals.itemCounter);
