@@ -5889,8 +5889,7 @@ namespace Gekko
                                         if (unknowVersion) txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ", but Gekko " + Globals.gekkoVersion + " only supports data trace versions: " + Stringlist.GetListWithCommas(Globals.traceVersions) + ".");
                                         else txt.MainAdd("The data traces inside the .gbk databank have data trace version " + traceVersion + ". This data trace version is known to Gekko " + Globals.gekkoVersion + ", but reading the traces failed.");
                                         txt.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
-                                    }
-                                    new Note();
+                                    }                                    
                                 }
                             }
                         }
@@ -17132,7 +17131,6 @@ namespace Gekko
                             //newTrace.GetContents().text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                            //new Writeln("qwerty pushing " + ts_clone.GetName());
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -21894,29 +21892,65 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                if (false)
+                bool traceFail = false;
+                
+                TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
+                try
                 {
-                    //Trimming when writing is not necessary if it is done continuously
-                    DateTime dt5 = DateTime.Now;
-                    Trace2.TraceTrim(databank);  //trims traces that are time-shadowed
-                    if (Globals.runningOnTTComputer) new Writeln("TTH: Trimming gbk: " + G.Seconds(dt5)); //G.Writeln("TTH: Trimming gbk: " + G.Seconds(dt5));
-                }                
-
-                TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
-                Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces
-                List<Trace2> temp = databank.traces;
+                    Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted); //packs traces                    
+                }
+                catch (Exception e) { traceFail = true; }
+                List<Trace2> tracesToWrite = databank.traces;
                 databank.traces = null;
+                
                 Parallel.ForEach(new List<int>() { 0, 1 }, number => //At least we are writing data and traces in parallel. 
                 {
-                    if (number == 0) ProtobufWrite(databank, pathAndFilename2);
-                    else if (number == 1) ProtobufWrite(temp, pathAndFilename3);
+                    if (number == 0)
+                    {
+                        ProtobufWrite(databank, pathAndFilename2);
+                    }
+                    else if (number == 1)
+                    {
+                        try
+                        {
+                            ProtobufWrite(tracesToWrite, pathAndFilename3);
+                        }
+                        catch (Exception e) { traceFail = true; }
+                    }
                     else new Error("Parallel problem");
-                });                
-                databank.traces = temp;
-                Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.
-                databank.traces = null;  //important!
+                });
+
+                if (isCloseCommand)
+                {
+                    //NOTE: Maybe in this case further trace handling is just a waste of time.
+                    //      The databank is dead, as it is in the process of being closed anyway.
+                }
+
+                try
+                {
+                    databank.traces = tracesToWrite;
+                    Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.
+                    databank.traces = null;  //important!
+                }
+                catch (Exception e)
+                {
+                    traceFail = true;
+                }
 
                 count = databank.storage.Count;  //must be before the finally
+
+                if (traceFail)
+                {
+                    using (var txt = new Warning())
+                    {
+                        try { File.Delete(pathAndFilename3); } catch { }  //a corrupted trace.data may be present: get it wiped out before zipping!
+                        try { foreach (SeriesMetaInformation meta in th.metas) meta.traceID2 = null; } catch { } //some of these may have been constructed: wipe them out!
+                        int c = 0; if (tracesToWrite != null) c = tracesToWrite.Count;
+                        txt.MainAdd("Writing " + c + " data traces to .gbk file failed for unknown reasons (but the data part of the file may be ok).");
+                        txt.MainAdd(Globals.traceError);
+                    }
+                }
+
             }
             finally
             {

@@ -1531,8 +1531,7 @@ namespace Gekko
             if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
             {
                 this.storage = new List<TraceAndPeriods2>();
-                for(int i = 0;i< this.storageIDTemporary.Count;i++)
-                //foreach (TraceID2 id in this.storageIDTemporary)
+                for (int i = 0; i < this.storageIDTemporary.Count; i++)
                 {
                     TraceID2 id = this.storageIDTemporary[i];
                     GekkoTimeSpansSimple periods = this.storagePeriodsTemporary[i];
