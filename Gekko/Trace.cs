@@ -921,11 +921,17 @@ namespace Gekko
         {
             if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
             {
-                TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
-                Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
-                foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
-                HandleTraceRead2(th.metas, dictInverted);
-                databank.traces = null;  //important!
+                try
+                {
+                    TraceHelper th = Gekko.Trace2.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
+                    Dictionary<TraceID2, Trace2> dictInverted = new Dictionary<TraceID2, Trace2>();
+                    foreach (Trace2 trace in databank.traces) dictInverted[trace.GetId()] = trace;
+                    HandleTraceRead2(th.metas, dictInverted);
+                }
+                finally
+                {
+                    databank.traces = null;  //important!
+                }
             }
         }
 

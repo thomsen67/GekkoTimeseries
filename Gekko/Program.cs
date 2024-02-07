@@ -3263,80 +3263,85 @@ namespace Gekko
 
         public static void WriteParallelDatabank(int k, Databank databank, string fileName, string hash, double hashMs, ReadInfo readInfo)
         {
-            int extra = 1;
-
-            DateTime t = DateTime.Now;
-            bool print = false; if (Globals.runningOnTTComputer) print = true;
-
-            List<string> files = GetSplitCacheFileNames(k + extra, fileName, "data", null, ref hash); //the last filename is cache parameters
-
-            List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
-            List<TwoInts> twoIntss = new List<TwoInts>();
-            for (int i = 0; i < k; i++)
+            try
             {
-                lists.Add(new List<ParallelHelper>());
-                twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
-            }
-            
-            TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
-            Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted);                       
+                int extra = 1;
 
-            lists = SplitVarsInSameSizeParts(databank.storage, k, print);
-            
-            int n = 0;
-            while (true)
-            {
+                DateTime t = DateTime.Now;
+                bool print = false; if (Globals.runningOnTTComputer) print = true;
+
+                List<string> files = GetSplitCacheFileNames(k + extra, fileName, "data", null, ref hash); //the last filename is cache parameters
+
+                List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
+                List<TwoInts> twoIntss = new List<TwoInts>();
                 for (int i = 0; i < k; i++)
                 {
-                    if (n >= databank.traces.Count) goto Lbl;
-                    lists[i].Add(new ParallelHelper(databank.traces[n]));
-                    n++;
+                    lists.Add(new List<ParallelHelper>());
+                    twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
                 }
-            }
-        Lbl:;
 
-            lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
-            {
-                try
+                TraceHelper th; Dictionary<TraceID2, Trace2> dict1Inverted;
+                Gekko.Trace2.HandleTraceWrite(databank, out th, out dict1Inverted);
+
+                lists = SplitVarsInSameSizeParts(databank.storage, k, print);
+
+                int n = 0;
+                while (true)
                 {
-                    if (File.Exists(files[i])) File.Delete(files[i]);
+                    for (int i = 0; i < k; i++)
+                    {
+                        if (n >= databank.traces.Count) goto Lbl;
+                        lists[i].Add(new ParallelHelper(databank.traces[n]));
+                        n++;
+                    }
                 }
-                catch (Exception e)
+            Lbl:;
+
+                lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
                 {
-                    new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                    try
+                    {
+                        if (File.Exists(files[i])) File.Delete(files[i]);
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("Protobuf cache problem (protobuffers). Message: " + e.Message);
+                    }
+                    ProtobufWrite(x, files[i]);
+                    return true;
+                }).All(_ => _);
+
+                //write out the cache parameters object
+                //read cache parameters
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                // ------> if databank.traces is big, it should be written in parallel together with the others! See also #kgs6dskdfs
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                DateTime dt0 = DateTime.Now;
+                ProtobufWrite(databank.cacheParameters, files[k + extra - 1]);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Write time cache params: " + G.Seconds(dt0));
+                dt0 = DateTime.Now;
+                Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
+
+                List<string> sfiles = new List<string>();
+                foreach (string file in files)
+                {
+                    sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
                 }
-                ProtobufWrite(x, files[i]);
-                return true;
-            }).All(_ => _);
 
-            //write out the cache parameters object
-            //read cache parameters
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            // ------> if databank.traces is big, it should be written in parallel together with the others! See also #kgs6dskdfs
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            DateTime dt0 = DateTime.Now;
-            ProtobufWrite(databank.cacheParameters, files[k + extra - 1]);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Write time cache params: " + G.Seconds(dt0));
-            dt0 = DateTime.Now;
-            Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted);
-            databank.traces = null;  //important!
+                if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
+                //if (print) new Writeln("TTH: Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);            
 
-            List<string> sfiles = new List<string>();
-            foreach (string file in files)
-            {
-                sfiles.Add(G.UpdprtFormat((double)(new FileInfo(file)).Length / 1e6d, 0, false));
+                double milliseconds = (DateTime.Now - t).TotalMilliseconds;
+                milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
+                string s = G.SecondsFormat(milliseconds);
+                readInfo.note += "Cache write time: " + s + ". ";
             }
-
-            if (print) new Writeln("TTH: Sizes (MB): " + Stringlist.GetListWithCommas(sfiles));
-            //if (print) new Writeln("TTH: Serialize (" + k + "): " + G.Seconds(t) + "      hashtime: " + hashTime);            
-
-            double milliseconds = (DateTime.Now - t).TotalMilliseconds;
-            milliseconds += hashMs;  //else it seems too easy: ReadParallel has already computed MD5
-            string s = G.SecondsFormat(milliseconds);
-            readInfo.note += "Cache write time: " + s + ". ";
-
+            finally
+            {
+                databank.traces = null;  //important!
+            }
         }
 
         /// <summary>
@@ -3392,91 +3397,102 @@ namespace Gekko
             //
             // When we have a 1of1, just read it without parallel.foreach (same for write).
 
-            int extra = 1;
+            Databank databank = null;
 
-            bool print = false;
-            if (Globals.runningOnTTComputer) print = true;
-
-            year1 = int.MaxValue;
-            year2 = int.MinValue;
-            DateTime t = DateTime.Now;
-            hash = Program.GetMD5Hash(null, fileName, null);
-            hashMs = (DateTime.Now - t).TotalMilliseconds;
-
-            List<string> files = new List<string>();
-            List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
-            List<TwoInts> twoIntss = new List<TwoInts>();
-
-            string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
-            int k = ValidateFileNames(part2);
-            if (k == -12345) return null;  //could not find anything useful in cache
-
-            for (int i = 0; i < k; i++)
+            try
             {
-                files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);                
-            }
 
-            for (int i = 0; i < k - extra; i++)
-            {                
-                lists.Add(new List<ParallelHelper>());
-                twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
-            }
-            
-            t = DateTime.Now;
+                int extra = 1;
 
-            Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
-            {
-                //See https://github.com/protobuf-net/protobuf-net/issues/668
-                //About double speed on TT pc, compared to no parallel  
+                bool print = false;
+                if (Globals.runningOnTTComputer) print = true;
 
-                int i = (int)index;                
-                List<ParallelHelper> o = ProtobufRead<List<ParallelHelper>>(files[i]);
-                lists[i] = o;
-                TwoInts yearMinMax = twoIntss[i];
-                foreach (ParallelHelper ph in lists[i])
+                year1 = int.MaxValue;
+                year2 = int.MinValue;
+                DateTime t = DateTime.Now;
+                hash = Program.GetMD5Hash(null, fileName, null);
+                hashMs = (DateTime.Now - t).TotalMilliseconds;
+
+                List<string> files = new List<string>();
+                List<List<ParallelHelper>> lists = new List<List<ParallelHelper>>();
+                List<TwoInts> twoIntss = new List<TwoInts>();
+
+                string part2 = Globals.gekkoVersion + "_" + "data" + "_" + hash + "_";
+                int k = ValidateFileNames(part2);
+                if (k == -12345) return null;  //could not find anything useful in cache
+
+                for (int i = 0; i < k; i++)
                 {
-                    if(!ph.isTrace()) ph.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
+                    files.Add(Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "data" + "_" + hash + "_" + (i + 1) + "of" + k + Globals.cacheExtension);
                 }
-                return 0;
-            }, _ => { });
 
-            Databank databank = new Databank("temporary");
-
-            DateTime t2 = DateTime.Now;
-            databank.traces = new List<Trace2>();
-            foreach (List<ParallelHelper> list in lists)
-            {
-                foreach (ParallelHelper ph in list)
+                for (int i = 0; i < k - extra; i++)
                 {
-                    if (ph.isTrace()) 
-                        databank.traces.Add(ph.trace);
-                    else databank.storage.Add(ph.name, ph.iv);
+                    lists.Add(new List<ParallelHelper>());
+                    twoIntss.Add(new TwoInts(int.MaxValue, int.MinValue));
                 }
-            }
-            lists = null;  //free for GC            
 
-            for (int i = 0; i < twoIntss.Count; i++)
+                t = DateTime.Now;
+
+                Parallel.ForEach(lists, () => 0, (x, pls, index, s) =>
+                {
+                    //See https://github.com/protobuf-net/protobuf-net/issues/668
+                    //About double speed on TT pc, compared to no parallel  
+
+                    int i = (int)index;
+                    List<ParallelHelper> o = ProtobufRead<List<ParallelHelper>>(files[i]);
+                    lists[i] = o;
+                    TwoInts yearMinMax = twoIntss[i];
+                    foreach (ParallelHelper ph in lists[i])
+                    {
+                        if (!ph.isTrace()) ph.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
+                    }
+                    return 0;
+                }, _ => { });
+
+                databank = new Databank("temporary");
+
+                DateTime t2 = DateTime.Now;
+                databank.traces = new List<Trace2>();
+                foreach (List<ParallelHelper> list in lists)
+                {
+                    foreach (ParallelHelper ph in list)
+                    {
+                        if (ph.isTrace())
+                            databank.traces.Add(ph.trace);
+                        else databank.storage.Add(ph.name, ph.iv);
+                    }
+                }
+                lists = null;  //free for GC            
+
+                for (int i = 0; i < twoIntss.Count; i++)
+                {
+                    if (twoIntss[i].int1 < year1) year1 = twoIntss[i].int1;
+                    if (twoIntss[i].int2 > year2) year2 = twoIntss[i].int2;
+                }
+
+                //read cache parameters
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                DateTime dt0 = DateTime.Now;
+                databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));
+                dt0 = DateTime.Now;
+                Gekko.Trace2.HandleTraceRead1(databank);
+                if (Globals.runningOnTTComputer) new Writeln("TTH: Handle time traces: " + G.Seconds(dt0));             
+
+                //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
+                readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
+
+            }
+            finally
             {
-                if (twoIntss[i].int1 < year1) year1 = twoIntss[i].int1;
-                if (twoIntss[i].int2 > year2) year2 = twoIntss[i].int2;
+                databank.traces = null;  //important!
             }
 
-            //read cache parameters
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            // ------> if databank.traces is big, it should be read in parallel together with the others! See also #kgs6dskdfs
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            DateTime dt0 = DateTime.Now;
-            databank.cacheParameters = ProtobufRead<DatabankCacheParams>(files[k - extra]);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Read time cache params: " + G.Seconds(dt0));                        
-            dt0 = DateTime.Now;
-            Gekko.Trace2.HandleTraceRead1(databank);
-            if (Globals.runningOnTTComputer) new Writeln("TTH: Handle time traces: " + G.Seconds(dt0));
-            databank.traces = null;  //important!
-
-            //if (print) new Writeln("TTH: Deserialize (" + k + "): " + G.Seconds(t) + "     cleanup: " + G.Seconds(t2));
-            readInfo.note += "Cache read time: " + G.Seconds(t) + ". ";
             return databank;
         }
 
@@ -21929,12 +21945,15 @@ namespace Gekko
                 try
                 {
                     databank.traces = tracesToWrite;
-                    Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.
-                    databank.traces = null;  //important!
+                    Gekko.Trace2.HandleTraceRead2(th.metas, dict1Inverted); //restores traces. They were removed temporarily so protobuf could write the data part without traces.                    
                 }
                 catch (Exception e)
                 {
                     traceFail = true;
+                }
+                finally
+                {
+                    databank.traces = null;  //important!
                 }
 
                 count = databank.storage.Count;  //must be before the finally
