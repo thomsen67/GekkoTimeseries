@@ -2130,15 +2130,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                int X = 0; int Y = 0;
-                int Width = 0; int Height = 0;
-                bool outOfBounds =
-    (X <= System.Windows.SystemParameters.VirtualScreenLeft - Width) ||
-    (Y <= System.Windows.SystemParameters.VirtualScreenTop - Height) ||
-    (System.Windows.SystemParameters.VirtualScreenLeft + System.Windows.SystemParameters.VirtualScreenWidth <= X) ||
-    (System.Windows.SystemParameters.VirtualScreenTop + System.Windows.SystemParameters.VirtualScreenHeight <= Y);
-                new Writeln("Left " + System.Windows.SystemParameters.VirtualScreenLeft + " top " + System.Windows.SystemParameters.VirtualScreenTop + " width " + System.Windows.SystemParameters.VirtualScreenWidth + " height " + System.Windows.SystemParameters.VirtualScreenHeight);
-                            }
+
+            }
 
             if (false && Globals.runningOnTTComputer)
             {                

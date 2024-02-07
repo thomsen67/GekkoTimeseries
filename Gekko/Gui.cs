@@ -806,8 +806,8 @@ namespace Gekko
 
             try
             {
-                gui.Size = new Size(us.MainWindowWidth, us.MainWindowHeight);
-                gui.Location = new Point(us.MainWindowLeftDistance, us.MainWindowTopDistance);
+                gui.Size = new Size(us.MainWindowWidth, us.MainWindowHeight);                
+                gui.Location = HandleMonitor(us.MainWindowLeftDistance, us.MainWindowTopDistance);
                 //this one can go wrong
                 //need to fix splitter to something fixed!
                 //height is 358 always, but it gets ok even if we change the height of Gekko
@@ -870,18 +870,43 @@ namespace Gekko
             }
 
             Program.options.folder_working = us.WorkingFolder;
-            Globals.guiGraphWindowTopDistance = us.GraphWindowTopDistance;
-            Globals.guiGraphWindowLeftDistance = us.GraphWindowLeftDistance;
-            Globals.guiDecompWindowTopDistance = us.DecompWindowTopDistance;
-            Globals.guiDecompWindowLeftDistance = us.DecompWindowLeftDistance;
+
+            Point pGraph = HandleMonitor(us.GraphWindowTopDistance, us.GraphWindowLeftDistance);
+            Globals.guiGraphWindowTopDistance = pGraph.X;
+            Globals.guiGraphWindowLeftDistance = pGraph.Y;
+
+            Point pDecomp = HandleMonitor(us.DecompWindowTopDistance, us.DecompWindowLeftDistance);
+            Globals.guiDecompWindowTopDistance = pDecomp.X;
+            Globals.guiDecompWindowLeftDistance = pDecomp.Y;
             Globals.guiDecompWindowHeightDistance = us.DecompWindowHeightDistance;
             Globals.guiDecompWindowWidthDistance = us.DecompWindowWidthDistance;
             Globals.guiDecompWindowSplitterHorizontal = us.DecompWindowSplitterHorizontal;
             Globals.guiDecompWindowSplitterVertical = us.DecompWindowSplitterVertical;
-            Globals.guiErrorWindowTopDistance = us.ErrorWindowTopDistance;
-            Globals.guiErrorWindowLeftDistance = us.ErrorWindowLeftDistance;
+
+            Point pError = HandleMonitor(us.ErrorWindowTopDistance, us.ErrorWindowLeftDistance);
+            Globals.guiErrorWindowTopDistance = pError.X;
+            Globals.guiErrorWindowLeftDistance = pError.Y;
 
             return us;
+        }
+
+        private static Point HandleMonitor(int left, int top)
+        {
+            if (Globals.runningOnTTComputer)
+            {
+                new Writeln("Monitor: input left " + left + " top " + top);
+            }
+            //Do not accept a top-left corner of a Gekko main window if it is (hardly) not shown.
+            //This may happen when having 2 monitors at work, and working on a laptop from home.
+            double physicalWidth = System.Windows.SystemParameters.VirtualScreenWidth;
+            double physicalHeight = System.Windows.SystemParameters.VirtualScreenHeight;
+            if (left > 0.9 * physicalWidth) left = 100;  //if within 100 pixels to right border of screen, move it!
+            if (top > 0.9 * physicalHeight) top = 100;  //if within 100 pixels to right border of screen, move it!
+            if (Globals.runningOnTTComputer)
+            {
+                new Writeln("Monitor: output left " + left + " top " + top);
+            }
+            return new Point(left, top);
         }
 
         private static void GuiUpdateRecentFilesMenu()
