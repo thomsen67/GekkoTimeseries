@@ -3451,8 +3451,24 @@ namespace Gekko
                 }
             }
 
-            if (type == "large") sb.AppendLine(" Program folder: ");
-            if (type == "large") sb.AppendLine("   " + GetProgramDir());
+            if (type == "large")
+            {
+                string pd = GetProgramDir();
+                string exe = null;
+                try
+                {
+                    string pd2 = Path.Combine(pd, "gekko.exe");
+                    DateTime modification = File.GetLastWriteTime(pd2);
+                    exe = " (gekko.exe: " + modification.ToString("g", CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ")";
+                }
+                catch { }
+
+                sb.AppendLine(" Program folder: ");
+                sb.AppendLine("   " + pd + exe);
+
+                
+            }
+
             sb.AppendLine(" Working folder: ");
             sb.AppendLine("   " + workingFolder);
 
