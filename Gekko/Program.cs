@@ -3333,7 +3333,7 @@ namespace Gekko
             }
             finally
             {
-                databank.traces = null;  //important!
+                if (databank != null) databank.traces = null;  //important!
             }
         }
 
@@ -3483,7 +3483,7 @@ namespace Gekko
             }
             finally
             {
-                databank.traces = null;  //important!
+                if (databank != null) databank.traces = null;  //important!
             }
 
             return databank;
@@ -21946,7 +21946,7 @@ namespace Gekko
                 }
                 finally
                 {
-                    databank.traces = null;  //important!
+                    if (databank != null) databank.traces = null;  //important!
                 }
 
                 count = databank.storage.Count;  //must be before the finally

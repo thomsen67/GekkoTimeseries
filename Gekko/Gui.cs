@@ -891,17 +891,26 @@ namespace Gekko
         }
 
         private static Point HandleMonitor(int left, int top)
-        {
-            if (Globals.runningOnTTComputer)
-            {
-                new Writeln("Monitor: input left " + left + " top " + top);
-            }
+        {            
             //Do not accept a top-left corner of a Gekko main window if it is (hardly) not shown.
             //This may happen when having 2 monitors at work, and working on a laptop from home.
+
+            var dpiXProperty = typeof(System.Windows.SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);            
+            var dpiX = (int)dpiXProperty.GetValue(null, null);
+            double factor = (double)dpiX / 96d;
             double physicalWidth = System.Windows.SystemParameters.VirtualScreenWidth;
             double physicalHeight = System.Windows.SystemParameters.VirtualScreenHeight;
-            if (left > 0.9 * physicalWidth) left = 100;  //if within 100 pixels to right border of screen, move it!
-            if (top > 0.9 * physicalHeight) top = 100;  //if within 100 pixels to right border of screen, move it!
+
+            if (Globals.runningOnTTComputer)
+            {
+                new Writeln("Monitor: input left " + left + " top " + top + " --> llimit = 0.9 * " + physicalWidth + " * " + factor + " = " + 0.9 * physicalWidth * factor);
+            }
+
+            if (left > 0.9 * physicalWidth * factor || top > 0.9 * physicalHeight * factor)
+            {
+                left = 100; top = 100; //if within 10% pixels, move it!
+            }
+            
             if (Globals.runningOnTTComputer)
             {
                 new Writeln("Monitor: output left " + left + " top " + top);

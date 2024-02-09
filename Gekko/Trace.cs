@@ -930,7 +930,7 @@ namespace Gekko
                 }
                 finally
                 {
-                    databank.traces = null;  //important!
+                    if (databank != null) databank.traces = null;  //important!
                 }
             }
         }
