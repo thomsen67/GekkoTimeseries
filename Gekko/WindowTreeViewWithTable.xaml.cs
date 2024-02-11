@@ -716,7 +716,7 @@ namespace Gekko
             {
                 // Initialize the component
                 InitializeComponent();           
-                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Click '>' x1xto unfold sub-traces. Click a row to see more trace info.")));
+                this.text.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Click '>' to unfold sub-traces. Click a row to see more trace info.")));
 
                 // Set the model for the grid
                 grid.ItemsSource = model.FlatModel;
