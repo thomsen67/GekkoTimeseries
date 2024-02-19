@@ -7592,7 +7592,7 @@ namespace Gekko
                         }
                         else
                         {
-                            if (freq != freq2) new Error(splice + ": frequency mismatch in the elements: " + freq.Pretty() + " vs. " + freq2.Pretty() + ".");
+                            if (freq != freq2) new Error(splice + ": frequency mismatch in the input series: " + freq.Pretty() + " vs. " + freq2.Pretty() + ".");
                         }
                     }
                 }

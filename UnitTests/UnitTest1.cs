@@ -17309,6 +17309,64 @@ namespace UnitTests
         [TestMethod]
         public void _Test_GAMSScalar1()
         {
+            // !
+            // !
+            // !
+            // ! This also produces a gamsscalar.json for users. See the GAMS appendix in the help system.
+            // !
+            // !
+            // !
+            //Newer model and newer GAMS, cf. _Test_GAMSScalar2()            
+            Globals.unitTestScreenOutput.Clear();
+            string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2024-01-10-c2f2447\Model\";
+
+            string modelName = ""; ;
+
+            for (int h = 1; h >= 0; h--)  //holdfixed
+            {
+                for (int p = 0; p < 3; p++)  //models
+                {
+                    if (p == 0) modelName = "M_static_calibration";
+                    else if (p == 1) modelName = "M_post";
+                    else if (p == 2) modelName = "M_static";
+                    else throw new GekkoException();
+                    I("RESET;");
+                    I("OPTION folder working = '" + path5 + "';");
+                    I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+                    if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");
+                    using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.WriteLine(@"// Gekko settings for GAMS CONVERT (produces scalar model for Gekko DECOMP).");
+                        sw.WriteLine(@"// Comments '//' can be used: not legal in .json, but Gekko removes them before reading the file.");
+                        sw.WriteLine(@"// Beware that you must use double backslash for paths.");
+                        sw.WriteLine(@"{");
+                        sw.WriteLine(@"  ""is_manual"" : true,                                   //Manual via popups?");
+                        sw.WriteLine(@"  ""gms_file"" : ""static_calibration.gms"",              //The .gms file containing the @solve() statement regarding model_name.");
+                        sw.WriteLine(@"  ""model_name"" : """ + modelName + @""",                            //Model that is being made into scalar model");
+                        sw.WriteLine(@"  ""raw_path"" : ""*.gms"",                               //Path to file(s) containing raw GAMS equations (may include *.gms)");
+                        sw.WriteLine(@"  ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations. Can be omitted. ");
+                        sw.WriteLine(@"  ""counts1"" : ""**** Counts do not match"",             //Can be omitted, default = ""**** Counts do not match""");
+                        sw.WriteLine(@"  ""counts2"" : ""Unmatched single free variables"",        //Can be omitted, default = ""Unmatched single free variables""");
+                        sw.WriteLine(@"  ""counts3"" : ""Single equations in unmatched =E= blocks""     //Can be omitted, default = ""Single equations in unmatched =E= blocks""");
+                        sw.WriteLine(@" } ");
+                    }
+                    File.Delete(path5 + "\\" + modelName + ".zip");
+                    I("gamsscalar('pack');");
+                    //long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
+                    //if (h == 1 && p == 0) Assert.IsTrue(size > 51000000 && size < 52000000);       //size should be around 51.819.217 bytes
+                    //else if (h == 1 && p == 1) Assert.IsTrue(size > 59000000 && size < 60000000);  //size should be around 59.109.882 bytes
+                    //else if (h == 0 && p == 0) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes
+                    //else if (h == 0 && p == 1) Assert.IsTrue(size > 70000000 && size < 71000000);  //size should be around 70.650.027 bytes (both fixed vars and post-model)                    
+                    //else new Error("Wrong!");
+                }
+            }
+        }
+
+
+        [TestMethod]
+        public void _Test_GAMSScalar1_OLDDELETE()
+        {
             //Older model and older GAMS, cf. _Test_GAMSScalar1()
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2022-01-26-xxxxxxx\klon\Model";        
@@ -17356,13 +17414,13 @@ namespace UnitTests
                 sw.WriteLine(@" } ");
             }
             File.Delete(path5 + "\\makro2gekko.zip");            
-            I("gamsscalar('pack');");
+            I("gamsscalar_OLDDELETE('pack');");
             long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;
             Assert.IsTrue(size > 60000000 && size < 62000000);  //size should be around 61012491 bytes plus minus.
         }
 
         [TestMethod]
-        public void _Test_GAMSScalar2()
+        public void _Test_GAMSScalar2_OLDDELETE()
         {
             // !
             // !
@@ -17436,7 +17494,7 @@ namespace UnitTests
                         sw.WriteLine(@" } ");
                     }
                     File.Delete(path5 + "\\makro2gekko.zip");
-                    I("gamsscalar('pack');");
+                    I("gamsscalar_OLDDELETE('pack');");
                     long size = new System.IO.FileInfo(path5 + "\\makro2gekko.zip").Length;                    
                     if (h == 1 && p == 0) Assert.IsTrue(size > 51000000 && size < 52000000);       //size should be around 51.819.217 bytes
                     else if (h == 1 && p == 1) Assert.IsTrue(size > 59000000 && size < 60000000);  //size should be around 59.109.882 bytes

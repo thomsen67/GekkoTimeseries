@@ -8,6 +8,19 @@ namespace Gekko
 {
     public class GamsScalarHelper
     {
+        public bool is_manual = true;
+        public string cmd_file = null;  //only used when is_manual is false.
+        public string gms_file = null;
+        public string model_name = null;
+        public string raw_path = null;
+        public object[] raw_ignore = null;
+        public string counts1 = "**** counts do not match";
+        public string counts2 = "**** unmatched free variables";
+        public string counts3 = "**** number of unmatched =e= rows";
+    }
+
+    public class GamsScalarHelper_OLDDELETE
+    {
         public string zip_name = null;
         public string raw_path = null;
         public object[] raw_ignore = null;
@@ -4553,7 +4566,7 @@ namespace Gekko
 
         public static void writefile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable file1, IVariable x1)
         {
-            Program.WriteFile(file1, O.ReplaceSlash(x1));
+            Program.WriteFileWithWait(file1, O.ReplaceSlash(x1));
         }
 
         public static IVariable nl(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -5634,6 +5647,52 @@ namespace Gekko
             new Writeln("Removed trace connections. Use tracestats2() to see resulting trace counts (" + G.Seconds(t0) + ").");
         }        
 
+        public static void gamsscalar_olddelete(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
+        {
+            //See _Test_GAMSScalar1()+2() unit tests
+            if (input.Length != 1) new Error("Expected 1 argument for gamsscalar()");
+            string input1 = O.ConvertToString(input[0]);
+            if (G.Equal(input1, "pack") || G.Equal(input1, "packmanual"))
+            {
+                bool isManual = G.Equal(input1, "packmanual");
+                GamsScalarHelper_OLDDELETE settings = new GamsScalarHelper_OLDDELETE();
+                Program.GamsScalar_OLDDELETE(0, 0, settings);
+            }
+            else if (G.Equal(input1, "info"))
+            {
+                GekkoTime t = new GekkoTime(EFreq.A, 2030, 1);
+                if (Program.model?.modelGamsScalar.dict_FromANumberToVarName != null)
+                {
+                    Zipper zipper = new Zipper("info.zip");
+                    string[] x = Program.model.modelGamsScalar.dict_FromANumberToVarName.OrderBy(s => s, new G.NaturalComparer(G.NaturalComparerOptions.Default)).ToArray();
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "vars.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string s in x)
+                        {
+                            sw.WriteLine(s);
+                        }
+                    }
+
+                    using (FileStream fs = Program.WaitForFileStream(Path.Combine(zipper.tempFolder, "eqs.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (string eq in Program.model.modelGamsScalar.dict_FromEqNumberToEqName)
+                        {
+                            if (!eq.Contains(t.ToString())) continue;
+                            string eqText = Program.model.modelGamsScalar.GetEquationTextUnfolded(eq, false, t);
+                            sw.WriteLine(eqText);
+                            sw.WriteLine();
+                        }
+                    }
+                    zipper.ZipAndCleanup();
+                    new Writeln("Created info.zip with vars.txt and eqs.txt inside. Equations are from the year " + t.ToString());
+                }
+                else new Error("It does not seem like a GAMS scalar model is loaded");
+            }
+            else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");            
+        }
+
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
         {
             //See _Test_GAMSScalar1()+2() unit tests
@@ -5677,8 +5736,8 @@ namespace Gekko
                 }
                 else new Error("It does not seem like a GAMS scalar model is loaded");
             }
-            else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");            
-        }                
+            else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");
+        }
 
         public static IVariable fromexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {

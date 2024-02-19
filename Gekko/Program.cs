@@ -9617,7 +9617,7 @@ namespace Gekko
         /// <param name="depth"></param>
         /// <param name="dif0"></param>
         /// <param name="settings"></param>
-        public static void GamsScalar(int depth, int dif0, GamsScalarHelper settings)
+        public static void GamsScalar_OLDDELETE(int depth, int dif0, GamsScalarHelper_OLDDELETE settings)
         {
             DateTime t00 = DateTime.Now;
             string path = Program.options.folder_working;
@@ -9954,7 +9954,7 @@ namespace Gekko
                             txt.MainAdd("");
                         }
                         new Writeln("");
-                        Program.GamsScalar(depth + 1, dif0 + dif, settings);
+                        Program.GamsScalar_OLDDELETE(depth + 1, dif0 + dif, settings);
                     }
                     else
                     {
@@ -9986,6 +9986,377 @@ namespace Gekko
                     File.Delete(f);
                 }
             }
+        }
+
+        public static void GamsScalar(int depth, int dif, GamsScalarHelper settings)
+        {
+            DateTime t00 = DateTime.Now;
+            string path = Program.options.folder_working;
+
+            //Idea is that Gekko provides popups, while user manually runs what is needed to run
+            //User input is gms file + model name + 
+
+            string lstFolder = "LST";
+            bool hasAlteredGmsFile = false;
+            bool optionsFileExists = false;
+            string gmsPath = null;
+            string gmsPathCopy = null;
+            try
+            {
+                if (depth > 1) new Error("GAMS solver called > 2 times in gamsscalar() function. This should not be necessary: report this to the Gekko editor.");
+                
+                if (depth == 0)
+                {
+                    if (File.Exists(Path.Combine(path, "convert.opt"))) optionsFileExists = true;
+                    if (!optionsFileExists)
+                    {
+                        File.WriteAllText(Path.Combine(path, "convert.opt"), " "); //create a convert.opt file to avoid GAMS error message (will be deleted again at the end). To avoid a warning, " " is used.
+                    }
+
+                    string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(path + "\\" + "gamsscalar.json"));
+                    System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    Dictionary<string, object> jsonTree = null;
+                    try
+                    {
+                        jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("The .json file does not seem correctly formatted. " + e.Message);
+                    }
+
+                    // -------------------------------------------------------------
+
+                    try { settings.is_manual = (bool)jsonTree["is_manual"]; } catch { }
+                    try { settings.cmd_file = (string)jsonTree["cmd_file"]; } catch { }
+                    try { settings.gms_file = (string)jsonTree["gms_file"]; } catch { }
+                    try { settings.model_name = (string)jsonTree["model_name"]; } catch { }
+                    try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
+                    try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
+                    try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
+                    try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
+                    try { settings.counts3 = (string)jsonTree["counts3"]; } catch { }
+
+                    // ============================================
+
+                    //if (settings.gms_file == null) new Error("You must indicate cmd_file in gamsscalar.json");
+                    if (settings.gms_file == null) new Error("You must indicate gms_file in gamsscalar.json");
+                    if (settings.model_name == null) new Error("You must indicate model_name in gamsscalar.json");
+                    if (settings.raw_path == null) new Error("You must indicate raw_path in gamsscalar.json");
+                    if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
+
+                    // -------------------------------------------------------------
+
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The gamsscalar() function is a helper function for GAMS to produce a ");
+                        txt.MainAdd("scalar model for use in the Gekko DECOMP statement.");
+                        txt.MainAdd("A GAMS scalar model is produced by the GAMS CONVERT command.");
+                    }
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("Settings:");
+                    }
+                    using (Writeln txt = new Writeln("- ", int.MaxValue, System.Drawing.Color.Empty, false, ETabs.Main))
+                    {
+                        txt.MainOmitVeryFirstNewLine();
+                        txt.MainAdd("working folder (receives output) = " + Program.options.folder_working); txt.MainNewLineTight();
+                        txt.MainAdd("cmd file = " + settings.cmd_file); txt.MainNewLineTight();
+                        txt.MainAdd("gms file = " + settings.gms_file); txt.MainNewLineTight();
+                        txt.MainAdd("model name = " + settings.model_name); txt.MainNewLineTight();
+                        txt.MainAdd("zip name = " + settings.model_name + ".zip"); txt.MainNewLineTight();
+                    }
+                    //
+                    //
+                    // HMMMMMMMMMMMMMMMMMMMMM!
+                    //
+                    //
+                    //DeleteFiles(path);
+                }
+
+                //using (Writeln txt = new Writeln())
+                //{
+                //    txt.MainAdd(""); txt.MainNewLineTight();
+                //    txt.MainAdd(""); txt.MainNewLineTight(); ;
+                //    txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                //    txt.MainAdd("DIFF = " + (dif0 + dif) + ", depth = " + depth); txt.MainNewLineTight();
+                //    txt.MainAdd("=========================================================================="); txt.MainNewLineTight();
+                //    txt.MainAdd(""); txt.MainNewLineTight();
+                //}
+
+
+                gmsPath = Program.CreateFullPathAndFileName(settings.gms_file);
+                gmsPathCopy = gmsPath + "_gekkocopy";
+                if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
+                if (!File.Exists(gmsPath)) new Error("Cannot find file: " + gmsPath);
+                Program.WaitForFileCopy(gmsPath, gmsPathCopy);
+                if (File.Exists(gmsPath)) Program.WaitForFileDelete(gmsPath);
+                hasAlteredGmsFile = true;
+
+                List<string> output = new List<string>();
+                List<string> input = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(gmsPathCopy));
+                foreach (string line in input)
+                {
+                    bool hit = false;
+                    string lineTrim = line.Trim();
+                    if (lineTrim.StartsWith("@solve("))
+                    {
+                        string rest = lineTrim.Substring("@solve(".Length);
+                        int i = rest.IndexOf(")");
+                        if (i >= 1)
+                        {
+                            string rest2 = rest.Substring(0, i).Trim();
+                            if (G.Equal(settings.model_name, rest2)) hit = true;
+                        }
+                    }
+                    if (hit)
+                    {
+                        //We have something like @solve(M_static_calibration); and we have checked out that M_static_calibration is the model_name
+                        //Will be replaced by this:                        
+                        output.Add("option mcp = convert;");
+                        output.Add(settings.model_name + ".holdFixed = 0;");  //is 1 for MAKRO
+                        output.Add("solve " + settings.model_name + " using mcp;");  //CNS??
+                        output.Add("abort \"Abort after trying to produce a GAMS scalar model\";");
+                    }
+                    else
+                    {
+                        output.Add(line);
+                    }
+                }
+
+                string soutput = Stringlist.ExtractTextFromLines(output).ToString();
+                Program.WriteFileWithWait(gmsPath, soutput);
+
+                new Writeln("Altered the original " + Path.GetFileName(gmsPath) + ", original copied to " + Path.GetFileName(gmsPath));
+
+                //string s1 = null;  //just to deduct it later on
+                //if (G.IsUnitTesting())
+                //{
+                //    s1 = Globals.unitTestScreenOutput.ToString();
+                //}
+                //else
+                //{
+                //    s1 = CrossThreadStuff.GetOutputWindowText();
+                //}
+
+                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                MessageBox.Show("File " + Path.GetFileName(gmsPath) + " has been adjusted by Gekko. You can run your .cmd file(s) manually now, unil GAMS stops.\nWhen GAMS stops with an error, click OK in this box.");
+                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+
+                //new Writeln("-------------------- calling GAMS start ---------------------------------------");
+
+                //using (Writeln txt = new Writeln())
+                //{
+                //    using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsscalar" + depth + ".cmd"), null, Program.GekkoFileReadOrWrite.Write))
+                //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                //    {
+                //        foreach (string s5 in settings.cmd_lines)
+                //        {
+                //            string s6 = (s5 as string).Replace("{gms_lines}", "gamsscalar" + depth + ".gms");
+                //            sw.WriteLine(s6);
+                //        }
+                //    }
+
+                //    string fail = null;
+
+                //    using (FileStream fs = Program.WaitForFileStream(Path.Combine(path, "gamsscalar" + depth + ".gms"), null, Program.GekkoFileReadOrWrite.Write))
+                //    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                //    {
+                //        string eqList = null;
+                //        if (dif0 > 0)
+                //        {
+                //            for (int i = 0; i < dif0 + dif; i++)
+                //            {
+                //                string s8 = "extra" + i;
+                //                eqList += ", " + s8;
+                //                sw.WriteLine("equation " + s8 + "[t]; " + s8 + "['" + settings.t1.ToString() + "'] .. " + settings.variable + "['" + settings.t1.ToString() + "'] =E= 0;");
+                //            }
+                //        }
+                //        foreach (string s5 in settings.gms_lines)
+                //        {
+                //            string s6 = (s5 as string).Replace("{t1}", settings.t1.ToString()).Replace("{t2}", settings.t2.ToString());
+                //            s6 = s6.Replace("{model}", settings.lmodel + eqList);
+                //            sw.WriteLine(s6);
+                //        }
+                //    }
+                //}
+
+                DateTime t0 = DateTime.Now;
+
+                //string s2 = null;
+                //if (G.IsUnitTesting())
+                //{
+                //    s2 = Globals.unitTestScreenOutput.ToString();
+                //}
+                //else
+                //{
+                //    s2 = CrossThreadStuff.GetOutputWindowText();
+                //}
+
+                //string s = s2.Substring(s1.Length);
+
+                string s = Program.GetTextFromFileWithWait(Path.Combine(path, lstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
+
+                //new Writeln("-------------------- calling GAMS end ---------------------------------------");
+
+                int difNew = 0;
+
+                List<string> ss = Stringlist.ExtractLinesFromText(s);
+                try
+                {
+                    for (int i = 0; i < ss.Count; i++)
+                    {
+                        if (G.Contains(ss[i], settings.counts1))
+                        {
+                            if (G.Contains(ss[i + 1], settings.counts3) && G.Contains(ss[i + 2], settings.counts2))
+                            {
+                                string[] ss1 = ss[i + 1].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] ss2 = ss[i + 2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                string x1 = ss1[ss1.Length - 1];
+                                string x2 = ss2[ss2.Length - 1];
+                                int i1 = int.Parse(x1);
+                                int i2 = int.Parse(x2);
+                                difNew = i1 - i2;
+                            }
+                            else
+                            {
+                                new Error("It seems the GAMS rows/cols do not match, but Gekko cannot extract the difference from the GAMS output, from the two lines following the line containing '" + settings.counts1 + "'.");
+                            }
+                            break;
+                        }
+                    }
+                }
+                catch { }
+
+                //Test date/time of gams.gms and dict.txt --> must be after start of ...
+
+                if (difNew < 0)
+                {
+                    new Error("In the gamsscalar() funtion, GAMS reports that there are more equations than variables. If you need to be able to handle this, please contact the Gekko editor (Gekko only handles more variables than equations.");
+                }
+                else if (difNew == 0)
+                {
+                    new Writeln("Created scalar model. Now packing: " + settings.model_name + ".zip" + "...");
+                    if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
+                    if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
+                    if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
+                    try
+                    {
+                        Zipper zipper = new Zipper(settings.model_name + ".zip");
+                        Program.WaitForFileCopy(Path.Combine(path, "gams.gms"), Path.Combine(zipper.tempFolder, "gams.gms"));
+                        Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
+
+                        bool isFolder = false;
+                        string rawpath = Program.CreateFullPathAndFileName(settings.raw_path);
+                        string temp = Path.GetFileName(rawpath);
+                        if (G.Equal(temp, "*.gms")) isFolder = true;
+                        if (temp.Contains("*") && !isFolder) new Error("Expected raw_path to use '*.gms' not '" + temp + "'");
+
+                        if (isFolder)
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            string[] files = Directory.GetFiles(Path.GetDirectoryName(rawpath), temp, SearchOption.AllDirectories);
+                            if (files.Length == 0)
+                            {
+                                new Warning("Did not find any " + temp + " files in '" + Path.GetDirectoryName(rawpath) + "' folder or sub-folders.");
+                            }
+                            else
+                            {
+                                foreach (string file in files)
+                                {
+                                    if (Path.GetFileNameWithoutExtension(file).StartsWith("gams", StringComparison.OrdinalIgnoreCase)) continue; //drop gams*.gms
+                                    if (!G.Equal(Path.GetExtension(temp), Path.GetExtension(file))) continue;  //must be same extension
+                                    bool ignore = false;
+                                    foreach (object osi in settings.raw_ignore)
+                                    {
+                                        string si = osi as string;
+                                        if (G.Equal(Path.GetFileName(file), si))
+                                        {
+                                            ignore = true;
+                                            break;
+                                        }
+                                    }
+                                    if (ignore) continue;
+                                    string fileTxt = Program.GetTextFromFileWithWait(file);
+                                    if (!fileTxt.Contains("..")) continue;
+                                    sb.Append(fileTxt);
+                                    sb.AppendLine();
+                                }
+                                using (FileStream fs = WaitForFileStream(Path.Combine(zipper.tempFolder, "raw.gms"), null, GekkoFileReadOrWrite.Write))
+                                using (StreamWriter res = G.GekkoStreamWriter(fs))
+                                {
+                                    res.Write(sb);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(rawpath))
+                            {
+                                Program.WaitForFileCopy(rawpath, Path.Combine(zipper.tempFolder, "raw.gms"));
+                            }
+                            else
+                            {
+                                new Warning("Did not find raw.gms as this file path: " + rawpath);
+                            }
+                        }
+                        zipper.ZipAndCleanup();
+                        new Writeln("Zipping of " + settings.model_name + ".zip" + " finished");
+                    }
+                    catch
+                    {
+                        new Error("Something went wrong when zipping " + settings.model_name + ".zip");
+                    }
+                    if (File.Exists(Path.Combine(path, "gams.gms"))) Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
+                    if (File.Exists(Path.Combine(path, "dict.txt"))) Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
+                }
+                else
+                {
+                    //difNew > 0
+                    new Writeln("");
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The model row/columns differ with " + difNew + " --> Gekko will try to remedy this.");
+                        txt.MainAdd("");
+                    }
+                    new Writeln("");
+                    Program.GamsScalar(depth + 1, difNew, settings);
+                }
+                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.model_name + ".zip" + " (" + G.Seconds(t00) + ").");
+            }
+            finally
+            {                
+                if (hasAlteredGmsFile)
+                {
+                    if (File.Exists(gmsPath)) Program.WaitForFileDelete(gmsPath);
+                    Program.WaitForFileCopy(gmsPathCopy, gmsPath);
+                    if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
+                    new Writeln("Reestablished the original " + Path.GetFileName(gmsPath));
+                }
+                if (depth == 0)
+                {
+                    //try { DeleteFiles(path); } catch { };
+                    try { if (!optionsFileExists) File.Delete(Path.Combine(path, "convert.opt")); } catch { };
+                }
+            }
+
+            //Internal method
+            //void DeleteFiles(string pathname)
+            //{
+            //    int counter = 0;
+            //    foreach (string f in Directory.EnumerateFiles(pathname, "gamsscalar*.cmd"))
+            //    {
+            //        Program.WaitForFileDelete(f);
+            //    }
+
+            //    foreach (string f in Directory.EnumerateFiles(pathname, "gamsscalar*.gms"))
+            //    {
+            //        Program.WaitForFileDelete(f);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -22140,7 +22511,8 @@ namespace Gekko
             }
         }
 
-        public static void WriteFile(IVariable file2, IVariable x1)
+        //See also overload.
+        public static void WriteFileWithWait(IVariable file2, IVariable x1)
         {
             string file = O.ConvertToString(file2);
             string x = O.ConvertToString(x1);
@@ -22153,6 +22525,21 @@ namespace Gekko
                     res.WriteLine(xx[i]);
                 }
                 res.Write(xx[xx.Length - 1]);
+                res.Flush();
+            }
+        }
+
+        /// <summary>
+        /// Write a file to disk while waiting for file stream. Use full path for file.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="x"></param>
+        public static void WriteFileWithWait(string file, string x)
+        {                
+            using (FileStream fs = WaitForFileStream(file, null, GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {                
+                res.Write(x);
                 res.Flush();
             }
         }
