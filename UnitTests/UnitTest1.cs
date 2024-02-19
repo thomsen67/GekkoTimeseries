@@ -17359,6 +17359,7 @@ namespace UnitTests
                     //else if (h == 0 && p == 0) Assert.IsTrue(size > 62000000 && size < 63000000);  //size should be around 62.892.362 bytes
                     //else if (h == 0 && p == 1) Assert.IsTrue(size > 70000000 && size < 71000000);  //size should be around 70.650.027 bytes (both fixed vars and post-model)                    
                     //else new Error("Wrong!");
+                    throw new GekkoException();
                 }
             }
         }

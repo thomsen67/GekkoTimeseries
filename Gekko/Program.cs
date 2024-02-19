@@ -9996,6 +9996,9 @@ namespace Gekko
             //Idea is that Gekko provides popups, while user manually runs what is needed to run
             //User input is gms file + model name + 
 
+            string gekkoExtra = "gekkoextra";
+            string gekkoTemp = "gekkoTemp12345";
+            string solve = "@solve(";
             string lstFolder = "LST";
             bool hasAlteredGmsFile = false;
             bool optionsFileExists = false;
@@ -10085,23 +10088,37 @@ namespace Gekko
                 //}
 
 
+
+
                 gmsPath = Program.CreateFullPathAndFileName(settings.gms_file);
                 gmsPathCopy = gmsPath + "_gekkocopy";
-                if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
-                if (!File.Exists(gmsPath)) new Error("Cannot find file: " + gmsPath);
-                Program.WaitForFileCopy(gmsPath, gmsPathCopy);
+
+                string s5 = Program.GetTextFromFileWithWait(gmsPath);
+                if (depth == 0 && s5.Contains(gekkoTemp))
+                {
+                    new Error("It seems the file " + gmsPath + " has been tampered with by Gekko. This may be because Gekko crashed in a previous try. If in the same folder the file " + Path.GetFileName(gmsPathCopy) + " exists, rename it to " + Path.GetFileName(gmsPath) + " to reestablish the original .gms file");
+                }
+                
+                if (depth == 0)
+                {
+                    if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
+                    if (!File.Exists(gmsPath)) new Error("Cannot find file: " + gmsPath);
+                    Program.WaitForFileCopy(gmsPath, gmsPathCopy);
+                }
                 if (File.Exists(gmsPath)) Program.WaitForFileDelete(gmsPath);
                 hasAlteredGmsFile = true;
 
                 List<string> output = new List<string>();
+                                
                 List<string> input = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(gmsPathCopy));
+                bool replaceOk = false;
                 foreach (string line in input)
                 {
                     bool hit = false;
                     string lineTrim = line.Trim();
-                    if (lineTrim.StartsWith("@solve("))
+                    if (lineTrim.StartsWith(solve))
                     {
-                        string rest = lineTrim.Substring("@solve(".Length);
+                        string rest = lineTrim.Substring(solve.Length);
                         int i = rest.IndexOf(")");
                         if (i >= 1)
                         {
@@ -10112,17 +10129,50 @@ namespace Gekko
                     if (hit)
                     {
                         //We have something like @solve(M_static_calibration); and we have checked out that M_static_calibration is the model_name
-                        //Will be replaced by this:                        
+                        //Will be replaced by this:
+                        //
+
+                        string eqList = null;
+
+                        if (dif > 0)
+                        {
+                            string varList = null;
+                            eqList = ", " + gekkoExtra + "0";
+                            for (int i = 0; i < dif + 1; i++)  // +1 to offset the extra equation
+                            {
+                                string s8 = "x" + gekkoExtra + i;
+                                varList += " + " + s8;
+                                if (i % 20 == 19) varList += G.NL;
+                            }
+                            output.Add("variables " + varList.Substring(" + ".Length).Replace(" + ", ", ") + ";");
+                            output.Add("equation " + gekkoExtra + "0" + "; " + gekkoExtra + "0" + " .. " + varList.Substring(" + ".Length) + " =E= 0;");
+
+                        }
+                        else if (dif < 0)
+                        {
+                            for (int i = 0; i < -dif; i++)
+                            {
+                                string s8 = gekkoExtra + i;
+                                eqList += ", " + s8;
+                                output.Add("equation " + s8 + "; " + s8 + " .. sum(t, qBNP[t]) =E= 0;");
+                            }
+
+                        }                        
+
+                        output.Add("model " + gekkoTemp + " / " + settings.model_name + eqList + " / ;");
                         output.Add("option mcp = convert;");
-                        output.Add(settings.model_name + ".holdFixed = 0;");  //is 1 for MAKRO
-                        output.Add("solve " + settings.model_name + " using mcp;");  //CNS??
-                        output.Add("abort \"Abort after trying to produce a GAMS scalar model\";");
+                        output.Add(gekkoTemp + ".holdFixed = 0;");  //is 1 for MAKRO
+                        output.Add("solve " + gekkoTemp + " using mcp;");  //CNS??
+                        output.Add("abort \"Abort after producing a GAMS scalar model\";");
+                        replaceOk = true;
                     }
                     else
                     {
                         output.Add(line);
                     }
                 }
+
+                if (!replaceOk) new Error("Could not find '" + solve + settings.model_name + ")' in file " + settings.gms_file);
 
                 string soutput = Stringlist.ExtractTextFromLines(output).ToString();
                 Program.WriteFileWithWait(gmsPath, soutput);
@@ -10138,6 +10188,8 @@ namespace Gekko
                 //{
                 //    s1 = CrossThreadStuff.GetOutputWindowText();
                 //}
+
+                DateTime t0 = DateTime.Now;
 
                 // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
                 // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
@@ -10181,9 +10233,7 @@ namespace Gekko
                 //            sw.WriteLine(s6);
                 //        }
                 //    }
-                //}
-
-                DateTime t0 = DateTime.Now;
+                //}                
 
                 //string s2 = null;
                 //if (G.IsUnitTesting())
@@ -10232,11 +10282,7 @@ namespace Gekko
 
                 //Test date/time of gams.gms and dict.txt --> must be after start of ...
 
-                if (difNew < 0)
-                {
-                    new Error("In the gamsscalar() funtion, GAMS reports that there are more equations than variables. If you need to be able to handle this, please contact the Gekko editor (Gekko only handles more variables than equations.");
-                }
-                else if (difNew == 0)
+                if (difNew == 0)
                 {
                     new Writeln("Created scalar model. Now packing: " + settings.model_name + ".zip" + "...");
                     if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
@@ -10315,7 +10361,11 @@ namespace Gekko
                 }
                 else
                 {
-                    //difNew > 0
+                    if (depth == 1 && difNew != 0)
+                    {
+                        new Error("gamsconvert() first findes " + dif + " row/col difference, then after trying to fix it findes " + difNew + " row/col differences. The scalar model cannot be created.");
+                    }
+
                     new Writeln("");
                     using (Writeln txt = new Writeln())
                     {
@@ -10329,17 +10379,17 @@ namespace Gekko
             }
             finally
             {                
-                if (hasAlteredGmsFile)
-                {
-                    if (File.Exists(gmsPath)) Program.WaitForFileDelete(gmsPath);
-                    Program.WaitForFileCopy(gmsPathCopy, gmsPath);
-                    if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
-                    new Writeln("Reestablished the original " + Path.GetFileName(gmsPath));
-                }
                 if (depth == 0)
                 {
                     //try { DeleteFiles(path); } catch { };
                     try { if (!optionsFileExists) File.Delete(Path.Combine(path, "convert.opt")); } catch { };
+                    if (hasAlteredGmsFile)
+                    {
+                        if (File.Exists(gmsPath)) Program.WaitForFileDelete(gmsPath);
+                        Program.WaitForFileCopy(gmsPathCopy, gmsPath);
+                        if (File.Exists(gmsPathCopy)) Program.WaitForFileDelete(gmsPathCopy);
+                        new Writeln("Reestablished the original " + Path.GetFileName(gmsPath));
+                    }
                 }
             }
 
