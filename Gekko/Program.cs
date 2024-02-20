@@ -9996,6 +9996,7 @@ namespace Gekko
             //Idea is that Gekko provides popups, while user manually runs what is needed to run
             //User input is gms file + model name + 
 
+            string cmdFile = "run.cmd";
             string gekkoExtra = "gekkoextra";
             string gekkoTemp = "gekkoTemp12345";
             string solve = "@solve(";
@@ -10112,6 +10113,16 @@ namespace Gekko
                         //Will be replaced by this:
                         //
 
+                        output.Add("");
+                        output.Add("# -----------------------------------------------------------------");
+                        output.Add("#   Gekko lines START");
+                        output.Add("# -----------------------------------------------------------------");
+                        output.Add("#   To revert to the original file, either use the file");
+                        output.Add("#   " + Path.GetFileName(gmsPathCopy) + " if it exists,");
+                        output.Add("#   or remove the lines from this point until 'Gekko lines END'.");
+                        output.Add("# -----------------------------------------------------------------");
+                        output.Add("");
+
                         string eqList = null;
 
                         if (dif > 0)
@@ -10144,28 +10155,41 @@ namespace Gekko
                         output.Add(gekkoTemp + ".holdFixed = 0;");  //is 1 for MAKRO
                         output.Add("solve " + gekkoTemp + " using mcp;");  //CNS??
                         output.Add("abort \"Abort after producing a GAMS scalar model\";");
+
+                        output.Add("");
+                        output.Add("# -----------------------------------------------------------------");
+                        output.Add("#   Gekko lines END");
+                        output.Add("# -----------------------------------------------------------------");                        
+                        output.Add("");
+                        
                         replaceOk = true;
                     }
-                    else
-                    {
-                        output.Add(line);
-                    }
+                    
+                    output.Add(line);                    
                 }
 
                 if (!replaceOk) new Error("Could not find '" + solve + settings.model_name + ")' in file " + settings.gms_file);
 
                 string soutput = Stringlist.ExtractTextFromLines(output).ToString();
-                Program.WriteFileWithWait(gmsPath, soutput);
+                Program.WriteFileWithWait(gmsPath, soutput, new UTF8Encoding(false));  //write it with utf8, else זרו get mangled.
 
                 new Writeln("Altered the original " + Path.GetFileName(gmsPath) + ", original copied to " + Path.GetFileName(gmsPath));
 
                 DateTime t0 = DateTime.Now;
 
-                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
-                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
-                MessageBox.Show("File " + Path.GetFileName(gmsPath) + " has been adjusted by Gekko. You can run your .cmd file(s) manually now, unil GAMS stops.\nWhen GAMS stops with an error, click OK in this box.");
-                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
-                // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                if (G.IsUnitTesting())
+                {
+                    string folder = Program.options.folder_working;
+                    Program.ExecuteShellCommand(cmdFile, false, folder);
+                }
+                else
+                {
+                    // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                    // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                    MessageBox.Show("Iteration #" + (depth + 1) + ": file '" + Path.GetFileName(gmsPath) + "' adjusted by Gekko, regarding the model '" + settings.model_name + "'. \nRun your .cmd file(s) manually now, unil the jobs are finished (that is, GAMS stops).\nThen click 'OK' below.", "Gekko gamsscalar() dialog");
+                    // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                    // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
+                }
                 
                 string s = Program.GetTextFromFileWithWait(Path.Combine(path, lstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
 
@@ -22494,14 +22518,25 @@ namespace Gekko
         /// </summary>
         /// <param name="file"></param>
         /// <param name="x"></param>
-        public static void WriteFileWithWait(string file, string x)
+        public static void WriteFileWithWait(string file, string x, Encoding encoding)
         {                
             using (FileStream fs = WaitForFileStream(file, null, GekkoFileReadOrWrite.Write))
-            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            using (StreamWriter res = G.GekkoStreamWriter(fs, encoding))
             {                
                 res.Write(x);
                 res.Flush();
             }
+        }
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="x"></param>
+        /// <param name="encoding"></param>
+        public static void WriteFileWithWait(string file, string x)
+        {
+            WriteFileWithWait(file, x, G.GetEncoding());
         }
 
         private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)

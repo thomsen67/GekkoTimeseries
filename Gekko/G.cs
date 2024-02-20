@@ -2618,9 +2618,20 @@ namespace Gekko
         /// </summary>
         /// <param name="fs2"></param>
         /// <returns></returns>
-        public static StreamWriter GekkoStreamWriter(FileStream fs2)
+        public static StreamWriter GekkoStreamWriter(FileStream fs2, Encoding encoding)
         {           
-            return new StreamWriter(fs2, G.GetEncoding());
+            return new StreamWriter(fs2, encoding);
+        }
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="fs2"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static StreamWriter GekkoStreamWriter(FileStream fs2)
+        {
+            return GekkoStreamWriter(fs2, G.GetEncoding());
         }
 
         /// <summary>
