@@ -9001,11 +9001,10 @@ namespace Gekko
         /// predents for DECOMP are also done. Precedents means which variables (often timeseries) are part of a given expression. This can be "recorded" when issuing
         /// a given expression or statement, for instance the GetIVariable() method can report back that a certain variable has been
         /// used in the expression. Such variables are then stored in Globals.precedents (a Dictionary with string keys).
-        /// </summary>
-        /// <param name="name"></param>
+        /// </summary>        
         /// <param name="ib"></param>
         /// <param name="iv"></param>
-        public static void RegisterANewTracePrecedent(IVariable iv, IBank ib, string name, bool isLhs, bool alsoIncludePrecedents)
+        public static void RegisterANewTracePrecedent(IVariable iv, IBank ib, bool isLhs, bool alsoIncludePrecedents)
         {
             if (iv == null) return;
             Series rv_series = iv as Series;
@@ -26799,18 +26798,7 @@ namespace Gekko
             s += ".";
             return s;
         }
-
-        private static void ChangeOperatorsToLower(PrtHelper ph)
-        {
-            if (ph.operators != null) ph.operators = ph.operators.ConvertAll(d => d.ToLower());
-            foreach (PrtHelperElement phe in ph.elementOptions)
-            {
-                if (phe == null) continue;
-                if (phe.operators == null) continue;
-                phe.operators = phe.operators.ConvertAll(d => d.ToLower());
-            }
-        }
-
+        
         public static string SetBlanks()
         {
             return G.NL + G.Blanks(200);

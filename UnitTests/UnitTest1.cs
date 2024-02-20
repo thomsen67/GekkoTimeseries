@@ -13085,18 +13085,49 @@ namespace UnitTests
             Series y;
             TraceContents2 tracec;
 
-            //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
-            I("reset;");
-            string ss1 = "y <2001 2005> = 1;"; I(ss1);
-            string ss2 = "y <2001 2005> = y + 1;"; I(ss2);
-            y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
-            Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
-            tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
-            Assert.AreEqual(tracec.text, ss2);
-            Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);
-            TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
-            Assert.AreEqual(tracec.text, ss2);            
-            Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
+            // --------------------------------------------------------------------------------------------------------
+            // Endogenous on RHS
+            // --------------------------------------------------------------------------------------------------------
+
+            if (true)
+            {
+                //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
+                I("reset;");
+                string ss1 = "y <2001 2005> = 1;"; I(ss1);
+                string ss2 = "y <2001 2005> = y + 1;"; I(ss2);
+                y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
+                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
+                tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
+                Assert.AreEqual(tracec.text, ss2);
+                Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);
+                TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
+                Assert.AreEqual(tracec.text, ss2);
+                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
+            }
+
+            if (true)
+            {
+                //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
+                // TODO TODO TODO TODO 
+                // TODO TODO TODO TODO 
+                // TODO TODO TODO TODO 
+                // TODO TODO TODO TODO  Get LHS into globalTracePrecedents with <m> and other operators.
+                // TODO TODO TODO TODO 
+                // TODO TODO TODO TODO 
+                // TODO TODO TODO TODO 
+                I("reset;");
+                string ss1 = "y <2001 2005> = 1;"; I(ss1);
+                string ss2 = "y <2001 2005 m> = 1;"; I(ss2);  //note: <m>
+                y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
+                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
+                tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
+                Assert.AreEqual(tracec.text, ss2);
+                Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);
+                TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
+                Assert.AreEqual(tracec.text, ss2);
+                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
+            }
+
 
             // -----------------------------------------------------------------------------
             // The following tests for both normal series x and for array-series x[a]

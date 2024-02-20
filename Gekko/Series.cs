@@ -2578,7 +2578,7 @@ namespace Gekko
                 }                
             }
 
-            Program.RegisterANewTracePrecedent(rv, this.GetParentDatabank(), "[" + miWildcard.ToString() + "]", isLhs, true);  //both precedents for DECOMP and data tracing
+            Program.RegisterANewTracePrecedent(rv, this.GetParentDatabank(), isLhs, true);  //both precedents for DECOMP and data tracing
 
             return rv;
         }        

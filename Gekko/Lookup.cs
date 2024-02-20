@@ -1274,24 +1274,7 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);
-                                        
-                    if (Program.options.databank_trace)
-                    {
-                        //We do not count the following ConvertFreqs... in Globals.traceTime. Can't be much.
-                        GekkoTime xt1 = smpl.t1; GekkoTime xt2 = smpl.t2; GekkoTime xt3 = smpl.t3; 
-                        if (O.UseFlexFreq(smpl.t1, smpl.t2, smpl.t3, lhs_series.freq))
-                        {
-                            //We need to do this because any of smpl.t1/t2/t3 may have different freq
-                            //from lhs_series. This will not happen often, but with x!a <2001q1 2010m5> = ... and the like.
-                            //SLACK: the conversions happen later on, too, if they are relevant.
-                            //       --> so there is some double work here.
-                            xt1 = GekkoTime.ConvertFreqsFirst(lhs_series.freq, smpl.t1, null);
-                            xt2 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t2);
-                            xt3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t3);
-                        }
-                        LookupHandleTrace(xt1, xt2, xt3, ib, lhs_series, isArraySubSeries, o, smpl.p);
-                    }                    
+                    LookupHandleMetaStuff(lhs_series, isArraySubSeries, o);                           
 
                     switch (rhs.Type())
                     {
@@ -1522,7 +1505,6 @@ namespace Gekko
                                 {
                                     OperatorHelperScalar(smpl, lhs_series, operatorType, d);
                                 }
-
                                 //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                 LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
 
@@ -1690,6 +1672,31 @@ namespace Gekko
                         //only for debugging                        
                         ReportSeriesMissingValue(lhs_series, smpl.t1, smpl.t2);
                     }
+
+                    if (keep || operatorType == ESeriesUpdTypes.d || operatorType == ESeriesUpdTypes.p || operatorType == ESeriesUpdTypes.m || operatorType == ESeriesUpdTypes.q || operatorType == ESeriesUpdTypes.mp || operatorType == ESeriesUpdTypes.dl)
+                    {
+                        //All these operators somehow include the LHS on the RHS (maybe lagged).
+                        //Operators <n> or <l> are <..nothing..> are not included.
+                        //<keep> also triggers this.
+                        Program.RegisterANewTracePrecedent(lhs_series, ib, false, true);  //false because it is as IF it also were on RHS!
+                    }
+
+                    if (Program.options.databank_trace)
+                    {
+                        //We do not count the following ConvertFreqs... in Globals.traceTime. Can't be much.
+                        GekkoTime xt1 = smpl.t1; GekkoTime xt2 = smpl.t2; GekkoTime xt3 = smpl.t3;
+                        if (O.UseFlexFreq(smpl.t1, smpl.t2, smpl.t3, lhs_series.freq))
+                        {
+                            //We need to do this because any of smpl.t1/t2/t3 may have different freq
+                            //from lhs_series. This will not happen often, but with x!a <2001q1 2010m5> = ... and the like.
+                            //SLACK: the conversions happen later on, too, if they are relevant.
+                            //       --> so there is some double work here.
+                            xt1 = GekkoTime.ConvertFreqsFirst(lhs_series.freq, smpl.t1, null);
+                            xt2 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t2);
+                            xt3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, smpl.t3);
+                        }
+                        LookupHandleTrace(xt1, xt2, xt3, ib, lhs_series, isArraySubSeries, o, smpl.p);
+                    }
                 }
             }
 
@@ -1736,7 +1743,7 @@ namespace Gekko
                             {
                                 counter1++;
                                 Series rhs = iv as Series;
-                                //if (rhs == null || Object.ReferenceEquals(rhs, lhs_series)) continue; //do not point to your own trace!                                
+                                //if (rhs == null || Object.ReferenceEquals(rhs, lhs_series)) continue; //do not point to your own (previous) trace! CHANGED: Ok to point to own trace (e.g. y = y + 1), but traceContainer now only records RHS variables.                               
                                 if (rhs == null) continue;
                                 if (rhs.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
                                 Trace2.AddRangeFromSeries1(trace, rhs);
