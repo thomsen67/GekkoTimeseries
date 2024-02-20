@@ -13098,6 +13098,10 @@ namespace UnitTests
             Assert.AreEqual(tracec.text, ss2);            
             Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
 
+            // -----------------------------------------------------------------------------
+            // The following tests for both normal series x and for array-series x[a]
+            // -----------------------------------------------------------------------------
+
             for (int i = 0; i < 2; i++)  //i=0: normal series /// i=1: array-series (NOTE + TODO: some of this is skipped)
             {
 

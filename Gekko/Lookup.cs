@@ -1736,7 +1736,8 @@ namespace Gekko
                             {
                                 counter1++;
                                 Series rhs = iv as Series;
-                                if (rhs == null || Object.ReferenceEquals(rhs, lhs_series)) continue; //do not point to your own trace!                                
+                                //if (rhs == null || Object.ReferenceEquals(rhs, lhs_series)) continue; //do not point to your own trace!                                
+                                if (rhs == null) continue;
                                 if (rhs.type == ESeriesType.ArraySuper) continue;  //do not do this for array-series parent
                                 Trace2.AddRangeFromSeries1(trace, rhs);
                             }

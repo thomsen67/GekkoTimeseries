@@ -9021,7 +9021,7 @@ namespace Gekko
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
             // TRACING TRACING TRACING TRACING 
-            if (Program.options.databank_trace && Globals.traceContainer != null)
+            if (Program.options.databank_trace && Globals.traceContainer != null && !isLhs)
             {                
                 try
                 {
