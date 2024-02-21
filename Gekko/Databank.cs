@@ -143,64 +143,34 @@ namespace Gekko
             this.name = name;            
         }
 
-        [ProtoBeforeSerialization]
+        /// <summary>
+        /// Not exactly clear why this is not just done manually when reading a protobuf Databank object. Well, if it works, don't fix it.
+        /// It is done manually for parallel gbk read/write.
+        /// </summary>
+        [ProtoBeforeSerialization]        
         public void BeforeProtobufWrite()
         {
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                Recurse(kvp.Value, true);
+                Program.ProtobufWalker(kvp.Value, true);
             }
         }
 
+        /// <summary>
+        /// Not exactly clear why this is not just done manually after reading a protobuf Databank object. Well, if it works, don't fix it.
+        /// It is done manually for parallel gbk read/write.
+        /// </summary>
         [ProtoAfterDeserialization]
         public void AfterProtobufRead()
         {
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                Recurse(kvp.Value, false);
+                Program.ProtobufWalker(kvp.Value, false);
             }
         }
 
-        /// <summary>
-        /// We have to recurse here, because [ProtoBeforeSerialization] and
-        /// [ProtoAfterDeserialization] do not work inside an object tree structure,
-        /// but only at the uppermost object. Before, this was put in Matrix.cs only.
-        /// </summary>
-        /// <param name="iv"></param>
-        /// <param name="b"></param>
-        public void Recurse(IVariable iv, bool b)
+        public void Clear() 
         {
-            if (iv.Type() == EVariableType.Matrix)
-            {
-                Matrix m = (Matrix)iv;
-                if (b)
-                {
-                    m.BeforeProtobufWrite();
-                }
-                else
-                {
-                    m.AfterProtobufRead();
-                }
-            }
-            else if (iv.Type() == EVariableType.List)
-            {
-                List thisList = (List)iv;
-                foreach (IVariable iv2 in thisList.list)
-                {
-                    Recurse(iv2, b);
-                }
-            }
-            else if (iv.Type() == EVariableType.Map)
-            {
-                Map thisMap = (Map)iv;
-                foreach (KeyValuePair<string, IVariable> kvp in thisMap.storage)
-                {
-                    Recurse(kvp.Value, b);
-                }
-            }
-        }
-
-        public void Clear() {
             if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
             yearStart = -12345;
             yearEnd = -12345;

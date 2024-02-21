@@ -8830,9 +8830,8 @@ namespace UnitTests
                 _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
                 _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
 
-
                 I("reset;");
-                I("read matrixbk;");  // --> currently failing!
+                I("read matrixbk;");  // --> failed before a fix 21-02-2024
                 _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
                 _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
                 _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);

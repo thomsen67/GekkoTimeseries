@@ -216,7 +216,7 @@ namespace Gekko
             this.trace = trace;
         }
 
-        public bool isTrace()
+        public bool IsTrace()
         {
             return this.trace != null;
         }
@@ -3290,6 +3290,18 @@ namespace Gekko
                 }
             Lbl:;
 
+
+                foreach (List<ParallelHelper>x1 in lists)
+                {
+                    foreach (ParallelHelper x2 in x1)
+                    {
+                        if (!x2.IsTrace())
+                        {
+                            Program.ProtobufWalker(x2.iv, true);
+                        }
+                    }                    
+                }
+
                 lists.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
                 {
                     try
@@ -3438,7 +3450,7 @@ namespace Gekko
                     TwoInts yearMinMax = twoIntss[i];
                     foreach (ParallelHelper ph in lists[i])
                     {
-                        if (!ph.isTrace()) ph.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
+                        if (!ph.IsTrace()) ph.iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent                            
                     }
                     return 0;
                 }, _ => { });
@@ -3451,9 +3463,15 @@ namespace Gekko
                 {
                     foreach (ParallelHelper ph in list)
                     {
-                        if (ph.isTrace())
+                        if (ph.IsTrace())
+                        {
                             databank.traces.Add(ph.trace);
-                        else databank.storage.Add(ph.name, ph.iv);
+                        }
+                        else
+                        {
+                            Program.ProtobufWalker(ph.iv, false);
+                            databank.storage.Add(ph.name, ph.iv);
+                        }
                     }
                 }
                 lists = null;  //free for GC            
@@ -3546,6 +3564,45 @@ namespace Gekko
                 if (!hits.Contains(Globals.localTempFilesLocation + "\\" + part2 + (i + 1) + "of" + i2 + Globals.cacheExtension)) return -12345;
             }
             return i2;  //is -12345 if something is wrong
+        }
+
+        /// <summary>
+        /// We have to recurse/walk here, because [ProtoBeforeSerialization] and
+        /// [ProtoAfterDeserialization] do not work inside an object tree structure,
+        /// but only at the uppermost object. Before, this was put in Matrix.cs only.
+        /// </summary>
+        /// <param name="iv"></param>
+        /// <param name="isBeforeProtobuf"></param>
+        public static void ProtobufWalker(IVariable iv, bool isBeforeProtobuf)
+        {
+            if (iv.Type() == EVariableType.Matrix)
+            {
+                Matrix m = (Matrix)iv;
+                if (isBeforeProtobuf)
+                {
+                    m.BeforeProtobufWrite();
+                }
+                else
+                {
+                    m.AfterProtobufRead();
+                }
+            }
+            else if (iv.Type() == EVariableType.List)
+            {
+                List thisList = (List)iv;
+                foreach (IVariable iv2 in thisList.list)
+                {
+                    ProtobufWalker(iv2, isBeforeProtobuf);
+                }
+            }
+            else if (iv.Type() == EVariableType.Map)
+            {
+                Map thisMap = (Map)iv;
+                foreach (KeyValuePair<string, IVariable> kvp in thisMap.storage)
+                {
+                    ProtobufWalker(kvp.Value, isBeforeProtobuf);
+                }
+            }
         }
 
         /// <summary>
