@@ -13089,35 +13089,64 @@ namespace UnitTests
             // Endogenous on RHS
             // --------------------------------------------------------------------------------------------------------
 
-            if (true)
+            List<string> m1 = new List<string>();
+            m1.Add("y <2001 2005> = 1;");
+            m1.Add("y <2001 2005 n> = 1;");
+            m1.Add("y <2001 2005 l> = 1;");
+            m1.Add("log(y) <2001 2005> = 1;");
+            m1.Add("y[2003] = 1;");            
+            foreach (string ss2 in m1)
             {
                 //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
                 I("reset;");
-                string ss1 = "y <2001 2005> = 1;"; I(ss1);
-                string ss2 = "y <2001 2005> = y + 1;"; I(ss2);
+                string ss1 = "y <2001 2005> = 1;";
+                I(ss1);
+                I(ss2);
                 y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
-                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
+                int add = 0;
+                if (ss2.Contains("y[2003]")) add = 1;  //will get 2 traces
+                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1 + add);
                 tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
                 Assert.AreEqual(tracec.text, ss2);
-                Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);
-                TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
-                Assert.AreEqual(tracec.text, ss2);
-                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
+                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2() == null);
+                if (add == 1)
+                {
+                    tracec = y.meta.trace2.TimeShadow2()[1].trace.GetContents();
+                    Assert.AreEqual(tracec.text, ss1);
+                    Assert.IsTrue(y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2() == null);
+                }
             }
 
-            if (true)
+
+
+            List<string> m2 = new List<string>();
+            m2.Add("y <2001 2005> = y + 1;");
+            m2.Add("y <2001 2005 dyn> = y[-1] + 1;");
+            m2.Add("y <2001 2005> ^= 1;");
+            m2.Add("y <2001 2005> %= 1;");
+            m2.Add("y <2001 2005> += 1;");
+            m2.Add("y <2001 2005> -= 1;");
+            m2.Add("y <2001 2005> *= 1;");
+            m2.Add("y <2001 2005> /= 1;");
+            m2.Add("y <2001 2005> #= 1;");
+            m2.Add("y <2001 2005 d> = 1;");
+            m2.Add("y <2001 2005 p> = 1;");
+            m2.Add("y <2001 2005 m> = 1;");
+            m2.Add("y <2001 2005 q> = 1;");
+            m2.Add("y <2001 2005 mp> = 1;");
+            m2.Add("y <2001 2005 dl> = 1;");
+            m2.Add("dif(y) <2001 2005> = 1;");
+            m2.Add("pch(y) <2001 2005> = 1;");
+            m2.Add("dlog(y) <2001 2005> = 1;");
+            m2.Add("y <2001 2005 keep=p> = 1;");
+            m1.Add("y[2003] = y[2003] + 1;");      //!!! Maybe should not report lagged endo...? #asfoiasufdysaf
+            foreach (string ss2 in m2)
             {
                 //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
-                // TODO TODO TODO TODO 
-                // TODO TODO TODO TODO 
-                // TODO TODO TODO TODO 
-                // TODO TODO TODO TODO  Get LHS into globalTracePrecedents with <m> and other operators.
-                // TODO TODO TODO TODO 
-                // TODO TODO TODO TODO 
-                // TODO TODO TODO TODO 
                 I("reset;");
-                string ss1 = "y <2001 2005> = 1;"; I(ss1);
-                string ss2 = "y <2001 2005 m> = 1;"; I(ss2);  //note: <m>
+                string ss1 = "y <2001 2005> = 1;"; 
+                I(ss1);
+                I(ss2);
                 y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
                 Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
                 tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
@@ -13126,7 +13155,7 @@ namespace UnitTests
                 TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
                 Assert.AreEqual(tracec.text, ss2);
                 Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
-            }
+            }           
 
 
             // -----------------------------------------------------------------------------

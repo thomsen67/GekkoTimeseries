@@ -236,14 +236,32 @@ namespace Gekko
                 foreach (TraceAndPeriods2 kvp in rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                 {
                     TraceAndPeriods2 childTrace2 = kvp;
+
                     bool known = false;
                     if (trace.precedents.GetStorage() != null)
                     {
-                        foreach (TraceAndPeriods2 tempElement in trace.precedents.GetStorage())
+
+                        Trace2 lastTrace = trace.precedents.GetStorage()[trace.precedents.Count() - 1].trace;
+                        Trace2 newTrace = childTrace2.trace;
+                        if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) < 1000000 && lastTrace.GetContents().text == newTrace.GetContents().text && lastTrace.GetContents().commandFileAndLine == newTrace.GetContents().commandFileAndLine)
                         {
-                            if (Object.ReferenceEquals(childTrace2, tempElement))
+                            //If we are (a) in same session (counters differ < 1e6) and (b) code is equal and (c) file line is equal then -->
+                            //we do not add this trace.
+                            //For instance reset; x <2014 2024> = 2; for val %t = 2014 to 2024; x[%t] = x[%t] + 2; end;
+                            //This loop will produce a network of references, accumulating more and more for traces near 2024.
+                            //The if here makes sure we do not get a lot of non-interesting dublets.
+                            //continue;  //the child trace is not added
+                            known = true;
+                        }
+
+                        if (!known)
+                        {
+                            foreach (TraceAndPeriods2 tempElement in trace.precedents.GetStorage())
                             {
-                                known = true; break;
+                                if (Object.ReferenceEquals(childTrace2, tempElement))
+                                {
+                                    known = true; break;
+                                }
                             }
                         }
                     }
@@ -262,13 +280,13 @@ namespace Gekko
 
                         // --------- clone start ----------------
                         //We must clone the period part of the trace+period, because otherwise it may be overwritten in a wrong way.
-                        GekkoTimeSpansSimple xx = null;
+                        GekkoTimeSpansSimple tempSpans = null;
                         if (childTrace2.periods != null)
                         {
-                            xx = new GekkoTimeSpansSimple();
-                            xx.AddRange(childTrace2.periods);  //the timespans themselves are immutable
+                            tempSpans = new GekkoTimeSpansSimple();
+                            tempSpans.AddRange(childTrace2.periods);  //the timespans themselves are immutable
                         }
-                        TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(childTrace2.trace, xx);
+                        TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(childTrace2.trace, tempSpans);
                         // --------- clone end ----------------
 
                         trace.precedents.GetStorage().Add(childTrace2Clone);
