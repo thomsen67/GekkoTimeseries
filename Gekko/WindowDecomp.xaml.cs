@@ -1098,19 +1098,27 @@ namespace Gekko
                     if (v != null)
                     {
                         if (!Program.IsDecompResidualName(v))
-                        {
-                            if (decompFind.model.DecompType() == EModelType.GAMSScalar)
+                        {                            
+                            if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
                             {
                                 isEndogenous = true;
                             }
-                            else if (decompFind.model.DecompType() == EModelType.GAMSRaw)
+                            else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
                             {
                                 if (Program.HasGamsEquation(v)) isEndogenous = true;
                             }
-                            if (decompFind.model.DecompType() == EModelType.Gekko)
+                            else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                             {
-                                EEndoOrExo e = Program.VariableTypeEndoExo(v);
-                                isEndogenous = e == EEndoOrExo.Endo;
+                                isEndogenous = true;
+                                try
+                                {
+                                    int lag2;
+                                    string name2 = v;
+                                    if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
+                                    EEndoOrExo e = Program.VariableTypeEndoExo(name2);
+                                    isEndogenous = e == EEndoOrExo.Endo;
+                                }
+                                catch { }                                
                             }
                             else
                             {

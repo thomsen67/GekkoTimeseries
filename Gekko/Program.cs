@@ -11384,92 +11384,95 @@ namespace Gekko
 
             try
             {
-
-                if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless || ts.type == ESeriesType.ArraySuper)
+                if (ts != null)
                 {
-                    string label_string = "";  //DGR asked to omit "Label: ", and it is typically pretty obvious anyway.
-                    string source_string = "Source: "; if (danish) source_string = "Kilde: ";
-                    string units_string = "Units: "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
+                    if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless || ts.type == ESeriesType.ArraySuper)
+                    {
+                        string label_string = "";  //DGR asked to omit "Label: ", and it is typically pretty obvious anyway.
+                        string source_string = "Source: "; if (danish) source_string = "Kilde: ";
+                        string units_string = "Units: "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
 
-                    if (!G.NullOrBlanks(ts.meta.label))
-                    {
-                        rv.Add(label_string + ts.meta.label);
-                    }
-                    else
-                    {
-                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.label))
+                        if (!G.NullOrBlanks(ts.meta.label))
                         {
-                            rv.Add(label_string + ts.mmi.parent.meta.label);
-                        }
-                    }
-
-                    if (!G.NullOrBlanks(ts.meta.source))
-                    {
-                        if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
-                        {
-                            //do nothing
+                            rv.Add(label_string + ts.meta.label);
                         }
                         else
                         {
-                            rv.Add(source_string + ts.meta.source);
-                        }
-                    }
-                    else
-                    {
-                        if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
-                        {
-                            //do nothing
-                        }
-                        else
-                        {
-                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
+                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.label))
                             {
-                                rv.Add(source_string + ts.mmi.parent.meta.source);
+                                rv.Add(label_string + ts.mmi.parent.meta.label);
+                            }
+                        }
+
+                        if (!G.NullOrBlanks(ts.meta.source))
+                        {
+                            if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
+                            {
+                                //do nothing
+                            }
+                            else
+                            {
+                                rv.Add(source_string + ts.meta.source);
+                            }
+                        }
+                        else
+                        {
+                            if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
+                            {
+                                //do nothing
+                            }
+                            else
+                            {
+                                if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
+                                {
+                                    rv.Add(source_string + ts.mmi.parent.meta.source);
+                                }
+                            }
+                        }
+
+                        if (!G.NullOrBlanks(ts.meta.units))
+                        {
+                            rv.Add(units_string + ts.meta.units);
+                        }
+                        else
+                        {
+                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.units))
+                            {
+                                rv.Add(units_string + ts.mmi.parent.meta.units);
                             }
                         }
                     }
 
-                    if (!G.NullOrBlanks(ts.meta.units))
+
+                    if (printData)
                     {
-                        rv.Add(units_string + ts.meta.units);
-                    }
-                    else
-                    {
-                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.units))
+
+                        rv.Add("-----------------------------------------------");
+                        rv.Add("Period        value        %");
+
+                        int counter = 0;
+
+                        //must be able to handle TIME where freq does not match the series freq
+                        foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
                         {
-                            rv.Add(units_string + ts.mmi.parent.meta.units);
+                            counter++;
+                            string sss = gt.ToString() + " ";  //see how it is done with a table here: #kj3ha3438u
+
+                            double n1 = ts.GetDataSimple(gt);
+                            double n0 = ts.GetDataSimple(gt.Add(-1));
+
+                            double level1 = n1;
+                            double pch1 = ((n1 / n0 - 1) * 100d);
+
+                            if (n1 == n0) pch1 = 0d;
+
+                            string levelFormatted;
+                            string pchFormatted;
+                            Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                            sss += levelFormatted + " " + pchFormatted + " ";
+                            rv.Add(sss);
                         }
-                    }
-                }
-
-                if (printData)
-                {
-
-                    rv.Add("-----------------------------------------------");
-                    rv.Add("Period        value        %");
-
-                    int counter = 0;
-
-                    //must be able to handle TIME where freq does not match the series freq
-                    foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
-                    {
-                        counter++;
-                        string sss = gt.ToString() + " ";  //see how it is done with a table here: #kj3ha3438u
-
-                        double n1 = ts.GetDataSimple(gt);
-                        double n0 = ts.GetDataSimple(gt.Add(-1));
-
-                        double level1 = n1;
-                        double pch1 = ((n1 / n0 - 1) * 100d);
-
-                        if (n1 == n0) pch1 = 0d;
-
-                        string levelFormatted;
-                        string pchFormatted;
-                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                        sss += levelFormatted + " " + pchFormatted + " ";
-                        rv.Add(sss);
                     }
                 }
             }
