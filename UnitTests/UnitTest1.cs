@@ -11707,34 +11707,37 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Sim_MONA()
         {
-            I("flush();");
-            I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");            
-            I("read monadata;");
-            I("model mona.mar22.frm;");
-            I("option freq q;");
-            Globals.unitTestScreenOutput.Clear();
-            try
+            for (int i = 0; i < 2; i++)
             {
-                I("sim <2021q1 2021q2>;");
-            }
-            catch { }
-            //Regex to remove blanks and newlines because the text snippet gets wrapped.
-            Assert.IsTrue(System.Text.RegularExpressions.Regex.Replace(Globals.unitTestScreenOutput.ToString(), @"\s+", string.Empty).Contains(System.Text.RegularExpressions.Regex.Replace(Globals.simFreqError, @"\s+", string.Empty)));
+                if (i == 0) I("flush();");
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("read monadata;");
+                I("model mona.mar22.frm;");
+                I("option freq q;");
+                Globals.unitTestScreenOutput.Clear();
+                try
+                {
+                    I("sim <2021q1 2021q2>;");
+                }
+                catch { }
+                //Regex to remove blanks and newlines because the text snippet gets wrapped.
+                Assert.IsTrue(System.Text.RegularExpressions.Regex.Replace(Globals.unitTestScreenOutput.ToString(), @"\s+", string.Empty).Contains(System.Text.RegularExpressions.Regex.Replace(Globals.simFreqError, @"\s+", string.Empty)));
 
-            I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-            I("read monadata;");
-            I("model mona.mar22freq.frm;");
-            I("option freq q;");
-            Globals.unitTestScreenOutput.Clear();
-            try
-            {
-                I("sim <2021q1 2021q2>;");
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("read monadata;");
+                I("model mona.mar22freq.frm;");
+                I("option freq q;");
+                Globals.unitTestScreenOutput.Clear();
+                try
+                {
+                    I("sim <2021q1 2021q2>;");
+                }
+                catch { }
+                //Regex to remove blanks and newlines because the text snippet gets wrapped.
+                Assert.IsFalse(System.Text.RegularExpressions.Regex.Replace(Globals.unitTestScreenOutput.ToString(), @"\s+", string.Empty).Contains(System.Text.RegularExpressions.Regex.Replace(Globals.simFreqError, @"\s+", string.Empty)));
             }
-            catch { }
-            //Regex to remove blanks and newlines because the text snippet gets wrapped.
-            Assert.IsFalse(System.Text.RegularExpressions.Regex.Replace(Globals.unitTestScreenOutput.ToString(), @"\s+", string.Empty).Contains(System.Text.RegularExpressions.Regex.Replace(Globals.simFreqError, @"\s+", string.Empty)));
         }
 
         [TestMethod]
