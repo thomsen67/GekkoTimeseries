@@ -3090,7 +3090,7 @@ namespace Gekko
 
             bool print = false; if (Globals.runningOnTTComputer) print = true;
             //Note: k+1 because the first list[0] object is very tiny
-            string salt = O.CurrentSubperiods().ToString();
+            string salt = G.Subperiods(model.modelCommon.GetFreq()).ToString();
             List<string> files = GetSplitCacheFileNames(k + Globals.systemTthreadsExtra + 1, inputFileName, "model", salt, ref hash);  //1 because 1-based, 2 for modelGams and modelGekko
             List<object> lists = ProtobufModelGamsScalar5a(k, model);
 
@@ -13578,19 +13578,23 @@ namespace Gekko
 
             if (modelCommentsHelper.infoText == null && modelCommentsHelper.infoCounter > 0)
             {
-                new Note("The correct syntax for info is 'Info: ' (followed by text). Note capital 'I' and the blank after ':'");
+                new Note("Model file: the correct syntax for info is 'Info: ' (followed by text). Note capital 'I' and the blank after ':'");
             }
             if (modelCommentsHelper.dateText == null && modelCommentsHelper.dateCounter > 0)
             {
-                new Note("The correct syntax for date is 'Date: ' (followed by date). Note capital 'D' and the blank after ':'");
+                new Note("Model file: the correct syntax for date is 'Date: ' (followed by date). Note capital 'D' and the blank after ':'");
+            }
+            if (modelCommentsHelper.freq == EFreq.None && modelCommentsHelper.freqCounter > 0)
+            {
+                new Note("Model file: the correct syntax for freq is 'Freq: ' (followed by freq). Note capital 'F' and the blank after ':'");
             }
             if (modelCommentsHelper.signatureFoundInFileHeader == null && modelCommentsHelper.signatureCounter > 0)
             {
-                new Note("The correct syntax for signature is 'Signature: ' (followed by the signature). Note capital 'S' and the blank after ':'");
+                new Note("Model file: the correct syntax for signature is 'Signature: ' (followed by the signature). Note capital 'S' and the blank after ':'");
             }
 
             //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
-            sb.AppendLine("SubPeriods: " + O.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.modelGekko.subPeriods
+            sb.AppendLine("SubPeriods: " + G.Subperiods(model.modelCommon.GetFreq()).ToString());  //for instance: "Frequency: 4". Cf. Program.model.modelGekko.subPeriods
 
             string trueHash = Program.GetMD5Hash(sb.ToString(), null, null);  //Pretty unlikely that two different .frm files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
@@ -13643,7 +13647,6 @@ namespace Gekko
                 if (modelCommentsHelper.infoText != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Info: '");
-                    //throw new GekkoException();
                 }
                 modelCommentsHelper.infoText = s3.Substring(6).Trim();
             }
@@ -13654,18 +13657,35 @@ namespace Gekko
                 if (modelCommentsHelper.dateText != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Date: '");
-                    //throw new GekkoException();
                 }
                 modelCommentsHelper.dateText = s3.Substring(6).Trim();
             }
             if (s3.ToLower().StartsWith("date:") || s3.ToLower().StartsWith("date :")) modelCommentsHelper.dateCounter++;
+            //-------------
+            if (s3.StartsWith("Freq: "))
+            {
+                if (modelCommentsHelper.freq != EFreq.None)
+                {
+                    new Error("Model file contains several comment lines starting with 'Freq: '");
+                }
+                string sfreq = s3.Substring(6).Trim();
+                try
+                {
+                    modelCommentsHelper.freq = G.ConvertFreq(sfreq);
+                }
+                catch
+                {
+                    new Error("In model .frm file in 'Freq: ' comment: could not convert '" + sfreq + "' into a Gekko frequency");
+                }
+            }
+            if (s3.ToLower().StartsWith("freq:") || s3.ToLower().StartsWith("freq :")) 
+                modelCommentsHelper.freqCounter++;
             //-------------
             if (s3.StartsWith("Signature: "))
             {
                 if (modelCommentsHelper.signatureFoundInFileHeader != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Signature: '");
-                    //throw new GekkoException();
                 }
                 modelCommentsHelper.signatureFoundInFileHeader = s3.Substring(11).Trim();
             }
@@ -18942,7 +18962,7 @@ namespace Gekko
             }
 
             //salted with subpers, so will end with "1" for annual, "4" for quarterly.
-            string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, O.CurrentSubperiods().ToString());
+            string modelHash = Program.GetMD5Hash(null, ffh.realPathAndFileName, G.Subperiods(model.modelCommon.GetFreq()).ToString());
 
             ModelCacheParams cacheParameters = null; //See also for databanks #i9hkjhesf34rf
 
@@ -19072,7 +19092,7 @@ namespace Gekko
         private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             Model model = new Model();
-            model.modelCommon.freq = Program.options.freq;
+            model.modelCommon.freq = Program.options.freq;  //this setting may be altered later on, if there is a '//Freq: <frequency>' in the .frm model file.
 
             Program.model = model;
 
@@ -19090,6 +19110,7 @@ namespace Gekko
             model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
             model.modelGekko.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
             model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
+            if (modelCommentsHelper.freq != EFreq.None) model.modelCommon.freq = modelCommentsHelper.freq;  //Taken as !q via a .frm line '//Freq: q' for instance
 
             string parsingSeconds = null;
 
@@ -35321,11 +35342,12 @@ namespace Gekko
         public int infoCounter = 0;
         public int dateCounter = 0;
         public int signatureCounter = 0;
+        public int freqCounter = 0;
         public string modelHashTrue = null;
         public string cutout_varlist;
         public string cutout_runbefore;
         public string cutout_runafter;
-
+        public EFreq freq = EFreq.None;
     }
 
     public class RunStatusData : INotifyPropertyChanged, IComparable<RunStatusData>

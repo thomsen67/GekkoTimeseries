@@ -6336,19 +6336,7 @@ namespace Gekko
             Matrix mat = new Matrix();
             mat.data = m;
             return mat;
-        }
-
-        /// <summary>
-        /// Returns number of subperiods for current freq. Does not work for D freq.
-        /// </summary>
-        /// <returns></returns>
-        public static int CurrentSubperiods()
-        {
-            int lag = 1;
-            if (Program.options.freq == EFreq.Q) lag = Globals.freqQSubperiods;
-            else if (Program.options.freq == EFreq.M) lag = Globals.freqMSubperiods;
-            return lag;
-        }
+        }        
 
         /// <summary>
         /// Is this used?

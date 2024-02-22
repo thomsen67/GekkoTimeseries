@@ -309,7 +309,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(function, "dlogy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -368,7 +368,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(function, "pchy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -479,7 +479,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(function, "dify") || G.Equal(function, "diffy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -881,7 +881,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(wh2.leftSideFunction, "dlogy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("*", true);
@@ -902,7 +902,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(wh2.leftSideFunction, "pchy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("*", true);
@@ -927,7 +927,7 @@ namespace Gekko.Parser.Frm
                             int lag = 1;
                             if (G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                             {
-                                lag = O.CurrentSubperiods();
+                                lag = G.Subperiods(model.parent.modelCommon.GetFreq());
                                 //Program.model.modelCommon.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNodeSimple("+", true);

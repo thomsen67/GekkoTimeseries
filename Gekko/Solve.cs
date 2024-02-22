@@ -791,7 +791,7 @@ namespace Gekko
                     int[][] bb = modelGamsScalar.bb;
                     double[] cc = modelGamsScalar.cc;
                     int[][] dd = modelGamsScalar.dd;
-                    int[] ee = modelGamsScalar.ee;                    
+                    int[] ee = modelGamsScalar.ee;
 
                     if (modelGamsScalar.isPerpetualModel)
                     {
@@ -884,21 +884,21 @@ namespace Gekko
                                     //normal series
                                     ts = O.GetIVariableFromString(nameWithFreq, O.ECreatePossibilities.Can) as Series;
                                     ts.SetData(t, v);
-                                    previousSeries = ts;                                    
-                                }                                
+                                    previousSeries = ts;
+                                }
                                 previousName = name;
-                                previousIndexes = indexesWithoutT;                                
+                                previousIndexes = indexesWithoutT;
                                 counterSeries++;
                             }
                         }
                         new Writeln("Residuals calculated for " + t1.ToString() + "-" + t2.ToString() + ", resulting in " + counterSeries + " (array-)series with a total of " + modelGamsScalar.eqCounts + " residual values (of which " + counterMissings + " were missings)");
-                    }                    
+                    }
                 }
                 return;
             }
 
             if (G.GetModelSourceType() != EModelType.Gekko)
-            {                
+            {
                 new Error("No Gekko model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
             }
 
@@ -906,18 +906,16 @@ namespace Gekko
             {
                 new Error("Unexpected error regarding the Gekko model, perhaps due to a caching issue. Try using 'flush();' before your MODEL statement.");
             }
-
-            int x = 1;
-            if (Program.model.modelCommon.freq == EFreq.Q) x = Globals.freqQSubperiods;
-            else if (Program.model.modelCommon.freq == EFreq.M) x = Globals.freqMSubperiods;
-            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelCommon.freq != EFreq.None && x != O.CurrentSubperiods())
+            
+            int x = G.Subperiods(Program.model.modelCommon.freq);
+            if (G.GetModelSourceType() == EModelType.Gekko && Program.model.modelCommon.freq != EFreq.None && x != G.CurrentSubperiods())
             {
                 using (Error e = new Error())
                 {
 
-                    e.MainAdd("The loaded Gekko model has frequency '" + G.ConvertFreq(Program.model.modelCommon.freq) + "' with " + x + " subperiods per year, whereas there are currently " + O.CurrentSubperiods() + " subperiods per year (given the current frequency).");
-                    e.MainAdd("This problem applies to the pchy(), dify(), diffy(), dlogy() functions which depend upon the number of subperiods inside a year. Please put");
-                    e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement to solve the issue.");
+                    e.MainAdd("The loaded Gekko model has frequency '" + G.ConvertFreq(Program.model.modelCommon.freq) + "' with " + x + " subperiods per year, whereas there are currently " + G.CurrentSubperiods() + " subperiods per year (given the current frequency).");
+                    e.MainAdd(Globals.simFreqError + " To solve the issue, you may either (a) put a '//Freq: <frequency>' (for instance: '//Freq: q') inside your .frm file, or (b) put");
+                    e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement.");
                 }
             }
 
@@ -974,7 +972,7 @@ namespace Gekko
             }
 
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBoxMainTabUpper.ResumeLayout();
-        }
+        }        
 
         public static void SimFast(GekkoTime tStart, GekkoTime tEnd, SimOptions so, P p)
         {

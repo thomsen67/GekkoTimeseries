@@ -601,6 +601,28 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For current freq, returns 4 for !q, 12 for !m, else 1. So 1 for !a and !u (but also 1 for !d and !w...).
+        /// </summary>
+        /// <returns></returns>
+        public static int CurrentSubperiods()
+        {
+            return Subperiods(Program.options.freq);
+        }
+
+        /// <summary>
+        /// Returns 4 for !q, 12 for !m, else 1. So 1 for !a and !u (but also 1 for !d and !w...).
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static int Subperiods(EFreq freq)
+        {
+            int x = 1;
+            if (freq == EFreq.Q) x = Globals.freqQSubperiods;
+            else if (freq == EFreq.M) x = Globals.freqMSubperiods;
+            return x;
+        }
+
+        /// <summary>
         /// Overload
         /// </summary>
         /// <param name="freq"></param>
