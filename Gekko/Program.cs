@@ -13606,6 +13606,9 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.date = "[empty]";
             if (modelCommentsHelper.dateText != null) Program.model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
 
+            Program.model.modelGekko.modelInfo.freq = "[empty]";
+            if (modelCommentsHelper.freq != EFreq.None) Program.model.modelGekko.modelInfo.freq = G.ConvertFreq(modelCommentsHelper.freq);
+
             if (modelCommentsHelper.signatureFoundInFileHeader == null)
             {
                 modelCommentsHelper.signatureStatus = ESignatureStatus.SignatureNotFoundInModelFile;
@@ -13678,8 +13681,7 @@ namespace Gekko
                     new Error("In model .frm file in 'Freq: ' comment: could not convert '" + sfreq + "' into a Gekko frequency");
                 }
             }
-            if (s3.ToLower().StartsWith("freq:") || s3.ToLower().StartsWith("freq :")) 
-                modelCommentsHelper.freqCounter++;
+            if (s3.ToLower().StartsWith("freq:") || s3.ToLower().StartsWith("freq :")) modelCommentsHelper.freqCounter++;
             //-------------
             if (s3.StartsWith("Signature: "))
             {
@@ -19107,6 +19109,7 @@ namespace Gekko
 
             model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
             model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
+            model.modelGekko.modelInfo.freq = G.ConvertFreq(modelCommentsHelper.freq);
             model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
             model.modelGekko.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
             model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;

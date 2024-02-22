@@ -483,7 +483,8 @@ namespace Gekko
         //-------------------------------------------------------------------------------------------
         //Do not save the following in protofile! (they will be created even if there is a cache hit)
         public string info;
-        public string date;        
+        public string date;
+        public string freq;
         public string timeUsedTotal;
         public string timeUsedParsing;
         //public ESignatureStatus signatureStatus;
@@ -512,11 +513,17 @@ namespace Gekko
 
             tab.CurRow.SetTopBorder(1, 1);
 
+            string sfreq = null;
+            if (freq == "q" || freq == "m")
+            {
+                sfreq = " (freq = " + freq + ")";
+            }
+
             tab.CurRow.SetText(1, "MODEL " + Path.GetFileNameWithoutExtension(fileName));
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
 
-            tab.CurRow.SetText(1, "Model     : " + fileName);
+            tab.CurRow.SetText(1, "Model     : " + fileName + sfreq);
             tab.CurRow.Next();
             if (info != null)
             {
@@ -527,7 +534,7 @@ namespace Gekko
             {
                 tab.CurRow.SetText(1, "Date      : " + date);
                 tab.CurRow.Next();
-            }
+            }            
             if (varlistStatus != null)
             {
                 tab.CurRow.SetText(1, "Varlist   : " + varlistStatus);
