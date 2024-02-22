@@ -581,7 +581,16 @@ namespace Gekko
                 int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber.GetInt(s2);
                 if (eqNumber == -12345)
                 {
-                    if (showErrors) new Error("Could not find the equation '" + s2 + "'");
+                    string s3 = null;
+                    try
+                    {
+                        if (modelGamsScalar.parent.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                        {
+                            s3 = " In the decomp window, try using Ctrl+click instead of normal click to find the equations in which the variable appears.";
+                        }
+                    }
+                    catch { }
+                    if (showErrors) new Error("Could not find the equation '" + s2 + "'." + s3);
                 }
                 //int eqNumber = modelGamsScalar.dict_FromEqNameToEqNumber[s2];
                 elementPeriod.eqNumber = eqNumber;

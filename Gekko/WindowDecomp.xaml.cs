@@ -1079,7 +1079,6 @@ namespace Gekko
             {
                 if ((isRowOrCol == Decomp.ERowsCols.Rows && type == GekkoTableTypes.Left) || (isRowOrCol == Decomp.ERowsCols.Cols && type == GekkoTableTypes.Top))
                 {
-
                     //
                     // LINKS etc.
                     // TODO: This is hacky. Better to look at adjacent cell content (like what happens when link is actually clicked)
@@ -1087,51 +1086,14 @@ namespace Gekko
                     //
                     //                    
 
-                    //TODO: offsets...
-                    //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
-                    Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + 2, j + 2);
-                    string v = c.vars_hack?[0];
-                    if (v == Globals.decompErrorName) v = null;
-                    if (v == Globals.decompIgnoreName) v = null;
-
-                    bool isEndogenous = false;
-                    if (v != null)
-                    {
-                        if (!Program.IsDecompResidualName(v))
-                        {                            
-                            if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
-                            {
-                                isEndogenous = true;
-                            }
-                            else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
-                            {
-                                if (Program.HasGamsEquation(v)) isEndogenous = true;
-                            }
-                            else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                            {
-                                isEndogenous = true;
-                                try
-                                {
-                                    int lag2;
-                                    string name2 = v;
-                                    if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
-                                    EEndoOrExo e = Program.VariableTypeEndoExo(name2);
-                                    isEndogenous = e == EEndoOrExo.Endo;
-                                }
-                                catch { }                                
-                            }
-                            else
-                            {
-                                //strange...
-                            }
-                        }
-                    }
+                    bool isEndogenous = IsEndogenous(i, j);
+                    
+                    textBlock.MouseDown += Mouse_Down;
 
                     if (isEndogenous || s == Globals.decompText0)
                     {
                         textBlock.MouseEnter += Mouse_Enter;
                         textBlock.MouseLeave += Mouse_Leave;
-                        textBlock.MouseDown += Mouse_Down;
                         textBlock.Foreground = new SolidColorBrush(Globals.MediumBlueDecompLink);
                         if (isRowOrCol == Decomp.ERowsCols.Rows)
                         {
@@ -1211,6 +1173,53 @@ namespace Gekko
                 //to do red lamp, there must be both vars and time, and they must be on separate row/col.
                 SetRedCircle(g, i, j, type, isRowOrCol, red, decompFind.decompOptions2);
             }
+        }
+
+        private bool IsEndogenous(int i, int j)
+        {
+            //TODO: offsets...
+            //2 below because the row or col labels all start in coord (0, 0), and guiDecompValues is 1-based. So first coord will be (2, 2).
+            int extra = 2;
+            Cell c = this.decompFind.decompOptions2.guiDecompValues.Get(i + extra, j + extra);
+            if (c == null) return false;
+            string v = c.vars_hack?[0];
+            if (v == Globals.decompErrorName) v = null;
+            if (v == Globals.decompIgnoreName) v = null;
+
+            bool isEndogenous = false;
+            if (v != null)
+            {
+                if (!Program.IsDecompResidualName(v))
+                {
+                    if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+                    {
+                        isEndogenous = true;
+                    }
+                    else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw)
+                    {
+                        if (Program.HasGamsEquation(v)) isEndogenous = true;
+                    }
+                    else if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                    {
+                        isEndogenous = true;
+                        try
+                        {
+                            int lag2;
+                            string name2 = v;
+                            if (v.Contains("¤")) Decomp.ConvertFromTurtleName(v, true, out name2, out lag2);  //v may be = x¤[-1]
+                            EEndoOrExo e = Program.VariableTypeEndoExo(name2);
+                            isEndogenous = e == EEndoOrExo.Endo;
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        //strange...
+                    }
+                }
+            }
+
+            return isEndogenous;
         }
 
 
@@ -1555,7 +1564,7 @@ namespace Gekko
             lastClick= DateTime.Now;
             if (ms < 500)  //Windows standard is 500
             {
-                MessageBox.Show(ms + " The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (forces a FIND window).");
+                MessageBox.Show("The DECOMP and FIND windows no longer use double-clicks. Use single-click or Ctrl+click (forces a FIND window).");
                 return;
             }
 
@@ -1659,7 +1668,7 @@ namespace Gekko
 
             GekkoTableTypes type = dockPanel.type;
             int x; int y;
-            CoordConversion(out x, out y, type, row, col);
+            CoordConversion(out x, out y, type, row, col);            
 
             if (type == GekkoTableTypes.TableContent && this.decompFind.decompOptions2.guiDecompIsSelecting)
             {
@@ -1677,7 +1686,8 @@ namespace Gekko
                 Cell c = null;
                 Cell c2 = null;
 
-                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);
+                c = this.decompFind.decompOptions2.guiDecompValues.Get(x, y);                       
+
                 if (rowOrCol == Decomp.ERowsCols.Rows)
                 {
                     c2 = this.decompFind.decompOptions2.guiDecompValues.Get(x, y + 1); //#7098asfuydasfd                
@@ -1758,8 +1768,23 @@ namespace Gekko
                             }
                             else
                             {
-                                if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko) this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gekko;
-                                else this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
+                                if (decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                                {
+                                    bool isEndogenous = IsEndogenous(dockPanel);
+
+                                    if (isEndogenous)
+                                    {
+                                        this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gekko;
+                                    }
+                                    else
+                                    {
+                                        this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gekko2;
+                                    }
+                                }
+                                else
+                                {
+                                    this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText_gams;
+                                }
                                 string var7 = HiddenVariableHelper(c2);
 
                                 int number = -12345;
@@ -1816,6 +1841,20 @@ namespace Gekko
                     RichSetText(equation, Decomp.GetColoredEquations(s));
                 }
             }
+        }
+
+        private static bool IsEndogenous(GekkoDockPanel2 dockPanel)
+        {
+            bool isEndogenous = false;
+            try
+            {
+                Border b = dockPanel.Children[0] as Border;
+                TextBlock tb = b.Child as TextBlock;
+                if (tb.Foreground.ToString() == new SolidColorBrush(Globals.MediumBlueDecompLink).ToString()) isEndogenous = true;
+            }
+            catch { }
+
+            return isEndogenous;
         }
 
         private static void CoordConversion(out int x, out int y, GekkoTableTypes type, int row, int col)

@@ -186,6 +186,7 @@ namespace Gekko
 
         public static string windowFindStatusBarText = "Click to decompose equation, Ctrl+click to select/retain.";
         public static string windowDecompStatusBarText_gekko = "Click to decompose variable, Ctrl+click to find equation(s)."; //Gekko model
+        public static string windowDecompStatusBarText_gekko2 = "Ctrl+click to find equation(s)."; //Gekko model
         public static string windowDecompStatusBarText_gams = "Click to find equation(s)."; //Gams model
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
         public const string decompGekkoEquationPrefix = "e_";
