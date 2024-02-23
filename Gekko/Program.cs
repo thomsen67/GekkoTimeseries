@@ -10052,6 +10052,7 @@ namespace Gekko
             //Idea is that Gekko provides popups, while user manually runs what is needed to run
             //User input is gms file + model name + 
 
+            string suffix = "_scalar";
             string cmdFile = "run.cmd";
             string gekkoExtra = "gekkoextra";
             string gekkoTemp = "gekkoTemp12345";
@@ -10123,7 +10124,7 @@ namespace Gekko
                         txt.MainAdd("cmd file = " + settings.cmd_file); txt.MainNewLineTight();
                         txt.MainAdd("gms file = " + settings.gms_file); txt.MainNewLineTight();
                         txt.MainAdd("model name = " + settings.model_name); txt.MainNewLineTight();
-                        txt.MainAdd("zip name = " + settings.model_name + ".zip"); txt.MainNewLineTight();
+                        txt.MainAdd("zip name = " + settings.model_name + suffix + ".zip"); txt.MainNewLineTight();
                     }                    
                 }                
 
@@ -10284,14 +10285,14 @@ namespace Gekko
 
                 if (difNew == 0)
                 {
-                    new Writeln("Created scalar model. Now packing: " + settings.model_name + ".zip" + "...");
+                    new Writeln("Created scalar model. Now packing: " + settings.model_name + suffix + ".zip" + "...");
                     if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
                     if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
                     if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
                     if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
                     try
                     {
-                        Zipper zipper = new Zipper(settings.model_name + ".zip");
+                        Zipper zipper = new Zipper(settings.model_name + suffix + ".zip");
                         Program.WaitForFileCopy(Path.Combine(path, "gams.gms"), Path.Combine(zipper.tempFolder, "gams.gms"));
                         Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
 
@@ -10355,11 +10356,11 @@ namespace Gekko
                             }
                         }
                         zipper.ZipAndCleanup();
-                        new Writeln("Zipping of " + settings.model_name + ".zip" + " finished");
+                        new Writeln("Zipping of " + settings.model_name + suffix + ".zip" + " finished");
                     }
                     catch
                     {
-                        new Error("Something went wrong when zipping " + settings.model_name + ".zip");
+                        new Error("Something went wrong when zipping " + settings.model_name + suffix + ".zip");
                     }
                     if (File.Exists(Path.Combine(path, "gams.gms"))) Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
                     if (File.Exists(Path.Combine(path, "dict.txt"))) Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
@@ -10380,7 +10381,7 @@ namespace Gekko
                     new Writeln("");
                     Program.GamsScalar(depth + 1, difNew, settings);
                 }
-                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.model_name + ".zip" + " (" + G.Seconds(t00) + ").");
+                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.model_name + suffix + ".zip" + " (" + G.Seconds(t00) + ").");
             }
             finally
             {                
