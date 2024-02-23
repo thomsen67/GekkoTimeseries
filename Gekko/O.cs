@@ -1896,7 +1896,7 @@ namespace Gekko
             }
             if (arg.Length > 0) arg += "\n" + "\n";
             arg += "Press [Enter] to continue";
-            MessageBox.Show(arg);
+            if (Globals.pausePopup) MessageBox.Show(arg);
         }
 
         /// <summary>
@@ -8527,7 +8527,13 @@ namespace Gekko
 
                 string txt = null;
 
-                if (Program.InputBox("Accept", msg, ref inputValue) == DialogResult.OK)
+                DialogResult dr = DialogResult.OK;
+                if (Globals.acceptPopup)
+                {
+                    dr = Program.InputBox("Accept", msg, ref inputValue);
+                }
+
+                if (dr == DialogResult.OK)
                 {
                     IVariable iv = O.AcceptHelper1(this.type, inputValue);
                     string s = O.AcceptHelper2(this.type, iv);

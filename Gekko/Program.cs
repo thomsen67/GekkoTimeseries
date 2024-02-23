@@ -13947,7 +13947,59 @@ namespace Gekko
                             new Writeln("Walks all traces");
                         }
                     }
-                    break; 
+                    break;
+                case "--nopause":
+                    {
+                        if (Globals.pausePopup)
+                        {
+                            Globals.pausePopup = false;
+                            new Writeln("No PAUSE popups");
+                        }
+                        else
+                        {
+                            Globals.pausePopup = true;
+                            new Writeln("PAUSE popups active");
+                        }
+                    }
+                    break;
+                case "--noaccept":
+                    {
+                        if (Globals.acceptPopup)
+                        {
+                            Globals.acceptPopup = false;
+                            new Writeln("No ACCEPT popups");
+                        }
+                        else
+                        {
+                            Globals.acceptPopup = true;
+                            new Writeln("ACCEPT popups active");
+                        }
+                    }
+                    break;
+                case "--nopopup":
+                    {
+                        if (Globals.acceptPopup)
+                        {
+                            Globals.acceptPopup = false;
+                            new Writeln("No ACCEPT popups");
+                        }
+                        else
+                        {
+                            Globals.acceptPopup = true;
+                            new Writeln("ACCEPT popups active");
+                        }
+                        if (Globals.pausePopup)
+                        {
+                            Globals.pausePopup = false;
+                            new Writeln("No PAUSE popups");
+                        }
+                        else
+                        {
+                            Globals.pausePopup = true;
+                            new Writeln("PAUSE popups active");
+                        }
+                    }
+                    break;
                 case "--antlr":
                     {
                         //

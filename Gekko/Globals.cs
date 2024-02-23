@@ -435,6 +435,8 @@ namespace Gekko
         public static string dateStamp = Program.GetDateStamp();
 
         public static StringBuilder errorMemory = null;
+        public static bool pausePopup = true;  //show popup for PAUSE command.
+        public static bool acceptPopup = true;  //show popup for ACCEPT command.
 
         public static bool unitTestIntegration = false;
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";

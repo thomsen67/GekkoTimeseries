@@ -891,9 +891,12 @@ namespace Gekko
         }
 
         private static Point HandleMonitor(int left, int top)
-        {            
+        {
             //Do not accept a top-left corner of a Gekko main window if it is (hardly) not shown.
             //This may happen when having 2 monitors at work, and working on a laptop from home.
+            //Seems to work reasonably ok regarding dpi etc., tested on DST computer.
+
+            double z = 0.95;
 
             var dpiXProperty = typeof(System.Windows.SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);            
             var dpiX = (int)dpiXProperty.GetValue(null, null);
@@ -903,17 +906,17 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("Monitor: input left " + left + " top " + top + " --> llimit = 0.9 * " + physicalWidth + " * " + factor + " = " + 0.9 * physicalWidth * factor);
+                new Writeln("TTH: (1) Monitor: input left " + left + " top " + top + " --> llimit = " + z + " * " + physicalWidth + " * " + factor + " = " + z * physicalWidth * factor);
             }
 
-            if (left > 0.9 * physicalWidth * factor || top > 0.9 * physicalHeight * factor)
+            if (left > z * physicalWidth * factor || top > z * physicalHeight * factor)
             {
-                left = 100; top = 100; //if within 10% pixels, move it!
+                left = 100; top = 100; //if within z (5%) pixels, move it back!
             }
             
             if (Globals.runningOnTTComputer)
             {
-                new Writeln("Monitor: output left " + left + " top " + top);
+                new Writeln("TTH: (2) Monitor: output left " + left + " top " + top);
             }
             return new Point(left, top);
         }
