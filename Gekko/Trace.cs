@@ -220,79 +220,150 @@ namespace Gekko
         /// When altering something regarding traces, make sure precedentsNames is also altered!
         /// See also AddRangeFromSeries2().
         /// </summary>
-        /// <param name="trace"></param>
+        /// <param name="lhsTrace"></param>
         /// <param name="rhs"></param>
-        public static void AddRangeFromSeries1(Trace2 trace, Series rhs)
+        public static void AddRangeFromSeries1(Trace2 lhsTrace, Series rhs)
         {
             bool hasTrace = true; if (rhs?.meta?.trace2 == null) hasTrace = false;
 
-            if (trace.GetContents().precedentsNames == null) trace.GetContents().precedentsNames = new List<string>();
+            if (lhsTrace.GetContents().precedentsNames == null) lhsTrace.GetContents().precedentsNames = new List<string>();
 
-            trace.GetContents().precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
+            lhsTrace.GetContents().precedentsNames.Add(TraceGetNameDecorated(rhs, hasTrace));
 
             if (hasTrace && rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
             {
                 int counter2 = -1;
                 foreach (TraceAndPeriods2 kvp in rhs.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                 {
-                    TraceAndPeriods2 childTrace2 = kvp;
+                    //Looping through RHS traces, from RHS variable
 
-                    bool known = false;
-                    if (trace.precedents.GetStorage() != null)
+                    TraceAndPeriods2 rhsTraceTap = kvp;
+                    Trace2 rhsTrace = rhsTraceTap.trace;
+
+                    bool similar = false;
+
+                    if (Globals.traceEndoRhsFix1)
                     {
+                        //This only deals with producing too many (deep) trace references for x[%t] = x[%t] + 2;
+                        //inside a time loop. It is not the number of traces that is the problem, but how they
+                        //cross-reference (and the depth of these references).
 
-                        Trace2 lastTrace = trace.precedents.GetStorage()[trace.precedents.Count() - 1].trace;
-                        Trace2 newTrace = childTrace2.trace;
-                        if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) < 1000000 && lastTrace.GetContents().text == newTrace.GetContents().text && lastTrace.GetContents().commandFileAndLine == newTrace.GetContents().commandFileAndLine)
+                        int n1 = 2;  //see comment below
+
+                        for (int i1 = 0; i1 < n1; i1++)
                         {
-                            //If we are (a) in same session (counters differ < 1e6) and (b) code is equal and (c) file line is equal then -->
-                            //we do not add this trace.
-                            //For instance reset; x <2014 2024> = 2; for val %t = 2014 to 2024; x[%t] = x[%t] + 2; end;
-                            //This loop will produce a network of references, accumulating more and more for traces near 2024.
-                            //The if here makes sure we do not get a lot of non-interesting dublets.
-                            //continue;  //the child trace is not added
-                            known = true;
+                            //looping through previous traces at same depth on LHS
+                            //
+                            // We are trying to avoid this:
+                            //
+                            // x[2003] = x[2003] + 1;   trace #4
+                            // x[2002] = x[2002] + 1;   trace #3
+                            // x[2001] = x[2001] + 1;   trace #2
+                            // x = 1;                   trace #1   
+                            //
+                            // where trace #4 refers to trace #3, trace #3 refers to trace #2, trace #2 refers to trace #1
+                            // This creates a deep spiderweb of references, so when we get to trace #3, Gekko will detect
+                            // that trace #2 is similar and skip the reference (trace #3 will still end up referencing trace #2).
+                            // Normally looking 1 trace back is enough for a time loop, but then what about 
+                            // x = 1; for val %t = 2001 to 2003; x[%t] = x[%t] + 1; x[%t] = x[%t] + 0; end;
+                            // because there are 2 statements inside loop, n1 = 1 would not catch this. Therefore we set
+                            // n > 1, but needs not be too large though, because n1 would only deal with the LHS variable
+                            // appearing on the RHS, which usually is not done several times consecutively.
+                            // So we set n1 = 2, which should be more than enough.
+                            //
+                            // HMM double loop RHS+LHS if n is large
+                            //
+                            if (i1 + 1 > lhsTrace.precedents.Count()) break;  //cannot get to n1
+                            TraceAndPeriods2 previousLhsTraceTap = lhsTrace.precedents.GetStorage()[lhsTrace.precedents.Count() - (i1 + 1)];
+                            if (Object.ReferenceEquals(previousLhsTraceTap, rhsTraceTap)) goto LabelDoNotAddAsChild; //actually same, faster check. Can this even happen?
+                            if (IsSimilarTrace(previousLhsTraceTap.trace, rhsTrace)) goto LabelDoNotAddAsChild;
                         }
+                    }
 
-                        if (!known)
+                    if (Globals.traceEndoRhsFix1)
+                    {
+                        if (IsSimilarTrace(lhsTrace, rhsTrace) && lhsTrace.traceContents.period.t1.EqualsGekkoTime(rhsTrace.traceContents.period.t1) && lhsTrace.traceContents.period.t2.EqualsGekkoTime(rhsTrace.traceContents.period.t2))
                         {
-                            foreach (TraceAndPeriods2 tempElement in trace.precedents.GetStorage())
+                            //
+                            //We are about to get something like this, for instance x = 1; x = x + 1; x = x + 1;
+                            //
+                            // x = x + 1;       trace #3    (lhsTrace, about to be added to)
+                            //     x = x + 1;   trace #2    (rhsTrace)
+                            //         x = 1;   trace #1    (could have siblings)
+                            //
+                            //But if produced by a loop, this may become very deep and unnecessary. So we cut trace #2 off,
+                            //eliminating it, so that we insted get this:
+                            //
+                            // x = x + 1;       trace #3                            
+                            //     x = 1;       trace #1   
+
+                            // We will have a problem with this:
+                            //
+                            // reset; x = 1;
+                            // x = x + 1; x = x + 0;
+                            // x = x + 1; x = x + 0;
+                            // x = x + 1; x = x + 0;
+                            // x = x + 1; x = x + 0;
+                            // x = x + 1; x = x + 0;
+                            //
+                            // because of the alternation. But that would take two consecutive x-with-lagged-endo, which would be rare.
+
+                            if (rhsTrace.precedents.Count() > 0)
                             {
-                                if (Object.ReferenceEquals(childTrace2, tempElement))
+                                foreach (TraceAndPeriods2 kvp2 in rhsTrace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
                                 {
-                                    known = true; break;
+                                    if (lhsTrace.precedents.GetStorage() == null) lhsTrace.precedents.InitWithEmptyList();
+                                    lhsTrace.precedents.GetStorage().Add(kvp2);
                                 }
+                                goto LabelDoNotAddAsChild;
                             }
                         }
                     }
 
-                    if (!known)
+                    counter2++;
+                    if (lhsTrace.precedents.GetStorage() == null) lhsTrace.precedents.InitWithEmptyList();                    
+                    if (counter2 == 0 && lhsTrace.precedents.GetStorage().Count > 0 && lhsTrace.precedents.GetStorage()[lhsTrace.precedents.GetStorage().Count - 1] != null)
                     {
-                        counter2++;
-                        if (trace.precedents.GetStorage() == null)
-                        {
-                            trace.precedents.InitWithEmptyList();
-                        }
-                        if (counter2 == 0 && trace.precedents.GetStorage().Count > 0 && trace.precedents.GetStorage()[trace.precedents.GetStorage().Count - 1] != null)
-                        {
-                            trace.precedents.GetStorage().Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));  //divider  
-                        }
-
-                        // --------- clone start ----------------
-                        //We must clone the period part of the trace+period, because otherwise it may be overwritten in a wrong way.
-                        GekkoTimeSpansSimple tempSpans = null;
-                        if (childTrace2.periods != null)
-                        {
-                            tempSpans = new GekkoTimeSpansSimple();
-                            tempSpans.AddRange(childTrace2.periods);  //the timespans themselves are immutable
-                        }
-                        TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(childTrace2.trace, tempSpans);
-                        // --------- clone end ----------------
-
-                        trace.precedents.GetStorage().Add(childTrace2Clone);
+                        lhsTrace.precedents.GetStorage().Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));  //divider  
                     }
+
+                    // --------- clone start ----------------
+                    //We must clone the period part of the trace+period, because otherwise it may be overwritten in a wrong way.
+                    GekkoTimeSpansSimple tempSpans = null;
+                    if (rhsTraceTap.periods != null)
+                    {
+                        tempSpans = new GekkoTimeSpansSimple();
+                        tempSpans.AddRange(rhsTraceTap.periods);  //the timespans themselves are immutable
+                    }
+                    TraceAndPeriods2 childTrace2Clone = new TraceAndPeriods2(rhsTraceTap.trace, tempSpans);
+                    // --------- clone end ----------------
+
+                    lhsTrace.precedents.GetStorage().Add(childTrace2Clone);
+                LabelDoNotAddAsChild:;
                 }
             }
+        }
+
+        /// <summary>
+        /// If we are
+        /// (a) in same session (counters differ little) and
+        /// (b) code is equal and
+        /// (c) file + line is equal
+        /// then --> we do not add this trace.
+        /// For instance reset; x &lt;2014 2024> = 2; for val %t = 2014 to 2024; x[%t] = x[%t] + 2; end;
+        /// This loop will produce a network of references, accumulating more and more for traces near 2024.
+        /// The if here makes sure we do not get a lot of non-interesting dublets.
+        /// </summary>
+        /// <param name="lastTrace"></param>
+        /// <param name="newTrace"></param>
+        /// <returns></returns>
+        private static bool IsSimilarTrace(Trace2 lastTrace, Trace2 newTrace)
+        {
+            bool similar = true;
+            if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) similar = false;
+            if (lastTrace.GetContents().text != newTrace.GetContents().text) similar = false;
+            if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) similar = false;
+            return similar;
         }
 
         /// <summary>
@@ -1392,6 +1463,20 @@ namespace Gekko
         // --- this is for time-shadowing        
         public Dictionary<Trace2, string> timeShadowing = new Dictionary<Trace2, string>();
         //public int timeShadowingCuts = 0;
+
+        /// <summary>
+        /// Depth of traces. Returns -1 if no traces are found.
+        /// </summary>
+        /// <returns></returns>
+        public int MaxDepth()
+        {
+            int depth = -1;
+            foreach (PrecedentsAndDepth pad in tracesDepth2.Values)
+            {
+                depth = Math.Max(depth, pad.depth - 1);
+            }
+            return depth;
+        }
 
     }
 

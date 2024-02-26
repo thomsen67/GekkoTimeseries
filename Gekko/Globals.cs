@@ -56,6 +56,8 @@ namespace Gekko
         public static GekkoTimeSpansSimple traceNullPeriods = new GekkoTimeSpansSimple();  //just a pointer to know where to find these. Only used for "divider" traces, because a null element cannot be protobuffed
         public static int traceN = 0;
         public const bool traceFix= false;
+        public const bool traceEndoRhsFix1 = true;
+        public const bool traceEndoRhsFix2 = true;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

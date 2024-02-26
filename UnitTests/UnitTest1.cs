@@ -8476,7 +8476,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceSpeed()
         {
-            I("reset; for val %i = 1950 to 2010; x <%i %i> = 100 + %i; end; x = 0; for val %i = 1 to 100000; x += 1; end;");
+            I("reset; for val %i = 1950 to 2010; x <%i %i> = 100 + %i; end; x = 0; for val %i = 1 to 1000; x += 1; end;");
             //to the test, make sure trace percentage is < 3%.
             Assert.Fail();
         }
@@ -13114,14 +13114,22 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceCommands()
-        {            
+        public void _Test_TraceEndogenousOnRhs()
+        {
+            // Two kinds of problems with endogenous on the RHS:
+            // (1) In accumulating loops, like y = y + 1 being looped, we may get n traces where n is loop number.
+            // (2) In time loops, like y[%t] = y[%t] + 1, the number of traces may be ok, but they may reference each other deep (depth = number of periods)
+            // (3) May be combination of (1) and (2), even though rare.
+
             Program.Flush();
             Series y;
             TraceContents2 tracec;
 
             // --------------------------------------------------------------------------------------------------------
-            // Endogenous on RHS
+            // No endogenous on RHS, completely standard
+            //   y <2001 2005> = 1;
+            //   y <2001 2005> = 1;
+            // Will only have 1 trace (but y <2001 2005> = 1; y[2003] = 1; --> will have 2 traces (just normal time-shadowing))
             // --------------------------------------------------------------------------------------------------------
 
             List<string> m1 = new List<string>();
@@ -13129,69 +13137,184 @@ namespace UnitTests
             m1.Add("y <2001 2005 n> = 1;");
             m1.Add("y <2001 2005 l> = 1;");
             m1.Add("log(y) <2001 2005> = 1;");
-            m1.Add("y[2003] = 1;");            
+            m1.Add("y[2003] = 1;");  //gets 2 traces due to shadowing
             foreach (string ss2 in m1)
-            {
-                //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
+            {                
                 I("reset;");
                 string ss1 = "y <2001 2005> = 1;";
                 I(ss1);
                 I(ss2);
                 y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
+                //Check that y has only 1 trace (but 2 for y[2003] = 1)
                 int add = 0;
-                if (ss2.Contains("y[2003]")) add = 1;  //will get 2 traces
-                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1 + add);
+                if (ss2.Contains("y[2003]")) add = 1;  //will have 2 traces
+                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1 + add);  //1 or 2 traces
                 tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
                 Assert.AreEqual(tracec.text, ss2);
-                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2() == null);
+                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2() == null); //no sub-traces
                 if (add == 1)
                 {
-                    tracec = y.meta.trace2.TimeShadow2()[1].trace.GetContents();
+                    tracec = y.meta.trace2.TimeShadow2()[1].trace.GetContents();  //trace #2
                     Assert.AreEqual(tracec.text, ss1);
-                    Assert.IsTrue(y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2() == null);
+                    Assert.IsTrue(y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2() == null); //no sub-traces
+                }
+                TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                Assert.AreEqual(1 + add, th.traces.Count);
+                Assert.AreEqual(0, th.MaxDepth());
+            }
+
+            // --------------------------------------------------------------------------------------------------------
+            // Endogenous on RHS
+            //   y <2001 2005> = 1;
+            //   y <2001 2005> = y + 1;
+            // We get trace "y <2001 2005> = y + 1;" and subtrace "y <2001 2005> = 1;"
+            // --------------------------------------------------------------------------------------------------------
+            
+            for (int i = 0; i < 3; i++)
+            {
+                List<string> m2 = new List<string>();
+                m2.Add("y <2001 2005> = y + 1;");
+                m2.Add("y <2001 2005 dyn> = y[-1] + 1;");  //if it is ... = y, ... = y[-1] or ... = y[+1] doesn't really matter regarding traces
+                m2.Add("y <2001 2005> ^= 1;");
+                m2.Add("y <2001 2005> %= 1;");
+                m2.Add("y <2001 2005> += 1;");
+                m2.Add("y <2001 2005> -= 1;");
+                m2.Add("y <2001 2005> *= 1;");
+                m2.Add("y <2001 2005> /= 1;");
+                m2.Add("y <2001 2005> #= 1;");
+                m2.Add("y <2001 2005 d> = 1;");
+                m2.Add("y <2001 2005 p> = 1;");
+                m2.Add("y <2001 2005 m> = 1;");
+                m2.Add("y <2001 2005 q> = 1;");
+                m2.Add("y <2001 2005 mp> = 1;");
+                m2.Add("y <2001 2005 dl> = 1;");
+                m2.Add("dif(y) <2001 2005> = 1;");
+                m2.Add("pch(y) <2001 2005> = 1;");
+                m2.Add("dlog(y) <2001 2005> = 1;");
+                m2.Add("y <2001 2005 keep=p> = 1;");
+                m1.Add("y[2003] = y[2003] + 1;");      //!!! Maybe should not report lagged endo...? #asfoiasufdysaf
+                foreach (string ss2 in m2)
+                {
+                    I("reset;");
+                    string ss1 = "y <2001 2005> = 1;";
+                    string ss3 = "y <2001 2005> = y + 0;";
+                    string ss4 = "y <2001 2005> = y + 0 + 0;";
+                    
+                    I(ss1);
+                    if (i == 0)
+                    {
+                        I(ss2);
+                    }
+                    else if (i == 1)
+                    {
+                        I("for val %i = 0 to 100; " + ss2 + " end;");
+                    }
+                    else
+                    {
+                        //This one will kind of "fail" because the statements with lagged endogenous alternate cyclically
+                        I("for val %i = 0 to 100; " + ss2 + ss3 + " " + ss4 + " end;");
+                    }
+
+                    y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
+                    Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);  //1 trace
+                    tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
+                    if (i == 2) Assert.AreEqual(tracec.text, ss4);
+                    else Assert.AreEqual(tracec.text, ss2);
+                    Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);  //1 subtrace
+                    TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
+                    if (i == 2) Assert.AreEqual(tracec2.text, ss3);
+                    else Assert.AreEqual(tracec2.text, ss1);
+                    if (i == 2) Assert.IsFalse(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null); //sub-sub-traces
+                    else Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null); //no sub-sub-traces
+                    TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                    if (i == 2)
+                    {
+                        //Not good, but would be rare though, see also #8iso8ufd8su
+                        //Cf. Globals.traceEndoRhsFix2
+                        Assert.AreEqual(304, th.traces.Count);
+                        Assert.AreEqual(303, th.MaxDepth());
+                    }
+                    else
+                    {
+                        Assert.AreEqual(2, th.traces.Count);
+                        Assert.AreEqual(1, th.MaxDepth());
+                    }
                 }
             }
 
-
-
-            List<string> m2 = new List<string>();
-            m2.Add("y <2001 2005> = y + 1;");
-            m2.Add("y <2001 2005 dyn> = y[-1] + 1;");
-            m2.Add("y <2001 2005> ^= 1;");
-            m2.Add("y <2001 2005> %= 1;");
-            m2.Add("y <2001 2005> += 1;");
-            m2.Add("y <2001 2005> -= 1;");
-            m2.Add("y <2001 2005> *= 1;");
-            m2.Add("y <2001 2005> /= 1;");
-            m2.Add("y <2001 2005> #= 1;");
-            m2.Add("y <2001 2005 d> = 1;");
-            m2.Add("y <2001 2005 p> = 1;");
-            m2.Add("y <2001 2005 m> = 1;");
-            m2.Add("y <2001 2005 q> = 1;");
-            m2.Add("y <2001 2005 mp> = 1;");
-            m2.Add("y <2001 2005 dl> = 1;");
-            m2.Add("dif(y) <2001 2005> = 1;");
-            m2.Add("pch(y) <2001 2005> = 1;");
-            m2.Add("dlog(y) <2001 2005> = 1;");
-            m2.Add("y <2001 2005 keep=p> = 1;");
-            m1.Add("y[2003] = y[2003] + 1;");      //!!! Maybe should not report lagged endo...? #asfoiasufdysaf
-            foreach (string ss2 in m2)
+            //
+            
+            // 
+            for (int i = 0; i < 3; i++)
             {
-                //Here, non-lagged endogenous. We must have "y <2001 2005> = y + 1" with subtrace "y <2001 2005> = 1".
-                I("reset;");
-                string ss1 = "y <2001 2005> = 1;"; 
-                I(ss1);
-                I(ss2);
-                y = O.GetIVariableFromString("Work:" + "y!a", ECreatePossibilities.NoneReportError) as Series;
-                Assert.AreEqual(y.meta.trace2.TimeShadow2().Count, 1);
-                tracec = y.meta.trace2.TimeShadow2()[0].trace.GetContents();
-                Assert.AreEqual(tracec.text, ss2);
-                Assert.AreEqual(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count, 1);
-                TraceContents2 tracec2 = y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents();
-                Assert.AreEqual(tracec.text, ss2);
-                Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null);
-            }           
+                List<Tuple<string, string>> m3 = new List<Tuple<string, string>>();
+                m3.Add(new Tuple<string, string>("for val %i = 2001 to 2020; x[%i] = x[%i] + 1; {insert}end;", "x[%i] = x[%i] + 1;"));
+                foreach (Tuple<string, string> ss2 in m3)
+                {
+                    I("reset;");
+                    string ss1 = "x <2001 2020> = 1;";
+                    I(ss1);
+                    if (i == 0)
+                    {
+                        I(ss2.Item1.Replace("{insert}", ""));
+                    }
+                    else if (i == 1)
+                    {
+                        I("for val %ii = 0 to 100; " + ss2.Item1.Replace("{insert}", "") + " end;");
+                    }
+                    else
+                    {
+                        I("for val %ii = 0 to 100; " + ss2.Item1.Replace("{insert}", "x[%i] = x[%i] + 0; x[%i] = x[%i] + 0 + 0;") + " end;");
+                    }
 
+                    y = O.GetIVariableFromString("Work:" + "x!a", ECreatePossibilities.NoneReportError) as Series;
+                    Assert.AreEqual(20, y.meta.trace2.TimeShadow2().Count);  //20 trace
+
+                    if (i < 2)  //we skip the text check for i==2
+                    {
+                        for (int ii = 10; ii <= 15; ii++)
+                        {
+                            //Check that traces are "lean", not creating a hall of mirrors effect.
+                            tracec = y.meta.trace2.TimeShadow2()[ii].trace.GetContents();
+                            Assert.AreEqual(tracec.text, ss2.Item2);
+                            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);  //2 subtraces                    
+                            Assert.AreEqual(ss2.Item2, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents().text);
+                            Assert.AreEqual(ss1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[1].trace.GetContents().text);
+                            Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2().Count() == 1); //1 sub-sub-trace
+                            Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[1].trace.TimeShadow2() == null); //0 sub-sub-trace
+                            Assert.AreEqual(ss1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2()[0].trace.GetContents().text);
+                            Assert.IsTrue(y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2()[0].trace.TimeShadow2() == null); //0 sub-sub-sub-trace
+                        }
+                    }
+
+                    TraceHelper th = Trace2.CollectAllTraces(Program.databanks.GetFirst(), ETraceHelper.GetAllMetasAndTraces);
+                    if (i == 0)
+                    {
+                        Assert.AreEqual(21, th.traces.Count);
+                        Assert.AreEqual(1, th.MaxDepth());
+                    }
+                    else if (i == 1)
+                    {
+                        Assert.AreEqual(23, th.traces.Count);
+                        Assert.AreEqual(1, th.MaxDepth());
+                    }
+                    else
+                    {
+                        //Not good, but would be rare though, see also #8iso8ufd8su
+                        //Cf. Globals.traceEndoRhsFix1
+                        Assert.AreEqual(6061, th.traces.Count);
+                        Assert.AreEqual(142, th.MaxDepth());
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void _Test_TraceCommands()
+        {            
+            Program.Flush();
+            Series y;
+            TraceContents2 tracec;            
 
             // -----------------------------------------------------------------------------
             // The following tests for both normal series x and for array-series x[a]
@@ -13978,12 +14101,12 @@ namespace UnitTests
             string s1 = Globals.unitTestScreenOutput.ToString();
             if (false)
             {
-                Assert.IsTrue(s1.Contains(" 4 series with 11 reachable traces "));
+                Assert.IsTrue(s1.Contains(" 4 series with 11 traces "));
                 Assert.IsTrue(s1.Contains("--> depth: 0, traces: 11" + G.NL));
             }
             else
             {
-                Assert.IsTrue(s1.Contains(" 4 series with 9 reachable traces "));
+                Assert.IsTrue(s1.Contains(" 4 series with 9 traces "));
                 Assert.IsTrue(s1.Contains("--> depth: 0, traces: 9" + G.NL));
             }
 
@@ -14005,27 +14128,27 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("tracestats2();");
             string s3 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(s3.Contains(" 4 series with 9 reachable traces "));
+            Assert.IsTrue(s3.Contains(" 4 series with 9 traces "));
             Assert.IsTrue(s3.Contains("--> depth: 0, traces: 9" + G.NL));
 
             Globals.unitTestScreenOutput.Clear();
             I("delete x1; tracestats2();");
             string s4 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(s4.Contains(" 3 series with 9 reachable traces "));
+            Assert.IsTrue(s4.Contains(" 3 series with 9 traces "));
             Assert.IsTrue(s4.Contains("--> depth: 0, traces: 7" + G.NL));
             Assert.IsTrue(s4.Contains("--> depth: 1, traces: 2" + G.NL));
 
             Globals.unitTestScreenOutput.Clear();
             I("delete x2; tracestats2();");
             string s5 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(s5.Contains(" 2 series with 9 reachable traces "));
+            Assert.IsTrue(s5.Contains(" 2 series with 9 traces "));
             Assert.IsTrue(s5.Contains("--> depth: 0, traces: 3" + G.NL));
             Assert.IsTrue(s5.Contains("--> depth: 1, traces: 6" + G.NL));
 
             Globals.unitTestScreenOutput.Clear();
             I("delete x3; tracestats2();");
             string s6 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(s6.Contains(" 1 series with 9 reachable traces "));
+            Assert.IsTrue(s6.Contains(" 1 series with 9 traces "));
             Assert.IsTrue(s6.Contains("--> depth: 0, traces: 1" + G.NL));
             Assert.IsTrue(s6.Contains("--> depth: 1, traces: 8" + G.NL));
 
@@ -14854,7 +14977,7 @@ namespace UnitTests
                                 if (true)
                                 {
                                     //Why has this changed from 19 to 16 reachables?? 6/2 2024
-                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 16 reachable traces in total."));
+                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 16 traces in total."));
                                     Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
                                     Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
                                     Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
@@ -14863,7 +14986,7 @@ namespace UnitTests
                                 }
                                 else
                                 {
-                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 19 reachable traces in total."));
+                                    Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 19 traces in total."));
                                     Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
                                     Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
                                     Assert.IsTrue(s.Contains("depth: 2, traces: 5"));
@@ -14874,7 +14997,7 @@ namespace UnitTests
                             else
                             {
                                 //If traces were not compacted/trimmed first in gbk, we would get this. See also above.
-                                Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 reachable traces in total."));
+                                Assert.IsTrue(s.Contains("Databank 'Work' has 3 series with 22 traces in total."));
                                 Assert.IsTrue(s.Contains("depth: 0, traces: 4"));
                                 Assert.IsTrue(s.Contains("depth: 1, traces: 3"));
                                 Assert.IsTrue(s.Contains("depth: 2, traces: 6"));

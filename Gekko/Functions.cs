@@ -5593,7 +5593,7 @@ namespace Gekko
 
             using (Writeln txt = new Writeln())
             {
-                txt.MainAdd("Databank '" + x.ConvertToString() + "' has " + th.seriesObjectCount + " series with " + (th.traces.Count) + " reachable traces in total.");
+                txt.MainAdd("Databank '" + x.ConvertToString() + "' has " + th.seriesObjectCount + " series with " + (th.traces.Count) + " traces in total.");
             }
 
             bool hasDepth1 = false;

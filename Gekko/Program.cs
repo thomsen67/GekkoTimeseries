@@ -10211,7 +10211,7 @@ namespace Gekko
                         output.Add("option mcp = convert;");
                         output.Add(gekkoTemp + ".holdFixed = 0;");  //is 1 for MAKRO
                         output.Add("solve " + gekkoTemp + " using mcp;");  //CNS??
-                        output.Add("abort \"Abort after producing a GAMS scalar model\";");
+                        output.Add("abort \"Abort after producing a GAMS scalar model for Gekko\";");
 
                         output.Add("");
                         output.Add("# -----------------------------------------------------------------");
