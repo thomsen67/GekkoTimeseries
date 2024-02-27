@@ -482,7 +482,7 @@ namespace Gekko.Parser.Gek
                                 new Writeln("");
                                 new Writeln("---------------------");
                                 new Writeln("---------------------");
-                                new Writeln("Dict mismatch");
+                                new Writeln("TTH: Dict mismatch");
                                 new Writeln("---------------------");
                                 new Writeln("---------------------");
                                 new Writeln("");
@@ -890,6 +890,7 @@ namespace Gekko.Parser.Gek
         {
             List<string> text = Stringlist.ExtractLinesFromText(ph.commandsText);
             ln = line0 + lineNumber - 1;
+            if (ln < 1) ln = 1;
             if (false)
             {
                 //this is not good here. Probably something from the old error messages.
@@ -998,7 +999,7 @@ namespace Gekko.Parser.Gek
                     //if n_bracket > 0, it could be something like #m = [1, 2; 3, 4]; --> do not break it into two.
                     //but the "inside bracket" stuff can only happen on the same line, so an unclosed "[" does not havoc all lines.
                     statement.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement.tokens, true);
-                    if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field");
+                    if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field (beware that a {a{local option¤options.htm}a} with bad syntax can trigger this error)");
 
                     if (true)
                     {

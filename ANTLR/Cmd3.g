@@ -48,6 +48,7 @@ tokens {
 	ASTDECOMPGROUP1;
 	ASTDECOMPGROUP1c;
 	ASTDECOMPGROUP1d;
+    ASTLOCALOPTIONS;
 	ASTFORTYPE2;
 	ASTNAKEDLISTMISS;
 	ASTPARENTDIRECTORY;
@@ -2542,6 +2543,9 @@ localOption:			    OPTION optionType1 -> ^(ASTBLOCKOPTION optionType1)
 						  | OPTION optionType2 -> ^(ASTBLOCKOPTION optionType2)
 							;
 
+//Will be "option ... ; option ... ; option ..."
+localOptions:               localOption (SEMICOLON localOption)* -> ^(ASTLOCALOPTIONS localOption+);
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -2823,13 +2827,11 @@ acceptType:                 VAL | STRING2 | DATE;
 analyze:                    ANALYZE analyzeOpt1? analyzeExpression (',' analyzeExpression)* -> ^({token("ASTANALYZE", ASTANALYZE, input.LT(1).Line)} ^(ASTOPT_ analyzeOpt1?) analyzeExpression+);
 analyzeExpression:		    expression -> ^({token("ASTANALYZEEXPRESSION¤"+($expression.text), ASTANALYZEEXPRESSION, 0)} expression);
 analyzeOpt1:                ISNOTQUAL
-						  | leftAngle2          analyzeOpt2h? RIGHTANGLE -> ^(ASTOPT1 analyzeOpt2h?)
-						  | leftAngleNo2 dates? analyzeOpt2h? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt2h?)
+						  | leftAngle2 localOptions RIGHTANGLE                                      -> ^(ASTOPT1 localOptions)                          
+                          | leftAngle2          analyzeOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h? localOptions?)
+						  | leftAngleNo2 dates? analyzeOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h? localOptions?)
+                          
 						    ;
-
-analyzeOpt2h:               analyzeOpt1h+ (SEMICOLON! localOption)*
-                          | localOption (SEMICOLON! localOption)*
-                            ;
 
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 						    ;		
