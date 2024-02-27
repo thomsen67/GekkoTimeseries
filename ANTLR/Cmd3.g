@@ -2361,8 +2361,7 @@ bank7Naked:					  AT GLUE -> ASTAT
 							| name7 COLON -> name7 ASTCOLON
 							  ;
 
-freq7Naked:				      GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;  
-//indexer7Naked:			      leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name7+);
+freq7Naked:				      GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;
 indexer7Naked:				  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -2537,6 +2536,11 @@ sigilOrVertical:            sigil
 						    ;
 
 freq:			   		   GLUE EXCLAMATION GLUE name -> name;
+
+//local options like "write <2010 2020; option...;  option...> x1, x2;" or "writefile(<2010 2020; option...; option...>, 'myfile.txt');"
+localOption:			    OPTION optionType1 -> ^(ASTBLOCKOPTION optionType1)
+						  | OPTION optionType2 -> ^(ASTBLOCKOPTION optionType2)
+							;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical START -------------------------------------------------------------------------------
@@ -2819,9 +2823,14 @@ acceptType:                 VAL | STRING2 | DATE;
 analyze:                    ANALYZE analyzeOpt1? analyzeExpression (',' analyzeExpression)* -> ^({token("ASTANALYZE", ASTANALYZE, input.LT(1).Line)} ^(ASTOPT_ analyzeOpt1?) analyzeExpression+);
 analyzeExpression:		    expression -> ^({token("ASTANALYZEEXPRESSION¤"+($expression.text), ASTANALYZEEXPRESSION, 0)} expression);
 analyzeOpt1:                ISNOTQUAL
-						  | leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
-						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
+						  | leftAngle2          analyzeOpt2h? RIGHTANGLE -> ^(ASTOPT1 analyzeOpt2h?)
+						  | leftAngleNo2 dates? analyzeOpt2h? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt2h?)
 						    ;
+
+analyzeOpt2h:               analyzeOpt1h+ (SEMICOLON! localOption)*
+                          | localOption (SEMICOLON! localOption)*
+                            ;
+
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 						    ;		
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3186,12 +3195,10 @@ block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({tok
 
 blockOpt1:                  blockOpt1h (COMMA2 blockOpt1h)* -> blockOpt1h+;
 
-blockOpt1h:              //   SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
-						    TIME dates -> ^(ASTDATES_BLOCK dates?)
-						  | optionType1 -> ^(ASTBLOCKOPTION optionType1)
-						  | optionType2 -> ^(ASTBLOCKOPTION optionType2)
+blockOpt1h:                 TIME dates -> ^(ASTDATES_BLOCK dates?)
+						  | OPTION? optionType1 -> ^(ASTBLOCKOPTION optionType1)
+						  | OPTION? optionType2 -> ^(ASTBLOCKOPTION optionType2)
 							;
-
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INDEX
