@@ -2788,7 +2788,7 @@ seriesOpt1a:                //so that we can handle y <2001 2005>=100; where '>=
 						  | leftAngleNo2 dates? seriesOpt1h* (SEMICOLON localOptions)? -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h* localOptions?)
                           ;
 
-seriesOpt1:                 ISNOTQUAL
+seriesOpt1:                 ISNOTQUAL                          
                           | leftAngle2 localOptions RIGHTANGLE          -> ^(ASTOPT1 localOptions)    
 						  | leftAngle2          seriesOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h* localOptions?)
 						  | leftAngleNo2 dates? seriesOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h* localOptions?)
@@ -2851,6 +2851,7 @@ checkoff:				    CHECKOFF seqOfBankvarnames -> ^({token("ASTCHECKOFF", ASTCHECKO
 							
 clear:					    CLEAR clearOpt1? seqOfBankvarnames? -> ^({token("ASTCLEAR", ASTCLEAR, input.LT(1).Line)} ^(ASTPLACEHOLDER clearOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 clearOpt1:				    ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                         -> ^(ASTOPT1 localOptions)      
                           | leftAngle clearOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 clearOpt1h* localOptions?)
                             ;
 clearOpt1h:				    FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)	
@@ -2877,6 +2878,7 @@ close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLO
 						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, input.LT(1).Line)} closeOpt1?)
 						    ;
 closeOpt1:				    ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                         -> ^(ASTOPT1 localOptions)      
                           | leftAngle closeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 closeOpt1h* localOptions?)
                             ;
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
@@ -2896,6 +2898,7 @@ collapse:                   collapse2 -> ^({token("ASTCOLLAPSE¤"+($collapse2.tex
 collapse2:				    COLLAPSE collapseOpt1? seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER collapseMethod?) ^(ASTPLACEHOLDER collapseOpt1?);
 collapseMethod:			    name;
 collapseOpt1:				ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                            -> ^(ASTOPT1 localOptions)      
                           | leftAngle collapseOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 collapseOpt1h* localOptions?)
                             ;
 collapseOpt1h:				MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)							
@@ -2907,6 +2910,7 @@ collapseOpt1h:				MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 
 compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, input.LT(1).Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTHANDLEFILENAME fileName?));
 compareOpt1:			    ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                     -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          compareOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 compareOpt1h* localOptions?)
 						  | leftAngleNo2 dates? compareOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h* localOptions?)
                             ;
@@ -2927,6 +2931,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 copy:                       copy2 -> ^({token("ASTCOPY¤"+($copy2.text), ASTCOPY, input.LT(1).Line)} copy2);
 copy2:                      COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames2)? -> ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames2?;
 copyOpt1                  : ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                  -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          copyOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 copyOpt1h* localOptions?)		
 						  | leftAngleNo2 dates? copyOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES_TYPE2 dates?) copyOpt1h* localOptions?)
 						  ;
@@ -2945,6 +2950,7 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 
 count:                      COUNT countOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTCOUNT", ASTCOUNT, input.LT(1).Line)} ^(ASTPLACEHOLDER countOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames);
 countOpt1:                  ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                         -> ^(ASTOPT1 localOptions)         
                           | leftAngle countOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 countOpt1h* localOptions?)
                             ;
 countOpt1h:                 BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes											  
@@ -3008,6 +3014,7 @@ decompLink1:                decompVar1 -> ^(ASTDECOMPLINK1 decompVar1)
 						    ;
 
 decompOpt1:					ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                    -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          decompOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 decompOpt1h* localOptions?)
 						  | leftAngleNo2 dates? decompOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h* localOptions?)
                             ;
@@ -3037,6 +3044,7 @@ eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, i
 find:                       FIND findOpt1? seqOfBankvarnamesOnly1 (TO seqOfBankvarnamesOnly1)? -> ^({token("ASTFIND", ASTFIND, input.LT(1).Line)} ^(ASTOPT_ findOpt1?) seqOfBankvarnamesOnly1+);
 
 findOpt1:					ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                  -> ^(ASTOPT1 localOptions)          
 						  | leftAngle2          findOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 findOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? findOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findOpt1h* localOptions?)
                             ;
@@ -3049,6 +3057,7 @@ findOpt1h:				    name -> ^(ASTOPT_STRING_PRTCODE name);
 delete:						DELETE deleteOpt1? seqOfBankvarnames? -> ^({token("ASTDELETE", ASTDELETE, input.LT(1).Line)} ^(ASTOPT_ deleteOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 
 deleteOpt1:					ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                   -> ^(ASTOPT1 localOptions)      
 						  | leftAngle          deleteOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 deleteOpt1h* localOptions?)
                             ;
 deleteOpt1h:			    NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
@@ -3062,6 +3071,7 @@ disp:						DISP stringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input
 						    ;
 
 dispOpt1:					ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                  -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          dispOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 dispOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? dispOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h* localOptions?)
                             ;
@@ -3074,6 +3084,7 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 doc:                        DOC docOpt1? seqOfBankvarnames? docOpt2 -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTOPT_ docOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTOPT_ docOpt2?))
 						    ;
 docOpt1:					ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                       -> ^(ASTOPT1 localOptions)      
 						  | leftAngle docOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 docOpt1h* localOptions?)						  
                             ;
 docOpt1h:				    BROWSER (EQUAL yesNo)? -> ^(ASTOPT_STRING_BROWSER yesNo?);
@@ -3090,7 +3101,7 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 
 download:                   download2 -> ^({token("ASTDOWNLOAD¤"+($download2.text), ASTDOWNLOAD, input.LT(1).Line)} download2);
 download2:                  DOWNLOAD downloadOpt1? url fileName? (DUMP '=' fileName2)? -> url ^(ASTHANDLEFILENAME fileName?) ^(ASTHANDLEFILENAME2 fileName2?) downloadOpt1?;
-downloadOpt1:               ISNOTQUAL | leftAngle downloadOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h* localOptions?);							
+downloadOpt1:               ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle downloadOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h* localOptions?);							
 downloadOpt1h:              ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
                           | KEY EQUAL expression -> ^(ASTOPT_STRING_KEY expression)
 						    ;
@@ -3107,11 +3118,16 @@ edit:                       EDIT fileNameStar -> ^({token("ASTEDIT", ASTEDIT, in
 // ENDO/EXO
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//TODO:
+//TODO: Local options, but how?
+//TODO:
+
+
 endo:                       ENDO eeOpt1? eeHelper -> ^({token("ASTENDO", ASTENDO, input.LT(1).Line)} ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
 exo:                        EXO eeOpt1? eeHelper -> ^({token("ASTEXO", ASTEXO, input.LT(1).Line)} ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
 
 eeOpt1:				     ISNOTQUAL
-						 | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTDATES2 dates?);
+						 | leftAngleNo2 dates? RIGHTANGLE                 -> ^(ASTDATES2 dates?);
 
 eeHelper:              eeHelper2 (COMMA2 eeHelper2)* -> eeHelper2+;
 eeHelper2:             indexerExpression eeOpt1?  -> ^(ASTPLACEHOLDER indexerExpression eeOpt1?);
@@ -3128,7 +3144,9 @@ exit:					    EXIT -> ^({token("ASTEXIT", ASTEXIT, input.LT(1).Line)});
 
 
 findmissingdata:			FINDMISSINGDATA findmissingdataOpt1? seqOfBankvarnames? -> ^({token("ASTFINDMISSINGDATA", ASTFINDMISSINGDATA, input.LT(1).Line)} ^(ASTPLACEHOLDER findmissingdataOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
-findmissingdataOpt1:        ISNOTQUAL | leftAngle2          findmissingdataOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h* localOptions?)							
+findmissingdataOpt1:        ISNOTQUAL 
+                          | leftAngle2 localOptions RIGHTANGLE                                             -> ^(ASTOPT1 localOptions)      
+                          | leftAngle2          findmissingdataOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? findmissingdataOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findmissingdataOpt1h* localOptions?)
                             ;
 findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE expression);
@@ -3216,7 +3234,7 @@ blockOpt1h:                 TIME dates -> ^(ASTDATES_BLOCK dates?)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, input.LT(1).Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
-indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 indexOpt1h* localOptions?);							
+indexOpt1:                  ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle indexOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 indexOpt1h* localOptions?);							
 indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)							  
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes					
 						  |	SHOWBANK EQUAL name -> ^(ASTOPT_STRING_SHOWBANK name)	//yes|no|all
@@ -3248,12 +3266,12 @@ itershow:				     ITERSHOW  (leftAngle dates? RIGHTANGLE)? seqOfBankvarnames -> 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 local:					    LOCAL localOpt1? seqOfBankvarnames? -> ^({token("ASTLOCAL", ASTLOCAL, input.LT(1).Line)} ^(ASTPLACEHOLDER localOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
-localOpt1:				    ISNOTQUAL | leftAngle localOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 localOpt1h* localOptions?);
+localOpt1:				    ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle localOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 localOpt1h* localOptions?);
 localOpt1h:				    ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						    ;	
 
 global:					    GLOBAL globalOpt1? seqOfBankvarnames? -> ^({token("ASTGLOBAL", ASTGLOBAL, input.LT(1).Line)} ^(ASTPLACEHOLDER globalOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
-globalOpt1:				    ISNOTQUAL | leftAngle globalOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 globalOpt1h* localOptions?);
+globalOpt1:				    ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle globalOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 globalOpt1h* localOptions?);
 globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						    ;
 
@@ -3305,7 +3323,7 @@ mode2:                      MIXED | SIM | DATA;
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
-modelOpt1:                  ISNOTQUAL | leftAngle modelOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> modelOpt1h*  localOptions?;
+modelOpt1:                  ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle modelOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> modelOpt1h*  localOptions?;
 modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
 						  |	DEP EQUAL expression -> ^(ASTOPT_VAR_DEP expression)
@@ -3323,7 +3341,7 @@ ols:                        OLS olsOpt1? olsExpression EQUAL (olsExpression (','
 olsExpression:				expression -> ^({token("ASTOLSEXPRESSION¤"+($expression.text), ASTOLSEXPRESSION, 0)} expression);
 
 olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
-olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> olsOpt1h* localOptions?;
+olsOpt1:                    ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle olsOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> olsOpt1h* localOptions?;
 olsOpt1h:                   dates -> ^(ASTDATES dates)
 						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
 						  | DUMP (EQUAL fileName)? -> ^(ASTOPT_STRING_DUMP fileName?)
@@ -3338,7 +3356,7 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 
 open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, input.LT(1).Line)} openOpt1? openHelper+);
 openHelper:                 seqOfFileNamesStar (AS seqOfBankvarnames)? -> ^(ASTOPENHELPER ^(ASTFILENAME seqOfFileNamesStar) ^(ASTAS seqOfBankvarnames?));
-openOpt1:                   ISNOTQUAL | leftAngle openOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> openOpt1h* localOptions?;
+openOpt1:                   ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle openOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> openOpt1h* localOptions?;
 openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
@@ -3386,7 +3404,7 @@ pause:                      PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 pipe:                       PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, input.LT(1).Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
-pipeOpt1:                   ISNOTQUAL | leftAngle pipeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> pipeOpt1h* localOptions?;
+pipeOpt1:                   ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle pipeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> pipeOpt1h* localOptions?;
 pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)	
 						  | PAUSE (EQUAL yesNo)? -> ^(ASTOPT_STRING_PAUSE yesNo?)						
@@ -3400,13 +3418,8 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 
 predict:				    PREDICT predictOpt1? seqOfBankvarnames -> ^({token("ASTPREDICT", ASTPREDICT, input.LT(1).Line)} ^(ASTOPT_ predictOpt1?) seqOfBankvarnames);
 
-//predictOpt1:			    ISNOTQUAL
-//						  | leftAngle2          predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 predictOpt1h*)							
-//						  | leftAngleNo2 dates? predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) predictOpt1h*)
-//                            ;
-//predictOpt1h:				;
-
-predictOpt1:			    ISNOTQUAL						  
+predictOpt1:			    ISNOTQUAL		
+                          | leftAngle2 localOptions RIGHTANGLE                       -> ^(ASTOPT1 localOptions)      
 						  | leftAngleNo2 dates? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) localOptions?)
                             ;
 
@@ -3449,6 +3462,7 @@ prtElement:                 expression
 
 prtElementOptionField:      leftAngle prtOptionField4Helper* RIGHTANGLE -> ^(ASTPRTELEMENTOPTIONFIELD prtOptionField4Helper*);
 prtOpt1:					ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                      -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          prtOpt1Helper* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper* localOptions?)							
 						  | leftAngleNo2 dates? prtOpt1Helper* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper* localOptions?)
                             ;
@@ -3637,14 +3651,14 @@ r_file:   				        R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.
 
 //deprecated
 r_export:  				        R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
-r_exportOpt1:			        ISNOTQUAL | leftAngle r_exportOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> r_exportOpt1h* localOptions?;
+r_exportOpt1:			        ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle r_exportOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> r_exportOpt1h* localOptions?;
 r_exportOpt1h:                  TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
 r_run:  				        R_RUN r_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTHANDLEFILENAME fileName?))
                               | R_RUN r_runOpt1? fileName? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ASTPLACEHOLDER ^(ASTHANDLEFILENAME fileName?))                              
 							    ;
 
-r_runOpt1:			            ISNOTQUAL | leftAngle r_runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> r_runOpt1h* localOptions?;
+r_runOpt1:			            ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle r_runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> r_runOpt1h* localOptions?;
 r_runOpt1h:                     MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
                               | TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression)
 								;
@@ -3657,7 +3671,7 @@ python_run:  				    PYTHON_RUN python_runOpt1? seqOfBankvarnames (FILE EQUAL fi
                               | PYTHON_RUN python_runOpt1? fileName? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
 							    ;
 
-python_runOpt1:			        ISNOTQUAL | leftAngle python_runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> python_runOpt1h* localOptions?;
+python_runOpt1:			        ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle python_runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> python_runOpt1h* localOptions?;
 python_runOpt1h:                MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
                               | TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression)
 								;
@@ -3670,7 +3684,7 @@ rebase:                     rebase2 -> ^({token("ASTREBASE¤"+($rebase2.text), AS
 rebase2:                    REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?;
 rebaseDate1:                expression;
 rebaseDate2:                expression;
-rebaseOpt1:                 ISNOTQUAL | leftAngle rebaseOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h* localOptions?);							
+rebaseOpt1:                 ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle rebaseOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h* localOptions?);							
 rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //obsolete: name can be without quotes
 						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
 						  | TOBANK EQUAL name -> ^(ASTOPT_STRING_TOBANK name)  //name can be without quotes
@@ -3684,7 +3698,7 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //obs
 
 rename:                     rename2 -> ^({token("ASTRENAME¤"+($rename2.text), ASTRENAME, input.LT(1).Line)} rename2);
 rename2:                    RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames2 -> ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames2 renameOpt1?;
-renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> renameOpt1h* localOptions?;
+renameOpt1:                 ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle renameOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> renameOpt1h* localOptions?;
 renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
 						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)
@@ -3705,6 +3719,7 @@ read2:                      readHelper readOpt1? fileNameStar (TO nameOrStar)? -
 readHelper:                 READ | IMPORT;
 
 readOpt1:                   ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                  -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          readOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> readOpt1h* localOptions?						
 						  | leftAngleNo2 dates? readOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTDATES_TYPE2 dates?) readOpt1h* localOptions?
                             ;
@@ -3756,7 +3771,7 @@ restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, input.
 
 run:                        RUN runOpt1? fileNameStar -> ^({token("ASTRUN", ASTRUN, input.LT(1).Line)} fileNameStar runOpt1?);
 
-runOpt1:                    ISNOTQUAL | leftAngle runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> runOpt1h* localOptions?;						
+runOpt1:                    ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle runOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> runOpt1h* localOptions?;						
 runOpt1h:                   SKIP EQUAL expression -> ^(ASTOPT_VAL_SKIP expression);	
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3798,6 +3813,7 @@ sign:					    SIGN -> ^({token("ASTSIGN", ASTSIGN, input.LT(1).Line)});
 
 sim:                        SIM simOpt1? -> ^({token("ASTSIM", ASTSIM, input.LT(1).Line)} simOpt1?);
 simOpt1:                    ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                 -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          simOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 simOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? simOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) simOpt1h* localOptions?)
                             ;
@@ -3829,6 +3845,7 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 splice:                     splice2 -> ^({token("ASTSPLICE¤"+($splice2.text), ASTSPLICE, input.LT(1).Line)} splice2);
 splice2:                    SPLICE spliceOpt1? seqOfBankvarnames EQUAL expression+ -> ^(ASTPLACEHOLDER spliceOpt1?) seqOfBankvarnames expression+;
 spliceOpt1:                 ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                          -> ^(ASTOPT1 localOptions)      
 						  | leftAngle spliceOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> spliceOpt1h* localOptions?												
                             ;
 
@@ -3837,12 +3854,6 @@ spliceOpt1h:                FIRST -> ^(ASTOPT_STRING_FIRST ASTYES)
 						  | N EQUAL expression -> ^(ASTOPT_VAL_N expression)
 						  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)  //rel1, rel2, rel3, abs
 							;
-
-//splice:                     SPLICE spliceOpt1? expression -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} spliceOpt1? expression);
-//spliceOpt1:                 ISNOTQUAL | leftAngle spliceOpt1h* RIGHTANGLE -> spliceOpt1h*;
-//spliceOpt1h:                TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
-//						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
-//						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // STOP
@@ -3857,7 +3868,7 @@ stop:					    STOP -> ^({token("ASTSTOP", ASTSTOP, input.LT(1).Line)});
 sys:						SYS -> ^({token("ASTSYS", ASTSYS, input.LT(1).Line)})
 						  | SYS sysOpt1? expression (WORKING '=' fileName)? -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression ^(ASTPLACEHOLDER sysOpt1?) ^(ASTHANDLEFILENAME fileName?))
 						    ;
-sysOpt1:			        ISNOTQUAL | leftAngle sysOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> sysOpt1h* localOptions?;
+sysOpt1:			        ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle sysOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> sysOpt1h* localOptions?;
 sysOpt1h:                   MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3890,6 +3901,7 @@ table:					    TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE na
 						  | MENUTABLE tableOpt1? fileName -> ^(ASTMENUTABLE tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line above
 						    ;
 tableOpt1:                  ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                   -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          tableOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 tableOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? tableOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) tableOpt1h* localOptions?)
                             ;
@@ -3911,7 +3923,7 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 tell:					    TELL tellOpt1? expression? -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} ^(ASTPLACEHOLDER expression?) ^(ASTPLACEHOLDER tellOpt1?));
-tellOpt1:			        ISNOTQUAL | leftAngle tellOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> tellOpt1h* localOptions?;
+tellOpt1:			        ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle tellOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> tellOpt1h* localOptions?;
 tellOpt1h:                  NOCR (EQUAL yesNo)? -> ^(ASTOPT_STRING_NOCR yesNo?)
                           | MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
 						  | LINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_LINE yesNo?)
@@ -3954,7 +3966,7 @@ unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 translate: TRANSLATE translateOpt1? fileName -> ^({token("ASTTRANSLATE", ASTTRANSLATE, input.LT(1).Line)} translateOpt1?  ^(ASTHANDLEFILENAME fileName?));
-translateOpt1: ISNOTQUAL | leftAngle        translateOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> translateOpt1h* localOptions?;						
+translateOpt1: ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle  translateOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> translateOpt1h* localOptions?;						
 translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
 						  | GEKKO20 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO20 yesNo?)
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
@@ -3974,6 +3986,7 @@ write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarname
 
 writeHelper:                WRITE | EXPORT;
 writeOpt1:                  ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                   -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          writeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> writeOpt1h* localOptions?
 						  | leftAngleNo2 dates? writeOpt1h* (SEMICOLON localOptions)? RIGHTANGLE ->  ^(ASTDATES_TYPE2 dates?) writeOpt1h* localOptions?
 						    ;
@@ -4022,7 +4035,7 @@ return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETU
 
 truncate:                   truncate2 -> ^({token("ASTTRUNCATE¤"+($truncate2.text), ASTTRUNCATE, input.LT(1).Line)} truncate2);
 truncate2:                  TRUNCATE truncateOpt1? seqOfBankvarnames -> ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames;
-truncateOpt1:               ISNOTQUAL | leftAngle truncateOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> truncateOpt1h? localOptions?;
+truncateOpt1:               ISNOTQUAL | leftAngle2 localOptions RIGHTANGLE -> ^(ASTOPT1 localOptions) | leftAngle truncateOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> truncateOpt1h? localOptions?;
 truncateOpt1h:              dates -> ^(ASTDATES dates);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4037,6 +4050,7 @@ xedit:                      XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT,
 
 x12a:					    X12A x12aOpt1? seqOfBankvarnames -> ^({token("ASTX12A", ASTX12A, input.LT(1).Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ x12aOpt1?)) seqOfBankvarnames);
 x12aOpt1:                   ISNOTQUAL
+                          | leftAngle2 localOptions RIGHTANGLE                                  -> ^(ASTOPT1 localOptions)      
 						  | leftAngle2          x12aOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> x12aOpt1h* localOptions?
 						  | leftAngleNo2 dates? x12aOpt1h* (SEMICOLON localOptions)? RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h* localOptions?
 						    ;
