@@ -58,6 +58,7 @@ namespace Gekko
         public const bool traceFix= false;
         public const bool traceEndoRhsFix1 = true;
         public const bool traceEndoRhsFix2 = true;
+        public const int traceDeepStartDepth = -1;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

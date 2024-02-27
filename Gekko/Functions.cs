@@ -5588,7 +5588,7 @@ namespace Gekko
             int[] depths = new int[max];
             foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
             {                
-                depths[Math.Min(kvp.Value.depth, max - 1)]++;
+                depths[Math.Min(kvp.Value.depth, max)]++;
             }
 
             using (Writeln txt = new Writeln())

@@ -1070,7 +1070,7 @@ namespace Gekko
             try
             {
                 TraceHelper th = new TraceHelper();
-                trace.DeepTrace(th, 0);
+                trace.DeepTrace(th, Globals.traceDeepStartDepth);
                 int count2 = Trace2.CountWithoutInvisible(th.tracesDepth2);
                 string s = "Traces";
                 if (true)
@@ -1473,7 +1473,7 @@ namespace Gekko
             int depth = -1;
             foreach (PrecedentsAndDepth pad in tracesDepth2.Values)
             {
-                depth = Math.Max(depth, pad.depth - 1);
+                depth = Math.Max(depth, pad.depth);
             }
             return depth;
         }

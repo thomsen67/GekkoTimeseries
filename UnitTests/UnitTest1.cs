@@ -17583,9 +17583,9 @@ namespace UnitTests
                     sw.WriteLine(@"  ""counts3"" : ""Single equations in unmatched =E= blocks""     //Can be omitted, default = ""Single equations in unmatched =E= blocks""");
                     sw.WriteLine(@" } ");
                 }
-                File.Delete(path5 + "\\" + modelName + ".zip");
+                File.Delete(path5 + "\\" + modelName + "_scalar.zip");
                 I("gamsscalar('pack');");
-                long size = new System.IO.FileInfo(path5 + "\\" + modelName + ".zip").Length;                
+                long size = new System.IO.FileInfo(path5 + "" + modelName + "_scalar.zip").Length;                
                 if (p == 0) Assert.IsTrue(size > 12500000 && size < 12600000);  //size should be around 12.539.120 bytes, not 10.349.279 (and sizes inside should be 584.739 for raw.gms, 22.240.511 for dict.txt and 42.036.341 for gams.gms -- for holdfixed = 1 we have 29.180.577 for gams.gms).                   
                 else if (p == 1) Assert.IsTrue(size > 3100000 && size < 3300000);  //size should be around 3.215.337
                 else if (p == 2) Assert.IsTrue(size > 6700000 && size < 6800000);  //size should be around 6.745.899 bytes

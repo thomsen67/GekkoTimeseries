@@ -2911,7 +2911,7 @@ namespace Gekko
                     if (th.type == ETraceHelper.GetAllMetasAndTraces || th.type == ETraceHelper.OnlyGetMetas) th.metas.Add(this.meta);
                     if (this.meta.trace2 != null && th.type != ETraceHelper.OnlyGetMetas)
                     {
-                        this.meta.trace2.DeepTrace(th, 0);
+                        this.meta.trace2.DeepTrace(th, Globals.traceDeepStartDepth);
                     }
                 }
             }
