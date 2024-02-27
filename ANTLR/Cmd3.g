@@ -2783,13 +2783,15 @@ assignmentType:             assignmentTypeNotEmpty
 						    ;
 
 seriesOpt1a:                //so that we can handle y <2001 2005>=100; where '>=' is parsed as a token
-						  | leftAngle2          seriesOpt1h* -> ^(ASTOPT1 seriesOpt1h*)
-						  | leftAngleNo2 dates? seriesOpt1h* -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
+                          | leftAngle2 localOptions          -> ^(ASTOPT1 localOptions)
+						  | leftAngle2          seriesOpt1h* (SEMICOLON localOptions)? -> ^(ASTOPT1 seriesOpt1h* localOptions?)
+						  | leftAngleNo2 dates? seriesOpt1h* (SEMICOLON localOptions)? -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h* localOptions?)
                           ;
 
 seriesOpt1:                 ISNOTQUAL
-						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
-						  | leftAngleNo2 dates? seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
+                          | leftAngle2 localOptions RIGHTANGLE          -> ^(ASTOPT1 localOptions)    
+						  | leftAngle2          seriesOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h* localOptions?)
+						  | leftAngleNo2 dates? seriesOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h* localOptions?)
                           ;
 
 seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
@@ -2829,8 +2831,7 @@ analyzeExpression:		    expression -> ^({token("ASTANALYZEEXPRESSION¤"+($express
 analyzeOpt1:                ISNOTQUAL
 						  | leftAngle2 localOptions RIGHTANGLE                                      -> ^(ASTOPT1 localOptions)                          
                           | leftAngle2          analyzeOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h? localOptions?)
-						  | leftAngleNo2 dates? analyzeOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h? localOptions?)
-                          
+						  | leftAngleNo2 dates? analyzeOpt1h? (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h? localOptions?)                          
 						    ;
 
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
