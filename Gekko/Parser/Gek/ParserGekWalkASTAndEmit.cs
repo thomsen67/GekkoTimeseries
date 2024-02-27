@@ -595,8 +595,7 @@ namespace Gekko.Parser.Gek
 
             if (relativeDepth == 1)
             {
-                //NEW COMMAND encountered
-                //Corresponds to a new statement at current "indentation" level
+                //New command encountered, corresponds to a new statement at current "indentation" level
                 w.wh = new WalkHelper();
                 w.wh.currentCommand = node.Text;  //if for instance a GENR statement, this field will be 'ASTGENR'
                 w.commandLinesCounter++;  //becomes 0 first time here (starts at -1)
@@ -659,8 +658,14 @@ namespace Gekko.Parser.Gek
             }
             else
             {
-                //After sub-nodes  
-                WalkASTAndEmitAfter(node, w);                
+                //After sub-nodes                  
+                WalkASTAndEmitAfter(node, w);
+                if (relativeDepth == 1 && w.wh.localOptionsCode != null)
+                {
+                    node.Code.Prepend(G.NL + w.wh.localOptionsCode[0] + w.wh.localOptionsCode[1] + G.NL);
+                    node.Code.A(G.NL + w.wh.localOptionsCode[2]);
+                    string s = node.Code.ToString();
+                }
             }  //end of switch on node.Text AFTER sub-nodes are done
 
             bool isGoto = false;
@@ -2074,81 +2079,23 @@ namespace Gekko.Parser.Gek
                     break;
 
                 case "ASTBLOCK":
+                case "ASTLOCALOPTIONS":
                     {
-
-                        string record = null;
-                        string alter = null;
-                        string play = null;
-
-                        foreach (ASTNode child in node[0].ChildrenIterator())
+                        string record = null; string alter = null; string play = null;                        
+                        if (node.Text == "ASTBLOCK")
                         {
-                            if (child.Text == "ASTDATES_BLOCK")
-                            {
-                                //handle BLOCK time ...
-
-                                string ss = child.Code.ToString();
-                                if (ss != null)
-                                {
-                                    string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
-                                    int n = ++Globals.counter;
-                                    record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
-                                    alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                                    play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
-                                    n = ++Globals.counter;
-                                    record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                    alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                                    play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                }
-                                else
-                                {
-                                    new Error("Internal error related to BLOCK");
-                                }
-                            }
-                            else if (child.Text == "ASTBLOCKOPTION")
-                            {
-                                Tuple<string, string> tup = HandleOptionAndBlock(child, true);
-                                if (tup.Item2 != "?")  //block solve ?; end; is just ignored.
-                                {
-
-                                    if (tup.Item1 == "Program.options.freq")
-                                    {
-                                        //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
-                                        int n = ++Globals.counter;
-                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
-                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
-                                        alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
-                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                                      // global perStart
-                                        n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
-                                        // global perEnd
-                                        n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                    }
-                                    else
-                                    {
-                                        int n = ++Globals.counter;
-                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
-                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
-                                        alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;       //O.PrintOptions(...)
-                                        alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
-                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                                        play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                new Error("Internal error related to BLOCK");
-                            }
+                            ParserOptionUndo(node[0], ref record, ref alter, ref play);
+                            node.Code.A(record);
+                            node.Code.A(alter);
+                            GetCodeFromAllChildren(node, node[1][0]);  //code inside the block
+                            node.Code.A(play);
                         }
-                        node.Code.A(record);
-                        node.Code.A(alter);
-                        GetCodeFromAllChildren(node, node[1][0]);  //code inside the block
-                        node.Code.A(play);
-
+                        else
+                        {
+                            //local option
+                            ParserOptionUndo(node, ref record, ref alter, ref play);
+                            w.wh.localOptionsCode = new List<string>() { record, alter, play };
+                        }
                     }
                     break;
 
@@ -4103,10 +4050,9 @@ ASTPLACEHOLDER [0]
                         }
                     }
                     break;
-                case "ASTOPT1":  //PRT-type statement
-                case "ASTOPT2":  //PRT-type statement
-                    {
-                        //node.Code.A("codes.Add(`" + node[0].Text + "`);" + G.NL;
+                case "ASTOPT1":  //Normal <>-option
+                case "ASTOPT2":  //PRT-type statement, element option
+                    {                        
                         GetCodeFromAllChildren(node);
                     }
                     break;
@@ -5190,6 +5136,82 @@ ASTPLACEHOLDER [0]
             }
         }
 
+        /// <summary>
+        /// Creates 3 code portions: (1) record relevant options, (2) alter relevant options, (3) restore/play relevant options.
+        /// NOTE: when changing freq, global periods is also recorded, so it can be played back without alteration (freq may alter global period in some cases).
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="record"></param>
+        /// <param name="alter"></param>
+        /// <param name="play"></param>
+        private static void ParserOptionUndo(ASTNode node, ref string record, ref string alter, ref string play)
+        {
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                if (child.Text == "ASTDATES_BLOCK")
+                {
+                    //handle BLOCK time ...
+
+                    string ss = child.Code.ToString();
+                    if (ss != null)
+                    {
+                        string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
+                        int n = ++Globals.counter;
+                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                        alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                        n = ++Globals.counter;
+                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                        alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                    }
+                    else
+                    {
+                        new Error("Internal error related to BLOCK");
+                    }
+                }
+                else if (child.Text == "ASTBLOCKOPTION")
+                {
+                    Tuple<string, string> tup = HandleOptionAndBlock(child, true);
+                    if (tup.Item2 != "?")  //block solve ?; end; is just ignored.
+                    {
+
+                        if (tup.Item1 == "Program.options.freq")
+                        {
+                            //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                            int n = ++Globals.counter;
+                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
+                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
+                            alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
+                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                          // global perStart
+                            n = ++Globals.counter;
+                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                            // global perEnd
+                            n = ++Globals.counter;
+                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                        }
+                        else
+                        {
+                            int n = ++Globals.counter;
+                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
+                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
+                            alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;       //O.PrintOptions(...)
+                            alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
+                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                            play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+                        }
+                    }
+                }
+                else
+                {
+                    new Error("Internal error related to BLOCK");
+                }
+            }
+        }
+
         private static SingletonHelper IsRhsVariableWithoutSigil(ASTNode node, ASTNode node1)
         {
             if (node1 == null) return null;
@@ -6183,6 +6205,8 @@ ASTPLACEHOLDER [0]
         public seriesType seriesHelper = seriesType.None;
 
         public string currentCommand = null;
-        public bool isGotoOrTarget = false;             
+        public bool isGotoOrTarget = false;
+
+        public List<string> localOptionsCode = null;
     }
 }
