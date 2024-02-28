@@ -662,8 +662,8 @@ namespace Gekko.Parser.Gek
                 WalkASTAndEmitAfter(node, w);
                 if (relativeDepth == 1 && w.wh.localOptionsCode != null)
                 {
-                    node.Code.Prepend(G.NL + w.wh.localOptionsCode[0] + w.wh.localOptionsCode[1] + G.NL);
-                    node.Code.A(G.NL + w.wh.localOptionsCode[2]);
+                    node.Code.Prepend(G.NL + G.NL + w.wh.localOptionsCode[0] + G.NL + "try {" + G.NL + w.wh.localOptionsCode[1] + G.NL);
+                    node.Code.A(G.NL + "}" + G.NL + "finally {" + G.NL + w.wh.localOptionsCode[2] + G.NL + "}" + G.NL);
                     string s = node.Code.ToString();
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
@@ -2086,9 +2086,13 @@ namespace Gekko.Parser.Gek
                         {
                             ParserOptionUndo(node[0], ref record, ref alter, ref play);
                             node.Code.A(record);
+                            node.Code.A("try {" + G.NL);
                             node.Code.A(alter);
                             GetCodeFromAllChildren(node, node[1][0]);  //code inside the block
+                            node.Code.A("}" + G.NL);
+                            node.Code.A("finally {" + G.NL);
                             node.Code.A(play);
+                            node.Code.A("}" + G.NL);
                         }
                         else
                         {
