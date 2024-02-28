@@ -2081,24 +2081,24 @@ namespace Gekko.Parser.Gek
                 case "ASTBLOCK":
                 case "ASTLOCALOPTIONS":
                     {
-                        string record = null; string alter = null; string play = null;                        
+                        string record = null; string alter = null; string restore = null;                        
                         if (node.Text == "ASTBLOCK")
                         {
-                            ParserOptionUndo(node[0], ref record, ref alter, ref play);
+                            ParserOptionUndo(node[0], ref record, ref alter, ref restore);
                             node.Code.A(record);
                             node.Code.A("try {" + G.NL);
                             node.Code.A(alter);
                             GetCodeFromAllChildren(node, node[1][0]);  //code inside the block
                             node.Code.A("}" + G.NL);
                             node.Code.A("finally {" + G.NL);
-                            node.Code.A(play);
+                            node.Code.A(restore);
                             node.Code.A("}" + G.NL);
                         }
                         else
                         {
                             //local option
-                            ParserOptionUndo(node, ref record, ref alter, ref play);
-                            w.wh.localOptionsCode = new List<string>() { record, alter, play };
+                            ParserOptionUndo(node, ref record, ref alter, ref restore);
+                            w.wh.localOptionsCode = new List<string>() { record, alter, restore };
                         }
                     }
                     break;
@@ -5141,14 +5141,14 @@ ASTPLACEHOLDER [0]
         }
 
         /// <summary>
-        /// Creates 3 code portions: (1) record relevant options, (2) alter relevant options, (3) restore/play relevant options.
-        /// NOTE: when changing freq, global periods is also recorded, so it can be played back without alteration (freq may alter global period in some cases).
+        /// Creates 3 code portions: (1) record relevant options, (2) alter relevant options, (3) restore relevant options.
+        /// NOTE: when changing freq, global periods is also recorded, so it can be restored without alteration (freq may alter global period in some cases).
         /// </summary>
         /// <param name="node"></param>
         /// <param name="record"></param>
         /// <param name="alter"></param>
-        /// <param name="play"></param>
-        private static void ParserOptionUndo(ASTNode node, ref string record, ref string alter, ref string play)
+        /// <param name="restore"></param>
+        private static void ParserOptionUndo(ASTNode node, ref string record, ref string alter, ref string restore)
         {
             foreach (ASTNode child in node.ChildrenIterator())
             {
@@ -5163,11 +5163,11 @@ ASTPLACEHOLDER [0]
                         int n = ++Globals.counter;
                         record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
                         alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                        restore += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
                         n = ++Globals.counter;
                         record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
                         alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                        restore += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
                     }
                     else
                     {
@@ -5187,15 +5187,15 @@ ASTPLACEHOLDER [0]
                             record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
                             alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
                             alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
-                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                            restore += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
                                                                                           // global perStart
                             n = ++Globals.counter;
                             record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                            restore += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
                             // global perEnd
                             n = ++Globals.counter;
                             record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                            restore += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
                         }
                         else
                         {
@@ -5204,8 +5204,8 @@ ASTPLACEHOLDER [0]
                             alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
                             alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;       //O.PrintOptions(...)
                             alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
-                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                            play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+                            restore += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                            restore += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
                         }
                     }
                 }
@@ -6211,6 +6211,6 @@ ASTPLACEHOLDER [0]
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
 
-        public List<string> localOptionsCode = null;
+        public List<string> localOptionsCode = null;  //0: record, 1: alter, 2: restore
     }
 }

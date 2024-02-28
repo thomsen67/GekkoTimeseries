@@ -5584,11 +5584,19 @@ namespace Gekko
             //NOTE: Does not include the invisible traces assigned to each series object
             Databank db = Program.databanks.GetDatabank(x.ConvertToString());
             TraceHelper th = Trace2.CollectAllTraces(db, ETraceHelper.GetAllMetasAndTraces);
-            int max = 10000;
-            int[] depths = new int[max];
+            //int max = 10000;
+            //int[] depths = new int[max];
+            //foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
+            //{                
+            //    depths[Math.Min(kvp.Value.depth, max)]++;
+            //}
+
+            SortedDictionary<int, int> depths = new SortedDictionary<int, int>();
             foreach (KeyValuePair<Trace2, PrecedentsAndDepth> kvp in th.tracesDepth2)
-            {                
-                depths[Math.Min(kvp.Value.depth, max)]++;
+            {
+                int key = kvp.Value.depth;
+                if (!depths.ContainsKey(key)) depths.Add(key, 1);
+                else depths[key]++;
             }
 
             using (Writeln txt = new Writeln())
@@ -5600,21 +5608,20 @@ namespace Gekko
             using (Writeln txt = new Writeln())
             {
                 txt.MainOmitVeryFirstNewLine();
-                for (int i = 1; i < max; i++)
+                foreach (KeyValuePair<int, int> kvp in depths)
                 {
                     string extra = null;
-                    if (depths[i] == 0) break;
                     if (Globals.runningOnTTComputer || G.IsUnitTesting())
                     {
-                        if (i == 0) extra = "    <--- only TTH";
+                        if (kvp.Key == -1) extra = "TTH: ";
                     }
                     else
                     {
-                        if (i == 0) continue;  //do not print that
-                    }                    
-                    txt.MainAdd("--> depth: " + (i - 1) + ", traces: " + depths[i] + extra);
+                        if (kvp.Key == -1) continue;  //do not print GluedToSeries
+                    }
+                    txt.MainAdd(extra + "--> depth: " + kvp.Key + ", traces: " + kvp.Value);
                     txt.MainNewLineTight();
-                    if (i - 1 > 0) hasDepth1 = true;
+                    if (kvp.Key > 0) hasDepth1 = true;
                 }
                 txt.MainAdd("");
                 txt.MainNewLineTight();

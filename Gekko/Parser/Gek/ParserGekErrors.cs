@@ -999,7 +999,7 @@ namespace Gekko.Parser.Gek
                     //if n_bracket > 0, it could be something like #m = [1, 2; 3, 4]; --> do not break it into two.
                     //but the "inside bracket" stuff can only happen on the same line, so an unclosed "[" does not havoc all lines.
                     statement.text = StringTokenizer.GetTextFromLeftBlanksTokens(statement.tokens, true);
-                    if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field (beware that a {a{local option¤options.htm}a} with bad syntax can trigger this error)");
+                    if (isInsideOptionField) statement.parenthesisErrors2.Add("Unclosed <> option field (beware that a {a{local option¤options.htm}a} with wrong syntax can trigger this error)");
 
                     if (true)
                     {
