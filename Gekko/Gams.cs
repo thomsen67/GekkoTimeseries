@@ -1482,6 +1482,12 @@ namespace Gekko
                     }
 
                     string eqname = helper.dict_FromEqNumberToEqName[number];
+
+                    if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
+                    {
+                        continue; //#oijlksaa
+                    }
+
                     string helper2 = "";
                     HandleEqLineAppend(helper, i, helper2);
                 }
@@ -1504,7 +1510,13 @@ namespace Gekko
                     {
                         new Error("Could not parse integer part of the string '" + th1.s + "'");
                     }
-                    string varname = helper.dict_FromVarNumberToVarName[number];
+                    string varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
+
+                    if (varname.StartsWith("x" + Globals.scalarModelExtraVariable))
+                    {
+                        continue;
+                    }
+
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
 
                     int i1 = -12345;

@@ -8853,6 +8853,9 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\AREMOS\Ras';");
             I("RUN regres;");
             CheckFullDatabank(0.0001, 0.01, 2010, 2013);  //must be < 0.0001 abs or < 0.01%. Quite strict.
+            I("read ras.gbk;");
+            TraceHelper th = Trace2.CollectAllTraces(First(), ETraceHelper.GetAllMetasAndTraces);
+            Assert.AreEqual(204, th.MaxDepth());  //crazy deep traces...!
         }
 
         [TestMethod]

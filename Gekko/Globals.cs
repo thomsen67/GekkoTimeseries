@@ -94,6 +94,15 @@ namespace Gekko
         public const string eqs5 = "<no scalar eqs>";
         public const string eqs6 = "could not be found...";
 
+        //Should be put in .json file...
+        public const string scalarModelSuffix = "_scalar";
+        public const string scalarModelCmdFile = "run.cmd";
+        public const string scalarModelModelName = "gekkoTemp12345";
+        public const string scalarModelExtraVariable = "gekkoextra";
+        public const string scalarModelGamsVariable = "qBNP[t]";
+        public const string scalarModelSolve = "@solve(";
+        public const string scalarModelLstFolder = "LST";
+
         public static bool bugfixDollarOperator = true;
         
         public const string pivotHelper1 = "{extra}";

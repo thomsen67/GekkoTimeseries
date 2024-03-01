@@ -10050,14 +10050,8 @@ namespace Gekko
             string path = Program.options.folder_working;
 
             //Idea is that Gekko provides popups, while user manually runs what is needed to run
-            //User input is gms file + model name + 
+            //User input is gms file + model name +             
 
-            string suffix = "_scalar";
-            string cmdFile = "run.cmd";
-            string gekkoExtra = "gekkoextra";
-            string gekkoTemp = "gekkoTemp12345";
-            string solve = "@solve(";
-            string lstFolder = "LST";
             bool hasAlteredGmsFile = false;
             bool optionsFileExists = false;
             string gmsPath = null;
@@ -10124,7 +10118,7 @@ namespace Gekko
                         txt.MainAdd("cmd file = " + settings.cmd_file); txt.MainNewLineTight();
                         txt.MainAdd("gms file = " + settings.gms_file); txt.MainNewLineTight();
                         txt.MainAdd("model name = " + settings.model_name); txt.MainNewLineTight();
-                        txt.MainAdd("zip name = " + settings.model_name + suffix + ".zip"); txt.MainNewLineTight();
+                        txt.MainAdd("zip name = " + settings.model_name + Globals.scalarModelSuffix + ".zip"); txt.MainNewLineTight();
                     }                    
                 }                
 
@@ -10132,7 +10126,7 @@ namespace Gekko
                 gmsPathCopy = gmsPath + "_gekkocopy";
 
                 string s5 = Program.GetTextFromFileWithWait(gmsPath);
-                if (depth == 0 && s5.Contains(gekkoTemp))
+                if (depth == 0 && s5.Contains(Globals.scalarModelModelName))
                 {
                     new Error("It seems the file " + gmsPath + " has been tampered with by Gekko. This may be because Gekko crashed in a previous try. If in the same folder the file " + Path.GetFileName(gmsPathCopy) + " exists, rename it to " + Path.GetFileName(gmsPath) + " to reestablish the original .gms file");
                 }
@@ -10154,9 +10148,9 @@ namespace Gekko
                 {
                     bool hit = false;
                     string lineTrim = line.Trim();
-                    if (lineTrim.StartsWith(solve))
+                    if (lineTrim.StartsWith(Globals.scalarModelSolve))
                     {
-                        string rest = lineTrim.Substring(solve.Length);
+                        string rest = lineTrim.Substring(Globals.scalarModelSolve.Length);
                         int i = rest.IndexOf(")");
                         if (i >= 1)
                         {
@@ -10185,32 +10179,32 @@ namespace Gekko
                         if (dif > 0)
                         {
                             string varList = null;
-                            eqList = ", " + gekkoExtra + "0";
+                            eqList = ", " + "e" + Globals.scalarModelExtraVariable + "0";
                             for (int i = 0; i < dif + 1; i++)  // +1 to offset the extra equation
                             {
-                                string s8 = "x" + gekkoExtra + i;
+                                string s8 = "x" + Globals.scalarModelExtraVariable + i;
                                 varList += " + " + s8;
                                 if (i % 20 == 19) varList += G.NL;
                             }
                             output.Add("variables " + varList.Substring(" + ".Length).Replace(" + ", ", ") + ";");
-                            output.Add("equation " + gekkoExtra + "0" + "; " + gekkoExtra + "0" + " .. " + varList.Substring(" + ".Length) + " =E= 0;");
+                            output.Add("equation " + "e" + Globals.scalarModelExtraVariable + "0" + "; " + "e" + Globals.scalarModelExtraVariable + "0" + " .. " + varList.Substring(" + ".Length) + " =E= 0;");
 
                         }
                         else if (dif < 0)
                         {
                             for (int i = 0; i < -dif; i++)
                             {
-                                string s8 = gekkoExtra + i;
+                                string s8 = "e" + Globals.scalarModelExtraVariable + i;
                                 eqList += ", " + s8;
-                                output.Add("equation " + s8 + "; " + s8 + " .. sum(t, qBNP[t]) =E= 0;");
+                                output.Add("equation " + s8 + "; " + s8 + " .. sum(t, " + Globals.scalarModelGamsVariable + ") =E= 0;");
                             }
 
                         }                        
 
-                        output.Add("model " + gekkoTemp + " / " + settings.model_name + eqList + " / ;");
+                        output.Add("model " + Globals.scalarModelModelName + " / " + settings.model_name + eqList + " / ;");
                         output.Add("option mcp = convert;");
-                        output.Add(gekkoTemp + ".holdFixed = 0;");  //is 1 for MAKRO
-                        output.Add("solve " + gekkoTemp + " using mcp;");  //CNS??
+                        output.Add(Globals.scalarModelModelName + ".holdFixed = 0;");  //is 1 for MAKRO
+                        output.Add("solve " + Globals.scalarModelModelName + " using mcp;");  //CNS??
                         output.Add("abort \"Abort after producing a GAMS scalar model for Gekko\";");
 
                         output.Add("");
@@ -10225,7 +10219,7 @@ namespace Gekko
                     output.Add(line);                    
                 }
 
-                if (!replaceOk) new Error("Could not find '" + solve + settings.model_name + ")' in file " + settings.gms_file);
+                if (!replaceOk) new Error("Could not find '" + Globals.scalarModelSolve + settings.model_name + ")' in file " + settings.gms_file);
 
                 string soutput = Stringlist.ExtractTextFromLines(output).ToString();
                 Program.WriteFileWithWait(gmsPath, soutput, new UTF8Encoding(false));  //write it with utf8, else זרו get mangled.
@@ -10237,7 +10231,7 @@ namespace Gekko
                 if (G.IsUnitTesting())
                 {
                     string folder = Program.options.folder_working;
-                    Program.ExecuteShellCommand(cmdFile, false, folder);
+                    Program.ExecuteShellCommand(Globals.scalarModelCmdFile, false, folder);
                 }
                 else
                 {
@@ -10248,7 +10242,7 @@ namespace Gekko
                     // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
                 }
                 
-                string s = Program.GetTextFromFileWithWait(Path.Combine(path, lstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
+                string s = Program.GetTextFromFileWithWait(Path.Combine(path, Globals.scalarModelLstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
 
                 //new Writeln("-------------------- calling GAMS end ---------------------------------------");
 
@@ -10285,14 +10279,14 @@ namespace Gekko
 
                 if (difNew == 0)
                 {
-                    new Writeln("Created scalar model. Now packing: " + settings.model_name + suffix + ".zip" + "...");
+                    new Writeln("Created scalar model. Now packing: " + settings.model_name + Globals.scalarModelSuffix + ".zip" + "...");
                     if (!File.Exists(Path.Combine(path, "gams.gms"))) new Error("The file gams.gms does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
                     if (!File.Exists(Path.Combine(path, "dict.txt"))) new Error("The file dict.txt does not exist in the working folder -- something probably went wrong in Gekko/GAMS.");
                     if (File.GetLastWriteTime(Path.Combine(path, "gams.gms")) < t0) new Error("The file gams.gms does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
                     if (File.GetLastWriteTime(Path.Combine(path, "dict.txt")) < t0) new Error("The file dict.txt does not seem to be newly created -- something probably went wrong in Gekko/GAMS.");
                     try
                     {
-                        Zipper zipper = new Zipper(settings.model_name + suffix + ".zip");
+                        Zipper zipper = new Zipper(settings.model_name + Globals.scalarModelSuffix + ".zip");
                         Program.WaitForFileCopy(Path.Combine(path, "gams.gms"), Path.Combine(zipper.tempFolder, "gams.gms"));
                         Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
 
@@ -10356,11 +10350,11 @@ namespace Gekko
                             }
                         }
                         zipper.ZipAndCleanup();
-                        new Writeln("Zipping of " + settings.model_name + suffix + ".zip" + " finished");
+                        new Writeln("Zipping of " + settings.model_name + Globals.scalarModelSuffix + ".zip" + " finished");
                     }
                     catch
                     {
-                        new Error("Something went wrong when zipping " + settings.model_name + suffix + ".zip");
+                        new Error("Something went wrong when zipping " + settings.model_name + Globals.scalarModelSuffix + ".zip");
                     }
                     if (File.Exists(Path.Combine(path, "gams.gms"))) Program.WaitForFileDelete(Path.Combine(path, "gams.gms"));
                     if (File.Exists(Path.Combine(path, "dict.txt"))) Program.WaitForFileDelete(Path.Combine(path, "dict.txt"));
@@ -10381,7 +10375,7 @@ namespace Gekko
                     new Writeln("");
                     Program.GamsScalar(depth + 1, difNew, settings);
                 }
-                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.model_name + suffix + ".zip" + " (" + G.Seconds(t00) + ").");
+                if (depth == 0) new Writeln("Successfully packed GAMS scalar model files for Gekko: " + settings.model_name + Globals.scalarModelSuffix + ".zip" + " (" + G.Seconds(t00) + ").");
             }
             finally
             {                

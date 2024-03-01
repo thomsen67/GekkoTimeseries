@@ -5200,12 +5200,12 @@ ASTPLACEHOLDER [0]
                         else
                         {
                             int n = ++Globals.counter;
-                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
-                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
-                            alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;       //O.PrintOptions(...)
-                            alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
-                            restore += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                            restore += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;            //var record117 = Program.options....;
+                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;                    //Program.options.... = ...;
+                            //alter += "O.PrintOptions(`" + tup.Item1 + "`, false);" + G.NL;        //O.PrintOptions(...) --> no printing
+                            alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;          //O.HandleOptions(...) with mute
+                            restore += tup.Item1 + " = record" + n + ";" + G.NL;                    //Program.options.... = record117
+                            restore += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;        //O.HandleOptions(...) with mut
                         }
                     }
                 }

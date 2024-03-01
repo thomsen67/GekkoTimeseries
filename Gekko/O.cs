@@ -849,7 +849,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used for OPTION command. Note: called from dynamic code.
+        /// Used for OPTION command, block options and local options (the last two are muted). Note: called from dynamic code.
+        /// Parameter isBlock is 0 for normal OPTION call, else 1 or 2 for block option or local option.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="isBlock"></param>
@@ -862,13 +863,14 @@ namespace Gekko
             if (G.Equal(s2, "freq"))
             {
                 //see also #89073589324
-                O.AdjustFreq();
+                if (isBlock == 0) O.AdjustFreq(); //non-mute
+                else O.AdjustFreq(true); //mute
             }
             else if (isBlock == 0 && G.Equal(s2, "interface_sound_type"))
             {
                 if (!p.hasBeenCmdFile)
                 {
-                    Program.PlaySound();
+                    if (isBlock == 0) Program.PlaySound();
                 }
             }
             else if (G.Equal(s2, "interface_edit_style"))
@@ -2084,9 +2086,17 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used when the user changes frequency, printing info on this.
+        /// Overload (no muting).
         /// </summary>
         public static void AdjustFreq()
+        {
+            AdjustFreq(false);
+        }
+
+        /// <summary>
+        /// Used when the user changes frequency, printing info on this. With mute==true, no printing on screen.
+        /// </summary>
+        public static void AdjustFreq(bool mute)
         {
             //hash #980432
 
@@ -2098,37 +2108,37 @@ namespace Gekko
 
             if (Program.options.freq == EFreq.A)
             {
-                G.Writeln("Freq changed to annual (A)");
+                if (!mute) G.Writeln("Freq changed to annual (A)");
                 Globals.globalPeriodStart = freqs.t1;
                 Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.Q)
             {
-                G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                if (!mute) G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
                 Globals.globalPeriodStart = freqs.t1;
                 Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.M)
             {
-                G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                if (!mute) G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
                 Globals.globalPeriodStart = freqs.t1;
                 Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.W)
             {
-                G.Writeln("Freq changed to weekly (W) -- note that start/end weeks have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                if (!mute) G.Writeln("Freq changed to weekly (W) -- note that start/end weeks have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
                 Globals.globalPeriodStart = freqs.t1;
                 Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.D)
             {
-                G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                if (!mute) G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
                 Globals.globalPeriodStart = freqs.t1;
                 Globals.globalPeriodEnd = freqs.t2;
             }
             else if (Program.options.freq == EFreq.U)
             {
-                G.Writeln("Frequency changed to undated (U)");
+                if (!mute) G.Writeln("Frequency changed to undated (U)");
                 Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
                 Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);
             }
