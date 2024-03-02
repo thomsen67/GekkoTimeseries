@@ -32856,6 +32856,88 @@ print(df2)
         }
 
         [TestMethod]
+        public void _Test_Databank_Compatibility()
+        {
+
+            //                  ----------read--------------
+            //                  2.5.2    3.1.15     3.1.16
+            //  ---   2.5.2              a2         a99                    prefix w=write, r=read
+            // write  3.1.15    b1                  b99
+            //  ---   3.1.16    z1       z2         
+            //
+
+            //maybe also test makrobk.gbk in < 3.1.16
+            // I("SYS 'gekko.exe read '" + folder + "\\makrobk.gbk' working = 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit';");
+
+            I("flush();");
+
+            if (true)
+            {
+                string x = "a2";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");                
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run compatible_w" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\3_1_15_64bit\\gekko.exe run compatible_r" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+
+            if (true)
+            {
+                string x = "a99";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run compatible_w" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                I("run compatible_r" + x + ".gcm;");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+
+            if (true)
+            {
+                string x = "b1";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\3_1_15_64bit\\gekko.exe run compatible_w" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run compatible_r" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+
+            if (true)
+            {
+                string x = "b99";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\3_1_15_64bit\\gekko.exe run compatible_w" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");                
+                I("run compatible_r" + x + ".gcm;");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+
+            if (true)
+            {
+                string x = "z1";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                I("run compatible_w" + x + ".gcm;");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run compatible_r" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+
+            if (true)
+            {
+                string x = "z2";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                I("run compatible_w" + x + ".gcm;");
+                I("SYS 'c:\\Thomas\\Gekko\\Exe\\3_1_15_64bit\\gekko.exe run compatible_r" + x + ".gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                string s = Program.GetTextFromFileWithWait(Globals.ttPath2 + @"\regres\Databanks\compatible_" + x + ".lst");
+                Assert.IsTrue(s.Contains("avgt(x_" + x + ")"));
+                Assert.IsTrue(s.Contains("4.3333"));
+            }
+        }
+
         public void _Test_Systems_MAKROBK()
         {
             //Tests MAKROBK update
@@ -32868,31 +32950,6 @@ print(df2)
             I("RUN makrobk;");
             Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1968_1993.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
             Assert.IsTrue(File.ReadAllText(folder + @"\Uddata\Compare\sam_previous_makrobk_v_makrobk_1994_2022.txt").Contains("Out of the 18883 common series, there are differences regarding 0 of them"));
-
-            //MAKE THIS WORK, ALSO FOR 3.1.1
-            //MAKE THIS WORK, ALSO FOR 3.1.1
-            //MAKE THIS WORK, ALSO FOR 3.1.1 make sure makrobk.gbk has traces.
-            //MAKE THIS WORK, ALSO FOR 3.1.1
-            //MAKE THIS WORK, ALSO FOR 3.1.1
-            Globals.unitTestScreenOutput.Clear();
-            I("SYS 'gekko.exe read '" + folder + "\\makrobk.gbk' working = 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit';");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Read 76543 variables... booh"));
-
-            // Also: check that this is time-inverted:
-            //reset;
-            //x1 = 1;
-            //x1 < 2020 2020 >= 2;
-            //x1 < 2018 2018 >= 3;
-            //x2 = 11;
-            //x2 < 2020 2020 >= 12;
-            //x2 < 2018 2018 >= 13;
-            //y = x1 + x2 + 1;
-            //y < 2016 2016 >= 100;
-            //disp y;
-            //Last ones on wall time must be shown first!
-
-            Assert.Fail();  //Do a test where older databanks (tsdx, 1.0, 1.1, 1.2 etc are read, if this test is not done already...)
-            //just try to find some old banks 
         }
 
         [TestMethod]
