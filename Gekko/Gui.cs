@@ -1714,7 +1714,7 @@ namespace Gekko
 
             if (Program.IsDependencyTracking())
             {
-                Globals.dataTraceContainer = new TraceSimple();
+                Globals.dependencyTracking = new DependencyTracking();
             }
 
             if (Program.options.global_pink)
@@ -2172,10 +2172,10 @@ namespace Gekko
                 }
 
                 List<string> traceList = null;
-                if (Program.IsDependencyTracking() && Globals.dataTraceContainer != null)  //last condition should not be necessary
+                if (Program.IsDependencyTracking() && Globals.dependencyTracking != null)  //last condition should not be necessary
                 {
-                    traceList = Globals.dataTraceContainer.Get();
-                    if (traceList.Count > 0)
+                    traceList = Globals.dependencyTracking.Get();
+                    if (traceList.Count > 0 || Globals.dependencyTracking.sysCalls > 0)
                     {
                         Table tab = new Table();
                         tab.CurRow.SetTopBorder(1, 3);
@@ -2191,6 +2191,14 @@ namespace Gekko
                             tab.CurRow.SetText(1, ss[1]);
                             tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
                             tab.CurRow.SetText(3, ss[2]);
+                        }
+                        if (Globals.dependencyTracking.sysCalls > 0)
+                        {
+                            count++;
+                            if (count > 0) tab.CurRow.Next();
+                            tab.CurRow.SetText(1, "SYS calls");
+                            tab.CurRow.SetText(2, "total = " + Globals.dependencyTracking.sysCalls);
+                            tab.CurRow.SetText(3, "Note: SYS calls may read/write files");
                         }
                         tab.CurRow.SetBottomBorder(1, 3);
                         tab.CurRow.SetLeftBorder(1);
