@@ -1677,9 +1677,9 @@ namespace Gekko
 
             Model model = new Model();
             model.modelCommon.SetModelSourceType(EModelType.GAMSScalar);
-                        
+
             DateTime t = DateTime.Now;
-            
+
             string timeLoadCache = null;
             string timeCompile = null;
 
@@ -1690,79 +1690,25 @@ namespace Gekko
 
             model = ReadGAMSScalarModel2(o, folders, model, input);
 
-            //TODO TODO TODO
-            //TODO TODO TODO Store the table in the cache
-            //TODO TODO TODO
+            ModelInfoGamsScalar mi = new ModelInfoGamsScalar();  //so that we also get this info when loading from cache
+            mi.modelName = input.zipFilePathAndName;
+            mi.periodT1 = model.modelGamsScalar.absoluteT1;
+            mi.periodT2 = model.modelGamsScalar.absoluteT2;
+            mi.countEqs1 = model.modelGamsScalar.CountEqs(1);
+            mi.countEqs2 = model.modelGamsScalar.CountEqs(2);
+            mi.countEqs3 = model.modelGamsScalar.CountEqs(3);
+            mi.countVars1 = model.modelGamsScalar.CountEqs(1);
+            mi.countVars2 = model.modelGamsScalar.CountEqs(2);
+            mi.countVars3 = model.modelGamsScalar.CountEqs(3);
 
-            Table tab = new Table();
+            model.modelGamsScalar.modelInfoGamsScalar = mi;
+            model.modelGamsScalar.modelInfoGamsScalar.Print(model.modelCommon.loadedFromCacheFile, t, timeLoadCache, timeCompile);
 
-            tab.CurRow.SetTopBorder(1, 1);
-
-            tab.CurRow.SetText(1, "MODEL " + Path.GetFileNameWithoutExtension(input.zipFilePathAndName));
-            tab.CurRow.SetBottomBorder(1, 1);
-            tab.CurRow.Next();
-
-            tab.CurRow.SetText(1, "Model   : " + input.zipFilePathAndName);
-            tab.CurRow.Next();
-
-            tab.CurRow.SetText(1, "Periods : " + model.modelGamsScalar.absoluteT1.ToString() + "-" + model.modelGamsScalar.absoluteT2.ToString() + " = " + GekkoTime.Observations(model.modelGamsScalar.absoluteT1, model.modelGamsScalar.absoluteT2) + " periods");
-            //tab.CurRow.Next();                        
-
-            //tab.CurRow.SetText(1, "Lags      : Largest lag = " + 0 + ", largest lead = " + 0);
-            tab.CurRow.SetBottomBorder(1, 1);
-            //tab.CurRow.Next();
-            //tab.CurRow.SetText(1, "Periods         = " + modelGamsScalar.t1.ToString() + "-" + modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(modelGamsScalar.t1, modelGamsScalar.t2) + " periods");
-            //tab.CurRow.SetBottomBorder(1, 1);
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All eqs         = " + model.modelGamsScalar.CountEqs(1) + " (all dimensions)");
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eqs per period  = " + model.modelGamsScalar.CountEqs(2) + " (no time dimension)");
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Eq names        = " + model.modelGamsScalar.CountEqs(3) + " (no dimensions)");
-            tab.CurRow.SetBottomBorder(1, 1);
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "All vars        = " + model.modelGamsScalar.CountVars(1) + " (all dimensions)");
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Vars per period = " + model.modelGamsScalar.CountVars(2) + " (no time dimension)");
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Var names       = " + model.modelGamsScalar.CountVars(3) + " (no dimensions)");
-            tab.CurRow.SetBottomBorder(1, 1);
-            tab.CurRow.SetLeftBorder(1);
-            tab.CurRow.SetRightBorder(1);
-
-            int widthRemember = Program.options.print_width;
-            Program.options.print_width = int.MaxValue;
-            try
-            {
-                List<string> ss = tab.Print();
-                using (Writeln txt = new Writeln())
-                {
-                    foreach (string s in ss)
-                    {
-                        txt.MainAdd(s);
-                        txt.MainNewLineTight();
-                    }
-                    if (model.modelCommon.loadedFromCacheFile)
-                    {
-                        txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
-                    }
-                    else
-                    {
-                        txt.MainAdd("Extracting from files, total time: " + G.Seconds(t));
-                    }
-                    txt.MainNewLineTight();
-                }
-            }
-            finally
-            {
-                //resetting, also if there is an error
-                Program.options.print_width = widthRemember;
-            }
-            
             return model;
-            
+
         }
 
+        
         private static Model ReadGAMSScalarModel2(O.Model o, List<string> folders, Model model, GAMSScalarModelSettings input)
         {
             //if (Globals.runningOnTTComputer) MessageBox.Show("TT comment: Parsing scalar model...");

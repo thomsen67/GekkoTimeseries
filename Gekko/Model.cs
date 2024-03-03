@@ -593,6 +593,102 @@ namespace Gekko
     }
 
     [ProtoContract]
+    public class ModelInfoGamsScalar
+    {
+        [ProtoMember(1)]        
+        public string modelName = null;
+
+        [ProtoMember(2)]
+        public GekkoTime periodT1 = GekkoTime.tNull;
+
+        [ProtoMember(3)]
+        public GekkoTime periodT2 = GekkoTime.tNull;
+
+        [ProtoMember(4)]
+        public int countEqs1 = -12345;
+
+        [ProtoMember(5)]
+        public int countEqs2 = -12345;
+
+        [ProtoMember(6)]
+        public int countEqs3 = -12345;
+
+        [ProtoMember(7)]
+        public int countVars1 = -12345;
+
+        [ProtoMember(8)]
+        public int countVars2 = -12345;
+
+        [ProtoMember(9)]
+        public int countVars3 = -12345;
+
+        public void Print(bool loadedFromCacheFile, DateTime t, string timeLoadCache, string timeCompile)
+        {
+            Table tab = new Table();
+
+            tab.CurRow.SetTopBorder(1, 1);
+
+            tab.CurRow.SetText(1, "MODEL " + Path.GetFileNameWithoutExtension(this.modelName));
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+
+            tab.CurRow.SetText(1, "Model   : " + this.modelName);
+            tab.CurRow.Next();
+
+            tab.CurRow.SetText(1, "Periods : " + this.periodT1.ToString() + "-" + this.periodT2.ToString() + " = " + GekkoTime.Observations(this.periodT1, this.periodT2) + " periods");
+
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "All eqs         = " + this.countEqs1 + " (all dimensions)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Eqs per period  = " + this.countEqs2 + " (no time dimension)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Eq names        = " + this.countEqs3 + " (no dimensions)");
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "All vars        = " + this.countVars1 + " (all dimensions)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Vars per period = " + this.countVars2 + " (no time dimension)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Var names       = " + this.countVars3 + " (no dimensions)");
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.SetLeftBorder(1);
+            tab.CurRow.SetRightBorder(1);
+
+            int widthRemember = Program.options.print_width;
+            Program.options.print_width = int.MaxValue;
+            try
+            {
+                List<string> ss = tab.Print();
+                using (Writeln txt = new Writeln())
+                {
+                    foreach (string s in ss)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                    if (loadedFromCacheFile)
+                    {
+                        txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));
+                    }
+                    else
+                    {
+                        txt.MainAdd("Extracting from files, total time: " + G.Seconds(t));
+                    }
+                    txt.MainNewLineTight();
+                }
+            }
+            finally
+            {
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+            }
+        }
+
+
+    }
+
+    [ProtoContract]
     public class ModelGams
     {
         
@@ -836,7 +932,10 @@ namespace Gekko
         /// End of data for static perpetual model, not protobuffed.
         /// </summary>
         public GekkoTime perpetualT2 = GekkoTime.tNull;
-        
+
+        [ProtoMember(29)]
+        public ModelInfoGamsScalar modelInfoGamsScalar = null; //contains just statistics for when the model loads from cache. Nothing serious here.
+
         // =============================================
         // =============================================
         // =============================================

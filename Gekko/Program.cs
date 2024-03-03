@@ -19041,7 +19041,7 @@ namespace Gekko
                     double hashMs = 0d;
                     DateTime t0 = DateTime.Now;
                     Model modelTemp = Program.ReadParallelModelMaybe(modelHash);
-                                        
+                                                            
                     if (true)
                     {
                         cacheParameters = new ModelCacheParams();
@@ -19075,7 +19075,10 @@ namespace Gekko
                             model.modelGekko.modelInfo.fileName = ffh.prettyPathAndFileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                         }
                         model.modelCommon.loadedFromCacheFile = true;
-                        //timeCompile = "compile: " + G.Seconds(t1);                        
+                        //timeCompile = "compile: " + G.Seconds(t1);
+                        //
+
+                        model.modelGamsScalar.modelInfoGamsScalar.Print(model.modelCommon.loadedFromCacheFile, DateTime.Now, "t1", "t2");
                     }
                     else
                     {
