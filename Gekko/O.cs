@@ -9629,12 +9629,10 @@ namespace Gekko
                     IVariable[] vars = e.variable;
                     IVariable iv = vars[0];  //vars[1] is just multiplier value
                     DataTable dt = Program.GetDataTable(iv);
-                    WindowTableViewer w = new WindowTableViewer(dt);
-                    w.Title = "Gekko viewer";
-                    w.ShowDialog();
+                    Program.CallPrtViewer(dt);
                     return;
                 }
-                
+
                 bool allSeries = AllSeries();
                 if (allSeries) Flatten(); //unfolds any lists in the prtElements
 
@@ -9809,7 +9807,7 @@ namespace Gekko
                     }
                 }
                                 
-            }
+            }            
 
             private bool AllSeries()
             {

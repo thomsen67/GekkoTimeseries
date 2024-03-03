@@ -5118,7 +5118,7 @@ namespace Gekko
             {
                 if (variableExistsAndHasIndex)
                 {
-                    error = "The '" + G.Chop_GetName(variableName) + "' element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable '" + G.Chop_GetName(variableName) + "' does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see the elements of the variable.";
+                    error = "The '" + G.Chop_GetName(variableName) + "' element [" + Stringlist.GetListWithCommas(G.Chop_GetIndex(variableName)) + "] was not found in the model, even though the variable '" + G.Chop_GetName(variableName) + "' does exist. You may use 'DISP " + G.Chop_GetName(variableName) + ";' to see/view the elements of the variable.";
                     return error;
                 }
                 else

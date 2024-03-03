@@ -16920,6 +16920,13 @@ namespace Gekko
             return eqsPrinted;
         }
 
+        public static void CallPrtViewer(DataTable dt)
+        {
+            WindowTableViewer w = new WindowTableViewer(dt);
+            w.Title = "Gekko viewer";
+            w.ShowDialog();
+        }
+
         /// <summary>
         /// For DISP (both Gekko and GAMS equations), show info on array-series, dimensions, etc.
         /// </summary>
@@ -16983,8 +16990,14 @@ namespace Gekko
                 MultidimItem mm = keys[0];
                 string first = keys[0].ToString();
                 string last = keys[keys.Count - 1].ToString();
+                                
+                Action<GAO> a = (gao) =>
+                {
+                    DataTable dt = Program.GetDataTable(keys);
+                    CallPrtViewer(dt);
+                };
 
-                G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
+                G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "] (" + G.GetLinkAction("view", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 if (ts.dimensions > 1)
                 {
                     G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
@@ -27672,6 +27685,35 @@ namespace Gekko
                         dtRow[j] = s;
                     }
                 }
+                //add the row *after* populating it (else slow)
+                dt.Rows.Add(dtRow);
+            }
+            return dt;
+        }
+
+        public static DataTable GetDataTable(List<MultidimItem> input)
+        {
+            if (input == null || input.Count == 0) new Error("Empty array-series: no elements to show.");
+            DataTable dt = new DataTable();
+
+            int dims = input[0].storage.Length;
+            for (int dim = 0; dim < dims; dim++)
+            {
+                dt.Columns.Add(dim.ToString(), typeof(string));
+            }
+
+            int i = -1;
+            foreach (MultidimItem x2 in input)
+            {
+                i++;
+                var dtRow = dt.NewRow();
+                int j = -1;
+                foreach (string x3 in x2.storage)
+                {
+                    j++;
+                    dtRow[j] = x3;
+                }
+
                 //add the row *after* populating it (else slow)
                 dt.Rows.Add(dtRow);
             }
