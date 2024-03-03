@@ -5792,7 +5792,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Rename()
-        {
+        {            
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually renamed
 

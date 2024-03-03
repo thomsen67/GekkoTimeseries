@@ -19064,6 +19064,10 @@ namespace Gekko
                         if (model.modelGamsScalar != null)
                         {
                             GamsModel.GAMSScalarModelHelper(true, model.modelGamsScalar);
+                            if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
+                            {
+                                if (model.modelGamsScalar?.modelInfoGamsScalar != null) model.modelGamsScalar.modelInfoGamsScalar.Print(true, t0);
+                            }
                         }
                         else if (model.modelGekko != null)
                         {
@@ -19075,10 +19079,6 @@ namespace Gekko
                             model.modelGekko.modelInfo.fileName = ffh.prettyPathAndFileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                         }
                         model.modelCommon.loadedFromCacheFile = true;
-                        //timeCompile = "compile: " + G.Seconds(t1);
-                        //
-
-                        model.modelGamsScalar.modelInfoGamsScalar.Print(true, t0);
                     }
                     else
                     {
