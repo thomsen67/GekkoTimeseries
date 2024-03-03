@@ -19078,7 +19078,7 @@ namespace Gekko
                         //timeCompile = "compile: " + G.Seconds(t1);
                         //
 
-                        model.modelGamsScalar.modelInfoGamsScalar.Print(model.modelCommon.loadedFromCacheFile, DateTime.Now, "t1", "t2");
+                        model.modelGamsScalar.modelInfoGamsScalar.Print(true, t0);
                     }
                     else
                     {

@@ -622,7 +622,7 @@ namespace Gekko
         [ProtoMember(9)]
         public int countVars3 = -12345;
 
-        public void Print(bool loadedFromCacheFile, DateTime t, string timeLoadCache, string timeCompile)
+        public void Print(bool loadedFromCacheFile, DateTime t)
         {
             Table tab = new Table();
 
@@ -669,11 +669,11 @@ namespace Gekko
                     }
                     if (loadedFromCacheFile)
                     {
-                        txt.MainAdd("Time: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));
+                        txt.MainAdd("Loaded from cache, time: " + G.Seconds(t));
                     }
                     else
                     {
-                        txt.MainAdd("Extracting from files, total time: " + G.Seconds(t));
+                        txt.MainAdd("Extracting from files, time: " + G.Seconds(t));
                     }
                     txt.MainNewLineTight();
                 }

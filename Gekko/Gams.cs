@@ -1680,9 +1680,6 @@ namespace Gekko
 
             DateTime t = DateTime.Now;
 
-            string timeLoadCache = null;
-            string timeCompile = null;
-
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
             input.zipFilePathAndName = fileName;
 
@@ -1697,12 +1694,12 @@ namespace Gekko
             mi.countEqs1 = model.modelGamsScalar.CountEqs(1);
             mi.countEqs2 = model.modelGamsScalar.CountEqs(2);
             mi.countEqs3 = model.modelGamsScalar.CountEqs(3);
-            mi.countVars1 = model.modelGamsScalar.CountEqs(1);
-            mi.countVars2 = model.modelGamsScalar.CountEqs(2);
-            mi.countVars3 = model.modelGamsScalar.CountEqs(3);
+            mi.countVars1 = model.modelGamsScalar.CountVars(1);
+            mi.countVars2 = model.modelGamsScalar.CountVars(2);
+            mi.countVars3 = model.modelGamsScalar.CountVars(3);
 
             model.modelGamsScalar.modelInfoGamsScalar = mi;
-            model.modelGamsScalar.modelInfoGamsScalar.Print(model.modelCommon.loadedFromCacheFile, t, timeLoadCache, timeCompile);
+            model.modelGamsScalar.modelInfoGamsScalar.Print(false, t);
 
             return model;
 
