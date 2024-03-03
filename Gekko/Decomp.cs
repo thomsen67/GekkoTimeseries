@@ -5197,21 +5197,16 @@ namespace Gekko
 
             while (true)
             {
-                string label = null;
-                try
-                {
-                    string name = G.Chop_AddFreq(G.Chop_GetName(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1), modelGamsScalar.parent.modelCommon.freq);
-                    Series ts = Program.databanks.GetFirst().GetIVariable(name) as Series;
-                    label = ts.meta.label;
-                }
-                catch { };
-
                 //#6irhwakery7
-                string name2 = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, false);
+                string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, false);
 
+                string label = null;
+                List<string> expls = Program.GetVariableExplanation(name, name, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+                if (expls != null && expls.Count > 0) label = expls[0];
+                
                 string lbl = null;
-                if (!G.NullOrEmpty(lbl)) lbl = "(" + label + ")";
-                temp.Add(name2 + lbl);
+                if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";
+                temp.Add(name + lbl);
                 if (f.eq != -12345)
                 {
                     temp.Add("--> " + modelGamsScalar.GetEqName(f.eq) + " --> ");
