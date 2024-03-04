@@ -1274,7 +1274,7 @@ namespace Gekko
 
         public static void GetStampAsString(TraceID2 id, out string stamp, out string stampDetailed)
         {
-            stamp = id.stamp.ToString("g", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
+            stamp = id.stamp.ToString("d", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             stampDetailed = id.stamp.ToString("G", System.Globalization.CultureInfo.CreateSpecificCulture(Globals.languageDaDK)) + ", #" + id.counter;
         }
 

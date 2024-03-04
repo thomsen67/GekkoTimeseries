@@ -6302,13 +6302,11 @@ namespace Gekko
                 {
                     if (j > 0 && dimsR[i, j - 1] != dimsR[i, j])
                     {
-                        new Error("Trying to concatenate matrices with " + dimsR[i, j - 1] + " and " + dimsR[i, j] + " rows");
-                        //throw new GekkoException();
+                        new Error("Trying to concatenate matrices with " + dimsR[i, j - 1] + " vs. " + dimsR[i, j] + " rows");
                     }
                     if (i > 0 && dimsC[i - 1, j] != dimsC[i, j])
                     {
-                        new Error("Trying to concatenate matrices with " + dimsC[i - 1, j] + " and " + dimsC[i, j] + " cols");
-                        //throw new GekkoException();
+                        new Error("Trying to concatenate matrices with " + dimsC[i - 1, j] + " vs. " + dimsC[i, j] + " cols");
                     }
                     if (i == 0) allCols += dimsC[i, j];
                     if (j == 0) allRows += dimsR[i, j];
