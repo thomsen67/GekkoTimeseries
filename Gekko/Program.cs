@@ -4127,10 +4127,12 @@ namespace Gekko
 
                         try
                         {
-                            d = G.ParseIntoDouble(s3, true);
+                            d = G.ParseIntoDouble(s3);
                         }
                         catch
                         {
+                            //But no error will ever be thrown here... Idea is that anything non-number becomes missing. Cannot be
+                            //changed due to compatibility.
                             using (Error e = new Error())
                             {
                                 string note = null;
@@ -5960,9 +5962,8 @@ namespace Gekko
                             }
                             else if (type == ESheetCollection.Matrix)
                             {
-                                string note = null;
-                                if (transpose) note = ". Note: cells are transposed.";
-                                new Error("Missing data in row " + row + ", col " + col + note);
+                                //No error is reported here: we accept blank cells that will be interpreted as = 0.
+                                //In contrast, a cell with a non-number will report error.
                             }
                             continue;
                         }

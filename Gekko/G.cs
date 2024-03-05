@@ -179,7 +179,6 @@ namespace Gekko
             if (reportError)
             {
                 new Error("Cannot convert '" + s + "' into a value"); return double.NaN;
-                //new GekkoException();
             }
             else
             {

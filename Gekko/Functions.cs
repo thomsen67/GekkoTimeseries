@@ -760,6 +760,87 @@ namespace Gekko
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
 
+        public static IVariable reorder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            List<IVariable> iDim = O.ConvertToList(x2);
+            IVariable iv = vals(smpl, _t1, _t2, x2);
+
+            List iv_list = iv as List;
+            if (iv_list == null) new Error("Malformed list");
+
+            if(iv_list.list.Count==0) new Error("Empty list not allowed");
+
+            List<int> reorder = new List<int>();
+            foreach (IVariable element in iv_list.list)
+            {
+                ScalarVal val = element as ScalarVal;
+                if (val == null) new Error("Malformed list");
+                int rounded = -12345;
+                bool b = G.ConvertToInt(out rounded, val.val);
+                if (!b) new Error("Malformed list");
+                reorder.Add(rounded);
+            }
+
+            bool has1 = false;
+            SortedDictionary<int, int> tjek = new SortedDictionary<int, int>();
+            foreach (int i in reorder)
+            {                
+                if (!tjek.ContainsKey(i)) tjek.Add(i, 0);
+            }
+
+            for (int i = 0; i < tjek.Count; i++)
+            {
+                if (tjek[i] != i) new Error("In list, expected an element " + i + ", but it is not present.");
+            }
+
+            Series ts = x1 as Series;
+            if (ts == null || ts.type != ESeriesType.ArraySuper)
+            {
+                new Error("You must use a array-timeseries variable");
+            }
+
+            if (ts.dimensions == 0 || ts.dimensions != reorder.Count)
+            {
+                new Error("Array-series expected to have " + reorder.Count + " dimensions, but has " + ts.dimensions);
+            }
+
+            //For Gekko 4.0, set name to G.GetArraySeriesTempName(G.ConvertFreq(EFreq.U))
+            Series tsNew = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));            
+            tsNew.SetArrayTimeseries(ts.dimensions + 1, true);
+
+            tsNew = ts.DeepClone(null, null) as Series;
+
+            foreach (KeyValuePair<MultidimItem, IVariable> kvp in tsNew.dimensionsStorage.storage)
+            {                
+                MultidimItem map = kvp.Key;
+                MultidimItem map2 = new MultidimItem(map.storage, tsNew);
+                               
+
+                for (int i = 0; i < reorder.Count; i++)
+                {
+                    //from i --> ii
+                    int ii = reorder[i];
+                    map2.storage[i] = map.storage[ii];
+                }                
+                
+                Series tsSub = kvp.Value as Series;
+                if (tsSub == null)
+                {
+                    new Error("Element is not a series");  //should not be possible
+                }
+
+                if (tsSub.type == ESeriesType.Timeless)
+                {
+                    new Error("Sub-series is timeless ... conversion will be fixed later on");
+                }
+
+                //tsNew.dimensionsStorage.AddIVariableWithOverwrite(mapRotated, tsRotatedSub);
+
+                
+            }
+
+            return tsNew;
+        }
 
         public static IVariable rotate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable dim)
         {
@@ -5076,7 +5157,6 @@ namespace Gekko
             else
             {
                 new Error("Expected a LIST variable as argument");
-                //throw new GekkoException();
             }
             return new ScalarString(s);
         }
