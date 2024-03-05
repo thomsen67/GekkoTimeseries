@@ -4299,9 +4299,7 @@ namespace Gekko
             // B1GD V02000  LAN 1969    3682,079
             // B1GD V02000  V   1966    846,584
             // B1GD V02000  V   1967    848,430
-            // B1GD V02000  V   1968    747,222
-
-            
+            // B1GD V02000  V   1968    747,222            
 
             for (int row = 1; row <= matrixMaxRow; row++)
             {
@@ -5715,9 +5713,19 @@ namespace Gekko
                 isMissing = true;
             }
 
+            EDataFormat fileType = EDataFormat.Xlsx;
+            if (G.Equal(o.opt_xls, "yes")) fileType = EDataFormat.Xls;
+            else if (G.Equal(o.opt_xlsx, "yes")) fileType = EDataFormat.Xlsx;
+            else if (G.Equal(o.opt_csv, "yes")) fileType = EDataFormat.Csv;
+            else if (G.Equal(o.opt_prn, "yes")) fileType = EDataFormat.Prn;
+
             //do copylocal
             string fileName = o.fileName;
-            fileName = G.AddExtension(fileName, ".xlsx");
+            if (fileType == EDataFormat.Csv) fileName = G.AddExtension(fileName, ".csv");
+            else if (fileType == EDataFormat.Prn) fileName = G.AddExtension(fileName, ".prn");
+            else if (fileType == EDataFormat.Xls) fileName = G.AddExtension(fileName, ".xls");
+            else fileName = G.AddExtension(fileName, ".xlsx");
+
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, true, true, o.p);            
             fileName = ffh.realPathAndFileName;            
 
@@ -5728,13 +5736,7 @@ namespace Gekko
             }
 
             if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(1, "Read", ffh.prettyPathAndFileName);
-
-            EDataFormat fileType = EDataFormat.Xlsx;
-            if (G.Equal(o.opt_xls, "yes")) fileType = EDataFormat.Xls;
-            else if (G.Equal(o.opt_xlsx, "yes")) fileType = EDataFormat.Xlsx;
-            else if (G.Equal(o.opt_csv, "yes")) fileType = EDataFormat.Csv;
-            else if (G.Equal(o.opt_prn, "yes")) fileType = EDataFormat.Prn;
-
+            
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
             {
