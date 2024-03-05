@@ -4320,39 +4320,14 @@ namespace Gekko
             // B1GD V02000  V   1968    747,222
             // 
 
-            bool isArray = true;
-            string tableName = "xxx";
-            EFreq freq = EFreq.A;
-            int dimensionsWithoutTime = 3;
-
-//Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
-//                                newTrace.GetContents().text = downloadHelper.gekkoCode + ";";
-//                                newTrace.GetContents().dataFile = downloadHelper.dataFile;
-//                                newTrace.GetContents().name = ts.GetNameAndParentDatabank();
-//                                newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-//                                Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
-
-            
-            string varNameWithFreq = tableName + Globals.freqIndicator + G.ConvertFreq(freq);
-                        
+            bool isArray = false;
+            string tableName = Path.GetFileNameWithoutExtension(oRead.FileName);
+            EFreq freq = EFreq.None;
+            int dimensionsWithoutTime = matrixMaxCol - 2;  //period and value deducted
+            if (dimensionsWithoutTime > 0) isArray = true;
             
             Series tsSuperseries = null;
-            if (dimensionsWithoutTime>0)
-            {                
-                if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                tsSuperseries = new Series(freq, varNameWithFreq);
-                //tsSuperseries.meta.domains = domains;                
-                tsSuperseries.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
-            }
-            else
-            {
-                //Zero-dimensional timeseries (that is, normal timeseries)
-                //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
-                //in this case, we just construct a normal timeseries
-                if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                tsSuperseries = new Series(freq, varNameWithFreq);                
-            }
-
+            
             List<string> oldDims = new List<string>() { "     " }; //will not match anything
             Series tsSubseries = null;  //the subseries in one of the dimension coordinates
 
@@ -4380,6 +4355,7 @@ namespace Gekko
                     if (colDistanceFromEnd == 1)
                     {
                         gt = ConvertFromStringInFileToGekkoTime(cellText, freqHere, annualIndicator1, format, false, col, row);
+                        if (freq == EFreq.None) freq = gt.freq;  //freq is tasted here
                     }
                     else if (colDistanceFromEnd == 0)
                     {
@@ -4395,7 +4371,24 @@ namespace Gekko
                         dims.Add(cellText);
                     }
                 }
-
+                if (row == 1)  //only created at row #1. Cannot do it sooner because freq is not known before.
+                {
+                    string varNameWithFreq = tableName + Globals.freqIndicator + G.ConvertFreq(freq);
+                    if (isArray)
+                    {
+                        if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                        tsSuperseries = new Series(freq, varNameWithFreq);
+                        tsSuperseries.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
+                    }
+                    else
+                    {
+                        //Zero-dimensional timeseries (that is, normal timeseries)
+                        //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
+                        //in this case, we just construct a normal timeseries
+                        if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                        tsSuperseries = new Series(freq, varNameWithFreq);
+                    }
+                }
                 ExtractTimeseriesFromLongTableLightHelper(dims, gt, d, freq, tsSuperseries, isArray, ref oldDims, ref tsSubseries);
             }
 
@@ -4428,59 +4421,65 @@ namespace Gekko
         /// <param name="tsSubseries"></param>
         private static void ExtractTimeseriesFromLongTableLightHelper(List<string> dims, GekkoTime gt, double d, EFreq freq, Series tsSuperseries, bool isArray, ref List<string> oldDims, ref Series tsSubseries)
         {
-            if (true)
+
+            // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+            // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+            // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+            // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+            // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+
+            //Reading the dimension coordinates
+
+            //int tt = -12345;
+
+            bool equal = CompareDims(oldDims, dims);
+
+            if (equal)
             {
-                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
-                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
-                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
-                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
-                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
-
-                //Reading the dimension coordinates
-
-                //int tt = -12345;
-
-                bool equal = CompareDims(oldDims, dims);
-
-                if (equal)
+                //keep the same ts2
+                //if time is the last dimension, the hash is the same for all periods
+                //this avoids getting the same Gekko variable over and over
+            }
+            else
+            {
+                //create it
+                if (isArray)
                 {
-                    //keep the same ts2
-                    //if time is the last dimension, the hash is the same for all periods
-                    //this avoids getting the same Gekko variable over and over
-                }
-                else
-                {
-                    //create it
-                    if (isArray)
+                    MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
+                    IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                    if (iv == null)
                     {
-                        MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
-                        IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
-                        if (iv == null)
-                        {
-                            tsSubseries = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
-                            tsSuperseries.dimensionsStorage.AddIVariableWithOverwrite(mmi, tsSubseries);
-                        }
-                        else
-                        {
-                            tsSubseries = iv as Series;
-                        }
+                        tsSubseries = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
+                        tsSuperseries.dimensionsStorage.AddIVariableWithOverwrite(mmi, tsSubseries);
+
+                        //Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
+                        //                                newTrace.GetContents().text = downloadHelper.gekkoCode + ";";
+                        //                                newTrace.GetContents().dataFile = downloadHelper.dataFile;
+                        //                                newTrace.GetContents().name = ts.GetNameAndParentDatabank();
+                        //                                newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        //                                Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
                     }
                     else
                     {
-                        //zero-dimensional series
-                        tsSubseries = tsSuperseries;  //just use that for this purpose
+                        tsSubseries = iv as Series;
                     }
                 }
-
-                //TODO
-                //TODO
-                //TODO record data in an array, and use setDataSequence().
-                //TODO
-                //TODO                        
-                tsSubseries.SetData(gt, d);
-
-                oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop
+                else
+                {
+                    //zero-dimensional series
+                    tsSubseries = tsSuperseries;  //just use that for this purpose
+                }
             }
+
+            //TODO
+            //TODO
+            //TODO record data in an array, and use setDataSequence().
+            //TODO
+            //TODO                        
+            tsSubseries.SetData(gt, d);
+
+            oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop
+
         }
 
         /// <summary>
