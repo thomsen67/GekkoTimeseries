@@ -5989,8 +5989,24 @@ namespace Gekko
                             }
                             else if (type == ESheetCollection.Matrix)
                             {
-                                //No error is reported here: we accept blank cells that will be interpreted as = 0.
-                                //In contrast, a cell with a non-number will report error.
+                                if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
+                                {
+                                    double v = double.NaN;
+                                    if (G.Equal(o.opt_missing, "yes"))
+                                    {
+                                        //do nothing
+                                    }
+                                    else
+                                    {
+                                        v = 0d;
+                                    }
+                                    outputMatrix.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
+                                }
+                                else
+                                {
+                                    //For xlsx, no error is reported here: we accept blank cells that will be interpreted as = 0.
+                                    //In contrast, a cell with a non-number will report error.
+                                }
                             }
                             continue;
                         }
