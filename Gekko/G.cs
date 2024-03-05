@@ -171,17 +171,25 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="reportError"></param>
         /// <returns></returns>
-        public static double ParseIntoDouble(string s, bool reportError)
+        public static double ParseIntoDouble(string s, bool reportError, out bool ok)
         {
+            ok = false;
             double d = double.NaN;
-            bool ok = G.TryParseIntoDouble(s, out d);
-            if (ok) return d;
+            bool ok2 = G.TryParseIntoDouble(s, out d);
+            if (ok2)
+            {
+                ok = true;
+                return d;
+            }
             if (reportError)
             {
-                new Error("Cannot convert '" + s + "' into a value"); return double.NaN;
+                new Error("Cannot convert '" + s + "' into a value");
+                ok = false;
+                return double.NaN;
             }
             else
             {
+                ok = false;
                 return double.NaN;
             }
         }
@@ -229,9 +237,9 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static double ParseIntoDouble(string s)
+        public static double ParseIntoDouble(string s, out bool ok)
         {
-            return G.ParseIntoDouble(s, false);
+            return G.ParseIntoDouble(s, false, out ok);
         }
 
         /// <summary>

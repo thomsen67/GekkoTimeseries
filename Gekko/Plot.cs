@@ -1311,12 +1311,14 @@ namespace Gekko
                 {
                     if (linewidthCorrection != 1d)
                     {
-                        double temp = G.ParseIntoDouble(linewidth);
+                        bool b = false;
+                        double temp = G.ParseIntoDouble(linewidth, out b);
                         linewidth = (temp * linewidthCorrection).ToString();
                     }
                     if (pointsizeCorrection != 1d)
                     {
-                        double temp = G.ParseIntoDouble(pointsize);
+                        bool b = false;
+                        double temp = G.ParseIntoDouble(pointsize, out b);
                         pointsize = (temp * pointsizeCorrection).ToString();
                     }
                 }

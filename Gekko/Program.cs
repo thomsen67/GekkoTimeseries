@@ -4125,9 +4125,10 @@ namespace Gekko
                             s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
                         }
 
+                        bool b = false;
                         try
                         {
-                            d = G.ParseIntoDouble(s3);
+                            d = G.ParseIntoDouble(s3, out b);
                         }
                         catch
                         {
@@ -4135,6 +4136,7 @@ namespace Gekko
                             //changed due to compatibility.
                             using (Error e = new Error())
                             {
+                                //see code below
                                 string note = null;
                                 if (dataFormat == EDataFormat.Csv) note = ". Note: You may change decimal separator: OPTION interface csv decimalseparator";
                                 else if (dataFormat == EDataFormat.Prn) note = ". Note: You may change decimal separator: OPTION interface prn decimalseparator";
@@ -4144,6 +4146,31 @@ namespace Gekko
                                 {
                                     e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
                                 }
+                            }
+                        }
+                        if (!b)
+                        {
+                            if (dataFormat == EDataFormat.Csv || dataFormat == EDataFormat.Prn)
+                            {
+                                using (Error e = new Error())
+                                {
+                                    //see code above
+                                    string note = null;
+                                    bool hasCommaOrDot = false;
+                                    if (s3.Contains(".") || s3.Contains(",")) hasCommaOrDot = true;
+                                    if (dataFormat == EDataFormat.Csv && hasCommaOrDot) note = ". Note: You may change decimal separator: OPTION interface csv decimalseparator";
+                                    else if (dataFormat == EDataFormat.Prn && hasCommaOrDot) note = ". Note: You may change decimal separator: OPTION interface prn decimalseparator";
+                                    e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
+                                    e.MainAdd(note);
+                                    if (s3.Trim() == ".")
+                                    {
+                                        e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //xlsx will thrown an error somewhere else
                             }
                         }
                     }
@@ -7141,7 +7168,8 @@ namespace Gekko
                         {
                             try
                             {
-                                ss = G.ParseIntoDouble(s, true);
+                                bool b = false;
+                                ss = G.ParseIntoDouble(s, true, out b);
                             }
                             catch
                             {
@@ -7413,7 +7441,8 @@ namespace Gekko
                             {
                                 try
                                 {
-                                    d = G.ParseIntoDouble(tokens[j].s);
+                                    bool b = false;
+                                    d = G.ParseIntoDouble(tokens[j].s, out b);
                                     counter++;
                                     if (minus) d = -d;
                                     ts.SetData(gt1.Add(counter), d);
@@ -8009,7 +8038,8 @@ namespace Gekko
 
                                 try
                                 {
-                                    value = G.ParseIntoDouble(temp2);
+                                    bool b = false;
+                                    value = G.ParseIntoDouble(temp2, out b);
                                 }
                                 catch
                                 {
@@ -11056,7 +11086,8 @@ namespace Gekko
                         {
                             cnt++;
                             double d = double.NaN;
-                            if (s2 != "NA") d = G.ParseIntoDouble(s2);
+                            bool b = false;
+                            if (s2 != "NA") d = G.ParseIntoDouble(s2, out b);
                             m.data[cnt / cols, cnt % cols] = d;
                         }
 
@@ -11457,7 +11488,8 @@ namespace Gekko
                                     int i1 = int.Parse(ss[0].Substring(0, 4));
                                     int i2 = int.Parse(ss[0].Substring(4, 2));
                                     GekkoTime gt = new GekkoTime(t1.freq, i1, i2);
-                                    ts.SetData(gt, G.ParseIntoDouble(ss[1]));
+                                    bool b = false;
+                                    ts.SetData(gt, G.ParseIntoDouble(ss[1], out b));
                                 }
                                 catch
                                 {
@@ -14200,9 +14232,12 @@ namespace Gekko
                                 string type = s3[0];
                                 int year = int.Parse(s3[1]);
                                 string var = s3[2];
-                                double val = G.ParseIntoDouble(s3[3]);
-                                double vs = G.ParseIntoDouble(s3[4]);
-                                double hs = G.ParseIntoDouble(s3[5]);
+                                bool bval = false;
+                                double val = G.ParseIntoDouble(s3[3], out bval);
+                                bool bvs = false;
+                                double vs = G.ParseIntoDouble(s3[4], out bvs);
+                                bool bhs = false;
+                                double hs = G.ParseIntoDouble(s3[5], out bhs);
                                 if (year < min) min = year;
                                 if (year > max) max = year;
                                 if (type == "abs")
@@ -14404,7 +14439,8 @@ namespace Gekko
                 case "--prune":
                     {
                         string[] ss2 = sub.Split(' ');
-                        double prune = G.ParseIntoDouble(ss2[1].Trim());
+                        bool b = false;
+                        double prune = G.ParseIntoDouble(ss2[1].Trim(), out b);
                         Globals.pruneDecomp = prune;
                         G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
                         G.Writeln();

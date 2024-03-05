@@ -2923,7 +2923,8 @@ namespace Gekko
             {
                 try
                 {
-                    double v = G.ParseIntoDouble(value.Trim(), true);
+                    bool b = false;
+                    double v = G.ParseIntoDouble(value.Trim(), true, out b);
                     iv = new ScalarVal(v);
                 }
                 catch

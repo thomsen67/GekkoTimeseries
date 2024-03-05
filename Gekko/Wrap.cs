@@ -357,7 +357,7 @@ namespace Gekko
                     {
                         sb.Append(" ");
                     }
-                    sb.Append(xx.storage[i].Trim());
+                    if (xx.storage[i] != null) sb.Append(xx.storage[i].Trim());
                 }
                 xx.consolidated = sb.ToString();
             }
