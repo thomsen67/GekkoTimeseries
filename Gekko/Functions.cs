@@ -788,10 +788,12 @@ namespace Gekko
                 if (!tjek.ContainsKey(i)) tjek.Add(i, 0);
             }
 
-            for (int i = 0; i < tjek.Count; i++)
+            int counter = 0;
+            foreach (KeyValuePair<int, int> kvp in tjek)
             {
-                if (tjek[i] != i) new Error("In list, expected an element " + i + ", but it is not present.");
-            }
+                counter++;
+                if (kvp.Key != counter) new Error("In list, expected an element " + i + ", but it is not present in the list.");
+            }            
 
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
@@ -813,29 +815,17 @@ namespace Gekko
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in tsNew.dimensionsStorage.storage)
             {                
                 MultidimItem map = kvp.Key;
-                MultidimItem map2 = new MultidimItem(map.storage, tsNew);
-                               
+
+                List<string> remember = new List<string>(map.storage);
 
                 for (int i = 0; i < reorder.Count; i++)
                 {
                     //from i --> ii
                     int ii = reorder[i];
-                    map2.storage[i] = map.storage[ii];
+                    map.storage[i] = remember[ii - 1];
                 }                
                 
-                Series tsSub = kvp.Value as Series;
-                if (tsSub == null)
-                {
-                    new Error("Element is not a series");  //should not be possible
-                }
-
-                if (tsSub.type == ESeriesType.Timeless)
-                {
-                    new Error("Sub-series is timeless ... conversion will be fixed later on");
-                }
-
-                //tsNew.dimensionsStorage.AddIVariableWithOverwrite(mapRotated, tsRotatedSub);
-
+                
                 
             }
 
