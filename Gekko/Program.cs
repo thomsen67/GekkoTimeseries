@@ -4258,9 +4258,27 @@ namespace Gekko
             return gt;
         }
 
+        public static bool CompareDims(List<string> oldDims, List<string> dims)
+        {
+            //no test if they are null
+            if (dims.Count != oldDims.Count) return false;
+            for (int i = 0; i < dims.Count; i++)
+            {
+                if (!G.Equal(dims[i], oldDims[i])) return false;
+            }
+            return true;
+        }
+
         public static void ExtractTimeseriesFromLongTableLight(TableLight matrix, CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, ReadInfo readInfo, string dateformat, string datetype)
         {
-
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // --> Maybe IMPORT <prn long> instead of <sdf>, would be more generic.
+            //     And then there could be different "long" types, cf. the
+            //     examples regarding arrow files.
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            
             //We could 'taste' the file, but how to distinguish A and U for instance?
             //Perhaps augment READ/IMPORT with freq indication for such files?
 
@@ -4299,7 +4317,44 @@ namespace Gekko
             // B1GD V02000  LAN 1969    3682,079
             // B1GD V02000  V   1966    846,584
             // B1GD V02000  V   1967    848,430
-            // B1GD V02000  V   1968    747,222            
+            // B1GD V02000  V   1968    747,222
+            // 
+
+            bool isArray = true;
+            string tableName = "xxx";
+            EFreq freq = EFreq.A;
+            int dimensionsWithoutTime = 3;
+
+//Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
+//                                newTrace.GetContents().text = downloadHelper.gekkoCode + ";";
+//                                newTrace.GetContents().dataFile = downloadHelper.dataFile;
+//                                newTrace.GetContents().name = ts.GetNameAndParentDatabank();
+//                                newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+//                                Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+
+            
+            string varNameWithFreq = tableName + Globals.freqIndicator + G.ConvertFreq(freq);
+                        
+            
+            Series tsSuperseries = null;
+            if (dimensionsWithoutTime>0)
+            {                
+                if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                tsSuperseries = new Series(freq, varNameWithFreq);
+                //tsSuperseries.meta.domains = domains;                
+                tsSuperseries.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
+            }
+            else
+            {
+                //Zero-dimensional timeseries (that is, normal timeseries)
+                //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
+                //in this case, we just construct a normal timeseries
+                if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                tsSuperseries = new Series(freq, varNameWithFreq);                
+            }
+
+            List<string> oldDims = new List<string>() { "     " }; //will not match anything
+            Series tsSubseries = null;  //the subseries in one of the dimension coordinates
 
             for (int row = 1; row <= matrixMaxRow; row++)
             {
@@ -4338,10 +4393,14 @@ namespace Gekko
                     else
                     {
                         dims.Add(cellText);
-                    }                    
+                    }
                 }
-                row = row;
+
+                ExtractTimeseriesFromLongTableLightHelper(dims, gt, d, freq, tsSuperseries, isArray, ref oldDims, ref tsSubseries);
             }
+
+            databank.AddIVariable(tsSuperseries.name, tsSuperseries);
+
             //See almost identical code in readTsd and readPcim and readTsp...
             readInfo.variables = variableCounter;
             if (oRead.Merge)
@@ -4353,6 +4412,74 @@ namespace Gekko
             {
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+        }
+
+        /// <summary>
+        /// Gets 1 row into array-subseries element.
+        /// </summary>
+        /// <param name="dims"></param>
+        /// <param name="gt"></param>
+        /// <param name="d"></param>
+        /// <param name="freq"></param>
+        /// <param name="tsSuperseries"></param>
+        /// <param name="isArray"></param>
+        /// <param name="oldDims"></param>
+        /// <param name="tsSubseries"></param>
+        private static void ExtractTimeseriesFromLongTableLightHelper(List<string> dims, GekkoTime gt, double d, EFreq freq, Series tsSuperseries, bool isArray, ref List<string> oldDims, ref Series tsSubseries)
+        {
+            if (true)
+            {
+                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+                // PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   PUTTING IN DATA   
+
+                //Reading the dimension coordinates
+
+                //int tt = -12345;
+
+                bool equal = CompareDims(oldDims, dims);
+
+                if (equal)
+                {
+                    //keep the same ts2
+                    //if time is the last dimension, the hash is the same for all periods
+                    //this avoids getting the same Gekko variable over and over
+                }
+                else
+                {
+                    //create it
+                    if (isArray)
+                    {
+                        MultidimItem mmi = new MultidimItem(dims.ToArray(), tsSuperseries);
+                        IVariable iv = null; tsSuperseries.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                        if (iv == null)
+                        {
+                            tsSubseries = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
+                            tsSuperseries.dimensionsStorage.AddIVariableWithOverwrite(mmi, tsSubseries);
+                        }
+                        else
+                        {
+                            tsSubseries = iv as Series;
+                        }
+                    }
+                    else
+                    {
+                        //zero-dimensional series
+                        tsSubseries = tsSuperseries;  //just use that for this purpose
+                    }
+                }
+
+                //TODO
+                //TODO
+                //TODO record data in an array, and use setDataSequence().
+                //TODO
+                //TODO                        
+                tsSubseries.SetData(gt, d);
+
+                oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop
             }
         }
 

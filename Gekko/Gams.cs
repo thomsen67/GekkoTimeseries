@@ -3536,7 +3536,7 @@ namespace Gekko
                                     dims.Add(s);
                                 }
 
-                                bool equal = CompareDims(oldDims, dims);
+                                bool equal = Program.CompareDims(oldDims, dims);
 
                                 if (equal)
                                 {
@@ -4269,18 +4269,7 @@ namespace Gekko
             }
 
             return;
-        }
-
-        private static bool CompareDims(List<string> oldDims, List<string> dims)
-        {
-            //no test if they are null
-            if (dims.Count != oldDims.Count) return false;
-            for (int i = 0; i < dims.Count; i++)
-            {
-                if (!G.Equal(dims[i], oldDims[i])) return false;
-            }
-            return true;
-        }
+        }        
 
 
         private static bool GamsIsFixed(double[] values, double value)
