@@ -4479,7 +4479,7 @@ namespace Gekko
             // be transformed into strings, not values. Especially regarding 
             // 1e5 this can be confusing. But then the .vals() function can be used.
 
-            TableLight table = Program.ReadCsvPrn(EDataFormat.Csv, fileName);
+            TableLight table = Program.ReadCsvPrn(EDataFormat.Csv, fileName, null);
 
             int iMax = table.GetRowMaxNumber();
             int jMax = table.GetColMaxNumber();
@@ -6809,6 +6809,7 @@ namespace Gekko
             public string opt_gdxopt = null;
             public string opt_tsp = null;
             public string opt_csv = null;
+            public string opt_sdf = null;
             public string opt_prn = null;
             public string opt_pcim = null;
             public string opt_xls = null;
@@ -6901,6 +6902,7 @@ namespace Gekko
                     oRead.FileName = this.fileName;
                     if (G.Equal(this.opt_csv, "yes")) oRead.Type = EDataFormat.Csv;
                     if (G.Equal(this.opt_prn, "yes")) oRead.Type = EDataFormat.Prn;
+                    if (G.Equal(this.opt_sdf, "yes")) oRead.Type = EDataFormat.Sdf;
                     if (G.Equal(this.opt_pcim, "yes")) oRead.Type = EDataFormat.Pcim;
                     if (G.Equal(this.opt_tsd, "yes")) oRead.Type = EDataFormat.Tsd;
                     if (G.Equal(this.opt_gbk, "yes")) oRead.Type = EDataFormat.Gbk;

@@ -631,6 +631,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_VIEW;
     ASTOPT_STRING_COLS;
     ASTOPT_STRING_CSV;
+    ASTOPT_STRING_SDF;
     ASTOPT_STRING_D;
     ASTOPT_STRING_DATES;
     ASTOPT_STRING_DIRECT;
@@ -1100,6 +1101,7 @@ Y2                    = 'Y2'                       ;
     CREATE           = 'CREATE'          ;
     CREATEVARS       = 'CREATEVARS'      ;
     CSV              = 'CSV'             ;
+    SDF              = 'SDF'             ;
     CURROW           = 'CURROW';
     D             = 'D'            ;
     DAMP             = 'DAMP'            ;
@@ -1752,6 +1754,7 @@ d.Add("Y" ,Y);
                                         d.Add("create"  , CREATE    );
                                         d.Add("createvars"              , CREATEVARS);
                                         d.Add("csv"     , CSV       );
+                                        d.Add("sdf"     , SDF       );
                                         d.Add("currow"  , CURROW       );
                                         d.Add("d"    , D      );
                                         d.Add("damp"    , DAMP      );
@@ -3364,6 +3367,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+                          | SDF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SDF yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)	
 						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)					
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
@@ -3736,6 +3740,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+                          | SDF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SDF yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
 						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
@@ -4469,6 +4474,7 @@ ident2: 					Ident |
   CPLOT|
   CREATEVARS|
   CSV|
+  SDF|
   CURROW|
   DAMP|
   DANISH|
@@ -4941,6 +4947,7 @@ ident3: 					Ident |
   CPLOT|
   CREATEVARS|
   CSV|
+  SDF|
   CURROW|
   DAMP|
   DANISH|

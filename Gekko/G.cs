@@ -3883,8 +3883,7 @@ namespace Gekko
         /// <returns></returns>
         public static int FindYear(int x, bool allowTwoDigits)
         {
-            string s = null;
-            if (allowTwoDigits) s = " or [0 - 199] -- the latter has 1900 added";
+            
             if (x >= Globals.possibleYearStart && x <= Globals.possibleYearEnd)
             {
                 return x;
@@ -3895,6 +3894,8 @@ namespace Gekko
             }
             else
             {
+                string s = null;
+                if (allowTwoDigits) s = " or [0 - 199] -- the latter has 1900 added";
                 new Error("A year with value " + x + " was input. The allowable range for years is [" + Globals.possibleYearStart + "-" + Globals.possibleYearEnd + "]" + s + ".");
                 return -12345;  //will never return anything
             }

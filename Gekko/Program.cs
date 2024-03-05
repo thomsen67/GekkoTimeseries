@@ -3722,18 +3722,19 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Reads .csv or .prn format into a TableLight "matrix" of cells.
+        /// Reads .csv or .prn or .sdf format into a TableLight "matrix" of cells.
+        /// String forcedDelimiter will force that delimiter regardless of options (may be set = null).
         /// </summary>
         /// <param name="type"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static TableLight ReadCsvPrn(EDataFormat type, string file)
+        public static TableLight ReadCsvPrn(EDataFormat type, string file, string forcedDelimiter)
         {
             //everything is stored as strings, no parsing into values... (probably because it is not that simple, comma vs. dot, NaN, etc.)
             //will remove quotes on cells
             //does not handle ';' inside a quoted string
 
-            char delimiter = ';';
+            char delimiter = ';';            
             if (type == EDataFormat.Csv)
             {
                 if (G.Equal(Program.options.interface_csv_delimiter, "comma")) delimiter = ',';
@@ -3743,6 +3744,11 @@ namespace Gekko
             {
                 if (G.Equal(Program.options.interface_prn_delimiter, "comma")) delimiter = ',';
                 else if (G.Equal(Program.options.interface_prn_delimiter, "tab")) delimiter = '\t';
+            }
+            if (forcedDelimiter != null)
+            {
+                if (forcedDelimiter.Length != 1) new Error("Delimiter must be length 1");
+                delimiter = forcedDelimiter[0];
             }
 
             string freqHere = G.ConvertFreq(Program.options.freq);
@@ -3963,82 +3969,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //datetype = text
-
-                    if (IsGekkoDateFormat(format))
-                    {
-                        //no format given, Gekko date format expected
-
-                        //if freq=a and 2001y, this is treated as integer 2001
-                        //if freq=a and 98, this is treated as 1998 (logic of GekkoTime.FromStringToGekkoTime()).
-                        //if freq=q and 200102, this is treated as 2001q2
-                        //if freq=m and 200102, this is treated as 2001m2
-                        //if 20010230, this is always treated as 2001m2d30 (we do not expect undated freq with 8 digits)
-                        //data with freq U MUST have "option freq u" set.
-
-                        bool error = false;
-                        bool done = false;
-
-                        if ((freqHere == EFreq.A))
-                        {
-                            if (date.Length == 5 && date.EndsWith(annualIndicator1, true, null))
-                            {
-                                //remove 'Y' if it is there
-                                date = date.Remove(date.Length - 1);
-                            }
-                        }
-
-                        if (G.IsInteger(date))
-                        {
-                            // 200102 --> q or m (if Q or M is set)
-                            // 20010230 --> daily (always)
-                            // undated must have freq U
-                            //
-
-                            if (freqHere == EFreq.U)
-                            {
-                                gt = new GekkoTime(freqHere, int.Parse(date), 1);
-                                done = true;
-                            }
-                            else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M || freqHere == EFreq.W))
-                            {
-                                //It might be a date like 199503, that is, 1995q3 or 1995m3 or 1995w3
-                                //We have to use the global freq here, how else to know the freq??
-                                //Only with freq Q or M
-                                gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
-                                done = true;
-                            }
-                            else if (date.Length == 8)
-                            {
-                                //It might be a date like 19950302, that is, 1995m3d2
-                                //Always, regardless of global freq, we do not expect U freq data this large
-                                gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
-                                done = true;
-                            }
-                        }
-
-                        if (done)
-                        {
-                            error = false;
-                        }
-                        else
-                        {
-                            gt = GekkoTime.FromStringToGekkoTime(date, true, false);
-                            if (gt.IsNull()) error = true;
-                        }
-
-                        if (error)
-                        {
-                            new Error("Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'. You may want to change the frequency: OPTION freq = ...");
-                        }
-                    }
-                    else
-                    {
-                        //non-Gekko date format
-                        //we have a yyyy-mm-dd-like format that we need to look into
-                        DateTime dt = GekkoTime.FromYYYYMMDDToDateTime(format, date);
-                        gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
-                    }
+                    gt = ConvertFromStringInFileToGekkoTime(date, freqHere, annualIndicator1, format, transpose, col, row);
                 }
 
                 if (readInfo.startPerInFile == -12345) readInfo.startPerInFile = gt.super;
@@ -4077,7 +4008,6 @@ namespace Gekko
             }
 
             for (int row = i_data; row <= matrixMaxRow; row++)
-            //for (int row = 1 + rowOffset; row <= matrixMaxRow; row++)
             {
 
                 Series ts = null;
@@ -4110,71 +4040,10 @@ namespace Gekko
                             //-----------------------
                             //NUMERIC DATA (rest of row)
                             //-----------------------
-                            //Second column and on (data)
-                            double d = double.NaN;
-                            bool shouldSkip = false;
-
-                            if (cell.type != ECellLightType.None)
-                            {
-                                if (cell.type == ECellLightType.Double) d = cell.data;
-                                else if (cell.type == ECellLightType.String)
-                                {
-                                    if (IsNonAvailableText(cell.text))
-                                    {
-                                        d = double.NaN;
-                                    }
-                                    else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
-                                    {
-                                        string s3 = cell.text;
-
-                                        if (oRead.Type == EDataFormat.Csv)
-                                        {
-                                            if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-                                            {
-                                                s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
-                                            {
-                                                s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
-                                            }
-                                        }                                        
-
-                                        try
-                                        {
-                                            d = G.ParseIntoDouble(s3);
-                                        }
-                                        catch
-                                        {
-                                            using (Error e = new Error())
-                                            {
-                                                e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
-                                                e.MainNewLine();
-                                                e.MainAdd("Note: You may change separator: OPTION interface csv decimalseparator");
-                                                if (s3.Trim() == ".")
-                                                {
-                                                    e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //must be xls or xlsx, and not #n/a or the like
-                                        using (Error txt = new Error())
-                                        {
-                                            txt.MainAdd("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. ");
-                                            txt.MoreAdd(ExcelTypeError());
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                shouldSkip = true;  //empty cell
-                            }
+                            //Second column and on (data)                            
+                            
+                            bool shouldSkip;
+                            double d = ConvertFromStringInFileToValue(cell, null, oRead.Type, transpose, row, col, out shouldSkip);
 
                             if (!shouldSkip)
                             {
@@ -4189,6 +4058,289 @@ namespace Gekko
                     }
 
                 }
+            }
+            //See almost identical code in readTsd and readPcim and readTsp...
+            readInfo.variables = variableCounter;
+            if (oRead.Merge)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+        }
+
+        /// <summary>
+        /// Converts into value strings like "123.45", etc.
+        /// Parameter forcedDecimalseparator may be set "comma" and will then override any options.
+        /// Params transpose, row, col are only for error reporting.
+        /// </summary>        
+
+        private static double ConvertFromStringInFileToValue(CellLight cell, string forcedDecimalseparator, EDataFormat dataFormat, bool transpose, int row, int col, out bool shouldSkip)
+        {
+            double d = double.NaN;
+            shouldSkip = false;
+            if (cell.type != ECellLightType.None)
+            {
+                if (cell.type == ECellLightType.Double)
+                {
+                    d = cell.data;
+                }
+                else if (cell.type == ECellLightType.String)
+                {
+                    if (IsNonAvailableText(cell.text))
+                    {
+                        d = double.NaN;
+                    }
+                    else if (dataFormat == EDataFormat.Csv || dataFormat == EDataFormat.Prn || dataFormat == EDataFormat.Sdf)
+                    {
+                        string s3 = cell.text;
+
+                        bool replace = false;
+                        if (dataFormat == EDataFormat.Csv)
+                        {
+                            if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                            {
+                                replace = true;                                
+                            }
+                        }
+                        else
+                        {
+                            if (G.Equal(Program.options.interface_prn_decimalseparator, "comma"))
+                            {
+                                replace = true;
+                            }
+                        }
+
+                        if (G.Equal(forcedDecimalseparator, "comma"))
+                        {
+                            replace = true;
+                        }
+
+                        if (replace)
+                        {
+                            s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
+                        }
+
+                        try
+                        {
+                            d = G.ParseIntoDouble(s3);
+                        }
+                        catch
+                        {
+                            using (Error e = new Error())
+                            {
+                                e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
+                                e.MainNewLine();
+                                e.MainAdd("Note: You may change separator: OPTION interface csv decimalseparator");
+                                if (s3.Trim() == ".")
+                                {
+                                    e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //must be xls or xlsx, and not #n/a or the like
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("In spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'. ");
+                            txt.MoreAdd(ExcelTypeError());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                shouldSkip = true;  //empty cell
+            }
+            return d;
+        }
+
+        /// <summary>
+        /// Converts into GekkoTime date strings like "2001", "2001y", "98", "2001q1", "2001k1", "200102", "20010230", etc.
+        /// Params transpose, row, col are only for error reporting.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="freqHere"></param>
+        /// <param name="annualIndicator1"></param>
+        /// <param name="format"></param>
+        /// <param name="transpose"></param>
+        /// <param name="col"></param>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        private static GekkoTime ConvertFromStringInFileToGekkoTime(string date, EFreq freqHere, string annualIndicator1, string format, bool transpose, int col, int row)
+        {
+            //datetype = text
+
+            GekkoTime gt = GekkoTime.tNull;
+
+            if (IsGekkoDateFormat(format))
+            {
+                //no format given, Gekko date format expected
+
+                //if freq=a and 2001y, this is treated as integer 2001
+                //if freq=a and 98, this is treated as 1998 (logic of GekkoTime.FromStringToGekkoTime()).
+                //if freq=q and 200102, this is treated as 2001q2
+                //if freq=m and 200102, this is treated as 2001m2
+                //if 20010230, this is always treated as 2001m2d30 (we do not expect undated freq with 8 digits)
+                //data with freq U MUST have "option freq u" set.
+
+                bool error = false;
+                bool done = false;
+
+                if ((freqHere == EFreq.A))
+                {
+                    if (date.Length == 5 && date.EndsWith(annualIndicator1, true, null))
+                    {
+                        //remove 'Y' if it is there
+                        date = date.Remove(date.Length - 1);
+                    }
+                }
+
+                if (G.IsInteger(date))
+                {
+                    // 200102 --> q or m (if Q or M is set)
+                    // 20010230 --> daily (always)
+                    // undated must have freq U
+                    //
+
+                    if (freqHere == EFreq.U)
+                    {
+                        gt = new GekkoTime(freqHere, int.Parse(date), 1);
+                        done = true;
+                    }
+                    else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M || freqHere == EFreq.W))
+                    {
+                        //It might be a date like 199503, that is, 1995q3 or 1995m3 or 1995w3
+                        //We have to use the global freq here, how else to know the freq??
+                        //Only with freq Q or M
+                        gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
+                        done = true;
+                    }
+                    else if (date.Length == 8)
+                    {
+                        //It might be a date like 19950302, that is, 1995m3d2
+                        //Always, regardless of global freq, we do not expect U freq data this large
+                        gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
+                        done = true;
+                    }
+                }
+
+                if (done)
+                {
+                    error = false;
+                }
+                else
+                {
+                    gt = GekkoTime.FromStringToGekkoTime(date, true, false);
+                    if (gt.IsNull()) error = true;
+                }
+
+                if (error)
+                {
+                    new Error("Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'. You may want to change the frequency: OPTION freq = ...");
+                }
+            }
+            else
+            {
+                //non-Gekko date format
+                //we have a yyyy-mm-dd-like format that we need to look into
+                DateTime dt = GekkoTime.FromYYYYMMDDToDateTime(format, date);
+                gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
+            }
+            return gt;
+        }
+
+        public static void ExtractTimeseriesFromLongTableLight(TableLight matrix, CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, ReadInfo readInfo, string dateformat, string datetype)
+        {
+
+            //We could 'taste' the file, but how to distinguish A and U for instance?
+            //Perhaps augment READ/IMPORT with freq indication for such files?
+
+            string forcedDecimalseparator = "comma";  //for now...!!!
+            EFreq freqHere = Program.options.freq;
+
+            bool isFirst = false;
+            string format = SplitDateFormatInTwo(dateformat, ref isFirst);
+
+            GekkoTime per1 = GekkoTime.tNull;
+            GekkoTime per2 = GekkoTime.tNull;
+
+            int variableCounter = 0;
+            string annualIndicator1 = "Y";
+
+            int matrixMaxRow = matrix.GetRowMaxNumber();
+            int matrixMaxCol = matrix.GetColMaxNumber();
+
+            //Sdf is like this (long dataframe, no header row)
+            // -----------------------------------------------
+            // B1GD V       LAN 1966    6303465,728
+            // B1GD V       LAN 1967    6328990,916
+            // B1GD V       LAN 1968    6561384,687
+            // B1GD V       V   1966    723554,674
+            // B1GD V       V   1967    810538,244
+            // B1GD V       V   1968    848782,326
+            // B1GD V01000  LAN 1966    68307,832
+            // B1GD V01000  LAN 1967    65424,336
+            // B1GD V01000  LAN 1968    63480,350
+            // B1GD V01000  V   1966    44977,132
+            // B1GD V01000  V   1967    45756,036
+            // B1GD V01000  V   1968    46897,673
+            // B1GD V02000  LAN 1966    2772,743
+            // B1GD V02000  LAN 1967    3802,763
+            // B1GD V02000  LAN 1968    3640,804
+            // B1GD V02000  LAN 1969    3682,079
+            // B1GD V02000  V   1966    846,584
+            // B1GD V02000  V   1967    848,430
+            // B1GD V02000  V   1968    747,222
+
+            
+
+            for (int row = 1; row <= matrixMaxRow; row++)
+            {
+                GekkoTime gt = GekkoTime.tNull;
+                double d = double.NaN;
+                List<string> dims = new List<string>();
+
+                for (int col = 1; col <= matrixMaxCol; col++)
+                {
+                    int colDistanceFromEnd = matrixMaxCol - col;  //1: second last, 0: last
+
+                    CellLight cell = matrix.Get(row, col);
+                    string cellText = null;
+                    if (cell.type == ECellLightType.String) cellText = cell.text;
+                    else if (cell.type == ECellLightType.Double) cellText = cell.data.ToString();
+                    else if (cell.type == ECellLightType.DateTime) cellText = cell.dateTime.ToString();
+
+                    if (cellText == null)
+                    {
+                        new Error("In cell row " + row + ", col" + col + ". This cell is empty.");
+                    }
+
+                    if (colDistanceFromEnd == 1)
+                    {
+                        gt = ConvertFromStringInFileToGekkoTime(cellText, freqHere, annualIndicator1, format, false, col, row);
+                    }
+                    else if (colDistanceFromEnd == 0)
+                    {
+                        bool shouldSkip;
+                        d = ConvertFromStringInFileToValue(cell, forcedDecimalseparator, oRead.Type, false, row, col, out shouldSkip);
+                        if (shouldSkip)
+                        {
+                            new Error("Missing data value in row " + row + ", col " + col);
+                        }
+                    }
+                    else
+                    {
+                        dims.Add(cellText);
+                    }                    
+                }
+                row = row;
             }
             //See almost identical code in readTsd and readPcim and readTsp...
             readInfo.variables = variableCounter;
@@ -4478,6 +4630,11 @@ namespace Gekko
                 if (oRead.Type == EDataFormat.Csv)
                 {
                     extension = "csv";
+                    isGbk = false;
+                }
+                if (oRead.Type == EDataFormat.Sdf)
+                {
+                    extension = "sdf";
                     isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Prn)
@@ -5228,6 +5385,10 @@ namespace Gekko
                     {
                         Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, originalFilePathPretty, dateformat, datetype);
                     }
+                    else if (oRead.Type == EDataFormat.Sdf)
+                    {
+                        ReadLongFormat_sdf(offset, oRead, readInfo, file, databankTemp, originalFilePath, originalFilePathPretty, dateformat, datetype);
+                    }
                     else if (oRead.Type == EDataFormat.Tsd)
                     {
                         ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref NaNCounter);
@@ -5428,7 +5589,7 @@ namespace Gekko
                 {
                     databank.Clear();
                 }
-                matrix = ReadCsvPrn(oRead.Type, file);
+                matrix = ReadCsvPrn(oRead.Type, file, null);
             }
             else
             {
@@ -5449,6 +5610,41 @@ namespace Gekko
                 }
             }
             ExtractTimeseriesFromTableLight(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
+        }
+
+        /// <summary>
+        /// Read a two-dimensional data file containg "cells" of data. Supports .csv, .prn, and xls(x). The timeseries data is read into a Gekko databank.
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="databank"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        private static void ReadLongFormat_sdf(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype)
+        {            
+            readInfo.fileName = originalFilePath;
+            readInfo.fileNamePretty = originalFilePathPretty;
+            TableLight matrix = null;
+            string prnType = null;
+            if (oRead.Type == EDataFormat.Sdf)
+            {
+                if (!oRead.Merge)
+                {
+                    databank.Clear();
+                }
+                try
+                {
+                    matrix = ReadCsvPrn(oRead.Type, file, "\t");
+                }
+                finally
+                {
+
+                }
+            }            
+            ExtractTimeseriesFromLongTableLight(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
         }
 
         /// <summary>
@@ -5541,7 +5737,7 @@ namespace Gekko
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
             {
-                inputTable = ReadCsvPrn(fileType, fileName);
+                inputTable = ReadCsvPrn(fileType, fileName, null);
             }
             else if (fileType == EDataFormat.Xls || fileType == EDataFormat.Xlsx)
             {
@@ -15664,8 +15860,8 @@ namespace Gekko
                         s = Encoding.UTF8.GetString(utf8Bytes);
                     }
 
-                    s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space     (can arise when copy-paste from html)
-                    s = s.Replace(Convert.ToChar(173).ToString(), "");   //soft hyphen            (can arise when copy-paste from html)
+                    s = s.Replace(System.Convert.ToChar(160).ToString(), " ");  //non-breaking space     (can arise when copy-paste from html)
+                    s = s.Replace(System.Convert.ToChar(173).ToString(), "");   //soft hyphen            (can arise when copy-paste from html)
 
                     //the code below is probably too dangerous: what about newlines etc.??
                     //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
@@ -15731,7 +15927,7 @@ namespace Gekko
                 byte[] hash2 = md5.ComputeHash(inputBytes);
                 // step 2, convert byte array to hex string
                 StringBuilder sb = new StringBuilder();
-                hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
                 //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
                 //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
                 //This is a little better than hex (32 symbols).
@@ -15760,7 +15956,7 @@ namespace Gekko
                         byte[] hash2 = md5Instance.ComputeHash(stream);
                         //hash = BitConverter.ToString(hash2).Replace("-", "").ToLowerInvariant();
                         //the above is longer because it only has 0, 1, 2, ... , 9, a, b, c, d, e, f.
-                        hash = Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                        hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
                     }
                 }
             }
@@ -30166,7 +30362,7 @@ namespace Gekko
             while (dividend > 0)
             {
                 modulo = (dividend - 1) % 26;
-                columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
+                columnName = System.Convert.ToChar(65 + modulo).ToString() + columnName;
                 dividend = (int)((dividend - modulo) / 26);
             }
 
@@ -34499,7 +34695,8 @@ namespace Gekko
         Xls,
         Xlsx,
         Gdx,
-        Aremos
+        Aremos,
+        Sdf
     }
 
     public enum EOpenType
