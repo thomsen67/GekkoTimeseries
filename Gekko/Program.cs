@@ -4127,15 +4127,17 @@ namespace Gekko
 
                         try
                         {
-                            d = G.ParseIntoDouble(s3);
+                            d = G.ParseIntoDouble(s3, true);
                         }
                         catch
                         {
                             using (Error e = new Error())
                             {
+                                string note = null;
+                                if (dataFormat == EDataFormat.Csv) note = ". Note: You may change decimal separator: OPTION interface csv decimalseparator";
+                                else if (dataFormat == EDataFormat.Prn) note = ". Note: You may change decimal separator: OPTION interface prn decimalseparator";
                                 e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
-                                e.MainNewLine();
-                                e.MainAdd("Note: You may change separator: OPTION interface csv decimalseparator");
+                                e.MainAdd(note);
                                 if (s3.Trim() == ".")
                                 {
                                     e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
@@ -5703,7 +5705,6 @@ namespace Gekko
                 if (listItems.Count == 0 || listItems.Count > 1)
                 {
                     new Error("For SHEET<import " + type.ToString().ToLower() + ">, only 1 name must be provided");
-                    //throw new GekkoException();
                 }
                 collectionName = listItems[0];
             }
@@ -5717,8 +5718,8 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
-            FindFileHelper ffh = Program.FindFile(fileName, null, true, true, false, true, o.p);
-            fileName = ffh.realPathAndFileName;
+            FindFileHelper ffh = Program.FindFile(fileName, null, true, true, true, true, o.p);            
+            fileName = ffh.realPathAndFileName;            
 
             if (Program.options.global_pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
@@ -5778,7 +5779,7 @@ namespace Gekko
 
             //check between 1... large number
 
-            if (type == ESheetCollection.None)
+            if (type == ESheetCollection.None)  //series
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
@@ -5829,12 +5830,30 @@ namespace Gekko
                             {
                                 (outputList.list[row - 1 - rowOffset] as List).Add(GekkoNull.gekkoNull);
                             }
+                            else if (type == ESheetCollection.Matrix)
+                            {
+                                string note = null;
+                                if (transpose) note = ". Note: cells are transposed.";
+                                new Error("Missing data in row " + row + ", col " + col + note);
+                            }
                             continue;
                         }
 
                         if (type == ESheetCollection.Matrix)
                         {
-                            double v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
+                            double v = double.NaN;
+                            if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
+                            {
+                                bool shouldSkip;
+                                v = Program.ConvertFromStringInFileToValue(cell, null, fileType, transpose, row, col, out shouldSkip);
+                                string note = null;
+                                if (transpose) note = ". Note: cells are transposed.";
+                                if (shouldSkip) new Error("Missing data in row " + row + ", col " + col + note);
+                            }
+                            else
+                            {
+                                v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
+                            }                         
                             outputMatrix.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
                         }
                         else if (type == ESheetCollection.List || type == ESheetCollection.Map)
