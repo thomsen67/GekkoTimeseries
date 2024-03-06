@@ -5172,17 +5172,54 @@ namespace Gekko
             return m;
         }
 
-        public static IVariable flatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        public static IVariable flatten(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            if (x1.Type() == EVariableType.List)
+            //for lists
+
+            if (x.Length == 0)
             {
-                return O.FlattenIVariables(x1);
+                new Error("Function flatten() must be called with > 0 arguents");
+                return null;
+            }
+            else if (x.Length == 1)
+            {
+                if (x[0].Type() == EVariableType.List)
+                {
+                    return O.FlattenIVariables(x[0]);
+                }
+                else
+                {
+                    return x[0];  //not touched
+                }
+            }
+            else if (x.Length == 2)
+            {
+                Series ts = x[0] as Series;
+                if (ts == null) new Error("Expected series input for flatten() argument #1");
+                if (ts.type != ESeriesType.ArraySuper) new Error("Expected series for flatten() to be array-series");
+                ScalarString ss = x[1] as ScalarString;
+                if (ss == null) new Error("Expected string input for flatten() argument #2");
+                string s = ss.string2;
+
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                {
+                    MultidimItem map = kvp.Key;
+                    string xx = G.Chop_RemoveFreq(ts.GetName());
+                    for (int i = 0; i < map.storage.Length; i++)
+                    {
+                        xx += s + map.storage[i];
+                    }
+                    Series ts2 = (kvp.Value as Series).DeepClone(null, null) as Series;
+                    Program.databanks.GetFirst().AddIVariable(G.Chop_AddFreq(xx, ts2.freq), ts2);
+                }
+                return x[0];  //just return itself: here it is the sideeffects that count!
             }
             else
             {
-                return x1;  //not touched
+                if (x.Length == 0) new Error("Function flatten() must be called with < 3 arguents");
+                return null;
             }
-        }        
+        }
 
         public static IVariable unique(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {

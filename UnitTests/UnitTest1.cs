@@ -32051,7 +32051,7 @@ print(df2)
         }
 
         [TestMethod]
-        public void _Test_ReadSdf()
+        public void _Test_ReadSdf_WithReorderRenameAndFlatten()
         {
             I("reset;");
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
@@ -32080,6 +32080,11 @@ print(df2)
             _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+            I("z.flatten('__');");
+            _AssertSeries(First(), "z__aa__bb__dd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z__aa__cc__dd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z__aa__bb__dd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z__aa__cc__dd!a", 2002, 7.8d, sharedDelta);
         }
 
 
