@@ -777,7 +777,8 @@ namespace Gekko
             List<string> table = new List<string>();
             List<string> renameFrom = new List<string>();
             List<string> renameTo = new List<string>();
-                        
+            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
+
             string lastRow = null;  //will not match anything
             int lastRowCounter = 0;
             int row = 0;
@@ -793,6 +794,7 @@ namespace Gekko
                     ScalarString ss = ivCol as ScalarString;
                     if (ss == null) new Error("Expected element (row) " + row + ", (col) " + col + " to be a string");
                     string s = ss.string2;
+                    if (G.NullOrBlanks(s)) new Error("Expected element (row) " + row + ", (col) " + col + " to be non-blank");
                     if (col == 1)
                     {
                         int i = G.ConvertToInt(ss.string2);
@@ -804,17 +806,21 @@ namespace Gekko
                         if (!G.Equal(lastRow, ss.string2))
                         {
                             lastRow = s;
-                            lastRowCounter++;
+                            lastRowCounter++;  //1 first time
+                            fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
                         }
                         oldDim.Add(lastRowCounter);
                     }
                     else if (col == 3)
                     {
-                        renameFrom.Add(s);
+                        renameFrom.Add(s);                        
                     }
                     else if (col == 4)
                     {
                         renameTo.Add(s);
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error("In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error("In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
+                        fromTo[lastRowCounter - 1].Add(renameFrom[renameFrom.Count - 1], renameTo[renameTo.Count - 1]);
                     }
                     else
                     {
@@ -826,6 +832,7 @@ namespace Gekko
             SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
             SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
             Dictionary<Tuple<int, int>, string> tjek = new Dictionary<Tuple<int, int>, string>();
+            
             for (int i = 0; i < oldDim.Count; i++)
             {
                 if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
@@ -882,7 +889,25 @@ namespace Gekko
             
             Series y = Functions.reorder(smpl, _t1, _t2, x1, new List(m)) as Series;
 
-            return null;
+            Series z = new Series(y.freq, G.Chop_SetFreq(y.name, y.freq));
+            z.SetArrayTimeseries(y.dimensions + 1, true);
+            z = ts.DeepClone(null, null) as Series;
+            int dim = 0;
+            foreach (KeyValuePair<MultidimItem, IVariable> kvp in z.dimensionsStorage.storage)
+            {                
+                MultidimItem map = kvp.Key;
+                for (int i = 0; i < map.storage.Length; i++)
+                {
+                    string to = null; fromTo[i].TryGetValue(map.storage[i], out to);
+                    if (to != null)
+                    {
+                        map.storage[i] = to;
+                    }
+                    
+                }
+            }
+
+            return z;
         }
 
 
@@ -930,30 +955,21 @@ namespace Gekko
             {
                 new Error("Array-series expected to have " + reorder.Count + " dimensions, but has " + ts.dimensions);
             }
-
-            //For Gekko 4.0, set name to G.GetArraySeriesTempName(G.ConvertFreq(EFreq.U))
-            Series tsNew = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));            
+            
+            Series tsNew = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
             tsNew.SetArrayTimeseries(ts.dimensions + 1, true);
-
             tsNew = ts.DeepClone(null, null) as Series;
-
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in tsNew.dimensionsStorage.storage)
             {                
                 MultidimItem map = kvp.Key;
-
                 List<string> remember = new List<string>(map.storage);
-
                 for (int i = 0; i < reorder.Count; i++)
                 {
                     //from i --> ii
                     int ii = reorder[i];
                     map.storage[i] = remember[ii - 1];
                 }                
-                
-                
-                
             }
-
             return tsNew;
         }
 
@@ -973,8 +989,7 @@ namespace Gekko
                 new Error("Array-series does not have a dimension #" + iDim);
                 //throw new GekkoException();
             }
-
-            //For Gekko 4.0, set name to G.GetArraySeriesTempName(G.ConvertFreq(EFreq.U))
+                        
             Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
