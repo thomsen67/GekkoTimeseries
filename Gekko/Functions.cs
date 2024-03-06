@@ -825,12 +825,12 @@ namespace Gekko
 
             SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
             SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
-            GekkoDictionary<string, string> tjek = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<Tuple<int, int>, string> tjek = new Dictionary<Tuple<int, int>, string>();
             for (int i = 0; i < oldDim.Count; i++)
             {
                 if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
                 if (!sortedNewDim.ContainsKey(newDim[i])) sortedNewDim.Add(newDim[i], 0);
-                if (!tjek.ContainsKey(oldDim[i] + " --> " + newDim[i])) tjek.Add(oldDim[i] + " --> " + newDim[i], null);
+                if (!tjek.ContainsKey(new Tuple<int, int>(oldDim[i], newDim[i]))) tjek.Add(new Tuple<int, int>(oldDim[i], newDim[i]), null);
             }
 
             if (sortedOldDim.Keys.First() != 1) new Error("Old dimensions must start with 1");
@@ -859,9 +859,9 @@ namespace Gekko
                 {
                     txt.MainAdd("Bad dimension reordering, expected " + n + " reorderings, got " + tjek.Count + ":");
                     txt.MainNewLineTight();
-                    foreach (string s in tjek.Keys)
+                    foreach (Tuple<int, int> s in tjek.Keys)
                     {
-                        txt.MainAdd(s);
+                        txt.MainAdd(s.Item1 + " --> " + s.Item2);
                         txt.MainNewLineTight();
                     }
                 }
@@ -872,10 +872,13 @@ namespace Gekko
             // ================================================
 
             List<IVariable> m = new List<IVariable>();
-            for (int i = 0; i < newDim.Count; i++)
+            c = 0;
+            foreach (Tuple<int, int> key in tjek.Keys)
             {
-                m.Add(new ScalarVal(newDim[i]));
-            }            
+                c++;
+                if (key.Item1 != c) new Error("Bad dimension");
+                m.Add(new ScalarVal(key.Item2));
+            }
             
             Series y = Functions.reorder(smpl, _t1, _t2, x1, new List(m)) as Series;
 
