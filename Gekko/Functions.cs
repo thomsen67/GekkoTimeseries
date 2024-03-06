@@ -760,9 +760,131 @@ namespace Gekko
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
 
-        public static IVariable reorder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            List<IVariable> iDim = O.ConvertToList(x2);
+            List<IVariable> rowList = O.ConvertToList(x2);
+            if (rowList == null) new Error("Expected list as argument #2");            
+            if (rowList.Count == 0) new Error("Empty list not allowed");
+
+            Series ts = x1 as Series;
+            if (ts == null || ts.type != ESeriesType.ArraySuper)
+            {
+                new Error("You must use a array-timeseries variable");
+            }
+
+            List<int> oldDim = new List<int>();
+            List<int> newDim = new List<int>();
+            List<string> table = new List<string>();
+            List<string> renameFrom = new List<string>();
+            List<string> renameTo = new List<string>();
+                        
+            string lastRow = null;  //will not match anything
+            int lastRowCounter = 0;
+            int row = 0;
+            foreach (IVariable iv in rowList)
+            {
+                row++;
+                List colList = iv as List;
+                if (colList == null) new Error("Expected list element #" + row + " to be a list of strings");
+                int col = 0;
+                foreach (IVariable ivCol in colList.list)
+                {
+                    col++;
+                    ScalarString ss = ivCol as ScalarString;
+                    if (ss == null) new Error("Expected element (row) " + row + ", (col) " + col + " to be a string");
+                    string s = ss.string2;
+                    if (col == 1)
+                    {
+                        int i = G.ConvertToInt(ss.string2);
+                        if (i == int.MaxValue) new Error("Cannot convert string '" + s + "' into an integer");
+                        newDim.Add(i);
+                    }
+                    else if (col == 2)
+                    {
+                        if (!G.Equal(lastRow, ss.string2))
+                        {
+                            lastRow = s;
+                            lastRowCounter++;
+                        }
+                        oldDim.Add(lastRowCounter);
+                    }
+                    else if (col == 3)
+                    {
+                        renameFrom.Add(s);
+                    }
+                    else if (col == 4)
+                    {
+                        renameTo.Add(s);
+                    }
+                    else
+                    {
+                        new Error("Sublists must have exactly 4 elements");
+                    }
+                }
+            }
+
+            SortedDictionary<int, int> sortedOldDim = new SortedDictionary<int, int>();
+            SortedDictionary<int, int> sortedNewDim = new SortedDictionary<int, int>();
+            GekkoDictionary<string, string> tjek = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < oldDim.Count; i++)
+            {
+                if (!sortedOldDim.ContainsKey(oldDim[i])) sortedOldDim.Add(oldDim[i], 0);
+                if (!sortedNewDim.ContainsKey(newDim[i])) sortedNewDim.Add(newDim[i], 0);
+                if (!tjek.ContainsKey(oldDim[i] + " --> " + newDim[i])) tjek.Add(oldDim[i] + " --> " + newDim[i], null);
+            }
+
+            if (sortedOldDim.Keys.First() != 1) new Error("Old dimensions must start with 1");
+            if (sortedNewDim.Keys.First() != 1) new Error("New dimensions must start with 1");
+            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last()) new Error("Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last());
+
+            int n = sortedOldDim.Keys.Last();
+
+            int c = 0;
+            foreach (int i in sortedOldDim.Keys)
+            {
+                c++;
+                if (i != c) new Error("In old dimensions, dimension #" + i + " is missing");
+            }
+
+            c = 0;
+            foreach (int i in sortedNewDim.Keys)
+            {
+                c++;
+                if (i != c) new Error("In new dimensions, dimension #" + i + " is missing");
+            }
+
+            if (tjek.Count != n)
+            {
+                using (var txt = new Error())
+                {
+                    txt.MainAdd("Bad dimension reordering, expected " + n + " reorderings, got " + tjek.Count + ":");
+                    txt.MainNewLineTight();
+                    foreach (string s in tjek.Keys)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
+
+            // ================================================
+            // Now we are ready for reordering and renaming
+            // ================================================
+
+            List<IVariable> m = new List<IVariable>();
+            for (int i = 0; i < newDim.Count; i++)
+            {
+                m.Add(new ScalarVal(newDim[i]));
+            }            
+            
+            Series y = Functions.reorder(smpl, _t1, _t2, x1, new List(m)) as Series;
+
+            return null;
+        }
+
+
+        public static IVariable reorder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {            
             IVariable iv = vals(smpl, _t1, _t2, x2);
 
             List iv_list = iv as List;
@@ -792,7 +914,7 @@ namespace Gekko
             foreach (KeyValuePair<int, int> kvp in tjek)
             {
                 counter++;
-                if (kvp.Key != counter) new Error("In list, expected an element " + i + ", but it is not present in the list.");
+                if (kvp.Key != counter) new Error("In list, expected an element " + counter + ", but it is not present in the list.");
             }            
 
             Series ts = x1 as Series;

@@ -32071,7 +32071,15 @@ print(df2)
             FAIL("y = x.reorder((2, 1));");
             FAIL("y = x.reorder((2,));");
             I("prt #(listfile x_cfg.csv);");
-
+            I("z = x.rename(#(listfile x_cfg.csv));");
+            //_AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2001, 1.2d, sharedDelta);
+            //_AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2001, 3.4d, sharedDelta);
+            //_AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2002, 5.6d, sharedDelta);
+            //_AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
         }
 
 
