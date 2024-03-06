@@ -6711,6 +6711,7 @@ namespace Gekko
         public static void StopHelper(GekkoSmpl smpl, P p)
         {
             //if (!Globals.stopFix) p.hasSeenStopCommand = 1;
+            p.stopCommandEncountered = true;
             O.FunctionLookupNew2(p, null, Globals.stopHelper)(smpl, p, false, null, null);
         }
 

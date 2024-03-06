@@ -1967,7 +1967,7 @@ namespace Gekko
 
                 if (FindException(e2, "GekkoException"))
                 {
-                    G.Write("*** ERROR: The statement failed");
+                    if (!p.stopCommandEncountered) G.Write("*** ERROR: The statement failed");  //do not show this after STOP command.
                 }
                 else
                 {
@@ -2011,7 +2011,10 @@ namespace Gekko
 
                 LinkContainer lc = new LinkContainer(s);
                 Globals.linkContainer.Add(lc.counter, lc);
-                G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
+                if (!p.stopCommandEncountered)
+                {
+                    G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
+                }
 
 
             }
@@ -34988,6 +34991,7 @@ namespace Gekko
         private GekkoDictionary<string, int> commandFileCounter = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private GekkoDictionary<string, string> commandFileCounterTainted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public int numberOfServiceMessages = 0;
+        public bool stopCommandEncountered = false;
 
         public static bool IsFunctionOrProcedure(string command)
         {
