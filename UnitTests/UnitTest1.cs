@@ -32050,6 +32050,30 @@ print(df2)
             _AssertListString(First(), "#m", new StringOrList("-058", "-1e5"));
         }
 
+        [TestMethod]
+        public void _Test_ReadSdf()
+        {
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("read <sdf> x.sdf;");
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);
+            I("y = x.reorder((2, 3, 1));");
+            _AssertSeries(First(), "y!a", new string[] { "b", "d", "a" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "c", "d", "a" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "b", "d", "a" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "y!a", new string[] { "c", "d", "a" }, 2002, 7.8d, sharedDelta);
+            FAIL("y = x.reorder((2, 3, 4));");
+            FAIL("y = x.reorder((2, 3, 0));");
+            FAIL("y = x.reorder((2, 4, 1));");
+            FAIL("y = x.reorder((2, 1));");
+            FAIL("y = x.reorder((2,));");
+            I("prt #(listfile x_cfg.csv);");
+
+        }
+
 
         [TestMethod]
         public void _Test_PriceIndexFunctions()

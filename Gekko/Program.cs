@@ -4329,6 +4329,9 @@ namespace Gekko
             int matrixMaxRow = matrix.GetRowMaxNumber();
             int matrixMaxCol = matrix.GetColMaxNumber();
 
+            if (matrixMaxRow < 1) new Error("Expected at least 1 row. Matrix dimensions are " + matrixMaxRow + " x " + matrixMaxCol);
+            if (matrixMaxCol < 3) new Error("Expected at least 3 cols. Matrix dimensions are " + matrixMaxRow + " x " + matrixMaxCol);
+
             //Sdf is like this (long dataframe, no header row)
             // -----------------------------------------------
             // B1GD V       LAN 1966    6303465,728
@@ -4378,6 +4381,9 @@ namespace Gekko
                     if (cell.type == ECellLightType.String) cellText = cell.text;
                     else if (cell.type == ECellLightType.Double) cellText = cell.data.ToString();
                     else if (cell.type == ECellLightType.DateTime) cellText = cell.dateTime.ToString();
+
+                    cellText = cellText.Trim();  //just for safety
+                    if (cellText.Contains(" ")) new Error("Cell row " + row + ", col " + col + " contains blanks ('" + cellText + "')");
 
                     if (cellText == null)
                     {
