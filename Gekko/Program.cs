@@ -5799,15 +5799,9 @@ namespace Gekko
                 {
                     databank.Clear();
                 }
-                try
-                {
-                    matrix = ReadCsvPrn(oRead.Type, file, "\t");
-                }
-                finally
-                {
 
-                }
-            }            
+                matrix = ReadCsvPrn(oRead.Type, file, "\t");
+            }         
             ExtractTimeseriesFromLongTableLight(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
         }
 

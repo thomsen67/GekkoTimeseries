@@ -32053,8 +32053,7 @@ print(df2)
         [TestMethod]
         public void _Test_ReadSdf_WithReorderRenameAndFlatten()
         {
-            I("reset;");
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read <sdf> x.sdf;");
             _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
             _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
@@ -32070,21 +32069,33 @@ print(df2)
             FAIL("y = x.reorder((2, 4, 1));");
             FAIL("y = x.reorder((2, 1));");
             FAIL("y = x.reorder((2,));");
-            I("prt #(listfile x_cfg.csv);");
+
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("read <sdf> x.sdf;");
             I("z = x.rename(#(listfile x_cfg.csv));");
-            //_AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2001, 1.2d, sharedDelta);
-            //_AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2001, 3.4d, sharedDelta);
-            //_AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2002, 5.6d, sharedDelta);
-            //_AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2002, 7.8d, sharedDelta);
+            I("z.flatten('_');");
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
-            I("z.flatten('__');");
-            _AssertSeries(First(), "z__aa__bb__dd!a", 2001, 1.2d, sharedDelta);
-            _AssertSeries(First(), "z__aa__cc__dd!a", 2001, 3.4d, sharedDelta);
-            _AssertSeries(First(), "z__aa__bb__dd!a", 2002, 5.6d, sharedDelta);
-            _AssertSeries(First(), "z__aa__cc__dd!a", 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);            
+            _AssertSeries(First(), "z_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
+
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("read <sdf> x.sdf;");
+            I("z = x.rename(#(listfile x_cfg2.csv));");
+            I("z.flatten('_');");
+            I("prt<n> z;");
+            _AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "bb", "dd", "aa" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z!a", new string[] { "cc", "dd", "aa" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z_bb_dd_aa", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z_cc_dd_aa", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z_bb_dd_aa", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z_cc_dd_aa", 2002, 7.8d, sharedDelta);
         }
 
 

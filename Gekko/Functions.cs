@@ -778,6 +778,9 @@ namespace Gekko
             List<string> renameFrom = new List<string>();
             List<string> renameTo = new List<string>();
             List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
+            List<string> col1col2 = new List<string>();
+
+            string cfg = "Config list: ";
 
             string lastRow = null;  //will not match anything
             int lastRowCounter = 0;
@@ -786,23 +789,39 @@ namespace Gekko
             {
                 row++;
                 List colList = iv as List;
-                if (colList == null) new Error("Expected list element #" + row + " to be a list of strings");
+                if (colList == null) new Error(cfg + "Expected list element #" + row + " to be a list of strings");
                 int col = 0;
                 foreach (IVariable ivCol in colList.list)
                 {
                     col++;
                     ScalarString ss = ivCol as ScalarString;
-                    if (ss == null) new Error("Expected element (row) " + row + ", (col) " + col + " to be a string");
+                    if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
                     string s = ss.string2;
-                    if (G.NullOrBlanks(s)) new Error("Expected element (row) " + row + ", (col) " + col + " to be non-blank");
+                    if (G.NullOrBlanks(s)) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-blank");
+                    s = s.Trim();
                     if (col == 1)
                     {
-                        int i = G.ConvertToInt(ss.string2);
-                        if (i == int.MaxValue) new Error("Cannot convert string '" + s + "' into an integer");
+                        int i = G.ConvertToInt(s);
+                        if (i == int.MaxValue) new Error(cfg + "Cannot convert string '" + s + "' into an integer");
                         newDim.Add(i);
                     }
                     else if (col == 2)
                     {
+                        string scol2col2Lower = newDim.Last() + ", " + s.ToLower();
+
+                        int i = col1col2.IndexOf(scol2col2Lower);
+                        if (i == -1)
+                        {
+                            col1col2.Add(scol2col2Lower);
+                        }
+                        else
+                        {
+                            if (i != col1col2.Count - 1)
+                            {
+                                new Error(cfg + "Combination of '" + scol2col2Lower + "' has been seen in row " + (i + 1) + ". Rows must be contiguous for each dimension.");
+                            }
+                        }
+
                         if (!G.Equal(lastRow, ss.string2))
                         {
                             lastRow = s;
@@ -818,13 +837,13 @@ namespace Gekko
                     else if (col == 4)
                     {
                         renameTo.Add(s);
-                        if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error("In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
-                        if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error("In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
+                        if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
                         fromTo[lastRowCounter - 1].Add(renameFrom[renameFrom.Count - 1], renameTo[renameTo.Count - 1]);
                     }
                     else
                     {
-                        new Error("Sublists must have exactly 4 elements");
+                        new Error(cfg + "Sublists must have exactly 4 elements");
                     }
                 }
             }
@@ -840,9 +859,9 @@ namespace Gekko
                 if (!tjek.ContainsKey(new Tuple<int, int>(oldDim[i], newDim[i]))) tjek.Add(new Tuple<int, int>(oldDim[i], newDim[i]), null);
             }
 
-            if (sortedOldDim.Keys.First() != 1) new Error("Old dimensions must start with 1");
-            if (sortedNewDim.Keys.First() != 1) new Error("New dimensions must start with 1");
-            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last()) new Error("Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last());
+            if (sortedOldDim.Keys.First() != 1) new Error(cfg + "Old dimensions must start with 1");
+            if (sortedNewDim.Keys.First() != 1) new Error(cfg + "New dimensions must start with 1");
+            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last()) new Error(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last());
 
             int n = sortedOldDim.Keys.Last();
 
@@ -850,21 +869,21 @@ namespace Gekko
             foreach (int i in sortedOldDim.Keys)
             {
                 c++;
-                if (i != c) new Error("In old dimensions, dimension #" + i + " is missing");
+                if (i != c) new Error(cfg + "In old dimensions, dimension #" + i + " is missing");
             }
 
             c = 0;
             foreach (int i in sortedNewDim.Keys)
             {
                 c++;
-                if (i != c) new Error("In new dimensions, dimension #" + i + " is missing");
+                if (i != c) new Error(cfg + "In new dimensions, dimension #" + i + " is missing");
             }
 
             if (tjek.Count != n)
             {
                 using (var txt = new Error())
                 {
-                    txt.MainAdd("Bad dimension reordering, expected " + n + " reorderings, got " + tjek.Count + ":");
+                    txt.MainAdd(cfg + "Bad dimension reordering, expected " + n + " reorderings, got " + tjek.Count + ":");
                     txt.MainNewLineTight();
                     foreach (Tuple<int, int> s in tjek.Keys)
                     {
@@ -887,11 +906,9 @@ namespace Gekko
                 m.Add(new ScalarVal(key.Item2));
             }
             
-            Series y = Functions.reorder(smpl, _t1, _t2, x1, new List(m)) as Series;
-
-            Series z = new Series(y.freq, G.Chop_SetFreq(y.name, y.freq));
-            z.SetArrayTimeseries(y.dimensions + 1, true);
-            z = ts.DeepClone(null, null) as Series;
+            //Series z = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
+            //z.SetArrayTimeseries(ts.dimensions + 1, true);
+            Series z = ts.DeepClone(null, null) as Series;
             int dim = 0;
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in z.dimensionsStorage.storage)
             {                
@@ -907,7 +924,9 @@ namespace Gekko
                 }
             }
 
-            return z;
+            Series y = Functions.reorder(smpl, _t1, _t2, z, new List(m)) as Series;
+
+            return y;
         }
 
 
