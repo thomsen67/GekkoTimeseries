@@ -807,7 +807,7 @@ namespace Gekko
                     }
                     else if (col == 2)
                     {
-                        string scol2col2Lower = newDim.Last() + ", " + s.ToLower();
+                        string scol2col2Lower = newDim.Last() + "; " + s.ToLower();
 
                         int i = col1col2.IndexOf(scol2col2Lower);
                         if (i == -1)
@@ -818,11 +818,11 @@ namespace Gekko
                         {
                             if (i != col1col2.Count - 1)
                             {
-                                new Error(cfg + "Combination of '" + scol2col2Lower + "' has been seen in row " + (i + 1) + ". Rows must be contiguous for each dimension.");
+                                new Error(cfg + "Combination of '" + scol2col2Lower + "' in row " + row + " has already been seen in row " + (i + 1) + ". Rows must be contiguous for each dimension.");
                             }
                         }
 
-                        if (!G.Equal(lastRow, ss.string2))
+                        if (!G.Equal(lastRow, s))
                         {
                             lastRow = s;
                             lastRowCounter++;  //1 first time
@@ -879,11 +879,26 @@ namespace Gekko
                 if (i != c) new Error(cfg + "In new dimensions, dimension #" + i + " is missing");
             }
 
+            if (col1col2.Count != n)
+            {
+                //Is this error even possibe here. Oh well, now we have it.
+                using (var txt = new Error())
+                {
+                    txt.MainAdd(cfg + "Bad dimension combinations (first 2 columns): expected " + n + ", got " + col1col2.Count + ":");
+                    txt.MainNewLineTight();
+                    foreach (string s in col1col2)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
+
             if (tjek.Count != n)
             {
                 using (var txt = new Error())
                 {
-                    txt.MainAdd(cfg + "Bad dimension reordering, expected " + n + " reorderings, got " + tjek.Count + ":");
+                    txt.MainAdd(cfg + "Bad dimension reordering: expected " + n + " reorderings, got " + tjek.Count + ":");
                     txt.MainNewLineTight();
                     foreach (Tuple<int, int> s in tjek.Keys)
                     {
@@ -975,9 +990,9 @@ namespace Gekko
                 new Error("Array-series expected to have " + reorder.Count + " dimensions, but has " + ts.dimensions);
             }
             
-            Series tsNew = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
-            tsNew.SetArrayTimeseries(ts.dimensions + 1, true);
-            tsNew = ts.DeepClone(null, null) as Series;
+            //Series tsNew = new Series(ts.freq, G.Chop_SetFreq(ts.name, ts.freq));
+            //tsNew.SetArrayTimeseries(ts.dimensions + 1, true);
+            Series tsNew = ts.DeepClone(null, null) as Series;
             foreach (KeyValuePair<MultidimItem, IVariable> kvp in tsNew.dimensionsStorage.storage)
             {                
                 MultidimItem map = kvp.Key;

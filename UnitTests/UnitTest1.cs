@@ -32070,8 +32070,11 @@ print(df2)
             FAIL("y = x.reorder((2, 1));");
             FAIL("y = x.reorder((2,));");
 
+            // ---------------------------------------
+
             I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read <sdf> x.sdf;");
+            FAIL("z = x.rename(#(listfile x_cfg2_fail1.csv));");  //dims must be contiguous
             I("z = x.rename(#(listfile x_cfg.csv));");
             I("z.flatten('_');");
             _AssertSeries(First(), "z!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
@@ -32082,6 +32085,8 @@ print(df2)
             _AssertSeries(First(), "z_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
             _AssertSeries(First(), "z_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
             _AssertSeries(First(), "z_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
+
+            // ---------------------------------------
 
             I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read <sdf> x.sdf;");
