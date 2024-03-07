@@ -861,7 +861,19 @@ namespace Gekko
 
             if (sortedOldDim.Keys.First() != 1) new Error(cfg + "Old dimensions must start with 1");
             if (sortedNewDim.Keys.First() != 1) new Error(cfg + "New dimensions must start with 1");
-            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last()) new Error(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last());
+            if (sortedOldDim.Keys.Last() != sortedNewDim.Keys.Last())
+            {
+                using (var txt = new Error())
+                {
+                    txt.MainAdd(cfg + "Old and new dimensions do not match: " + sortedOldDim.Keys.Last() + " versus " + sortedNewDim.Keys.Last()+". There are these combinations regarding first and second element of sublists:");
+                    txt.MainNewLineTight();
+                    foreach (string s in col1col2)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                }
+            }
 
             int n = sortedOldDim.Keys.Last();
 
@@ -930,6 +942,10 @@ namespace Gekko
                 MultidimItem map = kvp.Key;
                 for (int i = 0; i < map.storage.Length; i++)
                 {
+                    if (fromTo.Count != map.storage.Length)
+                    {
+                        new Error(cfg + "The array-series has " + map.storage.Length + " dimensions, but only " + fromTo.Count + " are present in the cfg list.");
+                    }
                     string to = null; fromTo[i].TryGetValue(map.storage[i], out to);
                     if (to != null)
                     {
