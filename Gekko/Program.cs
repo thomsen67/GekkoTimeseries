@@ -35052,6 +35052,11 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// True if this is a statement directly from the GUI input (that is: just typed by a human).
+        /// Note: marking > 1 lines in the GUI input box and hitting [Enter] will count as IsSimple() == false. That is considered like a program.
+        /// </summary>
+        /// <returns></returns>
         public bool IsSimple()
         {
             if (this.isOneLinerFromGui && this.counter <= 1)

@@ -2640,8 +2640,11 @@ namespace Gekko
 
         public static void flush(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
+            bool isFromGui = false;
+            if (smpl?.p != null) isFromGui = smpl.p.IsSimple();
+            if (!isFromGui) new Error("The flush() function is only intended for occasional manual use, not as a part of program lines.");            
             Program.Flush(true);  //removes cached models
-            new Writeln("Gekko cache files deleted. This function is intended for occasional manual use, not for putting inside a Gekko program.");
+            new Writeln("Gekko cache files deleted. This function is intended for occasional manual use.");
         }
 
         //Expect time dimension to be last for each "record", like (('a', 'b', '2001'), ('a', 'c', '2002'))
