@@ -369,7 +369,7 @@ namespace Gekko
                     //{
                         if (functionName == Globals.stopHelper)
                         {
-                            new Error("Stopping execution: STOP command encountered.");
+                            new Error("STOP statement encountered. All execution stopped.");
                         }
                         else
                         {

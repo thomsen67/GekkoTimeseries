@@ -7732,6 +7732,15 @@ namespace Gekko
                 GekkoTime basisStart = (data[n].x as Series).GetRealDataPeriodFirst();
                 GekkoTime basisEnd = (data[n].x as Series).GetRealDataPeriodLast();
 
+                if (basisStart.IsNull())
+                {
+                    Series ts = data[n].x as Series;
+                    string name = ts.GetName();
+                    string s = null;
+                    if (name != null) s = " (" + name + ")";
+                    new Error("While splicing, incoming series #" + (n + 1) + " of " + data.Count + "" + s + " does not seem to contain any data.");
+                }
+
                 GekkoTime tt1 = GekkoTime.tNull;  bool b1 = false;
                 SpliceHelper5(data, n-1, 0, out b1, out tt1);
                 if (b1) basisStart = tt1;
