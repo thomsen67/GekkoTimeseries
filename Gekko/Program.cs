@@ -11796,6 +11796,20 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Calls GetVariableExplanation(), but fetches only first line (if any). May return null.
+        /// </summary>
+        /// <param name="varnameMaybeWithFreq"></param>
+        /// <returns></returns>
+        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq)
+        {
+            if (varnameMaybeWithFreq == null) return null;
+            string label = null;
+            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+            if (expls != null && expls.Count > 0) label = expls[0];
+            return label;
+        }
+
+        /// <summary>
         /// Get name, label, source, unit, etc. for a timeseries (will also get lines from external varlist.dat file if present: these lines are shown right after name)
         /// </summary>
         /// <param name="varnameWithoutFreq"></param>
@@ -11806,6 +11820,7 @@ namespace Gekko
         /// <returns></returns>
         public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
+            //For Gekko 3.2, clean up the two first parameters (should be just 1).
             //For Gekko 3.2, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
             //Or make sure the label, source etc. objects are cleaned with ReplaceWhitespaceWith1Blank().
 
@@ -11840,57 +11855,15 @@ namespace Gekko
                         string source_string = "Source: "; if (danish) source_string = "Kilde: ";
                         string units_string = "Units: "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
 
-                        if (!G.NullOrBlanks(ts.meta.label))
-                        {
-                            rv.Add(label_string + ts.meta.label);
-                        }
-                        else
-                        {
-                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.label))
-                            {
-                                rv.Add(label_string + ts.mmi.parent.meta.label);
-                            }
-                        }
+                        string label2 = ts.MetaGetLabel();
+                        if (label2 != null) rv.Add(label_string + label2);
 
-                        if (!G.NullOrBlanks(ts.meta.source))
-                        {
-                            if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
-                            {
-                                //do nothing
-                            }
-                            else
-                            {
-                                rv.Add(source_string + ts.meta.source);
-                            }
-                        }
-                        else
-                        {
-                            if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
-                            {
-                                //do nothing
-                            }
-                            else
-                            {
-                                if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
-                                {
-                                    rv.Add(source_string + ts.mmi.parent.meta.source);
-                                }
-                            }
-                        }
+                        string source2 = ts.MetaGetSource();
+                        if (source2 != null && !(htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)) rv.Add(source_string + source2);                        
 
-                        if (!G.NullOrBlanks(ts.meta.units))
-                        {
-                            rv.Add(units_string + ts.meta.units);
-                        }
-                        else
-                        {
-                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.units))
-                            {
-                                rv.Add(units_string + ts.mmi.parent.meta.units);
-                            }
-                        }
+                        string units2 = ts.MetaGetUnits();
+                        if (units2 != null) rv.Add(units_string + units2);
                     }
-
 
                     if (printData)
                     {
@@ -11930,7 +11903,7 @@ namespace Gekko
             }
             return rv;
         }
-
+        
         /// <summary>
         /// Helper method.
         /// </summary>
@@ -16853,7 +16826,7 @@ namespace Gekko
                         string eq = Program.model.GetEquationText(new List<string>() { s2 }, false, tUsedHere);
                         if (!eq.EndsWith("."))
                         {
-                            using (var txt = new Writeln())
+                            using (var txt = new Writeln("", int.MaxValue, Color.Empty, false, ETabs.Main))
                             {
                                 txt.MainAdd("=========================================================================");
                                 txt.MainNewLineTight();

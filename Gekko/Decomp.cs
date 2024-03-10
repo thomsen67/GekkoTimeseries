@@ -5200,10 +5200,8 @@ namespace Gekko
                 //#6irhwakery7
                 string name = G.Chop_DimensionAddLag(f.pv.GetVariableAndPeriod(modelGamsScalar).Item1, modelGamsScalar.Maybe2000GekkoTime(t0), f.pv.GetVariableAndPeriod(modelGamsScalar).Item2, false);
 
-                string label = null;
-                List<string> expls = Program.GetVariableExplanation(name, name, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
-                if (expls != null && expls.Count > 0) label = expls[0];
-                
+                string label = Program.GetVariableExplanation1Line(name);
+
                 string lbl = null;
                 if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";
                 temp.Add(name + lbl);
@@ -5241,7 +5239,7 @@ namespace Gekko
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
             w.ShowDialog();
-        }
+        }        
 
         public enum ENormalizerType
         {

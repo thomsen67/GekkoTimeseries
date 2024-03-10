@@ -8490,7 +8490,9 @@ namespace Gekko
                 }
                 else
                 {
-                    List<string> vars = Restrict(this.names, true, false, true, false);
+                    int counter = 0;
+                    List<string> vars = Program.Search(this.names, null, EVariableType.Series);
+                    //List<string> vars = Restrict(this.names, true, false, true, false);
                     foreach (string s in vars)
                     {
                         IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);  //no searching!
@@ -8504,7 +8506,9 @@ namespace Gekko
                         if (opt_units != null) iv_series.meta.units = opt_units;
                         if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
                         iv_series.meta.SetDirty(true);
+                        counter++;
                     }
+                    new Writeln("Changed meta information for " + counter + " series");
                 }
             }
         }

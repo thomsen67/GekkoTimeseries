@@ -2979,7 +2979,74 @@ namespace Gekko
             mmi.parent = arraySeries;  //The mmi item points to the array-series
             subSeries.mmi = mmi; //the sub-series points to the mmi, this way we can get from the sub-series all the way up to the array-series.                        
         }
-    }    
+
+        /// <summary>
+        /// Get label from series (or parent series)
+        /// </summary>
+        /// <returns></returns>
+        public string MetaGetLabel()
+        {
+            if (this.meta == null) return null;
+            string label2 = null;
+            if (!G.NullOrBlanks(this.meta.label))
+            {
+                label2 = this.meta.label;
+            }
+            else
+            {
+                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.label))
+                {
+                    label2 = this.mmi.parent.meta.label;
+                }
+            }
+            return label2;
+        }
+
+        /// <summary>
+        /// Get source from series (or parent series)
+        /// </summary>
+        /// <returns></returns>
+        public string MetaGetSource()
+        {
+            if (this.meta == null) return null;
+            string source2 = null;
+            if (!G.NullOrBlanks(this.meta.source))
+            {
+                source2 = this.meta.source;
+            }
+            else
+            {
+                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.source))
+                {
+                    source2 = this.mmi.parent.meta.source;
+                }
+            }
+            return source2;
+        }
+
+        /// <summary>
+        /// Get units from series (or parent series)
+        /// </summary>
+        /// <returns></returns>
+        public string MetaGetUnits()
+        {
+            if (this.meta == null) return null;
+            string units2 = null;            
+            if (!G.NullOrBlanks(this.meta.units))
+            {
+                units2 = this.meta.units;
+            }
+            else
+            {
+                if (this.mmi != null && this.mmi.parent != null && !G.NullOrBlanks(this.mmi.parent.meta.units))
+                {
+                    units2 = this.mmi.parent.meta.units;
+                }
+            }
+            return units2;
+        }
+
+    }
 
     [ProtoContract]
     public class SeriesDataInformation

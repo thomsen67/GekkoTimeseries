@@ -6104,6 +6104,67 @@ namespace Gekko
             return v;
         }
 
+        public static void getvarlist(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {            
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
+            FindFileHelper ffh = Program.FindFile(s1, null, true, true, false, true, smpl.p);
+            if (ffh.realPathAndFileName == null) new Error("Could not find file: " + s1);
+            string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
+            Model model = new Model();
+            model.modelGekko = new ModelGekko(model);
+            model.modelGekko.modelInfo = new ModelInfo();
+            string s = Program.UnfoldVariableList(new StringReader("varlist;" + G.NL + txt), model);
+            if (model.modelGekko.modelInfo.varlist == null || model.modelGekko.modelInfo.varlist.Count == 0) new Error("Could not find any labels etc.");
+            int counter = 0;
+            foreach (Program.Item item in model.modelGekko.modelInfo.varlist)
+            {
+                string variable = item.variable;
+                List<string> explanation = item.explanation;
+                if (explanation == null) continue;
+                Series ts = O.GetIVariableFromString(variable, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                if (ts == null) continue;
+                counter++;
+                bool hasSeenSource = false;
+                int i = -1;
+                foreach (string e2 in explanation)
+                {
+                    i++;
+                    string e = e2.Trim();
+                    if (G.NullOrBlanks(e)) continue;
+                    if (i == 0)
+                    {
+                        ts.meta.label = e;
+                    }
+                    else if (i == 1)
+                    {
+                        string e3 = e;
+                        if (e3.StartsWith("(") && e3.EndsWith(")")) e3 = e3.Substring(1, e3.Length - 2);
+                        ts.meta.units = e3;
+                    }
+                    else
+                    {
+                        if (hasSeenSource)
+                        {
+                            if (G.NullOrEmpty(ts.meta.source)) ts.meta.source = e;
+                            else
+                            {
+                                if (ts.meta.source.EndsWith(".")) ts.meta.source += " " + e;
+                                else ts.meta.source += ". " + e;
+                            }
+                        }
+                        else
+                        {
+                            string e4 = e;
+                            if (e4.ToLower().StartsWith("kilde: ")) e4 = e4.Substring("kilde: ".Length).Trim();
+                            ts.meta.source = e4;
+                        }
+                        hasSeenSource = true;
+                    }
+                }                
+            }
+            new Writeln("Inserted " + counter + " explanations from varlist.");
+        }
+
         public static IVariable fromseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);

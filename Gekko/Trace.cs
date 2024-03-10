@@ -74,7 +74,10 @@ namespace Gekko
 
         [ProtoMember(7)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
-                
+
+        [ProtoMember(8)]
+        public string label = null;
+
         public TraceContents2()
         {
             //for protobuf
@@ -900,6 +903,9 @@ namespace Gekko
             
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
 
+            string label = ts.MetaGetLabel();
+            if (label != null) trace.GetContents().label = label;
+
             if (type == ETracePushType.Sibling)
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
@@ -1229,6 +1235,7 @@ namespace Gekko
             string fileDetailed = null;
             string stamp = null;
             string stampDetailed = null;
+            string label = null;
             List<string> precedentsNames = null;
 
             if (this.GetContents() != null)
@@ -1258,9 +1265,11 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) fileDetailed += " (data = " + this.GetContents().dataFile + ")";
                 Trace2.GetStampAsString(this.GetId(), out stamp, out stampDetailed);
                 if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
+                label = this.GetContents().label;
+                if (label != null) label = label.Trim();
             }
 
-            Item newItem = new Item(text, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, precedentsNames, hasChildren);
+            Item newItem = new Item(text, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);
             newItem.trace = this;
             return newItem;
         }
