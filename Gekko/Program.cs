@@ -16792,14 +16792,8 @@ namespace Gekko
                         bank = ts.GetParentDatabank().name;
                     }
 
-                    if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw || Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
-                    {
-                        DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
-                    }
-                    else
-                    {
-                        DispNonGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, variableMaybeWithFreq, bank);
-                    }
+                    bool b = Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw || Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar;
+                    DispHelper2(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, variableMaybeWithFreq, bank, b);
                 }
             }
 
@@ -16856,9 +16850,8 @@ namespace Gekko
         /// <param name="ts"></param>
         /// <param name="bank"></param>
         /// <param name="varnameWithoutFreq"></param>
-        private static void DispNonGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string varnameMaybeWithFreq, string bank)
-        {
-            //ADAM-style, normal timeseries
+        private static void DispHelper2(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string varnameMaybeWithFreq, string bank, bool isGams)
+        {        
 
             string varnameWithoutFreq = G.Chop_RemoveFreq(varnameMaybeWithFreq);
 
@@ -16866,15 +16859,28 @@ namespace Gekko
 
             bool isTimeless = ts.type == ESeriesType.Timeless;
 
+            string s2 = null;
+            if (isGams)
+            {
+                s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
+                if (s2 == "[]") s2 = null;
+            }
+
+            string ss = "SERIES";
+            if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
             G.Writeln();
             G.Writeln("==========================================================================================");
-            G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + ts.GetNameWithoutCurrentFreq(true));
+            G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + ts.GetNameWithoutCurrentFreq(true));
             if (true)
             {
-                EEndoOrExo type1 = VariableTypeEndoExo(varnameWithoutFreq);
                 string type3 = "";
-                if (type1 == EEndoOrExo.Exo) type3 = "Exogenous, ";
-                else if (type1 == EEndoOrExo.Endo) type3 = "Endogenous, ";
+                if (!isGams)
+                {
+                    EEndoOrExo type1 = VariableTypeEndoExo(varnameWithoutFreq);
+                    
+                    if (type1 == EEndoOrExo.Exo) type3 = "Exogenous, ";
+                    else if (type1 == EEndoOrExo.Endo) type3 = "Endogenous, ";
+                }
 
                 string freq = "[unknown frequency]";
 
@@ -16918,6 +16924,40 @@ namespace Gekko
                             G.Writeln(freq + " data from " + first.ToString() + " to " + last.ToString() + stamp);
                         }
                     }
+
+                    if (isGams)
+                    {
+                        if (ts.mmi != null)
+                        {
+                            //then it is a sub-series
+                            Series parent = ts.mmi.parent;
+                            if (parent != null)
+                            {
+                                //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
+                                if (parent.meta.fix == EFixedType.Parameter)
+                                {
+                                    G.Writeln("Fixed (parameter)");
+                                }
+                            }
+                        }
+
+                        if (isTimeless)
+                        {
+                            if (ts.meta.fix == EFixedType.Timeless)
+                            {
+                                G.Writeln("Fixed: " + Globals.fixedTimelessText);
+                            }
+                        }
+                        else
+                        {
+                            if (ts.meta.fix == EFixedType.Normal)
+                            {
+                                string s = ts.meta.fixedNormal.ToString();  //fixedNormal does exist if EFixedType.Normal
+                                G.Writeln("Fixed: " + s);
+                            }
+                        }
+
+                    }
                 }
 
                 List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
@@ -16945,18 +16985,41 @@ namespace Gekko
                     temp = new GekkoDictionary<string, string>[ts.dimensions];
                 }
 
-                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
-
-                if (G.GetModelSourceType() == EModelType.Gekko)
+                if (!isGams)
                 {
-                    DispHelperShowNormalEquation(showDetailed, varnameWithoutFreq);
+                    if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+
+                    if (G.GetModelSourceType() == EModelType.Gekko)
+                    {
+                        DispHelperShowNormalEquation(showDetailed, varnameWithoutFreq);
+                    }
+                    else
+                    {
+                        if (Program.model.modelGams?.equationsByVarname != null)
+                        {
+                            note = "+++ NOTE: There is a GAMS model loaded, perhaps you should use 'OPTION model type = gams;'?";
+                        }
+                    }
                 }
                 else
                 {
-                    if (Program.model.modelGams?.equationsByVarname != null)
+                    
+
+                    if (Program.model.modelGams != null)
                     {
-                        note = "+++ NOTE: There is a GAMS model loaded, perhaps you should use 'OPTION model type = gams;'?";
+                        if (Program.model.modelGams.equationsByVarname != null)
+                        {
+                            eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, true, varnameWithoutFreq, varnameWithoutFreq, eqsPrinted);
+                        }
                     }
+                    else
+                    {
+                        if (Program.model?.modelGekko?.equations != null)
+                        {
+                            note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
+                        }
+                    }
+
                 }
 
                 if (ts.dimensions > 0)
@@ -17075,118 +17138,118 @@ namespace Gekko
             return eh.codeLhsHumanVersion.Trim().Replace("[0]", "") + " = " + eh.codeRhsHumanVersion.Trim().Replace("[0]", "");
         }
 
-        /// <summary>
-        /// DISP for GAMS equations.
-        /// </summary>
-        /// <param name="tStart"></param>
-        /// <param name="tEnd"></param>
-        /// <param name="showDetailed"></param>
-        /// <param name="showAllPeriods"></param>
-        /// <param name="clickedLink"></param>
-        /// <param name="gamsToGekko"></param>
-        /// <param name="ts"></param>
-        /// <param name="variableMaybeWithFreq"></param>
-        /// <param name="bank"></param>
-        /// <param name="varnameWithoutFreq"></param>
-        private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string variableMaybeWithFreq, string bank)
-        {
-            string varnameWithoutFreq = G.Chop_RemoveFreq(variableMaybeWithFreq);
+        ///// <summary>
+        ///// DISP for GAMS equations.
+        ///// </summary>
+        ///// <param name="tStart"></param>
+        ///// <param name="tEnd"></param>
+        ///// <param name="showDetailed"></param>
+        ///// <param name="showAllPeriods"></param>
+        ///// <param name="clickedLink"></param>
+        ///// <param name="gamsToGekko"></param>
+        ///// <param name="ts"></param>
+        ///// <param name="variableMaybeWithFreq"></param>
+        ///// <param name="bank"></param>
+        ///// <param name="varnameWithoutFreq"></param>
+        //private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string variableMaybeWithFreq, string bank)
+        //{
+        //    string varnameWithoutFreq = G.Chop_RemoveFreq(variableMaybeWithFreq);
 
-            string note = null;
+        //    string note = null;
 
-            string s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
-            if (s2 == "[]") s2 = null;
+        //    string s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
+        //    if (s2 == "[]") s2 = null;
 
-            bool isTimeless = ts.type == ESeriesType.Timeless;
+        //    bool isTimeless = ts.type == ESeriesType.Timeless;
 
-            string ss = "SERIES";
-            if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
-            G.Writeln2("==========================================================================================");
-            G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
+        //    string ss = "SERIES";
+        //    if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
+        //    G.Writeln2("==========================================================================================");
+        //    G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
 
-            List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
-            foreach (string expl in expls) G.Writeln(expl);
+        //    List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+        //    foreach (string expl in expls) G.Writeln(expl);
 
-            if (ts.type == ESeriesType.ArraySuper)
-            {
+        //    if (ts.type == ESeriesType.ArraySuper)
+        //    {
 
-            }
-            else
-            {
-                if (ts.mmi != null)
-                {
-                    //then it is a sub-series
-                    Series parent = ts.mmi.parent;
-                    if (parent != null)
-                    {
-                        //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
-                        if (parent.meta.fix == EFixedType.Parameter)
-                        {
-                            G.Writeln("Fixed (parameter)");
-                        }
-                    }
-                }
+        //    }
+        //    else
+        //    {
+        //        if (ts.mmi != null)
+        //        {
+        //            //then it is a sub-series
+        //            Series parent = ts.mmi.parent;
+        //            if (parent != null)
+        //            {
+        //                //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
+        //                if (parent.meta.fix == EFixedType.Parameter)
+        //                {
+        //                    G.Writeln("Fixed (parameter)");
+        //                }
+        //            }
+        //        }
 
-                if (isTimeless)
-                {
-                    if (ts.meta.fix == EFixedType.Timeless)
-                    {
-                        G.Writeln("Fixed: " + Globals.fixedTimelessText);
-                    }
-                }
-                else
-                {
-                    if (ts.meta.fix == EFixedType.Normal)
-                    {
-                        string s = ts.meta.fixedNormal.ToString();  //fixedNormal does exist if EFixedType.Normal
-                        G.Writeln("Fixed: " + s);
-                    }
-                }
-            }
+        //        if (isTimeless)
+        //        {
+        //            if (ts.meta.fix == EFixedType.Timeless)
+        //            {
+        //                G.Writeln("Fixed: " + Globals.fixedTimelessText);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (ts.meta.fix == EFixedType.Normal)
+        //            {
+        //                string s = ts.meta.fixedNormal.ToString();  //fixedNormal does exist if EFixedType.Normal
+        //                G.Writeln("Fixed: " + s);
+        //            }
+        //        }
+        //    }
 
-            List<MultidimItem> keys = null;
+        //    List<MultidimItem> keys = null;
 
-            if (ts.type == ESeriesType.ArraySuper)
-            {
-                keys = ts.dimensionsStorage.storage.Keys.ToList();
-                keys.Sort(Multidim.CompareMultidimItems);
-            }
+        //    if (ts.type == ESeriesType.ArraySuper)
+        //    {
+        //        keys = ts.dimensionsStorage.storage.Keys.ToList();
+        //        keys.Sort(Multidim.CompareMultidimItems);
+        //    }
 
-            bool eqsPrinted = false;
+        //    bool eqsPrinted = false;
 
-            if (Program.model.modelGams != null)
-            {
-                if (Program.model.modelGams.equationsByVarname != null)
-                {
-                    eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, variableMaybeWithFreq, varnameWithoutFreq, eqsPrinted);
-                }
-            }
-            else
-            {
-                if (Program.model?.modelGekko?.equations != null)
-                {
-                    note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
-                }
-            }
+        //    if (Program.model.modelGams != null)
+        //    {
+        //        if (Program.model.modelGams.equationsByVarname != null)
+        //        {
+        //            eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, variableMaybeWithFreq, varnameWithoutFreq, eqsPrinted);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (Program.model?.modelGekko?.equations != null)
+        //        {
+        //            note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
+        //        }
+        //    }
 
-            if (ts.dimensions > 0)
-            {
-                DispHelperArraySeries(ts, keys, eqsPrinted);
-            }
-            else
-            {
-                DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);
-            }
+        //    if (ts.dimensions > 0)
+        //    {
+        //        DispHelperArraySeries(ts, keys, eqsPrinted);
+        //    }
+        //    else
+        //    {
+        //        DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);
+        //    }
 
-            if (G.GetModelSourceType() == EModelType.GAMSScalar)
-            {
-                //we try to fetch equation names
-            }
+        //    if (G.GetModelSourceType() == EModelType.GAMSScalar)
+        //    {
+        //        //we try to fetch equation names
+        //    }
 
-            G.Writeln("==========================================================================================");
+        //    G.Writeln("==========================================================================================");
 
-            if (note != null) G.Writeln(note);
-        }
+        //    if (note != null) G.Writeln(note);
+        //}
 
         /// <summary>
         /// Check whether a variable is part of a GAMS model

@@ -1130,7 +1130,7 @@ namespace Gekko
                         model.Add(item);
                     }
                     WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
-                    w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.80));
+                    w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
                     //dockPanel.Background = dockPanel.originalBackgroundColor;
                     //Globals.decompResidualColor;
                     string v = null;
