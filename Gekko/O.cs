@@ -8498,7 +8498,6 @@ namespace Gekko
                 {
                     int counter = 0;
                     List<string> vars = Program.Search(this.names, null, EVariableType.Series);
-                    //List<string> vars = Restrict(this.names, true, false, true, false);
                     foreach (string s in vars)
                     {
                         IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);  //no searching!

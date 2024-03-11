@@ -19486,7 +19486,7 @@ namespace Gekko
                 }
             }
             string note = null;
-            new Writeln("Inserted " + counter + " explanations from varlist (with " + counter2 + " elements). " + warning);
+            new Writeln("Inserted " + counter + " doc elements from varlist (which has " + counter2 + " elements). " + warning);
         }
 
         /// <summary>
