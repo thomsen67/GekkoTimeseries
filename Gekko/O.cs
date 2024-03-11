@@ -8492,14 +8492,7 @@ namespace Gekko
                 }
                 else if (G.Equal(this.opt_varlist, "yes"))
                 {
-                    if (this.fileName != null)
-                    {
-                        //import the list
-                    }
-                    else
-                    {
-                        //use model list
-                    }
+                    Program.ImportVarlist(this.fileName);
                 }
                 else
                 {
@@ -8523,7 +8516,7 @@ namespace Gekko
                     }
                     new Writeln("Changed meta information for " + counter + " series");
                 }
-            }
+            }            
         }
 
         public class Assignment

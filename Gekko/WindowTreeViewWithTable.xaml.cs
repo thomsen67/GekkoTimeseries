@@ -792,7 +792,7 @@ namespace Gekko
             Item item = (sender as DataGrid).SelectedItem as Item;
             string text = null;
             text = "Name: " + item.NameDetailed;
-            if (!G.NullOrBlanks(item.Label)) text += " -- '" + item.Label + "'";
+            if (!G.NullOrBlanks(item.Label)) text += " ('" + item.Label + "')";
             text += G.NL;
             text += "Code: " + item.CodeDetailed + G.NL;
             text += "Period: " + item.Period + ", Active: " + item.ActiveDetailed + G.NL;

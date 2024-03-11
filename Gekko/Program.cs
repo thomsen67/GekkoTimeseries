@@ -19406,6 +19406,89 @@ namespace Gekko
             }
         }
 
+        public static void ImportVarlist(string fileName)
+        {
+            Model model = new Model();
+            string warning = null;
+
+            if (fileName != null)
+            {
+                //import the list                        
+                FindFileHelper ffh = Program.FindFile(fileName, null, true, true, false, true, null);
+                if (ffh.realPathAndFileName == null) new Error("Could not find file: " + fileName);
+                string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
+                model.modelGekko = new ModelGekko(model);
+                model.modelGekko.modelInfo = new ModelInfo();
+                string s = Program.UnfoldVariableList(new StringReader("varlist;" + G.NL + txt), model);
+            }
+            else
+            {
+                //use model list
+                model = Program.model;
+                if (model.modelGekko == null) new Error("DOC<varlist>: The Gekko model found -- did you forget to load a model?");
+                if (model.modelGekko?.modelInfo?.varlist == null || (model.modelGekko?.modelInfo?.varlist != null && model.modelGekko.modelInfo.varlist.Count == 0))
+                {
+                    warning = "Note: the loaded model contains no varlist. ";
+                }
+            }                    
+            
+            int counter = 0;
+            int counter2 = 0;
+
+            if (warning == null)
+            {
+                foreach (Program.Item item in model.modelGekko.modelInfo.varlist)
+                {
+                    counter2++;
+                    string variable = item.variable;
+                    List<string> explanation = item.explanation;
+                    if (explanation == null) continue;
+                    Series ts = O.GetIVariableFromString(variable, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    if (ts == null) continue;
+                    counter++;
+                    bool hasSeenSource = false;
+                    int i = -1;
+                    foreach (string e2 in explanation)
+                    {
+                        i++;
+                        string e = e2.Trim();
+                        if (G.NullOrBlanks(e)) continue;
+                        if (i == 0)
+                        {
+                            ts.meta.label = e;
+                        }
+                        else if (i == 1)
+                        {
+                            string e3 = e;
+                            if (e3.StartsWith("(") && e3.EndsWith(")")) e3 = e3.Substring(1, e3.Length - 2);
+                            ts.meta.units = e3;
+                        }
+                        else
+                        {
+                            if (hasSeenSource)
+                            {
+                                if (G.NullOrEmpty(ts.meta.source)) ts.meta.source = e;
+                                else
+                                {
+                                    if (ts.meta.source.EndsWith(".")) ts.meta.source += " " + e;
+                                    else ts.meta.source += ". " + e;
+                                }
+                            }
+                            else
+                            {
+                                string e4 = e;
+                                if (e4.ToLower().StartsWith("kilde: ")) e4 = e4.Substring("kilde: ".Length).Trim();
+                                ts.meta.source = e4;
+                            }
+                            hasSeenSource = true;
+                        }
+                    }
+                }
+            }
+            string note = null;
+            new Writeln("Inserted " + counter + " explanations from varlist (with " + counter2 + " elements). " + warning);
+        }
+
         /// <summary>
         /// MODEL statement, loads Gekko or GAMS models (the latter requires MODEL&lt;gms&gt;)
         /// </summary>
