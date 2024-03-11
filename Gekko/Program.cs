@@ -25394,8 +25394,8 @@ namespace Gekko
             string variablesType = null;  //"_s" etc.
             bool dlog = false;
             string block = null;
-            string file = o.fileName;
-            file = G.StripQuotes(file);
+            //string path2 = null;
+            //path2 = G.StripQuotes(path2);
             //TODO TODO 
             //TODO TODO file should be path...
             //TODO TODO 
@@ -25404,7 +25404,7 @@ namespace Gekko
             if (G.Equal(o.opt_missing, "zero")) missingZero = true;
             bool history = false;
             if (G.Equal(o.opt_type, "hist")) history = true;
-            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, rel, history, missingZero);
+            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, null, o.fileName, o.opt_dump, o.opt_abs, rel, history, missingZero);
         }
 
         //Used for tables, don't use for other stuff!
