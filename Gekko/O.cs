@@ -8475,11 +8475,13 @@ namespace Gekko
         public class Doc
         {
             public string opt_browser = null;
+            public string opt_varlist = null;
             public string opt_label = null;
             public string opt_source = null;
             public string opt_units = null;
             public string opt_stamp = null;
             public List names = null;
+            public string fileName = null;
 
             public void Exe()
             {
@@ -8487,6 +8489,17 @@ namespace Gekko
                 {
                     EquationBrowser.Browser();
                     return;
+                }
+                else if (G.Equal(this.opt_varlist, "yes"))
+                {
+                    if (this.fileName != null)
+                    {
+                        //import the list
+                    }
+                    else
+                    {
+                        //use model list
+                    }
                 }
                 else
                 {

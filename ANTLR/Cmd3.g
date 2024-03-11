@@ -129,6 +129,7 @@ tokens {
 	ASTOPT_STRING_BROWSER;
     ASTOPT_STRING_PRINT;
 	ASTOPT_STRING_TOBANK;
+    ASTOPT_STRING_VARLIST;
 	ASTOPT_STRING_FROMBANK;
 	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_SORT;
@@ -1217,6 +1218,7 @@ Y2                    = 'Y2'                       ;
 	IF_OLD               = 'IF_OLD'              ;
 	ASBANK = 'ASBANK';
 	TOBANK = 'TOBANK';
+    VARLIST = 'VARLIST';
 	FROMBANK = 'FROMBANK';
     IGNOREMISSING    = 'IGNOREMISSING'   ;
     IGNOREMISSINGVARS = 'IGNOREMISSINGVARS';
@@ -1871,6 +1873,7 @@ d.Add("Y" ,Y);
 
 										d.Add("asbank"      , ASBANK      );
 										d.Add("tobank"      , TOBANK      );
+                                        d.Add("varlist"      , VARLIST      );
 										d.Add("frombank"      , FROMBANK      );
 
                                         d.Add("ignoremissing"           , IGNOREMISSING             );
@@ -3084,18 +3087,21 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // DOC
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-doc:                        DOC docOpt1? seqOfBankvarnames? docOpt2 -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTOPT_ docOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTOPT_ docOpt2?))
+doc:                        DOC docOpt1? seqOfBankvarnames? docOpt2 (FILE '=' fileName)? -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTOPT_ docOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTOPT_ docOpt2?)  ^(ASTHANDLEFILENAME fileName?))
 						    ;
 docOpt1:					ISNOTQUAL 
                           | leftAngle2 localOptions RIGHTANGLE                       -> ^(ASTOPT1 localOptions)      
 						  | leftAngle docOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 docOpt1h* localOptions?)						  
                             ;
-docOpt1h:				    BROWSER (EQUAL yesNo)? -> ^(ASTOPT_STRING_BROWSER yesNo?);
+docOpt1h:				    BROWSER (EQUAL yesNo)? -> ^(ASTOPT_STRING_BROWSER yesNo?)
+                          | VARLIST (EQUAL yesNo)? -> ^(ASTOPT_STRING_VARLIST yesNo?)
+                            ;
+
 docOpt2:                    docOpt2h*;
 docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
-					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
+					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)	                          
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4571,6 +4577,7 @@ ident2: 					Ident |
   HTML|
   ASBANK|
   TOBANK|
+  VARLIST|
   FROMBANK|
   IGNOREMISSINGVARS|
   IGNOREMISSING|
@@ -4873,6 +4880,7 @@ ident3: 					Ident |
   
   ASBANK|
   TOBANK|
+  VARLIST|
   FROMBANK|
   ABS|
   GEOMETRIC|

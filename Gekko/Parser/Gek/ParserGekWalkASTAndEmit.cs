@@ -1203,9 +1203,11 @@ namespace Gekko.Parser.Gek
                 case "ASTDOC":
                     {
                         node.Code.A("O.Doc o" + Num(node) + " = new O.Doc();" + G.NL);
+                        //use ChildrenCount() here??
                         if (node[0] != null) GetCodeFromAllChildren(node, node[0]);
                         if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                         if (node[2] != null) GetCodeFromAllChildren(node, node[2]);
+                        if (node[3].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = " + node[3].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         break;
                     }
