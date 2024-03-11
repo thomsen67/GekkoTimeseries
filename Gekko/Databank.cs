@@ -340,6 +340,10 @@ namespace Gekko
             return "databank " + "'" + this.name + "'";
         }
 
+        /// <summary>
+        /// Get name of databank.
+        /// </summary>
+        /// <returns></returns>
         public string GetName()
         {
             return this.name;

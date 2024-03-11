@@ -75,8 +75,8 @@ namespace Gekko
         [ProtoMember(7)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
 
-        [ProtoMember(8)]
-        public string label = null;
+        //[ProtoMember(8)]
+        //public string label = null;
 
         public TraceContents2()
         {
@@ -903,8 +903,8 @@ namespace Gekko
             
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
 
-            string label = ts.MetaGetLabel();
-            if (label != null) trace.GetContents().label = label;
+            //string label = ts.MetaGetLabel();
+            //if (label != null) trace.GetContents().label = label;
 
             if (type == ETracePushType.Sibling)
             {
@@ -1130,6 +1130,9 @@ namespace Gekko
                         model.Add(item);
                     }
                     WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
+                    w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.80));
+                    //dockPanel.Background = dockPanel.originalBackgroundColor;
+                    //Globals.decompResidualColor;
                     string v = null;
                     if (trace.GetContents() != null && trace.GetContents().name != null) v = G.Chop_RemoveBank(trace.GetContents().name, Program.databanks.GetFirst().name) + " - ";
                     w.Title = v + "Gekko data trace";
@@ -1225,7 +1228,8 @@ namespace Gekko
                                                                          
             bool hasChildren = false;
             if (this.precedents != null && this.precedents.Count() > 0) hasChildren = true;
-            string text = "null";
+            string name = "null";
+            string nameDetailed = "null";
             string code = "null";
             string codeDetailed = "null";
             string period = null;
@@ -1241,7 +1245,11 @@ namespace Gekko
             if (this.GetContents() != null)
             {
                 //Note: we always remove bank name, since this is often irrelevant. Freq is removed if same as current freq.
-                if (this.GetContents().name != null) text = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.GetContents().name), Program.options.freq);
+                if (this.GetContents().name != null)
+                {
+                    name = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.GetContents().name), Program.options.freq);
+                    nameDetailed= G.Chop_RemoveBank(this.GetContents().name);
+                }
                 GetCodeAsString(this.GetContents().text, out code, out codeDetailed);
                 GekkoTime t1 = GekkoTime.tNull;
                 GekkoTime t2 = GekkoTime.tNull;
@@ -1265,13 +1273,54 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) fileDetailed += " (data = " + this.GetContents().dataFile + ")";
                 Trace2.GetStampAsString(this.GetId(), out stamp, out stampDetailed);
                 if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
-                label = this.GetContents().label;
-                if (label != null) label = label.Trim();
+                //label = this.GetContents().label;
+                //if (label != null) label = label.Trim();
+                label = SearchForLabelInOpenDatabanks(nameDetailed);
             }
 
-            Item newItem = new Item(text, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);
+            Item newItem = new Item(name, nameDetailed, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);
             newItem.trace = this;
             return newItem;
+        }
+
+        /// <summary>
+        /// For a given variable name (without databank but possibly with freq), Gekko tries to find a timeseries in one
+        /// of the open databanks (including Ref) that has as its direct trace children a trace with the same trace ID as
+        /// the 'this' object. If so, the timeseries label is returned. May return null.
+        /// 
+        /// </summary>
+        /// <param name="nameWithFreq"></param>
+        /// <returns></returns>
+        private string SearchForLabelInOpenDatabanks(string nameWithFreq)
+        {
+            string label = null;
+            try
+            {                
+                if (nameWithFreq != null)
+                {
+                    //Why should it ever be == null, and why try... (fix Gekko 4.0)                    
+                    foreach (Databank db in Program.databanks.storage)
+                    {
+                        if (db == null) continue;  //ever so?
+                        string name2 = G.Chop_SetBank(nameWithFreq, db.GetName());
+                        Series ts = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        if (ts != null)
+                        {
+                            foreach (TraceAndPeriods2 tap in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                            {
+                                if (tap.trace.GetId() == this.GetId())
+                                {
+                                    // Object.ReferenceEquals(tap.trace, this) may return false if object has been cloned: testing Id's is best here
+                                    label = ts.meta.label;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { };
+            return label;
         }
 
         public static void GetCodeAsString(string text, out string code, out string codeDetailed)
