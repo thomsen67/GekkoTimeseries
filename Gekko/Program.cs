@@ -21922,7 +21922,7 @@ namespace Gekko
                 }
                 else if (freq == EFreq.Q)
                 {
-                    if (options != null && !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error("For quarterly data, you must use option 'annualoverlap'");
+                    if (options == null || !G.Equal(O.ConvertToString(options), "annualoverlap")) new Error("For quarterly data, you must use option 'annualoverlap'");
                     return LaspeyresQ(function, null, null, tempP, tempX, indexYear, options, tStart, tEnd);
                 }
                 else new Error("Only A and Q freq supported.");
@@ -22096,7 +22096,7 @@ namespace Gekko
             //Do p1_lag!a = p1!a[-1], and interpolate with repeat p1_lag!q from p1_lag!a.
             //Do p2_lag!a = p2!a[-1], and interpolate with repeat p2_lag!q from p2_lag!a.
 
-            //We run a normal laspchain() on these annual data
+            //Run a normal laspchain() on these annual data
             //Do p_lag!a = p!a[-1], and interpolate with repeat p_lag!q from p_lag!a.
 
             //Now calc q!q:
