@@ -14,6 +14,8 @@ using ExcelDna.ComInterop;
 using Extensibility;
 using System.Diagnostics;
 
+//In Excel, this must be set: File -> Options -> Trust Center -> Trust Center Setttings -> Macro Settings -> Trust Access to the VBA Project object model.
+
 //About 64-bit, maybe see this: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/
 
 //TODO: prt should work. Maybe wipe cells before sheet/prt? Optional. Starting cell?
@@ -78,20 +80,41 @@ namespace Gekcel
 
         public static string GetVersionNumber()
         {
-            MessageBox.Show("The following needs testing!! So debug it!!");
-            string p = (new DirectoryInfo(Directory.GetCurrentDirectory())).Parent.Parent.CreateSubdirectory("\\Gekko").CreateSubdirectory("\\Properties").FullName;
+            string rv = "3.x.x";
+            try
+            {
+                string file = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\" + "gekkoversion.info";
+                string s = File.ReadAllText(file);
+                rv = s.Trim();
+            } 
+            catch { };
+            return rv;
+        }
+        
+
+        public static string GetVersionNumber2()
+        {            
+            //string p = (new DirectoryInfo(Directory.GetCurrentDirectory())).Parent.Parent.CreateSubdirectory("\\Gekko").CreateSubdirectory("\\Properties").FullName;
+
+            var xx = new DirectoryInfo(Directory.GetCurrentDirectory());
+            var yy = xx.Parent.Parent.Parent.Parent;
+            var zz = yy.FullName + "\\Gekko" + "\\Properties";
+            string p = zz;
+
             string ss = File.ReadAllText(p + "\\AssemblyInfo.cs");
             int i = ss.IndexOf("AssemblyVersion(");
             int i1 = ss.IndexOf("\"", i + 1);
             int i2 = ss.IndexOf("\"", i1 + 1);
-            string s5 = ss.Substring(i1, i2 - i1);
+            string s5 = ss.Substring(i1 + 1, i2 - i1 - 1);
             if (!char.IsDigit(s5[0])) throw new Exception("!!!");
             if (s5[1] != '.') throw new Exception("!!!");
             if (!char.IsDigit(s5[2])) throw new Exception("!!!");
             if (s5[3] != '.') throw new Exception("!!!");
             if (!char.IsDigit(s5[4])) throw new Exception("!!!");
             //last char is probably ok if present
-            return s5;
+            string[] sss = s5.Split('.');
+            string s6 = sss[0] + "." + sss[1] + "." + sss[2];  //get rid of last ".0"
+            return s6;
         }
 
         public override string GetCustomUI(string RibbonID)
@@ -311,6 +334,8 @@ namespace Gekcel
             string newpath = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\bin\Debug";
             string demo = newpath + "\\demo.gbk";
             string demo_orig = (new DirectoryInfo(newpath)).Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+            string s = RibbonController.GetVersionNumber2();
+            File.WriteAllText(newpath + "\\gekkoversion.info", s);
 
             //THIS SUDDENTLY DOES NOT WORK...
             //string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";

@@ -725,7 +725,7 @@ namespace Deploy2
 
         private static void GekcelFileHelper(int bitness)
         {
-            MessageBox.Show(@"Remember to change Gekko version inside c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Program.cs. Locate for instance label='Gekcel 3.1.14' in a <button> and change to the right Gekko version. Just do this 1 time in all per new Gekko version.");
+            //MessageBox.Show(@"Remember to change Gekko version inside c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Program.cs. Locate for instance label='Gekcel 3.1.14' in a <button> and change to the right Gekko version. Just do this 1 time in all per new Gekko version.");
             string path1 = null;
             if (bitness == 32)
             {
@@ -743,7 +743,7 @@ namespace Deploy2
             List<string> files = new List<string>();
             files.Add("Gekko.exe");
             files.Add("Gekko.pdb");
-            files.Add("ANTLR.dll");
+            files.Add("ANTLR.dll");            
             foreach (string s in files)
             {
                 bool b = CheckExpiry(path1 + s);  //only check on these, not the rest
@@ -783,7 +783,8 @@ namespace Deploy2
             files.Add(path1 + "Gekko.exe");
             files.Add(path1 + "Gekko.pdb");
             files.Add(path1 + "ANTLR.dll");
-            if(bitness == 32) files.Add(path2 + "Gekcel.xlsm");  //note: path2 --> this file must be newly createdj for Gekcel 32-bit: good to check that here.
+            files.Add(path2 + "gekkoversion.info");
+            if (bitness == 32) files.Add(path2 + "Gekcel.xlsm");  //note: path2 --> this file must be newly createdj for Gekcel 32-bit: good to check that here.
             foreach (string s in files)
             {
                 bool b = CheckExpiry(s);  //only check on these, not the rest
