@@ -6046,6 +6046,16 @@ namespace Gekko
             else new Error("For gamsscalar(), did not recognize argument '" + input1 + "'");
         }
 
+        //3 problems: "eval" is used in old decomp that overrides. Function works, but does not pass P object in the right way.
+        //            very slow.
+        //What if it needs to return something? Could be nice to use run() for this and eval() to return something,
+        //but parser problems with run('prt 2;'); --> is eaten by ASTRUN...
+        //public static void eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        //{
+        //    string s = O.ConvertToString(x);
+        //    Program.RunGekkoCommands(s, "", 0, new P());
+        //}
+
         public static IVariable fromexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             double xx = O.ConvertToVal(x);

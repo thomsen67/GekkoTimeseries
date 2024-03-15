@@ -15,34 +15,15 @@ namespace Gekko
         int labelCounter;
         public static void C0(GekkoSmpl smpl, P p)
         {
-            //[[commandStart]]0
-            p.SetStack(@"¤1"); O.InitSmpl(smpl, p);
+            Action
+assign_156 = () => {
+    O.AdjustT0(smpl, -2);
+    IVariable ivTmpvar153 = O.FunctionLookupNew3(p, null, "loog")(smpl, p, false, null, null, new GekkoArg((spml155) => new ScalarVal(2d), (spml155) => null));
+    O.AdjustT0(smpl, 2);
+    
+    ;
+};
 
-            O.Copy o0 = new
-            O.Copy();
-            o0.type = @"ASTPLACEHOLDER"; o0.t1 = GekkoTime.tNull;
-            o0.t2 =
-            GekkoTime.tNull;
-
-            o0.opt_frombank = O.ConvertToString((new
-            ScalarString("work")));
-
-            o0.opt_tobank = O.ConvertToString((new
-            ScalarString("ref")));
-
-
-
-            o0.names1 = O.FlattenIVariablesSeq(false, new List(new List<IVariable>
-{O.Lookup(smpl, null, null, "#x", null, null, new  LookupSettings(), EVariableType.Var,
-null)}));
-            o0.gekkocode = @"copy <frombank=work tobank=ref> {#x} to *";
-            o0.p = p;
-            o0.names2 =
-            O.FlattenIVariablesSeq(false, new List(new List<IVariable> {new
-ScalarString("*")}));
-            o0.Exe();
-
-            //[[commandEnd]]0
         }
 
 

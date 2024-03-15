@@ -131,9 +131,7 @@ namespace Gekko.Parser.Gek
         }
 
         public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
-        {
-            //asdfg added [0]
-            //if (node.Text == "ASTFUNCTION" || node.Text == "ASTFUNCTION_Q")
+        {            
             if (node[0].Text == "ASTFUNCTION" || node[0].Text == "ASTFUNCTION_Q")
             {                
                 string functionName = GetFunctionName(node);
@@ -2398,8 +2396,6 @@ namespace Gekko.Parser.Gek
                         if (functionName == "null") functionName = "null2";  //cannot have the name Functions.null(...)
                         else if (functionName == "int") functionName = "int2";  //cannot have the name Functions.int(...)
 
-                        //string libraryNameWhereTheFunctionIsCallingFrom = CallingLibraryHelper(w);
-
                         bool hasLibrary; string libraryName;
                         LibraryHelper(node, out hasLibrary, out libraryName);
 
@@ -2617,8 +2613,7 @@ namespace Gekko.Parser.Gek
                                 List<string> args = new List<string>();
 
                                 if (node[1].ChildrenCount() == 0)
-                                {
-                                    //args += ", null, null";
+                                {                                    
                                     args.Add("null");
                                     args.Add("null");
                                 }

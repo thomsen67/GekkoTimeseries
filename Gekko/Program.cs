@@ -12776,7 +12776,6 @@ namespace Gekko
                     if (Program.model.modelGams == null)
                     {
                         new Error("DECOMP: A GAMS model is not loaded, cf. the MODEL statement.");
-                        //throw new GekkoException();
                     }
                     if (Program.model.modelGams.equationsByVarname != null)
                     {
@@ -24732,11 +24731,6 @@ namespace Gekko
                 string meta = null;
                 object[] metaInfo = myMethodInfo.GetCustomAttributes(false);
                 if (metaInfo.Length > 0) meta = ((MyCustomAttribute)(metaInfo[0])).Lag;
-
-                //if(name.ToLower().Contains("helper_error"))
-                //{
-
-                //}
 
                 if (name.StartsWith("HELPER_", StringComparison.OrdinalIgnoreCase) && !G.Equal(name, "HELPER_error"))
                 {
