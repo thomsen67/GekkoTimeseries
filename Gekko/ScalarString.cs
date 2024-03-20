@@ -1,9 +1,6 @@
-﻿using System;
+﻿using ProtoBuf;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using ProtoBuf;
 
 namespace Gekko
 {
@@ -11,7 +8,7 @@ namespace Gekko
     public class ScalarString : IVariable
     {
         [ProtoMember(1)]
-        public string string2;        
+        public string string2;
         public bool isFromNakedList = false; //do not protobuf this
 
         private ScalarString()
@@ -23,7 +20,7 @@ namespace Gekko
         {
             Initialize(s, false);  //last arg cannot be true --> too many errors regarding varnames etc.
         }
-        
+
 
         public ScalarString(string s, bool substitute)
         {
@@ -36,7 +33,7 @@ namespace Gekko
             if (s == null) s = "";  //for instance, a label or source from a timeseries that is null. If later search() or similar is used, it is better to use "" than null.
             if (substitute) s = SubstituteScalarsInString(s, true, false);
             string2 = s;
-        }        
+        }
 
         public static string SubstituteScalarsInString(string s, string reportError, string avoidVal)
         {
@@ -58,7 +55,7 @@ namespace Gekko
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.Length; i++)
-            {                
+            {
                 if (IsLeftCurly(s, i))
                 {
                     //search for matching
@@ -91,7 +88,7 @@ namespace Gekko
                     }
                 }
                 sb.Append(s[i]);
-                Flag1: i = i;
+            Flag1: i = i;
             }
 
             sb.Replace("~'", "'");
@@ -108,12 +105,12 @@ namespace Gekko
         private static bool IsRightCurly(string s, int i)
         {
             return s[i] == Globals.symbolRightCurly && !(i > 0 && s[i - 1] == Globals.symbolTilde);
-        }        
+        }
 
         public EVariableType Type()
         {
             return EVariableType.String;
-        }                       
+        }
 
         public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
@@ -224,8 +221,8 @@ namespace Gekko
                 {
                     e.MainAdd(Globals.stringConversionNote);
                 }
-            }            
-            
+            }
+
             throw new GekkoException();
         }
 
@@ -257,7 +254,7 @@ namespace Gekko
             //for instance for list elements, where a string is considered a 1-item list.
             return new List<IVariable>() { new ScalarString(this.string2) };  //always make a copy, so no risk of side effects
         }
-        
+
         public IVariable Add(GekkoSmpl t, IVariable x)
         {
             switch (x.Type())
@@ -265,11 +262,11 @@ namespace Gekko
                 case EVariableType.String:
                     {
                         return new ScalarString(this.string2 + ((ScalarString)x).string2);
-                    }                    
+                    }
                 case EVariableType.List:
                     {
                         using (Error txt = new Error())
-                        {                            
+                        {
                             List.ScalarAndListErrorMessage(txt, true);
                         }
                         return null;
@@ -278,7 +275,7 @@ namespace Gekko
                     {
                         new Error("You cannot add a string and a timeseries. " + Globals.stringConversionNote);
                         return null;
-                    }                    
+                    }
                 case EVariableType.Val:
                     {
                         return Operators.StringVal.Add(this, (ScalarVal)x, false);
@@ -297,7 +294,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
             }
-        }        
+        }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
@@ -308,7 +305,7 @@ namespace Gekko
                         return new ScalarString(this.string2 + ((ScalarString)x).string2);
                     }
                 case EVariableType.List:
-                    {                        
+                    {
                         //This is only allowed for stuff like COPY b:{#m} etc.
                         //See also #786592387654
                         return Operators.ScalarList.Add(t, this, x, false);
@@ -345,7 +342,7 @@ namespace Gekko
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
-        {            
+        {
             new Error("Multiplication involving a string ('" + this.string2 + "') is not allowed. " + Globals.stringConversionNote);
             return null;
         }

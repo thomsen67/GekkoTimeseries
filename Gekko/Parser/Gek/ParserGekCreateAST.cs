@@ -1432,6 +1432,7 @@ namespace Gekko.Parser.Gek
                 
                 if (flag)
                 {
+                    //#0osjfsk123
                     string[] ss = ast.Text.Split(Globals.parserExpressionSeparator);                    
                     cmdNode.Text = G.ReplaceGlueSymbols(ss[0]);
                     cmdNode.specialExpressionAndLabelInfo = ss;

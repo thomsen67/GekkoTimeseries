@@ -1453,6 +1453,22 @@ namespace Gekko.Parser.Gek
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
+                case "ASTGEKKO":
+                    {
+                        node.Code.A("O.Gekko2 o" + Num(node) + " = new O.Gekko2();" + G.NL);
+                        if (node[0].Text == "ASTVERSION")
+                        {
+                            node.Code.A("o" + Num(node) + ".op1 = " + "@`" + GetOperator(node[1][0][0].Text) + "`" + ";");
+                            node.Code.A("o" + Num(node) + ".x1a = " + node[1][1][0].Code + ";");
+                            node.Code.A("o" + Num(node) + ".x1b = " + node[1][1][1].Code + ";");
+                            node.Code.A("o" + Num(node) + ".x2a = " + node[2][1][0].Code + ";");
+                            node.Code.A("o" + Num(node) + ".x2b = " + node[2][1][1].Code + ";");
+                            node.Code.A("o" + Num(node) + ".logical12 = " + "@`" + node[2][2].Text + "`" + ";");
+                        }
+                        else new Error("Syntax error in GEKKO statement");
+                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    }
+                    break;
                 case "ASTSYS":
                     {
                         node.Code.A("O.Sys o" + Num(node) + " = new O.Sys();" + G.NL);
@@ -5135,6 +5151,41 @@ ASTPLACEHOLDER [0]
                     break;
 
             }
+        }
+
+        private static string GetOperator(string op)
+        {
+            string op2 = null;
+
+            if (op == "ASTIFOPERATOR4")  //"<"
+            {
+                op2 = "<";
+            }
+            else if (op == "ASTIFOPERATOR6")  //"<="
+            {
+                op2 = "<=";
+            }
+            else if (op == "ASTIFOPERATOR1") //"=="
+            {
+                op2 = "==";
+            }
+            else if (op == "ASTIFOPERATOR5")  //">="
+            {
+                op2 = ">=";
+            }
+            else if (op == "ASTIFOPERATOR3") //">"
+            {
+                op2 = ">";
+            }
+            else if (op == "ASTIFOPERATOR2") //"<>"
+            {
+                op2 = "<>";
+            }
+            else
+            {
+                new Error("In GEKKO statement, unknown comparison operator");
+            }
+            return op2;
         }
 
         /// <summary>

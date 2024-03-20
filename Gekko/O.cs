@@ -9108,7 +9108,18 @@ namespace Gekko
             public List<string> listItems = null;
         }
 
-        
+        public class Gekko2  //cannot be called "Gekko"
+        {
+            public string op1 = null;
+            public IVariable x1a = null;
+            public IVariable x1b = null;
+            public IVariable x2a = null;
+            public IVariable x2b = null;
+            public string logical12 = null;
+            public void Exe()
+            {
+            }
+        }
 
         public class Genr
         {

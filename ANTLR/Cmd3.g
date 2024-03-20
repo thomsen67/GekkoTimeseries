@@ -56,6 +56,8 @@ tokens {
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
+    ASTGEKKO;
+    ASTVERSION;
 	ASTOPT_STRING_DUMPOPTIONS;
 	ASTOPT_STRING_DATEFORMAT;
 	ASTOPT_STRING_DATETYPE;
@@ -1129,6 +1131,7 @@ Y2                    = 'Y2'                       ;
 	DYN             = 'DYN';
     DIRECT = 'DIRECT';
     DISP             = 'DISP'            ;
+    GEKKO             = 'GEKKO'            ;
     DISPLAY          = 'DISPLAY'         ;
     DOC = 'DOC';
     DOWNLOAD = 'DOWNLOAD';
@@ -1783,6 +1786,7 @@ d.Add("Y" ,Y);
 										d.Add("dyn"    , DYN      );
                                         d.Add("DIRECT", DIRECT);
                                         d.Add("disp"    , DISP      );
+                                        d.Add("gekko"    , GEKKO      );
                                         d.Add("display" , DISPLAY   );
                                         d.Add("DOC" ,DOC);
                                         d.Add("DOWNLOAD" ,DOWNLOAD);
@@ -2645,6 +2649,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | find                 SEMICOLON!
                           | for2
 						  | functionDef          SEMICOLON!
+                          | gekko                SEMICOLON!
 						  | global               SEMICOLON!
 						  | goto2                SEMICOLON!
 						  | hdg                  SEMICOLON!
@@ -3196,6 +3201,14 @@ type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
 objectFunctionNaked:        bankvarname GLUEDOT DOT libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)))
 						  |	bankvarname GLUEDOT DOT libraryWithColon? ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED_Q ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)))
 							;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// GEKKO
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+gekko:						GEKKO VERSION ifOperator versionAndDate (andOr ifOperator versionAndDate)? -> ^({token("ASTGEKKO", ASTGEKKO, input.LT(1).Line)} ASTVERSION ^(ASTPLACEHOLDER ifOperator versionAndDate) ^(ASTPLACEHOLDER ifOperator? versionAndDate? andOr?));
+andOr:                      AND | OR ;
+versionAndDate:             expression expression? -> ^(ASTPLACEHOLDER expression expression?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO
@@ -4313,6 +4326,7 @@ ident2: 					Ident |
   EVAL|
   DELETE|
   DISP|
+  GEKKO|
   DOC|
   DOWNLOAD|
   EDIT|

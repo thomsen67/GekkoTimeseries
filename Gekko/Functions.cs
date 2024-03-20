@@ -6050,6 +6050,10 @@ namespace Gekko
         //            very slow.
         //What if it needs to return something? Could be nice to use run() for this and eval() to return something,
         //but parser problems with run('prt 2;'); --> is eaten by ASTRUN...
+        //
+        //Actually if a STOP is issued inside any function, the P object can return the calling line.
+        //Maybe this could be good enough for rudimentary R-deparse(substitute(x))-like behavior.
+        //
         //public static void eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         //{
         //    string s = O.ConvertToString(x);
