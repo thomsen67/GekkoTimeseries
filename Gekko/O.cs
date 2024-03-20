@@ -9110,78 +9110,103 @@ namespace Gekko
 
         public class Gekko2  //cannot be called "Gekko"
         {
-            public string op1 = null;
+            public string operator1 = null;
             public IVariable x1a = null;
             public IVariable x1b = null;
-            public string op2 = null;
+            public string operator2 = null;
             public IVariable x2a = null;
             public IVariable x2b = null;
             public string logical12 = null;
             public void Exe()
             {
-
-                List<int> type = new List<int>();
-                List<string> s = new List<string>();
-                List<GekkoTime> gt = new List<GekkoTime>();
-                List<string> op = new List<string>();
+                
                 List<string> v = new List<string>();
-                List<bool> ok = new List<bool>();
-                type.Add(0); type.Add(0);
-                s.Add(null); s.Add(null);
-                gt.Add(GekkoTime.tNull); gt.Add(GekkoTime.tNull);
-                op.Add(null); op.Add(null);
+                List<bool> ok = new List<bool>();             
                 v.Add(null); v.Add(null);
                 ok.Add(false); ok.Add(false);
+
+                string op = null;
+                int type = 0;
+                GekkoTime gt = GekkoTime.tNull;
+                string s = null;
 
                 //Either type:
                 // 1: string, null
                 // 2: date, null
                 // 3: string, date
 
-                for (int i = 0; i < 1; i++)
-                {
-                    if (i == 0) op[i] = this.op1;
-                    else if (i == 1) op[i] = this.op2;
-                    else new Error("Operator problem");
+                int n = 1;
+                if (this.logical12 != null) n = 2;
 
-                    if (x1b == null)
+                for (int i = 0; i < n; i++)
+                {
+                    if (i == 0)
                     {
-                        if (x1a.Type() == EVariableType.String)
+                        op = this.operator1;
+                        if (x1b == null)
                         {
-                            type[i] = 1;
-                            s[i] = O.ConvertToString(x1a);
+                            if (x1a.Type() == EVariableType.String)
+                            {
+                                type = 1;
+                                s = O.ConvertToString(x1a);
+                            }
+                            else
+                            {
+                                type = 2;
+                                gt = O.ConvertToDate(x1a);
+                            }
                         }
                         else
                         {
-                            type[i] = 2;
-                            gt[i] = O.ConvertToDate(x1a);
+                            type = 3;
+                            s = O.ConvertToString(x1a);
+                            gt = O.ConvertToDate(x1b);
                         }
                     }
-                    else
+                    else if (i == 1)
                     {
-                        type[i] = 3;
-                        s[i] = O.ConvertToString(x1a);
-                        gt[i] = O.ConvertToDate(x1b);
+                        op = this.operator2;
+                        if (x2b == null)
+                        {
+                            if (x2a.Type() == EVariableType.String)
+                            {
+                                type = 1;
+                                s = O.ConvertToString(x2a);
+                            }
+                            else
+                            {
+                                type = 2;
+                                gt = O.ConvertToDate(x2a);
+                            }
+                        }
+                        else
+                        {
+                            type = 3;
+                            s = O.ConvertToString(x2a);
+                            gt = O.ConvertToDate(x2b);
+                        }
                     }
+                    else new Error("Operator problem");
 
                     int req_i1 = 0;
                     int req_i2 = 0;
                     int req_i3 = 0;
-                    if (type[i] == 1 || type[i] == 3)
+                    if (type == 1 || type == 3)
                     {
-                        SplitVersionNumber(s[i], ref req_i1, ref req_i2, ref req_i3);
+                        SplitVersionNumber(s, ref req_i1, ref req_i2, ref req_i3);
                     }
 
                     int req_d1 = 0;
                     int req_d2 = 0;
                     int req_d3 = 0;
-                    if ((type[i] == 2 || type[i] == 3) && gt[i].freq != EFreq.D)
+                    if ((type == 2 || type == 3))
                     {
-                        new Error("In 'GEKKO version' statement, a date is expected to be of daily frequency, not " + gt[i].ToString());
-                    }
-                    req_d1 = gt[i].super;
-                    req_d2 = gt[i].sub;
-                    req_d3 = gt[i].subsub;
+                        if (gt.IsNull()) new Error("Problem with 'GEKKO version' statement.");
+                        if (gt.freq != EFreq.D) new Error("In 'GEKKO version' statement, a date is expected to be of daily frequency, not " + gt.ToString());                        
+                        req_d1 = gt.super;
+                        req_d2 = gt.sub;
+                        req_d3 = gt.subsub;
+                    }                    
                     long req = GetLongNumber(req_i1, req_i2, req_i3, req_d1, req_d2, req_d3);
 
                     // ------------------------- Get system info ----------------------------
@@ -9189,50 +9214,56 @@ namespace Gekko
                     int ths_i1 = 0;
                     int ths_i2 = 0;
                     int ths_i3 = 0;
-                    SplitVersionNumber(Globals.gekkoVersion, ref ths_i1, ref ths_i2, ref ths_i3);
+                    if (type == 1 || type == 3)
+                    {
+                        SplitVersionNumber(Globals.gekkoVersion, ref ths_i1, ref ths_i2, ref ths_i3);
+                    }
 
                     int ths_d1 = 0;
                     int ths_d2 = 0;
                     int ths_d3 = 0;
-                    string pd = G.GetProgramDir();
-                    try
+                    if ((type == 2 || type == 3))
                     {
-                        string pd2 = Path.Combine(pd, "gekko.exe");
-                        DateTime modification = File.GetLastWriteTime(pd2);
-                        ths_d1 = modification.Year;
-                        ths_d2 = modification.Month;
-                        ths_d3 = modification.Day;
+                        string pd = G.GetProgramDir();
+                        try
+                        {
+                            string pd2 = Path.Combine(pd, "gekko.exe");
+                            DateTime modification = File.GetLastWriteTime(pd2);
+                            ths_d1 = modification.Year;
+                            ths_d2 = modification.Month;
+                            ths_d3 = modification.Day;
+                        }
+                        catch { }
                     }
-                    catch { }
                     long ths = GetLongNumber(ths_i1, ths_i2, ths_i3, ths_d1, ths_d2, ths_d3);
 
                     // ---------------------- compare ------------------
                                         
-                    if (op[i] == "<")
+                    if (op == "<")
                     {
                         if (ths < req) ok[i] = true;
                     }
-                    else if (op[i] == "<=")
+                    else if (op == "<=")
                     {
                         if (ths <= req) ok[i] = true;
                     }
-                    else if (op[i] == "==")
+                    else if (op == "==")
                     {
                         if (ths == req) ok[i] = true;
                     }
-                    else if (op[i] == ">=")
+                    else if (op == ">=")
                     {
                         if (ths >= req) ok[i] = true;
                     }
-                    else if (op[i] == ">")
+                    else if (op == ">")
                     {
                         if (ths > req) ok[i] = true;
                     }
-                    else if (op[i] == "<>")
+                    else if (op == "<>")
                     {
                         if (ths != req) ok[i] = true;
                     }
-                    else new Error("Invalid operator '" + op[i] + "'");
+                    else new Error("Invalid operator '" + op + "'");
 
                     string sreq_i = req_i1 + "." + req_i2 + "." + req_i3;
                     string sreq_d = req_d1 + "m" + req_d2 + "d" + req_d3;
@@ -9240,49 +9271,74 @@ namespace Gekko
                     string sths_i = ths_i1 + "." + ths_i2 + "." + ths_i3;
                     string sths_d = ths_d1 + "m" + ths_d2 + "d" + ths_d3;
 
-                    v[i] = sths_i + " " + sths_d + " " + op[i] + " " + sreq_i + " " + sreq_d;
-
-                }
-
-                if (ok[0])
-                {
-                    using (Error txt = new Error())
+                    if (type == 1)
                     {
-                        txt.MainAdd("Verified: Gekko version " + v[0]);
+                        v[i] = sths_i + " " + op + " " + sreq_i;
                     }
+                    else if (type == 2)
+                    {
+                        v[i] = sths_d + " " + op + " " + sreq_d;
+                    }
+                    else if (type == 3)
+                    {
+                        v[i] = sths_i + " " + sths_d + " " + op + " " + sreq_i + " " + sreq_d;
+                    }
+                    else new Error("Type error");                    
                 }
-                else
+
+                bool okCombined = false;
+                if (n == 1) okCombined = ok[0];
+                else if (n == 2)
                 {
-                    using (Error txt = new Error())
-                    {                        
-                        txt.MainAdd("You may out-comment the line to skip verification.");
+                    if (G.Equal(this.logical12, "and")) okCombined = ok[0] && ok[1];
+                    else if (G.Equal(this.logical12, "or")) okCombined = ok[0] || ok[1];
+                    else new Error("Number of conditions.");
+                }
+                else new Error("Number of conditions.");
+
+                if (n == 1)
+                {
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("Gekko version " + v[0] + " --> " + okCombined);
                     }
                 }
+                else if (n == 2)
+                {
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("Gekko version " + v[0] + " " + this.logical12 + " " + v[1] + " --> " + okCombined);
+                    }
+                }
+                else new Error("Number of conditions.");
+
+
             }
 
             private static void SplitVersionNumber(string s, ref int i1, ref int i2, ref int i3)
             {
+                if (s == null) new Error("Problem with 'GEKKO version' statement.");
                 string[] ss = s.Split('.');
                 if (ss.Length == 1)
                 {
                     i1 = G.ConvertToInt(ss[0]);
-                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal non-negative integer");
                 }
                 else if (ss.Length == 2)
                 {
                     i1 = G.ConvertToInt(ss[0]);
-                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal non-negative integer");
                     i2 = G.ConvertToInt(ss[1]);
-                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal integer");
+                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal non-negative integer");
                 }
                 else if (ss.Length == 3)
                 {
                     i1 = G.ConvertToInt(ss[0]);
-                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal non-negative integer");
                     i2 = G.ConvertToInt(ss[1]);
-                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal integer");
+                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal non-negative integer");
                     i3 = G.ConvertToInt(ss[2]);
-                    if (i3 == int.MaxValue || i3 < 0) new Error("Version part '" + ss[2] + "' is not a legal integer");
+                    if (i3 == int.MaxValue || i3 < 0) new Error("Version part '" + ss[2] + "' is not a legal non-negative integer");
                 }
                 else
                 {
@@ -9292,7 +9348,7 @@ namespace Gekko
 
             private static long GetLongNumber(long i1, long i2, long i3, long d1, long d2, long d3)
             {
-                // 1122333yyyymmdd (15 digits, long has 18-19).
+                // 1122333yyyymmdd (15 digits, long has 18-19).                
                 return (long)1e13 * i1 + (long)1e11 * i2 + (long)1e8 * i3 + (long)1e4 * d1 + (long)1e2 * d2 + d3;
             }
         }

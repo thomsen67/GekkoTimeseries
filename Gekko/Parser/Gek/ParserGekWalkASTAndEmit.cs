@@ -1457,18 +1457,19 @@ namespace Gekko.Parser.Gek
                     {
                         node.Code.A("O.Gekko2 o" + Num(node) + " = new O.Gekko2();" + G.NL);
                         if (node[0].Text == "ASTVERSION")
-                        {
-                            node.Code.A("o" + Num(node) + ".op1 = " + "@`" + GetOperator(node[1][0][0].Text) + "`" + ";");
+                        {                            
                             if (true)
                             {
+                                node.Code.A("o" + Num(node) + ".operator1 = " + "@`" + GetOperator(node[1][0][0].Text) + "`" + ";");
                                 node.Code.A("o" + Num(node) + ".x1a = " + node[1][1][0].Code + ";");
                                 if (node[1][1].ChildrenCount() > 1) node.Code.A("o" + Num(node) + ".x1b = " + node[1][1][1].Code + ";");
                             }
                             if (node[2].ChildrenCount() > 0)
                             {
+                                node.Code.A("o" + Num(node) + ".operator2 = " + "@`" + GetOperator(node[2][0][0].Text) + "`" + ";");
                                 if (node[2][1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".x2a = " + node[2][1][0].Code + ";");
                                 if (node[2][1].ChildrenCount() > 1) node.Code.A("o" + Num(node) + ".x2b = " + node[2][1][1].Code + ";");
-                                node.Code.A("o" + Num(node) + ".logical12 = " + "@`" + node[3].Text + "`" + ";");
+                                node.Code.A("o" + Num(node) + ".logical12 = " + "@`" + node[3][0].Text + "`" + ";");
                             }                            
                         }
                         else new Error("Syntax error in GEKKO statement");

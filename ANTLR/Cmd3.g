@@ -3206,7 +3206,7 @@ objectFunctionNaked:        bankvarname GLUEDOT DOT libraryWithColon? ident left
 // GEKKO
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-gekko:						GEKKO VERSION ifOperator versionAndDate (andOr VERSION ifOperator versionAndDate)? -> ^({token("ASTGEKKO", ASTGEKKO, input.LT(1).Line)} ASTVERSION ^(ASTPLACEHOLDER ifOperator versionAndDate) ^(ASTPLACEHOLDER ifOperator? versionAndDate?) ^(ASTPLACEHOLDER andOr));
+gekko:						GEKKO VERSION ifOperator versionAndDate (andOr VERSION ifOperator versionAndDate)? -> ^({token("ASTGEKKO", ASTGEKKO, input.LT(1).Line)} ASTVERSION ^(ASTPLACEHOLDER ifOperator versionAndDate) ^(ASTPLACEHOLDER ifOperator? versionAndDate?) ^(ASTPLACEHOLDER andOr?));
 andOr:                      AND | OR ;
 versionAndDate:             expression expression? -> ^(ASTPLACEHOLDER expression expression?);
 
