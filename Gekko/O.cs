@@ -9118,6 +9118,134 @@ namespace Gekko
             public string logical12 = null;
             public void Exe()
             {
+
+                long theirs = -12345L;
+
+                if (true)
+                {
+
+                    int type = 0;
+                    //Either type:
+                    // 1: string, null
+                    // 2: date, null
+                    // 3: string, date
+                    string s = null;
+                    GekkoTime gt = GekkoTime.tNull;
+                    if (x1b == null)
+                    {
+                        if (x1a.Type() == EVariableType.String)
+                        {
+                            type = 1;
+                            s = O.ConvertToString(x1a);
+                        }
+                        else
+                        {
+                            type = 2;
+                            gt = O.ConvertToDate(x1a);
+                        }
+                    }
+                    else
+                    {
+                        type = 3;
+                        s = O.ConvertToString(x1a);
+                        gt = O.ConvertToDate(x1b);
+                    }
+
+                    int i1 = 0;
+                    int i2 = 0;
+                    int i3 = 0;
+                    if (type == 1 || type == 3)
+                    {
+                        SplitVersionNumber(s, ref i1, ref i2, ref i3);
+                    }
+
+                    int d1 = 0;
+                    int d2 = 0;
+                    int d3 = 0;
+                    if ((type == 2 || type == 3) && gt.freq != EFreq.D)
+                    {
+                        new Error("In 'GEKKO version' statement, a date is expected to be of daily frequency.");
+                    }
+                    d1 = gt.super;
+                    d2 = gt.sub;
+                    d3 = gt.subsub;
+
+                    // 1122333yyyymmdd (15 digits, long has 18-19).
+                    theirs = GetLongNumber(i1, i2, i3, d1, d2, d3);
+                }
+
+                long ours = -12345L;
+                if (true)
+                {
+                    int i1 = 0;
+                    int i2 = 0;
+                    int i3 = 0;
+                    SplitVersionNumber(Globals.gekkoVersion, ref i1, ref i2, ref i3);
+
+                    int d1 = 0;
+                    int d2 = 0;
+                    int d3 = 0;
+                    string pd = G.GetProgramDir();
+                    try
+                    {
+                        string pd2 = Path.Combine(pd, "gekko.exe");
+                        DateTime modification = File.GetLastWriteTime(pd2);
+                        d1 = modification.Year;
+                        d2 = modification.Month;
+                        d3 = modification.Day;
+                    }
+                    catch { }
+                    ours = GetLongNumber(i1, i2, i3, d1, d2, d3);
+                }
+
+                if (theirs != ours)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("Versions do not match");
+                        txt.MainNewLine();
+                        txt.MainAdd("Current version: " + ours);
+                        txt.MainNewLine();
+                        txt.MainAdd("Required version: " + theirs);
+                        txt.MainNewLine();
+                        txt.MainAdd("You may out-comment the line to ignore it.");
+                    }
+                }
+            }
+
+            private static void SplitVersionNumber(string s, ref int i1, ref int i2, ref int i3)
+            {
+                string[] ss = s.Split('.');
+                if (ss.Length == 1)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                }
+                else if (ss.Length == 2)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                    i2 = G.ConvertToInt(ss[1]);
+                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal integer");
+                }
+                else if (ss.Length == 3)
+                {
+                    i1 = G.ConvertToInt(ss[0]);
+                    if (i1 == int.MaxValue || i1 < 0) new Error("Version part '" + ss[0] + "' is not a legal integer");
+                    i2 = G.ConvertToInt(ss[1]);
+                    if (i2 == int.MaxValue || i2 < 0) new Error("Version part '" + ss[1] + "' is not a legal integer");
+                    i3 = G.ConvertToInt(ss[2]);
+                    if (i3 == int.MaxValue || i3 < 0) new Error("Version part '" + ss[2] + "' is not a legal integer");
+                }
+                else
+                {
+                    new Error("Problems with number of dots in version number '" + s + "'");
+                }
+            }
+
+            private static long GetLongNumber(long i1, long i2, long i3, long d1, long d2, long d3)
+            {
+                return (long)1e13 * i1 + (long)1e11 * i2 + (long)1e8 * i3 + (long)1e4 * d1 + (long)1e2 * d2 + d3;
             }
         }
 
