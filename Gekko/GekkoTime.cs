@@ -319,6 +319,12 @@ namespace Gekko
             return days;
         }
 
+        /// <summary>
+        /// Converts a C# DateTime into a GekkoTime of desired frequency.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static GekkoTime FromDateTimeToGekkoTime(EFreq freq, DateTime dt)
         {
             int sub = 1;
@@ -348,7 +354,6 @@ namespace Gekko
             {
                 new Error("Cannot convert date to undated frequency");
             }
-
             return new GekkoTime(freq, super, sub, subsub);
         }
 

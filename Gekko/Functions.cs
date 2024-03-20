@@ -5705,6 +5705,21 @@ namespace Gekko
             return new ScalarString(Globals.gekkoVersion);
         }
 
+        public static IVariable gekkoversiondate(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            GekkoTime gt = GekkoTime.tNull;
+            string pd = G.GetProgramDir();
+            try
+            {
+                string pd2 = Path.Combine(pd, "gekko.exe");
+                DateTime modification = File.GetLastWriteTime(pd2);
+                gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, modification);                
+            }
+            catch { }
+            return new ScalarDate(gt);
+        }
+        
+
         public static IVariable gekkobitness(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(Program.Get64Bitness(1));
