@@ -9113,130 +9113,148 @@ namespace Gekko
             public string op1 = null;
             public IVariable x1a = null;
             public IVariable x1b = null;
+            public string op2 = null;
             public IVariable x2a = null;
             public IVariable x2b = null;
             public string logical12 = null;
             public void Exe()
             {
 
-                int type = 0;
+                List<int> type = new List<int>();
+                List<string> s = new List<string>();
+                List<GekkoTime> gt = new List<GekkoTime>();
+                List<string> op = new List<string>();
+                List<string> v = new List<string>();
+                List<bool> ok = new List<bool>();
+                type.Add(0); type.Add(0);
+                s.Add(null); s.Add(null);
+                gt.Add(GekkoTime.tNull); gt.Add(GekkoTime.tNull);
+                op.Add(null); op.Add(null);
+                v.Add(null); v.Add(null);
+                ok.Add(false); ok.Add(false);
+
                 //Either type:
                 // 1: string, null
                 // 2: date, null
                 // 3: string, date
-                string s = null;
-                GekkoTime gt = GekkoTime.tNull;
-                if (x1b == null)
+
+                for (int i = 0; i < 1; i++)
                 {
-                    if (x1a.Type() == EVariableType.String)
+                    if (i == 0) op[i] = this.op1;
+                    else if (i == 1) op[i] = this.op2;
+                    else new Error("Operator problem");
+
+                    if (x1b == null)
                     {
-                        type = 1;
-                        s = O.ConvertToString(x1a);
+                        if (x1a.Type() == EVariableType.String)
+                        {
+                            type[i] = 1;
+                            s[i] = O.ConvertToString(x1a);
+                        }
+                        else
+                        {
+                            type[i] = 2;
+                            gt[i] = O.ConvertToDate(x1a);
+                        }
                     }
                     else
                     {
-                        type = 2;
-                        gt = O.ConvertToDate(x1a);
+                        type[i] = 3;
+                        s[i] = O.ConvertToString(x1a);
+                        gt[i] = O.ConvertToDate(x1b);
                     }
-                }
-                else
-                {
-                    type = 3;
-                    s = O.ConvertToString(x1a);
-                    gt = O.ConvertToDate(x1b);
+
+                    int req_i1 = 0;
+                    int req_i2 = 0;
+                    int req_i3 = 0;
+                    if (type[i] == 1 || type[i] == 3)
+                    {
+                        SplitVersionNumber(s[i], ref req_i1, ref req_i2, ref req_i3);
+                    }
+
+                    int req_d1 = 0;
+                    int req_d2 = 0;
+                    int req_d3 = 0;
+                    if ((type[i] == 2 || type[i] == 3) && gt[i].freq != EFreq.D)
+                    {
+                        new Error("In 'GEKKO version' statement, a date is expected to be of daily frequency, not " + gt[i].ToString());
+                    }
+                    req_d1 = gt[i].super;
+                    req_d2 = gt[i].sub;
+                    req_d3 = gt[i].subsub;
+                    long req = GetLongNumber(req_i1, req_i2, req_i3, req_d1, req_d2, req_d3);
+
+                    // ------------------------- Get system info ----------------------------
+
+                    int ths_i1 = 0;
+                    int ths_i2 = 0;
+                    int ths_i3 = 0;
+                    SplitVersionNumber(Globals.gekkoVersion, ref ths_i1, ref ths_i2, ref ths_i3);
+
+                    int ths_d1 = 0;
+                    int ths_d2 = 0;
+                    int ths_d3 = 0;
+                    string pd = G.GetProgramDir();
+                    try
+                    {
+                        string pd2 = Path.Combine(pd, "gekko.exe");
+                        DateTime modification = File.GetLastWriteTime(pd2);
+                        ths_d1 = modification.Year;
+                        ths_d2 = modification.Month;
+                        ths_d3 = modification.Day;
+                    }
+                    catch { }
+                    long ths = GetLongNumber(ths_i1, ths_i2, ths_i3, ths_d1, ths_d2, ths_d3);
+
+                    // ---------------------- compare ------------------
+                                        
+                    if (op[i] == "<")
+                    {
+                        if (ths < req) ok[i] = true;
+                    }
+                    else if (op[i] == "<=")
+                    {
+                        if (ths <= req) ok[i] = true;
+                    }
+                    else if (op[i] == "==")
+                    {
+                        if (ths == req) ok[i] = true;
+                    }
+                    else if (op[i] == ">=")
+                    {
+                        if (ths >= req) ok[i] = true;
+                    }
+                    else if (op[i] == ">")
+                    {
+                        if (ths > req) ok[i] = true;
+                    }
+                    else if (op[i] == "<>")
+                    {
+                        if (ths != req) ok[i] = true;
+                    }
+                    else new Error("Invalid operator '" + op[i] + "'");
+
+                    string sreq_i = req_i1 + "." + req_i2 + "." + req_i3;
+                    string sreq_d = req_d1 + "m" + req_d2 + "d" + req_d3;
+
+                    string sths_i = ths_i1 + "." + ths_i2 + "." + ths_i3;
+                    string sths_d = ths_d1 + "m" + ths_d2 + "d" + ths_d3;
+
+                    v[i] = sths_i + " " + sths_d + " " + op[i] + " " + sreq_i + " " + sreq_d;
+
                 }
 
-                int req_i1 = 0;
-                int req_i2 = 0;
-                int req_i3 = 0;
-                if (type == 1 || type == 3)
-                {
-                    SplitVersionNumber(s, ref req_i1, ref req_i2, ref req_i3);
-                }
-
-                int req_d1 = 0;
-                int req_d2 = 0;
-                int req_d3 = 0;
-                if ((type == 2 || type == 3) && gt.freq != EFreq.D)
-                {
-                    new Error("In 'GEKKO version' statement, a date is expected to be of daily frequency, not " + gt.ToString());
-                }
-                req_d1 = gt.super;
-                req_d2 = gt.sub;
-                req_d3 = gt.subsub;
-                long req = GetLongNumber(req_i1, req_i2, req_i3, req_d1, req_d2, req_d3);
-
-                // ------------------------- Get system info ----------------------------
-
-                int ths_i1 = 0;
-                int ths_i2 = 0;
-                int ths_i3 = 0;
-                SplitVersionNumber(Globals.gekkoVersion, ref ths_i1, ref ths_i2, ref ths_i3);
-
-                int ths_d1 = 0;
-                int ths_d2 = 0;
-                int ths_d3 = 0;
-                string pd = G.GetProgramDir();
-                try
-                {
-                    string pd2 = Path.Combine(pd, "gekko.exe");
-                    DateTime modification = File.GetLastWriteTime(pd2);
-                    ths_d1 = modification.Year;
-                    ths_d2 = modification.Month;
-                    ths_d3 = modification.Day;
-                }
-                catch { }
-                long ths = GetLongNumber(ths_i1, ths_i2, ths_i3, ths_d1, ths_d2, ths_d3);
-
-                // ---------------------- compare ------------------
-
-                bool ok = false;
-                if (this.op1 == "<")
-                {
-                    if (ths < req) ok = true;
-                }
-                else if (this.op1 == "<=")
-                {
-                    if (ths <= req) ok = true;
-                }
-                else if (this.op1 == "==")
-                {
-                    if (ths == req) ok = true;
-                }
-                else if (this.op1 == ">=")
-                {
-                    if (ths >= req) ok = true;
-                }
-                else if (this.op1 == ">")
-                {
-                    if (ths > req) ok = true;
-                }
-                else if (this.op1 == "<>")
-                {
-                    if (ths != req) ok = true;
-                }
-                else new Error("Invalid operator '" + this.op1 + "'");
-
-                string sreq_i = req_i1 + "." + req_i2 + "." + req_i3;
-                string sreq_d = req_d1 + "m" + req_d2 + "d" + req_d3;
-
-                string sths_i = ths_i1 + "." + ths_i2 + "." + ths_i3;
-                string sths_d = ths_d1 + "m" + ths_d2 + "d" + ths_d3;
-
-                string v = sths_i + " " + sths_d + " " + this.op1 + " " + sreq_i + " " + sreq_d;
-
-                if (ok)
+                if (ok[0])
                 {
                     using (Error txt = new Error())
                     {
-                        txt.MainAdd("Verified: Gekko version " + v);
+                        txt.MainAdd("Verified: Gekko version " + v[0]);
                     }
                 }
                 else
                 {
                     using (Error txt = new Error())
-                    {
-                        txt.MainAdd("Could NOT verify: Gekko version " + v);
+                    {                        
                         txt.MainAdd("You may out-comment the line to skip verification.");
                     }
                 }
