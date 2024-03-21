@@ -13883,8 +13883,54 @@ namespace UnitTests
             Assert.AreEqual("yy1", ss1);
             string ss2 = meta2.trace2.GetPrecedents_BewareOnlyInternalUse()[2].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text; //yyy1
             Assert.AreEqual("yyy1", ss2);
-        }        
-        
+        }
+
+        [TestMethod]
+        public void _Test_TraceCopyAccumulation()
+        {
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+            I("reset; time 2000 2004; x = 1; rename x as y; rename y as z;"); //  --> GOOD, no accumulation, 3 traces
+            //test z
+
+            I("reset; time 2000 2004; x = 1; copy x as y; copy x as y;");    //   --> GOOD, no accumulation, 3 traces (but 2 of them are equal, so really only 2 traces, the first copy trace is gone)
+            //test y
+
+            I("reset; time 2000 2004; x = 1; copy < 2001 2002 > x as y; copy <2001 2002> x as y;"); //--> also ok
+            //test y
+
+            I("reset; time 2000 2004; x = 1; time 2001 2003; copy<respect> x as y; copy<respect> x as y; copy<respect> x as y;"); //--> BAD, ACCUMULATES            
+            if (true)
+            {
+                Series y = O.GetIVariableFromString("y!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = y.meta.trace2;
+                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
+                Assert.AreEqual(2003, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
+            }            
+
+            I("reset; time 2000 2004; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
+            if (true)
+            {
+                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x5.meta.trace2;
+                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
+                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
+            }
+
+            I("reset; time 2014 2024; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
+            if (true)
+            {
+                //Whereas the above is ok, this gets 2 traces, where [0] is a null period... WHY???
+                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x5.meta.trace2;
+                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
+                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
+            }
+            //test x5
+        }
 
         [TestMethod]
         public void _Test_TraceCopyIdIdentity()

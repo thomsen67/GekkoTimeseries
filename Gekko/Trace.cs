@@ -903,23 +903,61 @@ namespace Gekko
             
             if (ts.meta.trace2 == null) ts.meta.trace2 = new Trace2(ETraceType.GluedToSeries, ETraceParentOrChild.Parent);
 
-            //string label = ts.MetaGetLabel();
-            //if (label != null) trace.GetContents().label = label;
-
             if (type == ETracePushType.Sibling)
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(trace);
+
+                //In unit tests, trace period (t1/t2) is always present here, so no null periods.
+                //if (trace.GetContents().period.t1.IsNull())
+                //{
+                //}
             }
             else if (type == ETracePushType.NewParent)
-            {                   
+            {
+                //The idea regarding these probably is that it is a new object,
+                //possibly copying/cloning stuff from another object.
+                //For instance, where in the traces of x2 would you put the
+                //fact that x2 has been renamed to x1 ??? Therefore, .NewParent for that, and null period.
+
+                //In unit tests, trace period (t1/t2) is only null for:
+                //  rename x1 as x2;
+                //  copy x1 to x2;
+                //  copy <2001 2002> x1 to x2;  //when after above. probably copy<respect>too --> is this root problem??
+                //The others have periods, and typically also construct new objects.
+
+                //reset; x = 1; rename x as y; rename y as z; trace2 z;   --> GOOD, no accumulation, 3 traces
+                //reset; x = 1; copy x as y; copy x as y; trace2 y;       --> GOOD, no accumulation, 3 traces (but 2 of them are equal, so really only 2 traces, the first copy trace is gone)
+                //reset; x = 1; copy < 2020 2021 > x as y; copy < 2020 2021 > x as y; trace2 y; --> also ok
+                //reset; x = 1; copy<respect> x as y; copy<respect> x as y; trace2 y; --> BAD, ACCUMULATES
+                //reset; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; trace2 x5;  --> BAD ACCUMULATES 1 TIME too much
+
+                //LOOK AT COPY, maybe in the cases where we copy PART of data (with <t1 t2> or <respect>) FROM a series into a NEW series or EXISTING series.
+                //COPY<respect> accumulates worst, possibly because time is not detected --> should be, fix this first!
+
+                //if (trace.GetContents().period.t1.IsNull())
+                //{
+
+                //}
+
+                //COPY x1 to x2; (period)
+                //RENAME x1 as x2; (null)
+                //COLLAPSE y!a = x1; (period)
+                //INTERPOLATE... (period)
+                //REBASE... (period)
+                //SMOOTH... (period)
+                //DOWNLOAD... (period)
+                //TRUNCATE <2001q2 2002q3> y; (period)
+                //SPLICE... (period)
+                //READ <t1 t2> xx; (period)
+                //READ xx; (period)
                 trace.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents2();
                 TraceAndPeriods2 tap6 = new TraceAndPeriods2();
                 tap6.trace = trace;
-                GekkoTimeSpansSimple xx = new GekkoTimeSpansSimple();
-                xx.SetStorage(new List<GekkoTimeSpanSimple>() { tap6.trace.GetContents().period });  //should be ok to just add it here, because .GetContents().period never changes (is immutable anyway)
-                tap6.periods = xx;
+                GekkoTimeSpansSimple gtss = new GekkoTimeSpansSimple();
+                gtss.SetStorage(new List<GekkoTimeSpanSimple>() { tap6.trace.GetContents().period });  //should be ok to just add it here, because .GetContents().period never changes (is immutable anyway)
+                tap6.periods = gtss;
                 ts.meta.trace2.precedents.Add(tap6);
             }            
             else new Error("Trace");
