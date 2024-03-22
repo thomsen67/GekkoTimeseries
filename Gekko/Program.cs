@@ -5199,7 +5199,7 @@ namespace Gekko
                                             {
                                                 //All other get a trace with "read ... ;".
 
-                                                Trace2 newTrace = null;
+                                                Trace2 trace = null;
                                                 Series x = null;
 
                                                 if (periods == null)
@@ -5209,16 +5209,16 @@ namespace Gekko
                                                     if (t1.IsNull())
                                                     {
                                                         //can happen that a series is empty of data
-                                                        newTrace = new Trace2(ETraceType.Normal, true);
+                                                        trace = new Trace2(ETraceType.Normal, true);
                                                     }
                                                     else
                                                     {
-                                                        newTrace = new Trace2(ETraceType.Normal, t1, t2);
+                                                        trace = new Trace2(ETraceType.Normal, t1, t2);
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    newTrace = new Trace2(ETraceType.Normal, periods.t1, periods.t2);
+                                                    trace = new Trace2(ETraceType.Normal, periods.t1, periods.t2);
                                                 }
 
                                                 if (tsExisting != null)
@@ -5236,20 +5236,12 @@ namespace Gekko
                                                     // |   x1 <2002 2002> = 1
 
                                                     //tsExisting has x = 2
-                                                    newTrace.GetContents().text = oRead.gekkocode + ";"; //read <merge>
-                                                    newTrace.GetContents().dataFile = ffh.realPathAndFileName;
-                                                    newTrace.GetContents().name = name;
-                                                    newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                    if (!isGbk || dates != null)
-                                                    {
-                                                        //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
-                                                        if (tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse() != null)
-                                                        {
-                                                            newTrace.AddRangeFromSeries2(tsExisting, tsImported);
-                                                        }
-                                                        Gekko.Trace2.PushIntoSeries(tsExisting, newTrace, ETracePushType.Sibling);
-                                                    }
-                                                    else
+                                                    trace.GetContents().text = oRead.gekkocode + ";"; //read <merge>
+                                                    trace.GetContents().dataFile = ffh.realPathAndFileName;
+                                                    trace.GetContents().name = name;
+                                                    trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+
+                                                    if (isGbk && dates == null)
                                                     {
                                                         //No READ or IMPORT reported as trace, but rather the traces of the read/imported series
                                                         //WHY
@@ -5258,22 +5250,29 @@ namespace Gekko
                                                         //WHY
                                                         //WHY  why ony precedents[0]? What if there are precedents[1] etc?
                                                         //WHY
+                                                        //WHY                                                        
                                                         //WHY
                                                         //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        Precedents2 precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();                                                        
+                                                        Precedents2 precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();
                                                         if (precedents != null && precedents.Count() > 0)
                                                         {
-                                                            Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling); //x = 1
+                                                            Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling, false); //x = 1
                                                         }
+                                                    }
+                                                    else
+                                                    {
+                                                        //The following creates a READ or IMPORT trace, with "indented" sub-traces if any (there are none for non-gbk files)
+                                                        if (tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse() != null)
+                                                        {
+                                                            trace.AddRangeFromSeries2(tsExisting, tsImported);
+                                                        }
+                                                        Gekko.Trace2.PushIntoSeries(tsExisting, trace, ETracePushType.Sibling, Globals.traceUsesOrMayUseRealDataPeriod);
                                                     }
                                                 }
                                                 else
                                                 {
+                                                    //There is no existing series with the same name (read will also trigger this)
+                                                    //
                                                     //for instance:                                                
                                                     //  reset;
                                                     //  read <2001 2020 merge> bank;  //where in the bank x1 = 1
@@ -5282,11 +5281,11 @@ namespace Gekko
                                                     //                                                
                                                     // | read <merge> bank;     2002-2002
                                                     // |   x1 <2002 2002> = 1
-                                                    newTrace.GetContents().text = oRead.gekkocode + ";";
-                                                    newTrace.GetContents().dataFile = ffh.realPathAndFileName;
-                                                    newTrace.GetContents().name = name;
-                                                    newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                                    Gekko.Trace2.PushIntoSeries(tsImported, newTrace, ETracePushType.NewParent);
+                                                    trace.GetContents().text = oRead.gekkocode + ";";
+                                                    trace.GetContents().dataFile = ffh.realPathAndFileName;
+                                                    trace.GetContents().name = name;
+                                                    trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                                    Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                                                 }
                                             }
                                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
@@ -8447,12 +8446,13 @@ namespace Gekko
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
-                                Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
-                                newTrace.GetContents().text = downloadHelper.gekkoCode + ";";
-                                newTrace.GetContents().dataFile = downloadHelper.dataFile;
-                                newTrace.GetContents().name = ts.GetNameAndParentDatabank();
-                                newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                                Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
+                                trace.GetContents().text = downloadHelper.gekkoCode + ";";
+                                trace.GetContents().dataFile = downloadHelper.dataFile;
+                                trace.GetContents().name = ts.GetNameAndParentDatabank();
+                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                //trace can only have null period if px date range is null, not possible
+                                Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -8508,12 +8508,13 @@ namespace Gekko
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
-                                Trace2 newTrace = new Trace2(ETraceType.Normal, gt_start, gt_end);
-                                newTrace.GetContents().text = downloadHelper.gekkoCode + ";";
-                                newTrace.GetContents().dataFile = downloadHelper.dataFile;
-                                newTrace.GetContents().name = ts.GetNameAndParentDatabank();
-                                newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                                Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                                Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
+                                trace.GetContents().text = downloadHelper.gekkoCode + ";";
+                                trace.GetContents().dataFile = downloadHelper.dataFile;
+                                trace.GetContents().name = ts.GetNameAndParentDatabank();
+                                trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                                //trace can only have null period if px file has null period --> not possible
+                                Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -17908,12 +17909,12 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ETraceType.Normal, true);
-                        newTrace.GetContents().text = o.gekkocode + ";";
-                        //newTrace.GetContents().text = "Renamed " + output.s1 + " as " + output.s2;
-                        newTrace.GetContents().name = ts.GetNameAndParentDatabank();
-                        newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                        Gekko.Trace2.PushIntoSeries(ts, newTrace, ETracePushType.NewParent);
+                        //We don't want the parent trace to have null-time.                                                            
+                        Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
+                        trace.GetContents().text = o.gekkocode + ";";
+                        trace.GetContents().name = ts.GetNameAndParentDatabank();
+                        trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                        Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
@@ -18035,14 +18036,14 @@ namespace Gekko
                             {                                
                                 try
                                 {
+                                    //injecting
                                     DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                                    Trace2 newTrace = new Trace2(ETraceType.Normal, o.t1, o.t2, true);
-                                    newTrace.GetContents().text = o.gekkocode + ";";
-                                    //newTrace.GetContents().text = "Copied " + iv_series.GetName() + " into " + existing_series.GetName() + " (" + truncateTemp.t1 + "-" + truncateTemp.t2 + ")";
-                                    newTrace.GetContents().name = existing_series.GetNameAndParentDatabank();
-                                    newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                                    newTrace.AddRangeFromSeries2(existing_series, iv_series);
-                                    Gekko.Trace2.PushIntoSeries(existing_series, newTrace, ETracePushType.Sibling);
+                                    Trace2 trace = new Trace2(ETraceType.Normal, o.t1, o.t2, true);
+                                    trace.GetContents().text = o.gekkocode + ";";
+                                    trace.GetContents().name = existing_series.GetNameAndParentDatabank();
+                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
+                                    trace.AddRangeFromSeries2(existing_series, iv_series);
+                                    Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
                                     Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                 }
                                 catch (Exception e)
@@ -18068,10 +18069,9 @@ namespace Gekko
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
                             Trace2 newTrace = new Trace2(ETraceType.Normal, ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast(), true);
                             newTrace.GetContents().text = o.gekkocode + ";";
-                            //newTrace.GetContents().text = "Copied " + (iv as Series).GetName() + " to " + ts_clone.GetName() + " (clone)";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
-                            Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent);
+                            Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                             Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
@@ -25532,12 +25532,13 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
-                        newTrace.GetContents().text = gekkocode + ";";
-                        newTrace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
-                        newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                        newTrace.AddRangeFromSeries2(ts_lhs, ts_rhs);
-                        Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                        Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
+                        trace.GetContents().text = gekkocode + ";";
+                        trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
+                        //trace can only have null period if lhs has all missing values
+                        Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
@@ -25860,13 +25861,13 @@ namespace Gekko
                     try
                     {
                         DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                        Trace2 newTrace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
-                        newTrace.GetContents().text = gekkocode + ";";
-                        //newTrace.GetContents().text = "Interpolated from " + ts_rhs.GetName();
-                        newTrace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
-                        newTrace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
-                        newTrace.AddRangeFromSeries2(ts_lhs, ts_rhs);
-                        Gekko.Trace2.PushIntoSeries(ts_lhs, newTrace, ETracePushType.NewParent);
+                        Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
+                        trace.GetContents().text = gekkocode + ";";
+                        trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
+                        trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(true);
+                        trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
+                        //trace can only have null period if lhs has all missing values
+                        Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         Globals.traceTime += (DateTime.Now - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch

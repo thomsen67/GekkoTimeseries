@@ -59,6 +59,7 @@ namespace Gekko
         public const bool traceEndoRhsFix1 = true;
         public const bool traceEndoRhsFix2 = true;
         public const int traceDeepStartDepth = -1;
+        public const bool traceUsesOrMayUseRealDataPeriod = true;  //for some traces, the real data period is used, so missings may truncate it. So if a command has actually run over some period, and it produces missings, its trace may completely disappear. In that case, the user just sees missing for some period, but cannot se the code line "producing" this missing. If this needs to be fixed, the varible acts as a pointer to these places.
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

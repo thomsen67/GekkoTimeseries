@@ -13888,6 +13888,41 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceCopyAccumulation()
         {
+
+
+            // ------------------ RENAME ----------------------------
+            I("reset;");
+            I("x1 <2014 2024> = 1;");
+            I("x1 <2020 2020>= 2;");
+            I("x2 <2010 2030> = 100;");
+            string s = "rename x1 as x2;";
+            I(s); //after this, x2 object with 7 is completely gone (make x2 get its real data period).
+            I("x2 <2017 2017> = 3;"); //this should poke a hole in x2 with active period 2014-24.
+            I("x2 <2014 2016> = 4;"); //another hole
+            if (true)
+            {
+                Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x2.meta.trace2;
+                Assert.IsTrue(trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text.Contains(s));
+                Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+            }
+            I("x2 <2018 2024> = 5;"); //old rename and 1 and 2 values competely gone.
+            if (true)
+            {
+                Series x2 = O.GetIVariableFromString("x2!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x2.meta.trace2;
+                Assert.IsFalse(trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text.Contains(s));
+                Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());                
+            }
+
+
+
+
+
+
+
+
+
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             I("reset; time 2000 2004; x = 1; rename x as y; rename y as z;"); //  --> GOOD, no accumulation, 3 traces
@@ -13896,7 +13931,7 @@ namespace UnitTests
             I("reset; time 2000 2004; x = 1; copy x as y; copy x as y;");    //   --> GOOD, no accumulation, 3 traces (but 2 of them are equal, so really only 2 traces, the first copy trace is gone)
             //test y
 
-            I("reset; time 2000 2004; x = 1; copy < 2001 2002 > x as y; copy <2001 2002> x as y;"); //--> also ok
+            I("reset; time 2000 2004; x = 1; copy <2001 2002> x as y; copy <2001 2002> x as y;"); //--> also ok
             //test y
 
             I("reset; time 2000 2004; x = 1; time 2001 2003; copy<respect> x as y; copy<respect> x as y; copy<respect> x as y;"); //--> BAD, ACCUMULATES            
@@ -13929,7 +13964,13 @@ namespace UnitTests
                 Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
                 Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
             }
-            //test x5
+
+            
+
+
+
+
+
         }
 
         [TestMethod]
@@ -22460,7 +22501,7 @@ print(df2)
                             builder.Append(char1);
                         }
                         trace.GetContents().text = builder.ToString();
-                        Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling);
+                        Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling, false);
                         Program.databanks.GetFirst().AddIVariable(ts.GetName(), ts);
                         if (i == 0) s0 = trace.GetContents().text;
                     }

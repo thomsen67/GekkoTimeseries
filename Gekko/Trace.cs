@@ -889,9 +889,10 @@ namespace Gekko
         /// <summary>
         /// Type == NewParent ---> Puts the new trace on top of the series traces. Reconnects the existing series trace(s) to the new trace.
         /// Type == Sibling ---> Puts it among siblings. Removes the date(s) from its siblings.
+        /// Param usesRealDataPeriod is not used for now, just a pointer for future fixes.
         /// </summary>
         /// <param name="ts"></param>
-        public static void PushIntoSeries(Series ts, Trace2 trace, ETracePushType type)
+        public static void PushIntoSeries(Series ts, Trace2 trace, ETracePushType type, bool usesRealDataPeriod)
         {
             //
             // !!!
@@ -907,11 +908,8 @@ namespace Gekko
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(trace);
-
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
-                //if (trace.GetContents().period.t1.IsNull())
-                //{
-                //}
+                if (Globals.runningOnTTComputer && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1");
             }
             else if (type == ETracePushType.NewParent)
             {
@@ -951,6 +949,7 @@ namespace Gekko
                 //SPLICE... (period)
                 //READ <t1 t2> xx; (period)
                 //READ xx; (period)
+
                 trace.AddRangeFromSeries2(null, ts);
                 ts.meta.trace2.precedents = new Precedents2();
                 TraceAndPeriods2 tap6 = new TraceAndPeriods2();
