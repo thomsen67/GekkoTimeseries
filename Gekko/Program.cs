@@ -18102,7 +18102,16 @@ namespace Gekko
                         try
                         {
                             DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                            Trace2 newTrace = new Trace2(ETraceType.Normal, ts_clone.GetRealDataPeriodFirst(), ts_clone.GetRealDataPeriodLast(), true);
+
+                            GekkoTime xt1 = ts_clone.GetRealDataPeriodFirst();
+                            GekkoTime xt2 = ts_clone.GetRealDataPeriodLast();
+                            if (truncateTemp != null)
+                            {
+                                xt1 = truncateTemp.t1;
+                                xt2 = truncateTemp.t2;
+                            }
+
+                            Trace2 newTrace = new Trace2(ETraceType.Normal, xt1, xt2, true);
                             newTrace.GetContents().text = o.gekkocode + ";";
                             newTrace.GetContents().name = ts_clone.GetNameAndParentDatabank();
                             newTrace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);

@@ -13889,16 +13889,7 @@ namespace UnitTests
         public void _Test_TraceCopyAccumulation()
         {
 
-            I("reset; time 2014 2024; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
-            if (true)
-            {
-                //Whereas the above is ok, this gets 2 traces, where [0] is a null period... WHY???
-                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
-                Trace2 trace = x5.meta.trace2;
-                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
-                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
-                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
-            }
+            
 
             // ------------------ RENAME ----------------------------
             I("reset;");
@@ -13954,7 +13945,16 @@ namespace UnitTests
                 Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
             }
 
-            
+            I("reset; time 2014 2024; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
+            if (true)
+            {
+                //Whereas the above is ok, this gets 2 traces, where [0] is a null period... WHY???
+                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x5.meta.trace2;
+                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
+                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
+            }
 
 
         }
