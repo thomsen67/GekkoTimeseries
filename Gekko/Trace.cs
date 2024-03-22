@@ -14,7 +14,7 @@ namespace Gekko
         Normal,
         GluedToSeries,
         Divider,
-        Dangling
+        Dangling  //not used?
     }
 
     /// <summary>

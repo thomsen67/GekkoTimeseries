@@ -5223,13 +5223,14 @@ namespace Gekko
 
                                                 if (tsExisting != null)
                                                 {
-                                                    //There is already a series with same name, only happens with read<merge> or import.
+                                                    //There is already a series with same name,
+                                                    //only happens with read<merge> or import.
                                                     //for instance:
                                                     //  reset; time 2001 2003;
                                                     //  x1 = 2;
                                                     //  read <merge> bank;    //where in the bank x1 <2002 2002> = 1
                                                     //
-                                                    //should become:
+                                                    //should become: (HMMM, is this so?)
                                                     //
                                                     // | x1 = 2,                2001-2001, 2003-2003
                                                     // | read <merge> bank;     2002-2002
@@ -5243,21 +5244,52 @@ namespace Gekko
 
                                                     if (isGbk && dates == null)
                                                     {
-                                                        //No READ or IMPORT reported as trace, but rather the traces of the read/imported series
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY
-                                                        //WHY  why ony precedents[0]? What if there are precedents[1] etc?
-                                                        //WHY
-                                                        //WHY                                                        
-                                                        //WHY
-                                                        //WHY
+                                                        //We are merging. No READ or IMPORT reported as trace,
+                                                        //but rather the traces of the read/imported series are used directly as siblings.                                                        
+                                                        //
+                                                        //This illustrates it:
+                                                        //
+                                                        //reset;
+                                                        //x1 <2008 2008> = 8;
+                                                        //x1 <2009 2009> = 9;
+                                                        //write x1;
+                                                        //
+                                                        //reset; time 2001 2010;
+                                                        //x1 = 2;
+                                                        //x1 <2004 2004> = 3;
+                                                        //read <merge> x1;
+                                                        //disp x1;
+                                                        // ==> GIVES the following which seems ok:
+                                                        //| x1 <2009 2009> = 9; --> 2009-2009
+                                                        //| x1 <2008 2008> = 8; --> 2008-2008
+                                                        //| x1 <2004 2004>= 3;  --> 2004-2004
+                                                        //| x1 = 2;             --> 2001-2003, 2005-2007, 2010-2010
+                                                        //
+                                                        //Essentially same traces as this:
+                                                        //
+                                                        //reset; time 2001 2010;
+                                                        //x1 = 2;
+                                                        //x1 <2004 2004> = 3;
+                                                        //x1 <2008 2008> = 8;
+                                                        //x1 <2009 2009> = 9;
+
                                                         Precedents2 precedents = tsImported.meta?.trace2?.GetPrecedents_BewareOnlyInternalUse();
-                                                        if (precedents != null && precedents.Count() > 0)
+
+                                                        if (precedents != null)
                                                         {
-                                                            Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling, false); //x = 1
+                                                            foreach (TraceAndPeriods2 tap in precedents.GetStorage())
+                                                            {
+                                                                //This gets the first-level traces of the imported series into the traces of the existing series.
+                                                                if (tap.trace.type == ETraceType.Divider) continue;  //can that even happen when it is a trace just 1 level below GluedToSeries.
+                                                                //We MAY get null-periods here, but only if there are null-periods in the imported series
+                                                                Gekko.Trace2.PushIntoSeries(tsExisting, tap.trace, ETracePushType.Sibling, false); //x = 1
+                                                            }
                                                         }
+
+                                                        //if (precedents != null && precedents.Count() > 0)
+                                                        //{
+                                                        //    Gekko.Trace2.PushIntoSeries(tsExisting, precedents[0].trace, ETracePushType.Sibling, false); //x = 1
+                                                        //}
                                                     }
                                                     else
                                                     {
@@ -18027,6 +18059,9 @@ namespace Gekko
                     {
                         if (iv_series.freq == existing_series.freq)
                         {
+                            //
+                            // Injecting into existing series
+                            //
                             injectingToExistingSeries = true;
                             foreach (GekkoTime gt in new GekkoTimeIterator(truncateTemp))
                             {
@@ -18038,7 +18073,7 @@ namespace Gekko
                                 {
                                     //injecting
                                     DateTime traceTime = DateTime.Now;  //remember to compute Globals.traceTime at the of this try-catch
-                                    Trace2 trace = new Trace2(ETraceType.Normal, o.t1, o.t2, true);
+                                    Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
                                     trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(true);
