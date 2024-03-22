@@ -13889,6 +13889,16 @@ namespace UnitTests
         public void _Test_TraceCopyAccumulation()
         {
 
+            I("reset; time 2014 2024; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
+            if (true)
+            {
+                //Whereas the above is ok, this gets 2 traces, where [0] is a null period... WHY???
+                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
+                Trace2 trace = x5.meta.trace2;
+                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
+                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
+                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
+            }
 
             // ------------------ RENAME ----------------------------
             I("reset;");
@@ -13914,16 +13924,6 @@ namespace UnitTests
                 Assert.IsFalse(trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().text.Contains(s));
                 Assert.AreEqual(3, trace.GetPrecedents_BewareOnlyInternalUse().Count());                
             }
-
-
-
-
-
-
-
-
-
-            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             I("reset; time 2000 2004; x = 1; rename x as y; rename y as z;"); //  --> GOOD, no accumulation, 3 traces
             //test z
@@ -13954,21 +13954,7 @@ namespace UnitTests
                 Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
             }
 
-            I("reset; time 2014 2024; x3 = 3; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5; copy <2001 2002> x3 to x5;"); // --> BAD ACCUMULATES 1 TIME too much
-            if (true)
-            {
-                //Whereas the above is ok, this gets 2 traces, where [0] is a null period... WHY???
-                Series x5 = O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series;
-                Trace2 trace = x5.meta.trace2;
-                Assert.AreEqual(1, trace.GetPrecedents_BewareOnlyInternalUse().Count());
-                Assert.AreEqual(2001, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t1.super);
-                Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
-            }
-
             
-
-
-
 
 
         }
