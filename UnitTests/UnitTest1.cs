@@ -13888,8 +13888,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceCopyAccumulation()
         {
-
-            
+            //Tests that assure repeated commands do not just accumulate traces.            
 
             // ------------------ RENAME ----------------------------
             I("reset;");
@@ -13925,7 +13924,7 @@ namespace UnitTests
             I("reset; time 2000 2004; x = 1; copy <2001 2002> x as y; copy <2001 2002> x as y;"); //--> also ok
             //test y
 
-            I("reset; time 2000 2004; x = 1; time 2001 2003; copy<respect> x as y; copy<respect> x as y; copy<respect> x as y;"); //--> BAD, ACCUMULATES            
+            I("reset; time 2000 2004; x = 1; time 2001 2003; copy <respect> x as y; copy <respect> x as y; copy <respect> x as y;"); //--> BAD, ACCUMULATES            
             if (true)
             {
                 Series y = O.GetIVariableFromString("y!a", ECreatePossibilities.NoneReportError) as Series;

@@ -4758,6 +4758,23 @@ namespace Gekko
             return new ScalarVal(i + 1);  //return 0 if not found
         }
 
+        public static IVariable includes(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO also for lists
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
+            if (G.Contains(s1, s2)) return Globals.scalarVal1;  //same as index(..., ...) >= 0.
+            else return Globals.scalarVal0;
+        }
+
         public static IVariable startswith(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             string s1 = O.ConvertToString(x1);
