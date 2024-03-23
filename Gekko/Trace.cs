@@ -908,6 +908,64 @@ namespace Gekko
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(trace);
+
+                //Here, with lhs on rhs like "x = x + ..." or "x = x[-1] + ..." the traces in trace (depth=1) may already be 
+                //in ts.meta.trace2 (depth=0). If so, we remove them at depth=1. This has to be done after PrecedentsShadowing()
+                //because som traces at depth=0 may be removed (for instance if the statement has the same period).                
+
+                if (Globals.traceFixAccumulationProblem)
+                {
+                    List<TraceID2> m = new List<TraceID2>();
+                    if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+                    {
+                        foreach (TraceAndPeriods2 tapDepth0 in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                        {
+                            //string name = tapDepth0.trace.traceContents.name;  //isn't it always the same name??
+                            if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+                            {
+                                foreach (TraceAndPeriods2 tapDepth1 in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
+                                {
+                                    //probably the last one just being added does not need to be checked, but we keep it simple.
+                                    if (tapDepth0.trace.traceContents.id == tapDepth1.trace.traceContents.id)
+                                    {
+                                        m.Add(tapDepth1.trace.traceContents.id);
+                                        break;  //found one, take the next from depth=0.
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (m.Count > 0)
+                    {
+                        //will not happen that often
+                        //remove these traces from depth=1
+                        List<TraceAndPeriods2> existing = trace.GetPrecedents_BewareOnlyInternalUse().GetStorage();
+                        List<TraceAndPeriods2> taps = new List<TraceAndPeriods2>();
+                        foreach (TraceAndPeriods2 tap in existing)
+                        {
+                            if (m.Contains(tap.trace.traceContents.id)) continue;
+                            if (tap.trace.type == ETraceType.Divider)
+                            {
+                                if (taps.Count == 0) continue; //no divider at first place
+                                if (taps[taps.Count - 1].trace.type == ETraceType.Divider) continue; //no divider if previous is divider
+                            }
+                            taps.Add(tap);
+                        }
+
+                        //Remove any dividers at end
+                        while (taps.Count > 0)
+                        {
+                            if (taps[taps.Count - 1].trace.type == ETraceType.Divider) taps.RemoveAt(taps.Count - 1);
+                            else break;
+                        }
+                        trace.GetPrecedents_BewareOnlyInternalUse().InitWithEmptyList();
+                        foreach (TraceAndPeriods2 tap in taps)
+                        {
+                            trace.GetPrecedents_BewareOnlyInternalUse().Add(tap);
+                        }                            
+                    }
+                }
+
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
                 if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + trace.traceContents.text);
             }
@@ -1295,7 +1353,7 @@ namespace Gekko
                     t1 = this.GetContents().period.t1;
                     t2 = this.GetContents().period.t2;
                 }
-                if (t1.IsNull() && t2.IsNull()) period = "";
+                if (t1.IsNull() && t2.IsNull()) period = "[null]";
                 else period = "" + t1.ToString() + "-" + t2.ToString() + "";
                 GetActivePeriodsAsString(periods, ref active, ref activeDetailed);
 
@@ -1309,9 +1367,7 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.GetContents().dataFile) + ")";
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) fileDetailed += " (data = " + this.GetContents().dataFile + ")";
                 Trace2.GetStampAsString(this.GetId(), out stamp, out stampDetailed);
-                if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);
-                //label = this.GetContents().label;
-                //if (label != null) label = label.Trim();
+                if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
                 label = SearchForLabelInOpenDatabanks(nameDetailed);
             }
 
@@ -1383,15 +1439,17 @@ namespace Gekko
                     n++;
                     if (n > 0) active += ", ";
                     if (n > 0) activeDetailed += ", ";
+                    string s = gts.t1.ToString() + "-" + gts.t2.ToString();
+                    if (s == "[null]-[null]") s = "[null]";
                     if (n <= 1)
                     {
-                        active += gts.t1.ToString() + "-" + gts.t2.ToString();
+                        active += s;
                     }
                     else
                     {
                         active += "...";
                     }
-                    activeDetailed += gts.t1.ToString() + "-" + gts.t2.ToString();
+                    activeDetailed += s;
                 }
             }
         }

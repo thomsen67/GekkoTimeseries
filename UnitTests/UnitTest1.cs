@@ -13888,6 +13888,50 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceCopyAccumulation()
         {
+            // Lagged engogenous:
+            // A principle could be this:
+            //   Do things normally with x = x...
+            //   After pushIntoSeries with shadowing etc. check that trace id's from child level d=1 are not already at
+            //   at upper level d=0. If so, those child-traces are removed.
+            //   To not complicate too much, do it like this as an after-thought. Will be easier to maintain and speed should be ok.
+            //
+            I("reset;");
+            I("time 2001 2006;");
+            I("x1 = 1;");
+            I("x1a = 2;");
+            I("x2 = 100;");
+            I("x2 <2003 2003> = 101;");
+            I("x2 <2004 2004> = 102;");
+            I("x2 <2002 2002> = x2[-1] + x1 + x1a + 2;"); //--> if <2001 2006> all x2 traces at d=0 would disappear.
+            
+            //
+
+            //9 traces when folded out --> only 4 should be enough?
+            //
+            //This explodes:
+            //reset;
+            //time 2001 2006;
+            //x1 = 1;
+            //x2 = 100;
+            //x2 <2002 2002> = x2[-1] + x1 + 2;
+            //x2 <2003 2003>= x2[-1] + x1 + 3;
+            //x2 <2004 2004>= x2[-1] + x1 + 4;
+            //x2 <2005 2005>= x2[-1] + x1 + 5;
+            //trace2 x2;
+
+            // 
+            // 
+            //
+            I("reset;");
+            I("time 2001 2005;");
+            I("x1 = 2, 3, 4, 5, 6;");
+            I("x2 = 100;");
+            I("x2 <2002 2005> ^= dif(x1);");
+            I("x2 <2003 2005> %= 2;");
+            I("trace2 x2;");
+            Assert.Fail();
+
+
             //Tests that assure repeated commands do not just accumulate traces.            
 
             // ------------------ RENAME ----------------------------
