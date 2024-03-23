@@ -909,7 +909,7 @@ namespace Gekko
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(trace);
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
-                if (Globals.runningOnTTComputer && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1");
+                if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + trace.traceContents.text);
             }
             else if (type == ETracePushType.NewParent)
             {

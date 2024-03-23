@@ -13597,8 +13597,8 @@ namespace UnitTests
                     Assert.AreEqual(Globals.parserErrorSeparator + "1", tracec.commandFileAndLine);
                     Assert.AreEqual(null, tracec.dataFile);
                     Assert.AreEqual("rename x1 as y;", tracec.text);
-                    Assert.AreEqual(GekkoTime.tNull, tracec.period.t1);
-                    Assert.AreEqual(GekkoTime.tNull, tracec.period.t2);
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2001, 1), tracec.period.t1);
+                    Assert.AreEqual(new GekkoTime(EFreq.Q, 2002, 4), tracec.period.t2);
                     //We skip testing of periods here
                 }
 
@@ -14366,8 +14366,8 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
+            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
@@ -14377,8 +14377,8 @@ namespace UnitTests
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2().Count);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].periods.Count());
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
+            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[0].periods[0].t1.super);
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[0].periods[0].t2.super);
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2().Count);
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[0].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
@@ -14389,10 +14389,12 @@ namespace UnitTests
             I("y <2005 2005> = 3;");
             Assert.AreEqual(2, y.meta.trace2.TimeShadow2().Count);
             
-            Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].periods.Count());
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
-            Assert.AreEqual(-12345, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
-                        
+            Assert.AreEqual(2, y.meta.trace2.TimeShadow2()[1].periods.Count());
+            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t1.super);
+            Assert.AreEqual(2004, y.meta.trace2.TimeShadow2()[1].periods[0].t2.super);
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t1.super);
+            Assert.AreEqual(2006, y.meta.trace2.TimeShadow2()[1].periods[1].t2.super);
+
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2().Count); //x has 1 trace
 
             Assert.AreEqual(1, y.meta.trace2.TimeShadow2()[1].trace.TimeShadow2()[0].periods.Count()); //x trace has 1 period
