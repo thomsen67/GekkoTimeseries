@@ -454,8 +454,8 @@ namespace Gekko
         /// <returns></returns>
         public List<TraceAndPeriods2> TimeShadow2()
         {
-            if (Globals.traceWallTimeHandledSpecialWayFor1UnitTest) return TimeShadow2(true, false);
-            else return TimeShadow2(true, true);
+            if (Globals.traceWallTimeHandledSpecialWayFor1UnitTest) return TimeShadow2(false);
+            else return TimeShadow2(true);
         }
 
         /// <summary>
@@ -465,7 +465,7 @@ namespace Gekko
         /// if shadowedTracesAreRemoved == false, the period info may be empty.
         /// BEWARE: can return null!
         /// </summary>        
-        public List<TraceAndPeriods2> TimeShadow2(bool shadowedTracesAreRemoved, bool invertWallTime)
+        public List<TraceAndPeriods2> TimeShadow2(bool invertWallTime)
         {
             if (invertWallTime && !Globals.traceWallTimeHandledSpecialWayFor1UnitTest)
             {
@@ -1287,20 +1287,31 @@ namespace Gekko
 
         
         public Item FromTraceToTreeViewItemsTree(int depth, int cnt, GekkoTimeSpansSimple periods, int max, bool showDividers, ref int nn)
-        {            
+        {
+            string sAdd = null;
             Item item = FromTraceToTreeViewItem(periods, showDividers);
             nn++;            
             if (depth < max)
             {
                 List<TraceAndPeriods2> taps = this.TimeShadow2();
                 if (taps != null && taps.Count > 0)
-                {
+                {                    
                     foreach (TraceAndPeriods2 tap in taps)
                     {
-                        if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                        Item itemChild = null;
-                        itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, cnt + 1, tap.periods, max, showDividers, ref nn);
-                        item.GetChildren().Add(itemChild);
+                        if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers                                                
+                        bool ignore = false;
+                        if (Globals.traceEndoRhsFix4 && depth > 0)  //depth == 0 is phoney
+                        {
+                            if (this.traceContents.id == tap.trace.traceContents.id)
+                            {
+                                ignore = true;
+                            }
+                        }
+                        if (!ignore)
+                        {
+                            Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, cnt + 1, tap.periods, max, showDividers, ref nn);
+                            item.GetChildren().Add(itemChild);
+                        }
                     }
                 }
             }
@@ -1309,6 +1320,7 @@ namespace Gekko
 
         public static void ExpandTraceInTraceViewer(Item item)
         {
+            bool showDividers = false;  //make it an option
             if (Globals.isWindowTreeViewWithTableLazy)
             {                                
                 foreach (Item itemChild in item.GetChildren())
@@ -1321,9 +1333,36 @@ namespace Gekko
                     {
                         foreach (TraceAndPeriods2 tap in taps)
                         {
-                            if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                            Item itemGrandChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
-                            itemChild.GetChildren().Add(itemGrandChild);
+                            if (!showDividers && tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+
+                            bool ignore = false;
+                            if (Globals.traceEndoRhsFix4)
+                            {
+                                //The idea here is that if a trace appears on depth d+1, but is already present
+                                //at depth d, why should we show it? (Its periods may differ though, which ought to
+                                //be looked into).
+                                //So in such cases where "an uncle" (typically, alternatively "a parent") shows the same thing, the newphew (child)
+                                //is skipped in the viewer.
+                                //Often happens with traces like y = y + x; or y = y[-1] + x; where it is fair enough
+                                //to show the contents of x as children, but not the contents of y as children.
+
+                                TraceID2 traceGrandChildId = tap.trace.GetContents().id;
+                                foreach (Item itemChildZZZ in item.GetChildren())
+                                {
+                                    TraceID2 traceChildIdZZZ = itemChildZZZ.trace.GetContents().id;
+                                    if (traceGrandChildId == traceChildIdZZZ)
+                                    {
+                                        ignore = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!ignore)
+                            {
+                                Item itemGrandChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
+                                itemChild.GetChildren().Add(itemGrandChild);
+                            }
                         }
                     }
                 }
@@ -1363,7 +1402,7 @@ namespace Gekko
                 if (this.GetContents().name != null)
                 {
                     name = G.Chop_RemoveFreq(G.Chop_RemoveBank(this.GetContents().name), Program.options.freq);
-                    nameDetailed= G.Chop_RemoveBank(this.GetContents().name);
+                    nameDetailed = G.Chop_RemoveBank(this.GetContents().name);
                 }
                 GetCodeAsString(this.GetContents().text, out code, out codeDetailed);
                 GekkoTime t1 = GekkoTime.tNull;
