@@ -1219,7 +1219,7 @@ namespace Gekko
                     //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
                     int maxDepth2 = int.MaxValue;
                     if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-                    temp = trace.FromTraceToTreeViewItemsTree(0, 0, null, maxDepth2, Globals.traceShowDividers, ref nn);
+                    temp = trace.FromTraceToTreeViewItemsTree(0, null, maxDepth2, Globals.traceShowDividers, null, ref nn);
                     foreach (Item item in temp.GetChildren())
                     {
                         model.Add(item);
@@ -1286,9 +1286,8 @@ namespace Gekko
         }
 
         
-        public Item FromTraceToTreeViewItemsTree(int depth, int cnt, GekkoTimeSpansSimple periods, int max, bool showDividers, ref int nn)
-        {
-            string sAdd = null;
+        public Item FromTraceToTreeViewItemsTree(int depth, GekkoTimeSpansSimple periods, int max, bool showDividers, List<TraceAndPeriods2> uncles, ref int nn)
+        {            
             Item item = FromTraceToTreeViewItem(periods, showDividers);
             nn++;            
             if (depth < max)
@@ -1302,14 +1301,18 @@ namespace Gekko
                         bool ignore = false;
                         if (Globals.traceEndoRhsFix4 && depth > 0)  //depth == 0 is phoney
                         {
-                            if (this.traceContents.id == tap.trace.traceContents.id)
+                            foreach (TraceAndPeriods2 uncle in uncles)
                             {
-                                ignore = true;
+                                if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
+                                {
+                                    ignore = true;
+                                    break;
+                                }
                             }
                         }
                         if (!ignore)
                         {
-                            Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, cnt + 1, tap.periods, max, showDividers, ref nn);
+                            Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
                             item.GetChildren().Add(itemChild);
                         }
                     }
