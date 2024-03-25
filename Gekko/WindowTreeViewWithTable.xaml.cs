@@ -99,7 +99,7 @@ namespace Gekko
                     if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
 
                     List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
-                    if (taps != null)
+                    if (taps != null && itemChild.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
                     {
                         foreach (TraceAndPeriods2 tap in taps)
                         {
@@ -107,7 +107,7 @@ namespace Gekko
                             Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
                             itemChild.GetChildren().Add(itemGChild);
                         }
-                    }
+                    }                    
                 }
             }
         }
