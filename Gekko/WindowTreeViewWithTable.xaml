@@ -50,7 +50,7 @@
         <!--<TextBox Name="text" DockPanel.Dock="Bottom" Height="100" Padding="4, 4, 4, 4"></TextBox>-->
         <RichTextBox DockPanel.Dock="Bottom" Background="Transparent" BorderThickness="0" IsReadOnly="True" Name="text"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10"></RichTextBox>
         <DataGrid AutoGenerateColumns="False" Name="grid" CanUserAddRows="False" IsReadOnly="True" VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
-				  AlternationCount="2" AlternatingRowBackground="WhiteSmoke" SelectionChanged="SelectionChanged" SelectedCellsChanged="SelectedCellsChanged">
+				  AlternationCount="2" AlternatingRowBackground="WhiteSmoke" SelectionChanged="SelectionChanged" SelectedCellsChanged="SelectedCellsChanged" Background="White">
             <DataGrid.Resources>
                 <Style TargetType="DataGridRow">
                     <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
