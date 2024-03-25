@@ -283,7 +283,7 @@ namespace Gekko
                         }
                     }
 
-                    if (Globals.traceEndoRhsFix1)
+                    if (Globals.traceEndoRhsFix2)
                     {
                         if (IsSimilarTrace(lhsTrace, rhsTrace) && lhsTrace.traceContents.period.t1.EqualsGekkoTime(rhsTrace.traceContents.period.t1) && lhsTrace.traceContents.period.t2.EqualsGekkoTime(rhsTrace.traceContents.period.t2))
                         {
@@ -913,7 +913,7 @@ namespace Gekko
                 //in ts.meta.trace2 (depth=0). If so, we remove them at depth=1. This has to be done after PrecedentsShadowing()
                 //because som traces at depth=0 may be removed (for instance if the statement has the same period).                
 
-                if (Globals.traceFixAccumulationProblem)
+                if (Globals.traceEndoRhsFix3)
                 {
                     List<TraceID2> m = new List<TraceID2>();
                     if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)

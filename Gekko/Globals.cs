@@ -55,12 +55,12 @@ namespace Gekko
         public static bool traceWallTimeHandledSpecialWayFor1UnitTest = false;  //with true we get latest changes (in wall time) at top.        
         public static GekkoTimeSpansSimple traceNullPeriods = new GekkoTimeSpansSimple();  //just a pointer to know where to find these. Only used for "divider" traces, because a null element cannot be protobuffed
         public static int traceN = 0;
-        public const bool traceFix= false;
-        public const bool traceEndoRhsFix1 = true;
-        public const bool traceEndoRhsFix2 = true;
+        public const bool traceFix = false;        
         public const int traceDeepStartDepth = -1;
         public const bool traceUsesOrMayUseRealDataPeriod = true;  //for some traces, the real data period is used, so missings may truncate it. So if a command has actually run over some period, and it produces missings, its trace may completely disappear. In that case, the user just sees missing for some period, but cannot se the code line "producing" this missing. If this needs to be fixed, the varible acts as a pointer to these places.
-        public const bool traceFixAccumulationProblem = true;  //For x = x + ... , traces of x at depth=1 are dropped if they are already at depth=0 and are not shadowed by x = x + ...
+        public const bool traceEndoRhsFix1 = false;   //fix wall or mirrors for x[%t] = x[%t] + ...
+        public const bool traceEndoRhsFix2 = false;   //fix for  x = 1; x = x + 1; x = x + 1; ...
+        public const bool traceEndoRhsFix3 = false;  //For x = x + ... , traces of x at depth=1 are dropped if they are already at depth=0 and are not shadowed by x = x + ...
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

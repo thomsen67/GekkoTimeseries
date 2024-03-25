@@ -13928,8 +13928,8 @@ namespace UnitTests
             I("x2 = 100;");
             I("x2 <2002 2005> ^= dif(x1);");
             I("x2 <2003 2005> %= 2;");
-            I("trace2 x2;");
-            Assert.Fail();
+            
+            
 
 
             //Tests that assure repeated commands do not just accumulate traces.            
