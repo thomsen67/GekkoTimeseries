@@ -22198,6 +22198,10 @@ namespace Gekko
                 {
                     //Interpolates from !a to !q, annualP_better_lag --> quarterlyP_better_lag.
                     Series temp = new Series(EFreq.Q, null);
+                    if (annualP_better_lag[i].ts.GetRealDataPeriodFirst().IsNull())
+                    {
+                        new Error("Inside the laspchain() function (with 'annualoverlap' option), an intermediate annual price series is constructed. However, this series has only missing values. This may be because of missing data or because the time period is too short.");
+                    }
                     Program.InterpolateHelper(temp, annualP_better_lag[i].ts, null, "repeat");
                     SeriesAndBool sab = new SeriesAndBool();
                     sab.ts = temp;
