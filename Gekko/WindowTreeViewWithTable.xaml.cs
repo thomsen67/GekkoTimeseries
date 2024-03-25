@@ -89,28 +89,9 @@ namespace Gekko
         /// </summary>
         protected virtual void OnExpanding()
         {
-            if (Globals.isWindowTreeViewWithTableLazy)
-            {
-                //return;
-                Item item = this as Item;
-                foreach (Item itemChild in item.GetChildren())
-                {
-                    Trace2 traceChild = itemChild.trace;
-                    if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
+            Trace2.ExpandTraceInTraceViewer(this as Item);
+        }        
 
-                    List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
-                    if (taps != null && itemChild.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
-                    {
-                        foreach (TraceAndPeriods2 tap in taps)
-                        {
-                            if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                            Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
-                            itemChild.GetChildren().Add(itemGChild);
-                        }
-                    }                    
-                }
-            }
-        }
         protected virtual void OnExpanded() { }
         protected virtual void OnCollapsing() { }
         protected virtual void OnCollapsed() { }

@@ -1307,6 +1307,29 @@ namespace Gekko
             return item;
         }
 
+        public static void ExpandTraceInTraceViewer(Item item)
+        {
+            if (Globals.isWindowTreeViewWithTableLazy)
+            {                                
+                foreach (Item itemChild in item.GetChildren())
+                {
+                    Trace2 traceChild = itemChild.trace;
+                    if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
+
+                    List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
+                    if (taps != null && itemChild.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
+                    {
+                        foreach (TraceAndPeriods2 tap in taps)
+                        {
+                            if (tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                            Item itemGChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
+                            itemChild.GetChildren().Add(itemGChild);
+                        }
+                    }
+                }
+            }
+        }
+
         public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods, bool showDividers)
         {           
 
