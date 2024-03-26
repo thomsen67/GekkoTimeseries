@@ -1106,7 +1106,7 @@ namespace Gekko
                         {
                             foreach (TraceAndPeriods2 tap1 in taps1)
                             {
-                                if (!Globals.traceShowDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                if (!Program.options.databank_trace_divide && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                 Trace2 trace1 = tap1.trace;
                                 Item item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
                                 item.GetChildren().Add(item1);
@@ -1117,7 +1117,7 @@ namespace Gekko
                                 {
                                     foreach (TraceAndPeriods2 tap2 in taps2)
                                     {
-                                        if (!Globals.traceShowDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                        if (!Program.options.databank_trace_divide && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                         Trace2 trace2 = tap2.trace;
                                         bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
                                         if (!ignore)
@@ -1229,7 +1229,7 @@ namespace Gekko
                     {
                         foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
                         {
-                            if (!Globals.traceShowDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                            if (!Program.options.databank_trace_divide && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
                             bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
                             if (!ignore)
                             {
@@ -1333,15 +1333,16 @@ namespace Gekko
             // =========================================================================
             string showFreq = "maybe";  //"yes", "no", "maybe
             string showDatabank = "maybe";  //"yes", "no", "maybe"
+            string nullName = "-----";  //does not work well...
             // Also Globals.showDividers and Program.options.databank_trace_trim;
             // =========================================================================
                                                                          
             bool hasChildren = false;
             if (this.precedents != null && this.precedents.Count() > 0) hasChildren = true;
-            string name = "null";
-            string nameDetailed = "null";
-            string code = "null";
-            string codeDetailed = "null";
+            string name = nullName;
+            string nameDetailed = nullName;
+            string code = nullName;
+            string codeDetailed = nullName;
             string period = null;
             string active = null;
             string activeDetailed = null;
@@ -1382,8 +1383,15 @@ namespace Gekko
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) file += " (data = " + System.IO.Path.GetFileName(this.GetContents().dataFile) + ")";
                 if (!G.NullOrBlanks(this.GetContents().dataFile)) fileDetailed += " (data = " + this.GetContents().dataFile + ")";
                 Trace2.GetStampAsString(this.GetId(), out stamp, out stampDetailed);
-                if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                
-                label = SearchForLabelInOpenDatabanks(nameDetailed);
+                if (this.type == ETraceType.Divider)
+                {
+                    stamp = null; stampDetailed = null;                    
+                }
+                else
+                {
+                    label = SearchForLabelInOpenDatabanks(nameDetailed);
+                }
+                if (this.GetContents().precedentsNames != null) precedentsNames = GetPrecedentsNames(showFreq, showDatabank);                                
             }
 
             Item newItem = new Item(name, nameDetailed, code, codeDetailed, period, active, activeDetailed, stamp, stampDetailed, file, fileDetailed, label, precedentsNames, hasChildren);

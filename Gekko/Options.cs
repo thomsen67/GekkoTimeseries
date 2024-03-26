@@ -59,6 +59,7 @@ namespace Gekko
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
+        public bool databank_trace_divide = false;
 
         // ---
         public int decomp_maxlag = 10;
@@ -346,7 +347,8 @@ namespace Gekko
             Add("DATABANK SEARCH", Globals.xbool);
 
             Add("DATABANK TRACE", Globals.xbool);
-            Add("DATABANK TRACE DUBLETS", Globals.xbool);
+            Add("DATABANK TRACE DUBLETS", Globals.xbool); 
+            Add("DATABANK TRACE DIVIDE", Globals.xbool);
 
             Add("DECOMP MAXLAG", Globals.xint);
             Add("DECOMP MAXLEAD", Globals.xint);
