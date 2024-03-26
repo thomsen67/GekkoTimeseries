@@ -1261,7 +1261,7 @@ namespace Gekko
                             if (ignore)
                             {
                                 //Normally we should be sure that an "uncle" is inside the same divider.
-                                //But there are no dividers at this depth anyway, since this is near the series objet (glued).
+                                //But there are no dividers at this depth anyway, since this is near the series object (glued).
                             }
                             else
                             {
@@ -1272,7 +1272,7 @@ namespace Gekko
                         }
                     }
                 }
-                if (n == 0) item.HasChildren = false;
+                if (n == 0) item.HasChildren = false;  //Better?: if (item.GetChildren().Count == 0)...
                 else item.HasChildren = true;
             }
             else
@@ -1321,11 +1321,6 @@ namespace Gekko
             // We are expanding the childItem. We want to see if -- inside the same divider block -- a sibling to childTrace
             // has same id as the grandChildTrace. If so, kill it.
             //
-
-            //
-            // run bug;
-            // click qBnp 3 times.
-            //   
 
             bool showDividers = false;  //make it an option
             if (Globals.isWindowTreeViewWithTableLazy)
@@ -1406,11 +1401,9 @@ namespace Gekko
                                 childItem.GetChildren().Add(itemGrandChild);
                             }
                         }
-                    }
+                    }                    
 
-                    //childItem.GetChildren().Count
-
-                    if (n == 0) childItem.HasChildren = false;
+                    if (childItem.GetChildren().Count == 0) childItem.HasChildren = false;
                     else childItem.HasChildren = true;
                 }
             }
