@@ -1289,6 +1289,7 @@ namespace Gekko
         public Item FromTraceToTreeViewItemsTree(int depth, GekkoTimeSpansSimple periods, int max, bool showDividers, List<TraceAndPeriods2> uncles, ref int nn)
         {            
             Item item = FromTraceToTreeViewItem(periods, showDividers);
+            int n = 0;
             nn++;            
             if (depth < max)
             {
@@ -1312,12 +1313,15 @@ namespace Gekko
                         }
                         if (!ignore)
                         {
+                            n++;
                             Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
                             item.GetChildren().Add(itemChild);
                         }
                     }
                 }
             }
+            if (n == 0) item.HasChildren = false;
+            else item.HasChildren = true;
             return item;
         }
 
@@ -1348,12 +1352,10 @@ namespace Gekko
                                 //is skipped in the viewer.
                                 //Often happens with traces like y = y + x; or y = y[-1] + x; where it is fair enough
                                 //to show the contents of x as children, but not the contents of y as children.
-
-                                TraceID2 traceGrandChildId = tap.trace.GetContents().id;
-                                foreach (Item itemChildZZZ in item.GetChildren())
-                                {
-                                    TraceID2 traceChildIdZZZ = itemChildZZZ.trace.GetContents().id;
-                                    if (traceGrandChildId == traceChildIdZZZ)
+                                                                
+                                foreach (Item uncle in item.GetChildren())
+                                {                                    
+                                    if (tap.trace.GetContents().id == uncle.trace.GetContents().id)  //grandchild == uncle
                                     {
                                         ignore = true;
                                         break;

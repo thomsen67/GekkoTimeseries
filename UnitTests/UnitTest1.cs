@@ -13896,6 +13896,18 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceCopyAccumulation()
         {
+            //Get this in:
+            //read usmec;
+            //trace2 upsp;
+            //upsp < 2023 2035 >= 117;
+            //trace2 upsp;
+            //upsp < 1966 2022 >= 118;
+            //trace2 upsp;
+
+            //These old traces reappear in viewer. Get it into tests somehow with Items!
+            Assert.Fail();
+
+
             // Lagged engogenous:
             // A principle could be this:
             //   Do things normally with x = x...
