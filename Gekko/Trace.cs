@@ -1289,34 +1289,7 @@ namespace Gekko
         {            
             Item item = this.FromTraceToTreeViewItem(periods, showDividers);
 
-            if (!Program.options.databank_trace_dublets)
-            {
-                //At startup, we need to get two levels in: depth=0 and depth=1.
-                List<TraceAndPeriods2> taps1 = this.TimeShadow2();
-                if (taps1 != null && taps1.Count > 0)
-                {
-                    foreach (TraceAndPeriods2 tap1 in taps1)
-                    {
-                        Trace2 trace1 = tap1.trace;
-                        Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
-                        item.GetChildren().Add(item1);
-                        ExpandTraceInTraceViewer(item1);
-
-                        List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
-                        if (taps2 != null && taps2.Count > 0)
-                        {
-                            foreach (TraceAndPeriods2 tap2 in taps2)
-                            {
-                                Trace2 trace2 = tap2.trace;
-                                Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
-                                item1.GetChildren().Add(item2);
-                                ExpandTraceInTraceViewer(item2);
-                            }
-                        }
-                    }
-                }
-            }
-            else
+            if (Program.options.databank_trace_dublets)
             {
                 int n = 0;
                 nn++;
@@ -1359,6 +1332,33 @@ namespace Gekko
                 }
                 if (n == 0) item.HasChildren = false;
                 else item.HasChildren = true;
+            }
+            else
+            {
+                //At startup, we need to get two levels in: depth=0 and depth=1.
+                List<TraceAndPeriods2> taps1 = this.TimeShadow2();
+                if (taps1 != null && taps1.Count > 0)
+                {
+                    foreach (TraceAndPeriods2 tap1 in taps1)
+                    {
+                        Trace2 trace1 = tap1.trace;
+                        Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
+                        item.GetChildren().Add(item1);
+                        ExpandTraceInTraceViewer(item1);
+
+                        List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
+                        if (taps2 != null && taps2.Count > 0)
+                        {
+                            foreach (TraceAndPeriods2 tap2 in taps2)
+                            {
+                                Trace2 trace2 = tap2.trace;
+                                Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
+                                item1.GetChildren().Add(item2);
+                                ExpandTraceInTraceViewer(item2);
+                            }
+                        }
+                    }
+                }
             }
             return item;
         }
