@@ -1300,18 +1300,26 @@ namespace Gekko
                     {
                         if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers                                                
                         bool ignore = false;
-                        if (Globals.traceEndoRhsFix4 && depth > 0)  //depth == 0 is phoney
+                        if (Globals.traceEndoRhsFix4)
                         {
-                            foreach (TraceAndPeriods2 uncle in uncles)
+                            if (depth > 0)   //depth == 0 is phoney)
                             {
-                                if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
+                                foreach (TraceAndPeriods2 uncle in uncles)
                                 {
-                                    ignore = true;
-                                    break;
+                                    if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
+                                    {
+                                        ignore = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
-                        if (!ignore)
+                        if (ignore)
+                        {
+                            //Normally we should be sure that an "uncle" is inside the same divider.
+                            //But there are no dividers at this depth anyway, since this is near the series objet (glued).
+                        }
+                        else
                         {
                             n++;
                             Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
@@ -1327,51 +1335,144 @@ namespace Gekko
 
         public static void ExpandTraceInTraceViewer(Item item)
         {
+            //
+            //             item
+            //            /    \
+            //           /      
+            //       childItem              (childTrace)
+            //          /    \
+            //         /      
+            //   grandChildTrace
+            //
+            // We are expanding the childItem. We want to see if -- inside the same divider block -- a sibling to childTrace
+            // has same id as the grandChildTrace. If so, kill it.
+            //
             bool showDividers = false;  //make it an option
             if (Globals.isWindowTreeViewWithTableLazy)
             {                                
-                foreach (Item itemChild in item.GetChildren())
+                foreach (Item childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
                 {
-                    Trace2 traceChild = itemChild.trace;
-                    if (traceChild.type == ETraceType.Divider) continue; //dividers are not shown                
+                    int n = 0;
+                    Trace2 childTrace = childItem.trace;
+                    if (childTrace.type == ETraceType.Divider) continue; //dividers are not shown                
 
-                    List<TraceAndPeriods2> taps = traceChild.TimeShadow2();
-                    if (taps != null && itemChild.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
+                    List<TraceAndPeriods2> grandChildrenTraces = childTrace.TimeShadow2();
+                    if (grandChildrenTraces != null && childItem.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
                     {
-                        foreach (TraceAndPeriods2 tap in taps)
+                        foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
                         {
-                            if (!showDividers && tap.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                            if (!showDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
 
                             bool ignore = false;
                             if (Globals.traceEndoRhsFix4)
                             {
-                                //The idea here is that if a trace appears on depth d+1, but is already present
-                                //at depth d, why should we show it? (Its periods may differ though, which ought to
-                                //be looked into).
-                                //So in such cases where "an uncle" (typically, alternatively "a parent") shows the same thing, the newphew (child)
-                                //is skipped in the viewer.
-                                //Often happens with traces like y = y + x; or y = y[-1] + x; where it is fair enough
-                                //to show the contents of x as children, but not the contents of y as children.
-                                                                
-                                foreach (Item uncle in item.GetChildren())
-                                {                                    
-                                    if (tap.trace.GetContents().id == uncle.trace.GetContents().id)  //grandchild == uncle
+                                if (true)
+                                {
+                                    List<TraceAndPeriods2> xChildTraces = item.trace.TimeShadow2();
+                                    List<List<TraceAndPeriods2>> xChildTracesDivided = Trace2.SplitDividers(xChildTraces);                                    
+                                    foreach (List<TraceAndPeriods2> xChildTracesChunk in xChildTracesDivided)
                                     {
-                                        ignore = true;
-                                        break;
+                                        bool isRightChunk = false;
+                                        bool isDublet = false;
+                                        foreach (TraceAndPeriods2 xChildTrace in xChildTracesChunk)
+                                        {
+                                            if (xChildTrace.trace.GetContents().id == childTrace.GetContents().id)
+                                            {
+                                                isRightChunk = true;
+                                            }
+                                            if (xChildTrace.trace.GetContents().id == grandChildTrace.trace.GetContents().id)
+                                            {
+                                                isDublet = true;
+                                            }
+                                        }
+                                        if (isRightChunk && isDublet)
+                                        {
+                                            ignore = true;
+                                            break;
+                                        }
+                                        else if (isDublet)
+                                        {
+                                            if (Globals.runningOnTTComputer) MessageBox.Show("Invalid dublet!");
+                                        }
+                                    }
+                                }
+                                else 
+                                {
+                                    //The idea here is that if a trace appears on depth d+1, but is already present
+                                    //at depth d, why should we show it? (Its periods may differ though, which ought to
+                                    //be looked into).
+                                    //So in such cases where "an uncle" (typically, alternatively "a parent") shows the same thing, the newphew (child)
+                                    //is skipped in the viewer.
+                                    //Often happens with traces like y = y + x; or y = y[-1] + x; where it is fair enough
+                                    //to show the contents of x as children, but not the contents of y as children.
+                                    //
+                                    //Note: the uncle must be inside the same divider to count.
+
+                                    foreach (Item uncle in item.GetChildren())
+                                    {
+                                        if (grandChildTrace.trace.GetContents().id == uncle.trace.GetContents().id)  //grandchild == uncle
+                                        {
+                                            ignore = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
 
                             if (!ignore)
                             {
-                                Item itemGrandChild = tap.trace.FromTraceToTreeViewItem(tap.periods, Globals.traceShowDividers);
-                                itemChild.GetChildren().Add(itemGrandChild);
+                                n++;
+                                Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods, Globals.traceShowDividers);
+                                childItem.GetChildren().Add(itemGrandChild);
                             }
                         }
                     }
+                    if (n == 0) childItem.HasChildren = false;
+                    else childItem.HasChildren = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Splits a list of TraceAndPeriods2 into portions according to dividers. Returning object has Count == 0 if input is null or has Count == 0.
+        /// </summary>
+        /// <param name="xChildTraces"></param>
+        /// <returns></returns>
+        public static List<List<TraceAndPeriods2>> SplitDividers(List<TraceAndPeriods2> xChildTraces)
+        {
+            List<List<TraceAndPeriods2>> divided = new List<List<TraceAndPeriods2>>();
+            if (xChildTraces == null) return divided;
+            List<TraceAndPeriods2> current = null;
+            int counter = -1;
+            int dividerCounter = 0;
+            foreach (TraceAndPeriods2 xChildTrace in xChildTraces)
+            {
+                counter++;
+                if (counter == 0) current = new List<TraceAndPeriods2>();
+                if (xChildTrace.trace.type == ETraceType.Divider)
+                {
+                    dividerCounter++;
+                    if (counter == 0 || counter == xChildTraces.Count - 1) new Error("Divider problem"); //TODO TODO TODO remove this check for Gekko 3.2
+                    divided.Add(current);
+                    current = new List<TraceAndPeriods2>();
+                }
+                else
+                {
+                    current.Add(xChildTrace);
+                }
+            }
+            if (current != null) divided.Add(current);
+            if (true)
+            {                
+                //TODO TODO TODO remove this check for Gekko 3.2                
+                int n = 0;
+                foreach (List<TraceAndPeriods2> xx in divided)
+                {
+                    n += xx.Count;
+                }
+                if (xChildTraces.Count != n + dividerCounter) new Error("Divider problem");
+            }
+            return divided;
         }
 
         public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods, bool showDividers)
