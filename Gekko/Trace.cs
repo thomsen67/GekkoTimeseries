@@ -1289,6 +1289,26 @@ namespace Gekko
         public Item FromTraceToTreeViewItemsTree(int depth, GekkoTimeSpansSimple periods, int max, bool showDividers, List<TraceAndPeriods2> uncles, ref int nn)
         {            
             Item item = FromTraceToTreeViewItem(periods, showDividers);
+
+
+            if (false)
+            {
+                List<TraceAndPeriods2> taps = this.TimeShadow2();
+                if (taps != null && taps.Count > 0)
+                {
+                    foreach (TraceAndPeriods2 tap in taps)
+                    {
+                        Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
+                        item.GetChildren().Add(itemChild);
+                        ExpandTraceInTraceViewer(itemChild);
+                    }
+                }
+                return item;
+            }
+
+
+
+
             int n = 0;
             nn++;            
             if (depth < max)
