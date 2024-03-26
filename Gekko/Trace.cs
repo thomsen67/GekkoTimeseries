@@ -1188,11 +1188,17 @@ namespace Gekko
                                     {
                                         if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                         Trace2 trace2 = tap2.trace;
-                                        Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods, showDividers);
-                                        item1.GetChildren().Add(item2);
-                                        ExpandTraceInTraceViewer(item2);
+                                        bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
+                                        if (!ignore)
+                                        {
+                                            Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods, showDividers);
+                                            item1.GetChildren().Add(item2);
+                                            ExpandTraceInTraceViewer(item2);
+                                        }
                                     }
                                 }
+                                if (item1.GetChildren().Count == 0) item1.HasChildren = false;
+                                else item1.HasChildren = true;
                             }
                         }
                         temp = item;
@@ -1324,7 +1330,6 @@ namespace Gekko
                         Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
                         item.GetChildren().Add(item1);
                         ExpandTraceInTraceViewer(item1);
-
                         List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
                         if (taps2 != null && taps2.Count > 0)
                         {
@@ -1333,8 +1338,12 @@ namespace Gekko
                                 if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                 Trace2 trace2 = tap2.trace;
                                 Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
-                                item1.GetChildren().Add(item2);
-                                ExpandTraceInTraceViewer(item2);
+                                bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
+                                if (!ignore)
+                                {
+                                    item1.GetChildren().Add(item2);
+                                    ExpandTraceInTraceViewer(item2);
+                                }
                             }
                         }
                     }
@@ -1373,63 +1382,7 @@ namespace Gekko
                         foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
                         {
                             if (!showDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
-
-                            bool ignore = false;
-                            if (!Program.options.databank_trace_dublets)
-                            {
-                                if (true)
-                                {
-                                    List<TraceAndPeriods2> xChildTraces = item.trace.TimeShadow2();
-                                    List<List<TraceAndPeriods2>> xChildTracesDivided = Trace2.SplitDividers(xChildTraces);                                    
-                                    foreach (List<TraceAndPeriods2> xChildTracesChunk in xChildTracesDivided)
-                                    {
-                                        bool isRightChunk = false;
-                                        bool isDublet = false;
-                                        foreach (TraceAndPeriods2 xChildTrace in xChildTracesChunk)
-                                        {
-                                            if (xChildTrace.trace.GetContents().id == childTrace.GetContents().id)
-                                            {
-                                                isRightChunk = true;
-                                            }
-                                            if (xChildTrace.trace.GetContents().id == grandChildTrace.trace.GetContents().id)
-                                            {
-                                                isDublet = true;
-                                            }
-                                        }
-                                        if (isRightChunk && isDublet)
-                                        {
-                                            ignore = true;
-                                            break;
-                                        }
-                                        else if (isDublet)
-                                        {
-                                            if (Globals.runningOnTTComputer) MessageBox.Show("Invalid dublet!");
-                                        }
-                                    }
-                                }
-                                else 
-                                {
-                                    //The idea here is that if a trace appears on depth d+1, but is already present
-                                    //at depth d, why should we show it? (Its periods may differ though, which ought to
-                                    //be looked into).
-                                    //So in such cases where "an uncle" (typically, alternatively "a parent") shows the same thing, the newphew (child)
-                                    //is skipped in the viewer.
-                                    //Often happens with traces like y = y + x; or y = y[-1] + x; where it is fair enough
-                                    //to show the contents of x as children, but not the contents of y as children.
-                                    //
-                                    //Note: the uncle must be inside the same divider to count.
-
-                                    foreach (Item uncle in item.GetChildren())
-                                    {
-                                        if (grandChildTrace.trace.GetContents().id == uncle.trace.GetContents().id)  //grandchild == uncle
-                                        {
-                                            ignore = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
+                            bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
                             if (!ignore)
                             {
                                 n++;
@@ -1443,6 +1396,43 @@ namespace Gekko
                     else childItem.HasChildren = true;
                 }
             }
+        }
+
+        private static bool IgnoreNephew(List<TraceAndPeriods2> xChildSiblingTraces, Trace2 childTrace, Trace2 grandChildTrace)
+        {
+            if (Program.options.databank_trace_dublets) return false;
+            bool ignore = false;
+            if (xChildSiblingTraces == null) return false; //cannot evaluate
+            if (!Program.options.databank_trace_dublets)
+            {                
+                List<List<TraceAndPeriods2>> xChildTracesDivided = Trace2.SplitDividers(xChildSiblingTraces);
+                foreach (List<TraceAndPeriods2> xChildTracesChunk in xChildTracesDivided)
+                {
+                    bool isRightChunk = false;
+                    bool isDublet = false;
+                    foreach (TraceAndPeriods2 xChildTrace in xChildTracesChunk)
+                    {
+                        if (xChildTrace.trace.GetContents().id == childTrace.GetContents().id)
+                        {
+                            isRightChunk = true;
+                        }
+                        if (xChildTrace.trace.GetContents().id == grandChildTrace.GetContents().id)
+                        {
+                            isDublet = true;
+                        }
+                    }
+                    if (isRightChunk && isDublet)
+                    {
+                        ignore = true;
+                        break;
+                    }
+                    else if (isDublet)
+                    {
+                        if (Globals.runningOnTTComputer) MessageBox.Show("Invalid dublet!");
+                    }
+                }
+            }
+            return ignore;
         }
 
         /// <summary>
