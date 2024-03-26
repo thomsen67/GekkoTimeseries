@@ -908,64 +908,6 @@ namespace Gekko
             {
                 //In something like "reset; y = 1; y = 2;" this is called 2 times.
                 ts.meta.trace2.PrecedentsShadowing(trace);
-
-                //Here, with lhs on rhs like "x = x + ..." or "x = x[-1] + ..." the traces in trace (depth=1) may already be 
-                //in ts.meta.trace2 (depth=0). If so, we remove them at depth=1. This has to be done after PrecedentsShadowing()
-                //because som traces at depth=0 may be removed (for instance if the statement has the same period).                
-
-                if (Globals.traceEndoRhsFix3)
-                {
-                    List<TraceID2> m = new List<TraceID2>();
-                    if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
-                    {
-                        foreach (TraceAndPeriods2 tapDepth0 in ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage())
-                        {
-                            //string name = tapDepth0.trace.traceContents.name;  //isn't it always the same name??
-                            if (trace.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
-                            {
-                                foreach (TraceAndPeriods2 tapDepth1 in trace.GetPrecedents_BewareOnlyInternalUse().GetStorage())
-                                {
-                                    //probably the last one just being added does not need to be checked, but we keep it simple.
-                                    if (tapDepth0.trace.traceContents.id == tapDepth1.trace.traceContents.id)
-                                    {
-                                        m.Add(tapDepth1.trace.traceContents.id);
-                                        break;  //found one, take the next from depth=0.
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (m.Count > 0)
-                    {
-                        //will not happen that often
-                        //remove these traces from depth=1
-                        List<TraceAndPeriods2> existing = trace.GetPrecedents_BewareOnlyInternalUse().GetStorage();
-                        List<TraceAndPeriods2> taps = new List<TraceAndPeriods2>();
-                        foreach (TraceAndPeriods2 tap in existing)
-                        {
-                            if (m.Contains(tap.trace.traceContents.id)) continue;
-                            if (tap.trace.type == ETraceType.Divider)
-                            {
-                                if (taps.Count == 0) continue; //no divider at first place
-                                if (taps[taps.Count - 1].trace.type == ETraceType.Divider) continue; //no divider if previous is divider
-                            }
-                            taps.Add(tap);
-                        }
-
-                        //Remove any dividers at end
-                        while (taps.Count > 0)
-                        {
-                            if (taps[taps.Count - 1].trace.type == ETraceType.Divider) taps.RemoveAt(taps.Count - 1);
-                            else break;
-                        }
-                        trace.GetPrecedents_BewareOnlyInternalUse().InitWithEmptyList();
-                        foreach (TraceAndPeriods2 tap in taps)
-                        {
-                            trace.GetPrecedents_BewareOnlyInternalUse().Add(tap);
-                        }                            
-                    }
-                }
-
                 //In unit tests, trace period (t1/t2) is always present here, so no null periods.
                 if ((Globals.runningOnTTComputer || G.IsUnitTesting()) && trace.traceContents.period.t1.IsNull()) MessageBox.Show("*** TTH: Trace problem #1: " + trace.traceContents.text);
             }
@@ -1341,6 +1283,7 @@ namespace Gekko
                 {
                     foreach (TraceAndPeriods2 tap1 in taps1)
                     {
+                        if (!showDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
                         Trace2 trace1 = tap1.trace;
                         Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
                         item.GetChildren().Add(item1);
@@ -1351,6 +1294,7 @@ namespace Gekko
                         {
                             foreach (TraceAndPeriods2 tap2 in taps2)
                             {
+                                if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                 Trace2 trace2 = tap2.trace;
                                 Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
                                 item1.GetChildren().Add(item2);
@@ -1377,6 +1321,12 @@ namespace Gekko
             // We are expanding the childItem. We want to see if -- inside the same divider block -- a sibling to childTrace
             // has same id as the grandChildTrace. If so, kill it.
             //
+
+            //
+            // run bug;
+            // click qBnp 3 times.
+            //   
+
             bool showDividers = false;  //make it an option
             if (Globals.isWindowTreeViewWithTableLazy)
             {                                
@@ -1457,6 +1407,9 @@ namespace Gekko
                             }
                         }
                     }
+
+                    //childItem.GetChildren().Count
+
                     if (n == 0) childItem.HasChildren = false;
                     else childItem.HasChildren = true;
                 }
