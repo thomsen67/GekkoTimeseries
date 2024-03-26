@@ -1145,6 +1145,7 @@ namespace Gekko
 
             // Items = disp = 188, new items = 432 (437)
 
+            bool showDividers = false;
             int nn = 0;
 
             if (!G.IsUnitTesting())
@@ -1161,7 +1162,42 @@ namespace Gekko
                     //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
                     int maxDepth2 = int.MaxValue;
                     if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-                    temp = trace.FromTraceToTreeViewItemsTree(0, null, maxDepth2, Globals.traceShowDividers, null, ref nn);
+                    if (false)
+                    {
+                        temp = trace.FromTraceToTreeViewItemsTree(0, null, maxDepth2, Globals.traceShowDividers, null, ref nn);
+                    }
+                    else
+                    {
+                        Item item = trace.FromTraceToTreeViewItem(null, showDividers);
+                        //At startup, we need to get two levels in: depth=0 and depth=1.
+                        List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
+                        if (taps1 != null && taps1.Count > 0)
+                        {
+                            foreach (TraceAndPeriods2 tap1 in taps1)
+                            {
+                                if (!showDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                Trace2 trace1 = tap1.trace;
+                                Item item1 = trace1.FromTraceToTreeViewItem(tap1.periods, showDividers);
+                                item.GetChildren().Add(item1);
+                                ExpandTraceInTraceViewer(item1);
+
+                                List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
+                                if (taps2 != null && taps2.Count > 0)
+                                {
+                                    foreach (TraceAndPeriods2 tap2 in taps2)
+                                    {
+                                        if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                        Trace2 trace2 = tap2.trace;
+                                        Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods, showDividers);
+                                        item1.GetChildren().Add(item2);
+                                        ExpandTraceInTraceViewer(item2);
+                                    }
+                                }
+                            }
+                        }
+                        temp = item;
+                    }
+
                     foreach (Item item in temp.GetChildren())
                     {
                         model.Add(item);
