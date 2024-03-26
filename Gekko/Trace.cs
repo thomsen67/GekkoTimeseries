@@ -74,10 +74,7 @@ namespace Gekko
 
         [ProtoMember(7)]
         public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces.
-
-        //[ProtoMember(8)]
-        //public string label = null;
-
+                
         public TraceContents2()
         {
             //for protobuf
@@ -95,8 +92,7 @@ namespace Gekko
                 this.period = new GekkoTimeSpanSimple(GekkoTime.tNull, GekkoTime.tNull);
             }
             else new Error("TraceContents time error");
-        }        
-
+        }
     }
 
 
@@ -484,6 +480,7 @@ namespace Gekko
 
         public static List<TraceAndPeriods2> InvertWallTime(List<TraceAndPeriods2> rv3)
         {
+            //Could use the Divide() method?
             if (rv3 == null || rv3.Count <= 1) return rv3;  //no need to do anything
             List<TraceAndPeriods2> rv = new List<TraceAndPeriods2>(rv3.Count);
             List<TraceAndPeriods2> temp = new List<TraceAndPeriods2>();
@@ -701,9 +698,7 @@ namespace Gekko
                     {
                         //kvp.tap must be removed from both .storage and .storageSorted
                         //must be removed
-                        //this.precedents.UpdateSorted();
                         mustUpdateSorted = true;
-                        //sbi.mustBeRemoved = true;
                         removeInSorted.Add(sbi);
                         removeInUnsorted.Add(sbi.tap);
 
@@ -712,7 +707,6 @@ namespace Gekko
                     {
                         //It must be removed and added again because the last t2 of the spans changes
                         mustUpdateSorted = true;
-                        //sbi.mustBeRemoved = true;
                         removeInSorted.Add(sbi);
                         addToSorted.Add(sbi.tap);
                     }
@@ -797,25 +791,8 @@ namespace Gekko
             }
             if (known == null)
             {
-                if (Globals.traceFix)
-                {
-                    trace2 = this;
-                    trace2.precedents = this.precedents?.DeepClone(cloneHelper);
-                }
-                else
-                {
-                    if (true)
-                    {
-                        trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
-                        trace2.precedents = this.precedents?.DeepClone(cloneHelper);
-                    }
-                    else
-                    {
-                        trace2 = new Trace2(this.type, this.GetContents());
-                        trace2.precedents = this.precedents?.DeepClone(cloneHelper);
-                    }                   
-                }
-
+                trace2 = new Trace2(this.type, this.traceContents);  //the .traceContents object is not cloned!
+                trace2.precedents = this.precedents?.DeepClone(cloneHelper);
                 if (cloneHelper != null)
                 {
                     cloneHelper.dict.Add(this, trace2);
@@ -828,30 +805,7 @@ namespace Gekko
             return trace2;
         }
 
-        //public void PrintRecursive(int depth, List<string> output)
-        //{
-        //    if (depth > 0)
-        //    {
-        //        string s = Text();
-        //        output.Add("-" + G.Blanks(2 * (depth - 1)) + s);
-        //    }
-        //    if (this.precedents.Count() > 0)
-        //    {
-        //        foreach (Trace2 child in this.precedents.GetStorage())
-        //        {
-        //            if (child == null)
-        //            {
-        //                output.Add("-" + G.Blanks(2 * (depth - 1)) + "----------");
-        //            }
-        //            else
-        //            {
-        //                child.PrintRecursive(depth + 1, output);
-        //            }
-        //        }
-        //    }            
-        //    if (depth == 0 && output.Count == 0) new Writeln("[No trace found]");
-        //}        
-
+        
         public string PrintStamp()
         {
             string s = null;            
@@ -1019,20 +973,7 @@ namespace Gekko
             GekkoTimeSpansSimple temp5 = new GekkoTimeSpansSimple();
             temp5.SetStorage(rv);
             return temp5;
-        }
-
-        ///// <summary>
-        ///// Removes a particular trace from ts.meta.trace in a Series. Happens when a new Trace shadows other older traces.
-        ///// </summary>
-        ///// <param name="ts"></param>
-        //public static void RemoveFromSeries(Series ts, Trace ths)
-        //{
-        //    if (ts.meta.trace == null) return;
-        //    if (ts.meta.trace.precedents.Count() > 0)
-        //    {                
-        //        ts.meta.trace.precedents.GetStorage().Remove(ths);
-        //    }
-        //}
+        }        
 
         public static TraceHelper CollectAllTraces(Databank databank, ETraceHelper type)
         {            
@@ -1141,11 +1082,10 @@ namespace Gekko
         public static int CallTraceViewer(Trace2 trace, int maxDepth)
         {
             // with graph = false: 2 --> 4, 3 --> 11, 4 --> 35, 5 --> 134, 6 --> 204, 7 --> 397, 8 --> 432, 9 --> 432
-            // sith graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
+            // with graph = true:  2 --> 4, 3 --> 11, 4 --> 34, 5 --> 128, 6 --> 166, 7 --> 184, 8 --> 189, 9 --> 189
 
             // Items = disp = 188, new items = 432 (437)
-
-            bool showDividers = false;
+                        
             int nn = 0;
 
             if (!G.IsUnitTesting())
@@ -1154,30 +1094,21 @@ namespace Gekko
                 Thread sta = new Thread(delegate ()
                 {
                     Globals.itemCounter = 0;
-
-                    TreeGridModel model = new TreeGridModel();
-                    
+                    TreeGridModel model = new TreeGridModel();                    
                     Item temp = null;
-
-                    //if (lazy) temp = trace.precedents.GetStorage()[0].Get1Item(new List<GekkoTimeSpanSimple>());
-                    int maxDepth2 = int.MaxValue;
-                    if (Globals.isWindowTreeViewWithTableLazy) maxDepth2 = 2;
-                    if (false)
-                    {
-                        temp = trace.FromTraceToTreeViewItemsTree(0, null, maxDepth2, Globals.traceShowDividers, null, ref nn);
-                    }
-                    else
-                    {
-                        Item item = trace.FromTraceToTreeViewItem(null, showDividers);
+                    
+                    if (true)
+                    {                    
+                        Item item = trace.FromTraceToTreeViewItem(null);
                         //At startup, we need to get two levels in: depth=0 and depth=1.
                         List<TraceAndPeriods2> taps1 = trace.TimeShadow2();
                         if (taps1 != null && taps1.Count > 0)
                         {
                             foreach (TraceAndPeriods2 tap1 in taps1)
                             {
-                                if (!showDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                if (!Globals.traceShowDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                 Trace2 trace1 = tap1.trace;
-                                Item item1 = trace1.FromTraceToTreeViewItem(tap1.periods, showDividers);
+                                Item item1 = trace1.FromTraceToTreeViewItem(tap1.periods);
                                 item.GetChildren().Add(item1);
                                 ExpandTraceInTraceViewer(item1);
 
@@ -1186,12 +1117,12 @@ namespace Gekko
                                 {
                                     foreach (TraceAndPeriods2 tap2 in taps2)
                                     {
-                                        if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
+                                        if (!Globals.traceShowDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
                                         Trace2 trace2 = tap2.trace;
                                         bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
                                         if (!ignore)
                                         {
-                                            Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods, showDividers);
+                                            Item item2 = trace2.FromTraceToTreeViewItem(tap2.periods);
                                             item1.GetChildren().Add(item2);
                                             ExpandTraceInTraceViewer(item2);
                                         }
@@ -1208,6 +1139,7 @@ namespace Gekko
                     {
                         model.Add(item);
                     }
+
                     WindowTreeViewWithTable w = new WindowTreeViewWithTable(model);
                     w.text.Background = new System.Windows.Media.SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));  //this.scrollViewerFind.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));                    
                     string v = null;
@@ -1267,90 +1199,7 @@ namespace Gekko
                 Trace2.GetStampAsString(tap.trace.GetId(), out stamp, out stampDetailed);
                 G.Write("| " + code); G.Writeln(G.Blanks(50 - tap.trace.GetContents().text.Length) + " --> " + activeDetailed + ", " + stamp, Globals.MiddleGray);
             }            
-        }
-        
-        public Item FromTraceToTreeViewItemsTree(int depth, GekkoTimeSpansSimple periods, int max, bool showDividers, List<TraceAndPeriods2> uncles, ref int nn)
-        {            
-            Item item = this.FromTraceToTreeViewItem(periods, showDividers);
-
-            if (Program.options.databank_trace_dublets)
-            {
-                int n = 0;
-                nn++;
-                if (depth < max)
-                {
-                    List<TraceAndPeriods2> taps = this.TimeShadow2();
-                    if (taps != null && taps.Count > 0)
-                    {
-                        foreach (TraceAndPeriods2 tap in taps)
-                        {
-                            if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers                                                
-                            bool ignore = false;
-                            if (!Program.options.databank_trace_dublets)
-                            {
-                                if (depth > 0)   //depth == 0 is phoney)
-                                {
-                                    foreach (TraceAndPeriods2 uncle in uncles)
-                                    {
-                                        if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
-                                        {
-                                            ignore = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (ignore)
-                            {
-                                //Normally we should be sure that an "uncle" is inside the same divider.
-                                //But there are no dividers at this depth anyway, since this is near the series object (glued).
-                            }
-                            else
-                            {
-                                n++;
-                                Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
-                                item.GetChildren().Add(itemChild);
-                            }
-                        }
-                    }
-                }
-                if (n == 0) item.HasChildren = false;  //Better?: if (item.GetChildren().Count == 0)...
-                else item.HasChildren = true;
-            }
-            else
-            {
-                //At startup, we need to get two levels in: depth=0 and depth=1.
-                List<TraceAndPeriods2> taps1 = this.TimeShadow2();
-                if (taps1 != null && taps1.Count > 0)
-                {
-                    foreach (TraceAndPeriods2 tap1 in taps1)
-                    {
-                        if (!showDividers && tap1.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                        Trace2 trace1 = tap1.trace;
-                        Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
-                        item.GetChildren().Add(item1);
-                        ExpandTraceInTraceViewer(item1);
-                        List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
-                        if (taps2 != null && taps2.Count > 0)
-                        {
-                            foreach (TraceAndPeriods2 tap2 in taps2)
-                            {
-                                if (!showDividers && tap2.trace.type == ETraceType.Divider) continue;  //do not show dividers
-                                Trace2 trace2 = tap2.trace;
-                                Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
-                                bool ignore = IgnoreNephew(item.trace.TimeShadow2(), trace1, trace2);
-                                if (!ignore)
-                                {
-                                    item1.GetChildren().Add(item2);
-                                    ExpandTraceInTraceViewer(item2);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return item;
-        }
+        }        
 
         public static void ExpandTraceInTraceViewer(Item item)
         {
@@ -1366,8 +1215,7 @@ namespace Gekko
             // We are expanding the childItem. We want to see if -- inside the same divider block -- a sibling to childTrace
             // has same id as the grandChildTrace. If so, kill it.
             //
-
-            bool showDividers = false;  //make it an option
+                        
             if (Globals.isWindowTreeViewWithTableLazy)
             {                                
                 foreach (Item childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
@@ -1381,12 +1229,12 @@ namespace Gekko
                     {
                         foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
                         {
-                            if (!showDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                            if (!Globals.traceShowDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
                             bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
                             if (!ignore)
                             {
                                 n++;
-                                Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods, Globals.traceShowDividers);
+                                Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods);
                                 childItem.GetChildren().Add(itemGrandChild);
                             }
                         }
@@ -1477,7 +1325,7 @@ namespace Gekko
             return divided;
         }
 
-        public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods, bool showDividers)
+        public Item FromTraceToTreeViewItem(GekkoTimeSpansSimple periods)
         {           
 
             // =========================================================================
@@ -1710,12 +1558,6 @@ namespace Gekko
             precedentsNames = list;
             return precedentsNames;
         }
-
-        //public static bool MustBeRemoved(SortedBagItem s)
-        //{
-        //    return true;
-        //    //return s.mustBeRemoved;
-        //}
     }
 
     [ProtoContract]
@@ -1782,8 +1624,7 @@ namespace Gekko
         //
         // --- this is for time-shadowing        
         public Dictionary<Trace2, string> timeShadowing = new Dictionary<Trace2, string>();
-        //public int timeShadowingCuts = 0;
-
+        
         /// <summary>
         /// Depth of traces. Returns -1 if no traces are found.
         /// </summary>
@@ -1797,7 +1638,6 @@ namespace Gekko
             }
             return depth;
         }
-
     }
 
     public class PrecedentsAndDepth
@@ -2137,7 +1977,6 @@ namespace Gekko
     {
         public GekkoTime t = GekkoTime.tNull;
         public TraceAndPeriods2 tap;
-        //public bool mustBeRemoved = false;
 
         public SortedBagItem(GekkoTime t, TraceAndPeriods2 tap) 
         {

@@ -2877,9 +2877,8 @@ namespace Gekko
                     }
 
                     if (this.meta.trace2 != null)
-                    {                        
-                        if (Globals.traceFix) tsCopy.meta.trace2 = this.meta.trace2;
-                        else tsCopy.meta.trace2 = this.meta.trace2.DeepClone(cloneHelper);
+                    {                           
+                        tsCopy.meta.trace2 = this.meta.trace2.DeepClone(cloneHelper);
                     }
 
                 }
