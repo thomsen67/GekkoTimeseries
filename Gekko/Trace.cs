@@ -1284,72 +1284,82 @@ namespace Gekko
                 G.Write("| " + code); G.Writeln(G.Blanks(50 - tap.trace.GetContents().text.Length) + " --> " + activeDetailed + ", " + stamp, Globals.MiddleGray);
             }            
         }
-
         
         public Item FromTraceToTreeViewItemsTree(int depth, GekkoTimeSpansSimple periods, int max, bool showDividers, List<TraceAndPeriods2> uncles, ref int nn)
         {            
-            Item item = FromTraceToTreeViewItem(periods, showDividers);
+            Item item = this.FromTraceToTreeViewItem(periods, showDividers);
 
-
-            if (false)
+            if (!Program.options.databank_trace_dublets)
             {
-                List<TraceAndPeriods2> taps = this.TimeShadow2();
-                if (taps != null && taps.Count > 0)
+                //At startup, we need to get two levels in: depth=0 and depth=1.
+                List<TraceAndPeriods2> taps1 = this.TimeShadow2();
+                if (taps1 != null && taps1.Count > 0)
                 {
-                    foreach (TraceAndPeriods2 tap in taps)
+                    foreach (TraceAndPeriods2 tap1 in taps1)
                     {
-                        Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
-                        item.GetChildren().Add(itemChild);
-                        ExpandTraceInTraceViewer(itemChild);
+                        Trace2 trace1 = tap1.trace;
+                        Item item1 = trace1.FromTraceToTreeViewItem(periods, showDividers);
+                        item.GetChildren().Add(item1);
+                        ExpandTraceInTraceViewer(item1);
+
+                        List<TraceAndPeriods2> taps2 = trace1.TimeShadow2();
+                        if (taps2 != null && taps2.Count > 0)
+                        {
+                            foreach (TraceAndPeriods2 tap2 in taps2)
+                            {
+                                Trace2 trace2 = tap2.trace;
+                                Item item2 = trace2.FromTraceToTreeViewItem(periods, showDividers);
+                                item1.GetChildren().Add(item2);
+                                ExpandTraceInTraceViewer(item2);
+                            }
+                        }
                     }
                 }
-                return item;
             }
-
-
-
-
-            int n = 0;
-            nn++;            
-            if (depth < max)
+            else
             {
-                List<TraceAndPeriods2> taps = this.TimeShadow2();
-                if (taps != null && taps.Count > 0)
-                {                    
-                    foreach (TraceAndPeriods2 tap in taps)
+                int n = 0;
+                nn++;
+                if (depth < max)
+                {
+                    List<TraceAndPeriods2> taps = this.TimeShadow2();
+                    if (taps != null && taps.Count > 0)
                     {
-                        if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers                                                
-                        bool ignore = false;
-                        if (Globals.traceEndoRhsFix4)
+                        foreach (TraceAndPeriods2 tap in taps)
                         {
-                            if (depth > 0)   //depth == 0 is phoney)
+                            if (!showDividers && tap.trace.type == ETraceType.Divider) continue;  //do not show dividers                                                
+                            bool ignore = false;
+                            if (!Program.options.databank_trace_dublets)
                             {
-                                foreach (TraceAndPeriods2 uncle in uncles)
+                                if (depth > 0)   //depth == 0 is phoney)
                                 {
-                                    if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
+                                    foreach (TraceAndPeriods2 uncle in uncles)
                                     {
-                                        ignore = true;
-                                        break;
+                                        if (uncle.trace.traceContents.id == tap.trace.traceContents.id)
+                                        {
+                                            ignore = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (ignore)
-                        {
-                            //Normally we should be sure that an "uncle" is inside the same divider.
-                            //But there are no dividers at this depth anyway, since this is near the series objet (glued).
-                        }
-                        else
-                        {
-                            n++;
-                            Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
-                            item.GetChildren().Add(itemChild);
+                            if (ignore)
+                            {
+                                //Normally we should be sure that an "uncle" is inside the same divider.
+                                //But there are no dividers at this depth anyway, since this is near the series objet (glued).
+                            }
+                            else
+                            {
+                                n++;
+                                Item itemChild = tap.trace.FromTraceToTreeViewItemsTree(depth + 1, tap.periods, max, showDividers, taps, ref nn);
+                                item.GetChildren().Add(itemChild);
+                            }
                         }
                     }
                 }
+                if (n == 0) item.HasChildren = false;
+                else item.HasChildren = true;
             }
-            if (n == 0) item.HasChildren = false;
-            else item.HasChildren = true;
             return item;
         }
 
@@ -1384,7 +1394,7 @@ namespace Gekko
                             if (!showDividers && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
 
                             bool ignore = false;
-                            if (Globals.traceEndoRhsFix4)
+                            if (!Program.options.databank_trace_dublets)
                             {
                                 if (true)
                                 {
