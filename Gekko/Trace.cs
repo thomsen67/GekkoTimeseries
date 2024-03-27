@@ -1199,7 +1199,7 @@ namespace Gekko
                 Trace2.GetStampAsString(tap.trace.GetId(), out stamp, out stampDetailed);
                 G.Write("| " + code); G.Writeln(G.Blanks(50 - tap.trace.GetContents().text.Length) + " --> " + activeDetailed + ", " + stamp, Globals.MiddleGray);
             }            
-        }        
+        }
 
         public static void ExpandTraceInTraceViewer(Item item)
         {
@@ -1215,45 +1215,47 @@ namespace Gekko
             // We are expanding the childItem. We want to see if -- inside the same divider block -- a sibling to childTrace
             // has same id as the grandChildTrace. If so, kill it.
             //
-                        
-            if (Globals.isWindowTreeViewWithTableLazy)
-            {                                
-                foreach (Item childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
+
+            foreach (Item childItem in item.GetChildren()) //is already expanded, else .TimeShadow2() would be used.
+            {                
+                Trace2 childTrace = childItem.trace;
+                if (childTrace.type == ETraceType.Divider) continue; //dividers are not shown                
+
+                List<TraceAndPeriods2> grandChildrenTraces = childTrace.TimeShadow2();
+                if (grandChildrenTraces != null && childItem.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
                 {
-                    int n = 0;
-                    Trace2 childTrace = childItem.trace;
-                    if (childTrace.type == ETraceType.Divider) continue; //dividers are not shown                
-
-                    List<TraceAndPeriods2> grandChildrenTraces = childTrace.TimeShadow2();
-                    if (grandChildrenTraces != null && childItem.GetChildren().Count == 0) //.Count will be > 0 if it has been expanded already previously. If so, we avoid putting in dublets.
+                    foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
                     {
-                        foreach (TraceAndPeriods2 grandChildTrace in grandChildrenTraces)
-                        {
-                            if (!Program.options.databank_trace_divide && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
-                            bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
-                            if (!ignore)
-                            {
-                                n++;
-                                Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods);
-                                childItem.GetChildren().Add(itemGrandChild);
-                            }
+                        if (!Program.options.databank_trace_divide && grandChildTrace.trace.type == ETraceType.Divider) continue; //dividers are not shown
+                        bool ignore = IgnoreNephew(item.trace.TimeShadow2(), childTrace, grandChildTrace.trace);
+                        if (!ignore)
+                        {                            
+                            Item itemGrandChild = grandChildTrace.trace.FromTraceToTreeViewItem(grandChildTrace.periods);
+                            childItem.GetChildren().Add(itemGrandChild);
                         }
-                    }                    
-
-                    if (childItem.GetChildren().Count == 0) childItem.HasChildren = false;
-                    else childItem.HasChildren = true;
+                    }
                 }
+
+                if (childItem.GetChildren().Count == 0) childItem.HasChildren = false;
+                else childItem.HasChildren = true;
             }
         }
 
-        private static bool IgnoreNephew(List<TraceAndPeriods2> xChildSiblingTraces, Trace2 childTrace, Trace2 grandChildTrace)
+        /// <summary>
+        /// If a newphew trace has an "uncle" (a sibling to a parent (or the parent) inside the same divider), it may be ignored since it is already shown.
+        /// </summary>
+        /// <param name="childTraceSiblings"></param>
+        /// <param name="childTrace"></param>
+        /// <param name="grandChildTrace"></param>
+        /// <returns></returns>
+        private static bool IgnoreNephew(List<TraceAndPeriods2> childTraceSiblings, Trace2 childTrace, Trace2 grandChildTrace)
         {
             if (Program.options.databank_trace_dublets) return false;
             bool ignore = false;
-            if (xChildSiblingTraces == null) return false; //cannot evaluate
+            if (childTraceSiblings == null) return false; //cannot evaluate
             if (!Program.options.databank_trace_dublets)
             {                
-                List<List<TraceAndPeriods2>> xChildTracesDivided = Trace2.SplitDividers(xChildSiblingTraces);
+                List<List<TraceAndPeriods2>> xChildTracesDivided = Trace2.SplitDividers(childTraceSiblings);
                 foreach (List<TraceAndPeriods2> xChildTracesChunk in xChildTracesDivided)
                 {
                     bool isRightChunk = false;
