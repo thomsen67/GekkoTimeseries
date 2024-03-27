@@ -989,7 +989,8 @@ namespace Gekko
                         {
                             semis++;
                             int hits2 = helper.known;
-                            tokensLast = HandleEqLine(eqLine, tokensLast, helper);
+                            bool ignore = false;
+                            tokensLast = HandleEqLine(eqLine, tokensLast, helper, ref ignore);  //first line cannot suffer from that
                             if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
                             eqLine = new StringBuilder();
                         }
@@ -1048,8 +1049,12 @@ namespace Gekko
                             semis++;
                             eqLine.Append(line);
                             int hits2 = helper.known;
-                            tokensLast = HandleEqLine(eqLine, tokensLast, helper);
-                            if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
+                            bool ignore = false;
+                            tokensLast = HandleEqLine(eqLine, tokensLast, helper, ref ignore);
+                            if (!ignore)
+                            {
+                                if (helper.known == hits2) RemoveDoubleDots(helper, csCodeLines);
+                            }
                             eqLine = new StringBuilder();
                         }
                         else
@@ -1337,7 +1342,7 @@ namespace Gekko
             output.Add(s);
         }
 
-        private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper)
+        private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper, ref bool shouldBeIgnored)
         {
             //Remember: the human readable code is derived from this, so beware if changes are made,
             //cf. #af931klljaf89efw.            
@@ -1485,8 +1490,20 @@ namespace Gekko
 
                     if (eqname.StartsWith("e" + Globals.scalarModelExtraVariable))
                     {
-                        continue; //#oijlksaa
-                    }
+                        //Such equations may be either (too many eqs or too few):                      
+
+                        //equation egekkoextra0; egekkoextra0 .. xgekkoextra0 + xgekkoextra1 + ... = E = 0;
+                        //
+                        // --or-- 
+                        //
+                        //equation egekkoextra0; egekkoextra0 .. sum(t, qBnp[t]) =E= 0;
+                        //equation egekkoextra1; egekkoextra1 .. sum(t, qBnp[t]) =E= 0;
+                        //...
+
+                        shouldBeIgnored = true;
+
+                        //#oijlksaa
+                    } 
 
                     string helper2 = "";
                     HandleEqLineAppend(helper, i, helper2);
@@ -1512,10 +1529,10 @@ namespace Gekko
                     }
                     string varname = helper.dict_FromVarNumberToVarName[number]; //#oijlksaa
 
-                    if (varname.StartsWith("x" + Globals.scalarModelExtraVariable))
-                    {
-                        continue;
-                    }
+                    //if (varname.StartsWith("x" + Globals.scalarModelExtraVariable))
+                    //{
+                    //    continue;
+                    //}
 
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, varname, true);
 
@@ -2325,7 +2342,7 @@ namespace Gekko
 
                 if (equationsByEqname.ContainsKey(eqnameGams))
                 {
-                    new Error("The equation name '" + eqnameGams + "' appears multiple times. If the model is loaded from a .zip file, see the 'raw' equations inside the .zip (typically stored in raw.gms).");
+                    new Error("The equation name '" + eqnameGams + "' appears multiple times in the raw GAMS model. If the model is loaded from a .zip file, see the 'raw' equations inside the .zip (typically stored in raw.gms).");
                 }
                 else
                 {
