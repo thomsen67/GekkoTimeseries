@@ -11,9 +11,10 @@ namespace Gekko
         public bool is_manual = true;
         public string cmd_file = Globals.scalarModelCmdFile;  //only used when is_manual is false.
         public string gms_file = null;
+        public string lst_file = null;
         public string model_name = null;
         public string solve_call = "solve ";
-        public string raw_path = null;
+        public string raw_file = null;
         public object[] raw_ignore = null;
         public string counts1 = "**** counts do not match";
         public string counts2 = "**** unmatched free variables";

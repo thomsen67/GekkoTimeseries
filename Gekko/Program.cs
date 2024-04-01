@@ -10477,8 +10477,9 @@ namespace Gekko
             string path = Program.options.folder_working;
 
             //Idea is that Gekko provides popups, while user manually runs what is needed to run
-            //User input is gms file + model name +             
-
+            //User input is gms file + model name +
+            //
+            
             bool hasAlteredGmsFile = false;
             bool optionsFileExists = false;
             string gmsPath = null;
@@ -10512,9 +10513,10 @@ namespace Gekko
                     try { settings.is_manual = (bool)jsonTree["is_manual"]; } catch { }
                     try { settings.cmd_file = (string)jsonTree["cmd_file"]; } catch { }
                     try { settings.gms_file = (string)jsonTree["gms_file"]; } catch { }
+                    try { settings.lst_file = (string)jsonTree["lst_file"]; } catch { }
                     try { settings.model_name = (string)jsonTree["model_name"]; } catch { }
                     try { settings.solve_call = (string)jsonTree["solve_call"]; } catch { }
-                    try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
+                    try { settings.raw_file = (string)jsonTree["raw_file"]; } catch { }
                     try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
                     try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
                     try { settings.counts2 = (string)jsonTree["counts2"]; } catch { }
@@ -10524,8 +10526,16 @@ namespace Gekko
                                         
                     if (settings.gms_file == null) new Error("You must indicate gms_file in gamsscalar.json");
                     if (settings.model_name == null) new Error("You must indicate model_name in gamsscalar.json");
-                    if (settings.raw_path == null) new Error("You must indicate raw_path in gamsscalar.json");
+                    if (settings.raw_file == null) new Error("You must indicate raw_file in gamsscalar.json");
                     if (settings.raw_ignore == null) settings.raw_ignore = new object[0]; //will not ignore anything if omitted.
+                    if (settings.solve_call == null) settings.solve_call = "solve ";  //default
+                    if (G.IsLetterOrDigitOrUnderscore(settings.solve_call[settings.solve_call.Length - 1])) settings.solve_call += " ";
+                    if (settings.lst_file == null)
+                    {
+                        int idx = settings.gms_file.LastIndexOf('.');
+                        if (idx == -1) new Error("Could not find extension in '" + settings.gms_file + "'");
+                        settings.lst_file = G.Substring(settings.gms_file, 0, idx - 1) + ".lst";
+                    }
 
                     // -------------------------------------------------------------
 
@@ -10544,10 +10554,13 @@ namespace Gekko
                         txt.MainOmitVeryFirstNewLine();
                         txt.MainAdd("working folder (receives output) = " + Program.options.folder_working); txt.MainNewLineTight();
                         txt.MainAdd("is_manual = " + settings.is_manual); txt.MainNewLineTight();
-                        if (settings.is_manual) txt.MainAdd("cmd_file = " + settings.cmd_file); txt.MainNewLineTight();
-                        txt.MainAdd("cmd_file = " + settings.cmd_file); txt.MainNewLineTight();
+                        if (!settings.is_manual) txt.MainAdd("cmd_file = " + settings.cmd_file); txt.MainNewLineTight();
                         txt.MainAdd("gms_file = " + settings.gms_file); txt.MainNewLineTight();
+                        txt.MainAdd("lst_file = " + settings.lst_file); txt.MainNewLineTight();
                         txt.MainAdd("model_name = " + settings.model_name); txt.MainNewLineTight();
+                        txt.MainAdd("solve_call = " + settings.solve_call); txt.MainNewLineTight();
+                        txt.MainAdd("raw_file = " + settings.raw_file); txt.MainNewLineTight();
+                        try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
                         txt.MainAdd("zip_name = " + settings.model_name + Globals.scalarModelSuffix + ".zip"); txt.MainNewLineTight();
                     }                    
                 }                
@@ -10660,7 +10673,7 @@ namespace Gekko
                     output.Add(line);                    
                 }
 
-                if (!replaceOk) new Error("Could not find '" + Globals.scalarModelSolve + settings.model_name + ")' in file " + settings.gms_file);
+                if (!replaceOk) new Error("Could not find '" + settings.solve_call + settings.model_name + ")' in file " + settings.gms_file);
 
                 string soutput = Stringlist.ExtractTextFromLines(output).ToString();
                 Program.WriteFileWithWait(gmsPath, soutput, new UTF8Encoding(false));  //write it with utf8, else זרו get mangled.
@@ -10672,7 +10685,7 @@ namespace Gekko
                 if (G.IsUnitTesting() || !settings.is_manual)
                 {
                     string folder = Program.options.folder_working;
-                    Program.ExecuteShellCommand(settings.cmd_file, false, folder);
+                    Program.ExecuteShellCommand(Program.CreateFullPathAndFileName(settings.cmd_file), false, folder);
                 }
                 else
                 {
@@ -10682,8 +10695,10 @@ namespace Gekko
                     // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
                     // POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP POPUP
                 }
-                
-                string s = Program.GetTextFromFileWithWait(Path.Combine(path, Globals.scalarModelLstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
+
+                //string s = Program.GetTextFromFileWithWait(Path.Combine(path, Globals.scalarModelLstFolder, Path.GetFileNameWithoutExtension(settings.gms_file) + ".lst"));
+
+                string s = Program.GetTextFromFileWithWait(Program.CreateFullPathAndFileName(settings.lst_file));
 
                 //new Writeln("-------------------- calling GAMS end ---------------------------------------");
 
@@ -10732,10 +10747,10 @@ namespace Gekko
                         Program.WaitForFileCopy(Path.Combine(path, "dict.txt"), Path.Combine(zipper.tempFolder, "dict.txt"));
 
                         bool isFolder = false;
-                        string rawpath = Program.CreateFullPathAndFileName(settings.raw_path);
+                        string rawpath = Program.CreateFullPathAndFileName(settings.raw_file);
                         string temp = Path.GetFileName(rawpath);
                         if (G.Equal(temp, "*.gms")) isFolder = true;
-                        if (temp.Contains("*") && !isFolder) new Error("Expected raw_path to use '*.gms' not '" + temp + "'");
+                        if (temp.Contains("*") && !isFolder) new Error("Expected raw_file to use '*.gms' not '" + temp + "'");
 
                         if (isFolder)
                         {
@@ -10821,8 +10836,7 @@ namespace Gekko
             finally
             {                
                 if (depth == 0)
-                {
-                    //try { DeleteFiles(path); } catch { };
+                {                    
                     try { if (!optionsFileExists) File.Delete(Path.Combine(path, "convert.opt")); } catch { };
                     if (hasAlteredGmsFile)
                     {
