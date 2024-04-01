@@ -17691,7 +17691,7 @@ namespace UnitTests
             // ! This also produces a gamsscalar.json for users. See the GAMS appendix in the help system.
             // !
             // !
-            // !
+            // !            
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2024-01-10-c2f2447\Model\";
 
@@ -17739,7 +17739,8 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_GAMSScalar2()
-        {                     
+        {
+            Program.Flush();
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\Models\";
 
@@ -17773,6 +17774,9 @@ namespace UnitTests
                 File.Delete(path5 + "\\" + modelName + "_scalar.zip");
                 I("gamsscalar('pack');");
                 if (!File.Exists(path5 + "\\m_scalar.zip")) Assert.Fail();
+                I("model<gms>m_scalar.zip;");
+                I("sim<res>;");
+
             }
         }
 

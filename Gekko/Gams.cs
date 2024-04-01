@@ -1980,10 +1980,10 @@ namespace Gekko
             }
             else
             {                
-                //now we search backwards for start of line
+                //now we search backwards for start of line or a semicolon
                 for (int i2 = -1; i2 > -int.MaxValue; i2--)
                 {                    
-                    if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
+                    if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL || tok.Offset(i2).s == ";")
                     {
                         iEqStart = i2 + 1;
                         break;
