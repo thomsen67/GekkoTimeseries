@@ -10513,6 +10513,7 @@ namespace Gekko
                     try { settings.cmd_file = (string)jsonTree["cmd_file"]; } catch { }
                     try { settings.gms_file = (string)jsonTree["gms_file"]; } catch { }
                     try { settings.model_name = (string)jsonTree["model_name"]; } catch { }
+                    try { settings.solve_call = (string)jsonTree["solve_call"]; } catch { }
                     try { settings.raw_path = (string)jsonTree["raw_path"]; } catch { }
                     try { settings.raw_ignore = (object[])jsonTree["raw_ignore"]; } catch { }
                     try { settings.counts1 = (string)jsonTree["counts1"]; } catch { }
@@ -10542,10 +10543,12 @@ namespace Gekko
                     {
                         txt.MainOmitVeryFirstNewLine();
                         txt.MainAdd("working folder (receives output) = " + Program.options.folder_working); txt.MainNewLineTight();
-                        txt.MainAdd("cmd file = " + settings.cmd_file); txt.MainNewLineTight();
-                        txt.MainAdd("gms file = " + settings.gms_file); txt.MainNewLineTight();
-                        txt.MainAdd("model name = " + settings.model_name); txt.MainNewLineTight();
-                        txt.MainAdd("zip name = " + settings.model_name + Globals.scalarModelSuffix + ".zip"); txt.MainNewLineTight();
+                        txt.MainAdd("is_manual = " + settings.is_manual); txt.MainNewLineTight();
+                        if (settings.is_manual) txt.MainAdd("cmd_file = " + settings.cmd_file); txt.MainNewLineTight();
+                        txt.MainAdd("cmd_file = " + settings.cmd_file); txt.MainNewLineTight();
+                        txt.MainAdd("gms_file = " + settings.gms_file); txt.MainNewLineTight();
+                        txt.MainAdd("model_name = " + settings.model_name); txt.MainNewLineTight();
+                        txt.MainAdd("zip_name = " + settings.model_name + Globals.scalarModelSuffix + ".zip"); txt.MainNewLineTight();
                     }                    
                 }                
 
@@ -10575,10 +10578,21 @@ namespace Gekko
                 {
                     bool hit = false;
                     string lineTrim = line.Trim();
-                    if (lineTrim.StartsWith(Globals.scalarModelSolve))
+                    if (lineTrim.StartsWith(settings.solve_call, StringComparison.OrdinalIgnoreCase))
                     {
-                        string rest = lineTrim.Substring(Globals.scalarModelSolve.Length);
-                        int i = rest.IndexOf(")");
+                        string rest = lineTrim.Substring(settings.solve_call.Length).Trim();
+
+                        int ii = -1;
+                        foreach (char c in rest)
+                        {
+                            ii++;                            
+                            if (G.IsLetterOrDigitOrUnderscore(c)) continue;
+                            break;
+                        }
+
+                        //int i = rest.IndexOf(")");
+                        int i = ii;
+
                         if (i >= 1)
                         {
                             string rest2 = rest.Substring(0, i).Trim();
@@ -10587,18 +10601,18 @@ namespace Gekko
                     }
                     if (hit)
                     {
-                        //We have something like @solve(M_static_calibration); and we have checked out that M_static_calibration is the model_name
+                        //We have something like "solve M_static_calibration;" or  "@solve(M_static_calibration);" and we have checked out that M_static_calibration is the model_name
                         //Will be replaced by this:
                         //
 
                         output.Add("");
-                        output.Add("# -----------------------------------------------------------------");
-                        output.Add("#   Gekko lines START");
-                        output.Add("# -----------------------------------------------------------------");
-                        output.Add("#   To revert to the original file, either use the file");
-                        output.Add("#   " + Path.GetFileName(gmsPathCopy) + " if it exists,");
-                        output.Add("#   or remove the lines from this point until 'Gekko lines END'.");
-                        output.Add("# -----------------------------------------------------------------");
+                        output.Add("* -----------------------------------------------------------------");
+                        output.Add("*   Gekko lines START");
+                        output.Add("* -----------------------------------------------------------------");
+                        output.Add("*   To revert to the original file, either use the file");
+                        output.Add("*   " + Path.GetFileName(gmsPathCopy) + " if it exists,");
+                        output.Add("*   or remove the lines from this point until 'Gekko lines END'.");
+                        output.Add("* -----------------------------------------------------------------");
                         output.Add("");
 
                         string eqList = null;
@@ -10635,9 +10649,9 @@ namespace Gekko
                         output.Add("abort \"Abort after producing a GAMS scalar model for Gekko\";");
 
                         output.Add("");
-                        output.Add("# -----------------------------------------------------------------");
-                        output.Add("#   Gekko lines END");
-                        output.Add("# -----------------------------------------------------------------");                        
+                        output.Add("* -----------------------------------------------------------------");
+                        output.Add("*   Gekko lines END");
+                        output.Add("* -----------------------------------------------------------------");                        
                         output.Add("");
                         
                         replaceOk = true;
@@ -10655,10 +10669,10 @@ namespace Gekko
 
                 DateTime t0 = DateTime.Now;
 
-                if (G.IsUnitTesting())
+                if (G.IsUnitTesting() || !settings.is_manual)
                 {
                     string folder = Program.options.folder_working;
-                    Program.ExecuteShellCommand(Globals.scalarModelCmdFile, false, folder);
+                    Program.ExecuteShellCommand(settings.cmd_file, false, folder);
                 }
                 else
                 {

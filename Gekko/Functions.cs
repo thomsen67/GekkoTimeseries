@@ -9,9 +9,10 @@ namespace Gekko
     public class GamsScalarHelper
     {
         public bool is_manual = true;
-        public string cmd_file = null;  //only used when is_manual is false.
+        public string cmd_file = Globals.scalarModelCmdFile;  //only used when is_manual is false.
         public string gms_file = null;
         public string model_name = null;
+        public string solve_call = "solve ";
         public string raw_path = null;
         public object[] raw_ignore = null;
         public string counts1 = "**** counts do not match";

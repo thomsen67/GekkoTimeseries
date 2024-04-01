@@ -805,7 +805,7 @@ namespace Gekko
                         int counterSeries = 0;
 
                         for (int i = 0; i < modelGamsScalar.eqCounts; i++)
-                        {
+                        {                            
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
                                                                        //double x = r[i];                            
                         }

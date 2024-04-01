@@ -17692,7 +17692,6 @@ namespace UnitTests
             // !
             // !
             // !
-            //Newer model and newer GAMS, cf. _Test_GAMSScalar2()            
             Globals.unitTestScreenOutput.Clear();
             string path5 = Globals.ttPath2 + @"\regres\DREAM\MAKRO\2024-01-10-c2f2447\Model\";
 
@@ -17718,6 +17717,7 @@ namespace UnitTests
                     sw.WriteLine(@"  ""is_manual"" : true,                                   //Manual via popups?");
                     sw.WriteLine(@"  ""gms_file"" : ""static_calibration.gms"",              //The .gms file containing the @solve() statement regarding model_name.");
                     sw.WriteLine(@"  ""model_name"" : """ + modelName + @""",                            //Model that is being made into scalar model");
+                    sw.WriteLine(@"  ""solve_call"" : ""@solve("",                            //How does the model call look like?");
                     sw.WriteLine(@"  ""raw_path"" : ""*.gms"",                               //Path to file(s) containing raw GAMS equations (may include *.gms)");
                     sw.WriteLine(@"  ""raw_ignore"": [""functions.gms""],                    //List of ignored file names (without path) for raw equations. Can be omitted. ");
                     sw.WriteLine(@"  ""counts1"" : ""**** Counts do not match"",             //Can be omitted, default = ""**** Counts do not match""");
@@ -17725,9 +17725,52 @@ namespace UnitTests
                     sw.WriteLine(@"  ""counts3"" : ""Single equations in unmatched =E= blocks""     //Can be omitted, default = ""Single equations in unmatched =E= blocks""");
                     sw.WriteLine(@" } ");
                 }
+                File.Delete(path5 + "\\static_calibration.gms.lst");
+                File.Delete(path5 + "\\" + modelName + "_scalar.zip");
+                I("gamsscalar('pack');");  //popup is not shown, instead run.cmd is just run
+                long size = new System.IO.FileInfo(path5 + "" + modelName + "_scalar.zip").Length;                
+                if (p == 0) Assert.IsTrue(size > 12500000 && size < 12600000);  //size should be around 12.539.120 bytes, not 10.349.279 (and sizes inside should be 584.739 for raw.gms, 22.240.511 for dict.txt and 42.036.341 for gams.gms -- for holdfixed = 1 we have 29.180.577 for gams.gms).                   
+                else if (p == 1) Assert.IsTrue(size > 3100000 && size < 3300000);  //size should be around 3.215.337
+                else if (p == 2) Assert.IsTrue(size > 6700000 && size < 6800000);  //size should be around 6.745.899 bytes
+                else new Error("Wrong!");
+            }
+        }
+
+        [TestMethod]
+        public void _Test_GAMSScalar2()
+        {                     
+            Globals.unitTestScreenOutput.Clear();
+            string path5 = Globals.ttPath2 + @"\regres\Models\";
+
+            string modelName = ""; ;
+
+            for (int p = 0; p < 1; p++)  //models
+            {
+                if (p == 0) modelName = "m";
+                else throw new GekkoException();
+                I("reset;");
+                I("option folder working = '" + path5 + "';");
+                I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
+                if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");                
+                using (FileStream fs = Program.WaitForFileStream(path5 + "\\gamsscalar.json", null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {                    
+                    sw.WriteLine(@"{");
+                    sw.WriteLine(@"  ""is_manual"" : true,"); 
+                    sw.WriteLine(@"  ""cmd_file"" : ""scalar.cmd"",");
+                    sw.WriteLine(@"  ""gms_file"" : ""scalar.gms"",");
+                    sw.WriteLine(@"  ""model_name"" : """ + modelName + @""",");
+                    sw.WriteLine(@"  ""solve_call"" : ""solve "",");
+                    sw.WriteLine(@"  ""raw_path"" : ""scalar.gms"",");
+                    sw.WriteLine(@"  ""counts1"" : ""**** Counts do not match"",");
+                    sw.WriteLine(@"  ""counts2"" : ""Unmatched single free variables"",");
+                    sw.WriteLine(@"  ""counts3"" : ""Single equations in unmatched =E= blocks""");
+                    sw.WriteLine(@" } ");
+                }
+                File.Delete(path5 + "\\scalar.lst");
                 File.Delete(path5 + "\\" + modelName + "_scalar.zip");
                 I("gamsscalar('pack');");
-                long size = new System.IO.FileInfo(path5 + "" + modelName + "_scalar.zip").Length;                
+                long size = new System.IO.FileInfo(path5 + "" + modelName + "_scalar.zip").Length;
                 if (p == 0) Assert.IsTrue(size > 12500000 && size < 12600000);  //size should be around 12.539.120 bytes, not 10.349.279 (and sizes inside should be 584.739 for raw.gms, 22.240.511 for dict.txt and 42.036.341 for gams.gms -- for holdfixed = 1 we have 29.180.577 for gams.gms).                   
                 else if (p == 1) Assert.IsTrue(size > 3100000 && size < 3300000);  //size should be around 3.215.337
                 else if (p == 2) Assert.IsTrue(size > 6700000 && size < 6800000);  //size should be around 6.745.899 bytes
