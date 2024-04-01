@@ -17751,6 +17751,7 @@ namespace UnitTests
                 if (p == 0) modelName = "m";
                 else throw new GekkoException();
                 I("reset;");
+                I("time 2001 2003;");
                 I("option folder working = '" + path5 + "';");
                 I("option gams exe folder = 'c:\\GAMS\\45';");  //32-bit?
                 if (File.Exists(path5 + "\\gamsscalar.json")) File.Delete(path5 + "\\gamsscalar.json");                
@@ -17775,8 +17776,17 @@ namespace UnitTests
                 I("gamsscalar('pack');");
                 if (!File.Exists(path5 + "\\m_scalar.zip")) Assert.Fail();
                 I("model<gms>m_scalar.zip;");
-                I("sim<res>;");
+                I("model<gms>m_scalar.zip;");
 
+                //e1[t]..  3 * x1[t] + 7 * x2[t] =E= -103;
+                //e2[t]..5 * x1[t] + 9 * x2[t] = E = -166;
+                //e3[t]..y1[t] + y2[t] = E = 300;
+
+                I("x1 = 2, 3, 4;");                
+                I("x2 = 3, 5, 7;");
+                I("y1 = 12, 13, 14;");
+                I("y2 = 13, 15, 17;");
+                I("sim<res>;");
             }
         }
 

@@ -55,6 +55,8 @@ namespace Gekko
 
             List<List<TwoInts>> chunks = Chunker(n, threads, eqsPerChunk);
 
+            bool hasErrors = false;
+
             Parallel.ForEach(chunks, () => 0, (x, pls, index, s) =>
             {
                 List<TwoInts> chunkList = chunks[(int)index];
@@ -98,22 +100,27 @@ namespace Gekko
                     Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
                     compilerParams.GenerateExecutable = false;
                     string s2 = code.ToString();
-                    CompilerResults cr = null;
-                    try
+                    CompilerResults cr = null;                    
+                    cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2);
+                    if (cr.Errors.HasErrors)
                     {
-                        cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2);
+                        hasErrors = true;
                     }
-                    catch (Exception e)
+                    else
                     {
-                        new Error("Compilation failed");
+                        Assembly assembly = cr.CompiledAssembly;
+                        DateTime dt2 = DateTime.Now;
+                        Object[] o = new Object[1] { functions };
+                        assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                                                                                                                                                  
                     }
-                    Assembly assembly = cr.CompiledAssembly;
-                    DateTime dt2 = DateTime.Now;
-                    Object[] o = new Object[1] { functions };
-                    assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                                                                                                                                                  
                 }
                 return 0;
             }, _ => { });
+
+            if (hasErrors)
+            {
+                new Error("The GAMS scalar model could not be translated into equivalent Gekko code. This may be due to functions or math operators in the GAMS scalar model that are not properly translated into Gekko code. You may want to check your GAMS model regarding the use of unusual/rare functions or math operators/constructs.");
+            }
 
             if (Globals.runningOnTTComputer) new Writeln("TTH: Complete Compile5 --> : " + G.Seconds(dt0));
         }
@@ -870,7 +877,7 @@ namespace Gekko
             double[] cc = helper.c.ToArray();
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
             int[] ee = helper.eqPointers.ToArray();
-
+                        
             Compile5(csCodeLines, functions);
 
             dt1 = DateTime.Now;
