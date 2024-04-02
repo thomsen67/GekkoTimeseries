@@ -44,7 +44,7 @@ namespace Gekko
     public class TraceContents2  //Trace2 because it is experimental
     {
         [ProtoMember(1)]
-        public readonly TraceID2 id = new TraceID2();                
+        public readonly TraceID2 id = new TraceID2();
 
         //In principle, these fields could be made readonly, but it would take a bit of refactoring.
 
@@ -1479,7 +1479,13 @@ namespace Gekko
             }
         }
 
-        private List<string> GetPrecedentsNames(string showFreq, string showDatabank)
+        /// <summary>
+        /// May return empty list, but not null. Args are "yes", "no" or "maybe"
+        /// </summary>
+        /// <param name="showFreq"></param>
+        /// <param name="showDatabank"></param>
+        /// <returns></returns>
+        public List<string> GetPrecedentsNames(string showFreq, string showDatabank)
         {
             List<string> precedentsNames;
             List<string> list = new List<string>();

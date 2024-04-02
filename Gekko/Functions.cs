@@ -758,10 +758,87 @@ namespace Gekko
         }
 
 
+        public static IVariable gettrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            Series ts = Helper_GetSeriesFromSeriesOrString(x1, "Function getTrace(): ");
+            string type = O.ConvertToString(x2);
+            List m = new List();
+            if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            {
+                List<TraceAndPeriods2> taps = ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage();
+                foreach (TraceAndPeriods2 tap in taps)
+                {
+                    if (G.Equal(type, "id"))
+                    {                        
+                        string stamp = null;
+                        string stampDetailed = null;
+                        Trace2.GetStampAsString(tap.trace.GetId(), out stamp, out stampDetailed);
+                        m.Add(new ScalarString(stampDetailed));
+                    }
+                    else if (G.Equal(type, "stamp2"))
+                    {                        
+                        GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, tap.trace.GetId().stamp);
+                        m.Add(new ScalarDate(gt));
+                    }
+                    else if (G.Equal(type, "name"))
+                    {
+                        m.Add(new ScalarString(tap.trace.GetContents().name));
+                    }
+                    else if (G.Equal(type, "code"))
+                    {
+                        m.Add(new ScalarString(tap.trace.GetContents().text));
+                    }
+                    else if (G.Equal(type, "period"))
+                    {
+                        List mm = new List();
+                        mm.Add(new ScalarDate(tap.trace.GetContents().period.t1));
+                        mm.Add(new ScalarDate(tap.trace.GetContents().period.t2));
+                        m.Add(mm);
+                    }
+                    else if (G.Equal(type, "active"))
+                    {
+                        List mm = new List();
+                        List<GekkoTimeSpanSimple> gtsss = tap.periods.GetStorage();
+                        foreach (GekkoTimeSpanSimple gtss in gtsss)
+                        {
+                            List mmm = new List();
+                            mmm.Add(new ScalarDate(gtss.t1));
+                            mmm.Add(new ScalarDate(gtss.t2));
+                            mm.Add(mmm);
+                        }
+                        m.Add(mm);
+                    }
+                    else if (G.Equal(type, "file"))
+                    {
+                        m.Add(new ScalarString(tap.trace.GetContents().commandFileAndLine));
+                    }
+                    else if (G.Equal(type, "datafile"))
+                    {
+                        m.Add(new ScalarString(tap.trace.GetContents().dataFile));
+                    }
+                    else if (G.Equal(type, "vars"))
+                    {
+                        List mm = new List();
+                        List<string> precedents = tap.trace.GetPrecedentsNames("yes", "yes");
+                        if (precedents != null)
+                        {
+                            foreach (string s in precedents)
+                            {
+                                mm.Add(new ScalarString(s));
+                            }
+                        }
+                        m.Add(mm);
+                    }
+                    else new Error("Type '" + type + "' not recognized.");
+                }
+            }            
+            return m;
+        }
+
+
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
-
         public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             List<IVariable> rowList = O.ConvertToList(x2);
@@ -6154,24 +6231,9 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-
-            Series ts = null;
-
-            if (x1.Type() == EVariableType.Series)
-            {
-                ts = x1 as Series;
-            }
-            else if (x1.Type() == EVariableType.String)
-            {
-                ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError, true) as Series;
-                //ts = O.Lookup(null, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, null) as Series;
-            }
-            else
-            {
-                new Error("fromseries(): expected first argument to be series or string type");
-                //throw new GekkoException();
-            }
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);            
+            
+            Series ts = Helper_GetSeriesFromSeriesOrString(x1, "Function fromSeries(): ");
 
             string s2 = O.ConvertToString(x2);
 
@@ -6330,6 +6392,24 @@ namespace Gekko
             {
                 new Error("fromSeries(): Argument '" + s2 + "' not recognized."); return null;
             }
+        }
+
+        private static Series Helper_GetSeriesFromSeriesOrString(IVariable x1, string fname)
+        {
+            Series ts = null;
+            if (x1.Type() == EVariableType.Series)
+            {
+                ts = x1 as Series;
+            }
+            else if (x1.Type() == EVariableType.String)
+            {
+                ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError, true) as Series;
+            }
+            else
+            {
+                new Error(fname + "Expected first argument to be series or string type");
+            }
+            return ts;
         }
 
         /// <summary>
