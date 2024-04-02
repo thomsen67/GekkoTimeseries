@@ -921,7 +921,7 @@ namespace Gekko
         public List<ModelScalarEquation> precedents = null;
 
         [ProtoMember(28)]
-        public bool[] isTimeless = null;
+        public bool[] isTimeless = null;        
 
         public Model parent = null;  //is not protobuffed, is set while reading from protobuf
 
@@ -937,6 +937,12 @@ namespace Gekko
 
         [ProtoMember(29)]
         public ModelInfoGamsScalar modelInfoGamsScalar = null; //contains just statistics for when the model loads from cache. Nothing serious here.
+
+        [ProtoMember(30)]
+        public int fakeEqCounts = -12345;
+
+        [ProtoMember(31)]
+        public int fakeVarCounts = -12345;
 
         // =============================================
         // =============================================

@@ -710,20 +710,22 @@ namespace Gekko
             int substatus2 = 0;
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
+            int fakeEqCounts2 = 0;
+            int fakeVarCounts2 = 0;
             Dictionary<int, int> timeless = new Dictionary<int, int>();  //records timeless vars for later use in .isTimeless array.
             
             //read dictionary                        
             if (settings.scalarMemoryModelProducedByGekko)
             {
                 StreamReader sr = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(Stringlist.ExtractTextFromLines(settings.dictionary).ToString())));
-                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
             }
             else
             {
                 using (FileStream fs = Program.WaitForFileStream(settings.ffh_unrolledNames.realPathAndFileName, settings.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
                 using (TextReader sr = new StreamReader(fs))
                 {
-                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, sr);
+                    ReadScalarModelEquationsDictionaryLines(helper, split2, timeless, ref status2, ref substatus2, ref eqCounts2, ref varCounts2, ref fakeEqCounts2, ref fakeVarCounts2, sr);
                 }
             }
 
@@ -929,6 +931,11 @@ namespace Gekko
             modelGamsScalar.count = helper.count;
             modelGamsScalar.known = helper.known;
             modelGamsScalar.unique = helper.unique;
+            modelGamsScalar.fakeEqCounts = fakeEqCounts2;
+            modelGamsScalar.fakeVarCounts = fakeVarCounts2;
+
+            //if (Globals.runningOnTTComputer && modelGamsScalar.CountVars(1) != varCounts - fakeVarCounts2) new Writeln("TTH: Var count problem");
+
             //
             // Note that GAMS equation periods are not very useful.
             // In principle, e1[2020] .. may designate an equation with
@@ -983,7 +990,7 @@ namespace Gekko
         }
 
         private static void ReadGamsScalarModelEquationsLines(EqLineHelper helper, string[] split2, ref TokenList tokensLast, List<string> values, List<string> end, ref int status, ref int substatus, ref int eqCounts, ref int varCounts, ref int semis, List<string> csCodeLines, ref StringBuilder eqLine, StreamReader sr)
-        {
+        {            
             string line = null;
             while ((line = sr.ReadLine()) != null)
             {
@@ -1089,7 +1096,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, TextReader sr)
+        private static void ReadScalarModelEquationsDictionaryLines(EqLineHelper helper, string[] split2, Dictionary<int, int> timeless, ref int status2, ref int substatus2, ref int eqCounts2, ref int varCounts2, ref int fakeEqCounts2, ref int fakeVarCounts2, TextReader sr)
         {
             bool b = false;
             string line = null;
@@ -1159,12 +1166,18 @@ namespace Gekko
                     }
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
                     string eqName = ss2;
+                    if (G.Contains(eqName, Globals.scalarModelExtraVariable))
+                    {
+                        fakeEqCounts2++;
+                    }
+
                     int idx = ss2.IndexOf("[");
                     if (idx >= 0) eqName = ss2.Substring(0, idx);
                     helper.dict_FromEqNumberToEqName[n] = ss2;
                     helper.dict_FromEqNameToEqNumber.Add(ss2, n, b);  //filling this out could be postponed until decomp if loading is slow                        
                     helper.dict_FromEqNameToEqChunkNumber.AddIfNotAlreadyThere(eqName, helper.dict_FromEqNameToEqChunkNumber.Count(), b);
                     helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count() - 1;
+
                 }
                 else if (status2 == 2)
                 {
@@ -1179,8 +1192,14 @@ namespace Gekko
                         new Error("Could not parse integer part of the string '" + ss[0] + "'");
                     }
                     string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+
+                    if (G.Contains(ss2, Globals.scalarModelExtraVariable))
+                    {
+                        fakeVarCounts2++;
+                    }
+
                     helper.dict_FromVarNumberToVarName[n] = ss2;
-                    helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);                    
+                    helper.dict_FromVarNameToVarNumber.Add(ss2, n, b);
                     ExtractTimeDimensionHelper helper2 = ExtractTimeDimension(true, EExtractTimeDimension.NoIndexListOfStrings, ss2, true);
                     if (helper2.time.IsNull())
                     {
@@ -1192,6 +1211,7 @@ namespace Gekko
                         if (helper.t2.IsNull() || helper2.time.StrictlyLargerThan(helper.t2)) helper.t2 = helper2.time;
                     }
                     helper.dict_FromVarNameToANumber.AddIfNotAlreadyThere(helper2.resultingFullName, helper.dict_FromVarNameToANumber.Count(), b);
+
                 }
             }
         }

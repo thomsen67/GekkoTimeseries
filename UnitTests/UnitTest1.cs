@@ -17779,14 +17779,27 @@ namespace UnitTests
                 I("model<gms>m_scalar.zip;");
 
                 //e1[t]..  3 * x1[t] + 7 * x2[t] =E= -103;
-                //e2[t]..5 * x1[t] + 9 * x2[t] = E = -166;
-                //e3[t]..y1[t] + y2[t] = E = 300;
+                //e2[t]..  5 * x1[t] + 9 * x2[t] = E = -166;
+                //e3[t]..  y1[t] + y2[t] = E = 300;
 
                 I("x1 = 2, 3, 4;");                
                 I("x2 = 3, 5, 7;");
                 I("y1 = 12, 13, 14;");
                 I("y2 = 13, 15, 17;");
                 I("sim<res>;");
+
+                _AssertSeries(First(), "e1!a", 2001, 3 * 2 + 7 * 3 - (-103d), sharedDelta);
+                _AssertSeries(First(), "e1!a", 2002, 3 * 3 + 7 * 5 - (-103d), sharedDelta);
+                _AssertSeries(First(), "e1!a", 2003, 3 * 4 + 7 * 7 - (-103d), sharedDelta);
+
+                _AssertSeries(First(), "e2!a", 2001, 5 * 2 + 9 * 3 - (-166d), sharedDelta);
+                _AssertSeries(First(), "e2!a", 2002, 5 * 3 + 9 * 5 - (-166d), sharedDelta);
+                _AssertSeries(First(), "e2!a", 2003, 5 * 4 + 9 * 7 - (-166d), sharedDelta);
+
+                _AssertSeries(First(), "e3!a", 2001, 12 + 13 - (300), sharedDelta);
+                _AssertSeries(First(), "e3!a", 2002, 13 + 15 - (300), sharedDelta);
+                _AssertSeries(First(), "e3!a", 2003, 14 + 17 - (300), sharedDelta);
+
             }
         }
 

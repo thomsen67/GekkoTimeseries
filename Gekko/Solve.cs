@@ -804,19 +804,19 @@ namespace Gekko
                         int counterMissings = 0;
                         int counterSeries = 0;
 
-                        for (int i = 0; i < modelGamsScalar.eqCounts; i++)
+                        for (int i = 0; i < modelGamsScalar.eqCounts - modelGamsScalar.fakeEqCounts; i++)
                         {                            
                             functions[ee[i]](i, r, a, cc, bb, dd, 0);  //can return a sum (illegals signal)
                                                                        //double x = r[i];                            
                         }
                         //This could be speedup using a faster string matching, and more importantly storing the data in a double[] array and put it in in 1 go.                                                    
                         string previousName = ""; string[] previousIndexes = null; Series previousSeries = null;
-                        for (int i = 0; i < modelGamsScalar.eqCounts; i++)
+                        for (int i = 0; i < modelGamsScalar.eqCounts - modelGamsScalar.fakeEqCounts; i++)
                         {
                             string bank = null; string name2 = null; string freq2 = null; string[] indexes = null;
                             G.Chop_Chop(modelGamsScalar.GetEqName(i), out bank, out name2, out freq2, out indexes); //freq2 will be == null
                             string name = o.opt_prefix + name2;
-                            if (name2.ToLower().StartsWith("e" + Globals.scalarModelExtraVariable)) continue;
+                            //if (name2.ToLower().StartsWith("e" + Globals.scalarModelExtraVariable)) continue;
                             if (indexes == null) new Error("Equation " + name2 + " does not seem to have indexes -- this is unexpected.");
                             GekkoTime t = GekkoTime.FromStringToGekkoTime(indexes[indexes.Length - 1]);
 
