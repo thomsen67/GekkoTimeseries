@@ -17991,13 +17991,22 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void Copy(O.Copy o)
-        {
+        {            
             if (o.type == "ASTPLACEHOLDER") o.type = null;
             EVariableType type = EVariableType.Var;
-            if (o.type != null) type = G.GetVariableType(o.type);
+            if (o.type != null) type = G.GetVariableType(o.type);                        
 
             if (o.names2 == null)
             {
+                if (o.opt_tobank != null)
+                {
+                    //Make an error for Gekko 3.2
+                    using (Warning txt = new Warning())
+                    {                        
+                        txt.MainAdd("COPY <tobank=...> option is used, but the COPY statement itself is missing a TO part.");
+                        txt.MoreAdd("A COPY statement without the TO part always copies variables into the first-position databank, and in that case, any <tobank=...> is ignored. In order to copy a variable x from the databank b1 to the databank b2 you cannot use 'COPY <frombank=b1 tobank=b2> x;', but should instead use 'COPY <frombank=b1 tobank=b2> x to *;'. Note: this warning will become an error in Gekko 3.2. To avoid the warning, just remove the <tobank=...> part of the COPY statement.");
+                    }
+                }
                 o.names2 = new Gekko.List();
                 o.names2.Add(new ScalarString("First:*"));
             }
@@ -18157,7 +18166,7 @@ namespace Gekko
             string si = null;
             if (nIgnores > 0) si = " (ignored " + nIgnores + ")";
 
-            G.Writeln2("Copied data for " + nOk + " variables" + si);
+            G.Writeln2("Copied data for " + nOk + " variable" + G.S(nOk) + si);
 
         }        
 
@@ -18738,7 +18747,6 @@ namespace Gekko
                         if (!G.IsSimpleToken(bankRhs))
                         {
                             new Error("Illegal bankname in TO/AS part of " + command + "");
-                            //throw new GekkoException();
                         }
 
                         //fixed bank given in second part
@@ -24563,7 +24571,7 @@ namespace Gekko
                 }
                 else if (!removed.editable)
                 {
-                    new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter.");                    
+                    new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter. You may use UNLOCK to make it editable before it is written.");
                 }
                 else
                 {

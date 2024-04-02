@@ -6074,6 +6074,19 @@ namespace UnitTests
 
         }
 
+
+        [TestMethod]
+        public void _Test_CopyFromBankToBank()
+        {
+            I("reset;");
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\databanks\temp';");
+            I("x = 2;");
+            I("open <create> m1; unlock m1; clear m1;");
+            I("open <edit> m2; clear m2; lock m2;");
+            FAIL("copy <frombank = work tobank = m1> x;");  //ignores <tobank> and tries to copy from work to first-pos (m2). But m2 is locked. Before the error there is a warning, too.
+            I("copy <frombank = work tobank = m1> x to *;");  //copy from work to b1.
+        }
+
         [TestMethod]
         public void _Test_CopyLogic()
         {
@@ -13894,9 +13907,11 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceCopyAccumulation()
+        public void _Test_TraceResuccection()
         {
-            //Get this in:
+            Assert.Fail();
+            
+            //Get this in from working folder:
             //read usmec;
             //trace2 upsp;
             //upsp < 2023 2035 >= 117;
@@ -13904,10 +13919,12 @@ namespace UnitTests
             //upsp < 1966 2022 >= 118;
             //trace2 upsp;
 
-            //These old traces reappear in viewer. Get it into tests somehow with Items!
-            Assert.Fail();
+            //These old traces reappear/resurrect more and more. Which is good. But make a test of it.
+        }
 
-
+        [TestMethod]
+        public void _Test_TraceCopyAccumulation()
+        {
             // Lagged engogenous:
             // A principle could be this:
             //   Do things normally with x = x...
@@ -17777,29 +17794,24 @@ namespace UnitTests
                 if (!File.Exists(path5 + "\\m_scalar.zip")) Assert.Fail();
                 I("model<gms>m_scalar.zip;");
                 I("model<gms>m_scalar.zip;");
-
                 //e1[t]..  3 * x1[t] + 7 * x2[t] =E= -103;
                 //e2[t]..  5 * x1[t] + 9 * x2[t] = E = -166;
                 //e3[t]..  y1[t] + y2[t] = E = 300;
-
                 I("x1 = 2, 3, 4;");                
                 I("x2 = 3, 5, 7;");
                 I("y1 = 12, 13, 14;");
                 I("y2 = 13, 15, 17;");
                 I("sim<res>;");
-
                 _AssertSeries(First(), "e1!a", 2001, 3 * 2 + 7 * 3 - (-103d), sharedDelta);
                 _AssertSeries(First(), "e1!a", 2002, 3 * 3 + 7 * 5 - (-103d), sharedDelta);
                 _AssertSeries(First(), "e1!a", 2003, 3 * 4 + 7 * 7 - (-103d), sharedDelta);
-
                 _AssertSeries(First(), "e2!a", 2001, 5 * 2 + 9 * 3 - (-166d), sharedDelta);
                 _AssertSeries(First(), "e2!a", 2002, 5 * 3 + 9 * 5 - (-166d), sharedDelta);
                 _AssertSeries(First(), "e2!a", 2003, 5 * 4 + 9 * 7 - (-166d), sharedDelta);
-
                 _AssertSeries(First(), "e3!a", 2001, 12 + 13 - (300), sharedDelta);
                 _AssertSeries(First(), "e3!a", 2002, 13 + 15 - (300), sharedDelta);
                 _AssertSeries(First(), "e3!a", 2003, 14 + 17 - (300), sharedDelta);
-
+                Assert.AreEqual(Program.databanks.GetFirst().storage.Count(), 7);
             }
         }
 
