@@ -13907,7 +13907,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_TraceResuccection()
+        public void _Test_TraceResurrection()
         {
             Assert.Fail();
             

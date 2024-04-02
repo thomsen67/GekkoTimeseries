@@ -1278,7 +1278,7 @@ namespace Gekko
                     }
                     else if (isDublet)
                     {
-                        if (Globals.runningOnTTComputer) MessageBox.Show("Invalid dublet!");
+                        if (Globals.runningOnTTComputer || G.IsUnitTesting()) MessageBox.Show("Trace problem #2: Invalid dublet!");
                     }
                 }
             }

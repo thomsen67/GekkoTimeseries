@@ -1703,7 +1703,7 @@ namespace Gekko
             // Should #dependents list be reflected in hash ?????
             //
             model.modelGams = ReadGamsModelHelper(false, textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false, model);
-            if (Globals.runningOnTTComputer) Sniff3(model);
+            if (false && Globals.runningOnTTComputer) Sniff3(model);
             DateTime t1 = DateTime.Now;
             return model;
         }
@@ -1898,7 +1898,8 @@ namespace Gekko
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
-            List<string> problems = new List<string>();
+            List<string> problems = new List<string>();  //vars
+            List<string> problems2 = new List<string>(); //eqs
 
             int counter = 0;
 
@@ -1929,13 +1930,24 @@ namespace Gekko
                         good = true;
                     }
                 }
-                if (good) eqCounter = ReadGamsEquation(allowAssignments, sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, dump);
+                if (good) eqCounter = ReadGamsEquation(allowAssignments, sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, problems2, dump);
             }
             ModelGams modelGams = new ModelGams(model);
             modelGams.equationsByVarname = equationsByVarname;
             modelGams.equationsByEqname = equationsByEqname;
 
-            if (!silent)
+            if (silent)
+            {
+                if (problems2.Count > 0)
+                {
+                    using (Note txt2 = new Note())
+                    {
+                        txt2.MainAdd(problems2.Count + " equation dublets in raw GAMS model file.");
+                        txt2.MoreAdd("In the GAMS raw file (inside a scalar model .zip file: typically the file raw.gms), there are " + problems2.Count + " equation dublets. You may try to unpack raw.gms and issue the statement 'MODEL <gms> raw.gms;' too see the problematic equations. If nothing is done, Gekko will use the first occurrence of such dublet equations.");
+                    }
+                }            
+            }
+            else
             {
                 using (Writeln txt2 = new Writeln())
                 {
@@ -1947,9 +1959,19 @@ namespace Gekko
                     txt2.MainNewLineTight();
                     if (problems.Count > 0)
                     {
-                        txt2.MainAdd("There were the following problems while reading the model:");
+                        txt2.MainAdd("There were the following variable problems while reading the model:");
                         txt2.MainNewLineTight();
                         foreach (string s in problems)
+                        {
+                            txt2.MainAdd("+++  " + s);
+                            txt2.MainNewLineTight();
+                        }
+                    }
+                    if (problems2.Count > 0)
+                    {
+                        txt2.MainAdd("There were the following equation problems while reading the model:");
+                        txt2.MainNewLineTight();
+                        foreach (string s in problems2)
                         {
                             txt2.MainAdd("+++  " + s);
                             txt2.MainNewLineTight();
@@ -1985,7 +2007,7 @@ namespace Gekko
         /// Read (parse) a .gms/.gmy GAMS equation/assignment, translating it into an equivalent Gekko equation/assignment.
         /// The result is put into a ModelGamsEquation object.
         /// </summary>
-        private static int ReadGamsEquation(bool allowAssignments, StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
+        private static int ReadGamsEquation(bool allowAssignments, StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, bool dump)
         {
             //if allowAssignments == true, we are at ";", else we are at "..".
 
@@ -2226,8 +2248,6 @@ namespace Gekko
             WalkTokensGekkoSyntax(rhsTokensGekko, wt2Gekko);
             string rhsGekko = rhsTokensGekko.ToStringTrim();       
             
-
-
             if (true)
             {
                 int v = 3;
@@ -2289,7 +2309,7 @@ namespace Gekko
             }
 
             bool fromList = false;
-            string lhsVariable = ReadGamsModelGetLhsName(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
+            string lhsVariable = ReadGamsModelGetLhsName(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, problems2, ref fromList);
             string s = null;
             if (fromList) s = ", designated from list";
             if (lhsVariable == null) lhsVariable = "[not identified]";
@@ -2305,7 +2325,7 @@ namespace Gekko
         /// Tries to identify what is the LHS variable in the GAMS equation, and puts this into dictionaries for later retrieval by variable name or equation name.
         /// The method reacts to option model gams dep method = lhs|eqname, and also reacts to a #dependents list.
         /// </summary>
-        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, ref bool fromList)
+        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string> problems, List<string> problems2, ref bool fromList)
         {
             string lhs = null;
 
@@ -2369,7 +2389,7 @@ namespace Gekko
 
                 if (equationsByEqname.ContainsKey(eqnameGams))
                 {
-                    new Error("The equation name '" + eqnameGams + "' appears multiple times in the raw GAMS model. If the model is loaded from a .zip file, see the 'raw' equations inside the .zip (typically stored in raw.gms).");
+                    problems2.Add("Equation '" + eqnameGams + "' appears multiple times: first occurrence is used.");
                 }
                 else
                 {

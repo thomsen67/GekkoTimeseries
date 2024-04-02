@@ -1473,7 +1473,7 @@ namespace Gekko
             List<string> rv = null;
             if (type == 1)
             {
-                rv= this.dict_FromVarNumberToVarName.ToList();
+                rv = this.dict_FromVarNumberToVarName.ToList();
             }
             else if (type == 2)
             {

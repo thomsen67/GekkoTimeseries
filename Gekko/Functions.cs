@@ -758,80 +758,87 @@ namespace Gekko
         }
 
 
-        public static IVariable gettrace(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        public static IVariable gettrace2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            //Only at 1 level below "GluedToSeries", so there should be no dividers here... (or what?)
+            //Think about dividers if it is made more advanced.
+
             Series ts = Helper_GetSeriesFromSeriesOrString(x1, "Function getTrace(): ");
             string type = O.ConvertToString(x2);
             List m = new List();
-            if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
+            if (ts.meta.trace2 != null)
             {
-                List<TraceAndPeriods2> taps = ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage();
-                foreach (TraceAndPeriods2 tap in taps)
+                if (ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().Count() > 0)
                 {
-                    if (G.Equal(type, "id"))
-                    {                        
-                        string stamp = null;
-                        string stampDetailed = null;
-                        Trace2.GetStampAsString(tap.trace.GetId(), out stamp, out stampDetailed);
-                        m.Add(new ScalarString(stampDetailed));
-                    }
-                    else if (G.Equal(type, "stamp2"))
-                    {                        
-                        GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, tap.trace.GetId().stamp);
-                        m.Add(new ScalarDate(gt));
-                    }
-                    else if (G.Equal(type, "name"))
+                    List<TraceAndPeriods2> taps = ts.meta.trace2.GetPrecedents_BewareOnlyInternalUse().GetStorage();
+                    foreach (TraceAndPeriods2 tap in taps)
                     {
-                        m.Add(new ScalarString(tap.trace.GetContents().name));
-                    }
-                    else if (G.Equal(type, "code"))
-                    {
-                        m.Add(new ScalarString(tap.trace.GetContents().text));
-                    }
-                    else if (G.Equal(type, "period"))
-                    {
-                        List mm = new List();
-                        mm.Add(new ScalarDate(tap.trace.GetContents().period.t1));
-                        mm.Add(new ScalarDate(tap.trace.GetContents().period.t2));
-                        m.Add(mm);
-                    }
-                    else if (G.Equal(type, "active"))
-                    {
-                        List mm = new List();
-                        List<GekkoTimeSpanSimple> gtsss = tap.periods.GetStorage();
-                        foreach (GekkoTimeSpanSimple gtss in gtsss)
+                        if (G.Equal(type, "id"))
                         {
-                            List mmm = new List();
-                            mmm.Add(new ScalarDate(gtss.t1));
-                            mmm.Add(new ScalarDate(gtss.t2));
-                            mm.Add(mmm);
+                            string stamp = null;
+                            string stampDetailed = null;
+                            Trace2.GetStampAsString(tap.trace.GetId(), out stamp, out stampDetailed);
+                            m.Add(new ScalarString(stampDetailed));
                         }
-                        m.Add(mm);
-                    }
-                    else if (G.Equal(type, "file"))
-                    {
-                        m.Add(new ScalarString(tap.trace.GetContents().commandFileAndLine));
-                    }
-                    else if (G.Equal(type, "datafile"))
-                    {
-                        m.Add(new ScalarString(tap.trace.GetContents().dataFile));
-                    }
-                    else if (G.Equal(type, "vars"))
-                    {
-                        List mm = new List();
-                        List<string> precedents = tap.trace.GetPrecedentsNames("yes", "yes");
-                        if (precedents != null)
+                        else if (G.Equal(type, "stamp2"))
                         {
-                            foreach (string s in precedents)
+                            GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, tap.trace.GetId().stamp);
+                            m.Add(new ScalarDate(gt));
+                        }
+                        else if (G.Equal(type, "name"))
+                        {
+                            m.Add(new ScalarString(tap.trace.GetContents().name));
+                        }
+                        else if (G.Equal(type, "code"))
+                        {
+                            m.Add(new ScalarString(tap.trace.GetContents().text));
+                        }
+                        else if (G.Equal(type, "period"))
+                        {
+                            List mm = new List();
+                            mm.Add(new ScalarDate(tap.trace.GetContents().period.t1));
+                            mm.Add(new ScalarDate(tap.trace.GetContents().period.t2));
+                            m.Add(mm);
+                        }
+                        else if (G.Equal(type, "active"))
+                        {
+                            List mm = new List();
+                            List<GekkoTimeSpanSimple> gtsss = tap.periods.GetStorage();
+                            foreach (GekkoTimeSpanSimple gtss in gtsss)
                             {
-                                mm.Add(new ScalarString(s));
+                                List mmm = new List();
+                                mmm.Add(new ScalarDate(gtss.t1));
+                                mmm.Add(new ScalarDate(gtss.t2));
+                                mm.Add(mmm);
                             }
+                            m.Add(mm);
                         }
-                        m.Add(mm);
+                        else if (G.Equal(type, "file"))
+                        {
+                            m.Add(new ScalarString(tap.trace.GetContents().commandFileAndLine));
+                        }
+                        else if (G.Equal(type, "datafile"))
+                        {
+                            m.Add(new ScalarString(tap.trace.GetContents().dataFile));
+                        }
+                        else if (G.Equal(type, "vars"))
+                        {
+                            List mm = new List();
+                            List<string> precedents = tap.trace.GetPrecedentsNames("yes", "yes");
+                            if (precedents != null)
+                            {
+                                foreach (string s in precedents)
+                                {
+                                    mm.Add(new ScalarString(s));
+                                }
+                            }
+                            m.Add(mm);
+                        }
+                        else new Error("Type '" + type + "' not recognized.");
                     }
-                    else new Error("Type '" + type + "' not recognized.");
                 }
-            }            
+                m.list.Reverse();  //newest first!
+            }
             return m;
         }
 
