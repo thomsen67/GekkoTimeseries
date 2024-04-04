@@ -9302,24 +9302,24 @@ namespace Gekko
 
                 if (n == 1)
                 {
-                    if (okCombined) new Writeln("Gekko version control: " + v[0] + " --> OK");
+                    if (okCombined) new Writeln("Gekko version check: " + v[0] + " --> OK");
                     else
                     {                        
                         using (Error txt = new Error())
                         {
-                            txt.MainAdd("Gekko version problem. The version requirement " + v[0] + " is false.");
+                            txt.MainAdd("Gekko version check problem. The version requirement " + v[0] + " is false.");
                             txt.MoreAdd(details);
                         }
                     }
                 }
                 else if (n == 2)
                 {
-                    if (okCombined) new Writeln("Gekko version control: " + v[0] + " " + this.logical12 + " " + v[1] + " --> OK");
+                    if (okCombined) new Writeln("Gekko version check: " + v[0] + " " + this.logical12 + " " + v[1] + " --> OK");
                     else
                     {
                         using (Error txt = new Error())
                         {
-                            txt.MainAdd("Gekko version problem. The version requirement " + v[0] + " " + this.logical12 + " " + v[1] + " is false");
+                            txt.MainAdd("Gekko version check problem. The version requirement " + v[0] + " " + this.logical12 + " " + v[1] + " is false");
                             txt.MoreAdd(details);
                         }
                     }
