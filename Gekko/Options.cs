@@ -94,12 +94,19 @@ namespace Gekko
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS
         public int gams_trim = 0;  //trim vars/params from gdx with few elements  
-        // ---
+        
+        // --- ----------------------------------------------------------------------------
         // --- the following can only be called from gekko.ini next to gekko.exe
+        // ----    REMEMBER
+        // ----    REMEMBER
         // --- !!! REMEMBER to implement these 'global' options here (3 places in all): #er89ljkhaf87
         public string global_dependency_tracking = "none";  // none | simple
         public bool global_pink = false;
-        // ---
+        // ----    REMEMBER
+        // ----    REMEMBER
+        // ----    REMEMBER
+        // --- ----------------------------------------------------------------------------
+
         // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
