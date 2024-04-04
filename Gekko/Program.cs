@@ -313,8 +313,10 @@ namespace Gekko
     {
         public int sysCalls = 0;
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public void Add(int priority, string type, string fileName)
+        public void Add(int priority, string type, string fileName2)
         {
+            string fileName = fileName2;
+            if (fileName != null) fileName = fileName.Trim();  //just in case
             if (priority < 1 || priority > 9) new Error("Priority!");
             string s = priority + "¤" + type + "¤" + fileName;
             if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
@@ -20258,13 +20260,11 @@ namespace Gekko
             if (pause && fileName != null)
             {
                 new Error("You should use PIPE<pause> without a filename");
-                //throw new GekkoException();
             }
 
             if (continue2 && fileName != null)
             {
                 new Error("You should use PIPE<continue> without a filename");
-                //throw new GekkoException();
             }
 
             if (G.Equal(fileName, "con") || stop)   //PIPE con, or PIPE<stop>
@@ -20295,12 +20295,10 @@ namespace Gekko
             }
             else if (pause)
             {
-
                 Globals.pipe = false;
             }
             else if (continue2)
             {
-
                 Globals.pipe = true;
             }
             else
@@ -20352,6 +20350,7 @@ namespace Gekko
         /// <param name="mute"></param>
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
+            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Pipe", fileName);
             if (!mute && !Globals.pipe) G.Writeln2("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
@@ -22367,7 +22366,7 @@ namespace Gekko
                 DatopgekError();
             }
 
-            if (Program.options.global_pink && Globals.pink2)
+            if (Program.options.global_pink)
             {
                 if (writeType == EDatabankWriteType.Csv || writeType == EDatabankWriteType.Prn || writeType == EDatabankWriteType.Tsd)
                 {
@@ -22616,7 +22615,7 @@ namespace Gekko
 
         public static void DatopgekError()
         {
-            if (Globals.pinkStrict) new Error("Illegal access to g:\\datopgek\\ folder. " + Stringlist.GetListWithCommas(Globals.datopgek_errors));
+            new Error("Illegal access to g:\\datopgek\\ folder. " + Stringlist.GetListWithCommas(Globals.datopgek_errors));
         }
 
         /// <summary>

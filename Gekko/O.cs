@@ -3526,7 +3526,7 @@ namespace Gekko
                 Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
                 Program.DatopgekError();
             }
-            if (Program.options.global_pink && Globals.pink2 && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
+            if (Program.options.global_pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek3\\") || pathAndFilename.ToLower().Contains("g:/datopgek3/")))
             {
                 Globals.datopgek_listfiles.Add(pathAndFilename);
             }
@@ -10826,7 +10826,7 @@ namespace Gekko
 
                     if (Program.IsDependencyTracking()) Globals.dependencyTracking.sysCalls++;
 
-                    if (Program.options.global_pink && Globals.pink3)
+                    if (Program.options.global_pink)
                     {
                         Globals.datopgek_sysCalls.Add(ss);
                     }

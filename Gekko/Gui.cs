@@ -1723,12 +1723,12 @@ namespace Gekko
                 Globals.datopgek_banks = new List<string>();
             }
 
-            if (Program.options.global_pink && Globals.pink2)
+            if (Program.options.global_pink)
             {
                 Globals.datopgek_otherBanks = new List<string>();
                 Globals.datopgek_listfiles = new List<string>();
             }
-            if (Program.options.global_pink && Globals.pink3)
+            if (Program.options.global_pink)
             {
                 Globals.datopgek_sysCalls = new List<string>();
             }
