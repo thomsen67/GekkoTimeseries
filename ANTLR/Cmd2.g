@@ -1888,6 +1888,7 @@ expr2                     :
 						  | label2         SEMICOLON!
                           | test           SEMICOLON!
 						  | tell           SEMICOLON!
+                          | gekko          SEMICOLON!
                           | time           SEMICOLON!
 						  | timefilter     SEMICOLON!						
 						  | truncate       SEMICOLON!
@@ -2524,6 +2525,8 @@ tableCurrow: TABLE name GLUEDOT DOT CURROW GLUEDOT DOT  -> name;
 label2                    : TARGET ident -> ^(ASTTARGET ident);
 
 tell					  : TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} expression NOCR?);
+
+gekko   				  : GEKKO VERSION expression -> ^({token("ASTGEKKO", ASTGEKKO, $ASTGEKKO.Line)} expression);
 
 test                      : TEST ident ->  ^(ASTTEST ident);
 

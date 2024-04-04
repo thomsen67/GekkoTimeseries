@@ -5,6 +5,12 @@ using System.Text;
 
 namespace Gekko
 {
+    public class RootHelper
+    {
+        public string rootFileName = null;
+        public List<string> roots = new List<string>();
+    }
+
     public class Functions
     {
         //NOTE:
@@ -764,6 +770,99 @@ namespace Gekko
             int n2 = O.GetInt(x2);
             Matrix m = new Matrix(n1, n2, double.NaN);
             return m;
+        }
+
+        private static void helper_root(System.IO.DirectoryInfo directoryInfo, RootHelper rootHelper)
+        {
+            foreach (System.IO.FileInfo file in directoryInfo.GetFiles())
+            {
+                if (G.equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                {
+                    rootHelper.roots.Add(file.FullName.Trim());
+                    break;  //no need to carry on, cannot have dublets
+                }
+            }
+            System.IO.DirectoryInfo parent = directoryInfo.Parent;
+            if (parent == null) return;
+            helper_root(parent, rootHelper);
+        }
+
+
+        public static IVariable root(GekkoTime t)
+        {            
+            string rootFileName = "root.ini";
+            string folder1 = Program.options.folder_working;
+
+            //From working folder
+            RootHelper rootHelper1 = new RootHelper();
+            rootHelper1.rootFileName = rootFileName;
+            helper_root(new System.IO.DirectoryInfo(folder1), rootHelper1);
+
+            //From gcm file
+
+            if (rootHelper1.roots.Count == 0)
+            {
+                G.Writeln2("*** ERROR: Could not find a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders");
+                throw new GekkoException();
+            }
+            else if (rootHelper1.roots.Count == 1)
+            {
+                string fileAndFolder1 = rootHelper1.roots[0];
+                //seems to work ok on UNC path, for instance "\\localhost\b$\xx\root.ini" --> "\\localhost\b$\xx"
+                string dir1 = System.IO.Path.GetDirectoryName(fileAndFolder1);
+                //if we have "g:\root.ini", this will return "g:\" (note the backslash that is normally omitted)
+                //whereas "g:\sub\root.ini" will return "g:\sub". 
+                //So for the root we remove the backslash to be consistent, so we get "g:" instead of "g:\".
+                //The thing is that we prefer to use {root()}\xx\yy and not {root()}xx\yy.
+                //NOTE: Someting like RUN c:x.gcm is always interpreted as a (malformed) library call (library names must be > 1 char).
+                if (dir1.EndsWith("\\")) dir1 = dir1.Remove(dir1.Length - 1);
+
+                //NOTE: This test from Gekko 3.x is omitted.
+                //      It tests that the location of the running gcm file is consistent with what root() returns.
+                //      So in principle in Gekko 2.5.3 you start up Gekko in c:\system1\sub1, and call
+                //      a gcm (run c:\system2\sub1\xx.gcm) in system2, and in that case Gekko
+                //      will return the root of system1 without issuing an error.
+
+                ////now we test that the executing gcm (if any) is consistent with this root
+                //P p = smpl.p;
+                //string gcm = null; if (p != null) gcm = p.GetExecutingGcmFile(false); //p may be null, and method may return null                    
+                //if (gcm != null)
+                //{
+                //    string folder2 = Path.GetDirectoryName(gcm);
+
+                //    if (!G.equal(folder1, folder2)) //if working folder and gcm folder is the same, no need to check further (this is often the case)
+                //    {
+                //        //From gcm folder
+                //        RootHelper rootHelper2 = new RootHelper();
+                //        rootHelper2.rootFileName = rootFileName;
+                //        helper_root(new System.IO.DirectoryInfo(folder2), rootHelper2);
+
+                //        if (rootHelper2.roots.Count >= 1)
+                //        {
+                //            string fileAndFolder2 = rootHelper2.roots[0];  //the first and deepest one
+                //            if (!G.equal(fileAndFolder1, fileAndFolder2))
+                //            {
+                //                G.Writeln2("*** ERROR: The " + rootFileName + " file determined from the Gekko working folder is '" + fileAndFolder1 + "', while the " + rootFileName + " file determined from the currently running gcm file is '" + fileAndFolder2 + "'. " + Globals.rootError1);
+                //                throw new GekkoException();
+                //            }
+                //        }
+                //    }
+                //}
+
+                return new ScalarString(dir1);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: When searching for a " + rootFileName + " file in the folder '" + folder1 + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The files found are the following:");
+                int counter = 0;
+                foreach (string s in rootHelper1.roots)
+                {
+                    counter++;
+                    G.Writeln("File #" + counter + " of " + rootHelper1.roots.Count + ": " + s);
+                }
+                throw new GekkoException();
+            }
+            return null;  //because of errors we never get here
         }
 
         public static IVariable ismiss(GekkoTime t, IVariable x)

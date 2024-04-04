@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1022
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53940FA8-B349-4126-A38A-7681A1111A58}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,8 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "alglib", "alglib\alglib.csproj", "{52254553-EF42-469A-BB19-700C9065338A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ANTLR", "ANTLR\ANTLR.csproj", "{80843646-B8DD-4BEE-8B8C-5E59E9900463}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WA", "WA\WA.csproj", "{97DF83D0-2418-44F0-950B-B4BE29717AF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{9B2BAEA1-2E3E-47B6-8752-B827EBFD6350}"
 EndProject
@@ -164,27 +162,6 @@ Global
 		{80843646-B8DD-4BEE-8B8C-5E59E9900463}.Release-Mono|x64.Build.0 = Release32bit|x64
 		{80843646-B8DD-4BEE-8B8C-5E59E9900463}.Release-Mono|x86.ActiveCfg = Release32bit|x86
 		{80843646-B8DD-4BEE-8B8C-5E59E9900463}.Release-Mono|x86.Build.0 = Release32bit|x86
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Debug|x64.ActiveCfg = Debug|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Debug|x64.Build.0 = Debug|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release|Any CPU.ActiveCfg = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release|Any CPU.Build.0 = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release|x64.ActiveCfg = Release32bit|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release|x86.ActiveCfg = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release|x86.Build.0 = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|Any CPU.ActiveCfg = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|Any CPU.Build.0 = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|x64.ActiveCfg = Release32bit|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|x64.Build.0 = Release32bit|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|x86.ActiveCfg = Release32bit|x86
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release32bit|x86.Build.0 = Release32bit|x86
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release-Mono|Any CPU.ActiveCfg = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release-Mono|Any CPU.Build.0 = Release32bit|Any CPU
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release-Mono|x64.ActiveCfg = Release32bit|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release-Mono|x64.Build.0 = Release32bit|x64
-		{97DF83D0-2418-44F0-950B-B4BE29717AF2}.Release-Mono|x86.ActiveCfg = Release32bit|Any CPU
 		{9B2BAEA1-2E3E-47B6-8752-B827EBFD6350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B2BAEA1-2E3E-47B6-8752-B827EBFD6350}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B2BAEA1-2E3E-47B6-8752-B827EBFD6350}.Debug|x64.ActiveCfg = Debug|x64

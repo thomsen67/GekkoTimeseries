@@ -142,32 +142,45 @@ namespace Gekko
                     if (end != -1)
                     {
                         variable = s.Substring(j + 1, end - (j + 1)).Trim();
-                        if (variable.StartsWith(Globals.symbolMemvar.ToString())) variable = variable.Substring(1);
-                        if (G.IsSimpleToken(variable))
+
+                        if (G.equal(variable, "root()") || G.equal(variable, "root( )") || G.equal(variable, "root(  )"))
                         {
-                            try
-                            {
-                                IVariable a = O.GetScalar(variable, false);
-                                if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
-                                {
-                                    IVariable b = new ScalarString("");
-                                    IVariable c = b.Add(a, Globals.tNull);
-                                    string s3 = c.GetString();
-                                    string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
-                                    s2 += s4 + s3;
-                                    hit = true;
-                                }
-                                else
-                                {
-                                    //should not be possible regarding %-vars
-                                }
-                            }
-                            catch
-                            {
-                                if (reportError) throw new GekkoException();
-                            }
+                            //Something like '{root()}\bank1\xx';
+                            hit = true;
+                            s2 = (Functions.root(new GekkoTime(EFreq.Annual, 1, 1)) as ScalarString)._string2;
                             lastEnd = end;
                             j = lastEnd;
+                        }
+                        else
+                        {
+
+                            if (variable.StartsWith(Globals.symbolMemvar.ToString())) variable = variable.Substring(1);
+                            if (G.IsSimpleToken(variable))
+                            {
+                                try
+                                {
+                                    IVariable a = O.GetScalar(variable, false);
+                                    if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
+                                    {
+                                        IVariable b = new ScalarString("");
+                                        IVariable c = b.Add(a, Globals.tNull);
+                                        string s3 = c.GetString();
+                                        string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
+                                        s2 += s4 + s3;
+                                        hit = true;
+                                    }
+                                    else
+                                    {
+                                        //should not be possible regarding %-vars
+                                    }
+                                }
+                                catch
+                                {
+                                    if (reportError) throw new GekkoException();
+                                }
+                                lastEnd = end;
+                                j = lastEnd;
+                            }
                         }
                     }
                 }
