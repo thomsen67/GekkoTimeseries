@@ -9298,21 +9298,52 @@ namespace Gekko
                 }
                 else new Error("Number of conditions.");
 
+                string details = "You are using an inadequate Gekko version " + Globals.gekkoVersion + ", and another (possibly newer) version is required in order to run the program. You may remove the 'gekko version' check to avoid this error, but beware that the version check may be there for a reason, and that your program may fail or produce wrong results if the check is ignored.";
+
                 if (n == 1)
                 {
-                    using (Writeln txt = new Writeln())
-                    {
-                        txt.MainAdd("Gekko version " + v[0] + " --> " + okCombined);
+                    if (okCombined) new Writeln("Gekko version control: " + v[0] + " --> OK");
+                    else
+                    {                        
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("Gekko version problem. The version requirement " + v[0] + " is false.");
+                            txt.MoreAdd(details);
+                        }
                     }
                 }
                 else if (n == 2)
                 {
-                    using (Writeln txt = new Writeln())
+                    if (okCombined) new Writeln("Gekko version control: " + v[0] + " " + this.logical12 + " " + v[1] + " --> OK");
+                    else
                     {
-                        txt.MainAdd("Gekko version " + v[0] + " " + this.logical12 + " " + v[1] + " --> " + okCombined);
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("Gekko version problem. The version requirement " + v[0] + " " + this.logical12 + " " + v[1] + " is false");
+                            txt.MoreAdd(details);
+                        }
                     }
                 }
-                else new Error("Number of conditions.");
+                else
+                {
+                    new Error("Number of conditions.");
+                }
+
+                //if (n == 1)
+                //{
+                //    using (Writeln txt = new Writeln())
+                //    {
+                //        txt.MainAdd("Gekko version " + v[0] + " --> " + okCombined);
+                //    }
+                //}
+                //else if (n == 2)
+                //{
+                //    using (Writeln txt = new Writeln())
+                //    {
+                //        txt.MainAdd("Gekko version " + v[0] + " " + this.logical12 + " " + v[1] + " --> " + okCombined);
+                //    }
+                //}
+                //else new Error("Number of conditions.");
 
 
             }

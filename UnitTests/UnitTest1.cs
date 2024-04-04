@@ -181,6 +181,7 @@ namespace UnitTests
             Globals.globalPeriodEnd = new GekkoTime(EFreq.A, 2010, 1);
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
             Program.InitUfunctionsAndArithmeticsAndMore();
+            Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
         }
 
         // Use ClassCleanup to run code after all tests in a class have run
@@ -10169,6 +10170,20 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("sim<2006 2010>;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("27/33/29.4 iterations"));
+        }
+
+
+        [TestMethod]
+        public void _Test_GekkoVersion()
+        {                        
+            I("gekko version >= '" + Globals.gekkoVersion + "';");
+            I("gekko version == '" + Globals.gekkoVersion + "';");
+            I("gekko version <= '" + Globals.gekkoVersion + "';");
+            I("gekko version >= '" + Globals.gekkoVersion + "' or version < '" + Globals.gekkoVersion + "';");
+            FAIL("gekko version < '" + Globals.gekkoVersion + "';");
+            FAIL("gekko version > '" + Globals.gekkoVersion + "';");
+            FAIL("gekko version <> '" + Globals.gekkoVersion + "';");
+            FAIL("gekko version >= '" + Globals.gekkoVersion + "' and version < '" + Globals.gekkoVersion + "';");
         }
 
         [TestMethod]
