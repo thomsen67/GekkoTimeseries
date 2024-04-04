@@ -310,8 +310,7 @@ namespace Gekko
     }
 
     public class DependencyTracking
-    {
-        public int sysCalls = 0;
+    {        
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public void Add(int priority, string type, string fileName2)
         {
@@ -4922,9 +4921,7 @@ namespace Gekko
                         }
                         else
                         {
-                            new Error("OPEN: The databank '" + originalFileNameWithExtension + "' could not be found (see OPEN<create> if this is intentional).");
-                            //throw new GekkoException();
-                        }
+                            new Error("OPEN: The databank '" + originalFileNameWithExtension + "' could not be found (see OPEN<create> if this is intentional).");                        }
                     }
                 }
 
@@ -4960,8 +4957,6 @@ namespace Gekko
                 readInfo.fileName = file; readInfo.fileNamePretty = ffh.prettyPathAndFileName;
 
                 Databank databank = null;
-
-                //if (nonExistingGbkFileOpened) readInfo.type = EReadInfoTypes.NonExistingGbkFileOpened;
 
                 Databank databankTemp = null;  //temp bank where the external file is read into
 
@@ -22908,7 +22903,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
+            //if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -24907,10 +24902,11 @@ namespace Gekko
                 }
             }
             int n = 0;
-            if (!skipWrite) n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
-
-            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", removed.FileNameWithPath);
-
+            if (!skipWrite)
+            {
+                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write", removed.FileNameWithPath);
+                n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+            }
         }
 
         public static string ErrorHandling(string s, P p, bool noWindowShown)
@@ -31249,7 +31245,6 @@ namespace Gekko
                     else
                     {
                         new Error("Append option must be either yes, no or ifexist");
-                        //throw new GekkoException();
                     }
                 }
 
@@ -31270,13 +31265,11 @@ namespace Gekko
                     {
                         //(5) and (6)
                         new Error("You cannot use SHEET<append> without indicating a xlsx filename.");
-                        //throw new GekkoException();
                     }
 
                     if (!File.Exists(fileNameWithPathOriginal))
                     {
                         new Error("You cannot use SHEET<append> on a non-existing file: " + fileNameWithPathOriginal);
-                        //throw new GekkoException();
                     }
                 }
 

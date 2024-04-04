@@ -2620,15 +2620,15 @@ namespace Gekko
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
                 Program.DatopgekError();
-            }
+            }            
             List<string> folders = new List<string>();
             FindFileHelper ffh = Program.FindFile(fileName, folders, true, true, false, true, p);
             if (ffh.realPathAndFileName == null)
             {
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
-            List ml = GetRawListElements(ffh.realPathAndFileName);
             if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(1, "Read list", ffh.prettyPathAndFileName);
+            List ml = GetRawListElements(ffh.realPathAndFileName);            
             return ml;
         }
 
@@ -3530,6 +3530,7 @@ namespace Gekko
             {
                 Globals.datopgek_listfiles.Add(pathAndFilename);
             }
+            if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write list", pathAndFilename);
 
             List rhs_list = rhs as List;
             if (rhs_list == null)
@@ -3616,15 +3617,12 @@ namespace Gekko
                     else
                     {
                         new Error("Expected list elements to be string, date, val, or list");
-                        //throw new GekkoException();
                     }
                     res.WriteLine();
 
                 }
                 res.Flush();
-                res.Close();
-
-                if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Write list", pathAndFilename);
+                res.Close();                
             }
 
             string listfileName = G.TransformListfileName(varnameWithFreq);
@@ -10822,14 +10820,15 @@ namespace Gekko
                 else
                 {
                     string ss = O.ConvertToString(s);
-                    Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);
 
-                    if (Program.IsDependencyTracking()) Globals.dependencyTracking.sysCalls++;
+                    if (Program.IsDependencyTracking()) Globals.dependencyTracking.Add(2, "Sys", ss); //0 means do not print, but can be used for fencing...!
 
                     if (Program.options.global_pink)
                     {
                         Globals.datopgek_sysCalls.Add(ss);
                     }
+
+                    Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"), fileName);                    
                 }
             }
         }
