@@ -312,18 +312,25 @@ namespace Gekko
     public class DependencyTracking
     {        
         private GekkoDictionary<string, string> storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private List<string> blacklist = null;
+        private List<string> whitelist = null;
+
+        public DependencyTracking()
+        {
+            this.blacklist = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
+            this.whitelist = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+        }
+
         public void Add(int priority, string type, string fileName3)
         {
             string fileNameTrim = fileName3.Trim();
 
             if (!G.NullOrBlanks(Program.options.global_fence_black_folders) || !G.NullOrBlanks(Program.options.global_fence_white_folders))
-            {
-                List<string> black = SplitIntoFoldersBySemicolon(Program.options.global_fence_black_folders);
-                List<string> white = SplitIntoFoldersBySemicolon(Program.options.global_fence_white_folders);
+            {                
                 bool ok = true;
-                if (black.Count > 0 && white.Count > 0)
+                if (this.blacklist.Count > 0 && this.whitelist.Count > 0)
                 {
-                    if (!Match(black, fileNameTrim) && Match(white, fileNameTrim))
+                    if (!Match(this.blacklist, fileNameTrim) && Match(this.whitelist, fileNameTrim))
                     {
                         //do nothing
                     }
@@ -332,9 +339,9 @@ namespace Gekko
                         ok = false;
                     }
                 }
-                else if (black.Count > 0 && white.Count == 0)
+                else if (this.blacklist.Count > 0 && this.whitelist.Count == 0)
                 {
-                    if (!Match(black, fileNameTrim))
+                    if (!Match(this.blacklist, fileNameTrim))
                     {
                         //do nothing
                     }
@@ -343,9 +350,9 @@ namespace Gekko
                         ok = false;
                     }
                 }
-                else if (black.Count == 0 && white.Count > 0)
+                else if (this.blacklist.Count == 0 && this.whitelist.Count > 0)
                 {
-                    if (Match(white, fileNameTrim))
+                    if (Match(this.whitelist, fileNameTrim))
                     {
                         //do nothing
                     }
@@ -364,24 +371,20 @@ namespace Gekko
                     {
                         txt.MainAdd("The file path '" + fileNameTrim + "' is illegal due to the 'option global fence ...' settings.");
                         txt.MainNewLineTight();
-                        if (black.Count() > 0)
+                        if (this.blacklist.Count() > 0)
                         {
-                            txt.MainAdd("--- Blacklist: ---");
-                            txt.MainNewLineTight();
-                            foreach (string line in black)
+                            txt.MainAdd("--- Blacklist: ---"); txt.MainNewLineTight();
+                            foreach (string line in this.blacklist)
                             {
-                                txt.MainAdd(s);
-                                txt.MainNewLineTight();
+                                txt.MainAdd(line); txt.MainNewLineTight();
                             }
                         }
-                        if (white.Count() > 0)
+                        if (this.whitelist.Count() > 0)
                         {
-                            txt.MainAdd("--- Whitelist: ---");
-                            txt.MainNewLineTight();
-                            foreach (string line in white)
+                            txt.MainAdd("--- Whitelist: ---"); txt.MainNewLineTight();
+                            foreach (string line in this.whitelist)
                             {
-                                txt.MainAdd(s);
-                                txt.MainNewLineTight();
+                                txt.MainAdd(line); txt.MainNewLineTight();
                             }
                         }
                     }
@@ -434,7 +437,7 @@ namespace Gekko
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        private static List<string> SplitIntoFoldersBySemicolon(string input)
+        public List<string> SplitIntoFoldersBySemicolon(string input)
         {
             List<string> m = new List<string>();            
             if (!G.NullOrBlanks(input))
